@@ -1,6 +1,6 @@
-# Unified monorepo (US stock chatbot + dashboard + data pipeline + research)
+# market_dashboard
 
-This repository combines several projects into one workspace.
+GitHub: [js9726/market_dashboard](https://github.com/js9726/market_dashboard). This repository holds the US stock chatbot, market dashboard, data pipeline, and research snapshots in one workspace.
 
 ## Layout
 
@@ -14,18 +14,20 @@ This repository combines several projects into one workspace.
 
 > **Note:** Third-party code under `research/` is for reference; do not delete their original GitHub repositories (you do not own them). Remove nested `.git` was intentional so this repo is a single Git tree.
 
-## Create the GitHub repo and push
-
-1. On GitHub: **New repository** → name it (e.g. `unified-monorepo`); **do not** add README/license (this folder already has content).
-2. From this directory:
+## Clone and push
 
 ```bash
-cd "path/to/unified-monorepo"
-git init
-git add .
-git commit -m "Initial monorepo: apps, packages, research"
+git clone git@github.com:js9726/market_dashboard.git
+cd market_dashboard
+# after changes:
+git push -u origin main
+```
+
+If this folder was created locally first:
+
+```bash
+git remote add origin git@github.com:js9726/market_dashboard.git
 git branch -M main
-git remote add origin git@github.com:YOUR_USERNAME/YOUR_NEW_REPO.git
 git push -u origin main
 ```
 
@@ -39,13 +41,12 @@ Only delete repos under your account once you have:
 
 Then on GitHub for each of **your** old projects: **Settings → Danger zone → Delete this repository**.
 
-Names you likely retire (adjust if yours differ):
+Old standalone repos you may retire after this repo is canonical (adjust if yours differ):
 
 - `js9726/usStockChatBot`
 - `js9726/usChatBot-DataPipeline`
-- `js9726/market_dashboard`
 
-(You would **not** delete `hariomvyas/...` or `austinsw/...` — those remain their authors’ repos.)
+**This** repo (`js9726/market_dashboard`) is the combined home; do not delete it while it is your primary remote. You would **not** delete `hariomvyas/...` or `austinsw/...` — those remain their authors’ repos.
 
 ## Optional: preserve full Git history later
 
