@@ -1,0 +1,51 @@
+import requests
+import pandas as pd
+from datetime import datetime
+
+# Alpha Vantage API configuration
+API_KEY = 'GAVV7ZLEKJ7M6M42'
+SYMBOL = 'MSFT'
+
+# Function to get data from Alpha Vantage
+def get_financial_data(function):
+    url = f'https://www.alphavantage.co/query?function={function}&symbol={SYMBOL}&apikey={API_KEY}'
+    response = requests.get(url)
+    return response.json()
+
+# Get all financial data
+income_statement_data = get_financial_data('INCOME_STATEMENT')
+balance_sheet_data = get_financial_data('BALANCE_SHEET')
+cash_flow_data = get_financial_data('CASH_FLOW')
+
+# Extract quarterly reports for each statement
+income_quarterly = pd.DataFrame(income_statement_data.get('quarterlyReports', []))
+balance_quarterly = pd.DataFrame(balance_sheet_data.get('quarterlyReports', []))
+cash_flow_quarterly = pd.DataFrame(cash_flow_data.get('quarterlyReports', []))
+
+# Add statement type prefix to column names to avoid duplicates
+income_quarterly.columns = ['date' if col == 'fiscalDateEnding' else f'IS_{col}' for col in income_quarterly.columns]
+balance_quarterly.columns = ['date' if col == 'fiscalDateEnding' else f'BS_{col}' for col in balance_quarterly.columns]
+cash_flow_quarterly.columns = ['date' if col == 'fiscalDateEnding' else f'CF_{col}' for col in cash_flow_quarterly.columns]
+
+# Merge all statements on the date column
+combined_df = pd.merge(income_quarterly, balance_quarterly, on='date', how='outer')
+combined_df = pd.merge(combined_df, cash_flow_quarterly, on='date', how='outer')
+
+# Sort by date in descending order (most recent first)
+combined_df = combined_df.sort_values('date', ascending=False)
+
+# Convert numeric columns
+numeric_columns = combined_df.columns[1:]  # Skip the date column
+for col in numeric_columns:
+    combined_df[col] = pd.to_numeric(combined_df[col], errors='coerce')
+
+# Create filename
+excel_file = f'c:\\Users\\Administrator\\OneDrive\\Desktop\\Investment AI\\Master Code\\usChatBot-DataPipeline\\MSFT_FS.xlsx'
+
+# Export to Excel - single sheet
+with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
+    combined_df.to_excel(writer, sheet_name='Financial Statements', index=False)
+
+print(f"Data has been exported to {excel_file}")
+
+# python "AV Import.py"
