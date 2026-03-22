@@ -6,4 +6,4 @@ export default function SignUpPage() {
       <SignUp />
     </div>
   );
-} 
+}

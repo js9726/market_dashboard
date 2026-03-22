@@ -80,6 +80,17 @@ export async function getFinalancialMetrics(params: GetFinancialMetricsParams): 
       recommendationTrend
     } = quoteSummary;
 
+    /** Yahoo quoteSummary typings omit some runtime fields */
+    const fd = financialData as typeof financialData & {
+      totalRevenue?: number | null;
+      grossProfits?: number | null;
+    };
+    const sd = summaryDetail as typeof summaryDetail & {
+      forwardPE?: number | null;
+      priceToBook?: number | null;
+      priceToSalesTrailing12Months?: number | null;
+    };
+
     // Create metrics object with the actual data
     const metrics: FinancialMetrics = {
       // Price & Market Data
@@ -90,36 +101,36 @@ export async function getFinalancialMetrics(params: GetFinancialMetricsParams): 
       numberOfAnalystOpinions: summaryDetail?.numberOfAnalystOpinions ?? null,
 
       // Profitability
-      returnOnEquity: financialData?.returnOnEquity ?? null,
-      returnOnAssets: financialData?.returnOnAssets ?? null,
-      profitMargins: financialData?.profitMargins ?? null,
-      operatingMargins: financialData?.operatingMargins ?? null,
-      grossMargins: financialData?.grossMargins ?? null,
-      ebitdaMargins: financialData?.ebitdaMargins ?? null,
+      returnOnEquity: fd?.returnOnEquity ?? null,
+      returnOnAssets: fd?.returnOnAssets ?? null,
+      profitMargins: fd?.profitMargins ?? null,
+      operatingMargins: fd?.operatingMargins ?? null,
+      grossMargins: fd?.grossMargins ?? null,
+      ebitdaMargins: fd?.ebitdaMargins ?? null,
 
       // Growth & Revenue
-      revenueGrowth: financialData?.revenueGrowth ?? null,
-      revenuePerShare: financialData?.revenuePerShare ?? null,
-      totalRevenue: financialData?.totalRevenue ?? null,
-      grossProfits: financialData?.grossProfits ?? null,
+      revenueGrowth: fd?.revenueGrowth ?? null,
+      revenuePerShare: fd?.revenuePerShare ?? null,
+      totalRevenue: fd?.totalRevenue ?? null,
+      grossProfits: fd?.grossProfits ?? null,
 
       // Financial Health
-      currentRatio: financialData?.currentRatio ?? null,
-      quickRatio: financialData?.quickRatio ?? null,
-      debtToEquity: financialData?.debtToEquity ?? null,
-      totalDebt: financialData?.totalDebt ?? null,
-      totalCash: financialData?.totalCash ?? null,
-      totalCashPerShare: financialData?.totalCashPerShare ?? null,
+      currentRatio: fd?.currentRatio ?? null,
+      quickRatio: fd?.quickRatio ?? null,
+      debtToEquity: fd?.debtToEquity ?? null,
+      totalDebt: fd?.totalDebt ?? null,
+      totalCash: fd?.totalCash ?? null,
+      totalCashPerShare: fd?.totalCashPerShare ?? null,
 
       // Cash Flow
-      freeCashflow: financialData?.freeCashflow ?? null,
-      operatingCashflow: financialData?.operatingCashflow ?? null,
-      ebitda: financialData?.ebitda ?? null,
+      freeCashflow: fd?.freeCashflow ?? null,
+      operatingCashflow: fd?.operatingCashflow ?? null,
+      ebitda: fd?.ebitda ?? null,
 
       // Valuation Ratios
-      forwardPE: summaryDetail?.forwardPE ?? null,
-      priceToBook: summaryDetail?.priceToBook ?? null,
-      priceToSalesTrailing12Months: summaryDetail?.priceToSalesTrailing12Months ?? null
+      forwardPE: sd?.forwardPE ?? null,
+      priceToBook: sd?.priceToBook ?? null,
+      priceToSalesTrailing12Months: sd?.priceToSalesTrailing12Months ?? null
     };
 
     console.log('Final metrics object:', JSON.stringify(metrics, null, 2));

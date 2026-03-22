@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import { fundamentalsAgent } from '../../../../agents/fundamental/capability';
-import { technicalAgent } from '../../../../agents/technical/capability';
-import { formatTickers } from '@/utils/format';
+import { HumanMessage } from "langchain/schema";
+import { NextResponse } from "next/server";
+import { fundamentalsAgent } from "../../../../agents/fundamental/capability";
+import { technicalAgent } from "../../../../agents/technical/capability";
+import { formatTickers } from "@/utils/format";
 
 export async function POST(request: Request) {
   try {
@@ -43,9 +44,9 @@ export async function POST(request: Request) {
       const fundamentalResult = await fundamentalsAgent(state);
       
       // Only run technical analysis if OpenAI is available
-      let technicalResult = {
-        messages: [],
-        data: { ...state.data, analyst_signals: { technical_agent: {} } }
+      let technicalResult: Awaited<ReturnType<typeof technicalAgent>> = {
+        messages: [] as HumanMessage[],
+        data: { ...state.data, analyst_signals: { technical_agent: {} } },
       };
       
       if (process.env.DEEPSEEK_API_KEY) {

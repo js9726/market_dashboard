@@ -1,16 +1,35 @@
-import ChatInterface from '@/components/ChatInterface';
+import { currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const user = await currentUser();
+
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-          US Stock Analysis Chatbot
-        </h1>
-        <div className="bg-white rounded-lg shadow-lg">
-          <ChatInterface />
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold mb-8">Stock Analysis Chatbot</h1>
+      {user ? (
+        <Link
+          href="/dashboard"
+          className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600"
+        >
+          Go to Dashboard
+        </Link>
+      ) : (
+        <div className="space-x-4">
+          <Link
+            href="/sign-in"
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600"
+          >
+            Sign In
+          </Link>
+          <Link
+            href="/sign-up"
+            className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
+          >
+            Sign Up
+          </Link>
         </div>
-      </div>
-    </main>
+      )}
+    </div>
   );
 }

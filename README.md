@@ -6,13 +6,25 @@ GitHub: [js9726/market_dashboard](https://github.com/js9726/market_dashboard). T
 
 | Path | Description |
 |------|-------------|
-| `apps/usStockChatBot` | Chatbot app (see its `package.json` / local README). |
+| `apps/usStockChatBot` | Next.js chatbot + **in-app market dashboard** (see below). |
 | `apps/market_dashboard` | Dashboard (Python; see `requirements.txt`). |
 | `packages/usChatBot-DataPipeline` | Data pipeline for the chatbot ecosystem. |
 | `research/Commodity-Forecasting` | Vendored snapshot from [hariomvyas/Commodity-Forecasting](https://github.com/hariomvyas/Commodity-Forecasting). **Keep upstream `LICENSE` / attribution.** |
 | `research/Machine-Learning-Commodity-2022` | Vendored snapshot from [austinsw/Machine-Learning-on-Commodity-Price-Forecast-2022](https://github.com/austinsw/Machine-Learning-on-Commodity-Price-Forecast-2022). **Keep upstream `LICENSE` / attribution.** |
 
 > **Note:** Third-party code under `research/` is for reference; do not delete their original GitHub repositories (you do not own them). Remove nested `.git` was intentional so this repo is a single Git tree.
+
+## Chatbot + Python dashboard in one UI
+
+The Python app in `apps/market_dashboard` builds `data/snapshot.json`, `events.json`, `meta.json`, and `data/charts/*.png`. The Next app (`apps/usStockChatBot`) can **show the same snapshot** on `/dashboard` (tab *Dashboard*) with Recharts and tables; the *Chat* tab runs `$TICKER` analysis.
+
+1. Refresh data (optional): from `apps/market_dashboard`, run `python scripts/build_data.py --out-dir data`.
+2. Copy data into the web app: from `apps/usStockChatBot`, run **`npm run sync:market`** (copies into `public/market-dashboard/`).
+3. Run the chatbot: `npm run dev` and open `/dashboard` after signing in.
+
+Synced assets under `public/market-dashboard/` are gitignored to avoid committing large JSON/PNGs; run `sync:market` after clone or when the pipeline updates.
+
+The Next app expects **Clerk** (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`) and optional **DeepSeek** (`DEEPSEEK_API_KEY`) in `.env.local` for auth and AI analysis.
 
 ## Clone and push
 

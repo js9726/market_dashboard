@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# Copied from apps/market_dashboard (npm run sync:market)
+/public/market-dashboard/
+
 # production
 /build
 

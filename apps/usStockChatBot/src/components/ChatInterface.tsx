@@ -8,6 +8,18 @@ interface Message {
   isUser: boolean;
 }
 
+interface FundamentalEntry {
+  signal: string;
+  confidence: number;
+  metrics: Record<string, unknown>;
+  reasoning: {
+    profitability_signal: { details: string };
+    growth_signal: { details: string };
+    financial_health_signal: { details: string };
+    price_ratios_signal: { details: string };
+  };
+}
+
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -22,10 +34,10 @@ const ChatInterface: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const formatMetrics = (metrics: any) => {
+  const formatMetrics = (metrics: Record<string, unknown> | null | undefined) => {
     if (!metrics) return 'No metrics available';
     
-    const formatNumber = (value: any, isPercentage = false, inMillions = false) => {
+    const formatNumber = (value: unknown, isPercentage = false, inMillions = false) => {
       if (value === null || value === undefined) return 'N/A';
       const num = Number(value);
       if (isNaN(num)) return 'N/A';
@@ -128,8 +140,10 @@ const ChatInterface: React.FC = () => {
         }
 
         // Format the analysis response with both metrics and analysis
-        const analysisResponse = Object.entries(data.data.analyst_signals.fundamentals_agent)
-          .map(([ticker, analysis]: [string, any]) => {
+        const analysisResponse = Object.entries(
+          data.data.analyst_signals.fundamentals_agent as Record<string, FundamentalEntry>,
+        )
+          .map(([ticker, analysis]) => {
             return [
               `${ticker.toUpperCase()}: ${analysis.signal.toUpperCase()} (${analysis.confidence}% confidence)`,
               '',

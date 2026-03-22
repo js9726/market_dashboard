@@ -122,12 +122,6 @@ declare module 'yahoo-finance2' {
     issuanceOfStock: number;
   }
 
-  interface FinancialStatement {
-    incomeStatementHistory: IncomeStatement[];
-    balanceSheetHistory: BalanceSheet[];
-    cashflowStatementHistory: CashFlowStatement[];
-  }
-
   interface DefaultKeyStatistics {
     sharesOutstanding: number;
     floatShares: number;

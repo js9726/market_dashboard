@@ -40,8 +40,9 @@ const progress = {
 
 // Initialize DeepSeek client
 const openai = new OpenAI({
-  baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.DEEPSEEK_API_KEY
+  baseURL: "https://api.deepseek.com",
+  /** Placeholder allows Next build when env is unset; real calls still need DEEPSEEK_API_KEY. */
+  apiKey: process.env.DEEPSEEK_API_KEY ?? "build-without-key",
 });
 
 const systemPrompt = `You are a professional stock market analyst specializing in fundamental analysis.
@@ -82,19 +83,19 @@ export async function fundamentalsAgent(state: AgentState) {
         reasoning: {
           profitability_signal: {
             signal: "neutral",
-            details: `ROE: ${(metrics.returnOnEquity * 100).toFixed(2)}%, Net Margin: ${(metrics.profitMargins * 100).toFixed(2)}%`
+            details: `ROE: ${((metrics.returnOnEquity ?? 0) * 100).toFixed(2)}%, Net Margin: ${((metrics.profitMargins ?? 0) * 100).toFixed(2)}%`
           },
           growth_signal: {
             signal: "neutral",
-            details: `Revenue Growth: ${(metrics.revenueGrowth * 100).toFixed(2)}%, Total Revenue: $${(metrics.totalRevenue / 1000000).toFixed(2)}M`
+            details: `Revenue Growth: ${((metrics.revenueGrowth ?? 0) * 100).toFixed(2)}%, Total Revenue: $${((metrics.totalRevenue ?? 0) / 1000000).toFixed(2)}M`
           },
           financial_health_signal: {
             signal: "neutral",
-            details: `Current Ratio: ${metrics.currentRatio.toFixed(2)}, Debt to Equity: ${metrics.debtToEquity.toFixed(2)}`
+            details: `Current Ratio: ${(metrics.currentRatio ?? 0).toFixed(2)}, Debt to Equity: ${(metrics.debtToEquity ?? 0).toFixed(2)}`
           },
           price_ratios_signal: {
             signal: "neutral",
-            details: `Forward P/E: ${metrics.forwardPE.toFixed(2)}, P/S: ${metrics.priceToSalesTrailing12Months.toFixed(2)}`
+            details: `Forward P/E: ${(metrics.forwardPE ?? 0).toFixed(2)}, P/S: ${(metrics.priceToSalesTrailing12Months ?? 0).toFixed(2)}`
           }
         }
       };
@@ -105,25 +106,22 @@ export async function fundamentalsAgent(state: AgentState) {
           Analyze the following financial metrics for ${ticker}:
           
           Profitability Metrics:
-          - Return on Equity: ${metrics.return_on_equity}%
-          - Net Margin: ${metrics.net_margin}%
-          - Operating Margin: ${metrics.operating_margin}%
+          - Return on Equity: ${((metrics.returnOnEquity ?? 0) * 100).toFixed(2)}%
+          - Net Margin: ${((metrics.profitMargins ?? 0) * 100).toFixed(2)}%
+          - Operating Margin: ${((metrics.operatingMargins ?? 0) * 100).toFixed(2)}%
           
           Growth Metrics:
-          - Revenue Growth: ${metrics.revenue_growth}%
-          - Earnings Growth: ${metrics.earnings_growth}%
-          - Book Value Growth: ${metrics.book_value_growth}%
+          - Revenue Growth: ${((metrics.revenueGrowth ?? 0) * 100).toFixed(2)}%
           
           Financial Health:
-          - Current Ratio: ${metrics.current_ratio}
-          - Debt to Equity: ${metrics.debt_to_equity}
-          - Free Cash Flow per Share: ${metrics.free_cash_flow_per_share}
-          - Earnings per Share: ${metrics.earnings_per_share}
+          - Current Ratio: ${metrics.currentRatio ?? "N/A"}
+          - Debt to Equity: ${metrics.debtToEquity ?? "N/A"}
+          - Free Cash Flow: ${metrics.freeCashflow ?? "N/A"}
           
           Price Ratios:
-          - P/E Ratio: ${metrics.price_to_earnings_ratio}
-          - P/B Ratio: ${metrics.price_to_book_ratio}
-          - P/S Ratio: ${metrics.price_to_sales_ratio}
+          - Forward P/E: ${metrics.forwardPE ?? "N/A"}
+          - P/B Ratio: ${metrics.priceToBook ?? "N/A"}
+          - P/S Ratio: ${metrics.priceToSalesTrailing12Months ?? "N/A"}
           
           Please provide a detailed analysis with signals (bullish/bearish/neutral) and confidence levels for each aspect.`;
 

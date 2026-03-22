@@ -54,8 +54,9 @@ const progress = {
 
 // Initialize DeepSeek client
 const openai = new OpenAI({
-  baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.DEEPSEEK_API_KEY
+  baseURL: "https://api.deepseek.com",
+  /** Placeholder allows Next build when env is unset; real calls still need DEEPSEEK_API_KEY. */
+  apiKey: process.env.DEEPSEEK_API_KEY ?? "build-without-key",
 });
 
 const systemPrompt = `You are a professional technical analyst specializing in stock market analysis.
