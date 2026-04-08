@@ -20,7 +20,7 @@ import sys
 import time
 import datetime
 
-import google.generativeai as genai
+import requests
 
 
 # ---------------------------------------------------------------------------
@@ -156,24 +156,49 @@ Rules:
 """
 
 
-def call_gemini_with_retry(prompt, model="gemini-2.0-flash", max_retries=3):
+GEMINI_API_URL = (
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent"
+)
+
+
+def call_gemini_with_retry(prompt, max_retries=3):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         sys.exit("ERROR: GEMINI_API_KEY environment variable is not set.")
 
-    genai.configure(api_key=api_key)
-    client = genai.GenerativeModel(model)
+    headers = {"Content-Type": "application/json"}
+    params = {"key": api_key}
+    payload = {
+        "contents": [
+            {"parts": [{"text": prompt}]}
+        ],
+        "generationConfig": {
+            "temperature": 0.4,
+            "maxOutputTokens": 2048,
+        },
+    }
 
     for attempt in range(max_retries):
         try:
-            response = client.generate_content(prompt)
-            return response.text
-        except Exception as e:
-            err = str(e).lower()
-            is_rate_limit = "429" in str(e) or "quota" in err or "resource_exhausted" in err
+            resp = requests.post(
+                GEMINI_API_URL,
+                headers=headers,
+                params=params,
+                json=payload,
+                timeout=60,
+            )
+            if resp.status_code == 429:
+                raise IOError("rate_limit")
+            resp.raise_for_status()
+            data = resp.json()
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+        except (IOError, requests.HTTPError) as e:
+            is_rate_limit = "rate_limit" in str(e) or (
+                hasattr(e, "response") and getattr(e.response, "status_code", 0) == 429
+            )
             if is_rate_limit and attempt < max_retries - 1:
                 wait = 2 ** attempt
-                print(f"Gemini rate limit hit, retrying in {wait}s... (attempt {attempt+1}/{max_retries})")
+                print(f"Gemini rate limit (429), retrying in {wait}s... (attempt {attempt+1}/{max_retries})")
                 time.sleep(wait)
             else:
                 raise
@@ -183,7 +208,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", default="data", help="Directory with snapshot.json / events.json")
     parser.add_argument("--brief-file", default=None, help="Where to write the brief (default: <out-dir>/morning_brief.md)")
-    parser.add_argument("--model", default="gemini-2.0-flash", help="Gemini model to use (default: gemini-2.0-flash)")
     args = parser.parse_args()
 
     out_dir = args.out_dir
@@ -196,8 +220,8 @@ def main():
     print("Building prompt...")
     prompt = build_prompt(snapshot, events)
 
-    print(f"Calling Gemini ({args.model})...")
-    brief = call_gemini_with_retry(prompt, model=args.model)
+    print("Calling Gemini 2.5 Pro via REST API...")
+    brief = call_gemini_with_retry(prompt)
 
     with open(brief_path, "w", encoding="utf-8") as f:
         f.write(brief)
