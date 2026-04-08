@@ -25,6 +25,13 @@ try:
 except ImportError:
     investpy = None
 
+try:
+    import requests
+    from bs4 import BeautifulSoup
+    _BS4_AVAILABLE = True
+except ImportError:
+    _BS4_AVAILABLE = False
+
 # --- Config: no Liquid Stocks ---
 KEY_EVENTS = [
     "Fed", "Federal Reserve", "Interest Rate", "FOMC",
@@ -333,6 +340,77 @@ def get_stock_data(ticker_symbol, charts_dir):
         return None
 
 
+def fetch_finviz_industry_performance():
+    """Scrape 1D/1W/1M performance by industry from Finviz groups page."""
+    if not _BS4_AVAILABLE:
+        print("Warning: requests/beautifulsoup4 not installed, skipping Finviz scan.")
+        return {"top5": [], "bottom5": [], "all": []}
+    url = "https://finviz.com/groups.ashx?g=industry&v=210&o=name&st=d1"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    try:
+        resp = requests.get(url, headers=headers, timeout=15)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+        rows = []
+        for row in soup.select("tr.table-light-row-cp, tr.table-dark-row-cp"):
+            cols = [td.get_text(strip=True) for td in row.find_all("td")]
+            if len(cols) >= 6:
+                def parse_pct(s):
+                    try:
+                        return float(s.replace("%", "").replace("+", "").strip())
+                    except ValueError:
+                        return 0.0
+                rows.append({
+                    "industry": cols[1],
+                    "perf_1d": cols[3],
+                    "perf_1w": cols[4],
+                    "perf_1m": cols[5],
+                    "perf_1d_val": parse_pct(cols[3]),
+                })
+        rows.sort(key=lambda x: x["perf_1d_val"], reverse=True)
+        clean = [{k: v for k, v in r.items() if k != "perf_1d_val"} for r in rows]
+        return {"top5": clean[:5], "bottom5": clean[-5:], "all": clean}
+    except Exception as e:
+        print("Finviz industry fetch error:", e)
+        return {"top5": [], "bottom5": [], "all": []}
+
+
+def compute_breadth(tickers):
+    """
+    Compute market breadth metrics across a list of tickers:
+    - % of stocks trading above their 200-day SMA
+    - % of stocks in the top 30% of their 52-week range
+    Returns dict with counts and percentages.
+    """
+    above_200 = 0
+    near_52w_high = 0
+    valid = 0
+    for ticker in tickers:
+        try:
+            hist = yf.Ticker(ticker).history(period="1y")
+            if len(hist) < 200:
+                continue
+            close = hist["Close"].iloc[-1]
+            sma200 = hist["Close"].rolling(200).mean().iloc[-1]
+            high_52w = hist["Close"].max()
+            low_52w = hist["Close"].min()
+            valid += 1
+            if close > sma200:
+                above_200 += 1
+            rng = high_52w - low_52w
+            if rng > 0 and (close - low_52w) / rng >= 0.70:
+                near_52w_high += 1
+        except Exception:
+            continue
+    if valid == 0:
+        return {"above_200sma_pct": None, "near_52w_high_pct": None, "tickers_sampled": 0}
+    return {
+        "above_200sma_pct": round(above_200 / valid * 100, 1),
+        "near_52w_high_pct": round(near_52w_high / valid * 100, 1),
+        "tickers_sampled": valid,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", default="data", help="Output directory (default: data)")
@@ -343,6 +421,14 @@ def main():
 
     print("Fetching economic events...")
     events = get_upcoming_key_events()
+
+    print("Fetching Finviz industry performance...")
+    industry_perf = fetch_finviz_industry_performance()
+
+    print("Computing market breadth...")
+    # Use the Industries group as the breadth universe
+    breadth_tickers = STOCK_GROUPS.get("Sel Sectors", []) + STOCK_GROUPS.get("Industries", [])
+    breadth = compute_breadth(breadth_tickers)
 
     print("Fetching stock data (no Liquid Stocks)...")
     groups_data = {}
@@ -376,6 +462,8 @@ def main():
         "built_at": datetime.utcnow().isoformat() + "Z",
         "groups": groups_data,
         "column_ranges": column_ranges,
+        "industry_performance": industry_perf,
+        "breadth": breadth,
     }
     meta = {
         "SECTOR_COLORS": SECTOR_COLORS,

@@ -1,6 +1,7 @@
 import { HumanMessage, SystemMessage } from 'langchain/schema';
 import OpenAI from 'openai';
 import { FinancialMetrics, getFinalancialMetrics } from './tools/api';
+import { withRetry } from '../../src/utils/retry';
 
 interface AgentState {
   data: {
@@ -126,15 +127,17 @@ export async function fundamentalsAgent(state: AgentState) {
           Please provide a detailed analysis with signals (bullish/bearish/neutral) and confidence levels for each aspect.`;
 
           progress.updateStatus("fundamentals_agent", ticker, "Requesting AI analysis");
-          const completion = await openai.chat.completions.create({
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: metricsPrompt }
-            ],
-            model: "deepseek-chat",
-            temperature: 0.7,
-            max_tokens: 1000
-          });
+          const completion = await withRetry(() =>
+            openai.chat.completions.create({
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: metricsPrompt }
+              ],
+              model: "deepseek-chat",
+              temperature: 0.7,
+              max_tokens: 1000
+            })
+          );
 
           progress.updateStatus("fundamentals_agent", ticker, "Processing AI response");
           const analysis = JSON.parse(completion.choices[0].message.content || '{}');

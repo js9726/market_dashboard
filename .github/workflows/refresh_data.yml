@@ -1,0 +1,53 @@
+name: Refresh Market Data & Morning Brief
+
+on:
+  schedule:
+    # Run Mon–Fri at 8:30 AM ET (12:30 UTC) — 1 hour before US market open
+    - cron: '30 12 * * 1-5'
+  workflow_dispatch: {}   # allow manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/market_dashboard
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build market data (snapshot, events, charts)
+        run: python scripts/build_data.py --out-dir data
+
+      - name: Generate morning brief
+        run: python scripts/morning_brief.py --out-dir data
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Sync data into Next.js public folder
+        working-directory: apps/usStockChatBot
+        run: |
+          mkdir -p public/market-dashboard/charts
+          cp ../market_dashboard/data/snapshot.json public/market-dashboard/
+          cp ../market_dashboard/data/events.json    public/market-dashboard/
+          cp ../market_dashboard/data/meta.json      public/market-dashboard/
+          cp ../market_dashboard/data/morning_brief.md public/market-dashboard/
+          cp ../market_dashboard/data/charts/*.png   public/market-dashboard/charts/ 2>/dev/null || true
+
+      - name: Commit updated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add apps/usStockChatBot/public/market-dashboard
+          git diff --cached --quiet || git commit -m "chore: refresh market data [skip ci]"
+          git push
+        working-directory: .
