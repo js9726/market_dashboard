@@ -14,12 +14,20 @@ if errorlevel 1 (
     exit /b 1
 )
 
+:: Generate morning brief (requires GEMINI_API_KEY in environment or set below)
+:: set GEMINI_API_KEY=your-key-here
+python "%PY_APP%\scripts\morning_brief.py" --out-dir "%PY_APP%\data"
+if errorlevel 1 (
+    echo [%date% %time%] WARNING: morning_brief.py failed - continuing without brief
+)
+
 :: Copy data into Next.js public folder
 if not exist "%NEXT_PUBLIC%\charts" mkdir "%NEXT_PUBLIC%\charts"
-copy /Y "%PY_APP%\data\snapshot.json" "%NEXT_PUBLIC%\"
-copy /Y "%PY_APP%\data\events.json"   "%NEXT_PUBLIC%\"
-copy /Y "%PY_APP%\data\meta.json"     "%NEXT_PUBLIC%\"
-copy /Y "%PY_APP%\data\charts\*.png"  "%NEXT_PUBLIC%\charts\" 2>nul
+copy /Y "%PY_APP%\data\snapshot.json"     "%NEXT_PUBLIC%\"
+copy /Y "%PY_APP%\data\events.json"       "%NEXT_PUBLIC%\"
+copy /Y "%PY_APP%\data\meta.json"         "%NEXT_PUBLIC%\"
+copy /Y "%PY_APP%\data\morning_brief.md"  "%NEXT_PUBLIC%\" 2>nul
+copy /Y "%PY_APP%\data\charts\*.png"      "%NEXT_PUBLIC%\charts\" 2>nul
 
 echo [%date% %time%] Market data refresh complete.
 endlocal

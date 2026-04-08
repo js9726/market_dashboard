@@ -31,7 +31,7 @@ jobs:
       - name: Generate morning brief
         run: python scripts/morning_brief.py --out-dir data
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Sync data into Next.js public folder
         working-directory: apps/usStockChatBot

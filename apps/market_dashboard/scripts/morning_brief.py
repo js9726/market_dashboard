@@ -2,13 +2,15 @@
 US Market Morning Brief Generator
 Run from repo root: python apps/market_dashboard/scripts/morning_brief.py [--out-dir data]
 
-Reads snapshot.json (produced by build_data.py) and calls Claude to generate
+Reads snapshot.json (produced by build_data.py) and calls Gemini to generate
 an institutional-quality morning brief covering:
   1. Industry performance & rotation
   2. Relative strength stock picks
   3. Market breadth interpretation
   4. 5 things to know before the open
   5. Upcoming catalysts
+
+Requires: GEMINI_API_KEY environment variable
 """
 from __future__ import print_function
 import argparse
@@ -18,7 +20,7 @@ import sys
 import time
 import datetime
 
-import anthropic
+import google.generativeai as genai
 
 
 # ---------------------------------------------------------------------------
@@ -65,7 +67,6 @@ def build_prompt(snapshot, events):
         f"  Tickers sampled       : {breadth.get('tickers_sampled', 'N/A')}"
     )
 
-    # Build a compact ETF performance summary for indices / sectors
     indices = snapshot.get("groups", {}).get("Indices", [])
     indices_str = "  " + "  ".join(
         f"{r['ticker']} {r.get('daily', 'N/A'):+.2f}%"
@@ -116,7 +117,7 @@ def build_prompt(snapshot, events):
 [Market Breadth]
 {breadth_str}
 
-[RS Leaders — RS≥70 & ABC=A]
+[RS Leaders — RS>=70 & ABC=A]
 {rs_str}
 
 [Upcoming Key Events]
@@ -127,16 +128,16 @@ You are writing an institutional-quality US Market Morning Brief for professiona
 Using ONLY the data above, produce a concise brief with exactly these sections:
 
 ## 1. Industry Rotation
-- Top vs bottom industries; identify any rotation theme (e.g. growth→defensives, tech→energy)
+- Top vs bottom industries; identify any rotation theme (e.g. growth->defensives, tech->energy)
 - Note if 1W/1M trends confirm or contradict today's 1D move
 
 ## 2. Relative Strength Picks (RS Screener)
-- From the RS leaders list, highlight 3–5 tickers worth watching
+- From the RS leaders list, highlight 3-5 tickers worth watching
 - For each: ticker, 1-line reason (trend, breakout, volume, sector tailwind)
 
 ## 3. Market Breadth Interpretation
 - Is breadth expanding or contracting?
-- Bullish / Neutral / Weakening — and why
+- Bullish / Neutral / Weakening -- and why
 - Flag any divergence (e.g. indices up but breadth falling)
 
 ## 4. Five Things to Know Before the Open
@@ -155,20 +156,24 @@ Rules:
 """
 
 
-def call_claude_with_retry(prompt, model="claude-opus-4-6", max_tokens=1800, max_retries=3):
-    client = anthropic.Anthropic()
+def call_gemini_with_retry(prompt, model="gemini-2.0-flash", max_retries=3):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        sys.exit("ERROR: GEMINI_API_KEY environment variable is not set.")
+
+    genai.configure(api_key=api_key)
+    client = genai.GenerativeModel(model)
+
     for attempt in range(max_retries):
         try:
-            msg = client.messages.create(
-                model=model,
-                max_tokens=max_tokens,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return msg.content[0].text
-        except anthropic.APIStatusError as e:
-            if e.status_code == 529 and attempt < max_retries - 1:
+            response = client.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            err = str(e).lower()
+            is_rate_limit = "429" in str(e) or "quota" in err or "resource_exhausted" in err
+            if is_rate_limit and attempt < max_retries - 1:
                 wait = 2 ** attempt
-                print(f"API overloaded (529), retrying in {wait}s... (attempt {attempt+1}/{max_retries})")
+                print(f"Gemini rate limit hit, retrying in {wait}s... (attempt {attempt+1}/{max_retries})")
                 time.sleep(wait)
             else:
                 raise
@@ -178,6 +183,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", default="data", help="Directory with snapshot.json / events.json")
     parser.add_argument("--brief-file", default=None, help="Where to write the brief (default: <out-dir>/morning_brief.md)")
+    parser.add_argument("--model", default="gemini-2.0-flash", help="Gemini model to use (default: gemini-2.0-flash)")
     args = parser.parse_args()
 
     out_dir = args.out_dir
@@ -190,14 +196,14 @@ def main():
     print("Building prompt...")
     prompt = build_prompt(snapshot, events)
 
-    print("Calling Claude (claude-opus-4-6)...")
-    brief = call_claude_with_retry(prompt)
+    print(f"Calling Gemini ({args.model})...")
+    brief = call_gemini_with_retry(prompt, model=args.model)
 
     with open(brief_path, "w", encoding="utf-8") as f:
         f.write(brief)
 
     print(f"Morning brief written to {brief_path}")
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print(brief)
 
 
