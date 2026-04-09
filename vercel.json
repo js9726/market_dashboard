@@ -1,6 +1,3 @@
 {
-  "buildCommand": "cd apps/usStockChatBot && npm install && npm run build",
-  "outputDirectory": "apps/usStockChatBot/.next",
-  "installCommand": "cd apps/usStockChatBot && npm install",
-  "framework": "nextjs"
+  "rootDirectory": "apps/usStockChatBot"
 }
