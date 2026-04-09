@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
@@ -9,8 +8,8 @@ const inter = Inter({ subsets: ["latin"] });
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "US Stock Analysis Chatbot",
-  description: "A chatbot that provides fundamental analysis for US stocks",
+  title: "US Market Dashboard",
+  description: "Daily US market snapshot, morning brief, and stock analysis",
 };
 
 export default function RootLayout({
@@ -19,13 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>
-          {children}
-          <Analytics />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body className={inter.className}>
+        {children}
+        <Analytics />
+      </body>
+    </html>
   );
 }
