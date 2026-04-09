@@ -1,0 +1,2321 @@
+{
+  "built_at": "2026-04-09T05:45:40.118469Z",
+  "groups": {
+    "Indices": [
+      {
+        "ticker": "QQQE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/QQQE.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "MGK",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 70.0,
+        "rs_chart": "data/charts/MGK.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "QQQ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 35.0,
+        "rs_chart": "data/charts/QQQ.png",
+        "long": [
+          "TQQQ"
+        ],
+        "short": [
+          "SQQQ"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "IBIT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 90.0,
+        "rs_chart": "data/charts/IBIT.png",
+        "long": [
+          "BITX",
+          "BITU"
+        ],
+        "short": [
+          "SBIT",
+          "BITI"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "RSP",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/RSP.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "MDY",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 50.0,
+        "rs_chart": "data/charts/MDY.png",
+        "long": [
+          "MIDU"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IWM",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/IWM.png",
+        "long": [
+          "TNA"
+        ],
+        "short": [
+          "TZA"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "TLT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/TLT.png",
+        "long": [
+          "TMF"
+        ],
+        "short": [
+          "TMV"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "SPY",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 100.0,
+        "rs_chart": "data/charts/SPY.png",
+        "long": [
+          "SPXL",
+          "UPRO"
+        ],
+        "short": [
+          "SPXS",
+          "SH"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "ETHA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 100.0,
+        "rs_chart": "data/charts/ETHA.png",
+        "long": [
+          "ETHU"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "DIA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 45.0,
+        "rs_chart": "data/charts/DIA.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      }
+    ],
+    "S&P Style ETFs": [
+      {
+        "ticker": "IJS",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 65.0,
+        "rs_chart": "data/charts/IJS.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IJR",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 65.0,
+        "rs_chart": "data/charts/IJR.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IJT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 50.0,
+        "rs_chart": "data/charts/IJT.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IJJ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 95.0,
+        "rs_chart": "data/charts/IJJ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IJH",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 55.0,
+        "rs_chart": "data/charts/IJH.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IJK",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/IJK.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IVE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 55.0,
+        "rs_chart": "data/charts/IVE.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IVV",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 60.0,
+        "rs_chart": "data/charts/IVV.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IVW",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 65.0,
+        "rs_chart": "data/charts/IVW.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      }
+    ],
+    "Sel Sectors": [
+      {
+        "ticker": "XLK",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 75.0,
+        "rs_chart": "data/charts/XLK.png",
+        "long": [
+          "TECL"
+        ],
+        "short": [
+          "TECS"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XLI",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/XLI.png",
+        "long": [
+          "DUSL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "XLC",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/XLC.png",
+        "long": [
+          "LTL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "XLF",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 100.0,
+        "rs_chart": "data/charts/XLF.png",
+        "long": [
+          "FAS"
+        ],
+        "short": [
+          "FAZ"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XLU",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/XLU.png",
+        "long": [
+          "UTSL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "XLY",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/XLY.png",
+        "long": [
+          "WANT"
+        ],
+        "short": [
+          "SCC"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XLRE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 45.0,
+        "rs_chart": "data/charts/XLRE.png",
+        "long": [
+          "DRN"
+        ],
+        "short": [
+          "DRV"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XLP",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/XLP.png",
+        "long": [
+          "UGE"
+        ],
+        "short": [
+          "SZK"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XLB",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/XLB.png",
+        "long": [
+          "UYM"
+        ],
+        "short": [
+          "SMN"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XLE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 35.0,
+        "rs_chart": "data/charts/XLE.png",
+        "long": [
+          "ERX"
+        ],
+        "short": [
+          "ERY"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XLV",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 40.0,
+        "rs_chart": "data/charts/XLV.png",
+        "long": [
+          "CURE"
+        ],
+        "short": [],
+        "abc": null
+      }
+    ],
+    "EW Sectors": [
+      {
+        "ticker": "RSPT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 55.0,
+        "rs_chart": "data/charts/RSPT.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPC",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/RSPC.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPN",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 25.0,
+        "rs_chart": "data/charts/RSPN.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPF",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 95.0,
+        "rs_chart": "data/charts/RSPF.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSP",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/RSP.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPD",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/RSPD.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPU",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 65.0,
+        "rs_chart": "data/charts/RSPU.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPR",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/RSPR.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPH",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 35.0,
+        "rs_chart": "data/charts/RSPH.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPM",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/RSPM.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPS",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/RSPS.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "RSPG",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 45.0,
+        "rs_chart": "data/charts/RSPG.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      }
+    ],
+    "Industries": [
+      {
+        "ticker": "TAN",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/TAN.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "KCE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 80.0,
+        "rs_chart": "data/charts/KCE.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IBUY",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 95.0,
+        "rs_chart": "data/charts/IBUY.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "QQQE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/QQQE.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "JETS",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/JETS.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IBB",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 55.0,
+        "rs_chart": "data/charts/IBB.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "SMH",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 35.0,
+        "rs_chart": "data/charts/SMH.png",
+        "long": [
+          "SOXL"
+        ],
+        "short": [
+          "SOXS"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "CIBR",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/CIBR.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "UTES",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 95.0,
+        "rs_chart": "data/charts/UTES.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ROBO",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 25.0,
+        "rs_chart": "data/charts/ROBO.png",
+        "long": [
+          "UBOT"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IGV",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 75.0,
+        "rs_chart": "data/charts/IGV.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "WCLD",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 60.0,
+        "rs_chart": "data/charts/WCLD.png",
+        "long": [
+          "CLDL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ITA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 35.0,
+        "rs_chart": "data/charts/ITA.png",
+        "long": [
+          "DFEN"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "PAVE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/PAVE.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "BLOK",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 40.0,
+        "rs_chart": "data/charts/BLOK.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "AIQ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 40.0,
+        "rs_chart": "data/charts/AIQ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IYZ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 60.0,
+        "rs_chart": "data/charts/IYZ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "PEJ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 100.0,
+        "rs_chart": "data/charts/PEJ.png",
+        "long": [
+          "OOTO"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "FDN",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 65.0,
+        "rs_chart": "data/charts/FDN.png",
+        "long": [
+          "WEBL"
+        ],
+        "short": [
+          "WEBS"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "KBE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/KBE.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "UNG",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/UNG.png",
+        "long": [
+          "BOIL"
+        ],
+        "short": [
+          "KOLD"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "BOAT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/BOAT.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "KWEB",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/KWEB.png",
+        "long": [
+          "CWEB"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "KRE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/KRE.png",
+        "long": [
+          "DPST"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IBIT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 90.0,
+        "rs_chart": "data/charts/IBIT.png",
+        "long": [
+          "BITX",
+          "BITU"
+        ],
+        "short": [
+          "SBIT",
+          "BITI"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XRT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 90.0,
+        "rs_chart": "data/charts/XRT.png",
+        "long": [
+          "RETL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IHI",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/IHI.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "DRIV",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/DRIV.png",
+        "long": [
+          "EVAV"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "MSOS",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 75.0,
+        "rs_chart": "data/charts/MSOS.png",
+        "long": [
+          "MSOX"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "SOCL",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/SOCL.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "XLU",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/XLU.png",
+        "long": [
+          "UTSL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ARKF",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 100.0,
+        "rs_chart": "data/charts/ARKF.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "SLX",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/SLX.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ARKK",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 75.0,
+        "rs_chart": "data/charts/ARKK.png",
+        "long": [
+          "TARK"
+        ],
+        "short": [
+          "SARK"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XTN",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 100.0,
+        "rs_chart": "data/charts/XTN.png",
+        "long": [
+          "TPOR"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "XME",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/XME.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "KIE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/KIE.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "GLD",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/GLD.png",
+        "long": [
+          "UGL"
+        ],
+        "short": [
+          "GLL"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "GXC",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/GXC.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "SCHH",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 55.0,
+        "rs_chart": "data/charts/SCHH.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "GDX",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/GDX.png",
+        "long": [
+          "NUGT",
+          "GDXU"
+        ],
+        "short": [
+          "JDST",
+          "GDXD"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "IPAY",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 80.0,
+        "rs_chart": "data/charts/IPAY.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IWM",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/IWM.png",
+        "long": [
+          "TNA"
+        ],
+        "short": [
+          "TZA"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XOP",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 55.0,
+        "rs_chart": "data/charts/XOP.png",
+        "long": [
+          "GUSH"
+        ],
+        "short": [
+          "DRIP"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "VNQ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 45.0,
+        "rs_chart": "data/charts/VNQ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EATZ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 50.0,
+        "rs_chart": "data/charts/EATZ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "FXI",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 45.0,
+        "rs_chart": "data/charts/FXI.png",
+        "long": [
+          "YINN"
+        ],
+        "short": [
+          "YANG"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "DBA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 60.0,
+        "rs_chart": "data/charts/DBA.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ICLN",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/ICLN.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "SILJ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/SILJ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "REZ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 60.0,
+        "rs_chart": "data/charts/REZ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "LIT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/LIT.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "SLV",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/SLV.png",
+        "long": [
+          "AGQ"
+        ],
+        "short": [
+          "ZSL"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "XHB",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/XHB.png",
+        "long": [
+          "NAIL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "XHE",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 70.0,
+        "rs_chart": "data/charts/XHE.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "PBJ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 25.0,
+        "rs_chart": "data/charts/PBJ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "USO",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 80.0,
+        "rs_chart": "data/charts/USO.png",
+        "long": [
+          "UCO"
+        ],
+        "short": [
+          "SCO"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "DBC",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/DBC.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "FCG",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 55.0,
+        "rs_chart": "data/charts/FCG.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "XBI",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 75.0,
+        "rs_chart": "data/charts/XBI.png",
+        "long": [
+          "LABU"
+        ],
+        "short": [
+          "LABD"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "ARKG",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 25.0,
+        "rs_chart": "data/charts/ARKG.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "CPER",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/CPER.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "XES",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/XES.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "OIH",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/OIH.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "PPH",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/PPH.png",
+        "long": [
+          "PILL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "FNGS",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 85.0,
+        "rs_chart": "data/charts/FNGS.png",
+        "long": [
+          "FNGB"
+        ],
+        "short": [
+          "FNGD"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "URA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 20.0,
+        "rs_chart": "data/charts/URA.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "WGMI",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 40.0,
+        "rs_chart": "data/charts/WGMI.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "REMX",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/REMX.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      }
+    ],
+    "Countries": [
+      {
+        "ticker": "EZA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/EZA.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ARGT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/ARGT.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/EWA.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "THD",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 35.0,
+        "rs_chart": "data/charts/THD.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EIDO",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/EIDO.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWC",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 35.0,
+        "rs_chart": "data/charts/EWC.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "GREK",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/GREK.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWP",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 25.0,
+        "rs_chart": "data/charts/EWP.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWG",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/EWG.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWL",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 25.0,
+        "rs_chart": "data/charts/EWL.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EUFN",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 55.0,
+        "rs_chart": "data/charts/EUFN.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWY",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 15.0,
+        "rs_chart": "data/charts/EWY.png",
+        "long": [
+          "KORU"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IEUR",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/IEUR.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EFA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/EFA.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ACWI",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/ACWI.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "IEV",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/IEV.png",
+        "long": [
+          "EURL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWQ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 75.0,
+        "rs_chart": "data/charts/EWQ.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWI",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 70.0,
+        "rs_chart": "data/charts/EWI.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWJ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 45.0,
+        "rs_chart": "data/charts/EWJ.png",
+        "long": [
+          "EZJ"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWW",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/EWW.png",
+        "long": [
+          "MEXX"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ECH",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/ECH.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWD",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/EWD.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "ASHR",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 30.0,
+        "rs_chart": "data/charts/ASHR.png",
+        "long": [
+          "CHAU"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWS",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 60.0,
+        "rs_chart": "data/charts/EWS.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "KSA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/KSA.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "INDA",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 100.0,
+        "rs_chart": "data/charts/INDA.png",
+        "long": [
+          "INDL"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EEM",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/EEM.png",
+        "long": [
+          "EDC"
+        ],
+        "short": [
+          "EDZ"
+        ],
+        "abc": null
+      },
+      {
+        "ticker": "EWZ",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/EWZ.png",
+        "long": [
+          "BRZU"
+        ],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "TUR",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 0.0,
+        "rs_chart": "data/charts/TUR.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWH",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 10.0,
+        "rs_chart": "data/charts/EWH.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "EWT",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 5.0,
+        "rs_chart": "data/charts/EWT.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      },
+      {
+        "ticker": "MCHI",
+        "daily": null,
+        "intra": null,
+        "5d": null,
+        "20d": null,
+        "atr_pct": null,
+        "dist_sma50_atr": null,
+        "rs": 25.0,
+        "rs_chart": "data/charts/MCHI.png",
+        "long": [],
+        "short": [],
+        "abc": null
+      }
+    ]
+  },
+  "column_ranges": {
+    "Indices": {
+      "daily": [
+        null,
+        null
+      ],
+      "intra": [
+        null,
+        null
+      ],
+      "5d": [
+        null,
+        null
+      ],
+      "20d": [
+        null,
+        null
+      ]
+    },
+    "S&P Style ETFs": {
+      "daily": [
+        null,
+        null
+      ],
+      "intra": [
+        null,
+        null
+      ],
+      "5d": [
+        null,
+        null
+      ],
+      "20d": [
+        null,
+        null
+      ]
+    },
+    "Sel Sectors": {
+      "daily": [
+        null,
+        null
+      ],
+      "intra": [
+        null,
+        null
+      ],
+      "5d": [
+        null,
+        null
+      ],
+      "20d": [
+        null,
+        null
+      ]
+    },
+    "EW Sectors": {
+      "daily": [
+        null,
+        null
+      ],
+      "intra": [
+        null,
+        null
+      ],
+      "5d": [
+        null,
+        null
+      ],
+      "20d": [
+        null,
+        null
+      ]
+    },
+    "Industries": {
+      "daily": [
+        null,
+        null
+      ],
+      "intra": [
+        null,
+        null
+      ],
+      "5d": [
+        null,
+        null
+      ],
+      "20d": [
+        null,
+        null
+      ]
+    },
+    "Countries": {
+      "daily": [
+        null,
+        null
+      ],
+      "intra": [
+        null,
+        null
+      ],
+      "5d": [
+        null,
+        null
+      ],
+      "20d": [
+        null,
+        null
+      ]
+    }
+  },
+  "industry_performance": {
+    "top5": [],
+    "bottom5": [],
+    "all": []
+  },
+  "breadth": {
+    "above_200sma_pct": 0.0,
+    "near_52w_high_pct": 0.0,
+    "tickers_sampled": 80
+  }
+}

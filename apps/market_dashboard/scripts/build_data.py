@@ -6,6 +6,7 @@ Outputs: data/snapshot.json, data/events.json, data/meta.json, data/charts/*.png
 from __future__ import print_function
 import argparse
 import json
+import math
 import os
 import re
 import time
@@ -136,6 +137,35 @@ Industries_COLORS = {
     "GLD": "#8b6914", "SILJ": "#ff9800", "GDX": "#ff9800", "FXI": "#00bcd4", "GXC": "#00bcd4", "USO": "#8b6914",
     "DBA": "#8b6914", "UNG": "#8b6914", "DBC": "#8b6914", "WGMI": "#3f51b5", "REMX": "#ff9800",
 }
+
+
+def sanitize_json(obj):
+    """Recursively replace NaN/Inf with None and convert numpy scalars to
+    native Python types so output is valid JSON."""
+    if isinstance(obj, dict):
+        return {k: sanitize_json(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [sanitize_json(v) for v in obj]
+    # numpy scalar types — use .item() to convert to native Python
+    if hasattr(obj, 'item'):
+        try:
+            native = obj.item()
+            if isinstance(native, float):
+                return None if (math.isnan(native) or math.isinf(native)) else native
+            return native
+        except Exception:
+            pass
+    if isinstance(obj, float):
+        return None if (math.isnan(obj) or math.isinf(obj)) else obj
+    return obj
+
+
+def safe_json_dumps(data, **kwargs):
+    """Dump to JSON string and replace any remaining bare NaN/Infinity tokens."""
+    raw = json.dumps(data, ensure_ascii=False, **kwargs)
+    raw = re.sub(r'\bNaN\b', 'null', raw)
+    raw = re.sub(r'\b-?Infinity\b', 'null', raw)
+    return raw
 
 
 def get_ticker_to_sector_mapping():
@@ -478,11 +508,11 @@ def main():
     meta_path = os.path.join(out_dir, "meta.json")
 
     with open(snapshot_path, "w", encoding="utf-8") as f:
-        json.dump(snapshot, f, ensure_ascii=False, indent=2)
+        f.write(safe_json_dumps(sanitize_json(snapshot), indent=2))
     with open(events_path, "w", encoding="utf-8") as f:
-        json.dump(events, f, ensure_ascii=False, indent=2)
+        f.write(safe_json_dumps(sanitize_json(events), indent=2))
     with open(meta_path, "w", encoding="utf-8") as f:
-        json.dump(meta, f, ensure_ascii=False, indent=2)
+        f.write(safe_json_dumps(sanitize_json(meta), indent=2))
 
     print("Wrote", snapshot_path, events_path, meta_path, "and charts in", charts_dir)
 
