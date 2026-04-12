@@ -40,8 +40,22 @@ jobs:
           cp ../market_dashboard/data/snapshot.json public/market-dashboard/
           cp ../market_dashboard/data/events.json    public/market-dashboard/
           cp ../market_dashboard/data/meta.json      public/market-dashboard/
-          cp ../market_dashboard/data/morning_brief.md public/market-dashboard/
+          cp ../market_dashboard/data/morning_brief.md public/market-dashboard/ 2>/dev/null || true
           cp ../market_dashboard/data/charts/*.png   public/market-dashboard/charts/ 2>/dev/null || true
+
+      - name: Sanitize JSON (replace NaN/Infinity with null)
+        working-directory: apps/usStockChatBot
+        run: |
+          python3 -c "
+          import re, pathlib
+          for p in pathlib.Path('public/market-dashboard').glob('*.json'):
+              raw = p.read_text()
+              fixed = re.sub(r'\bNaN\b|\bInfinity\b|\b-Infinity\b', 'null', raw)
+              if fixed != raw:
+                  p.write_text(fixed)
+                  print(f'Sanitized {p.name}')
+          print('JSON sanitization complete')
+          "
 
       - name: Commit updated data
         run: |

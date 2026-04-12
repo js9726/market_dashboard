@@ -315,8 +315,15 @@ def create_rs_chart_png(rrs_data, ticker, charts_dir):
 def get_stock_data(ticker_symbol, charts_dir):
     try:
         stock = yf.Ticker(ticker_symbol)
-        hist = stock.history(period="21d")
-        daily = stock.history(period="60d")
+
+        # Drop rows where Close/Open/High/Low are NaN — yfinance sometimes returns
+        # NaN-filled rows for the current pre-market day when the pipeline runs
+        # before market open (4:30 AM ET). These poison all price calculations.
+        hist_raw  = stock.history(period="21d")
+        daily_raw = stock.history(period="60d")
+        hist  = hist_raw.dropna(subset=['Close', 'Open', 'High', 'Low'])
+        daily = daily_raw.dropna(subset=['Close', 'Open', 'High', 'Low'])
+
         if len(hist) < 2 or len(daily) < 50:
             return None
 
@@ -337,9 +344,9 @@ def get_stock_data(ticker_symbol, charts_dir):
         end_date = datetime.now()
         start_date = end_date - timedelta(days=120)
         try:
-            stock_history = stock.history(start=start_date, end=end_date)
-            spy_history = yf.Ticker("SPY").history(start=start_date, end=end_date)
-            if stock_history is not None and spy_history is not None:
+            stock_history = stock.history(start=start_date, end=end_date).dropna(subset=['Close', 'Open', 'High', 'Low'])
+            spy_history   = yf.Ticker("SPY").history(start=start_date, end=end_date).dropna(subset=['Close', 'Open', 'High', 'Low'])
+            if stock_history is not None and spy_history is not None and len(stock_history) > 0 and len(spy_history) > 0:
                 rrs_data = calculate_rrs(stock_history, spy_history, atr_length=14, length_rolling=50, length_sma=20, atr_multiplier=1.0)
                 if rrs_data is not None and len(rrs_data) >= 21:
                     recent_21 = rrs_data['rollingRRS'].iloc[-21:]
