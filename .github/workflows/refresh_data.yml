@@ -3,7 +3,9 @@ name: Refresh Market Data & Morning Brief
 on:
   schedule:
     # Run Mon–Fri at 4:30 AM ET (12:30 UTC) — 5 hour before US market open
-    - cron: '30 08 * * 1-5'
+    #- cron: '30 08 * * 1-5'
+    - cron: '05 * * * *'
+    
   workflow_dispatch: {}   # allow manual trigger
 
 jobs:
