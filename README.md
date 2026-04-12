@@ -40,13 +40,17 @@ market_dashboard/
 │       ├── src/
 │       │   ├── app/
 │       │   │   ├── api/analysis/ # POST /api/analysis — runs AI agents
-│       │   │   └── dashboard/    # Market snapshot UI
+│       │   │   ├── api/auth/     # Login / logout (password-based auth)
+│       │   │   ├── dashboard/    # Market snapshot UI
+│       │   │   └── login/        # Login page
 │       │   ├── components/       # Chat, Market Overview, Dashboard Shell
+│       │   ├── middleware.ts     # Route protection (redirects to /login)
 │       │   └── utils/
 │       │       └── retry.ts      # Exponential backoff for 529 errors
 │       └── public/market-dashboard/  # Synced data (gitignored)
 ├── packages/usChatBot-DataPipeline/
 ├── research/                     # Vendored ML research (attribution kept)
+├── CLAUDE.md                     # AI coding guidelines for this repo
 └── run_daily.bat                 # Local Windows Task Scheduler script
 ```
 
@@ -107,8 +111,8 @@ npm install
 Create `.env.local`:
 
 ```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
+# Auth — simple password gate (no external auth service needed)
+APP_PASSWORD=your_password_here
 
 # Optional — enables AI analysis tab
 DEEPSEEK_API_KEY=...
@@ -122,7 +126,19 @@ npm run sync:market   # copies data/ into public/market-dashboard/
 npm run dev           # http://localhost:3000
 ```
 
-Sign in → `/dashboard` to view the market snapshot.
+Go to `/login`, enter your password → redirected to `/dashboard`.
+
+---
+
+## Authentication
+
+This app uses a simple **password-based auth** system — no third-party auth service required.
+
+- `POST /api/auth/login` — validates `APP_PASSWORD`, sets a session cookie
+- `POST /api/auth/logout` — clears the session cookie
+- `src/middleware.ts` — protects all routes under `/dashboard`, redirects unauthenticated users to `/login`
+
+Set `APP_PASSWORD` in `.env.local` locally and as an environment variable in Vercel for production.
 
 ---
 
@@ -133,7 +149,7 @@ A Windows Task Scheduler job (`MarketDashboardRefresh`) is pre-configured to run
 To trigger manually anytime:
 
 ```bat
-"C:\Users\jiesh\AI codes hub\market_dashboard\run_daily.bat"
+run_daily.bat
 ```
 
 To verify the scheduled task:
@@ -162,15 +178,14 @@ The workflow at `.github/workflows/refresh_data.yml` runs automatically. Add one
 
 | Variable | Value |
 |---|---|
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | From Clerk dashboard |
-| `CLERK_SECRET_KEY` | From Clerk dashboard |
-| `DEEPSEEK_API_KEY` | Optional — enables AI analysis |
+| `APP_PASSWORD` | Your chosen login password |
+| `DEEPSEEK_API_KEY` | Optional — enables AI analysis tab |
+| `ANTHROPIC_API_KEY` | Optional — enables morning brief generation locally |
 
 4. Deploy. Vercel auto-redeploys whenever GitHub Actions commits fresh data.
-5. Add your Vercel URL to **Clerk → Domains** so auth works in production.
 
 > **Why not GitHub Pages?**  
-> GitHub Pages only serves static files. This app requires server-side Clerk auth and a Node.js API route (`/api/analysis`). Vercel is the natural free host for Next.js apps.
+> GitHub Pages only serves static files. This app requires server-side API routes (`/api/analysis`, `/api/auth`). Vercel is the natural free host for Next.js apps.
 
 ---
 
@@ -178,8 +193,7 @@ The workflow at `.github/workflows/refresh_data.yml` runs automatically. Add one
 
 | Variable | Where | Required | Purpose |
 |---|---|---|---|
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `.env.local` / Vercel | ✅ | Clerk auth (frontend) |
-| `CLERK_SECRET_KEY` | `.env.local` / Vercel | ✅ | Clerk auth (server) |
+| `APP_PASSWORD` | `.env.local` / Vercel | ✅ | Dashboard login password |
 | `ANTHROPIC_API_KEY` | GitHub Secret / `.env.local` | ✅ for brief | Morning brief via Claude |
 | `DEEPSEEK_API_KEY` | `.env.local` / Vercel | Optional | AI stock analysis tab |
 
