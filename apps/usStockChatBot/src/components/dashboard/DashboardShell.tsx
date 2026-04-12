@@ -4,8 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import ChatInterface from "@/components/ChatInterface";
 import MarketOverview from "@/components/market/MarketOverview";
+import MarketMetricsDashboard from "@/components/market/MarketMetricsDashboard";
 
-type Tab = "market" | "chat";
+type Tab = "market" | "metrics" | "chat";
 
 export default function DashboardShell() {
   const [tab, setTab] = useState<Tab>("market");
@@ -34,6 +35,17 @@ export default function DashboardShell() {
             </button>
             <button
               type="button"
+              onClick={() => setTab("metrics")}
+              className={`rounded-md px-4 py-2 text-sm font-medium transition ${
+                tab === "metrics"
+                  ? "bg-slate-700 text-white shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              📈 Market Metrics
+            </button>
+            <button
+              type="button"
               onClick={() => setTab("chat")}
               className={`rounded-md px-4 py-2 text-sm font-medium transition ${
                 tab === "chat"
@@ -58,6 +70,11 @@ export default function DashboardShell() {
               (Yahoo + calendar). Same tables as the static site, plus charts here.
             </p>
             <MarketOverview />
+          </div>
+        )}
+        {tab === "metrics" && (
+          <div>
+            <MarketMetricsDashboard />
           </div>
         )}
         {tab === "chat" && (
