@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 Behavioral guidelines for AI-assisted development on this repo. Applies to all sub-projects
-(`apps/market_dashboard`, `apps/usStockChatBot`, `packages/usChatBot-DataPipeline`).
+(`apps/market_dashboard_backend`, `apps/market_dashboard`, `packages/usChatBot-DataPipeline`).
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
@@ -11,12 +11,13 @@ Behavioral guidelines for AI-assisted development on this repo. Applies to all s
 
 | Layer | Path | Stack |
 |---|---|---|
-| Data Pipeline | `apps/market_dashboard/scripts/` | Python, yfinance, Finviz, requests, BeautifulSoup |
-| Morning Brief | `apps/market_dashboard/scripts/morning_brief.py` | Gemini 2.5 Pro via REST API |
-| Frontend | `apps/usStockChatBot/` | Next.js 15.5, TypeScript, Tailwind, Recharts |
-| Auth | `apps/usStockChatBot/src/middleware.ts` | Cookie-based password auth (no Clerk) |
+| Data Pipeline | `apps/market_dashboard_backend/scripts/` | Python, yfinance, Finviz, requests, BeautifulSoup |
+| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | Gemini 2.5 Pro via REST API |
+| Frontend | `apps/market_dashboard/` | Next.js 15.5, TypeScript, Tailwind, Recharts |
+| AI Agents | `apps/market_dashboard/agents/` | Fundamental (yahoo-finance2 + DeepSeek), Technical |
+| Auth | `apps/market_dashboard/src/middleware.ts` | Cookie-based password auth (no Clerk) |
 | Automation | `.github/workflows/refresh_data.yml` | GitHub Actions (Mon–Fri 8:30 AM ET / 12:30 UTC) |
-| Deployment | `vercel.json` | Vercel (rootDirectory: `apps/usStockChatBot`) |
+| Deployment | `vercel.json` | Vercel (rootDirectory: `apps/market_dashboard`) |
 
 ### Key Data Flow
 
@@ -25,6 +26,29 @@ build_data.py → data/snapshot.json + data/charts/*.png
 morning_brief.py → data/morning_brief.md
 sync step (CI or npm run sync:market) → public/market-dashboard/
 Vercel serves static files from public/
+```
+
+---
+
+## Commands
+
+### Python Data Pipeline (from `apps/market_dashboard_backend/`)
+
+```bash
+pip install -r requirements.txt
+python scripts/build_data.py --out-dir data       # fetch yfinance, Finviz, breadth metrics
+python scripts/morning_brief.py --out-dir data    # requires GEMINI_API_KEY
+```
+
+### Next.js Frontend (from `apps/market_dashboard/`)
+
+```bash
+npm install
+npm run sync:market    # copy Python output into public/market-dashboard/
+npm run dev            # dev server at http://localhost:3000 (Turbopack)
+npm run build          # production build — must exit 0 before deploying
+npm run lint           # ESLint
+npx tsc --noEmit       # type-check without emitting files
 ```
 
 ---
@@ -100,13 +124,20 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ## 5. Project-Specific Conventions
 
 ### Python (Data Pipeline)
-- Scripts live in `apps/market_dashboard/scripts/`.
+- Scripts live in `apps/market_dashboard_backend/scripts/`.
 - Output always goes to `--out-dir` (default: `data/`). Never hardcode paths.
 - `build_data.py` runs before `morning_brief.py` — they are sequential, not parallel.
 - The `data/` folder is gitignored; `public/market-dashboard/` in the Next.js app is also gitignored locally.
-- In CI, use `git add -f apps/usStockChatBot/public/market-dashboard` to force-add data files.
+- In CI, use `git add -f apps/market_dashboard/public/market-dashboard` to force-add data files.
 - Use `requirements.txt` for dependencies — no Poetry, no conda.
 - Always call `sanitize_json()` + `safe_json_dumps()` when writing JSON — Python's `json.dump` emits bare `NaN` which JavaScript cannot parse.
+
+### AI Agents (`agents/`)
+
+- `agents/` lives at `apps/market_dashboard/agents/`, **outside** `src/` — this is intentional.
+- `POST /api/analysis` runs two agents sequentially: `fundamentalsAgent` then `technicalAgent`.
+- `fundamentalsAgent` fetches financial metrics via `yahoo-finance2`, then optionally calls DeepSeek for signal reasoning. Falls back to raw metrics when `DEEPSEEK_API_KEY` is absent — this is expected, not a bug.
+- Both agents share an `AgentState` type and return `{ messages: HumanMessage[], data: AgentState['data'] }`.
 
 ### Next.js Frontend (Next.js 15.5 — NOT 16)
 - App Router only (`src/app/`). No Pages Router patterns.
@@ -129,7 +160,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Commit step uses `[skip ci]` in message to prevent infinite trigger loops.
 
 ### Vercel
-- Root directory is `apps/usStockChatBot` — set via `vercel.json` at repo root.
+- Root directory is `apps/market_dashboard` — set via `vercel.json` at repo root.
 - Required env vars in Vercel dashboard: `DASHBOARD_PASSWORD`, `AUTH_TOKEN`.
 - After adding env vars in Vercel, always trigger a **manual redeploy** — env vars don't apply to existing deployments.
 

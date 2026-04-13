@@ -17,7 +17,7 @@ jobs:
       contents: write        # needed to git-push the refreshed data back to main
     defaults:
       run:
-        working-directory: apps/market_dashboard
+        working-directory: apps/market_dashboard_backend
 
     steps:
       - uses: actions/checkout@v4
@@ -41,17 +41,17 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Sync data into Next.js public folder
-        working-directory: apps/usStockChatBot
+        working-directory: apps/market_dashboard
         run: |
           mkdir -p public/market-dashboard/charts
-          cp ../market_dashboard/data/snapshot.json public/market-dashboard/
-          cp ../market_dashboard/data/events.json    public/market-dashboard/
-          cp ../market_dashboard/data/meta.json      public/market-dashboard/
-          cp ../market_dashboard/data/morning_brief.md public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard/data/charts/*.png   public/market-dashboard/charts/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/snapshot.json public/market-dashboard/
+          cp ../market_dashboard_backend/data/events.json    public/market-dashboard/
+          cp ../market_dashboard_backend/data/meta.json      public/market-dashboard/
+          cp ../market_dashboard_backend/data/morning_brief.md public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/charts/*.png   public/market-dashboard/charts/ 2>/dev/null || true
 
       - name: Sanitize JSON (replace NaN/Infinity with null)
-        working-directory: apps/usStockChatBot
+        working-directory: apps/market_dashboard
         run: |
           python3 -c "
           import re, pathlib
@@ -68,7 +68,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f apps/usStockChatBot/public/market-dashboard
+          git add -f apps/market_dashboard/public/market-dashboard
           if git diff --cached --quiet; then
             echo "No data changes — nothing to commit."
           else

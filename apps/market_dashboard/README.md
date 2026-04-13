@@ -1,46 +1,36 @@
-# Market Dashboard
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Static stock dashboard with daily auto-refresh via GitHub Actions (Yahoo Finance), hosted on GitHub Pages.
+## Getting Started
 
-## Build data locally
+First, run the development server:
 
 ```bash
-cd market-dashboard
-pip install -r requirements.txt
-python scripts/build_data.py --out-dir data
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-This generates: `data/snapshot.json`, `data/events.json`, `data/meta.json`, and `data/charts/*.png`.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-To preview locally: open `index.html` in a browser, or serve the project root with a static server (e.g. `python -m http.server 8000`) and visit `http://localhost:8000`.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Deploy to GitHub Pages
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-1. Create a new GitHub repository and push this directory’s contents to it (or push as the repo root).
-2. **Before first deploy** you need initial data. Either:
-   - **Recommended:** In the repo go to **Actions** → “Refresh dashboard data” → **Run workflow**. When it finishes, it will commit `data/` to the repo.
-   - Or run locally: `python scripts/build_data.py --out-dir data`, then `git add data/`, commit and push.
-3. In the repo **Settings → Pages**:
-   - Set Source to **GitHub Actions** (or “Deploy from a branch”).
-   - If using a branch: choose branch `main` and folder `/ (root)`.
-4. The workflow runs daily at 16:30 US Eastern to refresh data; you can also run it manually from **Actions**.
+## Learn More
 
-Site URL: `https://<your-username>.github.io/<repo-name>/`
+To learn more about Next.js, take a look at the following resources:
 
-## Project structure
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-```
-market-dashboard/
-├── .github/workflows/refresh_data.yml   # Daily data refresh
-├── scripts/build_data.py                # Fetches data, outputs JSON + charts
-├── data/                                # Generated (commit for Pages)
-│   ├── snapshot.json
-│   ├── events.json
-│   ├── meta.json
-│   └── charts/*.png
-├── index.html                            # Static frontend
-├── requirements.txt
-└── README.md
-```
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Data: Yahoo Finance (yfinance), economic calendar (investpy). Charts: TradingView embed.
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

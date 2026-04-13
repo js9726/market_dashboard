@@ -27,13 +27,13 @@ market_dashboard/
 ├── .github/workflows/
 │   └── refresh_data.yml          # Daily pipeline: data → brief → commit
 ├── apps/
-│   ├── market_dashboard/
+│   ├── market_dashboard_backend/
 │   │   ├── scripts/
 │   │   │   ├── build_data.py     # Fetches yfinance, Finviz, breadth metrics
 │   │   │   └── morning_brief.py  # Calls Claude to generate morning brief
 │   │   ├── data/                 # Generated output (gitignored)
 │   │   └── requirements.txt
-│   └── usStockChatBot/           # Next.js 15 frontend
+│   └── market_dashboard/         # Next.js 15 frontend
 │       ├── agents/
 │       │   ├── fundamental/      # DeepSeek fundamental analysis agent
 │       │   └── technical/        # Technical analysis agent
@@ -89,7 +89,7 @@ cd market_dashboard
 ### 2. Python data pipeline
 
 ```bash
-cd apps/market_dashboard
+cd apps/market_dashboard_backend
 pip install -r requirements.txt
 python scripts/build_data.py --out-dir data
 ```
@@ -104,7 +104,7 @@ ANTHROPIC_API_KEY=sk-ant-... python scripts/morning_brief.py --out-dir data
 ### 4. Run the frontend
 
 ```bash
-cd apps/usStockChatBot
+cd apps/market_dashboard
 npm install
 ```
 
@@ -173,7 +173,7 @@ The workflow at `.github/workflows/refresh_data.yml` runs automatically. Add one
 ### Frontend — Vercel (free)
 
 1. Go to **vercel.com/new** → Import `js9726/market_dashboard`
-2. Set **Root Directory** → `apps/usStockChatBot`
+2. Set **Root Directory** → `apps/market_dashboard`
 3. Add environment variables:
 
 | Variable | Value |
