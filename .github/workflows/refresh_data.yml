@@ -31,6 +31,7 @@ jobs:
         run: python scripts/build_data.py --out-dir data
 
       - name: Generate morning brief
+        continue-on-error: true
         run: python scripts/morning_brief.py --out-dir data
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
