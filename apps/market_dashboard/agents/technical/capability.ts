@@ -1,6 +1,7 @@
 import { HumanMessage } from 'langchain/schema';
 import OpenAI from 'openai';
 import yahooFinance from 'yahoo-finance2';
+import { withRetry } from '../../src/utils/retry';
 
 interface AgentState {
   data: {
@@ -52,11 +53,11 @@ const progress = {
   }
 };
 
-// Initialize DeepSeek client
+// Initialize Gemini client via OpenAI-compatible endpoint
 const openai = new OpenAI({
-  baseURL: "https://api.deepseek.com",
-  /** Placeholder allows Next build when env is unset; real calls still need DEEPSEEK_API_KEY. */
-  apiKey: process.env.DEEPSEEK_API_KEY ?? "build-without-key",
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  /** Placeholder allows Next build when env is unset; real calls still need GEMINI_API_KEY. */
+  apiKey: process.env.GEMINI_API_KEY ?? "build-without-key",
 });
 
 const systemPrompt = `You are a professional technical analyst specializing in stock market analysis.
@@ -67,16 +68,23 @@ Focus on four key areas:
 3. Volume Analysis
 4. Support/Resistance Levels
 
-Provide your analysis in a structured format with clear reasoning for each aspect.`;
+Respond ONLY with a JSON object in this exact shape:
+{
+  "overall_signal": "bullish" | "bearish" | "neutral",
+  "confidence": <integer 0-100>,
+  "trend": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
+  "momentum": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
+  "volume": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
+  "support_resistance": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" }
+}`;
 
 async function getTechnicalMetrics(ticker: string, endDate: string) {
   try {
     // Get historical data
-    const result = await yahooFinance.historical(ticker, {
-      period1: new Date(new Date(endDate).setFullYear(new Date(endDate).getFullYear() - 1)),
-      period2: new Date(endDate),
-      interval: '1d'
-    });
+    const result = await withRetry(async () => {
+      // @ts-expect-error: yahoo-finance2 types omit the queryOptions 3rd argument
+      return yahooFinance.historical(ticker, { period1: new Date(new Date(endDate).setFullYear(new Date(endDate).getFullYear() - 1)), period2: new Date(endDate), interval: '1d' }, { skipValidation: true });
+    }, 3, 2000);
 
     if (!result || result.length === 0) {
       throw new Error('No historical data available');
@@ -199,9 +207,10 @@ export async function technicalAgent(state: AgentState) {
           { role: "system", content: systemPrompt },
           { role: "user", content: metricsPrompt }
         ],
-        model: "deepseek-chat",
+        model: "gemini-2.5-pro",
         temperature: 0.7,
-        max_tokens: 1000
+        max_tokens: 1000,
+        response_format: { type: "json_object" }
       });
 
       progress.updateStatus("technical_agent", ticker, "Processing AI response");

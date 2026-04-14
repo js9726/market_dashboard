@@ -18,6 +18,8 @@ const BASE = "/market-dashboard";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
+const KEY_INDEX_TICKERS = ["SPY", "QQQ", "DIA", "IWM", "GLD", "TLT", "HYG"];
+
 function pct(v: number | null | undefined): string {
   if (v == null || isNaN(v)) return "—";
   return `${v > 0 ? "+" : ""}${v.toFixed(2)}%`;
@@ -170,6 +172,27 @@ export default function MarketMetricsDashboard() {
 
   const leaders = useMemo(() => snapshot ? getLeaders(snapshot) : [], [snapshot]);
 
+  const statusTickers = useMemo(() => {
+    if (!snapshot) return [];
+    const indices = snapshot.groups["Indices"] ?? [];
+    return KEY_INDEX_TICKERS
+      .map((t) => indices.find((r) => r.ticker === t))
+      .filter((r): r is TickerRow => r != null);
+  }, [snapshot]);
+
+  const sectorRows = useMemo(() => snapshot ? (snapshot.groups["Sectors"] ?? []) : [], [snapshot]);
+
+  const sentiment = useMemo(() => {
+    if (!stats) return "MIXED";
+    const allGroups = Object.values(stats);
+    const totalUp   = allGroups.reduce((s, g) => s + g.upDay,   0);
+    const totalDown = allGroups.reduce((s, g) => s + g.downDay, 0);
+    const bull = totalUp / (totalUp + totalDown || 1);
+    if (bull >= 0.60) return "RISK-ON";
+    if (bull <= 0.35) return "RISK-OFF";
+    return "MIXED";
+  }, [stats]);
+
   const barData1 = useMemo(() => {
     if (!stats) return [];
     return makeBarData("Indices", stats.Indices, "Sectors", stats.Sectors);
@@ -210,27 +233,72 @@ export default function MarketMetricsDashboard() {
     <div style={{ background: "#06090f", color: "#e2e8f0", fontFamily: "'Inter', 'Segoe UI', sans-serif", padding: "16px 0" }}>
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 20, padding: "0 4px" }}>
-        <div>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: "#f1f5f9", margin: 0, letterSpacing: "-0.5px" }}>
-            📈 Market Metrics Dashboard
-          </h2>
-          <p style={{ fontSize: 12, color: "#475569", marginTop: 4 }}>
-            Breadth · SMA Positioning · RS Leaders · Inspired by @SteveDJacobs
-          </p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16, padding: "14px 16px", background: "#0e1318", border: "1px solid #1e2d3d", borderRadius: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 24 }}>📈</span>
+          <div>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.3px" }}>
+              Market <span style={{ color: "#0ea5e9" }}>Metrics</span> Dashboard
+            </h2>
+            <p style={{ fontSize: 11, color: "#64748b", marginTop: 3, fontFamily: "monospace" }}>
+              Breadth · Sectors · SMA Positioning · RS Leaders · Inspired by @SteveDJacobs
+            </p>
+          </div>
         </div>
-        <div style={{ fontSize: 11, color: "#334155", textAlign: "right" }}>
-          <div>Updated: {builtAt} MYT</div>
-          <div style={{ marginTop: 2 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+          <div style={{ fontSize: 12, fontFamily: "monospace", color: "#0ea5e9", fontWeight: 600 }}>
+            Updated: {builtAt} MYT
+          </div>
+          <div style={{ fontSize: 10, color: "#475569", fontFamily: "monospace" }}>
             {COLS.map((c) => (
               <span key={c} style={{ marginLeft: 8 }}>
-                <span style={{ color: "#64748b" }}>{c}:</span>{" "}
-                <span style={{ color: "#94a3b8" }}>{stats[c].total}</span>
+                <span style={{ color: "#475569" }}>{c}:</span>{" "}
+                <span style={{ color: "#64748b" }}>{stats[c].total}</span>
               </span>
             ))}
           </div>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 5,
+            padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600,
+            letterSpacing: "0.5px", textTransform: "uppercase",
+            background: sentiment === "RISK-ON"  ? "rgba(34,197,94,0.15)"  :
+                        sentiment === "RISK-OFF" ? "rgba(239,68,68,0.15)"  : "rgba(245,158,11,0.12)",
+            border: `1px solid ${sentiment === "RISK-ON" ? "rgba(34,197,94,0.3)" : sentiment === "RISK-OFF" ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`,
+            color: sentiment === "RISK-ON"  ? "#4ade80" :
+                   sentiment === "RISK-OFF" ? "#f87171" : "#fbbf24",
+          }}>
+            ● {sentiment}
+          </div>
         </div>
       </div>
+
+      {/* ── Status Chips (key indices) ── */}
+      {statusTickers.length > 0 && (
+        <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+          {statusTickers.map((r) => {
+            const isUp = (r.daily ?? 0) > 0;
+            const isDown = (r.daily ?? 0) < 0;
+            return (
+              <div key={r.ticker} style={{
+                display: "flex", flexDirection: "column",
+                padding: "9px 14px", background: "#0e1318",
+                border: "1px solid #1e2d3d", borderRadius: 8, minWidth: 90, flex: "1 1 90px",
+              }}>
+                <div style={{ fontSize: 9.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.8px", color: "#475569", marginBottom: 4 }}>
+                  {r.ticker}
+                </div>
+                <div style={{ fontFamily: "monospace", fontSize: 15, fontWeight: 600, color: "#e2e8f0" }}>
+                  {pct(r.daily)}
+                </div>
+                <div style={{ fontFamily: "monospace", fontSize: 10, marginTop: 2,
+                  color: isUp ? "#22c55e" : isDown ? "#ef4444" : "#64748b" }}>
+                  {r["5d"] != null ? `5d ${pct(r["5d"])}` : "—"}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* ── Section 1: Key Metrics Table ── */}
       <section style={{ marginBottom: 24 }}>
@@ -304,13 +372,70 @@ export default function MarketMetricsDashboard() {
         </div>
       </section>
 
-      {/* ── Section 2 & 3: Bar Charts ── */}
+      {/* ── Section 2: Sector Performance Grid ── */}
+      {sectorRows.length > 0 && (
+        <section style={{ marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", background: "#131a22", border: "1px solid #1e2d3d", borderBottom: "none", borderRadius: "8px 8px 0 0" }}>
+            <span>🏭</span>
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.2px", color: "#64748b" }}>
+              2 · Sector Performance
+            </span>
+            <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 10, color: "#475569", padding: "2px 8px", background: "#1a2330", borderRadius: 4, border: "1px solid #1e2d3d" }}>
+              Day · Week · Month % Chg
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 8, padding: 12, background: "#0e1318", border: "1px solid #1e2d3d", borderRadius: "0 0 8px 8px" }}>
+            {sectorRows.map((r) => {
+              const dayUp   = (r.daily ?? 0) > 0;
+              const dayDown = (r.daily ?? 0) < 0;
+              const topColor = dayUp ? "#22c55e" : dayDown ? "#ef4444" : "#475569";
+              return (
+                <div key={r.ticker} style={{ background: "#131a22", border: "1px solid #1e2d3d", borderRadius: 7, padding: "10px 12px", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: topColor }} />
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#e2e8f0" }}>{r.ticker}</div>
+                    </div>
+                    <div style={{ fontFamily: "monospace", fontSize: 15, fontWeight: 600, color: dayUp ? "#22c55e" : dayDown ? "#ef4444" : "#94a3b8" }}>
+                      {pct(r.daily)}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.5px", color: "#475569", marginBottom: 2 }}>Week</div>
+                      <div style={{ fontFamily: "monospace", fontSize: 10.5, fontWeight: 600, color: (r["5d"] ?? 0) > 0 ? "#22c55e" : (r["5d"] ?? 0) < 0 ? "#ef4444" : "#64748b" }}>
+                        {pct(r["5d"])}
+                      </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.5px", color: "#475569", marginBottom: 2 }}>Month</div>
+                      <div style={{ fontFamily: "monospace", fontSize: 10.5, fontWeight: 600, color: (r["20d"] ?? 0) > 0 ? "#22c55e" : (r["20d"] ?? 0) < 0 ? "#ef4444" : "#64748b" }}>
+                        {pct(r["20d"])}
+                      </div>
+                    </div>
+                    {r.rs != null && (
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.5px", color: "#475569", marginBottom: 2 }}>RS</div>
+                        <div style={{ fontFamily: "monospace", fontSize: 10.5, fontWeight: 600, color: rsColor(r.rs) }}>
+                          {r.rs.toFixed(0)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ── Section 3 & 4: Bar Charts ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
 
         {/* Chart 1: Indices + Sectors */}
         <section style={{ background: "#0b1120", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#475569", marginBottom: 12 }}>
-            2 · Indices <span style={{ color: "#166534" }}>■</span> + Sectors <span style={{ color: "#14532d" }}>▪</span>
+            3 · Indices <span style={{ color: "#166534" }}>■</span> + Sectors <span style={{ color: "#14532d" }}>▪</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={barData1} margin={{ top: 4, right: 8, left: -16, bottom: 0 }} barSize={14}>
@@ -334,7 +459,7 @@ export default function MarketMetricsDashboard() {
         {/* Chart 2: Industries + Countries */}
         <section style={{ background: "#0b1120", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#475569", marginBottom: 12 }}>
-            3 · Industries <span style={{ color: "#166534" }}>■</span> + Countries <span style={{ color: "#14532d" }}>▪</span>
+            4 · Industries <span style={{ color: "#166534" }}>■</span> + Countries <span style={{ color: "#14532d" }}>▪</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={barData2} margin={{ top: 4, right: 8, left: -16, bottom: 0 }} barSize={14}>
@@ -356,10 +481,10 @@ export default function MarketMetricsDashboard() {
         </section>
       </div>
 
-      {/* ── Section 4: High RS Screener (Qullamaggie-inspired) ── */}
+      {/* ── Section 5: High RS Screener (Qullamaggie-inspired) ── */}
       <section>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#475569", marginBottom: 8, paddingLeft: 4 }}>
-          4 · Qullamaggie-Inspired Screener — RS ≥ 60 Leaders ({leaders.length})
+          5 · Qullamaggie-Inspired Screener — RS ≥ 60 Leaders ({leaders.length})
         </div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>

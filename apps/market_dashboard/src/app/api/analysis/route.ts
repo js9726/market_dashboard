@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         data: { ...state.data, analyst_signals: { technical_agent: {} } },
       };
       
-      if (process.env.DEEPSEEK_API_KEY) {
+      if (process.env.GEMINI_API_KEY) {
         try {
           technicalResult = await technicalAgent(state);
         } catch (error) {

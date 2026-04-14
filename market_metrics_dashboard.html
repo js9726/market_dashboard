@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Metrics Dashboard — April 9, 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080b0f;
+    --bg2:       #0e1318;
+    --bg3:       #131a22;
+    --bg4:       #1a2330;
+    --border:    #1e2d3d;
+    --border2:   #243347;
+    --text:      #e2e8f0;
+    --text-dim:  #94a3b8;
+    --text-faint:#4a5568;
+    --green:     #22c55e;
+    --green-dim: #16a34a;
+    --red:       #ef4444;
+    --red-dim:   #dc2626;
+    --amber:     #f59e0b;
+    --blue:      #3b82f6;
+    --purple:    #a855f7;
+    --teal:      #14b8a6;
+    --accent:    #0ea5e9;
+
+    --cell-green-hi:  rgba(34,197,94,0.18);
+    --cell-green-md:  rgba(34,197,94,0.10);
+    --cell-green-lo:  rgba(34,197,94,0.05);
+    --cell-red-hi:    rgba(239,68,68,0.18);
+    --cell-red-md:    rgba(239,68,68,0.10);
+    --cell-red-lo:    rgba(239,68,68,0.05);
+    --cell-amber:     rgba(245,158,11,0.12);
+    --cell-neutral:   rgba(255,255,255,0.03);
+  }
+
+  html { background: var(--bg); }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 18px 20px 32px;
+    min-width: 960px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-icon {
+    font-size: 26px;
+    filter: drop-shadow(0 0 8px rgba(14,165,233,0.4));
+  }
+  .header-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .header-title span {
+    color: var(--accent);
+  }
+  .header-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .header-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .header-close {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+  }
+  .sentiment-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #f87171;
+  }
+  .sentiment-pill::before { content: '●'; font-size: 8px; }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .stat-chip {
+    display: flex;
+    flex-direction: column;
+    padding: 9px 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  .stat-chip .label {
+    font-size: 9.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-faint);
+    margin-bottom: 4px;
+  }
+  .stat-chip .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .stat-chip .change {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  .up   { color: var(--green); }
+  .down { color: var(--red);   }
+  .neutral { color: var(--text-dim); }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 14px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+  }
+  .section-icon { font-size: 13px; }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+  }
+  .section-badge {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    padding: 2px 8px;
+    background: var(--bg4);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── TABLE ── */
+  .tbl-wrap {
+    border: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  thead tr {
+    background: var(--bg4);
+  }
+  thead th {
+    padding: 8px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+    text-align: right;
+    border-bottom: 2px solid var(--border2);
+    white-space: nowrap;
+  }
+  thead th:first-child { text-align: left; }
+  thead th .th-sub {
+    display: block;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-faint);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 1px;
+  }
+
+  tbody tr { transition: background 0.1s; }
+  tbody tr:hover { background: rgba(255,255,255,0.03) !important; }
+  tbody tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+
+  tbody td {
+    padding: 6px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-align: right;
+    border-bottom: 1px solid rgba(30,45,61,0.6);
+    white-space: nowrap;
+    color: var(--text);
+  }
+  tbody td:first-child {
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--text-dim);
+    padding-left: 14px;
+  }
+
+  /* group row */
+  .group-row td {
+    background: var(--bg3) !important;
+    color: var(--text-faint) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 10px 5px 14px !important;
+    border-top: 1px solid var(--border) !important;
+    border-bottom: 1px solid var(--border) !important;
+    text-align: left !important;
+  }
+
+  /* coloured cells */
+  .c-g3  { background: var(--cell-green-hi); color: var(--green) !important; }
+  .c-g2  { background: var(--cell-green-md); color: var(--green) !important; }
+  .c-g1  { background: var(--cell-green-lo); color: #86efac !important; }
+  .c-r3  { background: var(--cell-red-hi);   color: var(--red) !important; }
+  .c-r2  { background: var(--cell-red-md);   color: var(--red) !important; }
+  .c-r1  { background: var(--cell-red-lo);   color: #fca5a5 !important; }
+  .c-a   { background: var(--cell-amber);    color: var(--amber) !important; }
+  .c-n   { color: var(--text-dim) !important; }
+
+  /* ── SECTOR GRID ── */
+  .sector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    padding: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+  }
+  .sector-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sector-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .sector-card.neg::before { background: var(--red); }
+  .sector-card.pos::before { background: var(--green); }
+  .sector-card.flat::before { background: var(--text-faint); }
+
+  .sc-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .sc-name { font-size: 11px; font-weight: 700; color: var(--text); }
+  .sc-etf  { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-faint); }
+  .sc-day  {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .sc-bars {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .sc-bar-item { flex: 1; }
+  .sc-bar-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-faint);
+    margin-bottom: 2px;
+  }
+  .sc-bar-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+  }
+
+  /* ── BREADTH GRID ── */
+  .breadth-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+  }
+  .breadth-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 11px 13px;
+  }
+  .bc-label {
+    font-size: 9.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+  }
+  .bc-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+  }
+  .bc-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    margin-top: 4px;
+    color: var(--text-dim);
+  }
+  .bc-bar-wrap {
+    height: 3px;
+    background: var(--border2);
+    border-radius: 2px;
+    margin-top: 7px;
+    overflow: hidden;
+  }
+  .bc-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .footer-left {
+    font-size: 10.5px;
+    color: var(--text-faint);
+  }
+  .footer-left strong { color: var(--text-dim); }
+  .footer-right {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+  }
+  .watermark {
+    font-size: 10px;
+    color: var(--text-faint);
+    text-align: center;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
+  .watermark span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">📈</div>
+    <div>
+      <div class="header-title">Market <span>Metrics</span> Dashboard</div>
+      <div class="header-sub">Breadth · Sectors · Health Indicators · End-of-Day Snapshot</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-date">Thursday, April 9, 2026</div>
+    <div class="header-close">NYSE Close · 4:00 PM ET</div>
+    <div class="sentiment-pill">RISK-OFF</div>
+  </div>
+</div>
+
+<!-- ═══════════════ STATUS CHIPS ═══════════════ -->
+<div class="status-bar">
+  <div class="stat-chip">
+    <div class="label">QQQ (Nasdaq 100)</div>
+    <div class="value">432.17</div>
+    <div class="change down">▼ −16.84 (−3.75%)</div>
+  </div>
+  <div class="stat-chip">
+    <div class="label">SPY (S&P 500)</div>
+    <div class="value">498.32</div>
+    <div class="change down">▼ −13.21 (−2.58%)</div>
+  </div>
+  <div class="stat-chip">
+    <div class="label">DIA (DJIA)</div>
+    <div class="value">38,241</div>
+    <div class="change down">▼ −847 (−2.17%)</div>
+  </div>
+  <div class="stat-chip">
+    <div class="label">VIX (Fear Index)</div>
+    <div class="value">38.4</div>
+    <div class="change down">▲ +4.7 (+13.9%)</div>
+  </div>
+  <div class="stat-chip">
+    <div class="label">Put/Call Ratio</div>
+    <div class="value">1.42</div>
+    <div class="change down">▲ +0.28 · BEARISH</div>
+  </div>
+  <div class="stat-chip">
+    <div class="label">NYSE A/D</div>
+    <div class="value">−2,847</div>
+    <div class="change down">Decliners dominant</div>
+  </div>
+  <div class="stat-chip">
+    <div class="label">10Y Yield</div>
+    <div class="value">4.38%</div>
+    <div class="change down">▲ +0.12 bps</div>
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 1: KEY METRICS ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-icon">📊</span>
+    <span class="section-title">Section 1 — Key Market Breadth Metrics</span>
+    <span class="section-badge">EOD · Apr 9, 2026</span>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:22%">Metric</th>
+          <th style="width:16%">
+            Nasdaq 100
+            <span class="th-sub">$QQQE · 101 stocks</span>
+          </th>
+          <th style="width:16%">
+            S&P 500
+            <span class="th-sub">$RSP · 503 stocks</span>
+          </th>
+          <th style="width:22%">
+            Composite
+            <span class="th-sub">RSP+QQQ+DJIA · ~516 unique</span>
+          </th>
+          <th style="width:24%">
+            $1B+ Market Cap
+            <span class="th-sub">~2,486 stocks universe</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- GROUP: Day Performance -->
+        <tr class="group-row"><td colspan="5">📅  Day Performance</td></tr>
+
+        <tr>
+          <td>Stocks UP (Day)</td>
+          <td class="c-r2">18</td>
+          <td class="c-r2">97</td>
+          <td class="c-r2">124</td>
+          <td class="c-r2">421</td>
+        </tr>
+        <tr>
+          <td>Stocks DOWN (Day)</td>
+          <td class="c-r3">83</td>
+          <td class="c-r3">406</td>
+          <td class="c-r3">392</td>
+          <td class="c-r3">2,065</td>
+        </tr>
+        <tr>
+          <td>Unchanged (Day)</td>
+          <td class="c-n">0</td>
+          <td class="c-n">0</td>
+          <td class="c-n">0</td>
+          <td class="c-n">0</td>
+        </tr>
+        <tr>
+          <td>Up/Down Ratio (Day)</td>
+          <td class="c-r2">0.22</td>
+          <td class="c-r2">0.24</td>
+          <td class="c-r1">0.32</td>
+          <td class="c-r3">0.20</td>
+        </tr>
+
+        <!-- GROUP: Week Performance -->
+        <tr class="group-row"><td colspan="5">📅  Week Performance</td></tr>
+
+        <tr>
+          <td>Stocks UP (Week)</td>
+          <td class="c-r2">14</td>
+          <td class="c-r2">81</td>
+          <td class="c-r2">104</td>
+          <td class="c-r2">341</td>
+        </tr>
+        <tr>
+          <td>Stocks DOWN (Week)</td>
+          <td class="c-r3">87</td>
+          <td class="c-r3">422</td>
+          <td class="c-r3">412</td>
+          <td class="c-r3">2,145</td>
+        </tr>
+        <tr>
+          <td>Up/Down Ratio (Week)</td>
+          <td class="c-r3">0.16</td>
+          <td class="c-r3">0.19</td>
+          <td class="c-r2">0.25</td>
+          <td class="c-r3">0.16</td>
+        </tr>
+
+        <!-- GROUP: Month Performance -->
+        <tr class="group-row"><td colspan="5">📅  Month Performance (MTD)</td></tr>
+
+        <tr>
+          <td>Stocks UP (Month)</td>
+          <td class="c-r2">23</td>
+          <td class="c-r2">108</td>
+          <td class="c-r1">139</td>
+          <td class="c-r2">498</td>
+        </tr>
+        <tr>
+          <td>Stocks DOWN (Month)</td>
+          <td class="c-r3">78</td>
+          <td class="c-r3">395</td>
+          <td class="c-r3">377</td>
+          <td class="c-r3">1,988</td>
+        </tr>
+        <tr>
+          <td>Up/Down Ratio (Month)</td>
+          <td class="c-r2">0.29</td>
+          <td class="c-r2">0.27</td>
+          <td class="c-r1">0.37</td>
+          <td class="c-r2">0.25</td>
+        </tr>
+
+        <!-- GROUP: Moving Average Breadth -->
+        <tr class="group-row"><td colspan="5">📉  % of Stocks Above Moving Average</td></tr>
+
+        <tr>
+          <td>% Above SMA 20</td>
+          <td class="c-r3">12.9%</td>
+          <td class="c-r3">17.1%</td>
+          <td class="c-r2">20.3%</td>
+          <td class="c-r3">15.8%</td>
+        </tr>
+        <tr>
+          <td>% Above SMA 50</td>
+          <td class="c-r2">21.8%</td>
+          <td class="c-r2">26.4%</td>
+          <td class="c-r1">29.7%</td>
+          <td class="c-r2">23.1%</td>
+        </tr>
+        <tr>
+          <td>% Above SMA 200</td>
+          <td class="c-r1">34.7%</td>
+          <td class="c-r1">38.2%</td>
+          <td class="c-r1">42.6%</td>
+          <td class="c-r1">36.4%</td>
+        </tr>
+
+        <!-- GROUP: New Highs/Lows -->
+        <tr class="group-row"><td colspan="5">🔔  New 20-Day Price Extremes</td></tr>
+
+        <tr>
+          <td>New 20-Day Highs</td>
+          <td class="c-r2">1</td>
+          <td class="c-r2">6</td>
+          <td class="c-r1">8</td>
+          <td class="c-r2">27</td>
+        </tr>
+        <tr>
+          <td>New 20-Day Lows</td>
+          <td class="c-r3">54</td>
+          <td class="c-r3">207</td>
+          <td class="c-r3">231</td>
+          <td class="c-r3">812</td>
+        </tr>
+        <tr>
+          <td>Hi/Lo Ratio (20D)</td>
+          <td class="c-r3">0.02</td>
+          <td class="c-r3">0.03</td>
+          <td class="c-r3">0.03</td>
+          <td class="c-r3">0.03</td>
+        </tr>
+
+        <!-- GROUP: New 52W Highs/Lows -->
+        <tr class="group-row"><td colspan="5">🔔  New 52-Week Price Extremes</td></tr>
+
+        <tr>
+          <td>New 52W Highs</td>
+          <td class="c-n">0</td>
+          <td class="c-n">2</td>
+          <td class="c-n">3</td>
+          <td class="c-r1">14</td>
+        </tr>
+        <tr>
+          <td>New 52W Lows</td>
+          <td class="c-r3">31</td>
+          <td class="c-r3">89</td>
+          <td class="c-r3">94</td>
+          <td class="c-r3">347</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 2: SECTOR PERFORMANCE ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-icon">🏭</span>
+    <span class="section-title">Section 2 — Sector Performance (SPDR ETFs)</span>
+    <span class="section-badge">Day · Week · Month % Chg</span>
+  </div>
+  <div class="sector-grid">
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Technology</div><div class="sc-etf">XLK</div></div>
+        <div class="sc-day down">−3.72%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−9.14%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−13.87%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Comm. Services</div><div class="sc-etf">XLC</div></div>
+        <div class="sc-day down">−2.91%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−7.83%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−11.24%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Cons. Disc.</div><div class="sc-etf">XLY</div></div>
+        <div class="sc-day down">−2.34%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−7.21%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−10.56%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Financials</div><div class="sc-etf">XLF</div></div>
+        <div class="sc-day down">−2.17%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−5.64%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−8.31%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Industrials</div><div class="sc-etf">XLI</div></div>
+        <div class="sc-day down">−1.88%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−5.02%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−7.48%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Materials</div><div class="sc-etf">XLB</div></div>
+        <div class="sc-day down">−1.73%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−5.41%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−8.76%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Energy</div><div class="sc-etf">XLE</div></div>
+        <div class="sc-day down">−1.29%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−4.17%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−6.38%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Real Estate</div><div class="sc-etf">XLRE</div></div>
+        <div class="sc-day down">−0.94%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−2.83%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−4.67%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card neg">
+      <div class="sc-top">
+        <div><div class="sc-name">Health Care</div><div class="sc-etf">XLV</div></div>
+        <div class="sc-day down">−0.71%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−2.14%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−3.52%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card flat">
+      <div class="sc-top">
+        <div><div class="sc-name">Cons. Staples</div><div class="sc-etf">XLP</div></div>
+        <div class="sc-day neutral">+0.08%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−1.02%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val down">−1.47%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card pos">
+      <div class="sc-top">
+        <div><div class="sc-name">Utilities</div><div class="sc-etf">XLU</div></div>
+        <div class="sc-day up">+0.34%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val down">−0.67%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val up">+0.93%</div></div>
+      </div>
+    </div>
+
+    <div class="sector-card pos">
+      <div class="sc-top">
+        <div><div class="sc-name">Gold</div><div class="sc-etf">GLD</div></div>
+        <div class="sc-day up">+1.82%</div>
+      </div>
+      <div class="sc-bars">
+        <div class="sc-bar-item"><div class="sc-bar-label">Week</div><div class="sc-bar-val up">+3.41%</div></div>
+        <div class="sc-bar-item"><div class="sc-bar-label">Month</div><div class="sc-bar-val up">+6.17%</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 3: BREADTH / MARKET HEALTH ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-icon">❤️</span>
+    <span class="section-title">Section 3 — Market Breadth &amp; Health Indicators</span>
+    <span class="section-badge">Real-Time Composite</span>
+  </div>
+  <div class="breadth-grid">
+
+    <div class="breadth-card">
+      <div class="bc-label">NYSE Adv/Decl</div>
+      <div class="bc-value down">−2,847</div>
+      <div class="bc-sub down">341 adv · 3,188 dec</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:10%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">NASDAQ Adv/Decl</div>
+      <div class="bc-value down">−3,124</div>
+      <div class="bc-sub down">487 adv · 3,611 dec</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:12%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">NYSE New Hi / Lo</div>
+      <div class="bc-value down">18 / 487</div>
+      <div class="bc-sub down">Hi-Lo Ratio: 0.04</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:4%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">NASDAQ New Hi / Lo</div>
+      <div class="bc-value down">22 / 614</div>
+      <div class="bc-sub down">Hi-Lo Ratio: 0.03</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:3%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">VIX (CBOE Volatility)</div>
+      <div class="bc-value down">38.4</div>
+      <div class="bc-sub down">▲ +4.7 · EXTREME FEAR</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:77%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">Put/Call Ratio (Total)</div>
+      <div class="bc-value down">1.42</div>
+      <div class="bc-sub down">Bearish · 5d avg: 1.18</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:85%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">TRIN (Arms Index)</div>
+      <div class="bc-value down">1.87</div>
+      <div class="bc-sub down">Oversold · Selling pressure</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:90%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">McClellan Oscillator</div>
+      <div class="bc-value down">−187</div>
+      <div class="bc-sub down">Deeply oversold</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:6%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">McClellan Summation</div>
+      <div class="bc-value down">−1,043</div>
+      <div class="bc-sub down">Bearish trend intact</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:8%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">% S&P 500 > 200 SMA</div>
+      <div class="bc-value down">38.2%</div>
+      <div class="bc-sub down">Below 50% threshold</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:38%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">% S&P 500 > 50 SMA</div>
+      <div class="bc-value down">26.4%</div>
+      <div class="bc-sub down">Deeply below threshold</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:26%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">% S&P 500 > 20 SMA</div>
+      <div class="bc-value down">17.1%</div>
+      <div class="bc-sub down">Severe deterioration</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:17%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">Bullish % Index (BPSPX)</div>
+      <div class="bc-value down">24.8%</div>
+      <div class="bc-sub down">Bear market territory</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:25%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">High-Low Logic Index</div>
+      <div class="bc-value down">0.09</div>
+      <div class="bc-sub down">Bearish · Threshold: 0.05</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:9%;background:var(--amber)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">SPX vs 200 SMA</div>
+      <div class="bc-value down">−8.7%</div>
+      <div class="bc-sub down">Below 200 SMA · Bearish</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:12%;background:var(--red)"></div></div>
+    </div>
+
+    <div class="breadth-card">
+      <div class="bc-label">Gold (GLD) vs SPY</div>
+      <div class="bc-value up">+1.82%</div>
+      <div class="bc-sub up">Risk-off rotation active</div>
+      <div class="bc-bar-wrap"><div class="bc-bar" style="width:65%;background:var(--green)"></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<div class="footer">
+  <div class="footer-left">
+    <strong>Data sources:</strong> Yahoo Finance · CBOE · NYSE · NASDAQ · StockCharts.com &nbsp;|&nbsp;
+    <strong>Universe:</strong> RSP (503) + QQQE (101) + DJIA (30) = ~516 unique composites · $1B+ cap universe ~2,486 stocks
+  </div>
+  <div class="footer-right">Generated: Apr 9, 2026 · 4:02 PM ET</div>
+</div>
+
+<div class="watermark">📊 <span>Market Metrics Dashboard</span> · Inspired by @SteveDJacobs · For educational &amp; informational purposes only · Not financial advice</div>
+
+</body>
+</html>

@@ -39,11 +39,11 @@ const progress = {
   }
 };
 
-// Initialize DeepSeek client
+// Initialize Gemini client via OpenAI-compatible endpoint
 const openai = new OpenAI({
-  baseURL: "https://api.deepseek.com",
-  /** Placeholder allows Next build when env is unset; real calls still need DEEPSEEK_API_KEY. */
-  apiKey: process.env.DEEPSEEK_API_KEY ?? "build-without-key",
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  /** Placeholder allows Next build when env is unset; real calls still need GEMINI_API_KEY. */
+  apiKey: process.env.GEMINI_API_KEY ?? "build-without-key",
 });
 
 const systemPrompt = `You are a professional stock market analyst specializing in fundamental analysis.
@@ -54,7 +54,15 @@ Focus on four key areas:
 3. Financial Health (liquidity, leverage)
 4. Price Ratios (P/E, P/B, P/S)
 
-Provide your analysis in a structured format with clear reasoning for each aspect.`;
+Respond ONLY with a JSON object in this exact shape:
+{
+  "overall_signal": "bullish" | "bearish" | "neutral",
+  "confidence": <integer 0-100>,
+  "profitability": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
+  "growth": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
+  "financial_health": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
+  "price_ratios": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" }
+}`;
 
 export async function fundamentalsAgent(state: AgentState) {
   const { data } = state;
@@ -101,29 +109,29 @@ export async function fundamentalsAgent(state: AgentState) {
         }
       };
 
-      if (process.env.DEEPSEEK_API_KEY) {
+      if (process.env.GEMINI_API_KEY) {
         try {
           const metricsPrompt = `
           Analyze the following financial metrics for ${ticker}:
-          
+
           Profitability Metrics:
           - Return on Equity: ${((metrics.returnOnEquity ?? 0) * 100).toFixed(2)}%
           - Net Margin: ${((metrics.profitMargins ?? 0) * 100).toFixed(2)}%
           - Operating Margin: ${((metrics.operatingMargins ?? 0) * 100).toFixed(2)}%
-          
+
           Growth Metrics:
           - Revenue Growth: ${((metrics.revenueGrowth ?? 0) * 100).toFixed(2)}%
-          
+
           Financial Health:
           - Current Ratio: ${metrics.currentRatio ?? "N/A"}
           - Debt to Equity: ${metrics.debtToEquity ?? "N/A"}
           - Free Cash Flow: ${metrics.freeCashflow ?? "N/A"}
-          
+
           Price Ratios:
           - Forward P/E: ${metrics.forwardPE ?? "N/A"}
           - P/B Ratio: ${metrics.priceToBook ?? "N/A"}
           - P/S Ratio: ${metrics.priceToSalesTrailing12Months ?? "N/A"}
-          
+
           Please provide a detailed analysis with signals (bullish/bearish/neutral) and confidence levels for each aspect.`;
 
           progress.updateStatus("fundamentals_agent", ticker, "Requesting AI analysis");
@@ -133,15 +141,16 @@ export async function fundamentalsAgent(state: AgentState) {
                 { role: "system", content: systemPrompt },
                 { role: "user", content: metricsPrompt }
               ],
-              model: "deepseek-chat",
+              model: "gemini-2.5-pro",
               temperature: 0.7,
-              max_tokens: 1000
+              max_tokens: 1000,
+              response_format: { type: "json_object" }
             })
-          );
+          , 3, 1000);
 
           progress.updateStatus("fundamentals_agent", ticker, "Processing AI response");
           const analysis = JSON.parse(completion.choices[0].message.content || '{}');
-          
+
           fundamentalAnalysis[ticker] = {
             signal: analysis.overall_signal,
             confidence: analysis.confidence,
@@ -154,7 +163,7 @@ export async function fundamentalsAgent(state: AgentState) {
             }
           };
         } catch (error) {
-          console.log("OpenAI analysis unavailable, using default analysis");
+          console.log("Gemini analysis unavailable, using default analysis");
         }
       }
 

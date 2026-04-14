@@ -5,7 +5,7 @@
 export async function withRetry<T>(
   fn: () => Promise<T>,
   maxRetries = 3,
-  baseDelayMs = 1000
+  baseDelayMs = 2000
 ): Promise<T> {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -14,9 +14,12 @@ export async function withRetry<T>(
       const e = err as { status?: number; statusCode?: number; response?: { status?: number }; message?: string };
       const status = e?.status ?? e?.response?.status ?? e?.statusCode;
       const isOverloaded = status === 529 || e?.message?.includes('overloaded');
-      if (isOverloaded && attempt < maxRetries - 1) {
+      const isTooManyRequests = status === 429 || e?.message?.includes('Too Many Requests');
+      const shouldRetry = isOverloaded || isTooManyRequests;
+      if (shouldRetry && attempt < maxRetries - 1) {
         const delay = baseDelayMs * Math.pow(2, attempt);
-        console.warn(`API overloaded (529), retrying in ${delay}ms... (attempt ${attempt + 1}/${maxRetries})`);
+        const reason = isTooManyRequests ? 'rate limited (429)' : 'overloaded (529)';
+        console.warn(`API ${reason}, retrying in ${delay}ms... (attempt ${attempt + 1}/${maxRetries})`);
         await new Promise((r) => setTimeout(r, delay));
         continue;
       }

@@ -1,4 +1,5 @@
 import yahooFinance from 'yahoo-finance2';
+import { withRetry } from '../../../src/utils/retry';
 
 export interface FinancialMetrics {
   // Price & Market Data
@@ -55,19 +56,17 @@ export async function getFinalancialMetrics(params: GetFinancialMetricsParams): 
     console.log(`Ticker: ${ticker}`);
     
     // Get quote data first
-    const quote = await yahooFinance.quote(ticker);
+    const quote = await withRetry(() =>
+      // @ts-expect-error: yahoo-finance2 types omit the queryOptions 3rd argument
+      yahooFinance.quote(ticker, {}, { skipValidation: true })
+    , 3, 2000);
     console.log('Quote data:', JSON.stringify(quote, null, 2));
 
     // Get detailed financial data
-    const quoteSummary = await yahooFinance.quoteSummary(ticker, {
-      modules: [
-        'price',
-        'summaryDetail',
-        'financialData',
-        'defaultKeyStatistics',
-        'recommendationTrend'
-      ]
-    });
+    const quoteSummary = await withRetry(async () => {
+      // @ts-expect-error: yahoo-finance2 types omit the queryOptions 3rd argument
+      return yahooFinance.quoteSummary(ticker, { modules: ['price', 'summaryDetail', 'financialData', 'defaultKeyStatistics', 'recommendationTrend'] }, { skipValidation: true });
+    }, 3, 2000);
 
     console.log('QuoteSummary raw response:', JSON.stringify(quoteSummary, null, 2));
 
