@@ -29,6 +29,33 @@ import requests
 
 
 # ---------------------------------------------------------------------------
+# Load .env from the repo root so the script works locally without manually
+# exporting env vars. In CI, GitHub Secrets are already in the environment
+# and this is a no-op (existing env vars are never overwritten).
+# ---------------------------------------------------------------------------
+
+def _load_env():
+    here = os.path.dirname(os.path.abspath(__file__))
+    # scripts/ -> market_dashboard_backend/ -> apps/ -> repo root
+    repo_root = os.path.normpath(os.path.join(here, "..", "..", ".."))
+    env_path = os.path.join(repo_root, ".env")
+    if not os.path.exists(env_path):
+        return
+    with open(env_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+_load_env()
+
+
+# ---------------------------------------------------------------------------
 # Watchlist & trader styles (embedded so backend has no file dependency)
 # ---------------------------------------------------------------------------
 

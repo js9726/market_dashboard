@@ -39,6 +39,8 @@ jobs:
         run: python scripts/morning_brief.py --out-dir data
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Sync data into Next.js public folder
         working-directory: apps/market_dashboard
@@ -47,7 +49,11 @@ jobs:
           cp ../market_dashboard_backend/data/snapshot.json public/market-dashboard/
           cp ../market_dashboard_backend/data/events.json    public/market-dashboard/
           cp ../market_dashboard_backend/data/meta.json      public/market-dashboard/
-          cp ../market_dashboard_backend/data/morning_brief.md public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief.md              public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief_gemini.html     public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief_openai.html     public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief_claude.html     public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief_meta.json       public/market-dashboard/ 2>/dev/null || true
           cp ../market_dashboard_backend/data/charts/*.png   public/market-dashboard/charts/ 2>/dev/null || true
 
       - name: Sanitize JSON (replace NaN/Infinity with null)
