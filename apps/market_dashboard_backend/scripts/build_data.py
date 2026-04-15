@@ -33,11 +33,6 @@ try:
 except ImportError:
     _BS4_AVAILABLE = False
 
-try:
-    import pandas_datareader.data as pdr
-    _PDR_AVAILABLE = True
-except ImportError:
-    _PDR_AVAILABLE = False
 
 # --- Config: no Liquid Stocks ---
 KEY_EVENTS = [
@@ -378,24 +373,28 @@ def create_rs_chart_png(rrs_data, ticker, charts_dir):
 
 
 def fetch_stooq_history(ticker, period_days):
-    """Fetch OHLCV history from stooq via pandas_datareader.
-
-    Returns a DataFrame (ascending date, dropna applied) or None.
-    stooq returns data newest-first — sorted ascending here.
-    Timezone is normalised to tz-naive to avoid comparison errors with yfinance.
-    """
-    if not _PDR_AVAILABLE:
+    """Fetch OHLCV history from stooq via direct HTTP CSV download."""
+    if not _BS4_AVAILABLE:  # requests is imported alongside bs4
         return None
     try:
         end = datetime.now()
         start = end - timedelta(days=period_days)
-        df = pdr.DataReader(ticker, 'stooq', start=start, end=end)
+        url = (
+            f"https://stooq.com/q/d/l/?s={ticker.lower()}"
+            f"&d1={start.strftime('%Y%m%d')}"
+            f"&d2={end.strftime('%Y%m%d')}"
+            f"&i=d"
+        )
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        from io import StringIO
+        df = pd.read_csv(StringIO(resp.text), parse_dates=["Date"], index_col="Date")
         if df is None or df.empty:
             return None
         df = df.sort_index(ascending=True)
         if df.index.tz is not None:
             df.index = df.index.tz_localize(None)
-        df = df.dropna(subset=['Close', 'Open', 'High', 'Low'])
+        df = df.dropna(subset=["Close", "Open", "High", "Low"])
         return df if not df.empty else None
     except Exception as e:
         print(f"stooq fetch failed for {ticker}: {e}")
