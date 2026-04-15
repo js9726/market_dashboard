@@ -1,0 +1,241 @@
+<style>
+.brief { font-family: var(--brief-font-mono, ui-monospace, 'Cascadia Code', monospace); padding: 1rem 0; max-width: 100%; color: var(--brief-text-primary, #e2e8f0); }
+.brief .b-header { border-bottom: 1px solid var(--brief-border-primary, #334155); padding-bottom: 0.75rem; margin-bottom: 1rem; }
+.brief .b-header h1 { font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+.brief .b-header .b-sub { font-size: 11px; color: var(--brief-text-secondary, #94a3b8); margin-top: 2px; }
+.brief .b-section { margin-bottom: 1.5rem; }
+.brief .b-section-title { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brief-text-secondary, #94a3b8); border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); padding-bottom: 4px; margin-bottom: 10px; }
+.brief .b-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); font-size: 13px; gap: 8px; }
+.brief .b-row:last-child { border-bottom: none; }
+.brief .b-ticker { font-weight: 500; min-width: 80px; flex-shrink: 0; }
+.brief .b-level { color: var(--brief-text-secondary, #94a3b8); font-size: 12px; }
+.brief .b-note { font-size: 11px; color: var(--brief-text-tertiary, #64748b); flex: 1; text-align: right; }
+.brief .b-up { color: #1D9E75; }
+.brief .b-down { color: #D85A30; }
+.brief .b-neutral { color: var(--brief-text-secondary, #94a3b8); }
+.brief .b-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 500; margin-left: 4px; }
+.brief .b-tag-warn { background: #FAEEDA; color: #854F0B; }
+.brief .b-tag-up { background: #1a3d2b; color: #4ade80; }
+.brief .b-tag-down { background: #3d1a1a; color: #f87171; }
+.brief .b-tag-info { background: #1a2a3d; color: #60a5fa; }
+.brief .b-mover { padding: 6px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); }
+.brief .b-mover:last-child { border-bottom: none; }
+.brief .b-mover-name { font-size: 13px; font-weight: 500; }
+.brief .b-mover-why { font-size: 11px; color: var(--brief-text-secondary, #94a3b8); margin-top: 2px; line-height: 1.4; }
+.brief .b-mover-style { font-size: 10px; color: #60a5fa; margin-top: 2px; font-style: italic; }
+.brief .b-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.brief .b-cal-item { padding: 5px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); font-size: 12px; }
+.brief .b-cal-item:last-child { border-bottom: none; }
+.brief .b-cal-time { color: var(--brief-text-secondary, #94a3b8); font-size: 11px; }
+.brief .b-cal-name { font-weight: 500; }
+.brief .b-cal-consensus { color: var(--brief-text-tertiary, #64748b); font-size: 11px; }
+.brief .b-mood-box { background: var(--brief-bg-secondary, #1e293b); border-radius: 6px; padding: 0.75rem 1rem; font-size: 12px; line-height: 1.7; }
+.brief .b-mood-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brief-text-secondary, #94a3b8); margin-bottom: 4px; }
+.brief .b-trader-call { margin-top: 8px; font-size: 11px; color: var(--brief-text-secondary, #94a3b8); line-height: 1.6; }
+.brief .b-trader-call strong { color: var(--brief-text-primary, #e2e8f0); }
+.brief .b-earnings-beat { font-size: 13px; padding: 5px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); }
+.brief .b-earnings-beat:last-child { border-bottom: none; }
+.brief .b-cite { font-size: 10px; color: var(--brief-text-tertiary, #64748b); font-style: italic; }
+.brief .b-alert { background: #2d1f0a; border-left: 3px solid #EF9F27; padding: 6px 10px; border-radius: 0 4px 4px 0; margin-bottom: 1rem; font-size: 12px; color: #fbbf24; }
+.brief .b-footer { font-size: 10px; color: var(--brief-text-tertiary, #64748b); padding-top: 0.5rem; border-top: 0.5px solid var(--brief-border-tertiary, #1e293b); margin-top: 1rem; }
+</style>
+<div class="brief">
+  <div class="b-header">
+    <h1>Morning Brief — Wednesday, April 15, 2026</h1>
+    <div class="b-sub">Generated 5:00 PM MYT | US markets open 9:30 PM MYT | Powered by live web search</div>
+  </div>
+  <div class="b-alert">⚠ IMF CUTS GLOBAL GROWTH OUTLOOK, CITING GEOPOLITICAL SHOCKS AND ENERGY PRICE VOLATILITY.</div>
+  <div class="b-section">
+    <div class="b-section-title">1. Index Snapshot</div>
+    <div class="b-row">
+      <span class="b-ticker">S&P 500</span>
+      <span class="b-level">7,005.75</span>
+      <span class="b-up">+0.01%</span>
+      <span class="b-note">Futures flat</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">NASDAQ 100</span>
+      <span class="b-level">26,011.00</span>
+      <span class="b-up">+0.05%</span>
+      <span class="b-note">Futures slightly up</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">DOW 30</span>
+      <span class="b-level">48,721.00</span>
+      <span class="b-up">+0.12%</span>
+      <span class="b-note">Futures indicating higher open</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">VIX</span>
+      <span class="b-level">18.07</span>
+      <span class="b-down">-5.49%</span>
+      <span class="b-note">Fear easing on peace talks</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">US 10Y</span>
+      <span class="b-level">4.26%</span>
+      <span class="b-up">+0.01%</span>
+      <span class="b-note">Yields steady</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">WTI Crude</span>
+      <span class="b-level">$90.70</span>
+      <span class="b-down">-0.58%</span>
+      <span class="b-note">Easing on diplomatic hopes</span>
+    </div>
+  </div>
+
+  <div class="b-section">
+    <div class="b-section-title">2. Overnight Asia & Europe — The Why</div>
+    <div class="b-row">
+      <span class="b-ticker">Nikkei 225</span>
+      <span class="b-up">+0.44%</span>
+      <span class="b-note">Gained on hopes for US-Iran talks, easing oil prices.</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">Hang Seng</span>
+      <span class="b-up">+0.40%</span>
+      <span class="b-note">Followed Wall Street's rally on improved risk sentiment.</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">CSI 300</span>
+      <span class="b-down">-0.10%</span>
+      <span class="b-note">Slightly down, lagging regional gains.</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">STOXX 600</span>
+      <span class="b-neutral">(unavailable)</span>
+      <span class="b-note">European markets opening cautiously.</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">DAX</span>
+      <span class="b-neutral">(unavailable)</span>
+      <span class="b-note">ECB's Lagarde signals patience on rates amid uncertainty.</span>
+    </div>
+  </div>
+
+  <div class="b-section">
+    <div class="b-section-title">3. Pre-Market Movers</div>
+    <div class="b-mover">
+      <div class="b-mover-name">AAL <span class="b-tag b-tag-up">+4.3%</span></div>
+      <div class="b-mover-why">Reports of a potential merger proposal with United Airlines are driving shares higher.</div>
+      <div class="b-mover-style">Trader lens (PrimeTrading): Watching for clean break and hold of pre-market highs for momentum confirmation.</div>
+    </div>
+    <div class="b-mover">
+      <div class="b-mover-name">WFC <span class="b-tag b-tag-down">-0.8%</span></div>
+      <div class="b-mover-why">Shares slipping in pre-market trading alongside other major banks like Citigroup.</div>
+      <div class="b-mover-style">Trader lens (Ted Zhang): Institutional distribution in financials? Watching if this weakness persists into the open.</div>
+    </div>
+    <div class="b-mover">
+      <div class="b-mover-name">AVGO <span class="b-tag b-tag-up">+1.5%</span></div>
+      <div class="b-mover-why">Broadcom and Meta announced an expanded multi-year partnership for AI chips, boosting sentiment.</div>
+      <div class="b-mover-style">Trader lens (Minervini): A high RS stock showing strength on positive news. A potential VCP setup could form.</div>
+    </div>
+  </div>
+
+  <div class="b-section">
+    <div class="b-section-title">4. Earnings On Deck</div>
+    <div class="b-two-col">
+      <div>
+        <div class="b-cal-name" style="margin-bottom: 5px;">Before Market Open</div>
+        <div class="b-earnings-beat">BAC <span class="b-note">Bank of America</span></div>
+        <div class="b-earnings-beat">MS <span class="b-note">Morgan Stanley</span></div>
+        <div class="b-earnings-beat">PNC <span class="b-note">PNC Financial</span></div>
+        <div class="b-earnings-beat">ASML <span class="b-note">ASML Holding</span></div>
+      </div>
+      <div>
+        <div class="b-cal-name" style="margin-bottom: 5px;">After Market Close</div>
+        <div class="b-earnings-beat">KMI <span class="b-note">Kinder Morgan</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="b-section">
+    <div class="b-section-title">5. Fed & Macro Calendar — This Week</div>
+    <div class="b-two-col">
+      <div>
+        <div class="b-cal-item">
+          <div class="b-cal-time">8:30 AM ET</div>
+          <div class="b-cal-name">Import/Export Prices</div>
+          <div class="b-cal-consensus">(data unavailable at generation time)</div>
+        </div>
+        <div class="b-cal-item">
+          <div class="b-cal-time">8:30 AM ET</div>
+          <div class="b-cal-name">Empire State Mfg Index</div>
+          <div class="b-cal-consensus">(data unavailable at generation time)</div>
+        </div>
+      </div>
+      <div>
+        <div class="b-cal-item">
+          <div class="b-cal-time">8:30 AM ET</div>
+          <div class="b-cal-name">Fed's Barr Speaks</div>
+        </div>
+        <div class="b-cal-item">
+          <div class="b-cal-time">1:45 PM ET</div>
+          <div class="b-cal-name">Fed's Bowman Speaks</div>
+        </div>
+        <div class="b-cal-item">
+          <div class="b-cal-time">2:00 PM ET</div>
+          <div class="b-cal-name">Fed's Beige Book</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="b-section">
+    <div class="b-section-title">6. Analyst Upgrades / Downgrades</div>
+    <div class="b-row">
+      <span class="b-ticker">INFO</span>
+      <span class="b-note">Upgraded to Buy at BofA</span>
+      <span class="b-up">$150 PT</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">DDOG</span>
+      <span class="b-note">Initiated Overweight at Piper Sandler</span>
+      <span class="b-up">$165 PT</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">MDB</span>
+      <span class="b-note">Upgraded to Buy at Guggenheim</span>
+      <span class="b-up">$480 PT</span>
+    </div>
+    <div class="b-row">
+      <span class="b-ticker">SNOW</span>
+      <span class="b-note">Downgraded to Neutral at BofA</span>
+      <span class="b-down">$180 PT</span>
+    </div>
+  </div>
+
+  <div class="b-section">
+    <div class="b-section-title">7. My Watchlist</div>
+    <div class="b-row"><span class="b-ticker">NVDA</span><span class="b-up">+0.2%</span><span class="b-note">Consolidating near highs, watching for pivot.</span></div>
+    <div class="b-row"><span class="b-ticker">TSLA</span><span class="b-down">-0.1%</span><span class="b-note">Below key moving averages, avoid for now.</span></div>
+    <div class="b-row"><span class="b-ticker">AAPL</span><span class="b-up">+0.1%</span><span class="b-note">Range-bound, needs catalyst.</span></div>
+    <div class="b-row"><span class="b-ticker">MSFT</span><span class="b-up">+0.3%</span><span class="b-note">Showing relative strength, near all-time highs.</span></div>
+    <div class="b-row"><span class="b-ticker">AMZN</span><span class="b-neutral">0.0%</span><span class="b-note">Choppy price action, waiting for setup.</span></div>
+    <div class="b-row"><span class="b-ticker">META</span><span class="b-up">+0.4%</span><span class="b-note">Strong uptrend, watch for continuation.</span></div>
+    <div class="b-row"><span class="b-ticker">GOOGL</span><span class="b-up">+0.2%</span><span class="b-note">Building a base, potential for breakout.</span></div>
+    <div class="b-row"><span class="b-ticker">AMD</span><span class="b-down">-0.2%</span><span class="b-note">Lagging NVDA, needs to reclaim key levels.</span></div>
+    <div class="b-row"><span class="b-ticker">SMCI</span><span class="b-up">+0.8%</span><span class="b-note">Volatile, but holding uptrend support.</span></div>
+    <div class="b-row"><span class="b-ticker">PLTR</span><span class="b-down">-0.5%</span><span class="b-note">Weakness below 20-day MA, caution advised.</span></div>
+    <div class="b-row"><span class="b-ticker">CRWD</span><span class="b-up">+0.6%</span><span class="b-note">Leading cybersecurity name, strong Stage 2 uptrend.</span></div>
+    <div class="b-row"><span class="b-ticker">MSTR</span><span class="b-down">-1.1%</span><span class="b-note">Correcting with Bitcoin, high volatility.</span></div>
+  </div>
+
+  <div class="b-section">
+    <div class="b-section-title">8. What to Watch — Market Mood</div>
+    <div class="b-mood-box">
+      <div class="b-mood-label">Mood: Cautiously Risk-On</div>
+      <p>Market sentiment has improved significantly on hopes of a diplomatic breakthrough in the Middle East, which has sent oil prices lower and eased inflation fears. The Nasdaq has logged ten straight days of gains. However, the IMF's downgrade of global growth serves as a major macro overhang. The key variable today will be the market's reaction to bank earnings and any forward guidance on the economy.</p>
+      <div class="b-trader-call">
+        <strong>Minervini:</strong> Market context is improving, but not yet a confirmed uptrend. Focus on high RS stocks forming tight pivots.
+        <strong>Ted Zhang:</strong> A rotation from tech into "Old Economy" value sectors like energy and industrials has been a key theme in early 2026. Watch if money flows back into tech as oil prices ease.
+        <strong>Clement Ang:</strong> Still a B-grade environment. Be selective with A-rated setups only. No need to force trades.
+        <strong>SRxTrades:</strong> Look for clean technical entries with volume confirmation. Avoid chasing extended names.
+        <strong>Jeff:</strong> Stick to your rules. Geopolitical headlines can cause whipsaws. Honor your stops.
+        <strong>Composite:</strong> The market is climbing a wall of worry. While the short-term trend is up, macro risks remain. Trade with the trend but manage risk tightly. Focus on leaders showing strength on a challenging backdrop (e.g., specific semi/software names).
+      </div>
+    </div>
+  </div>
+  <div class="b-footer">Generated via live web search · Not financial advice · April 15, 2026 5:00 PM MYT</div>
+</div>

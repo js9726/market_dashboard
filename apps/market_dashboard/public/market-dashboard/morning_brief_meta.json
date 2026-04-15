@@ -1,0 +1,20 @@
+{
+  "built_at": "2026-04-15T09:05:02.152571+00:00",
+  "providers": {
+    "gemini": {
+      "available": true,
+      "generated": true,
+      "label": "Gemini 2.5 Pro"
+    },
+    "openai": {
+      "available": true,
+      "generated": false,
+      "label": "GPT-4o"
+    },
+    "claude": {
+      "available": true,
+      "generated": false,
+      "label": "Claude claude-sonnet-4-6"
+    }
+  }
+}
