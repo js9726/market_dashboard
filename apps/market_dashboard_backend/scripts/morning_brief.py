@@ -191,7 +191,19 @@ def call_gemini_with_retry(prompt, max_retries=3):
                 raise IOError("rate_limit")
             resp.raise_for_status()
             data = resp.json()
-            return data["candidates"][0]["content"]["parts"][0]["text"]
+            candidate = data.get("candidates", [{}])[0]
+            content = candidate.get("content", {})
+            parts = content.get("parts")
+            if not parts:
+                finish_reason = candidate.get("finishReason", "unknown")
+                prompt_feedback = data.get("promptFeedback", {})
+                raise ValueError(
+                    f"Gemini returned no content parts "
+                    f"(finishReason={finish_reason}, promptFeedback={prompt_feedback})"
+                )
+            return parts[0]["text"]
+        except ValueError:
+            raise  # blocked/filtered response — no point retrying
         except (IOError, requests.HTTPError) as e:
             is_rate_limit = "rate_limit" in str(e) or (
                 hasattr(e, "response") and getattr(e.response, "status_code", 0) == 429

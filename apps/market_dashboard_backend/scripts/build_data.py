@@ -33,6 +33,12 @@ try:
 except ImportError:
     _BS4_AVAILABLE = False
 
+try:
+    import pandas_datareader.data as pdr
+    _PDR_AVAILABLE = True
+except ImportError:
+    _PDR_AVAILABLE = False
+
 # --- Config: no Liquid Stocks ---
 KEY_EVENTS = [
     "Fed", "Federal Reserve", "Interest Rate", "FOMC",
@@ -114,6 +120,65 @@ LEVERAGED_ETFS = {
     "INDA": {"long": ["INDL"], "short": []},
     "EEM": {"long": ["EDC"], "short": ["EDZ"]},
     "EWZ": {"long": ["BRZU"], "short": []}
+}
+
+# Google Finance URL: https://www.google.com/finance/quote/{TICKER}:{EXCHANGE}
+# Used by fetch_google_finance_quote() as a last-resort fallback for current-day price.
+GOOGLE_FINANCE_EXCHANGE = {
+    # Indices
+    "QQQE": "NASDAQ",  "MGK": "NYSEARCA",  "QQQ": "NASDAQ",
+    "IBIT": "NASDAQ",  "RSP": "NYSEARCA",   "MDY": "NYSEARCA",
+    "IWM": "NYSEARCA", "TLT": "NASDAQ",     "SPY": "NYSEARCA",
+    "ETHA": "NASDAQ",  "DIA": "NYSEARCA",
+    # S&P Style ETFs
+    "IJS": "NYSEARCA", "IJR": "NYSEARCA",   "IJT": "NYSEARCA",
+    "IJJ": "NYSEARCA", "IJH": "NYSEARCA",   "IJK": "NYSEARCA",
+    "IVE": "NYSEARCA", "IVV": "NYSEARCA",   "IVW": "NYSEARCA",
+    # Sel Sectors
+    "XLK": "NYSEARCA", "XLI": "NYSEARCA",   "XLC": "NYSEARCA",
+    "XLF": "NYSEARCA", "XLU": "NYSEARCA",   "XLY": "NYSEARCA",
+    "XLRE": "NYSEARCA","XLP": "NYSEARCA",   "XLB": "NYSEARCA",
+    "XLE": "NYSEARCA", "XLV": "NYSEARCA",
+    # EW Sectors
+    "RSPT": "NYSEARCA","RSPC": "NYSEARCA",  "RSPN": "NYSEARCA",
+    "RSPF": "NYSEARCA","RSPD": "NYSEARCA",  "RSPU": "NYSEARCA",
+    "RSPR": "NYSEARCA","RSPH": "NYSEARCA",  "RSPM": "NYSEARCA",
+    "RSPS": "NYSEARCA","RSPG": "NYSEARCA",
+    # Industries
+    "TAN": "NASDAQ",   "KCE": "NYSEARCA",   "IBUY": "NASDAQ",
+    "JETS": "NYSEARCA","IBB": "NASDAQ",     "SMH": "NASDAQ",
+    "CIBR": "NASDAQ",  "UTES": "NYSEARCA",  "ROBO": "NASDAQ",
+    "IGV": "NYSEARCA", "WCLD": "NASDAQ",    "ITA": "NYSEARCA",
+    "PAVE": "NYSE",    "BLOK": "NYSE",      "AIQ": "NYSE",
+    "IYZ": "NYSEARCA", "PEJ": "NASDAQ",     "FDN": "NYSEARCA",
+    "KBE": "NYSEARCA", "UNG": "NYSEARCA",   "BOAT": "NYSE",
+    "KWEB": "NYSEARCA","KRE": "NYSEARCA",   "XRT": "NYSEARCA",
+    "IHI": "NYSEARCA", "DRIV": "NASDAQ",    "MSOS": "OTC",
+    "SOCL": "NASDAQ",  "ARKF": "NYSEARCA",  "SLX": "NYSEARCA",
+    "ARKK": "NYSEARCA","XTN": "NYSEARCA",   "XME": "NYSEARCA",
+    "KIE": "NYSEARCA", "GLD": "NYSEARCA",   "GXC": "NYSEARCA",
+    "SCHH": "NYSEARCA","GDX": "NYSEARCA",   "IPAY": "NASDAQ",
+    "XOP": "NYSEARCA", "VNQ": "NYSEARCA",   "EATZ": "NYSE",
+    "FXI": "NYSEARCA", "DBA": "NYSEARCA",   "ICLN": "NASDAQ",
+    "SILJ": "NYSEARCA","REZ": "NYSEARCA",   "LIT": "NYSEARCA",
+    "SLV": "NYSEARCA", "XHB": "NYSEARCA",   "XHE": "NYSEARCA",
+    "PBJ": "NASDAQ",   "USO": "NYSEARCA",   "DBC": "NYSEARCA",
+    "FCG": "NYSEARCA", "XBI": "NYSEARCA",   "ARKG": "NYSEARCA",
+    "CPER": "NYSE",    "XES": "NYSEARCA",   "OIH": "NYSEARCA",
+    "PPH": "NASDAQ",   "FNGS": "NYSE",      "URA": "NYSEARCA",
+    "WGMI": "NASDAQ",  "REMX": "NYSEARCA",
+    # Countries
+    "EZA": "NYSEARCA", "ARGT": "NYSEARCA",  "EWA": "NYSEARCA",
+    "THD": "NYSEARCA", "EIDO": "NYSEARCA",  "EWC": "NYSEARCA",
+    "GREK": "NYSEARCA","EWP": "NYSEARCA",   "EWG": "NYSEARCA",
+    "EWL": "NYSEARCA", "EUFN": "NASDAQ",    "EWY": "NYSEARCA",
+    "IEUR": "NASDAQ",  "EFA": "NYSEARCA",   "ACWI": "NASDAQ",
+    "IEV": "NYSEARCA", "EWQ": "NYSEARCA",   "EWI": "NYSEARCA",
+    "EWJ": "NYSEARCA", "EWW": "NYSEARCA",   "ECH": "NYSEARCA",
+    "EWD": "NYSEARCA", "ASHR": "NYSEARCA",  "EWS": "NYSEARCA",
+    "KSA": "NYSEARCA", "INDA": "NYSEARCA",  "EEM": "NYSEARCA",
+    "EWZ": "NYSEARCA", "TUR": "NYSEARCA",   "EWH": "NYSEARCA",
+    "EWT": "NYSEARCA", "MCHI": "NASDAQ",
 }
 
 SECTOR_COLORS = {
@@ -312,19 +377,168 @@ def create_rs_chart_png(rrs_data, ticker, charts_dir):
         return None
 
 
+def fetch_stooq_history(ticker, period_days):
+    """Fetch OHLCV history from stooq via pandas_datareader.
+
+    Returns a DataFrame (ascending date, dropna applied) or None.
+    stooq returns data newest-first — sorted ascending here.
+    Timezone is normalised to tz-naive to avoid comparison errors with yfinance.
+    """
+    if not _PDR_AVAILABLE:
+        return None
+    try:
+        end = datetime.now()
+        start = end - timedelta(days=period_days)
+        df = pdr.DataReader(ticker, 'stooq', start=start, end=end)
+        if df is None or df.empty:
+            return None
+        df = df.sort_index(ascending=True)
+        if df.index.tz is not None:
+            df.index = df.index.tz_localize(None)
+        df = df.dropna(subset=['Close', 'Open', 'High', 'Low'])
+        return df if not df.empty else None
+    except Exception as e:
+        print(f"stooq fetch failed for {ticker}: {e}")
+        return None
+
+
+def fetch_google_finance_quote(ticker):
+    """Scrape current-day price from Google Finance.
+
+    Returns {"price": float, "prev_close": float, "open": float|None} or None.
+    Provides CURRENT-DAY data only — no historical OHLCV.
+    Used as last-resort rescue for daily/intra when all history sources fail.
+    """
+    if not _BS4_AVAILABLE:
+        return None
+    exchange = GOOGLE_FINANCE_EXCHANGE.get(ticker)
+    if not exchange:
+        return None
+    url = f"https://www.google.com/finance/quote/{ticker}:{exchange}"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    try:
+        resp = requests.get(url, headers=headers, timeout=10)
+        if resp.status_code != 200:
+            return None
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        # Current price — try multiple selectors in order of stability
+        price = None
+        for selector in [
+            'div.YMlKec.fxKbKc',
+            '[data-last-price]',
+            'div[class*="YMlKec"]',
+        ]:
+            tag = soup.select_one(selector)
+            if tag:
+                raw = tag.get('data-last-price') or tag.get_text(strip=True)
+                try:
+                    price = float(str(raw).replace(',', '').replace('$', ''))
+                    break
+                except (ValueError, AttributeError):
+                    continue
+        if price is None:
+            return None
+
+        # Previous close — find label then navigate to sibling value
+        prev_close = None
+        for label in soup.find_all(string=lambda t: t and 'Previous close' in t):
+            parent = label.find_parent()
+            if parent:
+                sib = parent.find_next_sibling()
+                if sib:
+                    try:
+                        prev_close = float(sib.get_text(strip=True).replace(',', '').replace('$', ''))
+                        break
+                    except ValueError:
+                        continue
+
+        # Today's open
+        open_price = None
+        for label in soup.find_all(string=lambda t: t and t.strip() == 'Open'):
+            parent = label.find_parent()
+            if parent:
+                sib = parent.find_next_sibling()
+                if sib:
+                    try:
+                        open_price = float(sib.get_text(strip=True).replace(',', '').replace('$', ''))
+                        break
+                    except ValueError:
+                        continue
+
+        return {"price": price, "prev_close": prev_close, "open": open_price}
+    except Exception as e:
+        print(f"Google Finance fetch failed for {ticker}: {e}")
+        return None
+
+
+def fetch_history_with_fallback(ticker, period_days):
+    """Fetch OHLCV history trying yfinance first, then stooq.
+
+    Returns a DataFrame (ascending date, dropna applied) or None.
+    """
+    # Layer 1: yfinance
+    try:
+        stock = yf.Ticker(ticker)
+        if period_days <= 30:
+            df = stock.history(period="21d")
+        elif period_days <= 90:
+            df = stock.history(period="60d")
+        elif period_days <= 400:
+            end = datetime.now()
+            start = end - timedelta(days=period_days)
+            df = stock.history(start=start, end=end)
+        else:
+            df = stock.history(period="1y")
+        if df.index.tz is not None:
+            df.index = df.index.tz_localize(None)
+        df = df.dropna(subset=['Close', 'Open', 'High', 'Low'])
+        if not df.empty:
+            return df
+    except Exception as e:
+        print(f"yfinance failed for {ticker} ({period_days}d): {e}")
+
+    # Layer 2: stooq
+    print(f"Falling back to stooq for {ticker} ({period_days}d)")
+    return fetch_stooq_history(ticker, period_days)
+
+
 def get_stock_data(ticker_symbol, charts_dir):
     try:
-        stock = yf.Ticker(ticker_symbol)
+        # Fetch short and long history with yfinance → stooq fallback
+        hist  = fetch_history_with_fallback(ticker_symbol, 30)
+        daily = fetch_history_with_fallback(ticker_symbol, 90)
 
-        # Drop rows where Close/Open/High/Low are NaN — yfinance sometimes returns
-        # NaN-filled rows for the current pre-market day when the pipeline runs
-        # before market open (4:30 AM ET). These poison all price calculations.
-        hist_raw  = stock.history(period="21d")
-        daily_raw = stock.history(period="60d")
-        hist  = hist_raw.dropna(subset=['Close', 'Open', 'High', 'Low'])
-        daily = daily_raw.dropna(subset=['Close', 'Open', 'High', 'Low'])
+        if hist is not None:
+            hist = hist.dropna(subset=['Close', 'Open', 'High', 'Low'])
+        if daily is not None:
+            daily = daily.dropna(subset=['Close', 'Open', 'High', 'Low'])
 
-        if len(hist) < 2 or len(daily) < 50:
+        # Google Finance rescue: history unavailable — return minimal row with daily/intra only
+        if hist is None or len(hist) < 2:
+            gf = fetch_google_finance_quote(ticker_symbol)
+            if gf and gf.get("price") and gf.get("prev_close"):
+                daily_chg = (gf["price"] / gf["prev_close"] - 1) * 100
+                intra_chg = (gf["price"] / gf["open"] - 1) * 100 if gf.get("open") else None
+                long_etfs, short_etfs = get_leveraged_etfs(ticker_symbol)
+                return {
+                    "ticker": ticker_symbol,
+                    "daily": round(daily_chg, 2),
+                    "intra": round(intra_chg, 2) if intra_chg is not None else None,
+                    "5d": None, "20d": None, "atr_pct": None,
+                    "dist_sma50_atr": None, "rs": None, "rs_chart": None,
+                    "long": long_etfs, "short": short_etfs, "abc": None,
+                }
+            return None  # all sources exhausted
+
+        if daily is None or len(daily) < 50:
             return None
 
         daily_change = (hist['Close'].iloc[-1] / hist['Close'].iloc[-2] - 1) * 100
@@ -341,11 +555,16 @@ def get_stock_data(ticker_symbol, charts_dir):
 
         rs_sts = None
         rrs_data = None
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=120)
+        start_date = datetime.now() - timedelta(days=120)
         try:
-            stock_history = stock.history(start=start_date, end=end_date).dropna(subset=['Close', 'Open', 'High', 'Low'])
-            spy_history   = yf.Ticker("SPY").history(start=start_date, end=end_date).dropna(subset=['Close', 'Open', 'High', 'Low'])
+            stock_history = fetch_history_with_fallback(ticker_symbol, 180)
+            spy_history   = fetch_history_with_fallback("SPY", 180)
+            # Trim to 120-day window (stooq returns buffered days)
+            ts = pd.Timestamp(start_date).tz_localize(None)
+            if stock_history is not None:
+                stock_history = stock_history[stock_history.index >= ts].dropna(subset=['Close', 'Open', 'High', 'Low'])
+            if spy_history is not None:
+                spy_history = spy_history[spy_history.index >= ts].dropna(subset=['Close', 'Open', 'High', 'Low'])
             if stock_history is not None and spy_history is not None and len(stock_history) > 0 and len(spy_history) > 0:
                 rrs_data = calculate_rrs(stock_history, spy_history, atr_length=14, length_rolling=50, length_sma=20, atr_multiplier=1.0)
                 if rrs_data is not None and len(rrs_data) >= 21:
@@ -424,8 +643,8 @@ def compute_breadth(tickers):
     valid = 0
     for ticker in tickers:
         try:
-            hist = yf.Ticker(ticker).history(period="1y")
-            if len(hist) < 200:
+            hist = fetch_history_with_fallback(ticker, 400)
+            if hist is None or len(hist) < 200:
                 continue
             close = hist["Close"].iloc[-1]
             sma200 = hist["Close"].rolling(200).mean().iloc[-1]
