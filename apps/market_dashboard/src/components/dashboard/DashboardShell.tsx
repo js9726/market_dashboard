@@ -5,11 +5,12 @@ import Link from "next/link";
 import ChatInterface from "@/components/ChatInterface";
 import MarketOverview from "@/components/market/MarketOverview";
 import MarketMetricsDashboard from "@/components/market/MarketMetricsDashboard";
+import MorningBrief from "@/components/market/MorningBrief";
 
-type Tab = "market" | "metrics" | "chat";
+type Tab = "brief" | "market" | "metrics" | "chat";
 
 export default function DashboardShell() {
-  const [tab, setTab] = useState<Tab>("market");
+  const [tab, setTab] = useState<Tab>("brief");
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -22,44 +23,35 @@ export default function DashboardShell() {
             <h1 className="text-lg font-semibold tracking-tight">Market desk</h1>
           </div>
           <nav className="flex gap-1 rounded-lg bg-slate-800/80 p-1">
-            <button
-              type="button"
-              onClick={() => setTab("market")}
-              className={`rounded-md px-4 py-2 text-sm font-medium transition ${
-                tab === "market"
-                  ? "bg-slate-700 text-white shadow"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              Dashboard
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab("metrics")}
-              className={`rounded-md px-4 py-2 text-sm font-medium transition ${
-                tab === "metrics"
-                  ? "bg-slate-700 text-white shadow"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              📈 Market Metrics
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab("chat")}
-              className={`rounded-md px-4 py-2 text-sm font-medium transition ${
-                tab === "chat"
-                  ? "bg-slate-700 text-white shadow"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              Chat ($tickers)
-            </button>
+            {(
+              [
+                { id: "brief", label: "Morning Brief" },
+                { id: "market", label: "Dashboard" },
+                { id: "metrics", label: "Market Metrics" },
+                { id: "chat", label: "Chat ($tickers)" },
+              ] as { id: Tab; label: string }[]
+            ).map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setTab(id)}
+                className={`rounded-md px-4 py-2 text-sm font-medium transition ${
+                  tab === id
+                    ? "bg-slate-700 text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </nav>
         </div>
       </header>
 
       <main className="container mx-auto max-w-6xl px-4 py-6">
+        {tab === "brief" && (
+          <MorningBrief />
+        )}
         {tab === "market" && (
           <div>
             <p className="mb-4 text-sm text-slate-400">

@@ -12,7 +12,7 @@ Behavioral guidelines for AI-assisted development on this repo. Applies to all s
 | Layer | Path | Stack |
 |---|---|---|
 | Data Pipeline | `apps/market_dashboard_backend/scripts/` | Python, yfinance, Finviz, requests, BeautifulSoup |
-| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | Gemini 2.5 Pro via REST API |
+| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | Gemini 2.5 Pro + GPT-4o + Claude (live web search, HTML output) |
 | Frontend | `apps/market_dashboard/` | Next.js 15.5, TypeScript, Tailwind, Recharts |
 | AI Agents | `apps/market_dashboard/agents/` | Fundamental (yahoo-finance2 + DeepSeek), Technical |
 | Auth | `apps/market_dashboard/src/middleware.ts` | Cookie-based password auth (no Clerk) |
@@ -23,7 +23,7 @@ Behavioral guidelines for AI-assisted development on this repo. Applies to all s
 
 ```
 build_data.py → data/snapshot.json + data/charts/*.png
-morning_brief.py → data/morning_brief.md
+morning_brief.py → data/morning_brief_{gemini,openai,claude}.html + data/morning_brief_meta.json
 sync step (CI or npm run sync:market) → public/market-dashboard/
 Vercel serves static files from public/
 ```
@@ -37,7 +37,8 @@ Vercel serves static files from public/
 ```bash
 pip install -r requirements.txt
 python scripts/build_data.py --out-dir data       # fetch yfinance, Finviz, breadth metrics
-python scripts/morning_brief.py --out-dir data    # requires GEMINI_API_KEY
+python scripts/morning_brief.py --out-dir data    # requires at least one of GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY
+# Optionally limit providers: --providers gemini,claude
 ```
 
 ### Next.js Frontend (from `apps/market_dashboard/`)
@@ -170,7 +171,9 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 | Variable | Where set | Required | Purpose |
 |---|---|---|---|
-| `GEMINI_API_KEY` | GitHub Secret + `.env.local` | Yes | Gemini 2.5 Pro morning brief |
+| `GEMINI_API_KEY` | GitHub Secret + `.env.local` | Yes (≥1 brief key) | Morning brief — Gemini 2.5 Pro with Search Grounding |
+| `OPENAI_API_KEY` | GitHub Secret + `.env.local` | Optional | Morning brief — GPT-4o with web_search_preview |
+| `ANTHROPIC_API_KEY` | GitHub Secret + `.env.local` | Optional | Morning brief — Claude claude-sonnet-4-6 with web search |
 | `DASHBOARD_PASSWORD` | Vercel + `.env.local` | Yes | Login password for dashboard |
 | `AUTH_TOKEN` | Vercel + `.env.local` | Yes | httpOnly session cookie value |
 | `DEEPSEEK_API_KEY` | `.env.local` / Vercel | Optional | AI stock analysis tab |
@@ -189,6 +192,10 @@ Never commit `.env.local`. Never log API keys. Never hardcode secrets in `.bat` 
 | `npm install` fails on Vercel | Clerk peer dep conflict with Next.js 16 | Clerk removed; do not re-add |
 | Workflow commits loop forever | Missing `[skip ci]` in commit message | Already fixed — don't remove it |
 | numpy `NaN` survives sanitize | `isinstance(obj, float)` misses `np.float64` | Use `.item()` on numpy scalars |
+| Morning brief tab shows error | `morning_brief_meta.json` not in `public/market-dashboard/` | Run `morning_brief.py` then `npm run sync:market` |
+| Brief provider button greyed out | API key not set or generation failed | Check env var; see `morning_brief_meta.json` for `generated: false` |
+| OpenAI brief fails | `openai` package not installed | `pip install openai>=1.70.0` |
+| Claude brief fails | `anthropic` package not installed | `pip install anthropic>=0.49.0` |
 
 ---
 
