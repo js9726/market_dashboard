@@ -73,7 +73,7 @@ function metricCellStyle(label: string, val: string): React.CSSProperties {
     if (num >= 1.5) return { background: "#14532d", color: "#86efac" };
     if (num >= 1.0) return { background: "#1c3a1a", color: "#6ee7b7" };
     if (num < 0.67) return { background: "#450a0a", color: "#fca5a5" };
-    return { background: "#3b1a0a", color: "#fdba74" };
+    return { background: "#7c2d12", color: "#fed7aa" };
   }
   return { color: "#94a3b8", background: "transparent" };
 }
@@ -106,8 +106,18 @@ function getMetricValue(stats: BreadthStats, key: string): string {
 
 function getLeaders(snapshot: MarketSnapshot): TickerRow[] {
   const all: TickerRow[] = Object.values(snapshot.groups).flat();
-  return all
+  const deduped = new Map<string, TickerRow>();
+
+  all
     .filter((r) => r.rs != null && (r.rs ?? 0) >= 60)
+    .forEach((row) => {
+      const existing = deduped.get(row.ticker);
+      if (!existing || (row.rs ?? 0) > (existing.rs ?? 0)) {
+        deduped.set(row.ticker, row);
+      }
+    });
+
+  return Array.from(deduped.values())
     .sort((a, b) => (b.rs ?? 0) - (a.rs ?? 0))
     .slice(0, 30);
 }
@@ -116,15 +126,15 @@ function rsColor(rs: number | null): string {
   if (rs == null) return "#475569";
   if (rs >= 80) return "#22c55e";
   if (rs >= 60) return "#86efac";
-  if (rs >= 40) return "#fbbf24";
+  if (rs >= 40) return "#f97316";
   return "#f87171";
 }
 
 function AbcPill({ abc }: { abc: string | null }) {
   if (!abc) return <span style={{ color: "#475569" }}>—</span>;
-  const bg = abc === "A" ? "#1d4ed8" : abc === "B" ? "#15803d" : "#b45309";
+  const bg = abc === "A" ? "#1d4ed8" : abc === "B" ? "#15803d" : "#92400e";
   return (
-    <span style={{ background: bg, color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, fontWeight: 700 }}>
+    <span style={{ background: bg, color: abc === "C" ? "#fef3c7" : "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 11, fontWeight: 700 }}>
       {abc}
     </span>
   );
@@ -240,12 +250,12 @@ export default function MarketMetricsDashboard() {
               Market <span style={{ color: "#0ea5e9" }}>Metrics</span> Dashboard
             </h2>
             <p style={{ fontSize: 11, color: "#64748b", marginTop: 3, fontFamily: "monospace" }}>
-              Breadth · Sectors · SMA Positioning · RS Leaders · Inspired by @SteveDJacobs
+              Breadth · Sectors · SMA Positioning · RS Leaders
             </p>
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-          <div style={{ fontSize: 12, fontFamily: "monospace", color: "#0ea5e9", fontWeight: 600 }}>
+          <div style={{ fontSize: 12, fontFamily: "monospace", color: "#f97316", fontWeight: 600 }}>
             Updated: {builtAt} MYT
           </div>
           <div style={{ fontSize: 10, color: "#475569", fontFamily: "monospace" }}>
@@ -261,10 +271,10 @@ export default function MarketMetricsDashboard() {
             padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600,
             letterSpacing: "0.5px", textTransform: "uppercase",
             background: sentiment === "RISK-ON"  ? "rgba(34,197,94,0.15)"  :
-                        sentiment === "RISK-OFF" ? "rgba(239,68,68,0.15)"  : "rgba(245,158,11,0.12)",
-            border: `1px solid ${sentiment === "RISK-ON" ? "rgba(34,197,94,0.3)" : sentiment === "RISK-OFF" ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`,
+                        sentiment === "RISK-OFF" ? "rgba(239,68,68,0.15)"  : "rgba(249,115,22,0.15)",
+            border: `1px solid ${sentiment === "RISK-ON" ? "rgba(34,197,94,0.3)" : sentiment === "RISK-OFF" ? "rgba(239,68,68,0.3)" : "rgba(249,115,22,0.3)"}`,
             color: sentiment === "RISK-ON"  ? "#4ade80" :
-                   sentiment === "RISK-OFF" ? "#f87171" : "#fbbf24",
+                   sentiment === "RISK-OFF" ? "#f87171" : "#f97316",
           }}>
             ● {sentiment}
           </div>
@@ -280,17 +290,17 @@ export default function MarketMetricsDashboard() {
             return (
               <div key={r.ticker} style={{
                 display: "flex", flexDirection: "column",
-                padding: "9px 14px", background: "#0e1318",
+                padding: "9px 14px", background: "#111b27",
                 border: "1px solid #1e2d3d", borderRadius: 8, minWidth: 90, flex: "1 1 90px",
               }}>
-                <div style={{ fontSize: 9.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.8px", color: "#475569", marginBottom: 4 }}>
+                <div style={{ fontSize: 9.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.8px", color: "#cbd5e1", marginBottom: 4 }}>
                   {r.ticker}
                 </div>
                 <div style={{ fontFamily: "monospace", fontSize: 15, fontWeight: 600, color: "#e2e8f0" }}>
                   {pct(r.daily)}
                 </div>
                 <div style={{ fontFamily: "monospace", fontSize: 10, marginTop: 2,
-                  color: isUp ? "#22c55e" : isDown ? "#ef4444" : "#64748b" }}>
+                  color: isUp ? "#86efac" : isDown ? "#fca5a5" : "#94a3b8" }}>
                   {r["5d"] != null ? `5d ${pct(r["5d"])}` : "—"}
                 </div>
               </div>
@@ -301,8 +311,8 @@ export default function MarketMetricsDashboard() {
 
       {/* ── Section 1: Key Metrics Table ── */}
       <section style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#475569", marginBottom: 8, paddingLeft: 4 }}>
-          1 · Key Metrics
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#f97316", marginBottom: 8, paddingLeft: 4 }}>
+          <span style={{ color: "#e2e8f0" }}>1</span> · <span style={{ color: "#cbd5e1" }}>Key Metrics</span>
         </div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
@@ -376,8 +386,8 @@ export default function MarketMetricsDashboard() {
         <section style={{ marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", background: "#131a22", border: "1px solid #1e2d3d", borderBottom: "none", borderRadius: "8px 8px 0 0" }}>
             <span>🏭</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.2px", color: "#64748b" }}>
-              2 · Sector Performance
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.2px", color: "#e2e8f0" }}>
+              <span style={{ color: "#f97316" }}>2</span> · Sector Performance
             </span>
             <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 10, color: "#475569", padding: "2px 8px", background: "#1a2330", borderRadius: 4, border: "1px solid #1e2d3d" }}>
               Day · Week · Month % Chg
@@ -433,8 +443,8 @@ export default function MarketMetricsDashboard() {
 
         {/* Chart 1: Indices + Sectors */}
         <section style={{ background: "#0b1120", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#475569", marginBottom: 12 }}>
-            3 · Indices <span style={{ color: "#166534" }}>■</span> + Sectors <span style={{ color: "#14532d" }}>▪</span>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+            <span style={{ color: "#e2e8f0" }}><span style={{ color: "#f97316" }}>3</span> · Indices</span> <span style={{ color: "#22c55e" }}>■</span> + <span style={{ color: "#e2e8f0" }}>Sectors</span> <span style={{ color: "#f97316" }}>■</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={barData1} margin={{ top: 4, right: 8, left: -16, bottom: 0 }} barSize={14}>
@@ -446,19 +456,19 @@ export default function MarketMetricsDashboard() {
                 labelStyle={{ color: "#94a3b8", fontWeight: 600 }}
                 cursor={{ fill: "#ffffff08" }}
               />
-              <Legend iconSize={10} iconType="square" wrapperStyle={{ fontSize: 11, color: "#64748b" }} />
-              <Bar dataKey="Indices Up"    fill="#166534" stackId="a" />
-              <Bar dataKey="Indices Down"  fill="#7f1d1d" stackId="a" />
-              <Bar dataKey="Sectors Up"   fill="#14532d" stackId="b" />
-              <Bar dataKey="Sectors Down" fill="#450a0a" stackId="b" />
+              <Legend iconSize={10} iconType="square" wrapperStyle={{ fontSize: 11, color: "#cbd5e1" }} />
+              <Bar dataKey="Indices Up"    fill="#22c55e" stackId="a" />
+              <Bar dataKey="Indices Down"  fill="#ef4444" stackId="a" />
+              <Bar dataKey="Sectors Up"   fill="#f97316" stackId="b" />
+              <Bar dataKey="Sectors Down" fill="#dc2626" stackId="b" />
             </BarChart>
           </ResponsiveContainer>
         </section>
 
         {/* Chart 2: Industries + Countries */}
         <section style={{ background: "#0b1120", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#475569", marginBottom: 12 }}>
-            4 · Industries <span style={{ color: "#166534" }}>■</span> + Countries <span style={{ color: "#14532d" }}>▪</span>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+            <span style={{ color: "#e2e8f0" }}><span style={{ color: "#f97316" }}>4</span> · Industries</span> <span style={{ color: "#22c55e" }}>■</span> + <span style={{ color: "#e2e8f0" }}>Countries</span> <span style={{ color: "#f97316" }}>■</span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={barData2} margin={{ top: 4, right: 8, left: -16, bottom: 0 }} barSize={14}>
@@ -470,11 +480,11 @@ export default function MarketMetricsDashboard() {
                 labelStyle={{ color: "#94a3b8", fontWeight: 600 }}
                 cursor={{ fill: "#ffffff08" }}
               />
-              <Legend iconSize={10} iconType="square" wrapperStyle={{ fontSize: 11, color: "#64748b" }} />
-              <Bar dataKey="Industries Up"    fill="#166534" stackId="a" />
-              <Bar dataKey="Industries Down"  fill="#7f1d1d" stackId="a" />
-              <Bar dataKey="Countries Up"   fill="#14532d" stackId="b" />
-              <Bar dataKey="Countries Down" fill="#450a0a" stackId="b" />
+              <Legend iconSize={10} iconType="square" wrapperStyle={{ fontSize: 11, color: "#cbd5e1" }} />
+              <Bar dataKey="Industries Up"    fill="#22c55e" stackId="a" />
+              <Bar dataKey="Industries Down"  fill="#ef4444" stackId="a" />
+              <Bar dataKey="Countries Up"   fill="#f97316" stackId="b" />
+              <Bar dataKey="Countries Down" fill="#dc2626" stackId="b" />
             </BarChart>
           </ResponsiveContainer>
         </section>
@@ -482,8 +492,8 @@ export default function MarketMetricsDashboard() {
 
       {/* ── Section 5: High RS Screener (Qullamaggie-inspired) ── */}
       <section>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#475569", marginBottom: 8, paddingLeft: 4 }}>
-          5 · Qullamaggie-Inspired Screener — RS ≥ 60 Leaders ({leaders.length})
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
+          <span style={{ color: "#e2e8f0" }}><span style={{ color: "#f97316" }}>5</span> · Qullamaggie-Inspired Screener</span> — RS ≥ 60 Leaders <span style={{ color: "#cbd5e1" }}>({leaders.length})</span>
         </div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
@@ -503,7 +513,7 @@ export default function MarketMetricsDashboard() {
                 const moPct  = r["20d"];
                 return (
                   <tr
-                    key={r.ticker}
+                    key={`${r.ticker}-${i}`}
                     style={{ background: i % 2 === 0 ? "#0b1120" : "#080d18", borderBottom: "1px solid #111827" }}
                   >
                     <td style={{ padding: "5px 10px", color: "#334155", fontSize: 11 }}>{i + 1}</td>

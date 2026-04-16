@@ -1,27 +1,38 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { auth } from "@/auth";
+import { NextResponse } from "next/server";
 
-const PUBLIC_PATHS = ['/login', '/api/auth', '/market-dashboard'];
+export default auth((req) => {
+  const session = req.auth;
+  const { pathname } = req.nextUrl;
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // Not signed in → Google sign-in
+  if (!session) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
-  // Allow public paths through
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+  const role = session.user?.role;
+
+  // Approved roles can proceed
+  if (role === "owner" || role === "allowed") {
+    // Admin area: owner only
+    if (pathname.startsWith("/admin") && role !== "owner") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
     return NextResponse.next();
   }
 
-  // Check session cookie
-  const session = request.cookies.get('dashboard_session')?.value;
-  const authToken = process.env.AUTH_TOKEN;
-
-  if (!session || !authToken || session !== authToken) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Pending / unknown → hold page
+  if (role === "pending" || !role) {
+    if (!pathname.startsWith("/pending")) {
+      return NextResponse.redirect(new URL("/pending", req.url));
+    }
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
-}
+  // Denied → sign them out
+  return NextResponse.redirect(new URL("/api/auth/signout", req.url));
+});
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|market-dashboard|.*\\.png$).*)'],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|market-dashboard|.*\\.png$).*)"],
 };

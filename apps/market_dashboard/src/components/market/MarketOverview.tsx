@@ -44,6 +44,33 @@ function AbcBadge({ abc }: { abc: string | null }) {
   );
 }
 
+const HEADER_TOOLTIPS = {
+  distAtr:
+    "Distance from the 50-day SMA measured in ATR units. Calculated as 100 x (Close / SMA50 - 1) / ATR%, where ATR% = 100 x ATR(14) / Close. Positive means above the 50-day SMA; negative means below it.",
+  rs:
+    "Relative Strength score versus SPY on a 0-100 scale. RRS is computed from the stock's daily move minus the SPY-implied move, normalized by the stock ATR(14). RS is then the percentile rank of today's 50-day rolling RRS versus the last 21 sessions.",
+  abc:
+    "Trend grade from moving-average alignment. A = EMA10 > EMA20 > SMA50. B = mixed alignment, where only part of the stack is in trend order. C = EMA10 < EMA20 < SMA50.",
+} as const;
+
+function HeaderWithTooltip({
+  label,
+  tooltip,
+}: {
+  label: string;
+  tooltip: string;
+}) {
+  return (
+    <span
+      className="cursor-help underline decoration-dotted underline-offset-4"
+      title={tooltip}
+      aria-label={`${label}: ${tooltip}`}
+    >
+      {label}
+    </span>
+  );
+}
+
 export default function MarketOverview() {
   const [snapshot, setSnapshot] = useState<MarketSnapshot | null>(null);
   const [events, setEvents] = useState<MacroEvent[]>([]);
@@ -210,9 +237,18 @@ export default function MarketOverview() {
                   <th className="p-2">5d</th>
                   <th className="p-2">20d</th>
                   <th className="p-2">ATR%</th>
-                  <th className="p-2">Dist/ATR</th>
-                  <th className="p-2">RS</th>
-                  <th className="p-2">ABC</th>
+                  <th className="p-2">
+                    <HeaderWithTooltip
+                      label="Dist/ATR"
+                      tooltip={HEADER_TOOLTIPS.distAtr}
+                    />
+                  </th>
+                  <th className="p-2">
+                    <HeaderWithTooltip label="RS" tooltip={HEADER_TOOLTIPS.rs} />
+                  </th>
+                  <th className="p-2">
+                    <HeaderWithTooltip label="ABC" tooltip={HEADER_TOOLTIPS.abc} />
+                  </th>
                   <th className="p-2">RRS</th>
                   <th className="p-2">Leveraged</th>
                 </tr>
