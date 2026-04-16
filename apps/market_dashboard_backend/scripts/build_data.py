@@ -380,7 +380,7 @@ def fetch_stooq_history(ticker, period_days):
         end = datetime.now()
         start = end - timedelta(days=period_days)
         url = (
-            f"https://stooq.com/q/d/l/?s={ticker.lower()}"
+            f"https://stooq.com/q/d/l/?s={ticker.lower()}.us"
             f"&d1={start.strftime('%Y%m%d')}"
             f"&d2={end.strftime('%Y%m%d')}"
             f"&i=d"
