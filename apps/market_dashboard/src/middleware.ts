@@ -5,6 +5,11 @@ export default auth((req) => {
   const session = req.auth;
   const { pathname } = req.nextUrl;
 
+  // Always allow login page and NextAuth API routes through (prevents redirect loop)
+  if (pathname.startsWith("/login") || pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
   // Not signed in → Google sign-in
   if (!session) {
     return NextResponse.redirect(new URL("/login", req.url));
