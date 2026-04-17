@@ -75,6 +75,7 @@ model SpreadsheetConnection {
   sheetTab      String    @default("T.Journal [JS]")
   headerRow     Int       @default(14)
   dateCol       Int       @default(1) // 0-indexed; col B = 1. Editable in UI if auto-detect fails.
+  colMap        Json      @default("{}") // { ticker, date, buyPrice, qty, pnl, exitPrice, side, fees, notes }
   lastSyncedAt  DateTime?
   createdAt     DateTime  @default(now())
 
@@ -93,6 +94,10 @@ model Trade {
   buyPrice  Decimal?  @db.Decimal(12, 4)
   quantity  Decimal?  @db.Decimal(12, 2)
   pnl       Decimal?  @db.Decimal(12, 2) // NULL = open trade
+  exitPrice Decimal?  @db.Decimal(12, 4)
+  side      String?   // "Long" | "Short"
+  fees      Decimal?  @db.Decimal(12, 2)
+  notes     String?
   rawRow    Json // full row stored for re-parsing without re-fetching
   syncedAt  DateTime  @default(now())
 

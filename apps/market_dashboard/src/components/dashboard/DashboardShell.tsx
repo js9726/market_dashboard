@@ -6,8 +6,9 @@ import ChatInterface from "@/components/ChatInterface";
 import MarketOverview from "@/components/market/MarketOverview";
 import MarketMetricsDashboard from "@/components/market/MarketMetricsDashboard";
 import MorningBrief from "@/components/market/MorningBrief";
+import JournalShell from "@/components/journal/JournalShell";
 
-type Tab = "brief" | "market" | "metrics" | "chat";
+type Tab = "brief" | "market" | "metrics" | "chat" | "journal";
 
 export default function DashboardShell() {
   const [tab, setTab] = useState<Tab>("brief");
@@ -29,6 +30,7 @@ export default function DashboardShell() {
                 { id: "market", label: "Dashboard" },
                 { id: "metrics", label: "Market Metrics" },
                 { id: "chat", label: "Chat ($tickers)" },
+                { id: "journal", label: "Trade Journal" },
               ] as { id: Tab; label: string }[]
             ).map(({ id, label }) => (
               <button
@@ -74,6 +76,7 @@ export default function DashboardShell() {
             <ChatInterface />
           </div>
         )}
+        {tab === "journal" && <JournalShell />}
       </main>
     </div>
   );

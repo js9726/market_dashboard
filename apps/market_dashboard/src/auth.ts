@@ -12,7 +12,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorization: {
         params: {
           scope:
-            "openid email profile https://www.googleapis.com/auth/spreadsheets.readonly",
+            "openid email profile https://www.googleapis.com/auth/spreadsheets",
           access_type: "offline", // required for refresh_token
           prompt: "consent",      // forces refresh_token even on re-auth
         },
