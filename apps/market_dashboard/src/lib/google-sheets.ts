@@ -39,10 +39,11 @@ function parseDate(val: string | undefined): Date | null {
     if (!isNaN(d.getTime())) return d;
   }
 
-  // DD/MM/YYYY or D/M/YYYY (Malaysian/British format, e.g. "24/1/2026")
-  const ddmmyyyy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (ddmmyyyy) {
-    const d = new Date(`${ddmmyyyy[3]}-${ddmmyyyy[2].padStart(2, "0")}-${ddmmyyyy[1].padStart(2, "0")}`);
+  // DD/MM/YY or DD/MM/YYYY (e.g. "28/01/25" or "28/01/2025")
+  const ddmmyy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (ddmmyy) {
+    const year = ddmmyy[3].length === 2 ? `20${ddmmyy[3]}` : ddmmyy[3];
+    const d = new Date(`${year}-${ddmmyy[2].padStart(2, "0")}-${ddmmyy[1].padStart(2, "0")}`);
     if (!isNaN(d.getTime())) return d;
   }
 
