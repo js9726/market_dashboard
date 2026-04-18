@@ -48,9 +48,7 @@ KEY_EVENTS = [
 
 STOCK_GROUPS = {
     "Indices": ["QQQE", "MGK", "QQQ", "IBIT", "RSP", "MDY", "IWM", "TLT", "SPY", "ETHA", "DIA"],
-    "S&P Style ETFs": ["IJS", "IJR", "IJT", "IJJ", "IJH", "IJK", "IVE", "IVV", "IVW"],
     "Sel Sectors": ["XLK", "XLI", "XLC", "XLF", "XLU", "XLY", "XLRE", "XLP", "XLB", "XLE", "XLV"],
-    "EW Sectors": ["RSPT", "RSPC", "RSPN", "RSPF", "RSP", "RSPD", "RSPU", "RSPR", "RSPH", "RSPM", "RSPS", "RSPG"],
     "Industries": [
         "TAN", "KCE", "IBUY", "QQQE", "JETS", "IBB", "SMH", "CIBR", "UTES", "ROBO", "IGV", "WCLD", "ITA", "PAVE", "BLOK", "AIQ", "IYZ", "PEJ", "FDN", "KBE",
         "UNG", "BOAT", "KWEB", "KRE", "IBIT", "XRT", "IHI", "DRIV", "MSOS", "SOCL", "XLU", "ARKF", "SLX", "ARKK", "XTN", "XME", "KIE", "GLD", "GXC", "SCHH",
@@ -125,20 +123,11 @@ GOOGLE_FINANCE_EXCHANGE = {
     "IBIT": "NASDAQ",  "RSP": "NYSEARCA",   "MDY": "NYSEARCA",
     "IWM": "NYSEARCA", "TLT": "NASDAQ",     "SPY": "NYSEARCA",
     "ETHA": "NASDAQ",  "DIA": "NYSEARCA",
-    # S&P Style ETFs
-    "IJS": "NYSEARCA", "IJR": "NYSEARCA",   "IJT": "NYSEARCA",
-    "IJJ": "NYSEARCA", "IJH": "NYSEARCA",   "IJK": "NYSEARCA",
-    "IVE": "NYSEARCA", "IVV": "NYSEARCA",   "IVW": "NYSEARCA",
     # Sel Sectors
     "XLK": "NYSEARCA", "XLI": "NYSEARCA",   "XLC": "NYSEARCA",
     "XLF": "NYSEARCA", "XLU": "NYSEARCA",   "XLY": "NYSEARCA",
     "XLRE": "NYSEARCA","XLP": "NYSEARCA",   "XLB": "NYSEARCA",
     "XLE": "NYSEARCA", "XLV": "NYSEARCA",
-    # EW Sectors
-    "RSPT": "NYSEARCA","RSPC": "NYSEARCA",  "RSPN": "NYSEARCA",
-    "RSPF": "NYSEARCA","RSPD": "NYSEARCA",  "RSPU": "NYSEARCA",
-    "RSPR": "NYSEARCA","RSPH": "NYSEARCA",  "RSPM": "NYSEARCA",
-    "RSPS": "NYSEARCA","RSPG": "NYSEARCA",
     # Industries
     "TAN": "NASDAQ",   "KCE": "NYSEARCA",   "IBUY": "NASDAQ",
     "JETS": "NYSEARCA","IBB": "NASDAQ",     "SMH": "NASDAQ",

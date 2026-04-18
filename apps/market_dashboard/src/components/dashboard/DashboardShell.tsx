@@ -3,12 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import ChatInterface from "@/components/ChatInterface";
-import MarketOverview from "@/components/market/MarketOverview";
 import MarketMetricsDashboard from "@/components/market/MarketMetricsDashboard";
 import MorningBrief from "@/components/market/MorningBrief";
 import JournalShell from "@/components/journal/JournalShell";
 
-type Tab = "brief" | "market" | "metrics" | "chat" | "journal";
+type Tab = "brief" | "overview" | "chat" | "journal";
 
 export default function DashboardShell() {
   const [tab, setTab] = useState<Tab>("brief");
@@ -27,8 +26,7 @@ export default function DashboardShell() {
             {(
               [
                 { id: "brief", label: "Morning Brief" },
-                { id: "market", label: "Dashboard" },
-                { id: "metrics", label: "Market Metrics" },
+                { id: "overview", label: "Overview" },
                 { id: "chat", label: "Chat ($tickers)" },
                 { id: "journal", label: "Trade Journal" },
               ] as { id: Tab; label: string }[]
@@ -51,26 +49,8 @@ export default function DashboardShell() {
       </header>
 
       <main className="container mx-auto max-w-6xl px-4 py-6">
-        {tab === "brief" && (
-          <MorningBrief />
-        )}
-        {tab === "market" && (
-          <div>
-            <p className="mb-4 text-sm text-slate-400">
-              Pipeline snapshot from{" "}
-              <code className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-300">
-                apps/market_dashboard_backend
-              </code>{" "}
-              (Yahoo + calendar). Same tables as the static site, plus charts here.
-            </p>
-            <MarketOverview />
-          </div>
-        )}
-        {tab === "metrics" && (
-          <div>
-            <MarketMetricsDashboard />
-          </div>
-        )}
+        {tab === "brief" && <MorningBrief />}
+        {tab === "overview" && <MarketMetricsDashboard />}
         {tab === "chat" && (
           <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
             <ChatInterface />

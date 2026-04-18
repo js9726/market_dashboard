@@ -2,10 +2,9 @@ name: Refresh Market Data & Morning Brief
 
 on:
   schedule:
-    # Run Mon–Fri at 8:30 AM ET (12:30 UTC) — before US market open
+    # Mon–Fri 8:30 AM ET (12:30 UTC) — before US market open
     - cron: '30 12 * * 1-5'
-    
-  workflow_dispatch: {}   # allow manual trigger
+  workflow_dispatch: {}
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
@@ -14,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # needed to git-push the refreshed data back to main
+      contents: write
     defaults:
       run:
         working-directory: apps/market_dashboard_backend
@@ -31,32 +30,45 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
-      - name: Build market data (snapshot, events, charts)
+      # ── Step 1: market data (snapshot, events, charts) ─────────────────────
+      - name: Build market data
         run: python scripts/build_data.py --out-dir data
 
+      # ── Step 2: morning brief (3 AI providers, non-fatal) ──────────────────
       - name: Generate morning brief
         continue-on-error: true
         run: python scripts/morning_brief.py --out-dir data
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
 
+      # ── Step 3: trader verdict JSON (AI-generated, non-fatal) ──────────────
+      - name: Generate trader verdict
+        continue-on-error: true
+        run: python scripts/trader_verdict.py --out-dir data --providers gemini,claude,openai
+        env:
+          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
+
+      # ── Step 4: sync all outputs into Next.js public/ ──────────────────────
       - name: Sync data into Next.js public folder
         working-directory: apps/market_dashboard
         run: |
           mkdir -p public/market-dashboard/charts
-          cp ../market_dashboard_backend/data/snapshot.json public/market-dashboard/
-          cp ../market_dashboard_backend/data/events.json    public/market-dashboard/
-          cp ../market_dashboard_backend/data/meta.json      public/market-dashboard/
-          cp ../market_dashboard_backend/data/morning_brief.md              public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/morning_brief_gemini.html     public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/morning_brief_openai.html     public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/morning_brief_claude.html     public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/morning_brief_meta.json       public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/charts/*.png   public/market-dashboard/charts/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/snapshot.json          public/market-dashboard/
+          cp ../market_dashboard_backend/data/events.json             public/market-dashboard/
+          cp ../market_dashboard_backend/data/meta.json               public/market-dashboard/
+          cp ../market_dashboard_backend/data/trader_verdict.json     public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief_gemini.html  public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief_openai.html  public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief_claude.html  public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/morning_brief_meta.json    public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/charts/*.png             public/market-dashboard/charts/ 2>/dev/null || true
 
-      - name: Sanitize JSON (replace NaN/Infinity with null)
+      # ── Step 5: sanitize JSON (replace NaN/Infinity with null) ────────────
+      - name: Sanitize JSON
         working-directory: apps/market_dashboard
         run: |
           python3 -c "
@@ -70,7 +82,9 @@ jobs:
           print('JSON sanitization complete')
           "
 
+      # ── Step 6: commit and push ────────────────────────────────────────────
       - name: Commit updated data
+        working-directory: .
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -83,4 +97,3 @@ jobs:
             git commit -m "chore: refresh market data [skip ci]"
             git push
           fi
-        working-directory: .
