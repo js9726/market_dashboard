@@ -9,7 +9,7 @@ import CalendarView from "./CalendarView";
 import EquityCurve from "./EquityCurve";
 import AddTradeModal from "./AddTradeModal";
 
-type Tab = "overview" | "trades" | "calendar" | "equity";
+type Tab = "overview" | "trades" | "calendar";
 
 type Connection = {
   id: string;
@@ -79,7 +79,6 @@ export default function JournalShell() {
     { id: "overview", label: "Overview" },
     { id: "trades", label: "Trades" },
     { id: "calendar", label: "Calendar" },
-    { id: "equity", label: "Equity Curve" },
   ];
 
   return (
@@ -126,14 +125,16 @@ export default function JournalShell() {
 
       {/* Content */}
       {tab === "overview" && (
-        stats ? <StatsCards stats={stats} /> : <p className="text-slate-500 text-sm">No data yet — sync your sheet.</p>
+        stats ? (
+          <div className="space-y-6">
+            <StatsCards stats={stats} />
+            <EquityCurve data={stats.equityCurve} />
+          </div>
+        ) : <p className="text-slate-500 text-sm">No data yet — sync your sheet.</p>
       )}
       {tab === "trades" && <TradeLog />}
       {tab === "calendar" && (
         stats ? <CalendarView calendarData={stats.calendarData} /> : <p className="text-slate-500 text-sm">No data yet.</p>
-      )}
-      {tab === "equity" && (
-        stats ? <EquityCurve data={stats.equityCurve} /> : <p className="text-slate-500 text-sm">No data yet.</p>
       )}
 
       {showAddModal && <AddTradeModal onClose={() => setShowAddModal(false)} />}
