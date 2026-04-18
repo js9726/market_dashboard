@@ -53,5 +53,7 @@ export async function POST() {
 
   const open = trades.filter((t) => t.pnl === null).length;
   const closed = trades.filter((t) => t.pnl !== null).length;
-  return NextResponse.json({ synced: trades.length, open, closed });
+  const datesResolved = trades.filter((t) => t.tradeDate !== null).length;
+  const sampleRawDates = rows.slice(1, 4).map((r) => r[colMap.date]);
+  return NextResponse.json({ synced: trades.length, open, closed, datesResolved, sampleRawDates });
 }

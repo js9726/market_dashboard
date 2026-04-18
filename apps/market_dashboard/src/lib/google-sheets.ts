@@ -31,22 +31,32 @@ function parseNum(val: string | undefined): number | null {
 
 function parseDate(val: string | undefined): Date | null {
   if (!val || val.trim() === "") return null;
+  const s = val.trim();
 
-  // Try DD/MM/YYYY (Malaysian/British format, e.g. "24/01/2026")
-  const ddmmyyyy = val.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  // YYYYMMDD with no separators (e.g. "20260124")
+  if (/^\d{8}$/.test(s)) {
+    const d = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`);
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  // DD/MM/YYYY or D/M/YYYY (Malaysian/British format, e.g. "24/1/2026")
+  const ddmmyyyy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (ddmmyyyy) {
     const d = new Date(`${ddmmyyyy[3]}-${ddmmyyyy[2].padStart(2, "0")}-${ddmmyyyy[1].padStart(2, "0")}`);
     if (!isNaN(d.getTime())) return d;
   }
 
-  // Google Sheets serial number (days since Dec 30 1899)
-  const serial = Number(val);
-  if (!isNaN(serial) && serial > 1000) {
-    const d = new Date((serial - 25569) * 86400000);
-    if (!isNaN(d.getTime())) return d;
+  // Google Sheets serial number (days since Dec 30 1899; range 30000–100000 covers ~1982–2173)
+  if (/^\d+$/.test(s)) {
+    const serial = Number(s);
+    if (serial > 30000 && serial < 100000) {
+      const d = new Date((serial - 25569) * 86400000);
+      if (!isNaN(d.getTime())) return d;
+    }
   }
 
-  const d = new Date(val);
+  // Standard parsing — ISO 8601, US MM/DD/YYYY, "Jan 24, 2026", etc.
+  const d = new Date(s);
   return isNaN(d.getTime()) ? null : d;
 }
 
