@@ -31,6 +31,21 @@ function parseNum(val: string | undefined): number | null {
 
 function parseDate(val: string | undefined): Date | null {
   if (!val || val.trim() === "") return null;
+
+  // Try DD/MM/YYYY (Malaysian/British format, e.g. "24/01/2026")
+  const ddmmyyyy = val.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (ddmmyyyy) {
+    const d = new Date(`${ddmmyyyy[3]}-${ddmmyyyy[2].padStart(2, "0")}-${ddmmyyyy[1].padStart(2, "0")}`);
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  // Google Sheets serial number (days since Dec 30 1899)
+  const serial = Number(val);
+  if (!isNaN(serial) && serial > 1000) {
+    const d = new Date((serial - 25569) * 86400000);
+    if (!isNaN(d.getTime())) return d;
+  }
+
   const d = new Date(val);
   return isNaN(d.getTime()) ? null : d;
 }
