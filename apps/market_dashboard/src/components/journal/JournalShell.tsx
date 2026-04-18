@@ -102,6 +102,13 @@ export default function JournalShell() {
         </nav>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => router.push("/journal/connect")}
+            className="rounded-lg bg-slate-600 hover:bg-slate-500 px-3 py-1.5 text-xs font-medium transition"
+            title="Change tab or remap columns"
+          >
+            Remap Columns
+          </button>
+          <button
             onClick={() => setShowAddModal(true)}
             className="rounded-lg bg-green-700 hover:bg-green-600 px-3 py-1.5 text-xs font-medium transition"
           >

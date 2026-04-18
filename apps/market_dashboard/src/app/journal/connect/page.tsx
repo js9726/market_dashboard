@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DEFAULT_COL_MAP, ColMap } from "@/lib/col-map";
 
@@ -22,9 +22,20 @@ const OPTIONAL_FIELDS: { key: keyof ColMap; label: string }[] = [
   { key: "notes", label: "Notes" },
 ];
 
+function indexToColLetters(index: number): string {
+  let letters = "";
+  let n = index + 1;
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    letters = String.fromCharCode(65 + rem) + letters;
+    n = Math.floor((n - 1) / 26);
+  }
+  return letters;
+}
+
 function colLabel(index: number, header: string): string {
-  const letter = String.fromCharCode(65 + index);
-  return `Col ${letter}${header ? ` – ${header}` : ""}`;
+  const letters = indexToColLetters(index);
+  return `Col ${letters}${header ? ` – ${header}` : ""}`;
 }
 
 export default function ConnectPage() {
@@ -35,12 +46,42 @@ export default function ConnectPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isRemap, setIsRemap] = useState(false);
 
   const [tabs, setTabs] = useState<{ title: string; sheetId: number }[]>([]);
   const [selectedTab, setSelectedTab] = useState("");
   const [headers, setHeaders] = useState<string[]>([]);
   const [headerRow] = useState(14);
   const [colMap, setColMap] = useState<ColMap>(DEFAULT_COL_MAP);
+
+  // On mount: check for existing connection and pre-fill for remap
+  useEffect(() => {
+    fetch("/api/journal/connection")
+      .then((r) => r.json())
+      .then(async (conn: { spreadsheetId: string; sheetTab: string; colMap: ColMap } | null) => {
+        if (!conn) return;
+        setIsRemap(true);
+        setSpreadsheetId(conn.spreadsheetId);
+        setUrl(`https://docs.google.com/spreadsheets/d/${conn.spreadsheetId}`);
+        setColMap(conn.colMap && Object.keys(conn.colMap).length ? conn.colMap : DEFAULT_COL_MAP);
+        setLoading(true);
+        try {
+          const res = await fetch("/api/journal/connection/headers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ spreadsheetId: conn.spreadsheetId, sheetTab: conn.sheetTab, headerRow: 14 }),
+          });
+          if (!res.ok) return;
+          const data = await res.json() as { tabs: { title: string; sheetId: number }[]; headers: string[]; resolvedTab: string };
+          setTabs(data.tabs);
+          setSelectedTab(conn.sheetTab ?? data.resolvedTab);
+          setHeaders(data.headers);
+          setStep(2);
+        } finally {
+          setLoading(false);
+        }
+      });
+  }, []);
 
   function extractId(rawUrl: string): string | null {
     const m = rawUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
@@ -142,10 +183,17 @@ export default function ConnectPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex items-start justify-center pt-16 px-4">
       <div className="w-full max-w-xl">
-        <h1 className="text-2xl font-bold mb-1">Connect your Trade Journal</h1>
+        <h1 className="text-2xl font-bold mb-1">
+          {isRemap ? "Remap Columns" : "Connect your Trade Journal"}
+        </h1>
         <p className="text-slate-400 text-sm mb-6">
-          Paste your Google Sheets URL and map your columns once — we&apos;ll sync your trades into the dashboard.
+          {isRemap
+            ? "Update your column mapping below, then save to re-sync."
+            : "Paste your Google Sheets URL and map your columns once — we'll sync your trades into the dashboard."}
         </p>
+        {loading && step === 1 && (
+          <p className="text-slate-400 text-sm mb-4">Loading your existing connection…</p>
+        )}
 
         {/* Step 1 — URL */}
         {step === 1 && (
