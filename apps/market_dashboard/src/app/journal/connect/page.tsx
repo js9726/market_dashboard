@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { DEFAULT_COL_MAP, ColMap } from "@/lib/col-map";
 
 const TEMPLATE_URL =
-  "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms/copy";
+  "https://docs.google.com/spreadsheets/d/1aUQl-qfkVLzaL5ueM52fLzhZNSBNLYiuoydGfhwVSIM/edit?gid=1094277529#gid=1094277529";
 
 const REQUIRED_FIELDS: { key: keyof ColMap; label: string }[] = [
   { key: "ticker", label: "Ticker / Symbol" },
