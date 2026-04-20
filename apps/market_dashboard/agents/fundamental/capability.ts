@@ -1,5 +1,6 @@
 import { HumanMessage, SystemMessage } from 'langchain/schema';
 import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import { FinancialMetrics, getFinalancialMetrics } from './tools/api';
 import { withRetry } from '../../src/utils/retry';
 
@@ -13,6 +14,7 @@ interface AgentState {
   };
   metadata: {
     show_reasoning: boolean;
+    provider?: string;
   };
 }
 
@@ -39,12 +41,46 @@ const progress = {
   }
 };
 
-// Initialize Gemini client via OpenAI-compatible endpoint
-const openai = new OpenAI({
-  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-  /** Placeholder allows Next build when env is unset; real calls still need GEMINI_API_KEY. */
-  apiKey: process.env.GEMINI_API_KEY ?? "build-without-key",
-});
+async function callLLM(provider: string | undefined, system: string, user: string): Promise<string> {
+  if (provider === "anthropic" && process.env.ANTHROPIC_API_KEY) {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const msg = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1024,
+      system,
+      messages: [{ role: "user", content: user }],
+    });
+    const block = msg.content[0];
+    return block.type === "text" ? block.text : "{}";
+  }
+
+  if (provider === "openai" && process.env.OPENAI_API_KEY) {
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const completion = await withRetry(() =>
+      client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "system", content: system }, { role: "user", content: user }],
+        response_format: { type: "json_object" },
+        max_tokens: 1024,
+      }), 3, 1000);
+    return completion.choices[0].message.content ?? "{}";
+  }
+
+  // Default: Gemini
+  if (!process.env.GEMINI_API_KEY) throw new Error("No LLM provider available");
+  const client = new OpenAI({
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+    apiKey: process.env.GEMINI_API_KEY,
+  });
+  const completion = await withRetry(() =>
+    client.chat.completions.create({
+      model: "gemini-2.5-pro",
+      messages: [{ role: "system", content: system }, { role: "user", content: user }],
+      response_format: { type: "json_object" },
+      max_tokens: 1024,
+    }), 3, 1000);
+  return completion.choices[0].message.content ?? "{}";
+}
 
 const systemPrompt = `You are a professional stock market analyst specializing in fundamental analysis.
 Your task is to analyze financial metrics and provide detailed reasoning for your analysis.
@@ -109,7 +145,8 @@ export async function fundamentalsAgent(state: AgentState) {
         }
       };
 
-      if (process.env.GEMINI_API_KEY) {
+      const hasAnyProvider = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
+      if (hasAnyProvider) {
         try {
           const metricsPrompt = `
           Analyze the following financial metrics for ${ticker}:
@@ -135,21 +172,10 @@ export async function fundamentalsAgent(state: AgentState) {
           Please provide a detailed analysis with signals (bullish/bearish/neutral) and confidence levels for each aspect.`;
 
           progress.updateStatus("fundamentals_agent", ticker, "Requesting AI analysis");
-          const completion = await withRetry(() =>
-            openai.chat.completions.create({
-              messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: metricsPrompt }
-              ],
-              model: "gemini-2.5-pro",
-              temperature: 0.7,
-              max_tokens: 1000,
-              response_format: { type: "json_object" }
-            })
-          , 3, 1000);
+          const raw = await callLLM(state.metadata.provider, systemPrompt, metricsPrompt);
 
           progress.updateStatus("fundamentals_agent", ticker, "Processing AI response");
-          const analysis = JSON.parse(completion.choices[0].message.content || '{}');
+          const analysis = JSON.parse(raw || '{}');
 
           fundamentalAnalysis[ticker] = {
             signal: analysis.overall_signal,

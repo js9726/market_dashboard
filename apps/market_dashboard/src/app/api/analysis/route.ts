@@ -31,7 +31,8 @@ export async function POST(request: Request) {
         analyst_signals: {}
       },
       metadata: {
-        show_reasoning: true
+        show_reasoning: true,
+        provider: body.provider as string | undefined,
       }
     };
 
