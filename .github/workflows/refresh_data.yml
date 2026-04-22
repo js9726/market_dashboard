@@ -3,7 +3,7 @@ name: Refresh Market Data & Morning Brief
 on:
   schedule:
     # Mon–Fri 8:30 AM ET (12:30 UTC) — before US market open
-    - cron: '30 12 * * 1-5'
+    - cron: '00,30 12-18 * * 1-5'
   workflow_dispatch: {}
 
 env:
