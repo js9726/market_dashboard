@@ -14,6 +14,20 @@ type Trade = {
   fees: Decimal | null;
   pnl: Decimal | null;
   notes: string | null;
+  proposedEntry: Decimal | null;
+  proposedSL: Decimal | null;
+  proposedTP: Decimal | null;
+  rrr: Decimal | null;
+  riskPct: Decimal | null;
+  rewardPct: Decimal | null;
+  positionPct: Decimal | null;
+  currency: string | null;
+  platform: string | null;
+  industry: string | null;
+  strategy: string | null;
+  verdict: Record<string, unknown> | null;
+  verdictScore: number | null;
+  verdictGeneratedAt: string | null;
 };
 
 type Providers = { gemini: boolean; openai: boolean; anthropic: boolean };
@@ -29,17 +43,22 @@ function verdictColor(v: string): string {
   const s = v?.toUpperCase() ?? "";
   if (s.includes("STRONG BUY") || s.includes("GREAT")) return "bg-emerald-900/60 text-emerald-300 border-emerald-700";
   if (s.includes("BUY") || s.includes("GOOD")) return "bg-green-900/60 text-green-300 border-green-700";
-  if (s.includes("HOLD") || s.includes("AVERAGE")) return "bg-yellow-900/60 text-yellow-300 border-yellow-700";
+  if (s.includes("ACCEPTABLE") || s.includes("HOLD") || s.includes("AVERAGE")) return "bg-yellow-900/60 text-yellow-300 border-yellow-700";
   if (s.includes("STRONG AVOID") || s.includes("MISTAKE")) return "bg-red-900/60 text-red-300 border-red-700";
   if (s.includes("AVOID") || s.includes("POOR")) return "bg-orange-900/60 text-orange-300 border-orange-700";
   return "bg-slate-700/60 text-slate-300 border-slate-600";
 }
 
 function scoreColor(score: number): string {
-  if (score >= 8) return "text-emerald-400";
-  if (score >= 6) return "text-green-400";
-  if (score >= 4) return "text-yellow-400";
+  if (score >= 7) return "text-emerald-400";
+  if (score >= 5) return "text-yellow-400";
   return "text-red-400";
+}
+
+function scoreBadgeBg(score: number): string {
+  if (score >= 7) return "bg-emerald-900/60 text-emerald-300 border-emerald-700";
+  if (score >= 5) return "bg-yellow-900/60 text-yellow-300 border-yellow-700";
+  return "bg-red-900/60 text-red-300 border-red-700";
 }
 
 function ProviderBar({
@@ -116,7 +135,7 @@ type TraderAnalysis = {
   note: string;
 };
 
-type EntryPlan = {
+type StockEntryPlan = {
   zone: string;
   stop: string;
   target: string;
@@ -143,7 +162,7 @@ type StockAnalysisResult = {
   forward_eps: number | null;
   dividend_yield_pct: number | null;
   trader_analysis: TraderAnalysis[];
-  entry_plan: EntryPlan;
+  entry_plan: StockEntryPlan;
   bulls: string[];
   bears: string[];
   composite_score: number;
@@ -197,7 +216,6 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
         className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-5 py-3 backdrop-blur">
           <div>
             <span className="text-lg font-semibold text-white">{ticker}</span>
@@ -212,33 +230,17 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
         </div>
 
         <div className="p-5 space-y-5">
-          <ProviderBar
-            providers={providers}
-            selected={selectedProvider}
-            onSelect={setSelectedProvider}
-            onRun={runAnalysis}
-            loading={loading}
-            hasResult={!!result}
-          />
+          <ProviderBar providers={providers} selected={selectedProvider} onSelect={setSelectedProvider} onRun={runAnalysis} loading={loading} hasResult={!!result} />
 
           {loading && <Spinner label={`Analysing ${ticker} with ${PROVIDER_LABELS[selectedProvider] ?? "AI"}…`} />}
           {error && <div className="rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-400">{error}</div>}
 
           {result && (
             <>
-              {/* Price summary strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                   { label: "Price", value: result.price ? `$${fmt2(result.price)}` : "—" },
-                  {
-                    label: "Change",
-                    value: result.price_change_pct != null
-                      ? (result.price_change_pct >= 0 ? "+" : "") + fmt2(result.price_change_pct) + "%"
-                      : "—",
-                    color: result.price_change_pct != null
-                      ? result.price_change_pct >= 0 ? "text-green-400" : "text-red-400"
-                      : "",
-                  },
+                  { label: "Change", value: result.price_change_pct != null ? (result.price_change_pct >= 0 ? "+" : "") + fmt2(result.price_change_pct) + "%" : "—", color: result.price_change_pct != null ? result.price_change_pct >= 0 ? "text-green-400" : "text-red-400" : "" },
                   { label: "52W Range", value: `$${fmt2(result.week52_low)} – $${fmt2(result.week52_high)}` },
                   { label: "Analyst PT", value: result.analyst_pt ? `$${fmt2(result.analyst_pt)}` : "—" },
                 ].map(({ label, value, color }) => (
@@ -249,7 +251,6 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                 ))}
               </div>
 
-              {/* Fundamentals strip */}
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
                 {[
                   { label: "Mkt Cap", value: result.market_cap },
@@ -257,14 +258,7 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                   { label: "Gross Margin", value: result.gross_margin_pct != null ? fmt2(result.gross_margin_pct) + "%" : "—" },
                   { label: "Fwd EPS", value: result.forward_eps != null ? "$" + fmt2(result.forward_eps) : "—" },
                   { label: "Div Yield", value: result.dividend_yield_pct != null ? fmt2(result.dividend_yield_pct) + "%" : "None" },
-                  {
-                    label: "Earnings",
-                    value: result.earnings_date
-                      ? result.earnings_days != null && result.earnings_days >= 0
-                        ? `${result.earnings_days}d`
-                        : result.earnings_date
-                      : "—",
-                  },
+                  { label: "Earnings", value: result.earnings_date ? result.earnings_days != null && result.earnings_days >= 0 ? `${result.earnings_days}d` : result.earnings_date : "—" },
                 ].map(({ label, value }) => (
                   <div key={label} className="rounded bg-slate-800/40 px-2 py-1.5">
                     <div className="text-[10px] text-slate-500">{label}</div>
@@ -273,7 +267,6 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                 ))}
               </div>
 
-              {/* 6-Trader Analysis */}
               <div>
                 <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Trader Analysis</div>
                 <div className="space-y-2">
@@ -282,9 +275,7 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                       <div className="flex items-center gap-2 mb-1.5">
                         <span className="text-xs font-semibold text-slate-300 w-36 shrink-0">{t.handle}</span>
                         <span className={`text-lg font-bold ${scoreColor(t.score)}`}>{t.score}<span className="text-xs text-slate-500">/10</span></span>
-                        <span className={`ml-1 rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${verdictColor(t.verdict)}`}>
-                          {t.verdict}
-                        </span>
+                        <span className={`ml-1 rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${verdictColor(t.verdict)}`}>{t.verdict}</span>
                       </div>
                       <p className="text-xs text-slate-400 leading-relaxed">{t.note}</p>
                     </div>
@@ -292,7 +283,6 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                 </div>
               </div>
 
-              {/* Entry Plan */}
               {result.entry_plan && (
                 <div>
                   <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Suggested Entry Plan</div>
@@ -316,58 +306,35 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                 </div>
               )}
 
-              {/* Bulls & Bears */}
               {(result.bulls?.length > 0 || result.bears?.length > 0) && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-xs font-medium text-green-400 uppercase tracking-wide mb-2">Bulls</div>
-                    <ul className="space-y-1">
-                      {(result.bulls ?? []).map((b, i) => (
-                        <li key={i} className="flex gap-2 text-xs text-slate-300">
-                          <span className="text-green-500 mt-0.5">▲</span>{b}
-                        </li>
-                      ))}
-                    </ul>
+                    <ul className="space-y-1">{(result.bulls ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-slate-300"><span className="text-green-500 mt-0.5">▲</span>{b}</li>)}</ul>
                   </div>
                   <div>
                     <div className="text-xs font-medium text-red-400 uppercase tracking-wide mb-2">Bears</div>
-                    <ul className="space-y-1">
-                      {(result.bears ?? []).map((b, i) => (
-                        <li key={i} className="flex gap-2 text-xs text-slate-300">
-                          <span className="text-red-500 mt-0.5">▼</span>{b}
-                        </li>
-                      ))}
-                    </ul>
+                    <ul className="space-y-1">{(result.bears ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-slate-300"><span className="text-red-500 mt-0.5">▼</span>{b}</li>)}</ul>
                   </div>
                 </div>
               )}
 
-              {/* Composite */}
               <div className="rounded-lg border border-slate-600 bg-slate-800/60 px-4 py-3 flex items-center gap-4">
                 <div>
                   <div className="text-[10px] text-slate-500 uppercase tracking-wide">Composite Score</div>
-                  <span className={`text-3xl font-bold ${scoreColor(result.composite_score)}`}>
-                    {result.composite_score}
-                    <span className="text-sm text-slate-500">/10</span>
-                  </span>
+                  <span className={`text-3xl font-bold ${scoreColor(result.composite_score)}`}>{result.composite_score}<span className="text-sm text-slate-500">/10</span></span>
                 </div>
                 <div className="flex-1">
-                  <span className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase ${verdictColor(result.composite_verdict)}`}>
-                    {result.composite_verdict}
-                  </span>
+                  <span className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase ${verdictColor(result.composite_verdict)}`}>{result.composite_verdict}</span>
                   <p className="mt-1 text-xs text-slate-400">{result.composite_note}</p>
-                  {result.best_match_trader && (
-                    <p className="mt-1 text-[10px] text-slate-500">Best match: <span className="text-slate-300">{result.best_match_trader}</span></p>
-                  )}
+                  {result.best_match_trader && <p className="mt-1 text-[10px] text-slate-500">Best match: <span className="text-slate-300">{result.best_match_trader}</span></p>}
                 </div>
               </div>
             </>
           )}
 
           {!loading && !error && !result && (
-            <div className="py-8 text-center text-sm text-slate-500">
-              Select a provider and click Analyse to get AI insights on {ticker}.
-            </div>
+            <div className="py-8 text-center text-sm text-slate-500">Select a provider and click Analyse to get AI insights on {ticker}.</div>
           )}
         </div>
       </div>
@@ -380,52 +347,66 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
 type TraderReview = {
   handle: string;
   entry_score: number;
+  risk_score: number;
+  setup_score: number;
+  total_score: number;
   verdict: string;
   note: string;
 };
 
+type BatchSell = {
+  tranche: string;
+  at: string;
+};
+
+type TradeEntryPlan = {
+  ideal_entry: string;
+  stop_loss: string;
+  target_1: string;
+  target_2: string;
+  position_size: string;
+  batch_sells: BatchSell[];
+};
+
 type TradeReviewResult = {
   ticker: string;
+  sector: string;
+  industry: string;
+  market_cap_tier: string;
   is_open: boolean;
   trader_reviews: TraderReview[];
-  strengths: string[];
-  weaknesses: string[];
+  best_match: string;
+  weakest_dimension: string;
+  bull_case: string[];
+  bear_case: string[];
+  entry_plan: TradeEntryPlan;
   overall_score: number;
   overall_verdict: string;
   lesson: string;
 };
 
-function TradeReviewModal({ trade, onClose }: { trade: Trade; onClose: () => void }) {
-  const [providers, setProviders] = useState<Providers | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<string>("");
+function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; onClose: () => void; onVerdictSaved: () => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<TradeReviewResult | null>(null);
+  const [result, setResult] = useState<TradeReviewResult | null>(
+    trade.verdict ? (trade.verdict as unknown as TradeReviewResult) : null
+  );
+  const [isFromCache, setIsFromCache] = useState(!!trade.verdict);
 
-  useEffect(() => {
-    fetch("/api/analysis/providers")
-      .then((r) => r.json())
-      .then((data: Providers) => {
-        setProviders(data);
-        const first = (["gemini", "openai", "anthropic"] as const).find((p) => data[p]);
-        if (first) setSelectedProvider(first);
-      })
-      .catch(() => setProviders({ gemini: false, openai: false, anthropic: false }));
-  }, []);
-
-  function runReview() {
+  function runReview(force = false) {
     setLoading(true);
     setError(null);
-    setResult(null);
     fetch("/api/analysis/trade-review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ trade, provider: selectedProvider }),
+      body: JSON.stringify({ tradeId: trade.id, force }),
     })
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
         setResult(data as TradeReviewResult);
+        setIsFromCache(false);
+        onVerdictSaved();
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
@@ -443,32 +424,51 @@ function TradeReviewModal({ trade, onClose }: { trade: Trade; onClose: () => voi
       >
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-5 py-3 backdrop-blur">
-          <div>
+          <div className="flex items-center gap-2">
             <span className="text-lg font-semibold text-white">{trade.ticker}</span>
-            <span className="ml-2 text-xs text-slate-400">Trade Review</span>
-            <span className={`ml-2 rounded px-1.5 py-0.5 text-[10px] font-medium ${isOpen ? "bg-blue-900/50 text-blue-400" : pnlNum! >= 0 ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}>
+            <span className="text-xs text-slate-400">Trade Review</span>
+            <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${isOpen ? "bg-blue-900/50 text-blue-400" : pnlNum! >= 0 ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}>
               {isOpen ? "Open" : pnlNum! >= 0 ? "Win" : "Loss"}
             </span>
+            {isFromCache && <span className="text-[10px] text-slate-500 italic">cached</span>}
           </div>
-          <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-white hover:bg-slate-700">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {result && (
+              <button
+                onClick={() => runReview(true)}
+                disabled={loading}
+                className="rounded px-3 py-1 text-[10px] font-medium border border-slate-600 text-slate-400 hover:border-amber-500 hover:text-amber-400 disabled:opacity-40 transition-colors"
+                title="Re-run AI analysis"
+              >
+                ⟳ Re-run
+              </button>
+            )}
+            {!result && !loading && (
+              <button
+                onClick={() => runReview(false)}
+                className="rounded bg-blue-600 hover:bg-blue-500 px-3 py-1 text-xs font-medium text-white transition-colors"
+              >
+                Analyse
+              </button>
+            )}
+            <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-white hover:bg-slate-700">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className="p-5 space-y-5">
-          {/* Trade summary */}
-          <div className="rounded-lg bg-slate-800/40 border border-slate-700 px-4 py-3 grid grid-cols-3 sm:grid-cols-5 gap-3 text-center text-xs">
+          {/* Trade summary strip */}
+          <div className="rounded-lg bg-slate-800/40 border border-slate-700 px-4 py-3 grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-xs">
             {[
               { label: "Side", value: trade.side ?? "—" },
               { label: "Entry", value: trade.buyPrice ? "$" + parseFloat(trade.buyPrice.toString()).toFixed(2) : "—" },
               { label: "Exit", value: trade.exitPrice ? "$" + parseFloat(trade.exitPrice.toString()).toFixed(2) : "—" },
               { label: "Qty", value: trade.quantity ? parseFloat(trade.quantity.toString()).toString() : "—" },
-              {
-                label: "P&L",
-                value: isOpen ? "Open" : `${pnlNum! >= 0 ? "+" : ""}$${Math.abs(pnlNum!).toFixed(2)}`,
-              },
+              { label: "P&L", value: isOpen ? "Open" : `${pnlNum! >= 0 ? "+" : ""}$${Math.abs(pnlNum!).toFixed(2)}` },
+              { label: "Strategy", value: trade.strategy ?? "—" },
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-slate-500 mb-0.5">{label}</div>
@@ -477,81 +477,126 @@ function TradeReviewModal({ trade, onClose }: { trade: Trade; onClose: () => voi
             ))}
           </div>
 
-          <ProviderBar
-            providers={providers}
-            selected={selectedProvider}
-            onSelect={setSelectedProvider}
-            onRun={runReview}
-            loading={loading}
-            hasResult={!!result}
-          />
+          {/* Pre-trade plan strip (if available) */}
+          {(trade.proposedEntry || trade.proposedSL || trade.proposedTP) && (
+            <div className="rounded-lg bg-slate-800/20 border border-slate-700/50 px-4 py-2 grid grid-cols-3 sm:grid-cols-5 gap-3 text-center text-xs">
+              {[
+                { label: "Plan Entry", value: trade.proposedEntry ? "$" + parseFloat(trade.proposedEntry.toString()).toFixed(2) : "—" },
+                { label: "Plan SL", value: trade.proposedSL ? "$" + parseFloat(trade.proposedSL.toString()).toFixed(2) : "—" },
+                { label: "Plan TP", value: trade.proposedTP ? "$" + parseFloat(trade.proposedTP.toString()).toFixed(2) : "—" },
+                { label: "RRR", value: trade.rrr ? parseFloat(trade.rrr.toString()).toFixed(2) : "—" },
+                { label: "Risk %", value: trade.riskPct ? parseFloat(trade.riskPct.toString()).toFixed(1) + "%" : "—" },
+              ].map(({ label, value }) => (
+                <div key={label}>
+                  <div className="text-slate-500 mb-0.5">{label}</div>
+                  <div className="font-medium text-slate-300">{value}</div>
+                </div>
+              ))}
+            </div>
+          )}
 
-          {loading && <Spinner label={`Reviewing ${trade.ticker} trade with ${PROVIDER_LABELS[selectedProvider] ?? "AI"}…`} />}
+          {loading && <Spinner label={`Reviewing ${trade.ticker} trade…`} />}
           {error && <div className="rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-400">{error}</div>}
 
           {result && (
             <>
-              {/* Per-trader reviews */}
+              {/* Sector / industry header */}
+              {(result.sector || result.industry) && (
+                <div className="flex gap-2 flex-wrap">
+                  {result.sector && <span className="rounded bg-slate-700/60 border border-slate-600 px-2 py-0.5 text-[10px] text-slate-300">{result.sector}</span>}
+                  {result.industry && <span className="rounded bg-slate-700/40 border border-slate-700 px-2 py-0.5 text-[10px] text-slate-400">{result.industry}</span>}
+                  {result.market_cap_tier && <span className="rounded bg-slate-700/40 border border-slate-700 px-2 py-0.5 text-[10px] text-slate-400">{result.market_cap_tier} Cap</span>}
+                </div>
+              )}
+
+              {/* 6-trader scoring rows */}
               <div>
                 <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Trader Perspectives</div>
                 <div className="space-y-2">
-                  {(result.trader_reviews ?? []).map((t) => (
-                    <div key={t.handle} className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-xs font-semibold text-slate-300 w-36 shrink-0">{t.handle}</span>
-                        <span className={`text-lg font-bold ${scoreColor(t.entry_score)}`}>{t.entry_score}<span className="text-xs text-slate-500">/10</span></span>
-                        <span className={`ml-1 rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${verdictColor(t.verdict)}`}>
-                          {t.verdict}
-                        </span>
+                  {(result.trader_reviews ?? []).map((t) => {
+                    const total = t.total_score ?? (t.entry_score + (t.risk_score ?? 0) + (t.setup_score ?? 0));
+                    return (
+                      <div key={t.handle} className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3">
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <span className="text-xs font-semibold text-slate-300 w-32 shrink-0">{t.handle}</span>
+                          <span className={`text-lg font-bold ${scoreColor(total)}`}>{total}<span className="text-xs text-slate-500">/10</span></span>
+                          <span className={`rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${verdictColor(t.verdict)}`}>{t.verdict}</span>
+                          <span className="ml-auto text-[10px] text-slate-500">
+                            Entry {t.entry_score}/4 · Risk {t.risk_score ?? "?"}/3 · Setup {t.setup_score ?? "?"}/3
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 leading-relaxed">{t.note}</p>
                       </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">{t.note}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Strengths & Weaknesses */}
-              {(result.strengths?.length > 0 || result.weaknesses?.length > 0) && (
+              {/* Bull / Bear case */}
+              {(result.bull_case?.length > 0 || result.bear_case?.length > 0) && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-xs font-medium text-green-400 uppercase tracking-wide mb-2">Strengths</div>
-                    <ul className="space-y-1">
-                      {(result.strengths ?? []).map((s, i) => (
-                        <li key={i} className="flex gap-2 text-xs text-slate-300">
-                          <span className="text-green-500 mt-0.5">✓</span>{s}
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="text-xs font-medium text-green-400 uppercase tracking-wide mb-2">Bull Case</div>
+                    <ul className="space-y-1">{(result.bull_case ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-slate-300"><span className="text-green-500 mt-0.5">▲</span>{b}</li>)}</ul>
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-red-400 uppercase tracking-wide mb-2">Areas to Improve</div>
-                    <ul className="space-y-1">
-                      {(result.weaknesses ?? []).map((w, i) => (
-                        <li key={i} className="flex gap-2 text-xs text-slate-300">
-                          <span className="text-red-500 mt-0.5">✗</span>{w}
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="text-xs font-medium text-red-400 uppercase tracking-wide mb-2">Bear Case</div>
+                    <ul className="space-y-1">{(result.bear_case ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-slate-300"><span className="text-red-500 mt-0.5">▼</span>{b}</li>)}</ul>
                   </div>
                 </div>
               )}
 
-              {/* Overall */}
-              <div className="rounded-lg border border-slate-600 bg-slate-800/60 px-4 py-3 flex items-start gap-4">
-                <div className="shrink-0">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wide">Overall Score</div>
-                  <span className={`text-3xl font-bold ${scoreColor(result.overall_score)}`}>
-                    {result.overall_score}
-                    <span className="text-sm text-slate-500">/10</span>
-                  </span>
-                  <div className="mt-1">
-                    <span className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase ${verdictColor(result.overall_verdict)}`}>
-                      {result.overall_verdict}
-                    </span>
+              {/* Entry plan */}
+              {result.entry_plan && (
+                <div>
+                  <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Entry Plan</div>
+                  <div className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3 space-y-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                      {[
+                        { label: "Ideal Entry", value: result.entry_plan.ideal_entry },
+                        { label: "Stop Loss", value: result.entry_plan.stop_loss },
+                        { label: "Target 1", value: result.entry_plan.target_1 },
+                        { label: "Target 2", value: result.entry_plan.target_2 },
+                        { label: "Position Size", value: result.entry_plan.position_size },
+                      ].map(({ label, value }) => (
+                        <div key={label}>
+                          <div className="text-slate-500 mb-0.5">{label}</div>
+                          <div className="font-semibold text-white">{value}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {result.entry_plan.batch_sells?.length > 0 && (
+                      <div>
+                        <div className="text-[10px] text-slate-500 mb-1.5">Batch Exit Plan</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          {result.entry_plan.batch_sells.map((b, i) => (
+                            <div key={i} className="rounded bg-slate-700/40 border border-slate-600/50 px-2 py-1.5 text-center">
+                              <div className="text-[10px] text-slate-400">{b.tranche}</div>
+                              <div className="text-xs font-medium text-slate-200">{b.at}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-1">Key Lesson</div>
+              )}
+
+              {/* Composite score footer */}
+              <div className="rounded-lg border border-slate-600 bg-slate-800/60 px-4 py-3 flex items-start gap-4">
+                <div className="shrink-0">
+                  <div className="text-[10px] text-slate-500 uppercase tracking-wide">Score</div>
+                  <span className={`text-3xl font-bold ${scoreColor(result.overall_score)}`}>
+                    {result.overall_score}<span className="text-sm text-slate-500">/10</span>
+                  </span>
+                  <div className="mt-1">
+                    <span className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase ${verdictColor(result.overall_verdict)}`}>{result.overall_verdict}</span>
+                  </div>
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  {result.best_match && <p className="text-[10px] text-slate-500">Best match: <span className="text-slate-300 font-medium">{result.best_match}</span></p>}
+                  {result.weakest_dimension && <p className="text-[10px] text-slate-500">Weakest: <span className="text-amber-400">{result.weakest_dimension}</span></p>}
+                  <div className="text-[10px] text-slate-500 mt-1">Key Lesson</div>
                   <p className="text-xs text-slate-300 leading-relaxed">{result.lesson}</p>
                 </div>
               </div>
@@ -560,7 +605,7 @@ function TradeReviewModal({ trade, onClose }: { trade: Trade; onClose: () => voi
 
           {!loading && !error && !result && (
             <div className="py-8 text-center text-sm text-slate-500">
-              Select a provider and click Analyse to get a trade quality review.
+              Click Analyse to get a detailed trade quality review.
             </div>
           )}
         </div>
@@ -600,7 +645,7 @@ export default function TradeLog() {
   const [stockTicker, setStockTicker] = useState<string | null>(null);
   const [reviewTrade, setReviewTrade] = useState<Trade | null>(null);
 
-  useEffect(() => {
+  function loadTrades() {
     setLoading(true);
     const params = new URLSearchParams({
       page: String(page),
@@ -616,12 +661,25 @@ export default function TradeLog() {
         setPages(data.pages);
       })
       .finally(() => setLoading(false));
-  }, [page, symbol, side, result]);
+  }
+
+  useEffect(() => { loadTrades(); }, [page, symbol, side, result]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleVerdictSaved() {
+    // Refresh the trade list so the score badge updates
+    loadTrades();
+  }
 
   return (
     <div className="space-y-3">
       {stockTicker && <StockAnalysisModal ticker={stockTicker} onClose={() => setStockTicker(null)} />}
-      {reviewTrade && <TradeReviewModal trade={reviewTrade} onClose={() => setReviewTrade(null)} />}
+      {reviewTrade && (
+        <TradeReviewModal
+          trade={reviewTrade}
+          onClose={() => setReviewTrade(null)}
+          onVerdictSaved={handleVerdictSaved}
+        />
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 items-center">
@@ -659,7 +717,7 @@ export default function TradeLog() {
         <table className="w-full text-sm">
           <thead className="bg-slate-800/80 text-slate-400 text-xs uppercase">
             <tr>
-              {["#", "Date", "Symbol", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "Notes", "Review"].map((h) => (
+              {["#", "Date", "Symbol", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "Verdict", "Score"].map((h) => (
                 <th key={h} className="px-3 py-2 text-left whitespace-nowrap">{h}</th>
               ))}
             </tr>
@@ -672,6 +730,10 @@ export default function TradeLog() {
             ) : trades.map((t, i) => {
               const { text: pnlText, color: pnlColor } = fmtPnl(t.pnl);
               const isOpen = t.pnl === null;
+              const verdict = t.verdict as TradeReviewResult | null;
+              const verdictSummary = verdict
+                ? `${verdict.overall_verdict}${verdict.best_match ? " · " + verdict.best_match : ""}`
+                : null;
               return (
                 <tr key={t.id} className="border-t border-slate-800 hover:bg-slate-800/40">
                   <td className="px-3 py-2 text-slate-500">{(page - 1) * 50 + i + 1}</td>
@@ -687,9 +749,7 @@ export default function TradeLog() {
                       >
                         {t.ticker}
                       </button>
-                    ) : (
-                      t.ticker
-                    )}
+                    ) : t.ticker}
                   </td>
                   <td className="px-3 py-2">
                     {t.side ? (
@@ -703,15 +763,39 @@ export default function TradeLog() {
                   <td className="px-3 py-2">{t.exitPrice ? `$${fmtNum(t.exitPrice)}` : "—"}</td>
                   <td className="px-3 py-2">{t.fees ? `$${fmtNum(t.fees)}` : "—"}</td>
                   <td className={`px-3 py-2 font-medium ${pnlColor}`}>{pnlText}</td>
-                  <td className="px-3 py-2 text-slate-400 max-w-xs truncate">{t.notes || "—"}</td>
+                  {/* Verdict column: shows summary if cached, else notes */}
+                  <td className="px-3 py-2 max-w-xs">
+                    {verdictSummary ? (
+                      <button
+                        onClick={() => setReviewTrade(t)}
+                        className="text-left text-xs text-slate-300 hover:text-white truncate block max-w-[200px]"
+                        title={verdictSummary}
+                      >
+                        {verdictSummary}
+                      </button>
+                    ) : (
+                      <span className="text-xs text-slate-500 truncate block max-w-[160px]">{t.notes || "—"}</span>
+                    )}
+                  </td>
+                  {/* Score column: badge if scored, else Analyse button */}
                   <td className="px-3 py-2">
-                    <button
-                      onClick={() => setReviewTrade(t)}
-                      className="rounded px-2 py-1 text-[10px] font-medium border border-slate-600 text-slate-400 hover:border-blue-500 hover:text-blue-400 transition-colors whitespace-nowrap"
-                      title="AI trade review"
-                    >
-                      Review
-                    </button>
+                    {t.verdictScore != null ? (
+                      <button
+                        onClick={() => setReviewTrade(t)}
+                        className={`rounded border px-2 py-0.5 text-xs font-semibold ${scoreBadgeBg(t.verdictScore)} hover:opacity-80 transition-opacity`}
+                        title="Click to view full review"
+                      >
+                        {t.verdictScore.toFixed(1)}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setReviewTrade(t)}
+                        className="rounded px-2 py-1 text-[10px] font-medium border border-slate-600 text-slate-400 hover:border-blue-500 hover:text-blue-400 transition-colors whitespace-nowrap"
+                        title="AI trade review"
+                      >
+                        Analyse
+                      </button>
+                    )}
                   </td>
                 </tr>
               );

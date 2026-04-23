@@ -27,6 +27,14 @@ export async function GET(req: Request) {
       orderBy: { tradeDate: "desc" },
       skip: (page - 1) * limit,
       take: limit,
+      select: {
+        id: true, ticker: true, tradeDate: true, buyPrice: true, quantity: true,
+        exitPrice: true, side: true, fees: true, pnl: true, notes: true,
+        proposedEntry: true, proposedSL: true, proposedTP: true,
+        rrr: true, riskPct: true, rewardPct: true, positionPct: true,
+        currency: true, platform: true, industry: true, strategy: true,
+        verdict: true, verdictScore: true, verdictGeneratedAt: true,
+      },
     }),
   ]);
 

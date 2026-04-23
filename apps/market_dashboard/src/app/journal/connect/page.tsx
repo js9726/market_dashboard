@@ -22,6 +22,20 @@ const OPTIONAL_FIELDS: { key: keyof ColMap; label: string }[] = [
   { key: "notes", label: "Notes" },
 ];
 
+const PLAN_FIELDS: { key: keyof ColMap; label: string }[] = [
+  { key: "proposedEntry", label: "Proposed Entry" },
+  { key: "proposedSL", label: "Stop Loss" },
+  { key: "proposedTP", label: "Take Profit" },
+  { key: "rrr", label: "RRR" },
+  { key: "riskPct", label: "Risk (%)" },
+  { key: "rewardPct", label: "Reward (%)" },
+  { key: "positionPct", label: "Position (%)" },
+  { key: "currency", label: "Currency" },
+  { key: "platform", label: "Platform" },
+  { key: "industry", label: "Industry" },
+  { key: "strategy", label: "Strategy" },
+];
+
 function indexToColLetters(index: number): string {
   let letters = "";
   let n = index + 1;
@@ -256,8 +270,25 @@ export default function ConnectPage() {
             </div>
 
             <div className="rounded-lg bg-slate-800/60 border border-slate-700 p-4 space-y-3">
-              <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Optional columns</p>
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Optional columns — Execution</p>
               {OPTIONAL_FIELDS.map(({ key, label }) => (
+                <div key={key} className="flex items-center gap-3">
+                  <span className="w-36 text-sm text-slate-300 shrink-0">{label}</span>
+                  <select
+                    value={colMap[key] ?? ""}
+                    onChange={(e) => setField(key, e.target.value)}
+                    className="flex-1 rounded bg-slate-700 border border-slate-600 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    {fieldOptions}
+                  </select>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-lg bg-slate-800/60 border border-slate-700 p-4 space-y-3">
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Optional columns — Trade Plan</p>
+              <p className="text-[11px] text-slate-500">Map your pre-trade plan columns to unlock richer AI trade reviews.</p>
+              {PLAN_FIELDS.map(({ key, label }) => (
                 <div key={key} className="flex items-center gap-3">
                   <span className="w-36 text-sm text-slate-300 shrink-0">{label}</span>
                   <select

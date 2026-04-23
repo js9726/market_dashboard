@@ -43,6 +43,17 @@ export async function POST() {
         fees: t.fees,
         notes: t.notes,
         rawRow: t.rawRow,
+        proposedEntry: t.proposedEntry,
+        proposedSL: t.proposedSL,
+        proposedTP: t.proposedTP,
+        rrr: t.rrr,
+        riskPct: t.riskPct,
+        rewardPct: t.rewardPct,
+        positionPct: t.positionPct,
+        currency: t.currency,
+        platform: t.platform,
+        industry: t.industry,
+        strategy: t.strategy,
       })),
     }),
     prisma.spreadsheetConnection.update({
@@ -55,5 +66,27 @@ export async function POST() {
   const closed = trades.filter((t) => t.pnl !== null).length;
   const datesResolved = trades.filter((t) => t.tradeDate !== null).length;
   const sampleRawDates = rows.slice(1, 4).map((r) => r[colMap.date]);
+
+  // Fire-and-forget: generate verdicts for up to 5 unscored trades
+  void (async () => {
+    try {
+      const unscored = await prisma.trade.findMany({
+        where: { userId: session.user.id, connectionId: connection.id, verdictScore: null, buyPrice: { not: null } },
+        take: 5,
+        select: { id: true },
+      });
+      for (const { id } of unscored) {
+        try {
+          await fetch(`${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/api/analysis/trade-review`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", cookie: (await import("next/headers")).cookies().toString() },
+            body: JSON.stringify({ tradeId: id }),
+          });
+        } catch { /* non-fatal */ }
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+    } catch { /* non-fatal */ }
+  })();
+
   return NextResponse.json({ synced: trades.length, open, closed, datesResolved, sampleRawDates });
 }

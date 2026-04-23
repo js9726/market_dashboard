@@ -89,6 +89,7 @@ model Trade {
   user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   connection   SpreadsheetConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
 
+  // Core execution fields
   ticker    String
   tradeDate DateTime?
   buyPrice  Decimal?  @db.Decimal(12, 4)
@@ -100,6 +101,24 @@ model Trade {
   notes     String?
   rawRow    Json // full row stored for re-parsing without re-fetching
   syncedAt  DateTime  @default(now())
+
+  // Pre-trade plan columns (mapped from Google Sheet)
+  proposedEntry Decimal? @db.Decimal(12, 4) // "Proposed Buy Price"
+  proposedSL    Decimal? @db.Decimal(12, 4) // "Proposed SL Price"
+  proposedTP    Decimal? @db.Decimal(12, 4) // "Proposed TP Price"
+  rrr           Decimal? @db.Decimal(6, 2)  // "RRR"
+  riskPct       Decimal? @db.Decimal(6, 2)  // "Risk (%)"
+  rewardPct     Decimal? @db.Decimal(6, 2)  // "Reward (%)"
+  positionPct   Decimal? @db.Decimal(6, 2)  // "Position (%)"
+  currency      String?
+  platform      String?
+  industry      String?
+  strategy      String?
+
+  // AI verdict cache
+  verdict            Json?
+  verdictScore       Float?
+  verdictGeneratedAt DateTime?
 
   @@index([userId, tradeDate])
 }

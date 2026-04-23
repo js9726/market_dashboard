@@ -1,7 +1,7 @@
 import { HumanMessage } from 'langchain/schema';
-import OpenAI from 'openai';
 import yahooFinance from 'yahoo-finance2';
 import { withRetry } from '../../src/utils/retry';
+import { callLLM } from '../../src/utils/llm-router';
 
 interface AgentState {
   data: {
@@ -16,9 +16,10 @@ interface AgentState {
   };
 }
 
-interface TechnicalSignal {
+interface TraderSignal {
   signal: string;
   details: string;
+  confidence: number;
 }
 
 interface TechnicalAnalysis {
@@ -39,11 +40,13 @@ interface TechnicalAnalysis {
       histogram: number;
     };
   };
-  reasoning: {
-    trend_signal: TechnicalSignal;
-    momentum_signal: TechnicalSignal;
-    volume_signal: TechnicalSignal;
-    support_resistance_signal: TechnicalSignal;
+  trader_signals: {
+    markminervini: TraderSignal;
+    clement_ang: TraderSignal;
+    jfsrev: TraderSignal;
+    ted_zhang: TraderSignal;
+    srx_trades: TraderSignal;
+    prime_trading: TraderSignal;
   };
 }
 
@@ -53,93 +56,69 @@ const progress = {
   }
 };
 
-// Initialize Gemini client via OpenAI-compatible endpoint
-const openai = new OpenAI({
-  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-  /** Placeholder allows Next build when env is unset; real calls still need GEMINI_API_KEY. */
-  apiKey: process.env.GEMINI_API_KEY ?? "build-without-key",
-});
+const systemPrompt = `You are a professional technical analyst. Evaluate the given technical metrics through the lens of 6 distinct trader personas. For each trader, output a signal (bullish/bearish/neutral), confidence (0-100), and brief details explaining their specific criteria.
 
-const systemPrompt = `You are a professional technical analyst specializing in stock market analysis.
-Your task is to analyze technical indicators and price patterns to provide trading signals.
-Focus on four key areas:
-1. Trend Analysis (Moving Averages, Price Action)
-2. Momentum (RSI, MACD)
-3. Volume Analysis
-4. Support/Resistance Levels
+Trader profiles:
+- markminervini: SEPA/Superperformance. Requires Stage 2 uptrend (price > 50-day > 150-day > 200-day SMA, 200-day rising). VCP base forming (volatility contracting). Bullish only if: price above all MAs in proper stack, base ≥5 weeks, volume drying up. Bearish if below 50-day MA.
+- clement_ang: Swing/Superperformance. 21/50 EMA confluence. Looks for pullback to rising 21-EMA on low volume. Bullish if: price pulling back to 21-EMA (SMA-20 proxy), liquid leader. Bearish if extended far above 21-EMA or no EMA support.
+- jfsrev: Mechanical/Systematic. Requires RVOL confirmation (volume > average). Stop width < 60% of ATR. Not extended > 4× ATR from 50-MA. Bullish if: volume confirming, tight range, not extended. Bearish if: low volume, wide stop, or pre-earnings.
+- ted_zhang: Institutional/Portfolio Manager. Three pillars: price > 20 > 50 > 200 SMA stack, strong fundamentals, sector leadership. Bullish if SMA stack intact, bearish if any key MA broken. Longer-term bias.
+- srx_trades: Technical Swing. Two setups: (A) Breakout — tight coil above MAs, volume confirming. (B) MA Pullback — 8/21/50 EMA pullback on LOW volume. Bullish if coiled above MAs with volume drying up. Uses 4-tranche exit plan.
+- prime_trading: Momentum/21-dma Pullback ONLY. Entry must be within 0-1× ATR of rising 21-dma (use SMA-20 as proxy). Bullish if price within 1 ATR of SMA-20 and SMA-20 is rising. Bearish if extended above or below.
 
-Respond ONLY with a JSON object in this exact shape:
+Respond ONLY with a JSON object:
 {
   "overall_signal": "bullish" | "bearish" | "neutral",
-  "confidence": <integer 0-100>,
-  "trend": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
-  "momentum": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
-  "volume": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" },
-  "support_resistance": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>" }
+  "overall_confidence": <integer 0-100>,
+  "markminervini": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>", "confidence": <integer 0-100> },
+  "clement_ang":   { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>", "confidence": <integer 0-100> },
+  "jfsrev":        { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>", "confidence": <integer 0-100> },
+  "ted_zhang":     { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>", "confidence": <integer 0-100> },
+  "srx_trades":    { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>", "confidence": <integer 0-100> },
+  "prime_trading": { "signal": "bullish" | "bearish" | "neutral", "details": "<reasoning>", "confidence": <integer 0-100> }
 }`;
 
 async function getTechnicalMetrics(ticker: string, endDate: string) {
-  try {
-    // Get historical data
-    const result = await withRetry(async () => {
-      // @ts-expect-error: yahoo-finance2 types omit the queryOptions 3rd argument
-      return yahooFinance.historical(ticker, { period1: new Date(new Date(endDate).setFullYear(new Date(endDate).getFullYear() - 1)), period2: new Date(endDate), interval: '1d' }, { skipValidation: true });
-    }, 3, 2000);
+  const result = await withRetry(async () => {
+    // @ts-expect-error: yahoo-finance2 types omit the queryOptions 3rd argument
+    return yahooFinance.historical(ticker, { period1: new Date(new Date(endDate).setFullYear(new Date(endDate).getFullYear() - 1)), period2: new Date(endDate), interval: '1d' }, { skipValidation: true });
+  }, 3, 2000);
 
-    if (!result || result.length === 0) {
-      throw new Error('No historical data available');
-    }
-
-    // Calculate technical indicators
-    const prices = result.map(d => d.close);
-    const volumes = result.map(d => d.volume);
-    const latestPrice = prices[prices.length - 1];
-    const latestVolume = volumes[volumes.length - 1];
-
-    // Calculate SMAs
-    const sma20 = calculateSMA(prices, 20);
-    const sma50 = calculateSMA(prices, 50);
-    const sma200 = calculateSMA(prices, 200);
-
-    // Calculate RSI
-    const rsi = calculateRSI(prices);
-
-    // Calculate MACD
-    const macd = calculateMACD(prices);
-
-    return {
-      price: latestPrice,
-      volume: latestVolume,
-      moving_averages: {
-        sma_20: sma20,
-        sma_50: sma50,
-        sma_200: sma200
-      },
-      rsi: rsi,
-      macd: macd
-    };
-  } catch (error) {
-    console.error(`Error calculating technical metrics for ${ticker}:`, error);
-    throw error;
+  if (!result || result.length === 0) {
+    throw new Error('No historical data available');
   }
+
+  const prices = result.map((d: any) => d.close);
+  const volumes = result.map((d: any) => d.volume);
+  const latestPrice = prices[prices.length - 1];
+  const latestVolume = volumes[volumes.length - 1];
+
+  return {
+    price: latestPrice,
+    volume: latestVolume,
+    moving_averages: {
+      sma_20: calculateSMA(prices, 20),
+      sma_50: calculateSMA(prices, 50),
+      sma_200: calculateSMA(prices, 200),
+    },
+    rsi: calculateRSI(prices),
+    macd: calculateMACD(prices),
+  };
 }
 
 function calculateSMA(prices: number[], period: number): number {
   if (prices.length < period) return 0;
-  const sum = prices.slice(-period).reduce((a, b) => a + b, 0);
+  const sum = prices.slice(-period).reduce((a: number, b: number) => a + b, 0);
   return sum / period;
 }
 
 function calculateRSI(prices: number[], period: number = 14): number {
   if (prices.length < period + 1) return 50;
-  
-  const changes = prices.slice(1).map((price, i) => price - prices[i]);
-  const gains = changes.map(change => change > 0 ? change : 0);
-  const losses = changes.map(change => change < 0 ? -change : 0);
-  
-  const avgGain = gains.slice(-period).reduce((a, b) => a + b, 0) / period;
-  const avgLoss = losses.slice(-period).reduce((a, b) => a + b, 0) / period;
-  
+  const changes = prices.slice(1).map((price: number, i: number) => price - prices[i]);
+  const gains = changes.map((c: number) => c > 0 ? c : 0);
+  const losses = changes.map((c: number) => c < 0 ? -c : 0);
+  const avgGain = gains.slice(-period).reduce((a: number, b: number) => a + b, 0) / period;
+  const avgLoss = losses.slice(-period).reduce((a: number, b: number) => a + b, 0) / period;
   const rs = avgGain / avgLoss;
   return 100 - (100 / (1 + rs));
 }
@@ -149,28 +128,25 @@ function calculateMACD(prices: number[]): { macd: number; signal: number; histog
   const ema26 = calculateEMA(prices, 26);
   const macd = ema12 - ema26;
   const signal = calculateEMA([macd], 9);
-  const histogram = macd - signal;
-
-  return { macd, signal, histogram };
+  return { macd, signal, histogram: macd - signal };
 }
 
 function calculateEMA(prices: number[], period: number): number {
   if (prices.length < period + 1) return prices[prices.length - 1];
-  
   const multiplier = 2 / (period + 1);
-  let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;
-  
+  let ema = prices.slice(0, period).reduce((a: number, b: number) => a + b, 0) / period;
   for (let i = period; i < prices.length; i++) {
     ema = (prices[i] - ema) * multiplier + ema;
   }
-  
   return ema;
 }
+
+const defaultTraderSignal: TraderSignal = { signal: "neutral", details: "Technical analysis unavailable", confidence: 50 };
 
 export async function technicalAgent(state: AgentState) {
   const { data } = state;
   const { end_date, tickers } = data;
-  
+
   const technicalAnalysis: { [key: string]: TechnicalAnalysis } = {};
 
   for (const ticker of tickers) {
@@ -181,51 +157,52 @@ export async function technicalAgent(state: AgentState) {
       const metrics = await getTechnicalMetrics(ticker, end_date);
       progress.updateStatus("technical_agent", ticker, "Technical metrics fetched successfully");
 
-      const metricsPrompt = `
-      Analyze the following technical metrics for ${ticker}:
-      
-      Price and Volume:
-      - Current Price: ${metrics.price}
-      - Current Volume: ${metrics.volume}
-      
-      Moving Averages:
-      - 20-day SMA: ${metrics.moving_averages.sma_20}
-      - 50-day SMA: ${metrics.moving_averages.sma_50}
-      - 200-day SMA: ${metrics.moving_averages.sma_200}
-      
-      Momentum Indicators:
-      - RSI: ${metrics.rsi}
-      - MACD: ${metrics.macd.macd}
-      - MACD Signal: ${metrics.macd.signal}
-      - MACD Histogram: ${metrics.macd.histogram}
-      
-      Please provide a detailed technical analysis with signals (bullish/bearish/neutral) and confidence levels for each aspect.`;
+      const avgVolume = metrics.volume;
+      const atr = Math.abs(metrics.price - metrics.moving_averages.sma_20);
 
-      progress.updateStatus("technical_agent", ticker, "Requesting AI analysis");
-      const completion = await openai.chat.completions.create({
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: metricsPrompt }
-        ],
-        model: "gemini-2.5-pro",
-        temperature: 0.7,
-        max_tokens: 1000,
-        response_format: { type: "json_object" }
-      });
+      const metricsPrompt = `Analyze the following technical metrics for ${ticker}:
+
+Price and Volume:
+- Current Price: ${metrics.price.toFixed(2)}
+- Current Volume: ${metrics.volume.toLocaleString()}
+- Avg Volume (proxy): ${avgVolume.toLocaleString()}
+
+Moving Averages:
+- 20-day SMA (21-EMA proxy): ${metrics.moving_averages.sma_20.toFixed(2)}
+- 50-day SMA: ${metrics.moving_averages.sma_50.toFixed(2)}
+- 200-day SMA: ${metrics.moving_averages.sma_200.toFixed(2)}
+
+Momentum Indicators:
+- RSI (14): ${metrics.rsi.toFixed(2)}
+- MACD: ${metrics.macd.macd.toFixed(4)}
+- MACD Signal: ${metrics.macd.signal.toFixed(4)}
+- MACD Histogram: ${metrics.macd.histogram.toFixed(4)}
+
+Derived:
+- Price distance from SMA-20: ${(metrics.price - metrics.moving_averages.sma_20).toFixed(2)} (${((metrics.price / metrics.moving_averages.sma_20 - 1) * 100).toFixed(1)}%)
+- Price distance from SMA-50: ${(metrics.price - metrics.moving_averages.sma_50).toFixed(2)} (${((metrics.price / metrics.moving_averages.sma_50 - 1) * 100).toFixed(1)}%)
+- Price distance from SMA-200: ${(metrics.price - metrics.moving_averages.sma_200).toFixed(2)} (${((metrics.price / metrics.moving_averages.sma_200 - 1) * 100).toFixed(1)}%)
+- Approx ATR (|price - SMA20|): ${atr.toFixed(2)}
+- SMA stack (20>50>200): ${metrics.moving_averages.sma_20 > metrics.moving_averages.sma_50 && metrics.moving_averages.sma_50 > metrics.moving_averages.sma_200 ? "YES" : "NO"}`;
+
+      progress.updateStatus("technical_agent", ticker, "Requesting 6-trader AI analysis");
+      const raw = await callLLM(metricsPrompt, systemPrompt, { maxTokens: 1500 });
 
       progress.updateStatus("technical_agent", ticker, "Processing AI response");
-      const analysis = JSON.parse(completion.choices[0].message.content || '{}');
-      
+      const analysis = JSON.parse(raw || '{}');
+
       technicalAnalysis[ticker] = {
-        signal: analysis.overall_signal,
-        confidence: analysis.confidence,
-        metrics: metrics,
-        reasoning: {
-          trend_signal: analysis.trend,
-          momentum_signal: analysis.momentum,
-          volume_signal: analysis.volume,
-          support_resistance_signal: analysis.support_resistance
-        }
+        signal: analysis.overall_signal ?? "neutral",
+        confidence: analysis.overall_confidence ?? 50,
+        metrics,
+        trader_signals: {
+          markminervini: analysis.markminervini ?? defaultTraderSignal,
+          clement_ang: analysis.clement_ang ?? defaultTraderSignal,
+          jfsrev: analysis.jfsrev ?? defaultTraderSignal,
+          ted_zhang: analysis.ted_zhang ?? defaultTraderSignal,
+          srx_trades: analysis.srx_trades ?? defaultTraderSignal,
+          prime_trading: analysis.prime_trading ?? defaultTraderSignal,
+        },
       };
 
       progress.updateStatus("technical_agent", ticker, "Analysis complete");
@@ -236,26 +213,19 @@ export async function technicalAgent(state: AgentState) {
         signal: "neutral",
         confidence: 50,
         metrics: {
-          price: 0,
-          volume: 0,
-          moving_averages: {
-            sma_20: 0,
-            sma_50: 0,
-            sma_200: 0
-          },
+          price: 0, volume: 0,
+          moving_averages: { sma_20: 0, sma_50: 0, sma_200: 0 },
           rsi: 50,
-          macd: {
-            macd: 0,
-            signal: 0,
-            histogram: 0
-          }
+          macd: { macd: 0, signal: 0, histogram: 0 },
         },
-        reasoning: {
-          trend_signal: { signal: "neutral", details: "Technical analysis unavailable" },
-          momentum_signal: { signal: "neutral", details: "Technical analysis unavailable" },
-          volume_signal: { signal: "neutral", details: "Technical analysis unavailable" },
-          support_resistance_signal: { signal: "neutral", details: "Technical analysis unavailable" }
-        }
+        trader_signals: {
+          markminervini: defaultTraderSignal,
+          clement_ang: defaultTraderSignal,
+          jfsrev: defaultTraderSignal,
+          ted_zhang: defaultTraderSignal,
+          srx_trades: defaultTraderSignal,
+          prime_trading: defaultTraderSignal,
+        },
       };
     }
   }
@@ -267,7 +237,8 @@ export async function technicalAgent(state: AgentState) {
   });
 
   if (state.metadata.show_reasoning) {
-    showAgentReasoning(technicalAnalysis, "Technical Analysis Agent");
+    console.log(`\nTechnical Analysis Agent Reasoning:`);
+    console.log(JSON.stringify(technicalAnalysis, null, 2));
   }
 
   state.data.analyst_signals.technical_agent = technicalAnalysis;
@@ -277,8 +248,3 @@ export async function technicalAgent(state: AgentState) {
     data: state.data
   };
 }
-
-function showAgentReasoning(analysis: any, agentName: string): void {
-  console.log(`\n${agentName} Reasoning:`);
-  console.log(JSON.stringify(analysis, null, 2));
-} 

@@ -14,6 +14,18 @@ export type RawTrade = {
   fees: number | null;
   notes: string | null;
   rawRow: string[];
+  // Pre-trade plan fields
+  proposedEntry: number | null;
+  proposedSL: number | null;
+  proposedTP: number | null;
+  rrr: number | null;
+  riskPct: number | null;
+  rewardPct: number | null;
+  positionPct: number | null;
+  currency: string | null;
+  platform: string | null;
+  industry: string | null;
+  strategy: string | null;
 };
 
 function makeClient(accessToken: string) {
@@ -97,17 +109,31 @@ export function parseTradeRows(rows: string[][], colMap: ColMap): RawTrade[] {
     const ticker = row[colMap.ticker]?.trim() ?? "";
     if (!ticker) continue;
 
+    const str = (col: number | null) => col !== null ? (row[col]?.trim() || null) : null;
+    const num = (col: number | null) => col !== null ? parseNum(row[col]) : null;
+
     trades.push({
       ticker,
       tradeDate: parseDate(row[colMap.date]),
       buyPrice: parseNum(row[colMap.buyPrice]),
       quantity: parseNum(row[colMap.quantity]),
       pnl: parseNum(row[colMap.pnl]),
-      exitPrice: colMap.exitPrice !== null ? parseNum(row[colMap.exitPrice]) : null,
-      side: colMap.side !== null ? (row[colMap.side]?.trim() || null) : null,
-      fees: colMap.fees !== null ? parseNum(row[colMap.fees]) : null,
-      notes: colMap.notes !== null ? (row[colMap.notes]?.trim() || null) : null,
+      exitPrice: num(colMap.exitPrice),
+      side: str(colMap.side),
+      fees: num(colMap.fees),
+      notes: str(colMap.notes),
       rawRow: row,
+      proposedEntry: num(colMap.proposedEntry),
+      proposedSL: num(colMap.proposedSL),
+      proposedTP: num(colMap.proposedTP),
+      rrr: num(colMap.rrr),
+      riskPct: num(colMap.riskPct),
+      rewardPct: num(colMap.rewardPct),
+      positionPct: num(colMap.positionPct),
+      currency: str(colMap.currency),
+      platform: str(colMap.platform),
+      industry: str(colMap.industry),
+      strategy: str(colMap.strategy),
     });
   }
 
