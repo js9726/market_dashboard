@@ -13,12 +13,22 @@ export async function POST(req: Request) {
     headerRow?: number;
   };
 
-  const accessToken = await getGoogleAccessToken(session.user.id);
-  const tabs = await listSpreadsheetTabs(spreadsheetId, accessToken);
+  let accessToken: string;
+  try {
+    accessToken = await getGoogleAccessToken(session.user.id);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: `Google auth failed: ${msg}` }, { status: 500 });
+  }
 
-  const targetTab = sheetTab ?? tabs[0]?.title ?? "Sheet1";
-  const rows = await fetchSheetRows(spreadsheetId, targetTab, headerRow, accessToken);
-  const headers: string[] = rows[0] ?? [];
-
-  return NextResponse.json({ tabs, headers, resolvedTab: targetTab });
+  try {
+    const tabs = await listSpreadsheetTabs(spreadsheetId, accessToken);
+    const targetTab = sheetTab ?? tabs[0]?.title ?? "Sheet1";
+    const rows = await fetchSheetRows(spreadsheetId, targetTab, headerRow, accessToken);
+    const headers: string[] = rows[0] ?? [];
+    return NextResponse.json({ tabs, headers, resolvedTab: targetTab });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: `Sheets API failed: ${msg}` }, { status: 500 });
+  }
 }

@@ -13,20 +13,34 @@ export async function POST() {
   });
   if (!connection) return NextResponse.json({ error: "No spreadsheet connected" }, { status: 400 });
 
-  const accessToken = await getGoogleAccessToken(session.user.id);
+  let accessToken: string;
+  try {
+    accessToken = await getGoogleAccessToken(session.user.id);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: `Google auth failed: ${msg}` }, { status: 500 });
+  }
+
   const colMap: ColMap = Object.keys(connection.colMap as object).length
     ? (connection.colMap as ColMap)
     : DEFAULT_COL_MAP;
 
-  const rows = await fetchSheetRows(
-    connection.spreadsheetId,
-    connection.sheetTab,
-    connection.headerRow,
-    accessToken
-  );
+  let rows: string[][];
+  try {
+    rows = await fetchSheetRows(
+      connection.spreadsheetId,
+      connection.sheetTab,
+      connection.headerRow,
+      accessToken
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: `Sheets fetch failed: ${msg}` }, { status: 500 });
+  }
 
   const trades = parseTradeRows(rows, colMap);
 
+  try {
   await prisma.$transaction([
     prisma.trade.deleteMany({ where: { connectionId: connection.id } }),
     prisma.trade.createMany({
@@ -61,6 +75,10 @@ export async function POST() {
       data: { lastSyncedAt: new Date() },
     }),
   ]);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: `DB write failed: ${msg}` }, { status: 500 });
+  }
 
   const open = trades.filter((t) => t.pnl === null).length;
   const closed = trades.filter((t) => t.pnl !== null).length;
