@@ -36,7 +36,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      // `account` is present on every sign-in — update stored tokens so a
+      // fresh refresh_token always replaces any previously revoked one.
+      if (account?.provider === "google") {
+        await prisma.account.update({
+          where: {
+            provider_providerAccountId: {
+              provider: "google",
+              providerAccountId: account.providerAccountId,
+            },
+          },
+          data: {
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            ...(account.refresh_token ? { refresh_token: account.refresh_token } : {}),
+          },
+        });
+      }
       // `user` is only present on the first sign-in; persist role into JWT
       if (user) {
         const dbUser = await prisma.user.findUnique({
