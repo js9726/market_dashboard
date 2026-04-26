@@ -134,7 +134,8 @@ export default function ConnectPage() {
       setHeaders(data.headers);
       setStep(2);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load sheet");
+      const msg = e instanceof Error ? e.message : "Failed to load sheet";
+      setError(msg.includes("REAUTH_REQUIRED") ? "Your Google session has expired. Please sign out and sign back in." : msg);
     } finally {
       setLoading(false);
     }
@@ -153,7 +154,8 @@ export default function ConnectPage() {
       const data = await res.json() as { tabs: { title: string; sheetId: number }[]; headers: string[] };
       setHeaders(data.headers);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to fetch headers");
+      const msg = e instanceof Error ? e.message : "Failed to fetch headers";
+      setError(msg.includes("REAUTH_REQUIRED") ? "Your Google session has expired. Please sign out and sign back in." : msg);
     } finally {
       setLoading(false);
     }
@@ -180,7 +182,8 @@ export default function ConnectPage() {
 
       router.push("/dashboard");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Save failed");
+      const msg = e instanceof Error ? e.message : "Save failed";
+      setError(msg.includes("REAUTH_REQUIRED") ? "Your Google session has expired. Please sign out and sign back in." : msg);
       setStep(2);
     } finally {
       setLoading(false);

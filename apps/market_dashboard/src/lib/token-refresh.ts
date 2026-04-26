@@ -29,6 +29,10 @@ export async function getGoogleAccessToken(userId: string): Promise<string> {
 
   if (!res.ok) {
     const body = await res.text();
+    // invalid_grant = token revoked or expired (Testing mode 7-day limit, password change, etc.)
+    if (body.includes("invalid_grant")) {
+      throw new Error("REAUTH_REQUIRED");
+    }
     throw new Error(`Token refresh failed: ${body}`);
   }
 

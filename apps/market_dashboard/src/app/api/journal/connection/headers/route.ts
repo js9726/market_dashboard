@@ -18,6 +18,9 @@ export async function POST(req: Request) {
     accessToken = await getGoogleAccessToken(session.user.id);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    if (msg === "REAUTH_REQUIRED") {
+      return NextResponse.json({ error: "REAUTH_REQUIRED" }, { status: 401 });
+    }
     return NextResponse.json({ error: `Google auth failed: ${msg}` }, { status: 500 });
   }
 
