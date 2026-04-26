@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import ChatInterface from "@/components/ChatInterface";
 import MarketMetricsDashboard from "@/components/market/MarketMetricsDashboard";
 import MorningBrief from "@/components/market/MorningBrief";
@@ -22,6 +23,7 @@ export default function DashboardShell() {
             </Link>
             <h1 className="text-lg font-semibold tracking-tight">Market desk</h1>
           </div>
+          <div className="flex items-center gap-3">
           <nav className="flex gap-1 rounded-lg bg-slate-800/80 p-1">
             {(
               [
@@ -45,6 +47,14 @@ export default function DashboardShell() {
               </button>
             ))}
           </nav>
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="rounded-md px-3 py-1.5 text-xs text-slate-400 hover:text-white hover:bg-slate-700 transition"
+            title="Sign out of Google to re-authenticate"
+          >
+            Sign out
+          </button>
+          </div>
         </div>
       </header>
 
