@@ -25,6 +25,7 @@ export interface MarketSnapshot {
       "20d": [number, number];
     }
   >;
+  fear_greed?: { value: number; label: string } | null;
 }
 
 export interface MacroEvent {

@@ -292,7 +292,6 @@ function FearGreedCard({ fg }: { fg: FearGreed | null }) {
 export default function MarketMetricsDashboard() {
   const [snapshot, setSnapshot]     = useState<MarketSnapshot | null>(null);
   const [verdictData, setVerdictData] = useState<TraderVerdictData | null>(null);
-  const [fearGreed, setFearGreed]   = useState<FearGreed | null>(null);
   const [error, setError]           = useState<string | null>(null);
 
   useEffect(() => {
@@ -310,19 +309,10 @@ export default function MarketMetricsDashboard() {
       .then((d) => { if (!cancelled && d) setVerdictData(d); })
       .catch(() => {});
 
-    // Fear & Greed from Alternative.me (free, CORS-friendly)
-    fetch("https://api.alternative.me/fng/?limit=1")
-      .then((r) => r.json())
-      .then((d) => {
-        const item = d?.data?.[0];
-        if (!cancelled && item) {
-          setFearGreed({ value: Number(item.value), label: item.value_classification });
-        }
-      })
-      .catch(() => {});
-
     return () => { cancelled = true; };
   }, []);
+
+  const fearGreed: FearGreed | null = snapshot?.fear_greed ?? null;
 
   const stats = useMemo(() => {
     if (!snapshot) return null;

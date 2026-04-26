@@ -655,6 +655,29 @@ def compute_breadth(tickers):
     }
 
 
+def fetch_cnn_fear_greed():
+    """Fetch CNN stock market Fear & Greed index."""
+    if not _BS4_AVAILABLE:
+        return None
+    try:
+        resp = requests.get(
+            "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        fg = data.get("fear_and_greed", {})
+        score = fg.get("score")
+        rating = fg.get("rating", "")
+        if score is None:
+            return None
+        return {"value": round(float(score), 1), "label": rating}
+    except Exception as e:
+        print(f"Warning: CNN Fear & Greed fetch failed: {e}")
+        return None
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", default="data", help="Output directory (default: data)")
@@ -662,6 +685,9 @@ def main():
     out_dir = args.out_dir
     charts_dir = os.path.join(out_dir, "charts")
     os.makedirs(charts_dir, exist_ok=True)
+
+    print("Fetching CNN Fear & Greed...")
+    fear_greed = fetch_cnn_fear_greed()
 
     print("Fetching economic events...")
     events = get_upcoming_key_events()
@@ -708,6 +734,7 @@ def main():
         "column_ranges": column_ranges,
         "industry_performance": industry_perf,
         "breadth": breadth,
+        "fear_greed": fear_greed,
     }
     meta = {
         "SECTOR_COLORS": SECTOR_COLORS,
