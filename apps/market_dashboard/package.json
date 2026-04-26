@@ -5,7 +5,7 @@
   "scripts": {
     "sync:market": "node scripts/sync-market-dashboard.mjs",
     "dev": "next dev --turbopack",
-    "build": "prisma migrate deploy && next build",
+    "build": "prisma migrate resolve --rolled-back 20260426000000_add_trade_plan_and_verdict_fields 2>/dev/null; prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate"

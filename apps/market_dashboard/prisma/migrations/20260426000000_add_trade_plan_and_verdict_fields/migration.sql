@@ -1,16 +1,17 @@
 -- AlterTable: add pre-trade plan columns and AI verdict cache to Trade
+-- IF NOT EXISTS guards against columns already present from a prior db push
 ALTER TABLE "Trade"
-  ADD COLUMN "proposedEntry"       DECIMAL(12,4),
-  ADD COLUMN "proposedSL"          DECIMAL(12,4),
-  ADD COLUMN "proposedTP"          DECIMAL(12,4),
-  ADD COLUMN "rrr"                 DECIMAL(6,2),
-  ADD COLUMN "riskPct"             DECIMAL(6,2),
-  ADD COLUMN "rewardPct"           DECIMAL(6,2),
-  ADD COLUMN "positionPct"         DECIMAL(6,2),
-  ADD COLUMN "currency"            TEXT,
-  ADD COLUMN "platform"            TEXT,
-  ADD COLUMN "industry"            TEXT,
-  ADD COLUMN "strategy"            TEXT,
-  ADD COLUMN "verdict"             JSONB,
-  ADD COLUMN "verdictScore"        DOUBLE PRECISION,
-  ADD COLUMN "verdictGeneratedAt"  TIMESTAMP(3);
+  ADD COLUMN IF NOT EXISTS "proposedEntry"       DECIMAL(12,4),
+  ADD COLUMN IF NOT EXISTS "proposedSL"          DECIMAL(12,4),
+  ADD COLUMN IF NOT EXISTS "proposedTP"          DECIMAL(12,4),
+  ADD COLUMN IF NOT EXISTS "rrr"                 DECIMAL(6,2),
+  ADD COLUMN IF NOT EXISTS "riskPct"             DECIMAL(6,2),
+  ADD COLUMN IF NOT EXISTS "rewardPct"           DECIMAL(6,2),
+  ADD COLUMN IF NOT EXISTS "positionPct"         DECIMAL(6,2),
+  ADD COLUMN IF NOT EXISTS "currency"            TEXT,
+  ADD COLUMN IF NOT EXISTS "platform"            TEXT,
+  ADD COLUMN IF NOT EXISTS "industry"            TEXT,
+  ADD COLUMN IF NOT EXISTS "strategy"            TEXT,
+  ADD COLUMN IF NOT EXISTS "verdict"             JSONB,
+  ADD COLUMN IF NOT EXISTS "verdictScore"        DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS "verdictGeneratedAt"  TIMESTAMP(3);
