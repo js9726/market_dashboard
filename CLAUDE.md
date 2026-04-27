@@ -149,9 +149,12 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Do not upgrade Next.js past 15.x without verifying all middleware/auth compatibility.
 
 ### Auth
-- Auth is cookie-based: `DASHBOARD_PASSWORD` checked at login, `AUTH_TOKEN` stored as httpOnly cookie.
+- Auth is **NextAuth v5** (Google OAuth) + Prisma + role-based access. Not cookie-based.
+- Roles: `owner` (full access + admin), `allowed` (standard user), `pending` (hold page), `denied` (blocked at sign-in).
 - Clerk has been removed — do not re-add it.
-- Middleware excludes `/market-dashboard/*` so static JSON/PNG files are served without a session.
+- `DASHBOARD_PASSWORD` and `AUTH_TOKEN` are from the **old** cookie-based auth — they are no longer used.
+- Middleware (`src/middleware.ts`) protects all routes. Exclusions: `/login`, `/api/auth/*`, `/market-dashboard/*` (static files).
+- All `/api/*` routes should have an explicit auth check (`const session = await auth(); if (!session?.user?.id) return 401`), because middleware returns a 302 redirect for unauthenticated requests — wrong for AJAX callers.
 
 ### GitHub Actions
 - Workflow: `.github/workflows/refresh_data.yml`
@@ -162,7 +165,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ### Vercel
 - Root directory is `apps/market_dashboard` — set via `vercel.json` at repo root.
-- Required env vars in Vercel dashboard: `DASHBOARD_PASSWORD`, `AUTH_TOKEN`.
+- Required env vars in Vercel dashboard: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_SECRET`, `DATABASE_URL`, `OWNER_EMAIL`.
 - After adding env vars in Vercel, always trigger a **manual redeploy** — env vars don't apply to existing deployments.
 
 ---
@@ -174,8 +177,12 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 | `GEMINI_API_KEY` | GitHub Secret + `.env.local` | Yes (≥1 brief key) | Morning brief — Gemini 2.5 Pro with Search Grounding |
 | `OPENAI_API_KEY` | GitHub Secret + `.env.local` | Optional | Morning brief — GPT-4o with web_search_preview |
 | `ANTHROPIC_API_KEY` | GitHub Secret + `.env.local` | Optional | Morning brief — Claude claude-sonnet-4-6 with web search |
-| `DASHBOARD_PASSWORD` | Vercel + `.env.local` | Yes | Login password for dashboard |
-| `AUTH_TOKEN` | Vercel + `.env.local` | Yes | httpOnly session cookie value |
+| `GOOGLE_CLIENT_ID` | Vercel + `.env.local` | Yes | Google OAuth client ID (NextAuth v5) |
+| `GOOGLE_CLIENT_SECRET` | Vercel + `.env.local` | Yes | Google OAuth client secret (NextAuth v5) |
+| `AUTH_SECRET` | Vercel + `.env.local` | Yes | NextAuth v5 session signing secret |
+| `DATABASE_URL` | Vercel + `.env.local` | Yes | PostgreSQL connection string (Prisma) |
+| `OWNER_EMAIL` | Vercel + `.env.local` | Yes | Email auto-promoted to `owner` role on first sign-in |
+| `NEXTAUTH_URL` | Vercel + `.env.local` | Yes (prod) | Base URL used for internal API calls |
 | `DEEPSEEK_API_KEY` | `.env.local` / Vercel | Optional | AI stock analysis tab |
 
 Never commit `.env.local`. Never log API keys. Never hardcode secrets in `.bat` files or scripts.
@@ -196,6 +203,24 @@ Never commit `.env.local`. Never log API keys. Never hardcode secrets in `.bat` 
 | Brief provider button greyed out | API key not set or generation failed | Check env var; see `morning_brief_meta.json` for `generated: false` |
 | OpenAI brief fails | `openai` package not installed | `pip install openai>=1.70.0` |
 | Claude brief fails | `anthropic` package not installed | `pip install anthropic>=0.49.0` |
+
+---
+
+---
+
+## 8. Session Learning Logs (`.learnings/`)
+
+Three local files track in-session discoveries. They are gitignored — they stay on your machine only.
+
+| File | Purpose |
+|------|---------|
+| `.learnings/LEARNINGS.md` | Lessons and known pitfalls found during sessions |
+| `.learnings/ERRORS.md` | Pipeline/build failures and their fixes |
+| `.learnings/FEATURE_REQUESTS.md` | Ideas captured mid-session |
+
+**Workflow:** When an entry recurs 2+ times, promote it manually to the Common Pitfalls table in this file and clear it from `.learnings/`. Committed `CLAUDE.md` updates are what travel to other machines and collaborators — `.learnings/` is local scratch pad only.
+
+**Never** enable a `PostToolUse` error-detector hook that reads Claude's stdout — tool output can contain API error messages with key fragments in debug traces, and writing those to `.learnings/ERRORS.md` risks leaking secrets if the file is ever committed accidentally.
 
 ---
 

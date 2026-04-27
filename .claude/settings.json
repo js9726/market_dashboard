@@ -1,24 +1,35 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/self-improvement-reminder.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"/c/Users/jiesh/AI codes hub/market_dashboard/.claude/hooks/check-ts.sh\"",
+            "command": "bash \".claude/hooks/check-ts.sh\"",
             "timeout": 30,
             "statusMessage": "Type-checking..."
           },
           {
             "type": "command",
-            "command": "bash \"/c/Users/jiesh/AI codes hub/market_dashboard/.claude/hooks/lint.sh\"",
+            "command": "bash \".claude/hooks/lint.sh\"",
             "timeout": 30,
             "statusMessage": "Running ESLint..."
           },
           {
             "type": "command",
-            "command": "bash \"/c/Users/jiesh/AI codes hub/market_dashboard/.claude/hooks/build.sh\"",
+            "command": "bash \".claude/hooks/build.sh\"",
             "timeout": 120,
             "statusMessage": "Checking Next.js build..."
           }

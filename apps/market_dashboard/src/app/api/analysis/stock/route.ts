@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import yahooFinance from "yahoo-finance2";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
+import { auth } from "@/auth";
 
 const TRADER_PROFILES = [
   {
@@ -94,6 +95,11 @@ function fmtBig(v: number | null | undefined): string {
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const ticker: string = (body.ticker ?? "").toUpperCase().trim();
