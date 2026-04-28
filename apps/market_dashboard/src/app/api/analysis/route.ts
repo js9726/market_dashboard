@@ -1,10 +1,16 @@
-import { HumanMessage } from "langchain/schema";
 import { NextResponse } from "next/server";
 import { fundamentalsAgent } from "../../../../agents/fundamental/capability";
 import { technicalAgent } from "../../../../agents/technical/capability";
 import { formatTickers } from "@/utils/format";
+import { auth } from "@/auth";
+import type { AgentMessage } from "@/types/agent";
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     console.log('\n=== API Request ===');
@@ -46,7 +52,7 @@ export async function POST(request: Request) {
       
       // Only run technical analysis if OpenAI is available
       let technicalResult: Awaited<ReturnType<typeof technicalAgent>> = {
-        messages: [] as HumanMessage[],
+        messages: [] as AgentMessage[],
         data: { ...state.data, analyst_signals: { technical_agent: {} } },
       };
       

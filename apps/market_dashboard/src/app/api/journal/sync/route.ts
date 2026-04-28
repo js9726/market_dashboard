@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getGoogleAccessToken } from "@/lib/token-refresh";
 import { fetchSheetRows, parseTradeRows, DEFAULT_COL_MAP, ColMap } from "@/lib/google-sheets";
+import { generateTradeVerdict } from "@/lib/generate-trade-verdict";
 import { NextResponse } from "next/server";
 
 export async function POST() {
@@ -98,11 +99,7 @@ export async function POST() {
       });
       for (const { id } of unscored) {
         try {
-          await fetch(`${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/api/analysis/trade-review`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", cookie: (await import("next/headers")).cookies().toString() },
-            body: JSON.stringify({ tradeId: id }),
-          });
+          await generateTradeVerdict(id, session.user.id);
         } catch { /* non-fatal */ }
         await new Promise((r) => setTimeout(r, 1000));
       }

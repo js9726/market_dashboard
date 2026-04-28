@@ -1,67 +1,70 @@
-import OpenAI from "openai";
-import Anthropic from "@anthropic-ai/sdk";
+import { generateText, type LanguageModel } from "ai";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+
+export type LLMTier = "fast" | "standard";
+
+// Model IDs per provider per tier.
+// fast   → cheap/quick for extraction, classification, simple structured output
+// standard → capable for multi-step reasoning, persona scoring, analysis
+const TIER_MODELS = {
+  deepseek:  { fast: "deepseek-chat",             standard: "deepseek-chat" },
+  anthropic: { fast: "claude-haiku-4-5-20251001", standard: "claude-sonnet-4-6" },
+  openai:    { fast: "gpt-4o-mini",               standard: "gpt-4o" },
+  gemini:    { fast: "gemini-2.0-flash",          standard: "gemini-2.5-pro" },
+} as const;
 
 interface LLMOptions {
   maxTokens?: number;
+  provider?: string; // "deepseek" | "anthropic" | "openai" | "gemini"
+  tier?: LLMTier;   // default: "standard"
 }
 
-/**
- * Calls the best available LLM provider in priority order:
- * Anthropic (Claude) → OpenAI (GPT-4o) → Gemini.
- * Returns the raw text content of the response.
- * Callers are responsible for JSON.parse if needed.
- */
+// DeepSeek uses the OpenAI-compatible API
+function deepseekModel(modelId: string): LanguageModel {
+  return createOpenAI({
+    baseURL: "https://api.deepseek.com/v1",
+    apiKey: process.env.DEEPSEEK_API_KEY ?? "",
+  })(modelId);
+}
+
+function resolveModel(provider?: string, tier: LLMTier = "standard"): LanguageModel {
+  // Explicit provider selection (used by stock analysis tab)
+  if (provider === "deepseek" && process.env.DEEPSEEK_API_KEY)
+    return deepseekModel(TIER_MODELS.deepseek[tier]);
+  if (provider === "anthropic" && process.env.ANTHROPIC_API_KEY)
+    return createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY })(TIER_MODELS.anthropic[tier]);
+  if (provider === "openai" && process.env.OPENAI_API_KEY)
+    return createOpenAI({ apiKey: process.env.OPENAI_API_KEY })(TIER_MODELS.openai[tier]);
+  if (provider === "gemini" && process.env.GEMINI_API_KEY)
+    return createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY })(TIER_MODELS.gemini[tier]);
+
+  // Priority fallback: DeepSeek → Anthropic → OpenAI → Gemini
+  if (process.env.DEEPSEEK_API_KEY) return deepseekModel(TIER_MODELS.deepseek[tier]);
+  if (process.env.ANTHROPIC_API_KEY)
+    return createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY })(TIER_MODELS.anthropic[tier]);
+  if (process.env.OPENAI_API_KEY)
+    return createOpenAI({ apiKey: process.env.OPENAI_API_KEY })(TIER_MODELS.openai[tier]);
+  if (process.env.GEMINI_API_KEY)
+    return createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY })(TIER_MODELS.gemini[tier]);
+
+  throw new Error(
+    "No AI provider configured. Set DEEPSEEK_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY."
+  );
+}
+
 export async function callLLM(
   userPrompt: string,
   systemPrompt: string,
   opts: LLMOptions = {}
 ): Promise<string> {
-  const { maxTokens = 2048 } = opts;
-
-  if (process.env.ANTHROPIC_API_KEY) {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const msg = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
-    });
-    const block = msg.content[0];
-    return block.type === "text" ? block.text : "{}";
-  }
-
-  if (process.env.OPENAI_API_KEY) {
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      response_format: { type: "json_object" },
-      max_tokens: maxTokens,
-    });
-    return completion.choices[0].message.content ?? "{}";
-  }
-
-  if (process.env.GEMINI_API_KEY) {
-    const client = new OpenAI({
-      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-      apiKey: process.env.GEMINI_API_KEY,
-    });
-    const completion = await client.chat.completions.create({
-      model: "gemini-2.5-pro",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      response_format: { type: "json_object" },
-      max_tokens: maxTokens,
-    });
-    return completion.choices[0].message.content ?? "{}";
-  }
-
-  throw new Error(
-    "No AI provider configured. Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY."
-  );
+  const { maxTokens = 2048, provider, tier = "standard" } = opts;
+  const { text } = await generateText({
+    model: resolveModel(provider, tier),
+    system: systemPrompt,
+    messages: [{ role: "user", content: userPrompt }],
+    maxTokens,
+  });
+  return text;
 }
