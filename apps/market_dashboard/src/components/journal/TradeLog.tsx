@@ -716,6 +716,7 @@ export default function TradeLog() {
   const [symbol, setSymbol] = useState("");
   const [side, setSide] = useState("");
   const [result, setResult] = useState("");
+  const [stateFilter, setStateFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [stockTicker, setStockTicker] = useState<string | null>(null);
   const [reviewTrade, setReviewTrade] = useState<Trade | null>(null);
@@ -727,6 +728,7 @@ export default function TradeLog() {
       ...(symbol ? { symbol } : {}),
       ...(side ? { side } : {}),
       ...(result ? { result } : {}),
+      ...(stateFilter ? { state: stateFilter } : {}),
     });
     fetch(`/api/journal/trades?${params}`)
       .then((r) => r.json())
@@ -738,7 +740,7 @@ export default function TradeLog() {
       .finally(() => setLoading(false));
   }
 
-  useEffect(() => { loadTrades(); }, [page, symbol, side, result]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { loadTrades(); }, [page, symbol, side, result, stateFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleVerdictSaved() {
     // Refresh the trade list so the score badge updates
@@ -783,6 +785,17 @@ export default function TradeLog() {
           <option value="win">Win</option>
           <option value="loss">Loss</option>
           <option value="open">Open</option>
+        </select>
+        <select
+          value={stateFilter}
+          onChange={(e) => { setStateFilter(e.target.value); setPage(1); }}
+          className="rounded bg-slate-800 border border-slate-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+        >
+          <option value="">All States</option>
+          <option value="OPEN">OPEN</option>
+          <option value="SEMI-OPEN">SEMI-OPEN</option>
+          <option value="CLOSE">CLOSE</option>
+          <option value="PLANNING">PLANNING</option>
         </select>
         <span className="text-xs text-slate-500 ml-auto">{total} trade{total !== 1 ? "s" : ""}</span>
       </div>

@@ -12,12 +12,22 @@ export async function GET(req: Request) {
   const symbol = searchParams.get("symbol")?.trim().toUpperCase() ?? "";
   const side = searchParams.get("side") ?? "";
   const result = searchParams.get("result") ?? "";
+  const stateFilter = searchParams.get("state") ?? "";
+
+  const OPEN_STATES = ["OPEN", "SEMI-OPEN", "PLANNING"];
 
   const where = {
     userId: session.user.id,
     ...(symbol ? { ticker: { contains: symbol } } : {}),
     ...(side ? { side } : {}),
-    ...(result === "win" ? { pnl: { gt: 0 } } : result === "loss" ? { pnl: { lte: 0 } } : result === "open" ? { pnl: null } : {}),
+    ...(stateFilter ? { state: stateFilter } : {}),
+    ...(result === "win"
+      ? { pnl: { gt: 0 }, NOT: { state: { in: OPEN_STATES } } }
+      : result === "loss"
+      ? { pnl: { lte: 0 }, NOT: { state: { in: OPEN_STATES } } }
+      : result === "open"
+      ? { OR: [{ state: { in: OPEN_STATES } }, { state: null, pnl: null }] }
+      : {}),
   };
 
   const [total, trades] = await Promise.all([

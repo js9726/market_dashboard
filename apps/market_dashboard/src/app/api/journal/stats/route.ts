@@ -25,7 +25,10 @@ export async function GET() {
     orderBy: { tradeDate: "asc" },
   });
 
-  const closed = trades.filter((t) => t.pnl !== null);
+  // Use state as primary source; fall back to pnl for trades without state
+  const isClosed = (t: typeof trades[0]) =>
+    t.state ? t.state.toUpperCase() === "CLOSE" : t.pnl !== null;
+  const closed = trades.filter(isClosed);
   const totalPnl = closed.reduce((s, t) => s + toNum(t.pnl), 0);
   const wins = closed.filter((t) => toNum(t.pnl) > 0);
   const losses = closed.filter((t) => toNum(t.pnl) <= 0);

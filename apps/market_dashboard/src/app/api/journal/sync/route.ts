@@ -88,8 +88,9 @@ export async function POST() {
     return NextResponse.json({ error: `DB write failed: ${msg}` }, { status: 500 });
   }
 
-  const open = trades.filter((t) => t.pnl === null).length;
-  const closed = trades.filter((t) => t.pnl !== null).length;
+  const OPEN_STATES = ["OPEN", "SEMI-OPEN", "PLANNING"];
+  const open = trades.filter((t) => t.state ? OPEN_STATES.includes(t.state.toUpperCase()) : t.pnl === null).length;
+  const closed = trades.length - open;
   const datesResolved = trades.filter((t) => t.tradeDate !== null).length;
   const sampleRawDates = rows.slice(1, 4).map((r) => r[colMap.date]);
 
