@@ -1,35 +1,8 @@
 import { NextResponse } from "next/server";
 import yahooFinance from "yahoo-finance2";
-import OpenAI from "openai";
-import Anthropic from "@anthropic-ai/sdk";
 import { auth } from "@/auth";
-
-const TRADER_PROFILES = [
-  {
-    handle: "@markminervini",
-    style: "SEPA/Superperformance. Requires tight VCP base, 3-4 weeks minimum, volume dry-up, ADR > 1.5%, EPS acceleration, RS new highs. Entry on pivot breakout with volume surge. Zero tolerance for wide stops.",
-  },
-  {
-    handle: "@Clement_Ang17",
-    style: "Process-driven swing trader. Stage 2 uptrend required. Uses 21/50 EMA confluence, clean base structures, defined risk via ATR stops. Prefers high RS in leading sectors. Holds through minor pullbacks if structure intact.",
-  },
-  {
-    handle: "@jftrev",
-    style: "Mechanical rule-based system. A-rated base required. Buys confirmed breakouts with volume, cuts losses < 7%, no averaging down. Strict position sizing (1–2% risk per trade). No discretion override.",
-  },
-  {
-    handle: "@TedHZhang",
-    style: "Institutional/TURBOTECTION framework. Monitors sector rotation, relative strength vs SPY. Uses options flow for confirmation. Needs institutional accumulation signals. Avoids extended or overhead-supply-laden charts.",
-  },
-  {
-    handle: "@SRxTrades",
-    style: "Technical momentum trader. Focuses on explosive price moves after consolidation. Uses support/resistance zones, breakout candles, volume profile. Rides momentum with trailing stops. Avoids choppy, low-range stocks.",
-  },
-  {
-    handle: "@PrimeTrading_",
-    style: "Price action precision. Reads candle patterns, daily/weekly structure. Enters at low-risk inflection points (test of EMA/support, inside days). Tight stops just beyond structure. High R:R setups only.",
-  },
-];
+import { callLLM } from "@/utils/llm-router";
+import { TRADER_PROFILES } from "@/lib/trader-profiles";
 
 async function fetchStockData(ticker: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,45 +15,7 @@ async function fetchStockData(ticker: string) {
   return summary as Record<string, unknown>;
 }
 
-async function callLLM(provider: string | undefined, prompt: string): Promise<string> {
-  const system = `You are an expert stock market analyst. Analyze the provided stock data through the lens of 6 specific trader styles and return ONLY valid JSON, no markdown fences.`;
-
-  if (provider === "anthropic" && process.env.ANTHROPIC_API_KEY) {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const msg = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2048,
-      system,
-      messages: [{ role: "user", content: prompt }],
-    });
-    const block = msg.content[0];
-    return block.type === "text" ? block.text : "{}";
-  }
-
-  if (provider === "openai" && process.env.OPENAI_API_KEY) {
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o",
-      messages: [{ role: "system", content: system }, { role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-      max_tokens: 2048,
-    });
-    return completion.choices[0].message.content ?? "{}";
-  }
-
-  if (!process.env.GEMINI_API_KEY) throw new Error("No AI provider available. Set GEMINI_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY.");
-  const client = new OpenAI({
-    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-    apiKey: process.env.GEMINI_API_KEY,
-  });
-  const completion = await client.chat.completions.create({
-    model: "gemini-2.5-pro",
-    messages: [{ role: "system", content: system }, { role: "user", content: prompt }],
-    response_format: { type: "json_object" },
-    max_tokens: 2048,
-  });
-  return completion.choices[0].message.content ?? "{}";
-}
+const stockAnalystSystem = `You are an expert stock market analyst. Analyze the provided stock data through the lens of 6 specific trader styles and return ONLY valid JSON, no markdown fences.`;
 
 function fmt(v: number | null | undefined, decimals = 2): string {
   if (v == null) return "N/A";
@@ -230,7 +165,7 @@ Return ONLY this JSON structure (no markdown, no explanation):
   "best_match_trader": "<handle of trader whose style fits best>"
 }`;
 
-    const raw = await callLLM(provider, prompt);
+    const raw = await callLLM(prompt, stockAnalystSystem, { maxTokens: 2048, provider });
 
     let analysis: Record<string, unknown>;
     try {

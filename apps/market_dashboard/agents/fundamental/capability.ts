@@ -1,20 +1,6 @@
-import { HumanMessage } from 'langchain/schema';
 import { getFinalancialMetrics } from './tools/api';
 import { callLLM } from '../../src/utils/llm-router';
-
-interface AgentState {
-  data: {
-    end_date: string;
-    tickers: string[];
-    analyst_signals: {
-      [key: string]: any;
-    };
-  };
-  metadata: {
-    show_reasoning: boolean;
-    provider?: string;
-  };
-}
+import type { AgentMessage, AgentState } from '../../src/types/agent';
 
 interface SignalReasoning {
   signal: string;
@@ -129,7 +115,7 @@ export async function fundamentalsAgent(state: AgentState) {
           Please provide a detailed analysis with signals (bullish/bearish/neutral) and confidence levels for each aspect.`;
 
           progress.updateStatus("fundamentals_agent", ticker, "Requesting AI analysis");
-          const raw = await callLLM(metricsPrompt, systemPrompt, { maxTokens: 1024 });
+          const raw = await callLLM(metricsPrompt, systemPrompt, { maxTokens: 1024, tier: "fast" });
 
           progress.updateStatus("fundamentals_agent", ticker, "Processing AI response");
           const analysis = JSON.parse(raw || '{}');
@@ -170,10 +156,10 @@ export async function fundamentalsAgent(state: AgentState) {
   }
 
   progress.updateStatus("fundamentals_agent", "all", "All analyses completed");
-  const message = new HumanMessage({
+  const message: AgentMessage = {
     content: JSON.stringify(fundamentalAnalysis),
-    name: "fundamentals_agent"
-  });
+    name: "fundamentals_agent",
+  };
 
   if (state.metadata.show_reasoning) {
     showAgentReasoning(fundamentalAnalysis, "Fundamental Analysis Agent");

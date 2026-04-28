@@ -1,20 +1,7 @@
-import { HumanMessage } from 'langchain/schema';
 import yahooFinance from 'yahoo-finance2';
 import { withRetry } from '../../src/utils/retry';
 import { callLLM } from '../../src/utils/llm-router';
-
-interface AgentState {
-  data: {
-    end_date: string;
-    tickers: string[];
-    analyst_signals: {
-      [key: string]: any;
-    };
-  };
-  metadata: {
-    show_reasoning: boolean;
-  };
-}
+import type { AgentMessage, AgentState } from '../../src/types/agent';
 
 interface TraderSignal {
   signal: string;
@@ -231,10 +218,10 @@ Derived:
   }
 
   progress.updateStatus("technical_agent", "all", "All analyses completed");
-  const message = new HumanMessage({
+  const message: AgentMessage = {
     content: JSON.stringify(technicalAnalysis),
-    name: "technical_agent"
-  });
+    name: "technical_agent",
+  };
 
   if (state.metadata.show_reasoning) {
     console.log(`\nTechnical Analysis Agent Reasoning:`);
