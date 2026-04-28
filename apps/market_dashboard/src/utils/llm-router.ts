@@ -49,7 +49,7 @@ function makeModel(p: Provider, tier: LLMTier): LanguageModel {
 
 // Build ordered list of providers to try.
 // Explicit provider goes first (if key present); remaining fill in priority order.
-function buildQueue(requested?: string, tier: LLMTier = "standard"): Provider[] {
+function buildQueue(requested?: string): Provider[] {
   const queue: Provider[] = [];
   if (requested && PROVIDER_ORDER.includes(requested as Provider) && hasKey(requested as Provider)) {
     queue.push(requested as Provider);
@@ -68,7 +68,7 @@ export async function callLLM(
   out?: { providerUsed?: string; modelUsed?: string; note?: string }
 ): Promise<string> {
   const { maxTokens = 2048, provider, tier = "standard" } = opts;
-  const queue = buildQueue(provider, tier);
+  const queue = buildQueue(provider);
 
   if (queue.length === 0) {
     throw new Error(
