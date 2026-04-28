@@ -3,7 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { getGoogleAccessToken } from "@/lib/token-refresh";
 import { fetchSheetRows, parseTradeRows, DEFAULT_COL_MAP, ColMap } from "@/lib/google-sheets";
 import { generateTradeVerdict } from "@/lib/generate-trade-verdict";
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+
+// Allow up to 60 s for the background verdict generation after response is sent
+export const maxDuration = 60;
 
 export async function POST() {
   const session = await auth();
@@ -90,21 +93,23 @@ export async function POST() {
   const datesResolved = trades.filter((t) => t.tradeDate !== null).length;
   const sampleRawDates = rows.slice(1, 4).map((r) => r[colMap.date]);
 
-  // Fire-and-forget: generate verdicts for up to 5 unscored trades
-  void (async () => {
+  // Generate verdicts after response is sent — after() keeps the function alive on Vercel
+  const userId = session.user.id;
+  const connectionId = connection.id;
+  after(async () => {
     try {
       const unscored = await prisma.trade.findMany({
-        where: { userId: session.user.id, connectionId: connection.id, verdictScore: null, buyPrice: { not: null } },
+        where: { userId, connectionId, verdictScore: null, buyPrice: { not: null } },
+        take: 20,
         select: { id: true },
       });
       for (const { id } of unscored) {
         try {
-          await generateTradeVerdict(id, session.user.id, { tier: "fast" });
+          await generateTradeVerdict(id, userId, { tier: "fast" });
         } catch { /* non-fatal */ }
-        await new Promise((r) => setTimeout(r, 1000));
       }
     } catch { /* non-fatal */ }
-  })();
+  });
 
   return NextResponse.json({ synced: trades.length, open, closed, datesResolved, sampleRawDates });
 }

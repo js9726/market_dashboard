@@ -164,7 +164,7 @@ export async function generateTradeVerdict(
 
   const prompt = buildPrompt(tradeData);
   const out: { providerUsed?: string; modelUsed?: string; note?: string } = {};
-  const raw = await callLLM(prompt, tradeReviewSystemPrompt, { maxTokens: 3000, ...opts }, out);
+  const raw = await callLLM(prompt, tradeReviewSystemPrompt, { maxTokens: 6000, ...opts }, out);
 
   const cleaned = raw
     .replace(/^```json\s*/i, "")
