@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma";
-import { callLLM } from "@/utils/llm-router";
+import { callLLM, type LLMTier } from "@/utils/llm-router";
 import { TRADER_PROFILES } from "@/lib/trader-profiles";
 import type { Prisma } from "@prisma/client";
+
+export type VerdictResult = {
+  review: Record<string, unknown>;
+  providerUsed: string;
+  modelUsed: string;
+  note?: string;
+};
 
 export type TradePromptInput = {
   ticker: string;
@@ -125,8 +132,9 @@ Return ONLY this JSON (no markdown):
 
 export async function generateTradeVerdict(
   tradeId: string,
-  userId: string
-): Promise<Record<string, unknown>> {
+  userId: string,
+  opts: { provider?: string; tier?: LLMTier } = {}
+): Promise<VerdictResult> {
   const dbTrade = await prisma.trade.findUnique({
     where: { id: tradeId, userId },
   });
@@ -155,7 +163,8 @@ export async function generateTradeVerdict(
   };
 
   const prompt = buildPrompt(tradeData);
-  const raw = await callLLM(prompt, tradeReviewSystemPrompt, { maxTokens: 3000 });
+  const out: { providerUsed?: string; modelUsed?: string; note?: string } = {};
+  const raw = await callLLM(prompt, tradeReviewSystemPrompt, { maxTokens: 3000, ...opts }, out);
 
   const cleaned = raw
     .replace(/^```json\s*/i, "")
@@ -165,14 +174,30 @@ export async function generateTradeVerdict(
   const review = JSON.parse(cleaned) as Record<string, unknown>;
 
   const overallScore = typeof review.overall_score === "number" ? review.overall_score : null;
-  await prisma.trade.update({
-    where: { id: tradeId },
-    data: {
-      verdict: review as Prisma.InputJsonValue,
-      verdictScore: overallScore,
-      verdictGeneratedAt: new Date(),
-    },
-  });
+  const providerUsed = out.providerUsed ?? "unknown";
+  const modelUsed = out.modelUsed ?? "unknown";
 
-  return review;
+  await prisma.$transaction([
+    prisma.tradeVerdictHistory.create({
+      data: {
+        tradeId,
+        ticker: dbTrade.ticker,
+        tradeDate: dbTrade.tradeDate,
+        model: modelUsed,
+        provider: providerUsed,
+        verdict: review as Prisma.InputJsonValue,
+        score: overallScore,
+      },
+    }),
+    prisma.trade.update({
+      where: { id: tradeId },
+      data: {
+        verdict: review as Prisma.InputJsonValue,
+        verdictScore: overallScore,
+        verdictGeneratedAt: new Date(),
+      },
+    }),
+  ]);
+
+  return { review, providerUsed, modelUsed, note: out.note };
 }

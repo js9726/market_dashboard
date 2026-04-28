@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const tradeId: string | undefined = body.tradeId;
     const force: boolean = body.force === true;
+    const provider: string | undefined = body.provider;
 
     // tradeId path: fetch from DB, check cache, generate and save verdict
     if (tradeId) {
@@ -31,11 +32,14 @@ export async function POST(request: Request) {
 
       // Return cached verdict if not forcing a rerun
       if (!force && dbTrade.verdict) {
-        return NextResponse.json(dbTrade.verdict);
+        return NextResponse.json({ ...(dbTrade.verdict as Record<string, unknown>), _meta: {} });
       }
 
-      const review = await generateTradeVerdict(tradeId, session.user.id);
-      return NextResponse.json(review);
+      const result = await generateTradeVerdict(tradeId, session.user.id, { provider });
+      return NextResponse.json({
+        ...result.review,
+        _meta: { providerUsed: result.providerUsed, modelUsed: result.modelUsed, providerNote: result.note },
+      });
     }
 
     // Ad-hoc path: caller supplies trade data directly (no DB save)
@@ -48,7 +52,8 @@ export async function POST(request: Request) {
     }
 
     const prompt = buildPrompt(tradeData);
-    const raw = await callLLM(prompt, tradeReviewSystemPrompt, { maxTokens: 3000 });
+    const out: { providerUsed?: string; modelUsed?: string; note?: string } = {};
+    const raw = await callLLM(prompt, tradeReviewSystemPrompt, { maxTokens: 3000, provider }, out);
 
     let review: Record<string, unknown>;
     try {
@@ -65,7 +70,10 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(review);
+    return NextResponse.json({
+      ...review,
+      _meta: { providerUsed: out.providerUsed, modelUsed: out.modelUsed, providerNote: out.note },
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unexpected error";
     return NextResponse.json({ error: message }, { status: 500 });

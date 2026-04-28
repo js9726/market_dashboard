@@ -26,6 +26,8 @@ export type RawTrade = {
   platform: string | null;
   industry: string | null;
   strategy: string | null;
+  // State from spreadsheet col AO
+  state: string | null;
 };
 
 function makeClient(accessToken: string) {
@@ -134,6 +136,7 @@ export function parseTradeRows(rows: string[][], colMap: ColMap): RawTrade[] {
       platform: str(colMap.platform),
       industry: str(colMap.industry),
       strategy: str(colMap.strategy),
+      state: str(colMap.state),
     });
   }
 

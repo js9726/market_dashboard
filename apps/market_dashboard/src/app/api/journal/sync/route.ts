@@ -72,6 +72,7 @@ export async function POST() {
         platform: t.platform,
         industry: t.industry,
         strategy: t.strategy,
+        state: t.state,
       })),
     }),
     prisma.spreadsheetConnection.update({
@@ -94,12 +95,11 @@ export async function POST() {
     try {
       const unscored = await prisma.trade.findMany({
         where: { userId: session.user.id, connectionId: connection.id, verdictScore: null, buyPrice: { not: null } },
-        take: 5,
         select: { id: true },
       });
       for (const { id } of unscored) {
         try {
-          await generateTradeVerdict(id, session.user.id);
+          await generateTradeVerdict(id, session.user.id, { tier: "fast" });
         } catch { /* non-fatal */ }
         await new Promise((r) => setTimeout(r, 1000));
       }

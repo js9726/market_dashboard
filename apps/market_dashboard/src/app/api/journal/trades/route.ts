@@ -33,6 +33,7 @@ export async function GET(req: Request) {
         proposedEntry: true, proposedSL: true, proposedTP: true,
         rrr: true, riskPct: true, rewardPct: true, positionPct: true,
         currency: true, platform: true, industry: true, strategy: true,
+        state: true,
         verdict: true, verdictScore: true, verdictGeneratedAt: true,
       },
     }),

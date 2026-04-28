@@ -8,6 +8,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
+    deepseek: !!process.env.DEEPSEEK_API_KEY,
     gemini: !!process.env.GEMINI_API_KEY,
     openai: !!process.env.OPENAI_API_KEY,
     anthropic: !!process.env.ANTHROPIC_API_KEY,

@@ -22,6 +22,8 @@ export type ColMap = {
   platform: number | null;
   industry: number | null;
   strategy: number | null;
+  // State — column AO (index 40) in the sheet
+  state: number | null;
 };
 
 export const DEFAULT_COL_MAP: ColMap = {
@@ -45,4 +47,5 @@ export const DEFAULT_COL_MAP: ColMap = {
   platform: null,
   industry: null,
   strategy: null,
+  state: 40, // column AO
 };

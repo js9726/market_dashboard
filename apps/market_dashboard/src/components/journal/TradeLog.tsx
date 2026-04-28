@@ -25,13 +25,24 @@ type Trade = {
   platform: string | null;
   industry: string | null;
   strategy: string | null;
+  state: string | null;
   verdict: Record<string, unknown> | null;
   verdictScore: number | null;
   verdictGeneratedAt: string | null;
 };
 
-type Providers = { gemini: boolean; openai: boolean; anthropic: boolean };
+type VerdictHistoryItem = {
+  id: string;
+  model: string;
+  provider: string;
+  verdict: Record<string, unknown>;
+  score: number | null;
+  createdAt: string;
+};
+
+type Providers = { deepseek: boolean; gemini: boolean; openai: boolean; anthropic: boolean };
 const PROVIDER_LABELS: Record<string, string> = {
+  deepseek: "DeepSeek",
   gemini: "Gemini 2.5 Pro",
   openai: "GPT-4o",
   anthropic: "Claude Sonnet",
@@ -83,7 +94,7 @@ function ProviderBar({
         <div className="h-7 w-48 animate-pulse rounded bg-slate-800" />
       ) : (
         <div className="flex gap-2">
-          {(["gemini", "openai", "anthropic"] as const).map((p) => {
+          {(["deepseek", "gemini", "openai", "anthropic"] as const).map((p) => {
             const available = providers[p];
             const active = selected === p;
             return (
@@ -183,10 +194,10 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
       .then((r) => r.json())
       .then((data: Providers) => {
         setProviders(data);
-        const first = (["gemini", "openai", "anthropic"] as const).find((p) => data[p]);
+        const first = (["deepseek", "gemini", "openai", "anthropic"] as const).find((p) => data[p]);
         if (first) setSelectedProvider(first);
       })
-      .catch(() => setProviders({ gemini: false, openai: false, anthropic: false }));
+      .catch(() => setProviders({ deepseek: false, gemini: false, openai: false, anthropic: false }));
   }, []);
 
   function runAnalysis() {
@@ -385,28 +396,83 @@ type TradeReviewResult = {
   lesson: string;
 };
 
+function stateBadge(state: string | null) {
+  if (!state) return null;
+  const s = state.toUpperCase();
+  const cls =
+    s === "CLOSE" ? "bg-green-900/50 text-green-400 border-green-800" :
+    s === "OPEN" ? "bg-blue-900/50 text-blue-400 border-blue-800" :
+    s === "SEMI-OPEN" ? "bg-amber-900/50 text-amber-400 border-amber-800" :
+    "bg-slate-700/50 text-slate-400 border-slate-600";
+  return <span className={`rounded border px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{state}</span>;
+}
+
 function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; onClose: () => void; onVerdictSaved: () => void }) {
+  const [providers, setProviders] = useState<Providers | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<string>("");
+  const [history, setHistory] = useState<VerdictHistoryItem[]>([]);
+  const [selectedHistoryId, setSelectedHistoryId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TradeReviewResult | null>(
     trade.verdict ? (trade.verdict as unknown as TradeReviewResult) : null
   );
   const [isFromCache, setIsFromCache] = useState(!!trade.verdict);
+  const [providerNote, setProviderNote] = useState<string>("");
+
+  useEffect(() => {
+    fetch("/api/analysis/providers")
+      .then((r) => r.json())
+      .then((data: Providers) => {
+        setProviders(data);
+        const first = (["deepseek", "gemini", "openai", "anthropic"] as const).find((p) => data[p]);
+        if (first) setSelectedProvider(first);
+      })
+      .catch(() => setProviders({ deepseek: false, gemini: false, openai: false, anthropic: false }));
+
+    fetch(`/api/journal/trades/${trade.id}/verdict-history`)
+      .then((r) => r.json())
+      .then((data: VerdictHistoryItem[]) => setHistory(data))
+      .catch(() => {});
+  }, [trade.id]);
+
+  function fetchHistory() {
+    fetch(`/api/journal/trades/${trade.id}/verdict-history`)
+      .then((r) => r.json())
+      .then((data: VerdictHistoryItem[]) => { setHistory(data); setSelectedHistoryId(""); })
+      .catch(() => {});
+  }
+
+  function selectHistoryItem(id: string) {
+    setSelectedHistoryId(id);
+    const item = history.find((h) => h.id === id);
+    if (item) {
+      setResult(item.verdict as unknown as TradeReviewResult);
+      setIsFromCache(true);
+      setProviderNote("");
+      setError(null);
+    }
+  }
 
   function runReview(force = false) {
     setLoading(true);
     setError(null);
+    setProviderNote("");
     fetch("/api/analysis/trade-review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tradeId: trade.id, force }),
+      body: JSON.stringify({ tradeId: trade.id, force, provider: selectedProvider }),
     })
       .then((r) => r.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        setResult(data as TradeReviewResult);
+      .then((data: Record<string, unknown>) => {
+        if (data.error) throw new Error(data.error as string);
+        const { _meta, ...review } = data;
+        setResult(review as unknown as TradeReviewResult);
         setIsFromCache(false);
+        const meta = _meta as { providerNote?: string } | undefined;
+        if (meta?.providerNote) setProviderNote(meta.providerNote);
         onVerdictSaved();
+        fetchHistory();
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
@@ -424,39 +490,33 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
       >
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-5 py-3 backdrop-blur">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-lg font-semibold text-white">{trade.ticker}</span>
             <span className="text-xs text-slate-400">Trade Review</span>
             <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${isOpen ? "bg-blue-900/50 text-blue-400" : pnlNum! >= 0 ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}>
               {isOpen ? "Open" : pnlNum! >= 0 ? "Win" : "Loss"}
             </span>
-            {isFromCache && <span className="text-[10px] text-slate-500 italic">cached</span>}
-          </div>
-          <div className="flex items-center gap-2">
-            {result && (
-              <button
-                onClick={() => runReview(true)}
-                disabled={loading}
-                className="rounded px-3 py-1 text-[10px] font-medium border border-slate-600 text-slate-400 hover:border-amber-500 hover:text-amber-400 disabled:opacity-40 transition-colors"
-                title="Re-run AI analysis"
+            {isFromCache && !selectedHistoryId && <span className="text-[10px] text-slate-500 italic">cached</span>}
+            {history.length > 0 && (
+              <select
+                value={selectedHistoryId}
+                onChange={(e) => e.target.value ? selectHistoryItem(e.target.value) : (setSelectedHistoryId(""), setResult(trade.verdict ? (trade.verdict as unknown as TradeReviewResult) : null), setIsFromCache(!!trade.verdict))}
+                className="rounded bg-slate-800 border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 focus:outline-none"
               >
-                ⟳ Re-run
-              </button>
+                <option value="">Latest</option>
+                {history.map((h) => (
+                  <option key={h.id} value={h.id}>
+                    {new Date(h.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · {h.provider} {h.score != null ? `(${h.score.toFixed(1)})` : ""}
+                  </option>
+                ))}
+              </select>
             )}
-            {!result && !loading && (
-              <button
-                onClick={() => runReview(false)}
-                className="rounded bg-blue-600 hover:bg-blue-500 px-3 py-1 text-xs font-medium text-white transition-colors"
-              >
-                Analyse
-              </button>
-            )}
-            <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-white hover:bg-slate-700">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
+          <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-white hover:bg-slate-700 shrink-0">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         <div className="p-5 space-y-5">
@@ -492,6 +552,21 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
                   <div className="font-medium text-slate-300">{value}</div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Provider bar */}
+          <ProviderBar
+            providers={providers}
+            selected={selectedProvider}
+            onSelect={setSelectedProvider}
+            onRun={() => runReview(true)}
+            loading={loading}
+            hasResult={!!result}
+          />
+          {providerNote && (
+            <div className="rounded bg-amber-900/20 border border-amber-800/40 px-3 py-1.5 text-[11px] text-amber-400">
+              {providerNote}
             </div>
           )}
 
@@ -605,7 +680,7 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
 
           {!loading && !error && !result && (
             <div className="py-8 text-center text-sm text-slate-500">
-              Click Analyse to get a detailed trade quality review.
+              Select a provider and click Analyse to get a detailed trade quality review.
             </div>
           )}
         </div>
@@ -717,16 +792,16 @@ export default function TradeLog() {
         <table className="w-full text-sm">
           <thead className="bg-slate-800/80 text-slate-400 text-xs uppercase">
             <tr>
-              {["#", "Date", "Symbol", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "Verdict", "Score"].map((h) => (
+              {["#", "Date", "Symbol", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "State", "Verdict", "Score"].map((h) => (
                 <th key={h} className="px-3 py-2 text-left whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={11} className="px-3 py-6 text-center text-slate-500">Loading…</td></tr>
+              <tr><td colSpan={12} className="px-3 py-6 text-center text-slate-500">Loading…</td></tr>
             ) : trades.length === 0 ? (
-              <tr><td colSpan={11} className="px-3 py-6 text-center text-slate-500">No trades found</td></tr>
+              <tr><td colSpan={12} className="px-3 py-6 text-center text-slate-500">No trades found</td></tr>
             ) : trades.map((t, i) => {
               const { text: pnlText, color: pnlColor } = fmtPnl(t.pnl);
               const isOpen = t.pnl === null;
@@ -763,6 +838,7 @@ export default function TradeLog() {
                   <td className="px-3 py-2">{t.exitPrice ? `$${fmtNum(t.exitPrice)}` : "—"}</td>
                   <td className="px-3 py-2">{t.fees ? `$${fmtNum(t.fees)}` : "—"}</td>
                   <td className={`px-3 py-2 font-medium ${pnlColor}`}>{pnlText}</td>
+                  <td className="px-3 py-2">{stateBadge(t.state)}</td>
                   {/* Verdict column: shows summary if cached, else notes */}
                   <td className="px-3 py-2 max-w-xs">
                     {verdictSummary ? (

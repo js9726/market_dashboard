@@ -34,6 +34,7 @@ const PLAN_FIELDS: { key: keyof ColMap; label: string }[] = [
   { key: "platform", label: "Platform" },
   { key: "industry", label: "Industry" },
   { key: "strategy", label: "Strategy" },
+  { key: "state", label: "State (CLOSE/OPEN/etc.)" },
 ];
 
 function indexToColLetters(index: number): string {

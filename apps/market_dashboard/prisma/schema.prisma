@@ -115,10 +115,31 @@ model Trade {
   industry      String?
   strategy      String?
 
-  // AI verdict cache
+  // State synced from spreadsheet (col AO): CLOSE | OPEN | SEMI-OPEN | PLANNING
+  state String?
+
+  // AI verdict cache (latest run)
   verdict            Json?
   verdictScore       Float?
   verdictGeneratedAt DateTime?
 
+  verdictHistory TradeVerdictHistory[]
+
   @@index([userId, tradeDate])
+}
+
+model TradeVerdictHistory {
+  id        String    @id @default(cuid())
+  tradeId   String
+  trade     Trade     @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  ticker    String
+  tradeDate DateTime?
+  model     String
+  provider  String
+  verdict   Json
+  score     Float?
+  createdAt DateTime  @default(now())
+
+  @@index([tradeId])
+  @@index([ticker, tradeDate])
 }
