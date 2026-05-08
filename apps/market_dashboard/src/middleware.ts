@@ -5,8 +5,14 @@ export default auth((req) => {
   const session = req.auth;
   const { pathname } = req.nextUrl;
 
-  // Always allow login page and NextAuth API routes through (prevents redirect loop)
-  if (pathname.startsWith("/login") || pathname.startsWith("/api/auth")) {
+  // Always allow login page, NextAuth API routes, and cron endpoints through.
+  // Cron endpoints do their own Bearer-token auth via CRON_SECRET — must not be
+  // gated behind user session middleware (Vercel Cron sends unauthenticated requests).
+  if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/cron")
+  ) {
     return NextResponse.next();
   }
 
