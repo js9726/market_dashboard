@@ -1,0 +1,16 @@
+[
+  {
+    "name": "renders date, market context, and all 7 trader profiles into prompt",
+    "input": {
+      "date_str": "2026-04-29",
+      "market_context": "Market snapshot built at: 2026-04-29\n\nKEY INDICES (daily | 5d | 20d | ABC | RS):\n  SPY    day=+0.42%  5d=+1.20%  20d=+3.10%  ABC=A  RS=72"
+    },
+    "expectedContains": [
+      "## Trader profiles",
+      "### @markminervini — Mark Minervini",
+      "### @jfsrev — Jeff (jfsrev)",
+      "@markminervini, @Clement_Ang17, @jfsrev, @TedHZhang, @SRxTrades, @PrimeTrading_, @Qullamaggie",
+      "2026-04-29"
+    ]
+  }
+]

@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@core-skills/*": [
+        "../../packages/core-skills/*"
       ]
     },
     "typeRoots": [

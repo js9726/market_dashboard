@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "input": {
+    "type": "object",
+    "properties": {
+      "stock_context": { "type": "string", "description": "Pre-formatted multi-line summary built from yahoo-finance2 quoteSummary" },
+      "display": {
+        "type": "object",
+        "description": "Raw display fields used to seed the JSON example so the LLM does not invent ticker metadata",
+        "properties": {
+          "name": { "type": "string" },
+          "sector": { "type": ["string", "null"] },
+          "industry": { "type": ["string", "null"] },
+          "exchange": { "type": ["string", "null"] },
+          "currentPrice": { "type": ["number", "null"] },
+          "changePct": { "type": ["number", "null"] },
+          "week52Low": { "type": ["number", "null"] },
+          "week52High": { "type": ["number", "null"] },
+          "analystPT": { "type": ["number", "null"] },
+          "earningsDate": { "type": ["string", "null"] },
+          "earningsDays": { "type": ["number", "null"] },
+          "marketCap": { "type": "string" },
+          "revenueTtm": { "type": "string" },
+          "grossMarginPct": { "type": ["number", "null"] },
+          "trailingEps": { "type": ["number", "null"] },
+          "forwardEps": { "type": ["number", "null"] },
+          "dividendYieldPct": { "type": ["number", "null"] }
+        },
+        "required": ["name", "marketCap", "revenueTtm"]
+      }
+    },
+    "required": ["stock_context", "display"],
+    "additionalProperties": false
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "sector": { "type": "string" },
+      "industry": { "type": "string" },
+      "exchange": { "type": "string" },
+      "price": { "type": ["number", "null"] },
+      "price_change_pct": { "type": ["number", "null"] },
+      "week52_low": { "type": ["number", "null"] },
+      "week52_high": { "type": ["number", "null"] },
+      "analyst_pt": { "type": ["number", "null"] },
+      "earnings_date": { "type": "string" },
+      "earnings_days": { "type": ["number", "null"] },
+      "market_cap": { "type": "string" },
+      "revenue_ttm": { "type": "string" },
+      "gross_margin_pct": { "type": ["number", "null"] },
+      "trailing_eps": { "type": ["number", "null"] },
+      "forward_eps": { "type": ["number", "null"] },
+      "dividend_yield_pct": { "type": ["number", "null"] },
+      "trader_analysis": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "handle": { "type": "string" },
+            "score": { "type": "number", "minimum": 1, "maximum": 10 },
+            "verdict": { "type": "string", "enum": ["STRONG BUY", "BUY", "HOLD", "AVOID", "STRONG AVOID"] },
+            "note": { "type": "string" }
+          },
+          "required": ["handle", "score", "verdict", "note"]
+        }
+      },
+      "entry_plan": {
+        "type": "object",
+        "properties": {
+          "zone": { "type": "string" },
+          "stop": { "type": "string" },
+          "target": { "type": "string" },
+          "risk_reward": { "type": "number" },
+          "batches": { "type": "string" }
+        }
+      },
+      "bulls": { "type": "array", "items": { "type": "string" } },
+      "bears": { "type": "array", "items": { "type": "string" } },
+      "composite_score": { "type": "number", "minimum": 1, "maximum": 10 },
+      "composite_verdict": { "type": "string", "enum": ["STRONG BUY", "BUY", "HOLD", "AVOID", "STRONG AVOID"] },
+      "composite_note": { "type": "string" },
+      "best_match_trader": { "type": "string" }
+    },
+    "required": ["name", "trader_analysis", "composite_score", "composite_verdict"]
+  }
+}

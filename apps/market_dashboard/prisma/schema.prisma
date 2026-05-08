@@ -61,10 +61,17 @@ model User {
   role          String    @default("pending")
   createdAt     DateTime  @default(now())
 
-  accounts   Account[]
-  sessions   Session[]
-  connection SpreadsheetConnection?
-  trades     Trade[]
+  // Daily LLM scan quota — reset by /api/cron/reset-quotas
+  dailyScansUsed   Int      @default(0)
+  dailyScansLimit  Int      @default(20)
+  lastQuotaResetAt DateTime @default(now())
+
+  accounts    Account[]
+  sessions    Session[]
+  connection  SpreadsheetConnection?
+  trades      Trade[]
+  watchlist   Watchlist[]
+  scanResults ScanResult[]
 }
 
 model SpreadsheetConnection {
@@ -136,10 +143,56 @@ model TradeVerdictHistory {
   tradeDate DateTime?
   model     String
   provider  String
+  // 'trader-debate' (6-persona scorer) | 'agent-pipeline' (5-agent role-based)
+  style     String    @default("trader-debate")
+  // 'day-0' (initial scoring at journal time) | 'day-14-rescore' (heuristic outcome check)
+  kind           String   @default("day-0")
+  // Populated only when kind='day-14-rescore'. Shape:
+  // { actual_close_d14, actual_pct_move_14d, actual_high_d14, actual_low_d14,
+  //   predicted_exit_price, predicted_stop_price, match_grade ('A'|'B'|'C'),
+  //   match_notes, drift_detected, wiki_changes_suggested[] }
+  outcomeMetrics Json?
   verdict   Json
   score     Float?
   createdAt DateTime  @default(now())
 
   @@index([tradeId])
   @@index([ticker, tradeDate])
+  @@index([kind, createdAt])  // for cron: find day-0 verdicts 14+ days old
+  @@index([tradeId, kind])    // for cron: check if day-14-rescore already exists
+}
+
+// ── Phase 4: Multi-tenant scanner + agent pipeline ───────────────────────────
+
+model Watchlist {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticker  String
+  addedAt DateTime @default(now())
+
+  @@unique([userId, ticker])
+  @@index([userId])
+  @@index([ticker])
+}
+
+model ScanResult {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticker     String
+  // BUY | SELL | HOLD
+  signal     String
+  entry      Decimal? @db.Decimal(12, 4)
+  stop       Decimal? @db.Decimal(12, 4)
+  target     Decimal? @db.Decimal(12, 4)
+  confidence Float?
+  // { data: {...}, technical: {...}, chart: {...}, risk: {...}, moderator: {...} }
+  agents     Json
+  computedAt DateTime @default(now())
+  expiresAt  DateTime
+
+  @@index([userId, expiresAt])
+  @@index([userId, ticker])
+  @@index([ticker])
 }

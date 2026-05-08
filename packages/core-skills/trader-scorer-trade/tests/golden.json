@@ -1,0 +1,28 @@
+[
+  {
+    "name": "open trade with full plan, all 7 traders rendered",
+    "input": {
+      "ticker": "NVDA",
+      "tradeDate": "2026-04-15",
+      "side": "Long",
+      "buyPrice": "850.00",
+      "quantity": "10",
+      "pnl": null,
+      "proposedEntry": "850.00",
+      "proposedSL": "810.00",
+      "proposedTP": "950.00",
+      "rrr": "2.5",
+      "riskPct": "1.0",
+      "rewardPct": "2.5",
+      "positionPct": "5.0"
+    },
+    "expectedContains": [
+      "Review this open trade.",
+      "Ticker: NVDA",
+      "Pre-trade plan:",
+      "### @markminervini",
+      "### @jfsrev",
+      "### @Qullamaggie"
+    ]
+  }
+]

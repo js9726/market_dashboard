@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "input": {
+    "type": "object",
+    "properties": {
+      "date_str": { "type": "string", "description": "ISO date for the verdict (YYYY-MM-DD)" },
+      "market_context": { "type": "string", "description": "Multi-line text summary built from snapshot.json by trader_verdict.build_market_context" }
+    },
+    "required": ["date_str", "market_context"],
+    "additionalProperties": false
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "date": { "type": "string" },
+      "traders": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "handle": { "type": "string" },
+            "verdict": { "type": "string", "enum": ["YES", "WAIT", "SELECTIVE", "NO"] },
+            "note": { "type": "string", "maxLength": 250 }
+          },
+          "required": ["handle", "verdict", "note"],
+          "additionalProperties": false
+        },
+        "minItems": 7,
+        "maxItems": 7
+      },
+      "open_positions": { "type": "array", "items": {} },
+      "planning_entries": { "type": "array", "items": {} }
+    },
+    "required": ["date", "traders", "open_positions", "planning_entries"],
+    "additionalProperties": false
+  }
+}

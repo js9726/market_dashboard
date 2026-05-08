@@ -1,9 +1,8 @@
 # CLAUDE.md
 
-Behavioral guidelines for AI-assisted development on this repo. Applies to all sub-projects
-(`apps/market_dashboard_backend`, `apps/market_dashboard`, `packages/usChatBot-DataPipeline`).
+Behavioral guidelines for AI-assisted development on this repo.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+**Bias:** caution over speed. For trivial tasks, use judgment.
 
 ---
 
@@ -11,217 +10,190 @@ Behavioral guidelines for AI-assisted development on this repo. Applies to all s
 
 | Layer | Path | Stack |
 |---|---|---|
-| Data Pipeline | `apps/market_dashboard_backend/scripts/` | Python, yfinance, Finviz, requests, BeautifulSoup |
-| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | Gemini 2.5 Pro + GPT-4o + Claude (live web search, HTML output) |
+| Data Pipeline | `apps/market_dashboard_backend/scripts/` | Python, yfinance, Finviz |
+| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | Gemini 2.5 Pro + GPT-4o + Claude (web search, HTML out) |
 | Frontend | `apps/market_dashboard/` | Next.js 15.5, TypeScript, Tailwind, Recharts |
 | AI Agents | `apps/market_dashboard/agents/` | Fundamental (yahoo-finance2 + DeepSeek), Technical |
-| Auth | `apps/market_dashboard/src/middleware.ts` | Cookie-based password auth (no Clerk) |
-| Automation | `.github/workflows/refresh_data.yml` | GitHub Actions (Mon–Fri 8:30 AM ET / 12:30 UTC) |
-| Deployment | `vercel.json` | Vercel (rootDirectory: `apps/market_dashboard`) |
+| Runtime Skills | `packages/core-skills/` | LLM prompts + dual TS/Python handlers |
+| Auth | `apps/market_dashboard/src/middleware.ts` | NextAuth v5 (Google OAuth) + Prisma |
+| Automation | `.github/workflows/refresh_data.yml` | GitHub Actions (Mon–Fri, every 30 min from 12:00–18:30 UTC) |
+| Deployment | `apps/market_dashboard/vercel.json` + Vercel project settings | Vercel project targets `apps/market_dashboard` |
 
 ### Key Data Flow
 
 ```
 build_data.py → data/snapshot.json + data/charts/*.png
 morning_brief.py → data/morning_brief_{gemini,openai,claude}.html + data/morning_brief_meta.json
-sync step (CI or npm run sync:market) → public/market-dashboard/
-Vercel serves static files from public/
+sync step → public/market-dashboard/  →  Vercel serves static files
 ```
 
 ---
 
 ## Commands
 
-### Python Data Pipeline (from `apps/market_dashboard_backend/`)
-
 ```bash
+# Python (from apps/market_dashboard_backend/)
 pip install -r requirements.txt
-python scripts/build_data.py --out-dir data       # fetch yfinance, Finviz, breadth metrics
-python scripts/morning_brief.py --out-dir data    # requires at least one of GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY
-# Optionally limit providers: --providers gemini,claude
-```
+python scripts/build_data.py --out-dir data
+python scripts/morning_brief.py --out-dir data        # needs ≥1 of GEMINI/OPENAI/ANTHROPIC keys
 
-### Next.js Frontend (from `apps/market_dashboard/`)
-
-```bash
+# Frontend (from apps/market_dashboard/)
 npm install
-npm run sync:market    # copy Python output into public/market-dashboard/
-npm run dev            # dev server at http://localhost:3000 (Turbopack)
-npm run build          # production build — must exit 0 before deploying
-npm run lint           # ESLint
-npx tsc --noEmit       # type-check without emitting files
+npm run sync:market          # copy Python output into public/market-dashboard/
+npm run skills:check         # warn if synced runtime skill artifacts are stale
+npm run skills:sync          # refresh packages/core-skills from the manifest
+npm run dev                  # http://localhost:3000 (Turbopack)
+npm run build                # must exit 0 before deploying
+npx tsc --noEmit             # type-check only
 ```
 
 ---
 
-## 1. Think Before Coding
+## 1. Ask Until 95% Confident — Never Assume
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+**Every Claude run starts here.** Before touching code:
 
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them — don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+- If below 95% confidence on intent, scope, or approach → **ask**. Keep asking until you reach 95%.
+- State assumptions explicitly when you proceed. If multiple interpretations exist, present them — never pick silently.
+- A wrong implementation done fast costs more than a clarifying question.
 
 ---
 
 ## 2. Simplicity First
 
-**Minimum code that solves the problem. Nothing speculative.**
+Minimum code that solves the problem. Nothing speculative.
 
 - No features beyond what was asked.
 - No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
+- No "flexibility" that wasn't requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
-
-Ask yourself: *"Would a senior engineer say this is overcomplicated?"* If yes, simplify.
 
 ---
 
 ## 3. Surgical Changes
 
-**Touch only what you must. Clean up only your own mess.**
+Touch only what you must. Match existing style.
 
-When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it — don't delete it.
-
-When your changes create orphans:
-- Remove imports/variables/functions that **your** changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: every changed line should trace directly to the user's request.
+- Don't refactor adjacent code, comments, or formatting.
+- Remove orphans **your** changes created — leave pre-existing dead code alone (mention it).
+- Every changed line should trace directly to the user's request.
 
 ---
 
 ## 4. Goal-Driven Execution
 
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
+Define success criteria. Loop until verified.
 
 | Instead of... | Transform to... |
 |---|---|
-| "Fix the morning brief" | "Run `morning_brief.py` and confirm `data/morning_brief.md` is valid Markdown" |
-| "Fix the snapshot" | "Confirm `snapshot.json` has zero `NaN` tokens and `JSON.parse` succeeds" |
-| "Fix the build" | "Run `npm run build` and confirm exit code 0" |
+| "Fix the morning brief" | "`morning_brief.py` runs and emits valid HTML + meta JSON" |
+| "Fix the snapshot" | "`snapshot.json` has zero `NaN` and `JSON.parse` succeeds" |
+| "Fix the build" | "`npm run build` exits 0" |
 | "Fix a bug" | "Write a test that reproduces it, then make it pass" |
-
-For multi-step tasks, state a brief plan:
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
 ---
 
 ## 5. Project-Specific Conventions
 
-### Python (Data Pipeline)
-- Scripts live in `apps/market_dashboard_backend/scripts/`.
-- Output always goes to `--out-dir` (default: `data/`). Never hardcode paths.
-- `build_data.py` runs before `morning_brief.py` — they are sequential, not parallel.
-- The `data/` folder is gitignored; `public/market-dashboard/` in the Next.js app is also gitignored locally.
-- In CI, use `git add -f apps/market_dashboard/public/market-dashboard` to force-add data files.
-- Use `requirements.txt` for dependencies — no Poetry, no conda.
-- Always call `sanitize_json()` + `safe_json_dumps()` when writing JSON — Python's `json.dump` emits bare `NaN` which JavaScript cannot parse.
+### Python data pipeline
+- Output goes to `--out-dir` (default `data/`). Never hardcode paths.
+- Always wrap JSON writes with `sanitize_json()` + `safe_json_dumps()` — bare `NaN` breaks browser `JSON.parse`.
+- `data/` and `apps/market_dashboard/public/market-dashboard/` are gitignored locally; CI force-adds with `git add -f`.
 
-### AI Agents (`agents/`)
+### Next.js frontend (15.5 — NOT 16)
+- App Router only. Middleware is `src/middleware.ts` (NOT `proxy.ts`).
+- After regenerating Python data, run `npm run sync:market`.
+- Do not upgrade past 15.x — middleware/auth compatibility breaks.
 
-- `agents/` lives at `apps/market_dashboard/agents/`, **outside** `src/` — this is intentional.
-- `POST /api/analysis` runs two agents sequentially: `fundamentalsAgent` then `technicalAgent`.
-- `fundamentalsAgent` fetches financial metrics via `yahoo-finance2`, then optionally calls DeepSeek for signal reasoning. Falls back to raw metrics when `DEEPSEEK_API_KEY` is absent — this is expected, not a bug.
-- Both agents share an `AgentState` type and return `{ messages: HumanMessage[], data: AgentState['data'] }`.
+### AI agents (`apps/market_dashboard/agents/`)
+- Lives **outside** `src/` by design.
+- `POST /api/analysis` runs `fundamentalsAgent` then `technicalAgent` sequentially.
+- Falling back to raw metrics when `DEEPSEEK_API_KEY` is absent is **expected**, not a bug.
 
-### Next.js Frontend (Next.js 15.5 — NOT 16)
-- App Router only (`src/app/`). No Pages Router patterns.
-- Middleware file is `src/middleware.ts` — NOT `proxy.ts` (that is Next.js 16 only).
-- API routes live under `src/app/api/`.
-- Environment variables: use `.env.local` locally; never commit secrets.
-- Run `npm run sync:market` after regenerating Python data to copy into `public/`.
-- Do not upgrade Next.js past 15.x without verifying all middleware/auth compatibility.
+### Runtime skills (`packages/core-skills/`)
+- Each skill = canonical 7-file folder (`SKILL.md`, `prompt.md`, `knowledge.md`, `schema.json`, TS + Python handlers, `tests/golden.json`).
+- Use `/scaffold-skill <name>` to create. Use `/extract-prompt <file> <skill>` to migrate a hardcoded prompt.
+- Knowledge bodies are committed runtime artifacts. Refresh them from the authoring wiki/global skills with `npm run skills:sync`, controlled by `packages/core-skills/skill-sync.manifest.json`.
+- Run `npm run skills:check` before commits that touch `llm_traders_wiki`, global skill references, or `packages/core-skills`.
+- Phase 3 scorer skills are intentionally split by use case: `trader-scorer-market`, `trader-scorer-stock`, and `trader-scorer-trade`.
 
-### Auth
-- Auth is **NextAuth v5** (Google OAuth) + Prisma + role-based access. Not cookie-based.
-- Roles: `owner` (full access + admin), `allowed` (standard user), `pending` (hold page), `denied` (blocked at sign-in).
-- Clerk has been removed — do not re-add it.
-- `DASHBOARD_PASSWORD` and `AUTH_TOKEN` are from the **old** cookie-based auth — they are no longer used.
-- Middleware (`src/middleware.ts`) protects all routes. Exclusions: `/login`, `/api/auth/*`, `/market-dashboard/*` (static files).
-- All `/api/*` routes should have an explicit auth check (`const session = await auth(); if (!session?.user?.id) return 401`), because middleware returns a 302 redirect for unauthenticated requests — wrong for AJAX callers.
+### Auth (NextAuth v5)
+- Roles: `owner` (admin), `allowed`, `pending`, `denied`. `OWNER_EMAIL` is auto-promoted on first sign-in.
+- Clerk is removed — do not re-add. `DASHBOARD_PASSWORD` / `AUTH_TOKEN` are dead — do not reference.
+- Every `/api/*` route needs an explicit `const session = await auth(); if (!session?.user?.id) return 401` — middleware returns 302 (wrong for AJAX).
+- Middleware exclusions: `/login`, `/api/auth/*`, `/market-dashboard/*` (static).
 
-### GitHub Actions
-- Workflow: `.github/workflows/refresh_data.yml`
-- Schedule: `30 12 * * 1-5` (Mon–Fri 12:30 UTC = 8:30 AM ET)
-- Required secret: `GEMINI_API_KEY` (for `morning_brief.py`)
-- Morning brief failure is non-fatal (`continue-on-error: true`) — data still updates.
-- Commit step uses `[skip ci]` in message to prevent infinite trigger loops.
-
-### Vercel
-- Root directory is `apps/market_dashboard` — set via `vercel.json` at repo root.
-- Required env vars in Vercel dashboard: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_SECRET`, `DATABASE_URL`, `OWNER_EMAIL`.
-- After adding env vars in Vercel, always trigger a **manual redeploy** — env vars don't apply to existing deployments.
+### CI / Vercel
+- Workflow `refresh_data.yml`, schedule `00,30 12-18 * * 1-5`, commit message contains `[skip ci]`. Morning brief is `continue-on-error`.
+- Vercel project is configured to build `apps/market_dashboard`; app-level `vercel.json` holds the Next.js build settings. After adding env vars, **manually redeploy** — env vars don't apply to existing deployments.
 
 ---
 
-## 6. Environment Variables Reference
+## 6. Environment Variables
 
-| Variable | Where set | Required | Purpose |
-|---|---|---|---|
-| `GEMINI_API_KEY` | GitHub Secret + `.env.local` | Yes (≥1 brief key) | Morning brief — Gemini 2.5 Pro with Search Grounding |
-| `OPENAI_API_KEY` | GitHub Secret + `.env.local` | Optional | Morning brief — GPT-4o with web_search_preview |
-| `ANTHROPIC_API_KEY` | GitHub Secret + `.env.local` | Optional | Morning brief — Claude claude-sonnet-4-6 with web search |
-| `GOOGLE_CLIENT_ID` | Vercel + `.env.local` | Yes | Google OAuth client ID (NextAuth v5) |
-| `GOOGLE_CLIENT_SECRET` | Vercel + `.env.local` | Yes | Google OAuth client secret (NextAuth v5) |
-| `AUTH_SECRET` | Vercel + `.env.local` | Yes | NextAuth v5 session signing secret |
-| `DATABASE_URL` | Vercel + `.env.local` | Yes | PostgreSQL connection string (Prisma) |
-| `OWNER_EMAIL` | Vercel + `.env.local` | Yes | Email auto-promoted to `owner` role on first sign-in |
-| `NEXTAUTH_URL` | Vercel + `.env.local` | Yes (prod) | Base URL used for internal API calls |
-| `DEEPSEEK_API_KEY` | `.env.local` / Vercel | Optional | AI stock analysis tab |
+| Variable | Required | Purpose |
+|---|---|---|
+| `GEMINI_API_KEY` | Yes (≥1 brief key) | Morning brief — Gemini 2.5 Pro + Search Grounding |
+| `OPENAI_API_KEY` | Optional | Morning brief — GPT-4o + web_search_preview |
+| `ANTHROPIC_API_KEY` | Optional | Morning brief — Claude Sonnet 4.6 + web search |
+| `GOOGLE_CLIENT_ID` / `_SECRET` | Yes | Google OAuth (NextAuth v5) |
+| `AUTH_SECRET` | Yes | NextAuth v5 session signing |
+| `DATABASE_URL` | Yes | Postgres (Prisma) |
+| `OWNER_EMAIL` | Yes | Auto-promoted to `owner` role |
+| `NEXTAUTH_URL` | Yes (prod) | Base URL for internal API calls |
+| `DEEPSEEK_API_KEY` | Optional | AI stock analysis tab |
 
-Never commit `.env.local`. Never log API keys. Never hardcode secrets in `.bat` files or scripts.
+Never commit `.env.local`. Never log keys. Never hardcode secrets.
 
 ---
 
 ## 7. Common Pitfalls
 
-| Symptom | Root Cause | Fix |
+| Symptom | Fix |
+|---|---|
+| `JSON.parse` fails in browser | bare `NaN` — use `safe_json_dumps()` + CI sanitize step |
+| numpy `NaN` survives sanitize | use `.item()` on numpy scalars |
+| Login fails after env-var change on Vercel | manual redeploy required |
+| Vercel cannot see updated wiki/global skill edits | run `npm run skills:sync`, commit `packages/core-skills`, then redeploy |
+| Middleware redirects JSON fetches | public path missing from `src/middleware.ts` allow checks + matcher regex |
+| `npm install` fails on Vercel | Clerk peer-dep conflict; Clerk is removed — do not re-add |
+| Workflow loops forever | missing `[skip ci]` in commit message |
+| Morning brief tab errors | `morning_brief_meta.json` not in `public/market-dashboard/` — run brief then `sync:market` |
+| Brief provider button greyed | API key missing or `generated: false` in meta |
+| OpenAI / Claude brief fails | `pip install openai>=1.70.0` / `anthropic>=0.49.0` |
+
+---
+
+## 8. Subagents — Default to Cheaper Models
+
+**Always prefer a subagent for routine, lower-thinking work.** Spawn via the Agent tool with `model: sonnet` (or `haiku` for trivial lookups). Reserve Opus for complex design, large-diff review, or when Sonnet has visibly underperformed in this session.
+
+**Use prebuilt subagents in `.claude/agents/` over ad-hoc Explore calls:**
+
+| Agent | When to use | Model |
 |---|---|---|
-| `JSON.parse` fails in browser | `snapshot.json` contains bare `NaN` | Use `safe_json_dumps()` + CI sanitize step |
-| Login fails on Vercel | Env vars added but no redeploy triggered | Redeploy manually from Vercel dashboard |
-| Middleware redirects JSON fetches | `/market-dashboard` not excluded from matcher | Add to `PUBLIC_PATHS` and matcher regex |
-| `npm install` fails on Vercel | Clerk peer dep conflict with Next.js 16 | Clerk removed; do not re-add |
-| Workflow commits loop forever | Missing `[skip ci]` in commit message | Already fixed — don't remove it |
-| numpy `NaN` survives sanitize | `isinstance(obj, float)` misses `np.float64` | Use `.item()` on numpy scalars |
-| Morning brief tab shows error | `morning_brief_meta.json` not in `public/market-dashboard/` | Run `morning_brief.py` then `npm run sync:market` |
-| Brief provider button greyed out | API key not set or generation failed | Check env var; see `morning_brief_meta.json` for `generated: false` |
-| OpenAI brief fails | `openai` package not installed | `pip install openai>=1.70.0` |
-| Claude brief fails | `anthropic` package not installed | `pip install anthropic>=0.49.0` |
+| `market-explorer` | "Where is X defined?", route lists, codebase lookups | Sonnet |
+| `prompt-extractor` | Phase 3 prompt migration — one prompt at a time | Sonnet |
+| `wiki-summarizer` | Composing `knowledge.md` for a runtime skill | Sonnet |
+
+**Slash commands** (`.claude/skills/`):
+
+| Command | Purpose |
+|---|---|
+| `/scaffold-skill <name>` | Generate 7-file skill folder under `packages/core-skills/` |
+| `/sync-data` | `build_data.py` → `morning_brief.py` → `sync:market` → NaN check |
+| `/api-route <path>` | Scaffold authenticated API route + middleware update |
+| `/safety-check` | Pre-commit gate (Clerk, NaN, legacy auth, build, types) |
+| `/extract-prompt <file> <skill>` | Migrate hardcoded prompt into a skill folder |
+| `/wiki-sync <skill>` | Refresh runtime skill artifacts through the manifest-backed sync command |
 
 ---
 
----
+## 9. Session Learnings (`.learnings/`, gitignored)
 
-## 8. Session Learning Logs (`.learnings/`)
-
-Three local files track in-session discoveries. They are gitignored — they stay on your machine only.
-
-| File | Purpose |
-|------|---------|
-| `.learnings/LEARNINGS.md` | Lessons and known pitfalls found during sessions |
-| `.learnings/ERRORS.md` | Pipeline/build failures and their fixes |
-| `.learnings/FEATURE_REQUESTS.md` | Ideas captured mid-session |
-
-**Workflow:** When an entry recurs 2+ times, promote it manually to the Common Pitfalls table in this file and clear it from `.learnings/`. Committed `CLAUDE.md` updates are what travel to other machines and collaborators — `.learnings/` is local scratch pad only.
-
-**Never** enable a `PostToolUse` error-detector hook that reads Claude's stdout — tool output can contain API error messages with key fragments in debug traces, and writing those to `.learnings/ERRORS.md` risks leaking secrets if the file is ever committed accidentally.
+`LEARNINGS.md` (pitfalls), `ERRORS.md` (build/pipeline failures), `FEATURE_REQUESTS.md` (ideas). When an entry recurs 2+ times, promote it manually into the Common Pitfalls table above. **Never** enable a `PostToolUse` hook that pipes Claude stdout into `.learnings/` — tool output can contain key fragments.
 
 ---
 
-**These guidelines are working if:** diffs are clean and minimal, clarifying questions come before implementation, and the build passes on the first try.
+**Working if:** diffs are minimal, clarifying questions come before implementation, build passes on the first try.

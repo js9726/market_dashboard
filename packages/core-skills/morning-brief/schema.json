@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "input": {
+    "type": "object",
+    "properties": {
+      "date_str": {
+        "type": "string",
+        "description": "Long-form date for the brief header (e.g., 'Wednesday, April 29, 2026')"
+      },
+      "watchlist": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Tickers to expand in Section 7"
+      }
+    },
+    "required": ["date_str"],
+    "additionalProperties": false
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "html": {
+        "type": "string",
+        "description": "HTML snippet beginning with the scoped <style> block and a single <div class=\"brief\"> container"
+      }
+    },
+    "required": ["html"],
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "description": "Frozen input → expected prompt substrings. LLM output is non-deterministic; we only assert the prompt builder structure stays stable.",
+  "fixtures": [
+    {
+      "name": "clean-pullback-into-rising-21dma",
+      "input": {
+        "ticker": "NVDA",
+        "tradeDate": "2026-04-15",
+        "side": "Long",
+        "buyPrice": "942.50",
+        "exitPrice": null,
+        "quantity": "100",
+        "pnl": null,
+        "notes": "Pullback to rising 21dma at 945, 0.3xATR below.",
+        "proposedEntry": "945.00",
+        "proposedSL": "920.00",
+        "proposedTP": "1015.00",
+        "snapshot": {
+          "currentPrice": 942.50,
+          "distanceTo21dmaAtr": 0.3,
+          "ema21Slope": "rising",
+          "wma10Slope": "rising",
+          "rsCompositeRank": 97,
+          "atrPct": 1.5,
+          "dailyClosingRangePct": 78,
+          "contractionLast5d": true,
+          "earningsDays": 21,
+          "marketCapTier": "Large"
+        }
+      },
+      "expectedPromptContains": [
+        "Ticker: NVDA",
+        "Side: Long",
+        "Entry price: $942.50",
+        "Exit price: Still open",
+        "P&L: Open position",
+        "Distance to 21dma (xATR): 0.30",
+        "21ema slope: rising",
+        "RS composite rank: 97",
+        "Contraction last 5d: yes",
+        "Earnings days: 21",
+        "@PrimeTrading_"
+      ]
+    },
+    {
+      "name": "extended-breakout-chase-mistake",
+      "input": {
+        "ticker": "TSLA",
+        "tradeDate": "2026-03-20",
+        "side": "Long",
+        "buyPrice": "275.00",
+        "exitPrice": "248.00",
+        "pnl": "-2700.00",
+        "notes": "Bought breakout 3xATR above 21dma. Failed.",
+        "proposedSL": "270.00",
+        "snapshot": {
+          "distanceTo21dmaAtr": 3.1,
+          "ema21Slope": "flat",
+          "rsCompositeRank": 62,
+          "earningsDays": 5,
+          "contractionLast5d": false
+        }
+      },
+      "expectedPromptContains": [
+        "Ticker: TSLA",
+        "P&L: $-2700.00",
+        "Exit price: $248.00",
+        "Distance to 21dma (xATR): 3.10",
+        "21ema slope: flat",
+        "RS composite rank: 62",
+        "Contraction last 5d: no",
+        "Earnings days: 5"
+      ]
+    }
+  ]
+}

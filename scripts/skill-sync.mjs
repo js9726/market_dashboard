@@ -1,0 +1,392 @@
+import crypto from "node:crypto";
+import fs from "node:fs/promises";
+import path from "node:path";
+import process from "node:process";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(SCRIPT_DIR, "..");
+const MANIFEST_PATH = path.join(REPO_ROOT, "packages", "core-skills", "skill-sync.manifest.json");
+const START_MARKER = "<!-- skill-sync:start";
+const END_MARKER = "skill-sync:end -->";
+
+function parseArgs(argv) {
+  const args = {
+    check: false,
+    dryRun: false,
+    strict: false,
+    includePlanned: false,
+    list: false,
+    skill: null
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--check") args.check = true;
+    else if (arg === "--dry-run") args.dryRun = true;
+    else if (arg === "--strict") args.strict = true;
+    else if (arg === "--include-planned") args.includePlanned = true;
+    else if (arg === "--list") args.list = true;
+    else if (arg === "--skill") {
+      args.skill = argv[index + 1];
+      index += 1;
+    } else if (arg.startsWith("--skill=")) {
+      args.skill = arg.slice("--skill=".length);
+    } else {
+      throw new Error(`Unknown argument: ${arg}`);
+    }
+  }
+
+  return args;
+}
+
+async function exists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function readJson(filePath) {
+  const text = await fs.readFile(filePath, "utf8");
+  return JSON.parse(text);
+}
+
+function sha256(text) {
+  return crypto.createHash("sha256").update(text, "utf8").digest("hex");
+}
+
+function shortHash(hash) {
+  return hash.slice(0, 12);
+}
+
+function expandCandidate(candidate) {
+  const envOnly = candidate.match(/^\$\{([A-Z0-9_]+)\}$/i);
+  if (envOnly) {
+    return process.env[envOnly[1]] || null;
+  }
+
+  return candidate.replace(/\$\{([A-Z0-9_]+)\}/gi, (_, name) => process.env[name] || "");
+}
+
+function resolvePath(candidate) {
+  if (path.isAbsolute(candidate)) return path.normalize(candidate);
+  return path.resolve(REPO_ROOT, candidate);
+}
+
+async function resolveSourceRoot(manifest, rootName) {
+  const root = manifest.sourceRoots[rootName];
+  if (!root) throw new Error(`Unknown source root "${rootName}" in manifest`);
+
+  for (const candidate of root.candidates || []) {
+    const expanded = expandCandidate(candidate);
+    if (!expanded) continue;
+
+    const resolved = resolvePath(expanded);
+    if (await exists(resolved)) return resolved;
+  }
+
+  return null;
+}
+
+async function resolveSourceFile(manifest, source) {
+  const rootDir = await resolveSourceRoot(manifest, source.root);
+  if (!rootDir) {
+    return {
+      ...source,
+      absolutePath: null,
+      exists: false,
+      error: `No available source root for "${source.root}"`
+    };
+  }
+
+  const candidates = [
+    path.join(rootDir, source.path)
+  ];
+
+  if (source.root === "wiki" && source.path.startsWith("wiki/")) {
+    candidates.push(path.join(rootDir, source.path.slice("wiki/".length)));
+  }
+
+  for (const candidate of candidates) {
+    if (await exists(candidate)) {
+      const content = await fs.readFile(candidate, "utf8");
+      return {
+        ...source,
+        absolutePath: candidate,
+        exists: true,
+        content,
+        hash: sha256(content)
+      };
+    }
+  }
+
+  return {
+    ...source,
+    absolutePath: candidates[0],
+    exists: false,
+    error: `Missing source file: ${candidates[0]}`
+  };
+}
+
+function cleanMarkdown(content) {
+  let text = content.replace(/\r\n/g, "\n");
+
+  if (text.startsWith("---\n")) {
+    const end = text.indexOf("\n---\n", 4);
+    if (end !== -1) text = text.slice(end + "\n---\n".length);
+  }
+
+  text = text.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2");
+  text = text.replace(/\[\[([^\]]+)\]\]/g, "$1");
+  return text.trim();
+}
+
+function extractExistingMetadata(content) {
+  const start = content.indexOf(START_MARKER);
+  const end = content.indexOf(END_MARKER);
+  if (start === -1 || end === -1 || end <= start) return null;
+
+  const jsonStart = start + START_MARKER.length;
+  const jsonText = content.slice(jsonStart, end).trim();
+  try {
+    return JSON.parse(jsonText);
+  } catch {
+    return null;
+  }
+}
+
+function renderBody(skill, output, resolvedSources) {
+  const sourceList = resolvedSources.map((source) => {
+    const hash = source.hash ? ` sha256:${shortHash(source.hash)}` : "";
+    return `- ${source.root}:${source.path}${hash}`;
+  }).join("\n");
+
+  const notes = (output.applicationNotes || [])
+    .map((note) => `- ${note}`)
+    .join("\n");
+
+  const sections = resolvedSources.map((source) => {
+    const cleaned = cleanMarkdown(source.content || "");
+    return [
+      `## Source: ${source.root}:${source.path}`,
+      "",
+      cleaned || "_Source was empty._"
+    ].join("\n");
+  });
+
+  const label = output.kind === "prompt" ? "Prompt" : "Knowledge";
+  return [
+    `# ${label}: ${output.title || skill.id}`,
+    "",
+    "This file is generated by the skill-sync system.",
+    "Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from `apps/market_dashboard/`.",
+    "",
+    "## Sources",
+    sourceList,
+    "",
+    "## Application Notes",
+    notes || "- No additional application notes declared.",
+    "",
+    ...sections
+  ].join("\n").trimEnd() + "\n";
+}
+
+function renderFile(skill, output, resolvedSources) {
+  const body = renderBody(skill, output, resolvedSources);
+  const metadata = {
+    manifestVersion: 1,
+    skill: skill.id,
+    target: output.target,
+    kind: output.kind || "knowledge",
+    strategy: output.strategy || "concat-markdown",
+    generatedAt: new Date().toISOString(),
+    renderHash: sha256(body),
+    sources: resolvedSources.map((source) => ({
+      root: source.root,
+      path: source.path,
+      sha256: source.hash
+    }))
+  };
+
+  return {
+    body,
+    renderHash: metadata.renderHash,
+    content: `${START_MARKER}\n${JSON.stringify(metadata, null, 2)}\n${END_MARKER}\n\n${body}`
+  };
+}
+
+function classifyStatus(existingContent, rendered, options) {
+  if (!existingContent) return { status: "missing", fail: true };
+
+  const metadata = extractExistingMetadata(existingContent);
+  if (!metadata) {
+    return {
+      status: "untracked",
+      fail: options.strict,
+      message: "No skill-sync metadata found. Run skills:sync once to establish a baseline."
+    };
+  }
+
+  if (metadata.renderHash !== rendered.renderHash) {
+    return {
+      status: "stale",
+      fail: true,
+      message: `Expected render hash ${shortHash(rendered.renderHash)}, found ${shortHash(metadata.renderHash || "missing")}.`
+    };
+  }
+
+  return { status: "fresh", fail: false };
+}
+
+async function processOutput(manifest, skill, output, options) {
+  const targetsRoot = path.resolve(REPO_ROOT, manifest.targetsRoot);
+  const targetPath = path.join(targetsRoot, output.target);
+  const required = output.required !== false;
+  const targetDir = path.dirname(targetPath);
+
+  const resolvedSources = [];
+  for (const source of output.sources || []) {
+    resolvedSources.push(await resolveSourceFile(manifest, source));
+  }
+
+  const missingSources = resolvedSources.filter((source) => !source.exists);
+  if (missingSources.length) {
+    return {
+      skill: skill.id,
+      target: output.target,
+      status: required ? "source-missing" : "planned-source-missing",
+      fail: required,
+      detail: missingSources.map((source) => source.error).join("; ")
+    };
+  }
+
+  const rendered = renderFile(skill, output, resolvedSources);
+  const hasTarget = await exists(targetPath);
+  if (!hasTarget && !required) {
+    return {
+      skill: skill.id,
+      target: output.target,
+      status: "planned-target-missing",
+      fail: false,
+      detail: "Target folder does not exist yet."
+    };
+  }
+
+  const existingContent = hasTarget ? await fs.readFile(targetPath, "utf8") : null;
+  const current = classifyStatus(existingContent, rendered, options);
+
+  if (options.check || options.dryRun) {
+    return {
+      skill: skill.id,
+      target: output.target,
+      status: current.status,
+      fail: current.fail,
+      detail: current.message || ""
+    };
+  }
+
+  if (current.status === "fresh") {
+    return {
+      skill: skill.id,
+      target: output.target,
+      status: "fresh",
+      fail: false,
+      detail: ""
+    };
+  }
+
+  if (!(await exists(targetDir))) {
+    if (!required) {
+      return {
+        skill: skill.id,
+        target: output.target,
+        status: "planned-target-missing",
+        fail: false,
+        detail: "Target folder does not exist yet."
+      };
+    }
+    await fs.mkdir(targetDir, { recursive: true });
+  }
+
+  await fs.writeFile(targetPath, rendered.content, "utf8");
+  return {
+    skill: skill.id,
+    target: output.target,
+    status: "synced",
+    fail: false,
+    detail: current.status === "untracked" ? "Existing file had no skill-sync metadata." : ""
+  };
+}
+
+function shouldProcessSkill(skill, options) {
+  if (options.skill && skill.id !== options.skill) return false;
+  if (!skill.enabled && !(options.includePlanned && skill.status === "planned")) return false;
+  return true;
+}
+
+function printList(manifest) {
+  console.log("Skill sync manifest");
+  for (const skill of manifest.skills || []) {
+    const mode = skill.enabled ? "enabled" : "disabled";
+    const status = skill.status || "unknown";
+    console.log(`- ${skill.id} (${status}, ${mode})`);
+  }
+}
+
+function printResults(results, options) {
+  const rows = results.map((result) => ({
+    skill: result.skill,
+    target: result.target,
+    status: result.status,
+    detail: result.detail || ""
+  }));
+
+  if (!rows.length) {
+    console.log("No skill-sync entries matched.");
+    return;
+  }
+
+  console.table(rows);
+
+  const warnings = results.filter((result) => result.status !== "fresh" && result.status !== "synced");
+  if (warnings.length && !options.check && !options.dryRun) {
+    console.log("Warnings were reported above. Planned/disabled entries are not written unless --include-planned is used.");
+  }
+}
+
+export async function runSkillSync(rawArgs = process.argv.slice(2)) {
+  const options = parseArgs(rawArgs);
+  const manifest = await readJson(MANIFEST_PATH);
+
+  if (options.list) {
+    printList(manifest);
+    return 0;
+  }
+
+  const results = [];
+  for (const skill of manifest.skills || []) {
+    if (!shouldProcessSkill(skill, options)) continue;
+    for (const output of skill.outputs || []) {
+      results.push(await processOutput(manifest, skill, output, options));
+    }
+  }
+
+  printResults(results, options);
+  const failures = results.filter((result) => result.fail);
+  if (failures.length) return 1;
+  return 0;
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  runSkillSync()
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch((error) => {
+      console.error(error.message);
+      process.exitCode = 1;
+    });
+}

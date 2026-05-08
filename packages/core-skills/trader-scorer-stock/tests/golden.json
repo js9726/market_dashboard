@@ -1,0 +1,34 @@
+[
+  {
+    "name": "renders stock context, all 7 trader profiles, and per-ticker schema example",
+    "input": {
+      "stockContext": "STOCK: NVDA - NVIDIA Corp\nExchange: NMS | Sector: Technology",
+      "display": {
+        "name": "NVIDIA Corp",
+        "sector": "Technology",
+        "industry": "Semiconductors",
+        "exchange": "NMS",
+        "currentPrice": 850.00,
+        "changePct": 1.25,
+        "week52Low": 400.00,
+        "week52High": 950.00,
+        "analystPT": 920.00,
+        "earningsDate": "2026-05-14",
+        "earningsDays": 15,
+        "marketCap": "$2.10T",
+        "revenueTtm": "$110.50B",
+        "grossMarginPct": 75.0,
+        "trailingEps": 12.96,
+        "forwardEps": 25.32,
+        "dividendYieldPct": 0.03
+      }
+    },
+    "expectedContains": [
+      "STOCK: NVDA - NVIDIA Corp",
+      "### @markminervini - Mark Minervini",
+      "### @jfsrev - Jeff (jfsrev)",
+      "### @Qullamaggie - Kristjan Kullamagi (Qullamaggie)",
+      "\"name\": \"NVIDIA Corp\""
+    ]
+  }
+]

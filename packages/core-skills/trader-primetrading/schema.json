@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "input": {
+    "type": "object",
+    "properties": {
+      "ticker": { "type": "string" },
+      "tradeDate": { "type": ["string", "null"] },
+      "side": { "type": ["string", "null"] },
+      "buyPrice": { "type": "string" },
+      "exitPrice": { "type": ["string", "null"] },
+      "quantity": { "type": ["string", "null"] },
+      "pnl": { "type": ["string", "null"] },
+      "notes": { "type": ["string", "null"] },
+      "proposedEntry": { "type": ["string", "null"] },
+      "proposedSL": { "type": ["string", "null"] },
+      "proposedTP": { "type": ["string", "null"] },
+      "snapshot": {
+        "type": ["object", "null"],
+        "description": "Optional numeric snapshot at entry. When absent the LLM must infer from general knowledge of the ticker around tradeDate.",
+        "properties": {
+          "currentPrice": { "type": ["number", "null"] },
+          "distanceTo21dmaAtr": { "type": ["number", "null"] },
+          "ema21Slope": { "type": ["string", "null"], "enum": ["rising", "flat", "falling", null] },
+          "wma10Slope": { "type": ["string", "null"], "enum": ["rising", "flat", "falling", null] },
+          "rsCompositeRank": { "type": ["number", "null"] },
+          "atrPct": { "type": ["number", "null"] },
+          "dailyClosingRangePct": { "type": ["number", "null"] },
+          "contractionLast5d": { "type": ["boolean", "null"] },
+          "earningsDays": { "type": ["number", "null"] },
+          "marketCapTier": { "type": ["string", "null"], "enum": ["Large", "Mid", "Small", "Micro", null] }
+        },
+        "additionalProperties": true
+      }
+    },
+    "required": ["ticker", "buyPrice"],
+    "additionalProperties": false
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "handle": { "type": "string", "const": "@PrimeTrading_" },
+      "ticker": { "type": "string" },
+      "entry_score": { "type": "number", "minimum": 0, "maximum": 4 },
+      "risk_score": { "type": "number", "minimum": 0, "maximum": 3 },
+      "setup_score": { "type": "number", "minimum": 0, "maximum": 3 },
+      "total_score": { "type": "number", "minimum": 0, "maximum": 10 },
+      "verdict": { "type": "string", "enum": ["GREAT ENTRY", "GOOD ENTRY", "ACCEPTABLE", "POOR ENTRY", "MISTAKE"] },
+      "note": { "type": "string" },
+      "flags": { "type": "array", "items": { "type": "string" } }
+    },
+    "required": ["handle", "ticker", "entry_score", "risk_score", "setup_score", "total_score", "verdict", "note", "flags"]
+  }
+}

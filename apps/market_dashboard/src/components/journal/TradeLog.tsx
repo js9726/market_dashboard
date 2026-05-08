@@ -396,6 +396,43 @@ type TradeReviewResult = {
   lesson: string;
 };
 
+type AgentSummary = { summary: string };
+type AgentPipelineResult = {
+  ticker: string;
+  agents: {
+    data: AgentSummary & { facts?: Record<string, unknown> };
+    technical: AgentSummary & { indicators?: Record<string, unknown> };
+    chart: AgentSummary & { pattern?: string | null; levels?: Record<string, unknown> };
+    risk: AgentSummary & {
+      suggested_size_pct?: number | null;
+      rr?: number | null;
+      stop_distance_pct?: number | null;
+      var_1d_pct?: number | null;
+      status: "approved" | "warn" | "reject";
+    };
+  };
+  moderator: {
+    signal: "BUY" | "SELL" | "HOLD";
+    confidence: number;
+    consensus?: string;
+    entry?: number | null;
+    stop?: number | null;
+    target?: number | null;
+    reasoning: string;
+    lesson?: string | null;
+  };
+};
+
+function isAgentPipelineResult(r: unknown): r is AgentPipelineResult {
+  return (
+    !!r &&
+    typeof r === "object" &&
+    "agents" in r &&
+    "moderator" in r &&
+    typeof (r as { moderator?: unknown }).moderator === "object"
+  );
+}
+
 function stateBadge(state: string | null) {
   if (!state) return null;
   const s = state.toUpperCase();
@@ -407,15 +444,102 @@ function stateBadge(state: string | null) {
   return <span className={`rounded border px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{state}</span>;
 }
 
+type ReviewStyle = "trader-debate" | "agent-pipeline";
+
+const AGENT_LABELS: Record<keyof AgentPipelineResult["agents"], { label: string; accent: string }> = {
+  data: { label: "Data", accent: "text-blue-300 border-blue-700 bg-blue-900/30" },
+  technical: { label: "Technical", accent: "text-emerald-300 border-emerald-700 bg-emerald-900/30" },
+  chart: { label: "Chart", accent: "text-amber-300 border-amber-700 bg-amber-900/30" },
+  risk: { label: "Risk", accent: "text-rose-300 border-rose-700 bg-rose-900/30" },
+};
+
+function signalColor(s: string): string {
+  if (s === "BUY") return "bg-emerald-900/60 text-emerald-300 border-emerald-700";
+  if (s === "SELL") return "bg-red-900/60 text-red-300 border-red-700";
+  return "bg-yellow-900/60 text-yellow-300 border-yellow-700";
+}
+
+function AgentPipelineView({ result }: { result: AgentPipelineResult }) {
+  const { agents, moderator } = result;
+  return (
+    <div className="space-y-4">
+      <div className="text-xs font-medium text-slate-400 uppercase tracking-wide">Agent pipeline</div>
+      <div className="space-y-2">
+        {(["data", "technical", "chart", "risk"] as const).map((k) => {
+          const agent = agents[k];
+          const meta = AGENT_LABELS[k];
+          return (
+            <div key={k} className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${meta.accent}`}>
+                  {meta.label}
+                </span>
+                {k === "risk" && agents.risk.status && (
+                  <span className={`text-[10px] uppercase ${agents.risk.status === "approved" ? "text-emerald-400" : agents.risk.status === "warn" ? "text-amber-400" : "text-red-400"}`}>
+                    {agents.risk.status}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">{agent.summary}</p>
+              {k === "risk" && (
+                <div className="mt-2 flex flex-wrap gap-3 text-[10px] text-slate-500">
+                  {agents.risk.suggested_size_pct != null && <span>Size: {agents.risk.suggested_size_pct.toFixed(1)}%</span>}
+                  {agents.risk.rr != null && <span>R/R: {agents.risk.rr.toFixed(2)}</span>}
+                  {agents.risk.stop_distance_pct != null && <span>Stop: {agents.risk.stop_distance_pct.toFixed(1)}%</span>}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="rounded-lg border border-slate-600 bg-slate-800/60 px-4 py-3">
+        <div className="flex items-center gap-3 mb-2 flex-wrap">
+          <span className="text-[10px] text-slate-500 uppercase tracking-wide">Moderator</span>
+          <span className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase ${signalColor(moderator.signal)}`}>
+            {moderator.signal}
+          </span>
+          <span className={`text-2xl font-bold ${scoreColor(moderator.confidence)}`}>
+            {moderator.confidence.toFixed(1)}<span className="text-xs text-slate-500">/10</span>
+          </span>
+          {moderator.consensus && <span className="text-[10px] text-slate-500">consensus {moderator.consensus}</span>}
+        </div>
+        {(moderator.entry != null || moderator.stop != null || moderator.target != null) && (
+          <div className="grid grid-cols-3 gap-3 mb-3 text-xs">
+            {[
+              { label: "Entry", value: moderator.entry },
+              { label: "Stop", value: moderator.stop },
+              { label: "Target", value: moderator.target },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <div className="text-[10px] text-slate-500">{label}</div>
+                <div className="font-semibold text-white">{value != null ? `$${value.toFixed(2)}` : "—"}</div>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-xs text-slate-300 leading-relaxed">{moderator.reasoning}</p>
+        {moderator.lesson && (
+          <>
+            <div className="mt-3 text-[10px] text-slate-500 uppercase tracking-wide">Journal lesson</div>
+            <p className="text-xs text-slate-200 leading-relaxed italic">{moderator.lesson}</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; onClose: () => void; onVerdictSaved: () => void }) {
   const [providers, setProviders] = useState<Providers | null>(null);
   const [selectedProvider, setSelectedProvider] = useState<string>("");
+  const [selectedStyle, setSelectedStyle] = useState<ReviewStyle>("trader-debate");
   const [history, setHistory] = useState<VerdictHistoryItem[]>([]);
   const [selectedHistoryId, setSelectedHistoryId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<TradeReviewResult | null>(
-    trade.verdict ? (trade.verdict as unknown as TradeReviewResult) : null
+  const [result, setResult] = useState<TradeReviewResult | AgentPipelineResult | null>(
+    trade.verdict ? (trade.verdict as unknown as TradeReviewResult | AgentPipelineResult) : null
   );
   const [isFromCache, setIsFromCache] = useState(!!trade.verdict);
   const [providerNote, setProviderNote] = useState<string>("");
@@ -447,7 +571,7 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
     setSelectedHistoryId(id);
     const item = history.find((h) => h.id === id);
     if (item) {
-      setResult(item.verdict as unknown as TradeReviewResult);
+      setResult(item.verdict as unknown as TradeReviewResult | AgentPipelineResult);
       setIsFromCache(true);
       setProviderNote("");
       setError(null);
@@ -461,13 +585,13 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
     fetch("/api/analysis/trade-review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tradeId: trade.id, force, provider: selectedProvider }),
+      body: JSON.stringify({ tradeId: trade.id, force, provider: selectedProvider, style: selectedStyle }),
     })
       .then((r) => r.json())
       .then((data: Record<string, unknown>) => {
         if (data.error) throw new Error(data.error as string);
         const { _meta, ...review } = data;
-        setResult(review as unknown as TradeReviewResult);
+        setResult(review as unknown as TradeReviewResult | AgentPipelineResult);
         setIsFromCache(false);
         const meta = _meta as { providerNote?: string } | undefined;
         if (meta?.providerNote) setProviderNote(meta.providerNote);
@@ -555,6 +679,30 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
             </div>
           )}
 
+          {/* Review style toggle */}
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-slate-500 uppercase tracking-wide">Review style</span>
+            <div className="inline-flex rounded-md border border-slate-700 bg-slate-800/60 p-0.5">
+              {(["trader-debate", "agent-pipeline"] as const).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSelectedStyle(s)}
+                  disabled={loading}
+                  className={`rounded px-3 py-1 text-[11px] font-medium transition ${
+                    selectedStyle === s
+                      ? "bg-emerald-600 text-white"
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  {s === "trader-debate" ? "Trader Debate" : "Agent Pipeline"}
+                </button>
+              ))}
+            </div>
+            {selectedStyle === "agent-pipeline" && (
+              <span className="text-[10px] text-amber-500/80">v0 — sparse snapshot, no live indicators</span>
+            )}
+          </div>
+
           {/* Provider bar */}
           <ProviderBar
             providers={providers}
@@ -573,7 +721,11 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
           {loading && <Spinner label={`Reviewing ${trade.ticker} trade…`} />}
           {error && <div className="rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-400">{error}</div>}
 
-          {result && (
+          {result && isAgentPipelineResult(result) && (
+            <AgentPipelineView result={result} />
+          )}
+
+          {result && !isAgentPipelineResult(result) && (
             <>
               {/* Sector / industry header */}
               {(result.sector || result.industry) && (
@@ -584,7 +736,7 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
                 </div>
               )}
 
-              {/* 6-trader scoring rows */}
+                              {/* 7-trader scoring rows */}
               <div>
                 <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Trader Perspectives</div>
                 <div className="space-y-2">

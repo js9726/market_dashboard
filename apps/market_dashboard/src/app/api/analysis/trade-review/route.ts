@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { requireUserIdAndQuota, incrementScanCount } from "@/lib/auth-helpers";
 import { callLLM } from "@/utils/llm-router";
 import {
   buildPrompt,
@@ -11,34 +11,45 @@ import {
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const guard = await requireUserIdAndQuota();
+    if (guard.error) return guard.error;
+    const userId = guard.userId;
 
     const body = await request.json();
     const tradeId: string | undefined = body.tradeId;
     const force: boolean = body.force === true;
     const provider: string | undefined = body.provider;
+    const style: "trader-debate" | "agent-pipeline" =
+      body.style === "agent-pipeline" ? "agent-pipeline" : "trader-debate";
 
     // tradeId path: fetch from DB, check cache, generate and save verdict
     if (tradeId) {
       const dbTrade = await prisma.trade.findUnique({
-        where: { id: tradeId, userId: session.user.id },
+        where: { id: tradeId, userId },
       });
       if (!dbTrade) {
         return NextResponse.json({ error: "Trade not found" }, { status: 404 });
       }
 
-      // Return cached verdict if not forcing a rerun
-      if (!force && dbTrade.verdict) {
-        return NextResponse.json({ ...(dbTrade.verdict as Record<string, unknown>), _meta: {} });
+      // Cache check applies only when not switching styles. The cached `Trade.verdict`
+      // field doesn't store its style, so a force=false request for the OTHER style
+      // re-runs (and overwrites the cache). Always-fresh agent-pipeline runs are
+      // the safer default until we add style-aware caching. Cache hits do NOT consume quota.
+      if (!force && dbTrade.verdict && style === "trader-debate") {
+        return NextResponse.json({ ...(dbTrade.verdict as Record<string, unknown>), _meta: { style: "trader-debate" } });
       }
 
-      const result = await generateTradeVerdict(tradeId, session.user.id, { provider });
+      const result = await generateTradeVerdict(tradeId, userId, { provider, style });
+      // Successful LLM run + DB write: charge the quota
+      await incrementScanCount(userId);
       return NextResponse.json({
         ...result.review,
-        _meta: { providerUsed: result.providerUsed, modelUsed: result.modelUsed, providerNote: result.note },
+        _meta: {
+          providerUsed: result.providerUsed,
+          modelUsed: result.modelUsed,
+          style: result.style,
+          providerNote: result.note,
+        },
       });
     }
 
@@ -63,12 +74,21 @@ export async function POST(request: Request) {
         .replace(/```\s*$/i, "")
         .trim();
       review = JSON.parse(cleaned);
-    } catch {
+    } catch (parseErr) {
+      console.error(
+        "[/api/analysis/trade-review ad-hoc] LLM returned invalid JSON for ticker=%s. Error: %s. Raw output (first 500 chars): %s",
+        tradeData.ticker,
+        parseErr instanceof Error ? parseErr.message : String(parseErr),
+        raw.slice(0, 500)
+      );
       return NextResponse.json(
         { error: "AI returned invalid JSON. Please try again." },
         { status: 500 }
       );
     }
+
+    // Successful ad-hoc run: charge the quota
+    await incrementScanCount(userId);
 
     return NextResponse.json({
       ...review,

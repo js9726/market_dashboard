@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "input": {
+    "type": "object",
+    "properties": {
+      "mode": { "type": "string", "enum": ["trade", "stock"] },
+      "ticker": { "type": "string" },
+      "snapshot": {
+        "type": "object",
+        "description": "Numeric snapshot — caller assembles this from yfinance / snapshot.json. Unknown fields can be null.",
+        "properties": {
+          "currentPrice": { "type": ["number", "null"] },
+          "changePctIntraday": { "type": ["number", "null"] },
+          "changePct5d": { "type": ["number", "null"] },
+          "changePct20d": { "type": ["number", "null"] },
+          "atrPct": { "type": ["number", "null"] },
+          "rsi14": { "type": ["number", "null"] },
+          "macdSignal": { "type": ["string", "null"], "enum": ["bullish", "bearish", "neutral", null] },
+          "emaHierarchy": { "type": ["string", "null"], "enum": ["bullish", "bearish", "mixed", null] },
+          "adx": { "type": ["number", "null"] },
+          "volumeRatio": { "type": ["number", "null"] },
+          "marketCapTier": { "type": ["string", "null"], "enum": ["Large", "Mid", "Small", "Micro", null] },
+          "sector": { "type": ["string", "null"] },
+          "industry": { "type": ["string", "null"] },
+          "earningsDays": { "type": ["number", "null"] },
+          "halts90d": { "type": ["number", "null"] }
+        },
+        "additionalProperties": true
+      },
+      "trade": {
+        "type": ["object", "null"],
+        "description": "Required when mode=trade. Same shape as trader-scorer-trade input.",
+        "properties": {
+          "tradeDate": { "type": ["string", "null"] },
+          "side": { "type": ["string", "null"] },
+          "buyPrice": { "type": "string" },
+          "exitPrice": { "type": ["string", "null"] },
+          "quantity": { "type": ["string", "null"] },
+          "pnl": { "type": ["string", "null"] },
+          "notes": { "type": ["string", "null"] },
+          "proposedEntry": { "type": ["string", "null"] },
+          "proposedSL": { "type": ["string", "null"] },
+          "proposedTP": { "type": ["string", "null"] }
+        },
+        "required": ["buyPrice"]
+      }
+    },
+    "required": ["mode", "ticker", "snapshot"],
+    "additionalProperties": false
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "ticker": { "type": "string" },
+      "agents": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "summary": { "type": "string" },
+              "facts": { "type": "object", "additionalProperties": true }
+            },
+            "required": ["summary"]
+          },
+          "technical": {
+            "type": "object",
+            "properties": {
+              "summary": { "type": "string" },
+              "indicators": { "type": "object", "additionalProperties": true }
+            },
+            "required": ["summary"]
+          },
+          "chart": {
+            "type": "object",
+            "properties": {
+              "summary": { "type": "string" },
+              "pattern": { "type": ["string", "null"] },
+              "levels": { "type": "object", "additionalProperties": true }
+            },
+            "required": ["summary"]
+          },
+          "risk": {
+            "type": "object",
+            "properties": {
+              "summary": { "type": "string" },
+              "suggested_size_pct": { "type": ["number", "null"] },
+              "rr": { "type": ["number", "null"] },
+              "stop_distance_pct": { "type": ["number", "null"] },
+              "var_1d_pct": { "type": ["number", "null"] },
+              "status": { "type": "string", "enum": ["approved", "warn", "reject"] }
+            },
+            "required": ["summary", "status"]
+          }
+        },
+        "required": ["data", "technical", "chart", "risk"]
+      },
+      "moderator": {
+        "type": "object",
+        "properties": {
+          "signal": { "type": "string", "enum": ["BUY", "SELL", "HOLD"] },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 10 },
+          "consensus": { "type": "string" },
+          "entry": { "type": ["number", "null"] },
+          "stop": { "type": ["number", "null"] },
+          "target": { "type": ["number", "null"] },
+          "reasoning": { "type": "string" },
+          "lesson": { "type": ["string", "null"] }
+        },
+        "required": ["signal", "confidence", "reasoning"]
+      }
+    },
+    "required": ["ticker", "agents", "moderator"]
+  }
+}

@@ -1,0 +1,51 @@
+[
+  {
+    "handle": "@markminervini",
+    "name": "Mark Minervini",
+    "styleShort": "SEPA/Superperformance. Stage 2 uptrend ONLY. VCP base required (volatility contracting toward pivot). EPS acceleration + RS at new highs. Pivot breakout entry. Stop 7-8% below pivot. Score high for: Stage 2 confirmed, proper base >=5wks, clean breakout on volume. Score low for: below 50MA, no base, extended entry.",
+    "styleLong": "SEPA / Superperformance. Requires: Stage 2 uptrend confirmed (price above 50/150/200-day SMAs in order), VCP or tight consolidation base, EPS/RS acceleration, market in confirmed uptrend. Max 5-8% stop, never averages down, cuts losses fast. Will only enter from a proper base, never from an extended position. Verdict YES only if market structure is clearly Stage 2 with leaders setting up. WAIT if distribution or wide/loose action. SELECTIVE if mixed signals.",
+    "dimensions": "Entry: is there a VCP/base? Is it Stage 2? Risk: stop defined under pivot? Setup: EPS+RS confirmation?"
+  },
+  {
+    "handle": "@Clement_Ang17",
+    "name": "Clement Ang",
+    "styleShort": "Swing + Superperformance. Liquid leaders only. Pocket pivot or 21EMA pullback entry. 21/50 EMA confluence. Never cut winners early - trail with moving averages. Score high for: liquid A-rated leader, pullback to rising 21EMA on lower volume. Score low for: thin stock, no EMA support, chasing extended move.",
+    "styleLong": "Swing + Superperformance, process-driven. Looks for liquid leaders, pocket pivots, A-rated entries. Market context is paramount - only trades in confirmed uptrends. Keeps monthly drawdowns small, sells into strength, chips up. Avoids overtrading. Verdict YES if market is in clear uptrend with high-RS leaders setting up. SELECTIVE if earnings risk is elevated or market is extended. WAIT if choppy or distribution phase.",
+    "dimensions": "Entry: 21EMA pullback or pocket pivot? Risk: EMA-based trailing stop? Setup: liquid leader, sector leading?"
+  },
+  {
+    "handle": "@jfsrev",
+    "name": "Jeff (jfsrev)",
+    "styleShort": "Mechanical/Systematic. LoD must be < 60% ATR (tight stop). RVOL required at entry (institutional conviction). Not extended > 4x ATR from 50-MA. Delay 30 min post open unless extreme RVOL. No earnings within days. Score high for: RVOL confirmed, tight LoD, not extended. Score low for: no RVOL, wide stop, pre-earnings.",
+    "styleLong": "Mechanical / robust system with high failure rate built in. Systematic entry signals with pre-defined sell rules. Hard stop-loss triggers, never deviates from rules. A-rated entries only (clean base, no extended). Rigid process over discretion. Verdict YES if mechanically valid setups are present and market conditions are favourable. WAIT if no A-rated setups. SELECTIVE if setups exist but market context is marginal. NO if breadth is severely negative.",
+    "dimensions": "Entry: RVOL present? LoD < 60% ATR? Risk: stop width vs ATR? Setup: not extended, no binary events?"
+  },
+  {
+    "handle": "@TedHZhang",
+    "name": "Ted Zhang",
+    "styleShort": "Portfolio Manager/Institutional. Three-pillar thesis: sector leadership + fundamental quality + price structure. Longer holds. Score high for: high-quality company, sector leader, clean SMA stack (price>20>50>200), strong thesis. Score low for: weak fundamentals, sector laggard, below key MAs.",
+    "styleLong": "Portfolio Manager / institutional-quality trend trading (TURBOTECTION style). Looks for high-quality growth names, market leaders, sector rotation, institutional accumulation signals. Asymmetric risk management at portfolio level. Verdict YES if leading sectors show institutional accumulation and market is in uptrend. SELECTIVE if rotating between sectors. WAIT if defensive positioning is warranted. Focus on the best-in-class setups only.",
+    "dimensions": "Entry: SMA stack intact? Risk: position sized for portfolio? Setup: three-pillar thesis present?"
+  },
+  {
+    "handle": "@SRxTrades",
+    "name": "SRxTrades",
+    "styleShort": "Technical Swing. Two methods: (A) Breakout - tight coil above MAs, volume drying up, trigger = break above resistance on volume. (B) MA Pullback - 8/21/50 EMA pullback on LOW volume. 4-tranche exit: 25% at resistance, 25% at 8EMA break, 25% at 21EMA, 25% at 50EMA. Score high for: tight base, clean setup, volume confirms.",
+    "styleLong": "Technical swing + momentum. Breakouts with volume confirmation, momentum continuation setups. Defined stop below key technical level, disciplined R:R (minimum 2:1). Avoids choppy, low-volume entries. Verdict YES if clean breakouts with volume support and RS >= 70 leaders are present. SELECTIVE if setups exist but volume/breadth is mixed. WAIT if market is choppy or extended without consolidation.",
+    "dimensions": "Entry: breakout or MA pullback? Volume confirming? Risk: 4-tranche plan? Setup: coiled above MAs?"
+  },
+  {
+    "handle": "@PrimeTrading_",
+    "name": "Alex Desjardins (PrimeTrading_)",
+    "styleShort": "Momentum/Price Action. ONLY 21dma pullbacks - no breakout chasing. Entry must be within 0-1x ATR of rising 21dma. Liquid leaders, top RS. Earnings 7+ days away. Soft structure stop (close below 21dma = exit). Score high for: within ATR of 21dma, liquid, rising 21dma. Score low for: extended above 21dma, pre-earnings, illiquid.",
+    "styleLong": "Momentum + price action precision. Entry timing is critical - avoids overheated/extended conditions. Volume confirmation at key levels. Quick exits if thesis breaks. Tight stops. Verdict YES if momentum is confirmed with clean price action at key levels. SELECTIVE if price action is extended and needs a pullback entry. WAIT if market is overextended or key support levels are broken. Focus on timing over frequency.",
+    "dimensions": "Entry: within 1x ATR of rising 21dma? Risk: close below 21dma as stop? Setup: liquid leader, earnings clear?"
+  },
+  {
+    "handle": "@Qullamaggie",
+    "name": "Kristjan Kullamagi (Qullamaggie)",
+    "styleShort": "Momentum Breakouts + Episodic Pivots. Trades a few repeatable high-velocity setups. Breakout: strong prior 30-100% move, tight 2w-2m base, ORH/daily breakout trigger. EP: fresh catalyst, ideally 10%+ gap and huge opening volume. Stop = low of day, not wider than ATR/ADR. Risk 0.25-1%, position usually 10-20%, max 30% overnight.",
+    "styleLong": "Momentum breakout and episodic pivot specialist. Wants either a clean common breakout from a tight base after a strong prior move, or a true catalyst-driven EP with a large gap and exceptional volume. Entry is usually through opening-range highs or a clean daily breakout level. Initial stop is low of day and should not be wider than ATR/ADR. Typically risks 0.25-1% of account, sizes most positions at 10-20%, and avoids holding more than 30% overnight in one stock/ETF. Takes partial profit after 3-5 days when the trade works, moves stop to breakeven, and trails the rest with the 10/20-day moving averages. Verdict YES only when momentum, setup quality, volume, risk distance, and liquidity align.",
+    "dimensions": "Entry: clean breakout/ORH or EP trigger? Risk: LOD stop within ATR/ADR and size within 0.25-1% risk? Setup: prior momentum or catalyst, tight base/clear air, volume confirmation?"
+  }
+]

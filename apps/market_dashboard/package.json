@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "sync:market": "node scripts/sync-market-dashboard.mjs",
+    "skills:sync": "node ../../scripts/skill-sync.mjs",
+    "skills:check": "node ../../scripts/check-skill-sync.mjs",
+    "skills:check:strict": "node ../../scripts/check-skill-sync.mjs --strict",
     "dev": "next dev --turbopack",
     "build": "prisma migrate resolve --rolled-back 20260426000000_add_trade_plan_and_verdict_fields 2>/dev/null; prisma migrate deploy && next build",
     "start": "next start",

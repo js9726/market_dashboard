@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "input": {
+    "type": "object",
+    "properties": {
+      "ticker": { "type": "string" },
+      "tradeDate": { "type": ["string", "null"] },
+      "side": { "type": ["string", "null"] },
+      "buyPrice": { "type": "string" },
+      "exitPrice": { "type": ["string", "null"] },
+      "quantity": { "type": ["string", "null"] },
+      "fees": { "type": ["string", "null"] },
+      "pnl": { "type": ["string", "null"] },
+      "notes": { "type": ["string", "null"] },
+      "strategy": { "type": ["string", "null"] },
+      "industry": { "type": ["string", "null"] },
+      "platform": { "type": ["string", "null"] },
+      "proposedEntry": { "type": ["string", "null"] },
+      "proposedSL": { "type": ["string", "null"] },
+      "proposedTP": { "type": ["string", "null"] },
+      "rrr": { "type": ["string", "null"] },
+      "riskPct": { "type": ["string", "null"] },
+      "rewardPct": { "type": ["string", "null"] },
+      "positionPct": { "type": ["string", "null"] }
+    },
+    "required": ["ticker", "buyPrice"],
+    "additionalProperties": false
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "ticker": { "type": "string" },
+      "sector": { "type": "string" },
+      "industry": { "type": "string" },
+      "market_cap_tier": { "type": "string", "enum": ["Large", "Mid", "Small", "Micro"] },
+      "is_open": { "type": "boolean" },
+      "trader_reviews": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "handle": { "type": "string" },
+            "entry_score": { "type": "number", "minimum": 0, "maximum": 4 },
+            "risk_score": { "type": "number", "minimum": 0, "maximum": 3 },
+            "setup_score": { "type": "number", "minimum": 0, "maximum": 3 },
+            "total_score": { "type": "number", "minimum": 0, "maximum": 10 },
+            "verdict": { "type": "string", "enum": ["GREAT ENTRY", "GOOD ENTRY", "ACCEPTABLE", "POOR ENTRY", "MISTAKE"] },
+            "note": { "type": "string" }
+          },
+          "required": ["handle", "entry_score", "risk_score", "setup_score", "total_score", "verdict", "note"]
+        }
+      },
+      "best_match": { "type": "string" },
+      "weakest_dimension": { "type": "string", "enum": ["Entry Quality", "Risk Management", "Setup Alignment"] },
+      "bull_case": { "type": "array", "items": { "type": "string" } },
+      "bear_case": { "type": "array", "items": { "type": "string" } },
+      "entry_plan": {
+        "type": "object",
+        "properties": {
+          "ideal_entry": { "type": "string" },
+          "stop_loss": { "type": "string" },
+          "target_1": { "type": "string" },
+          "target_2": { "type": "string" },
+          "position_size": { "type": "string" },
+          "batch_sells": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tranche": { "type": "string" },
+                "at": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "overall_score": { "type": "number", "minimum": 0, "maximum": 10 },
+      "overall_verdict": { "type": "string", "enum": ["GREAT ENTRY", "GOOD ENTRY", "ACCEPTABLE", "POOR ENTRY", "MISTAKE"] },
+      "lesson": { "type": "string" }
+    },
+    "required": ["ticker", "trader_reviews", "overall_score", "overall_verdict", "lesson"]
+  }
+}

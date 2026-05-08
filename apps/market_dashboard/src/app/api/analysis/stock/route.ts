@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import yahooFinance from "yahoo-finance2";
-import { auth } from "@/auth";
+import { requireUserIdAndQuota, incrementScanCount } from "@/lib/auth-helpers";
 import { callLLM } from "@/utils/llm-router";
-import { TRADER_PROFILES } from "@/lib/trader-profiles";
+import {
+  buildPrompt as buildStockPrompt,
+  SYSTEM_PROMPT as stockAnalystSystem,
+  type StockDisplayFields,
+} from "@core-skills/trader-scorer-stock/handler";
 
 async function fetchStockData(ticker: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,8 +18,6 @@ async function fetchStockData(ticker: string) {
   );
   return summary as Record<string, unknown>;
 }
-
-const stockAnalystSystem = `You are an expert stock market analyst. Analyze the provided stock data through the lens of 6 specific trader styles and return ONLY valid JSON, no markdown fences.`;
 
 function fmt(v: number | null | undefined, decimals = 2): string {
   if (v == null) return "N/A";
@@ -30,10 +32,9 @@ function fmtBig(v: number | null | undefined): string {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireUserIdAndQuota();
+  if (guard.error) return guard.error;
+  const userId = guard.userId;
 
   try {
     const body = await request.json();
@@ -113,57 +114,26 @@ FUNDAMENTALS:
 - Dividend Yield: ${dividendYield != null ? fmt(dividendYield * 100) + "%" : "None"}
 `;
 
-    const traderList = TRADER_PROFILES.map((t) => `${t.handle}: ${t.style}`).join("\n\n");
-
-    const prompt = `Analyze this stock through 6 trader style lenses and return a JSON object.
-
-${stockContext}
-
-TRADER PROFILES:
-${traderList}
-
-Return ONLY this JSON structure (no markdown, no explanation):
-{
-  "name": "${name}",
-  "sector": "${sector ?? ""}",
-  "industry": "${industry ?? ""}",
-  "exchange": "${exchange ?? ""}",
-  "price": ${currentPrice ?? "null"},
-  "price_change_pct": ${changePct != null ? +changePct.toFixed(2) : "null"},
-  "week52_low": ${week52Low ?? "null"},
-  "week52_high": ${week52High ?? "null"},
-  "analyst_pt": ${analystPT ?? "null"},
-  "earnings_date": "${earningsDate ?? ""}",
-  "earnings_days": ${earningsDays ?? "null"},
-  "market_cap": "${fmtBig(marketCap)}",
-  "revenue_ttm": "${fmtBig(totalRevenue)}",
-  "gross_margin_pct": ${grossMargins != null ? +(grossMargins * 100).toFixed(1) : "null"},
-  "trailing_eps": ${trailingEps ?? "null"},
-  "forward_eps": ${forwardEps ?? "null"},
-  "dividend_yield_pct": ${dividendYield != null ? +(dividendYield * 100).toFixed(2) : "null"},
-  "trader_analysis": [
-    {
-      "handle": "@markminervini",
-      "score": <number 1-10>,
-      "verdict": "<STRONG BUY | BUY | HOLD | AVOID | STRONG AVOID>",
-      "note": "<2-3 sentence reasoning specific to this trader's style and the stock data>"
-    },
-    ... (all 6 traders)
-  ],
-  "entry_plan": {
-    "zone": "<price range, e.g. $45.20–$46.00>",
-    "stop": "<stop loss price>",
-    "target": "<price target>",
-    "risk_reward": <number>,
-    "batches": "<entry batching strategy, e.g. 50% at breakout, 50% on first pullback>"
-  },
-  "bulls": ["<bull case point 1>", "<bull case point 2>", "<bull case point 3>"],
-  "bears": ["<bear case point 1>", "<bear case point 2>"],
-  "composite_score": <number 1-10 weighted average>,
-  "composite_verdict": "<STRONG BUY | BUY | HOLD | AVOID | STRONG AVOID>",
-  "composite_note": "<1-2 sentence overall summary>",
-  "best_match_trader": "<handle of trader whose style fits best>"
-}`;
+    const display: StockDisplayFields = {
+      name,
+      sector,
+      industry,
+      exchange,
+      currentPrice,
+      changePct,
+      week52Low,
+      week52High,
+      analystPT,
+      earningsDate,
+      earningsDays,
+      marketCap: fmtBig(marketCap),
+      revenueTtm: fmtBig(totalRevenue),
+      grossMarginPct: grossMargins != null ? grossMargins * 100 : null,
+      trailingEps,
+      forwardEps,
+      dividendYieldPct: dividendYield != null ? dividendYield * 100 : null,
+    };
+    const prompt = buildStockPrompt({ stockContext, display });
 
     const raw = await callLLM(prompt, stockAnalystSystem, { maxTokens: 2048, provider });
 
@@ -171,9 +141,18 @@ Return ONLY this JSON structure (no markdown, no explanation):
     try {
       const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
       analysis = JSON.parse(cleaned);
-    } catch {
+    } catch (parseErr) {
+      console.error(
+        "[/api/analysis/stock] LLM returned invalid JSON for ticker=%s. Error: %s. Raw output (first 500 chars): %s",
+        ticker,
+        parseErr instanceof Error ? parseErr.message : String(parseErr),
+        raw.slice(0, 500)
+      );
       return NextResponse.json({ error: "AI returned invalid JSON. Please try again." }, { status: 500 });
     }
+
+    // Quota: increment only after successful LLM call + parse. Failed runs do NOT consume quota.
+    await incrementScanCount(userId);
 
     return NextResponse.json(analysis);
   } catch (err) {

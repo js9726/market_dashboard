@@ -7,8 +7,9 @@ import ChatInterface from "@/components/ChatInterface";
 import MarketMetricsDashboard from "@/components/market/MarketMetricsDashboard";
 import MorningBrief from "@/components/market/MorningBrief";
 import JournalShell from "@/components/journal/JournalShell";
+import ScannerView from "@/components/scanner/ScannerView";
 
-type Tab = "brief" | "overview" | "chat" | "journal";
+type Tab = "brief" | "overview" | "scanner" | "chat" | "journal";
 
 export default function DashboardShell() {
   const [tab, setTab] = useState<Tab>("brief");
@@ -29,6 +30,7 @@ export default function DashboardShell() {
               [
                 { id: "brief", label: "Morning Brief" },
                 { id: "overview", label: "Overview" },
+                { id: "scanner", label: "Scanner" },
                 { id: "chat", label: "Chat ($tickers)" },
                 { id: "journal", label: "Trade Journal" },
               ] as { id: Tab; label: string }[]
@@ -61,6 +63,7 @@ export default function DashboardShell() {
       <main className="container mx-auto max-w-6xl px-4 py-6">
         {tab === "brief" && <MorningBrief />}
         {tab === "overview" && <MarketMetricsDashboard />}
+        {tab === "scanner" && <ScannerView />}
         {tab === "chat" && (
           <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
             <ChatInterface />

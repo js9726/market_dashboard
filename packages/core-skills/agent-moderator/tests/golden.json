@@ -1,0 +1,80 @@
+{
+  "description": "Frozen input → expected output shape (not values; LLM output is non-deterministic). Validates that buildPrompt() composes a stable structure.",
+  "fixtures": [
+    {
+      "name": "stock-mode-bullish-snapshot",
+      "input": {
+        "mode": "stock",
+        "ticker": "NVDA",
+        "snapshot": {
+          "currentPrice": 945.20,
+          "changePctIntraday": 2.84,
+          "changePct5d": 5.12,
+          "changePct20d": 14.62,
+          "atrPct": 1.5,
+          "rsi14": 62,
+          "macdSignal": "bullish",
+          "emaHierarchy": "bullish",
+          "adx": 28,
+          "volumeRatio": 1.8,
+          "marketCapTier": "Large",
+          "sector": "Technology",
+          "industry": "Semiconductors",
+          "earningsDays": 21,
+          "halts90d": 0
+        },
+        "trade": null
+      },
+      "expectedPromptContains": [
+        "## Mode\nstock",
+        "## Ticker\nNVDA",
+        "Current price: 945.20",
+        "RSI(14): 62.0",
+        "Volume vs 20-day avg: 1.80×",
+        "Days to next earnings: 21",
+        "## Output schema"
+      ],
+      "expectedOutputKeys": ["ticker", "agents", "moderator"]
+    },
+    {
+      "name": "trade-mode-closed-loss",
+      "input": {
+        "mode": "trade",
+        "ticker": "TSLA",
+        "snapshot": {
+          "currentPrice": 224.0,
+          "changePctIntraday": -3.5,
+          "rsi14": 38,
+          "macdSignal": "bearish",
+          "emaHierarchy": "bearish",
+          "atrPct": 3.2
+        },
+        "trade": {
+          "tradeDate": "2026-04-15",
+          "side": "Long",
+          "buyPrice": "247.80",
+          "exitPrice": "230.50",
+          "quantity": "100",
+          "pnl": "-1730.00",
+          "notes": "Bought breakout that failed.",
+          "proposedEntry": "247.50",
+          "proposedSL": "240.00",
+          "proposedTP": "270.00"
+        }
+      },
+      "expectedPromptContains": [
+        "## Mode\ntrade",
+        "## Ticker\nTSLA",
+        "## Trade",
+        "State: CLOSED",
+        "Side: Long",
+        "Buy price: $247.80",
+        "Exit price: $230.50",
+        "P&L: $-1730.00",
+        "Notes: Bought breakout that failed.",
+        "lesson"
+      ],
+      "expectedOutputKeys": ["ticker", "agents", "moderator"]
+    }
+  ]
+}

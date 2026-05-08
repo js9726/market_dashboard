@@ -1,0 +1,13 @@
+[
+  {
+    "name": "renders date and watchlist into prompt template",
+    "input": {
+      "date_str": "Wednesday, April 29, 2026",
+      "watchlist": ["NVDA", "TSLA"]
+    },
+    "expectedContains": [
+      "Morning Brief — Wednesday, April 29, 2026",
+      "WATCHLIST: NVDA, TSLA"
+    ]
+  }
+]

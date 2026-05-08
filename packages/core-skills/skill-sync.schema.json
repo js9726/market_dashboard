@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Market Dashboard Skill Sync Manifest",
+  "type": "object",
+  "required": ["version", "targetsRoot", "sourceRoots", "skills"],
+  "properties": {
+    "version": { "type": "integer" },
+    "description": { "type": "string" },
+    "targetsRoot": { "type": "string" },
+    "sourceRoots": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["candidates"],
+        "properties": {
+          "description": { "type": "string" },
+          "candidates": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "enabled"],
+        "properties": {
+          "id": { "type": "string" },
+          "status": { "type": "string" },
+          "enabled": { "type": "boolean" },
+          "reason": { "type": "string" },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "target", "strategy", "sources"],
+              "properties": {
+                "kind": { "enum": ["knowledge", "prompt"] },
+                "target": { "type": "string" },
+                "required": { "type": "boolean" },
+                "strategy": { "enum": ["concat-markdown"] },
+                "title": { "type": "string" },
+                "sources": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["root", "path"],
+                    "properties": {
+                      "root": { "type": "string" },
+                      "path": { "type": "string" }
+                    }
+                  }
+                },
+                "applicationNotes": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
