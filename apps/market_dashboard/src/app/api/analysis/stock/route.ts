@@ -6,7 +6,7 @@ import {
   buildPrompt as buildStockPrompt,
   SYSTEM_PROMPT as stockAnalystSystem,
   type StockDisplayFields,
-} from "@core-skills/trader-scorer-stock/handler";
+} from "@/lib/trader-scorer-stock/handler";
 
 async function fetchStockData(ticker: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

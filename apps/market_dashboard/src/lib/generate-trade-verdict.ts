@@ -5,13 +5,13 @@ import {
   parseNumeric,
   SYSTEM_PROMPT as tradeReviewSystemPrompt,
   type TradePromptInput,
-} from "@core-skills/trader-scorer-trade/handler";
+} from "@/lib/trader-scorer-trade/handler";
 import {
   buildPrompt as buildAgentModeratorPrompt,
   SYSTEM_PROMPT as agentModeratorSystemPrompt,
   type ModeratorPromptInput,
   type SnapshotInput,
-} from "../../../../packages/core-skills/agent-moderator/handler";
+} from "@/lib/agent-moderator/handler";
 import type { Prisma } from "@prisma/client";
 
 export type ReviewStyle = "trader-debate" | "agent-pipeline";
