@@ -51,7 +51,19 @@ def _read_input(argv: list[str]) -> str:
                 sys.exit(2)
             return argv[2]
         # treat first arg as a file path
-        with open(argv[1], encoding="utf-8") as fh:
+        path = argv[1]
+        if not os.path.exists(path):
+            print(
+                f"\nERROR: File not found: {path!r}\n\n"
+                "Options:\n"
+                "  1. Re-run and push in one step:  python cli_run.py --provider gemini --post\n"
+                "  2. Save first, then ingest:       python cli_run.py --out brief_output.json\n"
+                "                                    python ingest_to_dashboard.py brief_output.json\n"
+                "  3. Pipe JSON via stdin:            echo '{...}' | python ingest_to_dashboard.py\n",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        with open(path, encoding="utf-8") as fh:
             return fh.read()
     # read from stdin
     return sys.stdin.read()
