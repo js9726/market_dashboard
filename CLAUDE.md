@@ -16,7 +16,7 @@ Behavioral guidelines for AI-assisted development on this repo.
 | AI Agents | `apps/market_dashboard/agents/` | Fundamental (yahoo-finance2 + DeepSeek), Technical |
 | Runtime Skills | `packages/core-skills/` | LLM prompts + dual TS/Python handlers |
 | Auth | `apps/market_dashboard/src/middleware.ts` | NextAuth v5 (Google OAuth) + Prisma |
-| Automation | `.github/workflows/refresh_data.yml` | GitHub Actions (Mon–Fri, every 30 min from 12:00–18:30 UTC) |
+| Automation | `.github/workflows/refresh_data.yml` | GitHub Actions (Mon–Fri, single 13:00 UTC pre-market run; intraday refreshes via `/api/morning-verdict` lazy regen) |
 | Deployment | `apps/market_dashboard/vercel.json` + Vercel project settings | Vercel project targets `apps/market_dashboard` |
 
 ### Key Data Flow
@@ -142,7 +142,11 @@ Define success criteria. Loop until verified.
 | `DATABASE_URL` | Yes | Postgres (Prisma) |
 | `OWNER_EMAIL` | Yes | Auto-promoted to `owner` role |
 | `NEXTAUTH_URL` | Yes (prod) | Base URL for internal API calls |
-| `DEEPSEEK_API_KEY` | Optional | AI stock analysis tab |
+| `DEEPSEEK_API_KEY` | Yes (Phase 5) | AI stock analysis tab + intraday morning verdict regen |
+| `BRIEF_INGEST_KEY` | Yes (Phase 5) | Shared secret for `POST /api/morning-verdict/ingest` (cron writes brief rows) |
+| `LIVE_QUOTE_INGEST_KEY` | Yes (Phase 5) | Shared secret for `POST /api/live-quotes/ingest` (moomoo daemon + Yahoo fallback) |
+| `MOOMOO_OPEND_HOST` | Optional (local-only) | moomoo OpenD host for `live_quote_daemon.py` (default `127.0.0.1`) |
+| `MOOMOO_OPEND_PORT` | Optional (local-only) | moomoo OpenD port (default `11111`) |
 
 Never commit `.env.local`. Never log keys. Never hardcode secrets.
 

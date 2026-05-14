@@ -45,76 +45,22 @@ _load_env()
 
 
 # ---------------------------------------------------------------------------
-# Trader profiles — styles define how each trader evaluates market conditions
+# Trader profiles — loaded from packages/core-skills/_shared/trader-profiles.json
+# (single source of truth shared with the TS frontend)
 # ---------------------------------------------------------------------------
 
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_SHARED_DIR = os.path.normpath(
+    os.path.join(_HERE, "..", "..", "..", "packages", "core-skills", "_shared")
+)
+if _SHARED_DIR not in sys.path:
+    sys.path.insert(0, _SHARED_DIR)
+
+from prompt_loader import load_trader_profiles  # noqa: E402
+
 TRADER_PROFILES = [
-    {
-        "handle": "@markminervini",
-        "name": "Mark Minervini",
-        "style": (
-            "SEPA / Superperformance. Requires: Stage 2 uptrend confirmed (price above 50/150/200-day SMAs "
-            "in order), VCP or tight consolidation base, EPS/RS acceleration, market in confirmed uptrend. "
-            "Max 5-8% stop, never averages down, cuts losses fast. Will only enter from a proper base, "
-            "never from an extended position. Verdict YES only if market structure is clearly Stage 2 "
-            "with leaders setting up. WAIT if distribution or wide/loose action. SELECTIVE if mixed signals."
-        ),
-    },
-    {
-        "handle": "@Clement_Ang17",
-        "name": "Clement Ang",
-        "style": (
-            "Swing + Superperformance, process-driven. Looks for liquid leaders, pocket pivots, A-rated "
-            "entries. Market context is paramount — only trades in confirmed uptrends. Keeps monthly "
-            "drawdowns small, sells into strength, chips up. Avoids overtrading. Verdict YES if market "
-            "is in clear uptrend with high-RS leaders setting up. SELECTIVE if earnings risk is elevated "
-            "or market is extended. WAIT if choppy or distribution phase."
-        ),
-    },
-    {
-        "handle": "@jftrev",
-        "name": "Jeff (jftrev)",
-        "style": (
-            "Mechanical / robust system with high failure rate built in. Systematic entry signals with "
-            "pre-defined sell rules. Hard stop-loss triggers, never deviates from rules. A-rated entries "
-            "only (clean base, no extended). Rigid process over discretion. Verdict YES if mechanically "
-            "valid setups are present and market conditions are favourable. WAIT if no A-rated setups. "
-            "SELECTIVE if setups exist but market context is marginal. NO if breadth is severely negative."
-        ),
-    },
-    {
-        "handle": "@TedHZhang",
-        "name": "Ted Zhang",
-        "style": (
-            "Portfolio Manager / institutional-quality trend trading (TURBOTECTION® style). Looks for "
-            "high-quality growth names, market leaders, sector rotation, institutional accumulation "
-            "signals. Asymmetric risk management at portfolio level. Verdict YES if leading sectors show "
-            "institutional accumulation and market is in uptrend. SELECTIVE if rotating between sectors. "
-            "WAIT if defensive positioning is warranted. Focus on the best-in-class setups only."
-        ),
-    },
-    {
-        "handle": "@SRxTrades",
-        "name": "SRxTrades",
-        "style": (
-            "Technical swing + momentum. Breakouts with volume confirmation, momentum continuation setups. "
-            "Defined stop below key technical level, disciplined R:R (minimum 2:1). Avoids choppy, "
-            "low-volume entries. Verdict YES if clean breakouts with volume support and RS ≥ 70 leaders "
-            "are present. SELECTIVE if setups exist but volume/breadth is mixed. WAIT if market is "
-            "choppy or extended without consolidation."
-        ),
-    },
-    {
-        "handle": "@PrimeTrading_",
-        "name": "Alex Desjardins (PrimeTrading_)",
-        "style": (
-            "Momentum + price action precision. Entry timing is critical — avoids overheated/extended "
-            "conditions. Volume confirmation at key levels. Quick exits if thesis breaks. Tight stops. "
-            "Verdict YES if momentum is confirmed with clean price action at key levels. SELECTIVE if "
-            "price action is extended and needs a pullback entry. WAIT if market is overextended "
-            "or key support levels are broken. Focus on timing over frequency."
-        ),
-    },
+    {"handle": p["handle"], "name": p["name"], "style": p["styleLong"]}
+    for p in load_trader_profiles()
 ]
 
 REQUIRED_HANDLES = {p["handle"] for p in TRADER_PROFILES}
@@ -207,52 +153,16 @@ def build_market_context(snapshot: dict) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Prompt builder
+# Prompt builder — delegated to packages/core-skills/trader-scorer-market
 # ---------------------------------------------------------------------------
 
-def build_prompt(date_str: str, market_context: str) -> str:
-    profiles_text = "\n\n".join(
-        f"  {p['handle']} ({p['name']}):\n  {p['style']}"
-        for p in TRADER_PROFILES
-    )
+_SKILL_DIR = os.path.normpath(
+    os.path.join(_HERE, "..", "..", "..", "packages", "core-skills", "trader-scorer-market")
+)
+if _SKILL_DIR not in sys.path:
+    sys.path.insert(0, _SKILL_DIR)
 
-    handles_list = ", ".join(p["handle"] for p in TRADER_PROFILES)
-    schema_example = json.dumps({
-        "date": date_str,
-        "traders": [
-            {"handle": "@markminervini", "verdict": "YES", "note": "One or two sentences explaining why, in this trader's voice."},
-            {"handle": "@Clement_Ang17", "verdict": "SELECTIVE", "note": "..."},
-        ],
-        "open_positions": [],
-        "planning_entries": [],
-    }, indent=2)
-
-    return f"""You are simulating how 6 professional traders would assess today's market conditions ({date_str}).
-Analyse the market snapshot below and produce a JSON verdict for each trader.
-
-MARKET SNAPSHOT:
-{market_context}
-
-TRADER PROFILES (6 traders — one JSON entry each):
-{profiles_text}
-
-TASK:
-For each of the 6 traders ({handles_list}), produce a verdict based on their specific style and the market data above.
-- verdict must be exactly one of: "YES" (enter new positions now), "WAIT" (stand aside), "SELECTIVE" (only the very best setups), "NO" (close longs / avoid)
-- note must be 1-2 tight sentences (≤180 chars) in that trader's voice — specific, actionable, referencing the actual data
-- Be consistent: the same snapshot should yield the same verdict if run again
-
-OUTPUT:
-Return ONLY a raw JSON object — no markdown fences, no explanation, no preamble.
-The JSON must match this exact schema:
-{schema_example}
-
-Rules:
-- Include all 6 trader handles — no additions, no omissions
-- open_positions and planning_entries must be empty arrays [] — do not fabricate user portfolio data
-- Verdict labels must be uppercase: YES | WAIT | SELECTIVE | NO
-- Notes must not exceed 200 characters each
-"""
+from handler import build_prompt  # noqa: E402,F401
 
 
 # ---------------------------------------------------------------------------
@@ -461,7 +371,7 @@ def _rule_based_verdict(snapshot: dict, date_str: str) -> dict:
         market_note    = f"SPY ABC={spy_abc}, breadth ratio={ratio:.2f}. Mixed signals — best setups only."
 
     style_overrides = {
-        "@jftrev": ("WAIT" if market_verdict == "YES" else market_verdict,
+        "@jfsrev": ("WAIT" if market_verdict == "YES" else market_verdict,
                     "Systematic rules require A-rated base + confirm. Raise bar in current conditions."),
         "@TedHZhang": (market_verdict,
                        f"Sector rotation monitor active. {market_note}"),

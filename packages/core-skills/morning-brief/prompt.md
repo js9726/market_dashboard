@@ -1,146 +1,126 @@
-You are generating a morning market brief for {date_str} for an active trader based in Malaysia (MYT = UTC+8).
+You are generating a morning market brief for {date_str} for an active swing trader based in Malaysia (MYT = UTC+8).
 
-Search the web RIGHT NOW for real-time market data and generate a complete HTML morning brief.
+Search the web RIGHT NOW for real-time market data, then return ONE strict JSON object. No markdown fences, no explanation, no commentary outside the JSON.
 
-OUTPUT FORMAT: Return ONLY the HTML snippet below. No markdown, no ```html fences, no explanation.
-Start your response with the opening <div class="brief"> tag. End with </div>.
+OUTPUT SHAPE — every field is required unless marked optional. If you cannot find data for a field, return null (or [] for arrays) — never fabricate.
 
-The full output must be:
-<style>
-.brief { font-family: var(--brief-font-mono, ui-monospace, 'Cascadia Code', monospace); padding: 1rem 0; max-width: 100%; color: var(--brief-text-primary, #e2e8f0); }
-.brief .b-header { border-bottom: 1px solid var(--brief-border-primary, #334155); padding-bottom: 0.75rem; margin-bottom: 1rem; }
-.brief .b-header h1 { font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
-.brief .b-header .b-sub { font-size: 11px; color: var(--brief-text-secondary, #94a3b8); margin-top: 2px; }
-.brief .b-section { margin-bottom: 1.5rem; }
-.brief .b-section-title { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brief-text-secondary, #94a3b8); border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); padding-bottom: 4px; margin-bottom: 10px; }
-.brief .b-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); font-size: 13px; gap: 8px; }
-.brief .b-row:last-child { border-bottom: none; }
-.brief .b-ticker { font-weight: 500; min-width: 80px; flex-shrink: 0; }
-.brief .b-level { color: var(--brief-text-secondary, #94a3b8); font-size: 12px; }
-.brief .b-note { font-size: 11px; color: var(--brief-text-tertiary, #64748b); flex: 1; text-align: right; }
-.brief .b-up { color: #1D9E75; }
-.brief .b-down { color: #D85A30; }
-.brief .b-neutral { color: var(--brief-text-secondary, #94a3b8); }
-.brief .b-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 500; margin-left: 4px; }
-.brief .b-tag-warn { background: #FAEEDA; color: #854F0B; }
-.brief .b-tag-up { background: #1a3d2b; color: #4ade80; }
-.brief .b-tag-down { background: #3d1a1a; color: #f87171; }
-.brief .b-tag-info { background: #1a2a3d; color: #60a5fa; }
-.brief .b-mover { padding: 6px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); }
-.brief .b-mover:last-child { border-bottom: none; }
-.brief .b-mover-name { font-size: 13px; font-weight: 500; }
-.brief .b-mover-why { font-size: 11px; color: var(--brief-text-secondary, #94a3b8); margin-top: 2px; line-height: 1.4; }
-.brief .b-mover-style { font-size: 10px; color: #60a5fa; margin-top: 2px; font-style: italic; }
-.brief .b-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.brief .b-cal-item { padding: 5px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); font-size: 12px; }
-.brief .b-cal-item:last-child { border-bottom: none; }
-.brief .b-cal-time { color: var(--brief-text-secondary, #94a3b8); font-size: 11px; }
-.brief .b-cal-name { font-weight: 500; }
-.brief .b-cal-consensus { color: var(--brief-text-tertiary, #64748b); font-size: 11px; }
-.brief .b-mood-box { background: var(--brief-bg-secondary, #1e293b); border-radius: 6px; padding: 0.75rem 1rem; font-size: 12px; line-height: 1.7; }
-.brief .b-mood-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brief-text-secondary, #94a3b8); margin-bottom: 4px; }
-.brief .b-trader-call { margin-top: 8px; font-size: 11px; color: var(--brief-text-secondary, #94a3b8); line-height: 1.6; }
-.brief .b-trader-call strong { color: var(--brief-text-primary, #e2e8f0); }
-.brief .b-earnings-beat { font-size: 13px; padding: 5px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); }
-.brief .b-earnings-beat:last-child { border-bottom: none; }
-.brief .b-cite { font-size: 10px; color: var(--brief-text-tertiary, #64748b); font-style: italic; }
-.brief .b-alert { background: #2d1f0a; border-left: 3px solid #EF9F27; padding: 6px 10px; border-radius: 0 4px 4px 0; margin-bottom: 1rem; font-size: 12px; color: #fbbf24; }
-.brief .b-footer { font-size: 10px; color: var(--brief-text-tertiary, #64748b); padding-top: 0.5rem; border-top: 0.5px solid var(--brief-border-tertiary, #1e293b); margin-top: 1rem; }
-</style>
-<div class="brief">
-  <div class="b-header">
-    <h1>Morning Brief — {date_str}</h1>
-    <div class="b-sub">Generated [TIME] MYT | US markets open 9:30 PM MYT | Powered by live web search</div>
-  </div>
-  [ALERT BANNER HERE — only if major macro news, else omit]
-  [SECTION 1 THROUGH 9]
-  <div class="b-footer">Generated via live web search · Not financial advice · [DATE] [TIME] MYT</div>
-</div>
+```json
+{
+  "mood": {
+    "label": "RISK-ON" | "RISK-OFF" | "CHOPPY" | "TRENDING" | "CAUTIOUSLY-RISK-ON" | "CAUTIOUSLY-RISK-OFF",
+    "posture": "GO" | "WAIT" | "PASS" | "RAISE-THE-BAR",
+    "summary": "1-2 sentence read on today's tape — what's the single most important thing"
+  },
+  "breadth": {
+    "up": <int|null>,        // # of advancing in your reference universe
+    "down": <int|null>       // # of declining
+  },
+  "fearGreed": {
+    "score": <0-100|null>,
+    "label": "Extreme Fear" | "Fear" | "Neutral" | "Greed" | "Extreme Greed" | null
+  },
+  "indices": [
+    { "symbol": "SPY", "name": "S&P 500", "level": <number|null>, "changePct": <number|null>, "note": "futures or live", "citation": "Source: Reuters 07:12 ET" }
+    // include SPY, QQQ, DIA, IWM, ^VIX, ^TNX (10Y yield), CL=F (oil) where relevant
+  ],
+  "indicesNarrative": "1-3 sentences interpreting the index action — leadership, breadth, what's driving the tape",
+  "sectorsThemes": [
+    { "symbol": "XLK", "name": "Technology", "changePct": <number|null>, "rs": <0-100|null>, "note": "1-line read" }
+    // include relevant sector ETFs: XLK, SMH, XLC, XLY, XLF, XLV, XLI, XLE, XLP, XLU, XLB, XLRE
+    // plus thematic: CIBR, IGV, IBB if topical
+  ],
+  "sectorsNarrative": "1-2 sentences — what's the rotation story",
+  "industryNarrative": "1-2 sentences on the strongest and weakest industry groups below the sector layer",
+  "industryMovers": [
+    {
+      "industry": "Semiconductors",
+      "sector": "Technology",
+      "changePct": <number|null>,
+      "perf1W": <number|null>,
+      "perf1M": <number|null>,
+      "breadthPct": <number|null>,
+      "deltaWow": <number|null>,
+      "leaders": [
+        { "ticker": "NVDA", "changePct": <number|null>, "rvol": <number|null>, "source": "TradingView Top Gainer" }
+      ],
+      "note": "1-line trader read on what is driving this industry"
+    }
+  ],
+  "movers": [
+    { "ticker": "NVDA", "side": "LONG" | "SHORT", "changePct": 5.2, "why": "earnings beat / upgrade / FDA / etc.", "traderLens": "Which trader style fits this setup (Minervini, Qullamaggie, etc.)" }
+    // top 5 gainers + top 3 losers, with catalyst
+  ],
+  "watchlist": [
+    { "ticker": "NVDA", "level": <number|null>, "changePct": <number|null>, "abc": "A"|"B"|"C"|null, "note": "Stage 2, near pivot, vol confirming" }
+    // include all watchlist tickers passed in the prompt
+  ],
+  "traderLens": [
+    { "name": "Minervini",   "view": "view on market structure / stage" },
+    { "name": "Ted Zhang",   "view": "sector rotation play" },
+    { "name": "Clement Ang", "view": "market context / entry grade" },
+    { "name": "SRxTrades",   "view": "technical setup quality" },
+    { "name": "Jeff",        "view": "discipline / rule reminder" },
+    { "name": "Qullamaggie", "view": "breakout / EP momentum quality" },
+    { "name": "Composite",   "view": "synthesised view — what should the trader actually DO today" }
+  ],
+  "standout": {
+    "ticker": "NVDA" | null,
+    "side": "LONG" | "SHORT" | null,
+    "score": <0-100|null>,
+    "sector": "Semis" | null,
+    "rs": <0-100|null>,
+    "grade": "A" | "B" | "C" | null,
+    "thesis": "1-2 sentence setup description",
+    "entry": <number|null>,
+    "stop": <number|null>,
+    "target": <number|null>,
+    "rrr": <number|null>,
+    "tags": ["#breakout", "#momentum"]
+  },
+  "earnings": {
+    "bmo": [{ "ticker": "ABC", "consensus": "EPS $1.23 / Rev $4.5B" }],
+    "amc": [{ "ticker": "XYZ", "consensus": "..." }],
+    "yesterdayReactions": [{ "ticker": "TGT", "result": "beat 5%", "movePct": 3.2 }]
+  },
+  "calendar": [
+    { "time": "08:30 ET", "name": "CPI YoY", "consensus": "3.2%" }
+  ],
+  "ratings": {
+    "upgrades":   [{ "ticker": "AAPL", "firm": "Morgan Stanley", "rating": "Overweight", "pt": 250 }],
+    "downgrades": [{ "ticker": "MSFT", "firm": "Goldman", "rating": "Neutral", "pt": 380 }]
+  },
+  "alert": "<short banner text|null>",
+  "citations": [
+    "Reuters 07:12 ET — overnight Asia note",
+    "Bloomberg 08:01 ET — Fed speakers"
+  ]
+}
+```
 
-TRADER STYLE FRAMEWORK (apply to colour the analysis):
-- **Minervini**: Stage 2 uptrends, VCP patterns, tight bases near highs, high RS stocks. Won't buy in weak market context.
-- **Ted Zhang (TedHZhang)**: Sector rotation, institutional money flow, where smart money is accumulating/distributing.
-- **Clement Ang**: Market context first — only A-rated setups in confirmed uptrends. Sits out choppy/distribution phases.
-- **SRxTrades**: Technical setups with volume confirmation. Never chases extended moves. Waits for clean pivot entries.
-- **Jeff (jfsrev)**: Mechanical discipline, pre-defined rules, hard stops. No averaging down. Rule-based, no emotion.
-- **PrimeTrading**: Price action precision, momentum confirmation, clean entries at key levels.
-- **Qullamaggie**: Momentum breakouts and episodic pivots. Wants strong prior move or fresh catalyst, ORH trigger, LOD stop, volume expansion.
+TRADER STYLE FRAMEWORK (use to colour `traderLens` and `movers[].traderLens`):
+- **Minervini**: Stage 2 uptrends, VCP, tight bases near highs, high RS. Won't buy in weak markets.
+- **Ted Zhang**: Sector rotation, institutional flow.
+- **Clement Ang**: Market context first; only A-grade setups in confirmed uptrends. Sits out chop.
+- **SRxTrades**: Volume confirmation. Never chases. Waits for clean pivot entries.
+- **Jeff**: Mechanical discipline, hard stops. No averaging down.
+- **Qullamaggie**: Momentum breakouts + episodic pivots; ORH trigger, LOD stop, volume expansion.
+- **Composite**: synthesised view — what should the trader actually DO today.
 
 WATCHLIST: {watchlist_str}
 
-
-Use these CSS classes (all scoped under .brief parent):
-- Section wrapper: <div class="b-section">
-- Section title: <div class="b-section-title">N. TITLE</div>
-- Data row: <div class="b-row"><span class="b-ticker">SPY</span><span class="b-up">+1.2%</span><span class="b-note">note</span></div>
-- Alert banner: <div class="b-alert">⚠ ALERT TEXT</div>  (only if major macro event)
-- Mover block: <div class="b-mover"><div class="b-mover-name">TICKER <span class="b-tag b-tag-up">+12%</span></div><div class="b-mover-why">reason</div><div class="b-mover-style">Trader lens: ...</div></div>
-- Mood box: <div class="b-mood-box"><div class="b-mood-label">Mood: ...</div><p>text</p><div class="b-trader-call"><strong>Minervini:</strong> ... <strong>Ted Zhang:</strong> ...</div></div>
-- Tags: <span class="b-tag b-tag-up">BEAT</span> | b-tag-down | b-tag-warn | b-tag-info
-- Colors: class="b-up" (green) | class="b-down" (red) | class="b-neutral" (grey)
-- Citation: <span class="b-cite">Source: Reuters 07:12 ET</span>
-
-
-SECTIONS TO GENERATE (search the web for each):
-
-1. INDEX SNAPSHOT
-Search: "S&P 500 futures today", "NASDAQ pre-market today", "Dow futures", "VIX today", "10 year treasury yield today"
-- S&P 500, NASDAQ Composite, Dow Jones, Russell 2000: level + % change (futures or live)
-- VIX level + change, 10Y yield, WTI oil price if relevant
-- Include ALERT BANNER if there is breaking macro news (geopolitics, major Fed action, black swan)
-
-2. OVERNIGHT ASIA & EUROPE — THE WHY
-Search: "Asia markets today {date_str}", "Europe markets today {date_str}"
-- Nikkei, Hang Seng, CSI 300, Kospi, ASX 200: level + % change
-- Stoxx 600, DAX, CAC 40: level + % change
-- CRITICAL: explain WHY each region moved — policy, data, earnings, geopolitics. Not just numbers.
-
-3. PRE-MARKET MOVERS
-Search: "pre-market movers today {date_str}", "biggest stock movers pre-market"
-- Top 3–5 gainers with catalyst (earnings beat, upgrade, FDA approval, deal, etc.)
-- Top 3 losers with catalyst
-- For each significant mover: include a b-mover-style callout applying a trader lens (which style fits the setup?)
-
-4. EARNINGS ON DECK
-Search: "earnings reports {date_str}", "earnings before open today", "earnings after close today", "yesterday earnings surprise"
-- Companies reporting today BMO (before market open) and AMC (after market close)
-- Yesterday's notable earnings reactions: beat/miss vs estimate and stock % move
-
-5. FED & MACRO CALENDAR — THIS WEEK
-Search: "economic calendar {date_str}", "Fed speakers this week", "CPI PPI data this week"
-- Use b-two-col grid layout for the calendar
-- Key data releases: time (ET), event name, consensus estimate
-- Fed speakers scheduled
-- Rate cut/hike probability from futures if relevant
-
-6. ANALYST UPGRADES / DOWNGRADES
-Search: "analyst upgrades downgrades today {date_str}", "Wall Street ratings changes today"
-- Top 3 upgrades: ticker, firm, new rating, price target
-- Top 3 downgrades: ticker, firm, new rating, price target
-- Note if any are watchlist stocks
-
-7. MY WATCHLIST
-For each ticker ({watchlist_str}):
-Search "[TICKER] stock pre-market {date_str}" or use latest available data.
-Show: last close or pre-market price | % change | one-line setup note
-Apply trader-style lens: Is it Stage 2? Near a pivot? Volume confirming? Avoid or watch?
-
-8. WHAT TO WATCH — MARKET MOOD (editorial closer)
-- Overall market mood: risk-on / risk-off / choppy / trending + why
-- The single most important variable to watch today
-- Composite trader-style read:
-  Minervini: [view on market structure/stage]
-  Ted Zhang: [sector rotation play]
-  Clement Ang: [market context / entry grade]
-  SRxTrades: [technical setup quality]
-  Jeff: [discipline/rule reminder]
-  Qullamaggie: [breakout/EP momentum quality, volume, ORH/LOD risk]
-  Composite: [synthesised view — what should the trader actually DO today?]
+SECTIONS YOU MUST RESEARCH (search the web for each — every numeric must trace to a citation):
+1. Index snapshot: SPY/QQQ/DIA/IWM futures or live, VIX, 10Y, oil
+2. Overnight Asia + Europe (one line "why" per region — set a `note` on each index entry)
+3. Industry movers below the sector layer (top industry groups, leaders, one-line reason)
+4. Pre-market movers (top 5 gainers + 3 losers with catalyst)
+5. Earnings on deck (BMO + AMC + yesterday's reactions)
+6. Macro calendar (today + tomorrow)
+7. Analyst upgrades/downgrades (top 3 of each)
+8. Watchlist standouts (each ticker, current price, 1-line setup)
+9. Mood / posture / single most important variable to watch
 
 RULES:
-- Every data point MUST cite its source inline using <span class="b-cite">Source: Name, time</span>
-- All numbers must be color-coded with b-up / b-down / b-neutral classes
-- Each section scannable in < 30 seconds
-- Tone: confident, concise, professional — like a prop desk morning note
-- If you cannot find data for something, write "(data unavailable at generation time)" — never fabricate numbers
-- Output ONLY the HTML — start with the <style> block, then <div class="brief">
+- Every numeric value must come from a real, recent web result — never fabricate.
+- If something is unavailable, write `null` and add an entry to `citations` explaining ("data unavailable at generation time").
+- Output ONLY the JSON object. The first character of your response MUST be `{`. The last character MUST be `}`.
+- No prose. No markdown. No code fences.

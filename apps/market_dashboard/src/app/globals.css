@@ -1,3 +1,6 @@
+@import "./design-tokens.css";
+@import "./market-desk.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,13 +12,9 @@
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgb(var(--background-end-rgb))
-  )
-  rgb(var(--background-start-rgb));
+  margin: 0;
+  color: var(--fg-1);
+  background: var(--bg-canvas);
 }
 
 /* Custom scrollbar styles */
@@ -24,15 +23,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg-canvas);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--line-strong);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--fg-3);
 }

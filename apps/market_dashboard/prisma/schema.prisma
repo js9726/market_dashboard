@@ -196,3 +196,54 @@ model ScanResult {
   @@index([userId, ticker])
   @@index([ticker])
 }
+
+// ── Phase 5: Unified Conviction Desk — brief cache + live quotes ──────────────
+//
+// MorningBriefCache stores both the long-form HTML brief AND the structured
+// trader-verdict JSON for a given 15-minute bucket × provider. Cadence:
+//   - Pre-market (13:00 UTC weekdays): all 4 providers — deepseek, gemini,
+//     openai, claude (rich web-search-grounded run)
+//   - Intraday (13:30–15:30 UTC weekdays, every 15 min): deepseek + gemini
+//     (fast snapshot-only run, lazy-fetched by /api/morning-verdict)
+//   - Owner-triggered: any provider, any time (5-min rate limit per provider)
+//
+// `bucketAt` is floor(generatedAt, 15 min) in UTC. The unique [bucketAt,provider]
+// pair lets multiple providers coexist in the same bucket and lets owner reruns
+// upsert in place.
+//
+model MorningBriefCache {
+  id             String   @id @default(cuid())
+  bucketAt       DateTime
+  provider       String   // 'deepseek' | 'gemini' | 'openai' | 'claude'
+  htmlBody       String   @db.Text  // legacy — empty for new rows; keeps backwards compat
+  verdictJson    Json?    // legacy — same row's structuredJson is preferred for the UI
+  structuredJson Json?    // PRIMARY: full StructuredBrief shape consumed by the UI
+  generatedAt    DateTime @default(now())
+  generatedBy    String   // 'cron-premarket' | 'intraday-lazy' | 'owner-rerun:<email>'
+  inputHash      String   // sha256 of snapshot.json — skip regen if unchanged
+  tokensIn       Int?
+  tokensOut      Int?
+  costUsd        Decimal? @db.Decimal(10, 6)
+  errorMsg       String?  // populated if the provider call failed (still upserts row)
+
+  @@unique([bucketAt, provider])
+  @@index([provider, bucketAt(sort: Desc)])
+  @@index([generatedAt(sort: Desc)])
+}
+
+// LiveQuote is upserted by external producers (moomoo daemon or Yahoo fallback
+// workflow). Single row per symbol — we don't need history here (Postgres isn't
+// the right store for tick history). The `source` + `observedAt` columns let
+// the UI flag stale rows and decide which producer wins.
+//
+model LiveQuote {
+  symbol     String   @id // 'SPY', 'QQQ', 'XLK', ...
+  price      Decimal  @db.Decimal(12, 4)
+  changePct  Decimal? @db.Decimal(8, 4)
+  volume     BigInt?
+  source     String   // 'moomoo' | 'yahoo'
+  observedAt DateTime
+  ingestedAt DateTime @default(now())
+
+  @@index([source, observedAt(sort: Desc)])
+}

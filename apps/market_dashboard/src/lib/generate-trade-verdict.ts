@@ -11,7 +11,7 @@ import {
   SYSTEM_PROMPT as agentModeratorSystemPrompt,
   type ModeratorPromptInput,
   type SnapshotInput,
-} from "@core-skills/agent-moderator/handler";
+} from "../../../../packages/core-skills/agent-moderator/handler";
 import type { Prisma } from "@prisma/client";
 
 export type ReviewStyle = "trader-debate" | "agent-pipeline";

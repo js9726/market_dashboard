@@ -1,0 +1,390 @@
+/* ==========================================================================
+   Market Desk / TWI Trade Journal — Foundations
+   --------------------------------------------------------------------------
+   Two surfaces share this system:
+     1. Market Desk (dark)   — the live shipped Next.js app. Slate + orange.
+                                Trader-tool aesthetic, dense, monospace data.
+     2. TWI Trade Journal (light) — the journaling surface. Cream + emerald.
+                                Friendly, modular, generous whitespace.
+
+   Tokens are scoped:
+     :root, [data-mode="dark"]       → Market Desk dark
+     [data-mode="light"]             → TWI light
+   Semantic vars (--fg-1, --bg-canvas, --accent, etc.) are mode-aware.
+   Raw scales (--slate-950, --emerald-600) are constants.
+   ========================================================================== */
+
+/* -------- Webfonts ------------------------------------------------------- */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+/* -------- Raw color scales ---------------------------------------------- */
+:root {
+  /* Slate — primary neutral on dark surfaces */
+  --slate-50:  #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --slate-950: #020617;
+
+  /* Deep navies used by the live dashboard. Hand-tuned, not Tailwind. */
+  --ink-canvas:  #06090f;  /* page background, dashboard root */
+  --ink-surface: #0e1318;  /* card surface */
+  --ink-raised:  #131a22;  /* elevated card / sector tile */
+  --ink-line:    #1e2d3d;  /* hairline borders on dark */
+  --ink-row-a:   #090e15;
+  --ink-row-b:   #0b1120;
+  --ink-row-divider: #111827;
+
+  /* Cream — primary surface on light TWI */
+  --cream-50:  #FBFAF7;
+  --cream-100: #F4F1EC;  /* page bg */
+  --cream-200: #ECE7DD;
+  --cream-300: #E2DCCE;
+
+  /* Brand accents */
+  --orange-300: #fdba74;
+  --orange-400: #fb923c;
+  --orange-500: #f97316;   /* DASHBOARD ACCENT — section labels, "RISK-ON" cue */
+  --orange-600: #ea580c;
+  --orange-700: #c2410c;
+
+  --emerald-300: #6ee7b7;
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;   /* JOURNAL ACCENT — "+ Add Trade", primary CTA */
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+  --emerald-800: #065f46;
+  --emerald-900: #064e3b;
+
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+
+  /* Semantic — direction (used in BOTH modes for P&L / day-change) */
+  --gain-50:  #ecfdf5;
+  --gain-200: #86efac;
+  --gain-400: #4ade80;
+  --gain-500: #22c55e;
+  --gain-700: #15803d;
+  --gain-900: #14532d;
+
+  --loss-50:  #fef2f2;
+  --loss-200: #fca5a5;
+  --loss-400: #f87171;
+  --loss-500: #ef4444;
+  --loss-700: #b91c1c;
+  --loss-900: #450a0a;
+
+  --warn-200: #fed7aa;
+  --warn-400: #fbbf24;
+  --warn-500: #f59e0b;
+  --warn-700: #b45309;
+  --warn-900: #78350f;
+
+  /* Tier colors — used on the Leaderboard. Saturated, badge-style. */
+  --tier-legend:   #f59e0b;   /* gold/amber */
+  --tier-masters:  #ef4444;   /* red */
+  --tier-diamond:  #22d3ee;   /* cyan */
+  --tier-platinum: #a78bfa;   /* violet */
+  --tier-gold:     #eab308;
+  --tier-silver:   #94a3b8;
+  --tier-bronze:   #b45309;
+
+  /* -------- Type scale (ramp; same numbers in both modes) ---------------- */
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "Menlo", monospace;
+
+  /* fluid scale — t-50 is overline, t-500 is page H1 */
+  --t-overline: 0.6875rem; /* 11px — UPPERCASE LABELS */
+  --t-micro:    0.625rem;  /* 10px — captions / table sub-headers */
+  --t-xs:       0.75rem;   /* 12px — body small / dense table cells */
+  --t-sm:       0.8125rem; /* 13px — UI default */
+  --t-md:       0.875rem;  /* 14px — body */
+  --t-lg:       1rem;      /* 16px */
+  --t-xl:       1.125rem;  /* 18px — section heading */
+  --t-2xl:      1.375rem;  /* 22px — hero metric */
+  --t-3xl:      1.75rem;   /* 28px — page heading */
+  --t-4xl:      2.25rem;   /* 36px — display */
+
+  --lh-tight: 1.15;
+  --lh-snug:  1.35;
+  --lh-base:  1.5;
+  --lh-loose: 1.65;
+
+  --tracking-tight:    -0.02em;
+  --tracking-normal:    0;
+  --tracking-wide:      0.05em;
+  --tracking-overline:  0.1em;   /* uppercase labels */
+
+  /* -------- Spacing scale (4px base) ----------------------------------- */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* -------- Radii ------------------------------------------------------ */
+  --radius-xs: 4px;     /* badge, pill */
+  --radius-sm: 6px;     /* button, input */
+  --radius-md: 8px;     /* card */
+  --radius-lg: 10px;    /* hero card */
+  --radius-xl: 12px;    /* journal card */
+  --radius-2xl: 16px;   /* large modal */
+  --radius-pill: 999px;
+
+  /* -------- Borders ---------------------------------------------------- */
+  --border-hairline: 1px solid var(--ink-line);
+
+  /* -------- Shadows ---------------------------------------------------- */
+  --shadow-card-light:
+    0 1px 2px 0 rgba(15, 23, 42, 0.04),
+    0 1px 3px 0 rgba(15, 23, 42, 0.06);
+  --shadow-popover-light:
+    0 12px 24px -8px rgba(15, 23, 42, 0.12),
+    0 4px 8px -2px rgba(15, 23, 42, 0.06);
+  --shadow-modal-light:
+    0 24px 64px -16px rgba(15, 23, 42, 0.25),
+    0 8px 16px -4px rgba(15, 23, 42, 0.10);
+
+  /* dark surfaces don't use big drop shadows; they use border + inner glow */
+  --shadow-card-dark: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  --shadow-modal-dark: 0 24px 80px rgba(0, 0, 0, 0.6);
+
+  /* -------- Motion ----------------------------------------------------- */
+  --ease-out:    cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:    120ms;
+  --dur-base:    180ms;
+  --dur-slow:    260ms;
+}
+
+/* ==========================================================================
+   Mode: DARK (Market Desk) — default for :root
+   ========================================================================== */
+:root,
+[data-mode="dark"] {
+  --bg-canvas:   var(--ink-canvas);
+  --bg-surface:  var(--ink-surface);
+  --bg-raised:   var(--ink-raised);
+  --bg-row-a:    var(--ink-row-a);
+  --bg-row-b:    var(--ink-row-b);
+  --bg-overlay:  rgba(2, 6, 23, 0.7);
+
+  --fg-1: var(--slate-200);  /* primary text */
+  --fg-2: var(--slate-400);  /* secondary text / labels */
+  --fg-3: var(--slate-500);  /* tertiary / metadata */
+  --fg-4: var(--slate-600);  /* placeholder / disabled */
+
+  --line: var(--ink-line);
+  --line-strong: var(--slate-700);
+
+  --accent: var(--orange-500);
+  --accent-fg: #ffffff;
+  --accent-soft-bg: rgba(249, 115, 22, 0.15);
+  --accent-soft-border: rgba(249, 115, 22, 0.3);
+
+  --gain-fg: var(--gain-400);
+  --gain-bg: rgba(34, 197, 94, 0.12);
+  --gain-cell-bg: var(--gain-900);
+  --gain-cell-fg: var(--gain-200);
+
+  --loss-fg: var(--loss-400);
+  --loss-bg: rgba(239, 68, 68, 0.12);
+  --loss-cell-bg: var(--loss-900);
+  --loss-cell-fg: var(--loss-200);
+
+  --link: var(--blue-400);
+  --link-hover: #93c5fd;
+
+  --shadow-card: var(--shadow-card-dark);
+  --shadow-modal: var(--shadow-modal-dark);
+
+  /* Scrollbars */
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Mode: LIGHT (TWI Trade Journal)
+   ========================================================================== */
+[data-mode="light"] {
+  --bg-canvas:  var(--cream-100);
+  --bg-surface: #ffffff;
+  --bg-raised:  var(--cream-50);
+  --bg-row-a:   #ffffff;
+  --bg-row-b:   var(--cream-50);
+  --bg-overlay: rgba(15, 23, 42, 0.4);
+
+  --fg-1: #0f172a;
+  --fg-2: #475569;
+  --fg-3: #64748b;
+  --fg-4: #94a3b8;
+
+  --line: #E5E0D5;
+  --line-strong: #C9C2B2;
+
+  --accent: var(--emerald-500);
+  --accent-fg: #ffffff;
+  --accent-soft-bg: #ECFDF5;
+  --accent-soft-border: #A7F3D0;
+
+  --gain-fg: var(--emerald-600);
+  --gain-bg: #ECFDF5;
+  --gain-cell-bg: #D1FAE5;
+  --gain-cell-fg: #065F46;
+
+  --loss-fg: #DC2626;
+  --loss-bg: #FEF2F2;
+  --loss-cell-bg: #FEE2E2;
+  --loss-cell-fg: #991B1B;
+
+  --link: var(--emerald-700);
+  --link-hover: var(--emerald-800);
+
+  --shadow-card: var(--shadow-card-light);
+  --shadow-modal: var(--shadow-modal-light);
+
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   Semantic typography classes (mode-aware)
+   --------------------------------------------------------------------------
+   Use these directly. They are the named "styles" of the system.
+   ========================================================================== */
+
+.t-display {
+  font-family: var(--font-sans);
+  font-size: var(--t-4xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+
+.t-h1 {
+  font-family: var(--font-sans);
+  font-size: var(--t-3xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+
+.t-h2 {
+  font-family: var(--font-sans);
+  font-size: var(--t-xl);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  color: var(--fg-1);
+}
+
+.t-h3 {
+  font-family: var(--font-sans);
+  font-size: var(--t-md);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  color: var(--fg-1);
+}
+
+.t-body {
+  font-family: var(--font-sans);
+  font-size: var(--t-md);
+  font-weight: 400;
+  line-height: var(--lh-base);
+  color: var(--fg-1);
+}
+
+.t-body-small {
+  font-family: var(--font-sans);
+  font-size: var(--t-sm);
+  font-weight: 400;
+  line-height: var(--lh-base);
+  color: var(--fg-2);
+}
+
+.t-caption {
+  font-family: var(--font-sans);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  line-height: var(--lh-snug);
+  color: var(--fg-3);
+}
+
+/* The signature "section header" of the dashboard:
+   uppercase, tight-letter, 11px, accent color */
+.t-overline {
+  font-family: var(--font-sans);
+  font-size: var(--t-overline);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Number / ticker / price — always monospace, tabular */
+.t-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.t-metric {
+  font-family: var(--font-mono);
+  font-size: var(--t-2xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-1);
+}
+
+.t-ticker {
+  font-family: var(--font-mono);
+  font-size: var(--t-md);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--fg-1);
+}
+
+/* Code / inline code */
+.t-code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  color: var(--fg-1);
+}
+
+/* ==========================================================================
+   Base resets the system depends on
+   ========================================================================== */
+.ds-base {
+  font-family: var(--font-sans);
+  background: var(--bg-canvas);
+  color: var(--fg-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--t-sm);
+  line-height: var(--lh-base);
+}
+
+.ds-base *,
+.ds-base *::before,
+.ds-base *::after {
+  box-sizing: border-box;
+}

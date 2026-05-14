@@ -1,20 +1,24 @@
 """
 Multi-AI Morning Brief Generator
-Generates a rich HTML morning brief using Gemini, OpenAI, and/or Claude.
+Generates a structured-JSON morning brief using Gemini, OpenAI, and/or Claude.
 Each provider uses live web search to gather real-time market data.
 
 Run from repo root:
   python apps/market_dashboard_backend/scripts/morning_brief.py [--out-dir data]
 
 Outputs:
-  <out-dir>/morning_brief_gemini.html
-  <out-dir>/morning_brief_openai.html
-  <out-dir>/morning_brief_claude.html
+  <out-dir>/morning_brief_gemini.json    (structured shape per prompt.md)
+  <out-dir>/morning_brief_openai.json
+  <out-dir>/morning_brief_claude.json
   <out-dir>/morning_brief_meta.json
 
+When --post-to is provided, also POSTs each provider's structured JSON to the
+Vercel /api/morning-verdict/ingest endpoint so the unified Conviction Desk
+picks it up immediately (no commit needed).
+
 Required env vars (at least one):
-  GEMINI_API_KEY   — Google Gemini 2.5 Pro with Search Grounding
-  OPENAI_API_KEY   — OpenAI GPT-4o with web_search_preview
+  GEMINI_API_KEY    — Google Gemini 2.5 Pro with Search Grounding
+  OPENAI_API_KEY    — OpenAI GPT-4o with web_search_preview
   ANTHROPIC_API_KEY — Anthropic Claude claude-sonnet-4-6 with web search beta
 """
 from __future__ import print_function
@@ -56,172 +60,19 @@ _load_env()
 
 
 # ---------------------------------------------------------------------------
-# Watchlist & trader styles (embedded so backend has no file dependency)
+# Skill handler — morning-brief skill at packages/core-skills/morning-brief/
+# Owns the prompt template + watchlist defaults. Provider calls below stay
+# here because each SDK has bespoke web-search tool wiring.
 # ---------------------------------------------------------------------------
 
-WATCHLIST = ["NVDA", "TSLA", "AAPL", "MSFT", "AMZN", "META", "GOOGL", "AMD", "SMCI", "PLTR", "CRWD", "MSTR"]
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_SKILL_DIR = os.path.normpath(
+    os.path.join(_HERE, "..", "..", "..", "packages", "core-skills", "morning-brief")
+)
+if _SKILL_DIR not in sys.path:
+    sys.path.insert(0, _SKILL_DIR)
 
-TRADER_STYLES = """
-- **Minervini**: Stage 2 uptrends, VCP patterns, tight bases near highs, high RS stocks. Won't buy in weak market context.
-- **Ted Zhang (TedHZhang)**: Sector rotation, institutional money flow, where smart money is accumulating/distributing.
-- **Clement Ang**: Market context first — only A-rated setups in confirmed uptrends. Sits out choppy/distribution phases.
-- **SRxTrades**: Technical setups with volume confirmation. Never chases extended moves. Waits for clean pivot entries.
-- **Jeff (jfsrev)**: Mechanical discipline, pre-defined rules, hard stops. No averaging down. Rule-based, no emotion.
-- **PrimeTrading**: Price action precision, momentum confirmation, clean entries at key levels.
-""".strip()
-
-
-# ---------------------------------------------------------------------------
-# HTML CSS template (scoped to .brief — no global * or body resets)
-# ---------------------------------------------------------------------------
-
-BRIEF_CSS = """<style>
-.brief { font-family: var(--brief-font-mono, ui-monospace, 'Cascadia Code', monospace); padding: 1rem 0; max-width: 100%; color: var(--brief-text-primary, #e2e8f0); }
-.brief .b-header { border-bottom: 1px solid var(--brief-border-primary, #334155); padding-bottom: 0.75rem; margin-bottom: 1rem; }
-.brief .b-header h1 { font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
-.brief .b-header .b-sub { font-size: 11px; color: var(--brief-text-secondary, #94a3b8); margin-top: 2px; }
-.brief .b-section { margin-bottom: 1.5rem; }
-.brief .b-section-title { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brief-text-secondary, #94a3b8); border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); padding-bottom: 4px; margin-bottom: 10px; }
-.brief .b-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); font-size: 13px; gap: 8px; }
-.brief .b-row:last-child { border-bottom: none; }
-.brief .b-ticker { font-weight: 500; min-width: 80px; flex-shrink: 0; }
-.brief .b-level { color: var(--brief-text-secondary, #94a3b8); font-size: 12px; }
-.brief .b-note { font-size: 11px; color: var(--brief-text-tertiary, #64748b); flex: 1; text-align: right; }
-.brief .b-up { color: #1D9E75; }
-.brief .b-down { color: #D85A30; }
-.brief .b-neutral { color: var(--brief-text-secondary, #94a3b8); }
-.brief .b-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 500; margin-left: 4px; }
-.brief .b-tag-warn { background: #FAEEDA; color: #854F0B; }
-.brief .b-tag-up { background: #1a3d2b; color: #4ade80; }
-.brief .b-tag-down { background: #3d1a1a; color: #f87171; }
-.brief .b-tag-info { background: #1a2a3d; color: #60a5fa; }
-.brief .b-mover { padding: 6px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); }
-.brief .b-mover:last-child { border-bottom: none; }
-.brief .b-mover-name { font-size: 13px; font-weight: 500; }
-.brief .b-mover-why { font-size: 11px; color: var(--brief-text-secondary, #94a3b8); margin-top: 2px; line-height: 1.4; }
-.brief .b-mover-style { font-size: 10px; color: #60a5fa; margin-top: 2px; font-style: italic; }
-.brief .b-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.brief .b-cal-item { padding: 5px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); font-size: 12px; }
-.brief .b-cal-item:last-child { border-bottom: none; }
-.brief .b-cal-time { color: var(--brief-text-secondary, #94a3b8); font-size: 11px; }
-.brief .b-cal-name { font-weight: 500; }
-.brief .b-cal-consensus { color: var(--brief-text-tertiary, #64748b); font-size: 11px; }
-.brief .b-mood-box { background: var(--brief-bg-secondary, #1e293b); border-radius: 6px; padding: 0.75rem 1rem; font-size: 12px; line-height: 1.7; }
-.brief .b-mood-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brief-text-secondary, #94a3b8); margin-bottom: 4px; }
-.brief .b-trader-call { margin-top: 8px; font-size: 11px; color: var(--brief-text-secondary, #94a3b8); line-height: 1.6; }
-.brief .b-trader-call strong { color: var(--brief-text-primary, #e2e8f0); }
-.brief .b-earnings-beat { font-size: 13px; padding: 5px 0; border-bottom: 0.5px solid var(--brief-border-tertiary, #1e293b); }
-.brief .b-earnings-beat:last-child { border-bottom: none; }
-.brief .b-cite { font-size: 10px; color: var(--brief-text-tertiary, #64748b); font-style: italic; }
-.brief .b-alert { background: #2d1f0a; border-left: 3px solid #EF9F27; padding: 6px 10px; border-radius: 0 4px 4px 0; margin-bottom: 1rem; font-size: 12px; color: #fbbf24; }
-.brief .b-footer { font-size: 10px; color: var(--brief-text-tertiary, #64748b); padding-top: 0.5rem; border-top: 0.5px solid var(--brief-border-tertiary, #1e293b); margin-top: 1rem; }
-</style>"""
-
-HTML_STRUCTURE_GUIDE = """
-Use these CSS classes (all scoped under .brief parent):
-- Section wrapper: <div class="b-section">
-- Section title: <div class="b-section-title">N. TITLE</div>
-- Data row: <div class="b-row"><span class="b-ticker">SPY</span><span class="b-up">+1.2%</span><span class="b-note">note</span></div>
-- Alert banner: <div class="b-alert">⚠ ALERT TEXT</div>  (only if major macro event)
-- Mover block: <div class="b-mover"><div class="b-mover-name">TICKER <span class="b-tag b-tag-up">+12%</span></div><div class="b-mover-why">reason</div><div class="b-mover-style">Trader lens: ...</div></div>
-- Mood box: <div class="b-mood-box"><div class="b-mood-label">Mood: ...</div><p>text</p><div class="b-trader-call"><strong>Minervini:</strong> ... <strong>Ted Zhang:</strong> ...</div></div>
-- Tags: <span class="b-tag b-tag-up">BEAT</span> | b-tag-down | b-tag-warn | b-tag-info
-- Colors: class="b-up" (green) | class="b-down" (red) | class="b-neutral" (grey)
-- Citation: <span class="b-cite">Source: Reuters 07:12 ET</span>
-"""
-
-
-def build_prompt(date_str: str) -> str:
-    watchlist_str = ", ".join(WATCHLIST)
-    return f"""You are generating a morning market brief for {date_str} for an active trader based in Malaysia (MYT = UTC+8).
-
-Search the web RIGHT NOW for real-time market data and generate a complete HTML morning brief.
-
-OUTPUT FORMAT: Return ONLY the HTML snippet below. No markdown, no ```html fences, no explanation.
-Start your response with the opening <div class="brief"> tag. End with </div>.
-
-The full output must be:
-{BRIEF_CSS}
-<div class="brief">
-  <div class="b-header">
-    <h1>Morning Brief — {date_str}</h1>
-    <div class="b-sub">Generated [TIME] MYT | US markets open 9:30 PM MYT | Powered by live web search</div>
-  </div>
-  [ALERT BANNER HERE — only if major macro news, else omit]
-  [SECTION 1 THROUGH 9]
-  <div class="b-footer">Generated via live web search · Not financial advice · [DATE] [TIME] MYT</div>
-</div>
-
-TRADER STYLE FRAMEWORK (apply to colour the analysis):
-{TRADER_STYLES}
-
-WATCHLIST: {watchlist_str}
-
-{HTML_STRUCTURE_GUIDE}
-
-SECTIONS TO GENERATE (search the web for each):
-
-1. INDEX SNAPSHOT
-Search: "S&P 500 futures today", "NASDAQ pre-market today", "Dow futures", "VIX today", "10 year treasury yield today"
-- S&P 500, NASDAQ Composite, Dow Jones, Russell 2000: level + % change (futures or live)
-- VIX level + change, 10Y yield, WTI oil price if relevant
-- Include ALERT BANNER if there is breaking macro news (geopolitics, major Fed action, black swan)
-
-2. OVERNIGHT ASIA & EUROPE — THE WHY
-Search: "Asia markets today {date_str}", "Europe markets today {date_str}"
-- Nikkei, Hang Seng, CSI 300, Kospi, ASX 200: level + % change
-- Stoxx 600, DAX, CAC 40: level + % change
-- CRITICAL: explain WHY each region moved — policy, data, earnings, geopolitics. Not just numbers.
-
-3. PRE-MARKET MOVERS
-Search: "pre-market movers today {date_str}", "biggest stock movers pre-market"
-- Top 3–5 gainers with catalyst (earnings beat, upgrade, FDA approval, deal, etc.)
-- Top 3 losers with catalyst
-- For each significant mover: include a b-mover-style callout applying a trader lens (which style fits the setup?)
-
-4. EARNINGS ON DECK
-Search: "earnings reports {date_str}", "earnings before open today", "earnings after close today", "yesterday earnings surprise"
-- Companies reporting today BMO (before market open) and AMC (after market close)
-- Yesterday's notable earnings reactions: beat/miss vs estimate and stock % move
-
-5. FED & MACRO CALENDAR — THIS WEEK
-Search: "economic calendar {date_str}", "Fed speakers this week", "CPI PPI data this week"
-- Use b-two-col grid layout for the calendar
-- Key data releases: time (ET), event name, consensus estimate
-- Fed speakers scheduled
-- Rate cut/hike probability from futures if relevant
-
-6. ANALYST UPGRADES / DOWNGRADES
-Search: "analyst upgrades downgrades today {date_str}", "Wall Street ratings changes today"
-- Top 3 upgrades: ticker, firm, new rating, price target
-- Top 3 downgrades: ticker, firm, new rating, price target
-- Note if any are watchlist stocks
-
-7. MY WATCHLIST
-For each ticker ({watchlist_str}):
-Search "[TICKER] stock pre-market {date_str}" or use latest available data.
-Show: last close or pre-market price | % change | one-line setup note
-Apply trader-style lens: Is it Stage 2? Near a pivot? Volume confirming? Avoid or watch?
-
-8. WHAT TO WATCH — MARKET MOOD (editorial closer)
-- Overall market mood: risk-on / risk-off / choppy / trending + why
-- The single most important variable to watch today
-- Composite trader-style read:
-  Minervini: [view on market structure/stage]
-  Ted Zhang: [sector rotation play]
-  Clement Ang: [market context / entry grade]
-  SRxTrades: [technical setup quality]
-  Jeff: [discipline/rule reminder]
-  Composite: [synthesised view — what should the trader actually DO today?]
-
-RULES:
-- Every data point MUST cite its source inline using <span class="b-cite">Source: Name, time</span>
-- All numbers must be color-coded with b-up / b-down / b-neutral classes
-- Each section scannable in < 30 seconds
-- Tone: confident, concise, professional — like a prop desk morning note
-- If you cannot find data for something, write "(data unavailable at generation time)" — never fabricate numbers
-- Output ONLY the HTML — start with the <style> block, then <div class="brief">
-"""
+from handler import build_prompt, DEFAULT_WATCHLIST as WATCHLIST  # noqa: E402,F401
 
 
 # ---------------------------------------------------------------------------
@@ -269,11 +120,13 @@ def generate_gemini(prompt: str, out_dir: str) -> bool:
                 finish = candidate.get("finishReason", "unknown")
                 print(f"[Gemini] No content parts (finishReason={finish})")
                 return False
-            html = parts[0]["text"].strip()
-            html = _strip_fences(html)
-            out_path = os.path.join(out_dir, "morning_brief_gemini.html")
+            body = parts[0]["text"].strip()
+            body = _strip_fences(body)
+            if not _validate_json(body, "Gemini"):
+                return False
+            out_path = os.path.join(out_dir, "morning_brief_gemini.json")
             with open(out_path, "w", encoding="utf-8") as f:
-                f.write(html)
+                f.write(body)
             print(f"[Gemini] Written to {out_path}")
             return True
         except Exception as e:
@@ -312,20 +165,22 @@ def generate_openai(prompt: str, out_dir: str) -> bool:
                 max_output_tokens=8192,
             )
             # Extract text from the response output items
-            html = ""
+            body = ""
             for item in response.output:
                 if hasattr(item, "type") and item.type == "message":
                     for content in item.content:
                         if hasattr(content, "type") and content.type == "output_text":
-                            html += content.text
-            html = html.strip()
-            if not html:
+                            body += content.text
+            body = body.strip()
+            if not body:
                 print("[OpenAI] Empty response.")
                 return False
-            html = _strip_fences(html)
-            out_path = os.path.join(out_dir, "morning_brief_openai.html")
+            body = _strip_fences(body)
+            if not _validate_json(body, "OpenAI"):
+                return False
+            out_path = os.path.join(out_dir, "morning_brief_openai.json")
             with open(out_path, "w", encoding="utf-8") as f:
-                f.write(html)
+                f.write(body)
             print(f"[OpenAI] Written to {out_path}")
             return True
         except Exception as e:
@@ -369,18 +224,20 @@ def generate_claude(prompt: str, out_dir: str) -> bool:
                 betas=["web-search-2025-03-05"],
             )
             # Collect all text blocks from the response
-            html = ""
+            body = ""
             for block in response.content:
                 if hasattr(block, "type") and block.type == "text":
-                    html += block.text
-            html = html.strip()
-            if not html:
+                    body += block.text
+            body = body.strip()
+            if not body:
                 print("[Claude] Empty response.")
                 return False
-            html = _strip_fences(html)
-            out_path = os.path.join(out_dir, "morning_brief_claude.html")
+            body = _strip_fences(body)
+            if not _validate_json(body, "Claude"):
+                return False
+            out_path = os.path.join(out_dir, "morning_brief_claude.json")
             with open(out_path, "w", encoding="utf-8") as f:
-                f.write(html)
+                f.write(body)
             print(f"[Claude] Written to {out_path}")
             return True
         except Exception as e:
@@ -396,16 +253,30 @@ def generate_claude(prompt: str, out_dir: str) -> bool:
 # ---------------------------------------------------------------------------
 
 def _strip_fences(text: str) -> str:
-    """Remove ```html ... ``` fences if the model wrapped output in them."""
+    """Remove ```json / ```html / ``` fences if the model wrapped output in them."""
     if text.startswith("```"):
         lines = text.splitlines()
-        # Drop first line (```html or ```) and last line (```)
+        # Drop first line (```json/```html/```) and last line (```)
         if lines[-1].strip() == "```":
             lines = lines[1:-1]
         elif lines[0].strip().startswith("```"):
             lines = lines[1:]
         text = "\n".join(lines)
     return text.strip()
+
+
+def _validate_json(body: str, label: str) -> bool:
+    """Verify the model output parses as JSON. Logs a sample on failure."""
+    try:
+        parsed = json.loads(body)
+    except json.JSONDecodeError as e:
+        print(f"[{label}] JSON parse failed at line {e.lineno}: {e.msg}")
+        print(f"[{label}] First 300 chars: {body[:300]!r}")
+        return False
+    if not isinstance(parsed, dict):
+        print(f"[{label}] Top-level is {type(parsed).__name__}, expected dict")
+        return False
+    return True
 
 
 def write_meta(out_dir: str, results: dict):
@@ -439,14 +310,64 @@ def write_meta(out_dir: str, results: dict):
 # Main
 # ---------------------------------------------------------------------------
 
+def _post_to_ingest(post_to, post_key, provider, json_body_str, generated_by):
+    """POST a structured JSON brief to /api/morning-verdict/ingest.
+
+    `json_body_str` is the raw JSON text the model produced (already validated).
+    We attach it as `structuredJson` (parsed) and send an empty `htmlBody` for
+    schema compatibility — the new frontend renders only `structuredJson`.
+    """
+    if not post_to or not post_key:
+        return
+    import hashlib
+    import urllib.error
+    import urllib.request as _ur
+    try:
+        structured = json.loads(json_body_str)
+    except json.JSONDecodeError:
+        print(f"[ingest] {provider}: cannot parse body — skipping post")
+        return
+    payload = {
+        "provider": provider,
+        "htmlBody": "",
+        "structuredJson": structured,
+        "generatedBy": generated_by,
+        "inputHash": hashlib.sha256(json_body_str.encode("utf-8")).hexdigest(),
+    }
+    body = json.dumps(payload).encode("utf-8")
+    req = _ur.Request(
+        post_to,
+        data=body,
+        method="POST",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + post_key,
+        },
+    )
+    try:
+        with _ur.urlopen(req, timeout=30) as r:
+            r.read()
+        print(f"[ingest] posted {provider} to {post_to}")
+    except urllib.error.HTTPError as e:
+        print(f"[ingest] {provider}: HTTP {e.code} {e.read().decode('utf-8', 'ignore')[:200]}")
+    except Exception as e:
+        print(f"[ingest] {provider}: {e}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", default="data", help="Output directory")
     parser.add_argument(
         "--providers",
         default="gemini,openai,claude",
-        help="Comma-separated providers to run (gemini,openai,claude)",
+        help="Comma-separated providers to run (gemini,openai,claude,deepseek)",
     )
+    parser.add_argument("--post-to", default=os.environ.get("VERCEL_INGEST_URL_FULL"),
+                        help="Optional URL of /api/morning-verdict/ingest to POST results")
+    parser.add_argument("--post-key", default=os.environ.get("BRIEF_INGEST_KEY"),
+                        help="Bearer token for the ingest endpoint")
+    parser.add_argument("--generated-by", default="cron-premarket",
+                        help="Tag stored in MorningBriefCache.generatedBy")
     args = parser.parse_args()
 
     out_dir = args.out_dir
@@ -467,12 +388,30 @@ def main():
     if "claude" in enabled:
         results["claude"] = generate_claude(prompt, out_dir)
 
+    # DeepSeek doesn't have web search — skipped here for the rich pre-market run.
+    # Intraday DeepSeek refreshes are handled by the Next.js /api/morning-verdict
+    # lazy-regen path (TS-side, snapshot-fed).
+
     if not any(results.values()):
         print("\nERROR: No providers succeeded. Set at least one of:")
         print("  GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY")
         sys.exit(1)
 
     write_meta(out_dir, results)
+
+    # Push successful briefs to the Vercel cache so the unified Conviction Desk
+    # picks them up immediately (no commit needed).
+    if args.post_to and args.post_key:
+        for provider, ok in results.items():
+            if not ok:
+                continue
+            json_path = os.path.join(out_dir, f"morning_brief_{provider}.json")
+            if not os.path.exists(json_path):
+                continue
+            with open(json_path, encoding="utf-8") as f:
+                json_body_str = f.read()
+            _post_to_ingest(args.post_to, args.post_key, provider, json_body_str, args.generated_by)
+
     successful = [p for p, ok in results.items() if ok]
     print(f"\nDone. Generated briefs for: {', '.join(successful)}")
 

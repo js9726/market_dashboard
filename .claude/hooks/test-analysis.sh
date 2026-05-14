@@ -4,5 +4,5 @@
 APP_DIR="/c/Users/jiesh/AI codes hub/market_dashboard/apps/market_dashboard"
 cd "$APP_DIR" || { echo "ERROR: Could not cd to $APP_DIR"; exit 1; }
 echo "--- node scripts/test-analysis.mjs ---"
-echo "NOTE: Requires: npm run dev (in a separate terminal)"
+echo "NOTE: Requires: npm run dev (in a separate terminal) and ANALYSIS_TEST_COOKIE from a signed-in browser session"
 node scripts/test-analysis.mjs

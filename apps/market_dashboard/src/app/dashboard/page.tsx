@@ -1,5 +1,8 @@
-import DashboardShell from "@/components/dashboard/DashboardShell";
+import { auth } from "@/auth";
+import ConvictionDesk from "@/components/market-desk/ConvictionDesk";
 
-export default function DashboardPage() {
-  return <DashboardShell />;
+export default async function DashboardPage() {
+  const session = await auth();
+  const isOwner = session?.user?.role === "owner";
+  return <ConvictionDesk isOwner={isOwner} />;
 }

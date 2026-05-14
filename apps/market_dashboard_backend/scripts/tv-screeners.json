@@ -1,0 +1,99 @@
+{
+  "_doc": "Each entry mirrors a saved TradingView screener. The 'query' object follows scanner.tradingview.com's JSON contract — refine the filters whenever your real TV screener returns different rows. The 'tv_url' is the original saved-screener link for cross-reference.",
+  "screeners": [
+    {
+      "id": "top-gainer",
+      "name": "Top Gainer",
+      "tv_url": "https://www.tradingview.com/screener/1R7JpXRD/",
+      "query": {
+        "filter": [
+          {"left": "change",                   "operation": "egreater", "right": 5},
+          {"left": "market_cap_basic",         "operation": "egreater", "right": 1000000000},
+          {"left": "average_volume_30d_calc",  "operation": "egreater", "right": 500000},
+          {"left": "exchange",                 "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
+        ],
+        "options": {"lang": "en"},
+        "markets": ["america"],
+        "sort":   {"sortBy": "change", "sortOrder": "desc"},
+        "range":  [0, 25]
+      }
+    },
+    {
+      "id": "best-winners",
+      "name": "Best Winners",
+      "tv_url": "https://www.tradingview.com/screener/CE7LsGK3/",
+      "query": {
+        "filter": [
+          {"left": "change",                       "operation": "egreater", "right": 3},
+          {"left": "relative_volume_10d_calc",     "operation": "egreater", "right": 1.5},
+          {"left": "close",                        "operation": "egreater", "right": "SMA50"},
+          {"left": "market_cap_basic",             "operation": "egreater", "right": 1000000000},
+          {"left": "exchange",                     "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
+        ],
+        "options": {"lang": "en"},
+        "markets": ["america"],
+        "sort":   {"sortBy": "relative_volume_10d_calc", "sortOrder": "desc"},
+        "range":  [0, 25]
+      }
+    },
+    {
+      "id": "best-winner-small-big",
+      "name": "Best Winner (Small Cap ~ Big Cap)",
+      "tv_url": "https://www.tradingview.com/screener/T4yd4xsf/?symbol=NASDAQ%3AMRAM",
+      "query": {
+        "filter": [
+          {"left": "change",                       "operation": "egreater", "right": 3},
+          {"left": "relative_volume_10d_calc",     "operation": "egreater", "right": 1.5},
+          {"left": "close",                        "operation": "egreater", "right": "SMA50"},
+          {"left": "average_volume_30d_calc",      "operation": "egreater", "right": 500000},
+          {"left": "market_cap_basic",             "operation": "egreater", "right": 300000000},
+          {"left": "exchange",                     "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
+        ],
+        "options": {"lang": "en"},
+        "markets": ["america"],
+        "sort":   {"sortBy": "relative_volume_10d_calc", "sortOrder": "desc"},
+        "range":  [0, 25]
+      }
+    },
+    {
+      "id": "premarket-movers",
+      "name": "Premarket Movers",
+      "tv_url": "https://www.tradingview.com/screener/BDYpp0Ef/",
+      "query": {
+        "filter": [
+          {"left": "premarket_change",         "operation": "egreater", "right": 3},
+          {"left": "market_cap_basic",         "operation": "egreater", "right": 500000000},
+          {"left": "exchange",                 "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
+        ],
+        "options": {"lang": "en"},
+        "markets": ["america"],
+        "sort":   {"sortBy": "premarket_change", "sortOrder": "desc"},
+        "range":  [0, 25]
+      }
+    },
+    {
+      "id": "vcp-200ma",
+      "name": "VCP USA (200MA, 1mo)",
+      "tv_url": "https://www.tradingview.com/screener/491EL1gR/",
+      "query": {
+        "filter": [
+          {"left": "close",                      "operation": "egreater", "right": "SMA200"},
+          {"left": "Perf.1M",                    "operation": "egreater", "right": 0},
+          {"left": "ATRP",                       "operation": "in_range", "right": [0, 5]},
+          {"left": "relative_volume_10d_calc",   "operation": "egreater", "right": 1},
+          {"left": "market_cap_basic",           "operation": "egreater", "right": 1000000000},
+          {"left": "exchange",                   "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
+        ],
+        "options": {"lang": "en"},
+        "markets": ["america"],
+        "sort":   {"sortBy": "relative_volume_10d_calc", "sortOrder": "desc"},
+        "range":  [0, 25]
+      }
+    }
+  ],
+  "columns_to_fetch": [
+    "name", "close", "change", "volume", "relative_volume_10d_calc",
+    "market_cap_basic", "sector", "industry", "Perf.W", "Perf.1M",
+    "premarket_change", "ATRP"
+  ]
+}

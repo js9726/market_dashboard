@@ -9,3 +9,6 @@ beautifulsoup4>=4.11.0
 # Morning brief multi-AI providers (install whichever keys you have)
 openai>=1.70.0
 anthropic>=0.49.0
+# tradingview-screener wraps the unofficial scanner.tradingview.com endpoint.
+# Optional — tv_screener_fetch.py uses urllib directly so this is informational.
+# tradingview-screener>=2.0.0

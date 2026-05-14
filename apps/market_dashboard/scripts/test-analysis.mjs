@@ -2,44 +2,28 @@
  * Validation script for the /api/analysis endpoint.
  * Run from apps/market_dashboard: node scripts/test-analysis.mjs
  *
- * Reads AUTH_TOKEN from .env.local to authenticate, then POSTs a test
+ * Requires a signed-in NextAuth browser Cookie header, then POSTs a test
  * request for $AAPL and asserts that real financial data is returned.
+ *
+ * Example:
+ *   ANALYSIS_TEST_COOKIE="next-auth.session-token=..." node scripts/test-analysis.mjs
+ *   node scripts/test-analysis.mjs --cookie "next-auth.session-token=..."
  */
 
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-// --- Read .env.local ---
-function loadEnv() {
-  const envPath = join(__dirname, '..', '.env.local');
-  const env = {};
-  try {
-    const lines = readFileSync(envPath, 'utf8').split('\n');
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-      const idx = trimmed.indexOf('=');
-      if (idx === -1) continue;
-      env[trimmed.slice(0, idx).trim()] = trimmed.slice(idx + 1).trim();
-    }
-  } catch {
-    console.error('Could not read .env.local — make sure you are running from apps/market_dashboard/');
-    process.exit(1);
-  }
-  return env;
+function getArgValue(name) {
+  const idx = process.argv.indexOf(name);
+  return idx >= 0 ? process.argv[idx + 1] : undefined;
 }
 
-const env = loadEnv();
-const AUTH_TOKEN = env.AUTH_TOKEN;
-if (!AUTH_TOKEN) {
-  console.error('AUTH_TOKEN not found in .env.local');
+const cookieHeader = getArgValue('--cookie') ?? process.env.ANALYSIS_TEST_COOKIE;
+if (!cookieHeader) {
+  console.error('Missing signed-in Cookie header.');
+  console.error('Sign in locally, copy the request Cookie header from your browser devtools, then run:');
+  console.error('  ANALYSIS_TEST_COOKIE="next-auth.session-token=..." node scripts/test-analysis.mjs');
   process.exit(1);
 }
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = process.env.ANALYSIS_TEST_BASE_URL ?? 'http://localhost:3000';
 const TICKER = 'AAPL';
 const today = new Date().toISOString().split('T')[0];
 
@@ -65,7 +49,7 @@ try {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Cookie': `dashboard_session=${AUTH_TOKEN}`,
+      'Cookie': cookieHeader,
     },
     body: JSON.stringify({ tickers: [TICKER], end_date: today }),
   });

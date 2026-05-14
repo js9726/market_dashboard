@@ -9,8 +9,8 @@ const inter = Inter({ subsets: ["latin"] });
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "US Market Dashboard",
-  description: "Daily US market snapshot, morning brief, and stock analysis",
+  title: "Market Desk JS",
+  description: "Conviction Desk, market snapshot, morning brief, and stock analysis",
 };
 
 export default function RootLayout({
@@ -19,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" data-mode="light">
+      <body className={`${inter.className} ds-base`} data-mode="light">
         <Providers>{children}</Providers>
         <Analytics />
       </body>

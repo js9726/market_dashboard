@@ -1,9 +1,17 @@
 name: Refresh Market Data & Morning Brief
 
+# Single pre-market run, Mon–Fri 13:00 UTC (= 9:00 AM ET during EDT,
+# 8:00 AM ET during EST — both still pre-open). Generates the rich
+# web-search-grounded brief from all four AI providers and pushes the
+# results into the Postgres MorningBriefCache via /api/morning-verdict/ingest.
+#
+# Intraday refreshes (every 15 min during the first 2 hours of US open) are
+# handled by /api/morning-verdict's lazy-regen path on Vercel — no GH Actions
+# involvement.
+
 on:
   schedule:
-    # Mon–Fri 8:30 AM ET (12:30 UTC) — before US market open
-    - cron: '00,30 12-18 * * 1-5'
+    - cron: '0 13 * * 1-5'
   workflow_dispatch: {}
 
 env:
@@ -34,25 +42,49 @@ jobs:
       - name: Build market data
         run: python scripts/build_data.py --out-dir data
 
-      # ── Step 2: morning brief (3 AI providers, non-fatal) ──────────────────
+      # ── Step 1b: market breadth (NYSE+Nasdaq composite, sectors, industries)
+      - name: Compute market breadth
+        continue-on-error: true
+        timeout-minutes: 12
+        run: python scripts/breadth_scan.py --out-dir data
+
+      # ── Step 1c: TradingView screener hits + DeepSeek auto-score top 5 ────
+      - name: Fetch TV screeners
+        continue-on-error: true
+        run: python scripts/tv_screener_fetch.py --out-dir data --score
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+
+      # ── Step 2: morning brief — all 4 providers, pushed to Postgres ────────
+      # The Python script writes HTML files to data/ and (when --post-to is set)
+      # POSTs each provider's output to /api/morning-verdict/ingest. Brief
+      # generation is non-fatal so a single provider failure doesn't break the
+      # build.
       - name: Generate morning brief
         continue-on-error: true
-        run: python scripts/morning_brief.py --out-dir data
+        run: |
+          python scripts/morning_brief.py --out-dir data \
+            --post-to "${VERCEL_INGEST_URL%/}/api/morning-verdict/ingest" \
+            --post-key "$BRIEF_INGEST_KEY" \
+            --generated-by cron-premarket
         env:
-          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY:        ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY:        ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY:     ${{ secrets.ANTHROPIC_API_KEY }}
+          DEEPSEEK_API_KEY:      ${{ secrets.DEEPSEEK_API_KEY }}
+          VERCEL_INGEST_URL:     ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:      ${{ secrets.BRIEF_INGEST_KEY }}
 
-      # ── Step 3: trader verdict JSON (AI-generated, non-fatal) ──────────────
+      # ── Step 3: trader verdict JSON (still useful for spotlight fallback) ──
       - name: Generate trader verdict
         continue-on-error: true
         run: python scripts/trader_verdict.py --out-dir data --providers gemini,claude,openai
         env:
-          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
-          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY:    ${{ secrets.OPENAI_API_KEY }}
 
-      # ── Step 4: sync all outputs into Next.js public/ ──────────────────────
+      # ── Step 4: sync snapshot/charts only (brief now lives in Postgres) ────
       - name: Sync data into Next.js public folder
         working-directory: apps/market_dashboard
         run: |
@@ -61,10 +93,9 @@ jobs:
           cp ../market_dashboard_backend/data/events.json             public/market-dashboard/
           cp ../market_dashboard_backend/data/meta.json               public/market-dashboard/
           cp ../market_dashboard_backend/data/trader_verdict.json     public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/morning_brief_gemini.html  public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/morning_brief_openai.html  public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/morning_brief_claude.html  public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/morning_brief_meta.json    public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/breadth.json            public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/breadth_history.json    public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/tv_screeners.json       public/market-dashboard/ 2>/dev/null || true
           cp ../market_dashboard_backend/data/charts/*.png             public/market-dashboard/charts/ 2>/dev/null || true
 
       # ── Step 5: sanitize JSON (replace NaN/Infinity with null) ────────────
@@ -82,7 +113,7 @@ jobs:
           print('JSON sanitization complete')
           "
 
-      # ── Step 6: commit and push ────────────────────────────────────────────
+      # ── Step 6: commit and push (snapshot/charts only) ─────────────────────
       - name: Commit updated data
         working-directory: .
         run: |
