@@ -37,6 +37,9 @@ PATH B: python cli_run.py (fast — snapshot-fed, no web search)
 
 ## PATH A — Claude CLI (run this in Claude CLI / Codex CLI)
 
+> **The push to the dashboard is MANDATORY — always run Step 4.**
+> The brief is useless sitting in memory. Step 4 is what puts it live for viewers.
+
 ### Step 1 — Read Jie's TV Watchlist via Chrome
 
 Navigate Chrome to the watchlist URL. The user must be logged in to TradingView in Chrome.
@@ -74,42 +77,40 @@ are already embedded in the snapshot via `tv_screeners.json`.
 
 ### Step 3 — Generate the StructuredBrief
 
-Build the prompt using `handler.py`:
-
-```python
-from handler import build_prompt
-import datetime
-
-now_myt = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=8)
-date_str = now_myt.strftime("%A, %B {day}, %Y").replace("{day}", str(now_myt.day))
-prompt = build_prompt(date_str, watchlist=$FULL_WATCHLIST)
-```
+The fastest path — let `cli_run.py` handle generation AND push in one command (Step 4).
+Only call the AI separately if you need to inspect the JSON before pushing.
 
 Call the AI with web search enabled (Gemini Search Grounding or Claude web search):
-- Pre-market (before 9:30 PM MYT): use Gemini or Claude — web search gives richer citations
-- Intraday: use DeepSeek — fast, cheap, snapshot-fed
+- Pre-market / at open (9:30 PM MYT): Gemini — web search gives richer citations
+- Intraday refresh: DeepSeek — fast, cheap, snapshot-fed
 
 The response MUST be a single JSON object matching the StructuredBrief schema.
-Validate it parses correctly before pushing.
 
-### Step 4 — Push to dashboard
-
-```python
-python ingest_to_dashboard.py brief_output.json
-```
-
-Or call `cli_run.py` directly with the watchlist extracted in Steps 1-2:
+### Step 4 — Generate + Push to dashboard (single command — ALWAYS run this)
 
 ```bash
+cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
+
 python cli_run.py \
   --provider gemini \
   --tv-watchlist "NVDA,TSLA,AAPL,..." \
   --post
 ```
 
+Replace `NVDA,TSLA,AAPL,...` with `$FULL_WATCHLIST` from Steps 1-2.
+
+The `--post` flag is what injects the brief into the Postgres DB so the dashboard and
+all viewers see it. **Without `--post` the brief is never saved — it only prints to stdout.**
+
 Confirm push: `✓ Pushed: bucketAt=... id=...`
 
 Dashboard viewers see the updated brief within 60 seconds (the poll interval).
+
+If you already have a JSON file from a previous generation, push it standalone:
+
+```bash
+python ingest_to_dashboard.py brief_output.json
+```
 
 ---
 
