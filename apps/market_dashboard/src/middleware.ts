@@ -8,10 +8,19 @@ export default auth((req) => {
   // Always allow login page, NextAuth API routes, and cron endpoints through.
   // Cron endpoints do their own Bearer-token auth via CRON_SECRET — must not be
   // gated behind user session middleware (Vercel Cron sends unauthenticated requests).
+  //
+  // Machine-auth API routes (CLI tools, GitHub Actions) use Bearer token auth
+  // inside the route handler. They MUST be excluded here so the middleware
+  // redirect never fires before the handler can inspect the Authorization header.
+  // Without this exclusion, urllib/fetch follows the 302 redirect to /login,
+  // gets back HTML, and json.loads() fails with "Expecting value: line 1 col 1".
   if (
     pathname.startsWith("/login") ||
     pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/api/cron")
+    pathname.startsWith("/api/cron") ||
+    pathname.startsWith("/api/morning-verdict/ingest") ||
+    pathname.startsWith("/api/watchlist/export") ||
+    pathname.startsWith("/api/live-quotes/ingest")
   ) {
     return NextResponse.next();
   }

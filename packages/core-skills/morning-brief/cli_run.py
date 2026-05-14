@@ -110,7 +110,7 @@ def _call_deepseek(prompt: str) -> str:
             "model": "deepseek-chat",
             "messages": [{"role": "user", "content": prompt}],
             "response_format": {"type": "json_object"},
-            "max_tokens": 6000,
+            "max_tokens": 8000,
         }
     ).encode("utf-8")
     req = urllib.request.Request(
@@ -134,7 +134,7 @@ def _call_openai(prompt: str) -> str:
             "model": "gpt-4o",
             "messages": [{"role": "user", "content": prompt}],
             "response_format": {"type": "json_object"},
-            "max_tokens": 6000,
+            "max_tokens": 8000,
         }
     ).encode("utf-8")
     req = urllib.request.Request(
@@ -164,7 +164,10 @@ def _call_gemini(prompt: str) -> str:
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {
                 "responseMimeType": "application/json",
-                "maxOutputTokens": 6000,
+                # 16 000 gives Gemini 2.5 Pro plenty of headroom for a full
+                # StructuredBrief (typical output ~3-5k tokens). 6 000 was
+                # cutting responses mid-JSON on large watchlists.
+                "maxOutputTokens": 16000,
             },
         }
     ).encode("utf-8")
@@ -174,9 +177,20 @@ def _call_gemini(prompt: str) -> str:
         method="POST",
         headers={"Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(req, timeout=120) as r:
+    with urllib.request.urlopen(req, timeout=180) as r:
         data = json.loads(r.read().decode("utf-8"))
-    return data["candidates"][0]["content"]["parts"][0]["text"]
+    # Surface finish reason so truncation is visible in logs
+    candidate = data["candidates"][0]
+    finish = candidate.get("finishReason", "UNKNOWN")
+    if finish not in ("STOP", "MAX_TOKENS"):
+        print(f"[cli_run] Gemini finishReason={finish}", file=sys.stderr)
+    if finish == "MAX_TOKENS":
+        print(
+            "[cli_run] WARNING: Gemini hit MAX_TOKENS — response may be truncated. "
+            "JSON parse will likely fail. Try reducing watchlist size.",
+            file=sys.stderr,
+        )
+    return candidate["content"]["parts"][0]["text"]
 
 
 def _call_claude(prompt: str) -> str:
@@ -371,7 +385,21 @@ def main() -> None:
         structured = json.loads(raw_stripped)
     except json.JSONDecodeError as exc:
         print(f"JSON parse error: {exc}", file=sys.stderr)
-        print("Raw response:\n", raw_stripped[:2000], file=sys.stderr)
+        # Show ~200 chars around the failure position for easy diagnosis
+        pos = exc.pos
+        snippet_start = max(0, pos - 120)
+        snippet_end = min(len(raw_stripped), pos + 120)
+        snippet = raw_stripped[snippet_start:snippet_end]
+        arrow = " " * (pos - snippet_start) + "^"
+        print(f"Context around char {pos}:\n{snippet}\n{arrow}", file=sys.stderr)
+        if len(raw_stripped) < 200:
+            print("Full response (short):\n", raw_stripped, file=sys.stderr)
+        elif exc.msg == "Expecting value" and pos > len(raw_stripped) - 50:
+            print(
+                "[cli_run] Response appears truncated (hit token limit). "
+                "Try --provider deepseek for a shorter output, or reduce watchlist size.",
+                file=sys.stderr,
+            )
         sys.exit(1)
 
     print("[cli_run] ✓ JSON parsed successfully.", file=sys.stderr)
