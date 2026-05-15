@@ -231,13 +231,19 @@ function IndustryList({
           rows.map((row) => (
             <li
               key={`${title}-${row.industry}`}
-              className="grid grid-cols-[minmax(0,1fr)_64px_64px] gap-2 text-[12px]"
+              className="grid grid-cols-[minmax(0,1fr)_auto_52px] gap-2 text-[12px]"
             >
               <span className="truncate font-semibold text-[var(--fg-1)]" title={row.industry}>
                 {row.industry}
               </span>
-              <span className={`text-right font-mono ${deltaClass(history ? row.delta_wow : row.pct_above_50sma)}`}>
-                {history ? formatPct(row.delta_wow, true) : formatPct(row.pct_above_50sma)}
+              {/* Always show current breadth%; append WoW delta when history is available */}
+              <span className="whitespace-nowrap text-right font-mono">
+                <span className="text-[var(--fg-2)]">{formatPct(row.pct_above_50sma)}</span>
+                {history && row.delta_wow != null && (
+                  <span className={`ml-1.5 ${deltaClass(row.delta_wow)}`}>
+                    {row.delta_wow > 0 ? "↑" : "↓"} {formatPct(Math.abs(row.delta_wow))}
+                  </span>
+                )}
               </span>
               <span className="text-right font-mono text-[var(--fg-3)]">{row.n} names</span>
             </li>

@@ -2,10 +2,12 @@ name: Morning Brief — 9:30 PM MYT (market open)
 
 # Runs at 13:30 UTC = 9:30 PM MYT = 9:30 AM ET (US market open), Mon–Fri.
 # Uses cli_run.py which:
-#   1. Reads your saved watchlist from the dashboard DB (/api/watchlist/export)
-#   2. Merges today's TV screener top tickers (tv_screeners.json from prior run)
-#   3. Calls Gemini (falls back to DeepSeek) with the combined list
-#   4. Pushes the StructuredBrief JSON to /api/morning-verdict/ingest
+#   1. Fetches CNN Fear & Greed Index live
+#   2. Fetches live yfinance prices for all watchlist tickers
+#   3. Reads your saved watchlist from the dashboard DB (/api/watchlist/export)
+#   4. Merges today's TV screener top tickers (tv_screeners.json from prior run)
+#   5. Calls DeepSeek-V4-Flash + web search (falls back to Gemini) with the combined list
+#   6. Pushes the StructuredBrief JSON to /api/morning-verdict/ingest
 # Dashboard viewers see the updated brief within 60 seconds.
 
 on:
@@ -14,9 +16,9 @@ on:
   workflow_dispatch:
     inputs:
       provider:
-        description: 'AI provider (gemini | deepseek | openai | claude)'
+        description: 'AI provider (deepseek-search | deepseek | gemini | openai | claude)'
         required: false
-        default: 'gemini'
+        default: 'deepseek-search'
       watchlist:
         description: 'Override watchlist (comma-separated tickers, blank = use DB)'
         required: false
@@ -41,37 +43,35 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      # Install only what cli_run.py needs (stdlib-only — no extra deps)
-      # The backend requirements are NOT needed here; cli_run.py uses urllib only.
-      # However, we install the backend requirements anyway so that any future
-      # enrichment steps (e.g. yfinance snapshot) work without a separate install.
+      # cli_run.py uses only stdlib + optional yfinance for live price pre-fetch
       - name: Install Python dependencies
-        run: pip install requests yfinance 2>/dev/null || true
+        run: pip install yfinance
 
-      # ── Primary run: Gemini (best quality, web-search grounded) ─────────────
-      - name: Generate + push morning brief (Gemini)
-        id: gemini
+      # ── Primary run: DeepSeek-V4-Flash + web search (live-data grounded) ────
+      - name: Generate + push morning brief (DeepSeek search)
+        id: deepseek_search
         continue-on-error: true
         run: |
-          PROVIDER="${{ github.event.inputs.provider || 'gemini' }}"
+          PROVIDER="${{ github.event.inputs.provider || 'deepseek-search' }}"
           EXTRA_FLAGS=""
           if [ -n "${{ github.event.inputs.watchlist }}" ]; then
             EXTRA_FLAGS="--watchlist ${{ github.event.inputs.watchlist }}"
           fi
           python cli_run.py --provider "$PROVIDER" --post $EXTRA_FLAGS
         env:
-          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           DEEPSEEK_API_KEY:  ${{ secrets.DEEPSEEK_API_KEY }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY:    ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
 
-      # ── Fallback: DeepSeek (fast, cheap) if Gemini failed ───────────────────
-      - name: Fallback — DeepSeek brief
-        if: steps.gemini.outcome == 'failure'
-        run: python cli_run.py --provider deepseek --post
+      # ── Fallback: Gemini if DeepSeek search failed ───────────────────────────
+      - name: Fallback — Gemini brief
+        if: steps.deepseek_search.outcome == 'failure'
+        run: python cli_run.py --provider gemini --post
         env:
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           DEEPSEEK_API_KEY:  ${{ secrets.DEEPSEEK_API_KEY }}
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}

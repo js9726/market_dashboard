@@ -89,30 +89,139 @@ def _push(structured_json: object, provider: str) -> dict:
 ROOT = Path(__file__).parent
 
 
-def _build_prompt(date_str: str, watchlist: list[str]) -> str:
+def _fetch_fear_and_greed() -> tuple[int | None, str | None]:
+    """Fetch CNN Fear & Greed Index. Returns (score, label) or (None, None) on failure."""
+    url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        fg = data.get("fear_and_greed", {})
+        score = fg.get("score")
+        label = fg.get("rating")
+        if score is not None:
+            return round(float(score)), str(label) if label else None
+    except Exception as e:
+        print(f"[cli_run] Fear & Greed fetch failed ({e})", file=sys.stderr)
+    return None, None
+
+
+def _fetch_live_prices(tickers: list[str]) -> dict[str, dict]:
+    """
+    Fetch current price + change% via yfinance for each ticker.
+    Returns {TICKER: {price: float|None, changePct: float|None}}.
+    Capped at 25 tickers to stay within a 30 s window.
+    """
+    if not tickers:
+        return {}
+    try:
+        import yfinance as yf  # optional dep; installed in the GH Actions runner
+    except ImportError:
+        print("[cli_run] yfinance not installed — skipping live price fetch", file=sys.stderr)
+        return {}
+
+    results: dict[str, dict] = {}
+    batch = tickers[:25]
+    try:
+        # Batch download is faster than per-ticker calls.
+        # yfinance returns a DataFrame for multiple tickers and a Series-indexed
+        # DataFrame for a single ticker — handle both cases.
+        raw = yf.download(batch, period="2d", interval="1d", progress=False, auto_adjust=True)
+        closes = raw["Close"]
+        # For a single ticker yf returns closes as a plain Series; wrap it.
+        import pandas as pd
+        if isinstance(closes, pd.Series):
+            closes = closes.to_frame(name=batch[0])
+        for ticker in batch:
+            try:
+                if ticker not in closes.columns:
+                    results[ticker] = {"price": None, "changePct": None}
+                    continue
+                vals = closes[ticker].dropna()
+                if len(vals) >= 2:
+                    prev, curr = float(vals.iloc[-2]), float(vals.iloc[-1])
+                    change_pct = round((curr - prev) / prev * 100, 2)
+                    results[ticker] = {"price": round(curr, 2), "changePct": change_pct}
+                elif len(vals) == 1:
+                    results[ticker] = {"price": round(float(vals.iloc[-1]), 2), "changePct": None}
+                else:
+                    results[ticker] = {"price": None, "changePct": None}
+            except Exception:
+                results[ticker] = {"price": None, "changePct": None}
+    except Exception as e:
+        print(f"[cli_run] yfinance batch download failed ({e})", file=sys.stderr)
+        for ticker in batch:
+            results[ticker] = {"price": None, "changePct": None}
+
+    found = sum(1 for v in results.values() if v.get("price") is not None)
+    print(f"[cli_run] Live prices fetched: {found}/{len(batch)} tickers resolved", file=sys.stderr)
+    return results
+
+
+def _build_live_block(
+    fear_greed: tuple[int | None, str | None],
+    live_prices: dict[str, dict],
+) -> str:
+    lines: list[str] = []
+
+    fg_score, fg_label = fear_greed
+    if fg_score is not None:
+        lines.append(f"  Fear & Greed Index: {fg_score}/100 ({fg_label})")
+
+    if live_prices:
+        lines.append("  Watchlist live prices (as of brief generation — use exactly):")
+        for ticker, d in live_prices.items():
+            price = d.get("price")
+            chg = d.get("changePct")
+            if price is not None:
+                chg_str = f"{'+' if chg and chg > 0 else ''}{chg:.2f}%" if chg is not None else "N/A"
+                lines.append(f"    {ticker}: ${price:.2f} ({chg_str})")
+            else:
+                lines.append(f"    {ticker}: price unavailable")
+
+    if not lines:
+        return "  (No pre-fetched data available — rely on web search for all values.)"
+    return "\n".join(lines)
+
+
+def _build_prompt(
+    date_str: str,
+    watchlist: list[str],
+    fear_greed: tuple[int | None, str | None] = (None, None),
+    live_prices: dict[str, dict] | None = None,
+) -> str:
     template = (ROOT / "prompt.md").read_text(encoding="utf-8")
+    live_block = _build_live_block(fear_greed, live_prices or {})
     return (
         template
         .replace("{date_str}", date_str)
         .replace("{watchlist_str}", ", ".join(watchlist))
+        .replace("{live_data_block}", live_block)
     )
 
 
 # ── provider callers ──────────────────────────────────────────────────────────
 
-def _call_deepseek(prompt: str) -> str:
+def _call_deepseek(prompt: str, *, search: bool = False) -> str:
+    """
+    Calls DeepSeek chat completions.
+
+    model: deepseek-v4-flash (previously deepseek-chat).
+    search=True adds search_options to enable web grounding (beta).
+    """
     api_key = os.environ.get("DEEPSEEK_API_KEY", "")
     if not api_key:
         print("DEEPSEEK_API_KEY not set.", file=sys.stderr)
         sys.exit(2)
-    body = json.dumps(
-        {
-            "model": "deepseek-chat",
-            "messages": [{"role": "user", "content": prompt}],
-            "response_format": {"type": "json_object"},
-            "max_tokens": 8000,
-        }
-    ).encode("utf-8")
+    payload: dict = {
+        "model": "deepseek-v4-flash",
+        "messages": [{"role": "user", "content": prompt}],
+        "response_format": {"type": "json_object"},
+        "max_tokens": 8000,
+    }
+    if search:
+        payload["search_options"] = {"search_enabled": True}
+    body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
         "https://api.deepseek.com/v1/chat/completions",
         data=body,
@@ -122,6 +231,11 @@ def _call_deepseek(prompt: str) -> str:
     with urllib.request.urlopen(req, timeout=120) as r:
         data = json.loads(r.read().decode("utf-8"))
     return data["choices"][0]["message"]["content"]
+
+
+def _call_deepseek_search(prompt: str) -> str:
+    """DeepSeek v4-flash with web search enabled (primary cron provider)."""
+    return _call_deepseek(prompt, search=True)
 
 
 def _call_openai(prompt: str) -> str:
@@ -222,7 +336,8 @@ def _call_claude(prompt: str) -> str:
 
 
 CALLERS = {
-    "deepseek": _call_deepseek,
+    "deepseek": _call_deepseek,          # deepseek-v4-flash, no search
+    "deepseek-search": _call_deepseek_search,  # deepseek-v4-flash + web search (preferred for cron)
     "openai": _call_openai,
     "gemini": _call_gemini,
     "claude": _call_claude,
@@ -332,9 +447,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a StructuredBrief via an AI provider.")
     parser.add_argument(
         "--provider",
-        default="deepseek",
+        default="deepseek-search",
         choices=list(CALLERS),
-        help="Which AI provider to use (default: deepseek)",
+        help="Which AI provider to use (default: deepseek-search = v4-flash + web search)",
     )
     parser.add_argument("--post", action="store_true", help="Push result to the dashboard ingest API")
     parser.add_argument("--out", default=None, help="Save JSON output to a file")
@@ -363,7 +478,19 @@ def main() -> None:
         "{day}", str(now_myt.day)
     )  # e.g. "Thursday, May 14, 2026"
 
-    prompt = _build_prompt(date_str, watchlist)
+    # ── Pre-fetch live data before calling the LLM ──────────────────────────
+    print("[cli_run] Fetching Fear & Greed Index...", file=sys.stderr)
+    fear_greed = _fetch_fear_and_greed()
+    fg_score, fg_label = fear_greed
+    print(
+        f"[cli_run] Fear & Greed: {fg_score}/100 ({fg_label})" if fg_score else "[cli_run] Fear & Greed: unavailable",
+        file=sys.stderr,
+    )
+
+    print(f"[cli_run] Fetching live prices for {len(watchlist)} tickers...", file=sys.stderr)
+    live_prices = _fetch_live_prices(watchlist)
+
+    prompt = _build_prompt(date_str, watchlist, fear_greed=fear_greed, live_prices=live_prices)
 
     print(f"[cli_run] provider={args.provider}  date={date_str}  watchlist={watchlist}", file=sys.stderr)
     print("[cli_run] Calling provider...", file=sys.stderr)

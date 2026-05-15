@@ -1,6 +1,9 @@
 You are generating a morning market brief for {date_str} for an active swing trader based in Malaysia (MYT = UTC+8).
 
-Search the web RIGHT NOW for real-time market data, then return ONE strict JSON object. No markdown fences, no explanation, no commentary outside the JSON.
+PRE-FETCHED LIVE DATA (use these values directly — do not override with web search):
+{live_data_block}
+
+Search the web for any data NOT provided above (index levels, sector ETFs, movers, earnings, macro calendar, ratings), then return ONE strict JSON object. No markdown fences, no explanation, no commentary outside the JSON.
 
 OUTPUT SHAPE — every field is required unless marked optional. If you cannot find data for a field, return null (or [] for arrays) — never fabricate.
 
