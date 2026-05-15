@@ -90,9 +90,26 @@ ROOT = Path(__file__).parent
 
 
 def _fetch_fear_and_greed() -> tuple[int | None, str | None]:
-    """Fetch CNN Fear & Greed Index. Returns (score, label) or (None, None) on failure."""
+    """
+    Fetch CNN Fear & Greed Index.
+    Returns (score, label) or (None, None) on failure.
+
+    CNN's dataviz endpoint requires browser-like headers or it returns 418.
+    We send a realistic Accept/Referer header set to pass the bot check.
+    """
     url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://edition.cnn.com/markets/fear-and-greed",
+        "Origin": "https://edition.cnn.com",
+    }
+    req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=10) as r:
             data = json.loads(r.read().decode("utf-8"))
