@@ -56,8 +56,14 @@ function scoreTone(score: number | null | undefined): { background: string; colo
 }
 
 function extractManualScore(payload: Record<string, unknown>): ManualScore {
-  const composite = typeof payload.composite_score === "number" ? payload.composite_score : null;
-  const score = composite == null ? null : Math.round(composite * 10);
+  // LLMs sometimes return numbers as strings (e.g. "7.5" instead of 7.5).
+  // composite_score is on a 1–10 scale; multiply ×10 to match the 0–100 display scale.
+  const raw = payload.composite_score;
+  const composite =
+    typeof raw === "number" ? raw :
+    typeof raw === "string" ? parseFloat(raw) :
+    null;
+  const score = composite == null || isNaN(composite) ? null : Math.round(composite * 10);
   const verdict = typeof payload.composite_verdict === "string" ? payload.composite_verdict : null;
   const note = typeof payload.composite_note === "string" ? payload.composite_note : null;
   return { score, verdict, note };

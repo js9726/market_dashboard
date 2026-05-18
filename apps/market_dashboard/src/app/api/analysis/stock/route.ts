@@ -8,15 +8,22 @@ import {
   type StockDisplayFields,
 } from "@/lib/trader-scorer-stock/handler";
 
+const FULL_MODULES   = ["price", "financialData", "summaryDetail", "defaultKeyStatistics", "assetProfile", "calendarEvents"] as const;
+const CORE_MODULES   = ["price", "financialData", "summaryDetail", "defaultKeyStatistics", "assetProfile"] as const;
+
 async function fetchStockData(ticker: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const yf = yahooFinance as any;
-  const summary = await yf.quoteSummary(
-    ticker,
-    { modules: ["price", "financialData", "summaryDetail", "defaultKeyStatistics", "assetProfile", "calendarEvents"] },
-    { skipValidation: true }
-  );
-  return summary as Record<string, unknown>;
+  try {
+    // Try the full module set first (includes earnings dates via calendarEvents).
+    const summary = await yf.quoteSummary(ticker, { modules: FULL_MODULES }, { skipValidation: true });
+    return summary as Record<string, unknown>;
+  } catch {
+    // calendarEvents (or another optional module) sometimes causes Yahoo Finance
+    // to reject the request for certain tickers.  Fall back to core modules only.
+    const summary = await yf.quoteSummary(ticker, { modules: CORE_MODULES }, { skipValidation: true });
+    return summary as Record<string, unknown>;
+  }
 }
 
 function fmt(v: number | null | undefined, decimals = 2): string {
@@ -135,7 +142,10 @@ FUNDAMENTALS:
     };
     const prompt = buildStockPrompt({ stockContext, display });
 
-    const raw = await callLLM(prompt, stockAnalystSystem, { maxTokens: 2048, provider });
+    // tier:"fast" keeps the request well inside Vercel's function timeout:
+    //   deepseek-chat  → primary (fast + cheap)
+    //   gemini-2.0-flash → fallback (2-4 s vs 10-20 s for 2.5-pro)
+    const raw = await callLLM(prompt, stockAnalystSystem, { maxTokens: 1024, provider, tier: "fast" });
 
     let analysis: Record<string, unknown>;
     try {
