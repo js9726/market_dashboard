@@ -16,7 +16,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import type { BreadthSnapshot } from "@/types/breadth";
+import type { BreadthSnapshot, MarketBreadth } from "@/types/breadth";
 import type { TvScreenerHit, TvScreenersFile } from "@/types/tv-screener";
 
 export interface SnapshotIndustryLeader {
@@ -46,6 +46,8 @@ export interface ComposedSnapshot {
   sectors: Record<string, { price: number; changePct: number | null; source: string }>;
   watchlist: Record<string, { price: number; changePct: number | null; source: string }>;
   industryMovers: SnapshotIndustryMover[];
+  breadth: MarketBreadth | null;
+  marketDirection: string | null;
   baseline: unknown; // raw snapshot.json content for the LLM
 }
 
@@ -333,16 +335,55 @@ export async function composeSnapshot(watchlist: string[]): Promise<ComposedSnap
         .filter((x): x is [string, { price: number; changePct: number | null; source: string }] => x !== null),
     );
 
+  const indices = pickGroup(INDEX_SYMBOLS);
+
   return {
     builtAt: new Date().toISOString(),
     baselineBuiltAt,
     liveAsOf: liveAsOf ? liveAsOf.toISOString() : null,
-    indices: pickGroup(INDEX_SYMBOLS),
+    indices,
     sectors: pickGroup(SECTOR_SYMBOLS),
     watchlist: pickGroup(watchlist),
     industryMovers: buildIndustryMovers({ baseline, tvScreeners, breadth }),
+    breadth: breadth?.market ?? null,
+    marketDirection: buildMarketDirection(indices),
     baseline,
   };
+}
+
+/**
+ * One-line summary of the live tape, e.g.
+ *   "RED — SPY -1.20% / QQQ -1.51% / IWM -2.41% / DIA -1.03% (VIX +5.18%)"
+ * Authoritative anti-hallucination cue for the LLM. Returns null if no live
+ * index changePct is available.
+ */
+function buildMarketDirection(
+  indices: Record<string, { price: number; changePct: number | null; source: string }>,
+): string | null {
+  const equityKeys = ["SPY", "QQQ", "IWM", "DIA"] as const;
+  const parts: string[] = [];
+  let positive = 0;
+  let negative = 0;
+  for (const key of equityKeys) {
+    const row = indices[key];
+    if (!row || row.changePct == null) continue;
+    if (row.changePct > 0) positive += 1;
+    else if (row.changePct < 0) negative += 1;
+    const sign = row.changePct >= 0 ? "+" : "";
+    parts.push(`${key} ${sign}${row.changePct.toFixed(2)}%`);
+  }
+  if (parts.length === 0) return null;
+
+  const vix = indices["^VIX"];
+  const vixPart =
+    vix && vix.changePct != null
+      ? ` (VIX ${vix.changePct >= 0 ? "+" : ""}${vix.changePct.toFixed(2)}%)`
+      : "";
+
+  let label = "MIXED";
+  if (negative > positive && negative >= 2) label = "RED";
+  else if (positive > negative && positive >= 2) label = "GREEN";
+  return `${label} — ${parts.join(" / ")}${vixPart}`;
 }
 
 /**

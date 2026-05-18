@@ -175,15 +175,51 @@ def _fetch_live_prices(tickers: list[str]) -> dict[str, dict]:
     return results
 
 
+def _fetch_breadth_from_disk() -> dict | None:
+    """
+    Read the latest breadth.json written by breadth_scan.py. Looks in the same
+    candidate paths as tv_screeners.json so the cron and local runs both work.
+    Returns the `market` sub-dict (advance/decline/new_highs/new_lows/universe_size),
+    or None if the file is missing/malformed.
+    """
+    candidates = [
+        ROOT.parent.parent.parent / "apps" / "market_dashboard" / "public" / "market-dashboard" / "breadth.json",
+        ROOT.parent.parent.parent / "apps" / "market_dashboard_backend" / "data" / "breadth.json",
+        ROOT / "breadth.json",
+    ]
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            market = data.get("market") if isinstance(data, dict) else None
+            if isinstance(market, dict):
+                return market
+        except Exception:
+            continue
+    return None
+
+
 def _build_live_block(
     fear_greed: tuple[int | None, str | None],
     live_prices: dict[str, dict],
+    breadth: dict | None = None,
 ) -> str:
     lines: list[str] = []
 
     fg_score, fg_label = fear_greed
     if fg_score is not None:
         lines.append(f"  Fear & Greed Index: {fg_score}/100 ({fg_label})")
+
+    if breadth:
+        lines.append(
+            "  Market breadth (from breadth_scan.py — authoritative, copy into breadth.up/breadth.down exactly, never invent):"
+        )
+        lines.append(f"    advance: {breadth.get('advance')}")
+        lines.append(f"    decline: {breadth.get('decline')}")
+        lines.append(f"    new_highs: {breadth.get('new_highs')}")
+        lines.append(f"    new_lows: {breadth.get('new_lows')}")
+        lines.append(f"    universe_size: {breadth.get('universe_size')}")
 
     if live_prices:
         lines.append("  Watchlist live prices (as of brief generation — use exactly):")
@@ -206,9 +242,10 @@ def _build_prompt(
     watchlist: list[str],
     fear_greed: tuple[int | None, str | None] = (None, None),
     live_prices: dict[str, dict] | None = None,
+    breadth: dict | None = None,
 ) -> str:
     template = (ROOT / "prompt.md").read_text(encoding="utf-8")
-    live_block = _build_live_block(fear_greed, live_prices or {})
+    live_block = _build_live_block(fear_greed, live_prices or {}, breadth=breadth)
     return (
         template
         .replace("{date_str}", date_str)
@@ -507,7 +544,16 @@ def main() -> None:
     print(f"[cli_run] Fetching live prices for {len(watchlist)} tickers...", file=sys.stderr)
     live_prices = _fetch_live_prices(watchlist)
 
-    prompt = _build_prompt(date_str, watchlist, fear_greed=fear_greed, live_prices=live_prices)
+    breadth = _fetch_breadth_from_disk()
+    if breadth:
+        print(
+            f"[cli_run] Breadth from disk: advance={breadth.get('advance')} decline={breadth.get('decline')} universe={breadth.get('universe_size')}",
+            file=sys.stderr,
+        )
+    else:
+        print("[cli_run] Breadth: no breadth.json found — LLM will return null", file=sys.stderr)
+
+    prompt = _build_prompt(date_str, watchlist, fear_greed=fear_greed, live_prices=live_prices, breadth=breadth)
 
     print(f"[cli_run] provider={args.provider}  date={date_str}  watchlist={watchlist}", file=sys.stderr)
     print("[cli_run] Calling provider...", file=sys.stderr)

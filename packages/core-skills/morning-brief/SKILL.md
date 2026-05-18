@@ -21,16 +21,18 @@ then pushes it to the dashboard so Jie and his viewers see it in real time.
 ## DAILY WORKFLOW — two paths
 
 ```
-PATH A: Claude CLI (richest — web search + live TV watchlist)
+PATH A: Claude CLI itself generates the brief (populates the "Claude" tab)
    Step 1  Read TV watchlist via Chrome
    Step 2  Read TV screener top tickers
-   Step 3  Generate brief (web search grounded)
-   Step 4  Push to dashboard
+   Step 3  Claude CLI runs WebSearch against the prompt.md research sections
+           → produces a single StructuredBrief JSON object in chat
+   Step 4  Pipe the JSON through ingest_to_dashboard.py
+           → lands on the Claude tab (provider="claude")
 
-PATH B: python cli_run.py (fast — snapshot-fed, no web search)
+PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/GPT-4o tabs)
    Reads watchlist from dashboard DB + screener json
-   Calls DeepSeek / Gemini API directly
-   Pushes to dashboard
+   Calls the chosen provider's API (DeepSeek / Gemini / OpenAI / Anthropic)
+   Pushes to dashboard as that provider
 ```
 
 ---
@@ -75,56 +77,81 @@ Store the merged list as `$FULL_WATCHLIST` (personal + screener extras, deduplic
 If Chrome is unavailable, skip this step. The screener results from the last daily run
 are already embedded in the snapshot via `tv_screeners.json`.
 
-### Step 3 — Generate the StructuredBrief
+### Step 3 — Claude CLI generates the StructuredBrief itself
 
-The fastest path — let `cli_run.py` handle generation AND push in one command (Step 4).
-Only call the AI separately if you need to inspect the JSON before pushing.
+This step is what makes PATH A populate the **Claude** tab on the dashboard.
+Claude CLI is the generator here — not Gemini, not DeepSeek. `cli_run.py` calls
+external provider APIs and is used in PATH B; do NOT use it in this step.
 
-Call the AI with web search enabled (Gemini Search Grounding or Claude web search):
-- Pre-market / at open (9:30 PM MYT): Gemini — web search gives richer citations
-- Intraday refresh: DeepSeek — fast, cheap, snapshot-fed
+1. **Read the prompt template** at `packages/core-skills/morning-brief/prompt.md`.
+2. **Read the trader profiles** at `packages/core-skills/_shared/trader-profiles.json`
+   so the `traderLens` and `movers[].traderLens` fields use the correct seven names.
+3. **Fill the prompt slots locally:**
+   - `{date_str}` — today's date in Malaysia time (MYT = UTC+8).
+   - `{watchlist_str}` — `$FULL_WATCHLIST` from Steps 1–2.
+   - `{live_data_block}` — fetch CNN Fear & Greed (`https://production.dataviz.cnn.io/index/fearandgreed/graphdata`) and yfinance live prices for the watchlist, OR leave a brief "unavailable" stub if those endpoints fail. Do not hold up Step 3 on these — the WebSearch in step 4 will fill any gaps.
+4. **Use your WebSearch tool** to research the sections enumerated in `prompt.md`
+   (indices/breadth/sectors/industry movers/earnings/economic calendar/Fear & Greed).
+   Every numeric value you emit must be traceable to a citation you actually fetched.
+5. **Emit a single JSON object** matching the StructuredBrief schema (the schema is
+   described inline in `prompt.md`). No prose, no markdown — JSON only.
 
-The response MUST be a single JSON object matching the StructuredBrief schema.
+### Step 4 — Push the Claude-generated JSON to the Claude tab
 
-### Step 4 — Generate + Push to dashboard (single command — ALWAYS run this)
+`ingest_to_dashboard.py` defaults `BRIEF_PROVIDER` to `"claude"`, so a plain pipe lands
+on the Claude tab. Save the JSON from Step 3 to disk first (so the push is reproducible
+and the JSON is auditable), then ingest:
 
-```bash
+```powershell
 cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
 
-python cli_run.py \
-  --provider gemini \
-  --tv-watchlist "NVDA,TSLA,AAPL,..." \
-  --post
-```
+# write the JSON Claude produced in Step 3 to a file (PowerShell heredoc):
+@'
+{ "mood": {...}, "breadth": {...}, ... full StructuredBrief ... }
+'@ | Out-File -Encoding utf8 brief_output.json
 
-Replace `NVDA,TSLA,AAPL,...` with `$FULL_WATCHLIST` from Steps 1-2.
-
-The `--post` flag is what injects the brief into the Postgres DB so the dashboard and
-all viewers see it. **Without `--post` the brief is never saved — it only prints to stdout.**
-
-Confirm push: `✓ Pushed: bucketAt=... id=...`
-
-Dashboard viewers see the updated brief within 60 seconds (the poll interval).
-
-If you already have a JSON file from a previous generation, push it standalone:
-
-```bash
+# push as provider=claude (the default)
 python ingest_to_dashboard.py brief_output.json
 ```
 
+Bash / WSL equivalent:
+
+```bash
+cd "/c/Users/jiesh/AI codes hub/market_dashboard/packages/core-skills/morning-brief"
+cat > brief_output.json <<'EOF'
+{ "mood": {...}, "breadth": {...}, ... full StructuredBrief ... }
+EOF
+python ingest_to_dashboard.py brief_output.json
+```
+
+**Confirm in chat:**
+> `✓ Ingested as provider='claude', bucketAt=<ISO>`
+
+Dashboard viewers see the updated **Claude** chip within ~60 seconds (the poll interval).
+
+If you only need to refresh DeepSeek/Gemini/GPT-4o instead, jump to PATH B.
+
 ---
 
-## PATH B — Direct Python (quick re-run, no web search)
+## PATH B — `cli_run.py` (refreshes DeepSeek / Gemini / GPT-4o tabs)
 
-Use this for intraday snapshot refreshes or when you just want a fast re-run.
+Use this for the **non-Claude** provider tabs. Each invocation calls one provider's
+API and pushes the result tagged as that provider. The Claude tab is NOT refreshed
+by this path — use PATH A for that.
 
 ```bash
 cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
 
-# Uses watchlist from dashboard DB + today's screener results automatically
+# DeepSeek — fast, cheap intraday refresh (no web search)
 python cli_run.py --provider deepseek --post
 
-# Override with specific tickers
+# Gemini — pre-market run, Search Grounding gives richer citations
+python cli_run.py --provider gemini --post --tv-watchlist "NVDA,TSLA,AAPL,..."
+
+# OpenAI GPT-4o — pre-market, web_search_preview tool
+python cli_run.py --provider openai --post
+
+# Override watchlist with specific tickers
 python cli_run.py --provider deepseek --post --watchlist "NVDA,TSLA,AAPL,COIN"
 ```
 
@@ -172,15 +199,19 @@ python scripts/tv_screener_fetch.py --out-dir data
 cd ../../apps/market_dashboard
 npm run sync:market
 
-# 4. Generate morning brief + push (reads your dashboard watchlist automatically)
+# 4. Refresh the non-Claude provider tabs via PATH B
 cd ../../packages/core-skills/morning-brief
 python cli_run.py --provider gemini --post
+python cli_run.py --provider deepseek --post
+python cli_run.py --provider openai --post   # optional, requires OPENAI_API_KEY
 ```
 
-Or via Claude CLI (richer — uses live web search + reads TV watchlist from Chrome):
+Then run Claude CLI to refresh the **Claude** tab via PATH A:
 ```
 run morning brief
 ```
+Claude CLI uses its own WebSearch tool, emits a StructuredBrief JSON, and pipes
+it through `ingest_to_dashboard.py` (which defaults to provider=claude).
 
 ---
 

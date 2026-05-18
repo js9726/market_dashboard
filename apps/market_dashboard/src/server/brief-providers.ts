@@ -24,7 +24,7 @@ export interface ProviderResult {
 }
 
 const MODEL_IDS: Record<BriefProvider, string> = {
-  deepseek: "deepseek-chat",
+  deepseek: "deepseek-v4-flash",
   gemini: "gemini-2.5-pro",
   openai: "gpt-4o",
   claude: "claude-sonnet-4-6",
@@ -59,6 +59,10 @@ function buildSystemPrompt(): string {
     "This is a snapshot-fed refresh with no live web access; reason only from the snapshot and breadth data provided.",
     "Use null (not empty string) when a field cannot be inferred from the snapshot.",
     "",
+    "ANTI-HALLUCINATION RULES",
+    "1. The BREADTH block in the user message is authoritative. Set `breadth.up` = `advance` and `breadth.down` = `decline` exactly as given. Use `null` for both if the block is missing — never invent these numbers.",
+    "2. Every `traderLens[].view`, `movers[].traderLens`, and the `mood`/`indicesNarrative`/`sectorsNarrative` fields must be consistent with the MARKET DIRECTION line. On a RED tape, do not write 'confirmed uptrend', 'rotation into <leadership>', or similar bullish framing unless a positive sector or index in the snapshot directly supports it. On a GREEN tape, the inverse applies.",
+    "",
     "TRADER-STYLE FRAMEWORK",
     "Colour the `traderLens` array and `movers[].traderLens` using these seven trader lenses.",
     "Match each trader's lens exactly — do not invent new names.",
@@ -73,10 +77,26 @@ function buildSystemPrompt(): string {
 const SYSTEM_PROMPT = buildSystemPrompt();
 
 function userPromptFor(snapshot: ComposedSnapshot, dateStr: string, watchlist: string[]): string {
+  const breadthBlock = snapshot.breadth
+    ? [
+        "BREADTH (from breadth_scan.py — authoritative, copy verbatim into breadth.up / breadth.down):",
+        `advance: ${snapshot.breadth.advance}`,
+        `decline: ${snapshot.breadth.decline}`,
+        `new_highs: ${snapshot.breadth.new_highs}`,
+        `new_lows: ${snapshot.breadth.new_lows}`,
+        `universe: ${snapshot.breadth.universe_size}`,
+      ].join("\n")
+    : "BREADTH: unavailable — set breadth.up and breadth.down to null.";
+
   return [
     `Date: ${dateStr} (Malaysia time)`,
     `Live data as of: ${snapshot.liveAsOf ?? "unavailable"}`,
     `Baseline snapshot built at: ${snapshot.baselineBuiltAt ?? "unavailable"}`,
+    "",
+    "MARKET DIRECTION (computed from live indices — authoritative):",
+    snapshot.marketDirection ?? "unavailable",
+    "",
+    breadthBlock,
     "",
     "INDICES (live overlay):",
     JSON.stringify(snapshot.indices, null, 2),
