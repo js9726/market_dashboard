@@ -12,7 +12,11 @@ const TV_WATCHLIST_URL = "https://www.tradingview.com/watchlists/169793207/";
 const TICKER_RE = /^[A-Z][A-Z0-9.\-]{0,9}$/;
 
 function normalizeTicker(raw: string): string | null {
-  const t = raw.trim().toUpperCase();
+  let t = raw.trim().toUpperCase();
+  // Strip TradingView exchange prefix (NYSE:GLXY, NASDAQ:NVDA, SNP:SPX, BATS:VG, etc.)
+  if (t.includes(":")) {
+    t = t.split(":").pop()!.trim();
+  }
   return TICKER_RE.test(t) ? t : null;
 }
 
@@ -35,11 +39,13 @@ export default function WatchlistEditor() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/watchlist");
+      const res = await fetch("/api/watchlist", { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as { items?: WatchlistItem[] };
       setItems(data.items ?? []);
-    } catch {
-      setError("Failed to load watchlist.");
+      setError(null);
+    } catch (e) {
+      setError(`Failed to load watchlist (${(e as Error).message}).`);
     } finally {
       setLoading(false);
     }
@@ -83,6 +89,23 @@ export default function WatchlistEditor() {
     }
   }
 
+  async function clearAll() {
+    if (!items.length) return;
+    if (!window.confirm(`Remove all ${items.length} tickers from your watchlist?`)) return;
+    setSaving(true);
+    let removed = 0;
+    for (const item of items) {
+      try {
+        const res = await fetch(`/api/watchlist?ticker=${encodeURIComponent(item.ticker)}`, { method: "DELETE" });
+        if (res.ok) removed++;
+      } catch { /* skip */ }
+    }
+    setItems([]);
+    setSaving(false);
+    flash(`Cleared ${removed} ticker${removed !== 1 ? "s" : ""}.`);
+    void load();
+  }
+
   async function handleBulkImport() {
     const tickers = bulkText
       .split(/[\s,\n]+/)
@@ -110,6 +133,7 @@ export default function WatchlistEditor() {
     setBulkText("");
     setBulkOpen(false);
     flash(`${added} ticker${added !== 1 ? "s" : ""} added.`);
+    void load();
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -146,13 +170,31 @@ export default function WatchlistEditor() {
           >
             {bulkOpen ? "Cancel" : "Bulk Import"}
           </button>
+          <button
+            type="button"
+            className="mds-button h-7 px-3 text-[11px]"
+            onClick={() => void clearAll()}
+            disabled={!items.length || saving}
+            title="Remove all tickers from your watchlist"
+          >
+            Clear All
+          </button>
         </div>
       </div>
 
       {notice ? (
         <p className="mb-3 t-caption text-[var(--accent)]">{notice}</p>
       ) : error ? (
-        <p className="mb-3 t-caption text-[var(--loss-fg)]">{error}</p>
+        <p className="mb-3 t-caption text-[var(--loss-fg)]">
+          {error}{" "}
+          <button
+            type="button"
+            className="underline hover:text-[var(--fg-1)]"
+            onClick={() => void load()}
+          >
+            Retry
+          </button>
+        </p>
       ) : null}
 
       {/* Bulk import panel */}
