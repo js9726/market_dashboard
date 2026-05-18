@@ -1,17 +1,24 @@
 name: Refresh Market Data & Morning Brief
 
-# Single pre-market run, Mon–Fri 13:00 UTC (= 9:00 AM ET during EDT,
-# 8:00 AM ET during EST — both still pre-open). Generates the rich
-# web-search-grounded brief from all four AI providers and pushes the
-# results into the Postgres MorningBriefCache via /api/morning-verdict/ingest.
+# Full pipeline (snapshot + breadth + TV screeners + 4-provider brief + trader
+# verdict) runs in three windows around the US session, Mon–Fri (times in UTC,
+# locked to EDT — during EST these all shift +1h in market terms, acceptable
+# drift for a Malaysia-based owner).
 #
-# Intraday refreshes (every 15 min during the first 2 hours of US open) are
-# handled by /api/morning-verdict's lazy-regen path on Vercel — no GH Actions
-# involvement.
+#   13:00            30 min pre-market (9:00 AM ET)
+#   13:30 14:00 14:30 15:00 15:30   first 2 hours of market, every 30 min
+#   20:30            30 min post-close (4:30 PM ET)
+#
+# Total: 7 ticks/day, ~35/week. Each tick commits fresh data/* JSON which
+# triggers a Vercel redeploy (~140 builds/month, within Hobby tier).
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'
+    - cron: '0 13 * * 1-5'           # 30 min pre-market (09:00 ET EDT)
+    - cron: '30 13 * * 1-5'          # market open      (09:30 ET EDT)
+    - cron: '0,30 14 * * 1-5'        # 10:00 & 10:30 ET (first hour of trading)
+    - cron: '0,30 15 * * 1-5'        # 11:00 & 11:30 ET (second hour of trading)
+    - cron: '30 20 * * 1-5'          # 30 min post-close (16:30 ET EDT)
   workflow_dispatch: {}
 
 env:
