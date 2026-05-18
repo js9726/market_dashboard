@@ -6,6 +6,8 @@ import { useMorningVerdict, type BriefProviderName } from "@/hooks/useMorningVer
 import { useLiveQuotes, type LiveQuoteRow } from "@/hooks/useLiveQuotes";
 import type { StructuredBrief } from "@/types/structured-brief";
 import MarketBreadthPanels from "./MarketBreadthPanels";
+import FreshnessBadge from "./FreshnessBadge";
+import { BRIEF_THRESHOLDS, LIVE_QUOTE_THRESHOLDS } from "@/lib/freshness";
 
 const INDICES = [
   { symbol: "SPX", fallbackSymbol: "SPY" },
@@ -151,7 +153,10 @@ export default function MorningBriefHero({ isOwner = false }: MorningBriefHeroPr
     <section className="conviction-brief">
       <div className="conviction-brief__head">
         <div>
-          <p className="t-overline">Morning Brief</p>
+          <div className="flex items-center gap-3">
+            <p className="t-overline">Morning Brief</p>
+            <FreshnessBadge timestamp={entry?.generatedAt} thresholds={BRIEF_THRESHOLDS} />
+          </div>
           <h2>
             {dateLabel}
             {briefView.posture ? ` - ${briefView.posture}` : ""}
@@ -208,10 +213,7 @@ export default function MorningBriefHero({ isOwner = false }: MorningBriefHeroPr
             })}
           </div>
           {entry ? (
-            <span className="t-caption t-mono">
-              {entry.stale ? "Stale " : ""}
-              {new Date(entry.generatedAt).toLocaleTimeString()}
-            </span>
+            <FreshnessBadge timestamp={entry.generatedAt} thresholds={BRIEF_THRESHOLDS} />
           ) : null}
         </div>
         {isOwner ? (
@@ -272,11 +274,22 @@ function IndicesCard({
 }) {
   const briefBySymbol = new Map((briefIndices ?? []).map((row) => [row.symbol, row]));
 
+  // Freshest quote across SPY/QQQ/IWM/DIA — used to badge the panel header.
+  const freshestObservedAt = INDICES.reduce<string | null>((latest, { symbol, fallbackSymbol }) => {
+    const q = quotes.get(symbol) ?? quotes.get(fallbackSymbol);
+    if (!q) return latest;
+    if (!latest) return q.observedAt;
+    return new Date(q.observedAt).getTime() > new Date(latest).getTime() ? q.observedAt : latest;
+  }, null);
+
   return (
     <div className="conviction-brief__card">
-      <p className="t-overline text-[var(--fg-3)]">
-        Indices {activeSource ? <span className="t-caption">- {activeSource}</span> : null}
-      </p>
+      <div className="flex items-center gap-2 flex-wrap">
+        <p className="t-overline text-[var(--fg-3)]">
+          Indices {activeSource ? <span className="t-caption">- {activeSource}</span> : null}
+        </p>
+        <FreshnessBadge timestamp={freshestObservedAt} thresholds={LIVE_QUOTE_THRESHOLDS} />
+      </div>
       <ul className="compact-list">
         {INDICES.map(({ symbol, fallbackSymbol }) => {
           const quote = quotes.get(symbol);

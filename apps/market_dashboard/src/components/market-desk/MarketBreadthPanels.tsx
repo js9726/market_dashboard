@@ -5,22 +5,13 @@ import { useBreadth } from "@/hooks/useBreadth";
 import type { IndustryRow, SectorRow } from "@/types/breadth";
 import BreadthBar from "./BreadthBar";
 import StageAnalysisBar from "./StageAnalysisBar";
+import FreshnessBadge from "./FreshnessBadge";
+import { SNAPSHOT_THRESHOLDS } from "@/lib/freshness";
 
 function formatPct(value: number | null | undefined, signed = false): string {
   if (value == null || Number.isNaN(value)) return "-";
   const prefix = signed && value > 0 ? "+" : "";
   return `${prefix}${value.toFixed(1)}%`;
-}
-
-function formatBuiltAt(value: string | null | undefined): string {
-  if (!value) return "-";
-  return new Date(value).toLocaleString("en-MY", {
-    timeZone: "Asia/Kuala_Lumpur",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 function formatMcap(value: number | null | undefined): string {
@@ -60,9 +51,13 @@ export default function MarketBreadthPanels() {
             NYSE + Nasdaq composite attempt, {universeText}; sector and industry breadth at {formatMcap(data?.mcap_floor)}
           </p>
         </div>
-        <p className="t-caption t-mono">
-          {loading ? "Loading..." : error ? `Unavailable: ${error}` : `Built ${formatBuiltAt(data?.built_at)}`}
-        </p>
+        {loading ? (
+          <p className="t-caption t-mono">Loading...</p>
+        ) : error ? (
+          <p className="t-caption t-mono">Unavailable: {error}</p>
+        ) : (
+          <FreshnessBadge timestamp={data?.built_at} thresholds={SNAPSHOT_THRESHOLDS} />
+        )}
       </div>
 
       <div className="space-y-4">

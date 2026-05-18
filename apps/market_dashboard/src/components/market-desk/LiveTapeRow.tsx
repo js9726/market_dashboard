@@ -1,6 +1,8 @@
 "use client";
 
 import { useLiveQuotes, type LiveQuoteRow } from "@/hooks/useLiveQuotes";
+import FreshnessBadge from "./FreshnessBadge";
+import { LIVE_QUOTE_THRESHOLDS } from "@/lib/freshness";
 
 const SECTORS: Array<{ symbol: string; label: string }> = [
   { symbol: "XLK", label: "Technology" },
@@ -23,11 +25,10 @@ const WATCHLIST = [
 
 function sourceBadge(activeSource: string | null, activeAt: string | null) {
   if (!activeSource) return <span className="t-caption">No live source</span>;
-  const ago = activeAt ? Math.max(0, Math.round((Date.now() - new Date(activeAt).getTime()) / 1000)) : null;
   return (
-    <span className="t-caption">
-      {activeSource}
-      {ago != null ? ` · ${ago}s ago` : ""}
+    <span className="inline-flex items-center gap-2">
+      <span className="t-caption">{activeSource}</span>
+      <FreshnessBadge timestamp={activeAt} thresholds={LIVE_QUOTE_THRESHOLDS} />
     </span>
   );
 }
