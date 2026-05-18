@@ -243,14 +243,20 @@ def _build_prompt(
     fear_greed: tuple[int | None, str | None] = (None, None),
     live_prices: dict[str, dict] | None = None,
     breadth: dict | None = None,
+    screener_unscored: list[str] | None = None,
 ) -> str:
     template = (ROOT / "prompt.md").read_text(encoding="utf-8")
     live_block = _build_live_block(fear_greed, live_prices or {}, breadth=breadth)
+    unscored_str = (
+        ", ".join(screener_unscored) if screener_unscored
+        else "none (all screener tickers already scored)"
+    )
     return (
         template
         .replace("{date_str}", date_str)
         .replace("{watchlist_str}", ", ".join(watchlist))
         .replace("{live_data_block}", live_block)
+        .replace("{screener_unscored_str}", unscored_str)
     )
 
 
@@ -417,30 +423,57 @@ def _fetch_dashboard_watchlist() -> list[str]:
         return []
 
 
+_TV_SCREENER_PATHS = [
+    ROOT.parent.parent.parent / "apps" / "market_dashboard" / "public" / "market-dashboard" / "tv_screeners.json",
+    ROOT / "tv_screeners.json",
+]
+
+
+def _load_tv_screeners() -> dict | None:
+    for path in _TV_SCREENER_PATHS:
+        if path.exists():
+            try:
+                return json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+    return None
+
+
 def _top_screener_tickers(max_per_screener: int = 5) -> list[str]:
     """
     Pull the top tickers from the latest tv_screeners.json if available.
     Looks in the project's public/market-dashboard/ folder relative to this script.
     """
-    candidates = [
-        ROOT.parent.parent.parent / "apps" / "market_dashboard" / "public" / "market-dashboard" / "tv_screeners.json",
-        ROOT / "tv_screeners.json",
-    ]
-    for path in candidates:
-        if path.exists():
-            try:
-                data = json.loads(path.read_text(encoding="utf-8"))
-                tickers: list[str] = []
-                for screener in data.get("screeners", []):
-                    hits = screener.get("hits", [])
-                    for hit in hits[:max_per_screener]:
-                        t = hit.get("ticker")
-                        if t and t not in tickers:
-                            tickers.append(t)
-                return tickers
-            except Exception:
-                pass
-    return []
+    data = _load_tv_screeners()
+    if not data:
+        return []
+    tickers: list[str] = []
+    for screener in data.get("screeners", []):
+        hits = screener.get("hits", [])
+        for hit in hits[:max_per_screener]:
+            t = hit.get("ticker")
+            if t and t not in tickers:
+                tickers.append(t)
+    return tickers
+
+
+def _screener_unscored_tickers() -> list[str]:
+    """
+    Return screener tickers that were NOT auto-scored by the daily pipeline
+    (i.e. hits that have no `score` field). These will be included in the
+    StructuredBrief under `screenerScores` so the dashboard can display them.
+    """
+    data = _load_tv_screeners()
+    if not data:
+        return []
+    tickers: list[str] = []
+    for screener in data.get("screeners", []):
+        for hit in screener.get("hits", []):
+            if hit.get("score") is None:
+                t = hit.get("ticker")
+                if t and t not in tickers:
+                    tickers.append(t)
+    return tickers
 
 
 def _parse_tickers(raw: str) -> list[str]:
@@ -553,7 +586,19 @@ def main() -> None:
     else:
         print("[cli_run] Breadth: no breadth.json found — LLM will return null", file=sys.stderr)
 
-    prompt = _build_prompt(date_str, watchlist, fear_greed=fear_greed, live_prices=live_prices, breadth=breadth)
+    screener_unscored = _screener_unscored_tickers()
+    if screener_unscored:
+        print(f"[cli_run] Unscored screener tickers to score: {screener_unscored}", file=sys.stderr)
+    else:
+        print("[cli_run] All screener tickers already scored (or no screener file found).", file=sys.stderr)
+
+    prompt = _build_prompt(
+        date_str, watchlist,
+        fear_greed=fear_greed,
+        live_prices=live_prices,
+        breadth=breadth,
+        screener_unscored=screener_unscored,
+    )
 
     print(f"[cli_run] provider={args.provider}  date={date_str}  watchlist={watchlist}", file=sys.stderr)
     print("[cli_run] Calling provider...", file=sys.stderr)

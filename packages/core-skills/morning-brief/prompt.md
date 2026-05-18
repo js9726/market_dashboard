@@ -93,6 +93,14 @@ OUTPUT SHAPE — every field is required unless marked optional. If you cannot f
     "downgrades": [{ "ticker": "MSFT", "firm": "Goldman", "rating": "Neutral", "pt": 380 }]
   },
   "alert": "<short banner text|null>",
+  "screenerScores": {
+    "TICKER": {
+      "score": <0-100|null>,
+      "verdict": "BUY" | "HOLD" | "AVOID" | "STRONG BUY" | "STRONG AVOID" | null,
+      "note": "1-sentence trader-lens read on the setup quality"
+    }
+    /* include ALL screener tickers that do NOT already have a score field in tv_screeners.json */
+  },
   "citations": [
     "Reuters 07:12 ET — overnight Asia note",
     "Bloomberg 08:01 ET — Fed speakers"
@@ -111,6 +119,12 @@ TRADER STYLE FRAMEWORK (use to colour `traderLens` and `movers[].traderLens`):
 
 WATCHLIST: {watchlist_str}
 
+SCREENER TICKERS TO SCORE: {screener_unscored_str}
+These tickers appeared in today's TV screener run but were NOT auto-scored by the daily pipeline.
+For each: apply the 7-trader composite lens (same framework as `traderLens`). Emit each in `screenerScores`
+with `score` as a 0–100 integer (composite × 10), a `verdict` label, and a 1-sentence `note`.
+Use the screener data already provided in `{live_data_block}` — no extra web search needed for these.
+
 SECTIONS YOU MUST RESEARCH (search the web for each — every numeric must trace to a citation):
 1. Index snapshot: SPY/QQQ/DIA/IWM futures or live, VIX, 10Y, oil
 2. Overnight Asia + Europe (one line "why" per region — set a `note` on each index entry)
@@ -121,6 +135,7 @@ SECTIONS YOU MUST RESEARCH (search the web for each — every numeric must trace
 7. Analyst upgrades/downgrades (top 3 of each)
 8. Watchlist standouts (each ticker, current price, 1-line setup)
 9. Mood / posture / single most important variable to watch
+10. Screener scores (section above) — score every unscored screener ticker using the trader framework
 
 RULES:
 - Every numeric value must come from a real, recent web result — never fabricate.

@@ -1,14 +1,64 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTvScreeners } from "@/hooks/useTvScreeners";
 import type { TvScreener, TvScreenerHit } from "@/types/tv-screener";
+import FreshnessBadge from "./FreshnessBadge";
+import { SNAPSHOT_THRESHOLDS } from "@/lib/freshness";
 
 type ManualScore = {
   score: number | null;
   verdict: string | null;
   note: string | null;
 };
+
+/**
+ * Reads screener scores that the Claude CLI morning-brief embeds in the
+ * StructuredBrief under `screenerScores`. Fetched once on mount (browser
+ * cache re-uses the same response the MorningBriefHero is already polling).
+ * Scores are 0-100 as emitted by the CLI (already scaled).
+ */
+function useBriefScreenerScores(): Record<string, ManualScore> {
+  const [scores, setScores] = useState<Record<string, ManualScore>>({});
+  useEffect(() => {
+    fetch("/api/morning-verdict")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: unknown) => {
+        if (!data || typeof data !== "object") return;
+        const providers = (data as Record<string, unknown>).providers;
+        if (!providers || typeof providers !== "object") return;
+        const claude = (providers as Record<string, unknown>).claude;
+        if (!claude || typeof claude !== "object") return;
+        const structured = (claude as Record<string, unknown>).structured;
+        if (!structured || typeof structured !== "object") return;
+        const raw = (structured as Record<string, unknown>).screenerScores;
+        if (!raw || typeof raw !== "object") return;
+        const out: Record<string, ManualScore> = {};
+        for (const [ticker, val] of Object.entries(raw as Record<string, unknown>)) {
+          if (!val || typeof val !== "object") continue;
+          const v = val as Record<string, unknown>;
+          const rawScore = v.score;
+          const numeric =
+            typeof rawScore === "number" ? rawScore :
+            typeof rawScore === "string" ? parseFloat(rawScore) :
+            null;
+          // CLI emits scores on a 0-100 scale; if someone uses 1-10 by mistake, scale up.
+          const score =
+            numeric == null || isNaN(numeric) ? null :
+            numeric <= 10 ? Math.round(numeric * 10) :
+            Math.round(numeric);
+          out[ticker] = {
+            score,
+            verdict: typeof v.verdict === "string" ? v.verdict : null,
+            note: typeof v.note === "string" ? v.note : null,
+          };
+        }
+        setScores(out);
+      })
+      .catch(() => { /* silently ignore — brief scores are enhancement only */ });
+  }, []);
+  return scores;
+}
 
 function formatPct(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) return "-";
@@ -71,6 +121,7 @@ function extractManualScore(payload: Record<string, unknown>): ManualScore {
 
 export default function TvScreenerHits() {
   const { data, loading, error } = useTvScreeners();
+  const briefScores = useBriefScreenerScores();
   const screeners = useMemo(() => data?.screeners ?? [], [data?.screeners]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
@@ -125,9 +176,14 @@ export default function TvScreenerHits() {
             DeepSeek auto-scores the top 5 rows in the daily run; score the rest on demand.
           </p>
         </div>
-        <p className="t-caption t-mono">
-          {loading ? "Loading..." : error ? `Unavailable: ${error}` : data?.scored ? "Top 5 scored" : "Unscored"}
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="t-caption t-mono">
+            {loading ? "Loading..." : error ? `Unavailable: ${error}` : data?.scored ? "Top 5 scored" : "Unscored"}
+          </p>
+          {!loading && !error ? (
+            <FreshnessBadge timestamp={data?.fetched_at} thresholds={SNAPSHOT_THRESHOLDS} />
+          ) : null}
+        </div>
       </div>
 
       {copyMessage ? <p className="mb-3 t-caption text-[var(--accent)]">{copyMessage}</p> : null}
@@ -183,6 +239,7 @@ export default function TvScreenerHits() {
           <ScreenerTable
             screener={activeScreener}
             manualScores={manualScores}
+            briefScores={briefScores}
             scoringKey={scoringKey}
             onScore={scoreTicker}
           />
@@ -199,11 +256,13 @@ export default function TvScreenerHits() {
 function ScreenerTable({
   screener,
   manualScores,
+  briefScores,
   scoringKey,
   onScore,
 }: {
   screener: TvScreener;
   manualScores: Record<string, ManualScore>;
+  briefScores: Record<string, ManualScore>;
   scoringKey: string | null;
   onScore: (hit: TvScreenerHit, screenerId: string) => void;
 }) {
@@ -229,8 +288,10 @@ function ScreenerTable({
             screener.hits.map((hit) => {
               const key = `${screener.id}:${hit.ticker}`;
               const manual = manualScores[key];
-              const score = hit.score ?? manual?.score ?? null;
-              const verdict = hit.verdict ?? manual?.verdict ?? null;
+              const brief = briefScores[hit.ticker];
+              // Priority: auto-score (Python daily run) → CLI morning-brief score → manual button click
+              const score = hit.score ?? brief?.score ?? manual?.score ?? null;
+              const verdict = hit.verdict ?? brief?.verdict ?? manual?.verdict ?? null;
               const scoreStyle = scoreTone(score);
               return (
                 <tr key={key} className="border-b border-[var(--line)] last:border-0">
@@ -265,7 +326,7 @@ function ScreenerTable({
                       <span
                         className="inline-flex rounded px-2 py-1 font-mono text-[11px] font-bold"
                         style={scoreStyle}
-                        title={hit.thesis ?? manual?.note ?? undefined}
+                        title={hit.thesis ?? brief?.note ?? manual?.note ?? undefined}
                       >
                         {verdict ? `${verdict} ` : ""}
                         {score}
