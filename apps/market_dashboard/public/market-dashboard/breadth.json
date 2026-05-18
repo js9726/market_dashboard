@@ -1,44 +1,44 @@
 {
   "market": {
-    "new_highs": 14,
-    "new_lows": 11,
-    "advance": 174,
-    "decline": 174,
+    "new_highs": 30,
+    "new_lows": 26,
+    "advance": 426,
+    "decline": 377,
     "stage_counts": {
-      "1": 105,
-      "2": 84,
-      "3": 49,
-      "4": 111
+      "1": 222,
+      "2": 215,
+      "3": 107,
+      "4": 267
     },
-    "universe_size": 373
+    "universe_size": 856
   },
   "momentum": {
-    "up_from_open": 169,
-    "down_from_open": 172,
-    "up_on_volume": 11,
-    "down_on_volume": 9,
-    "up_4pct": 17,
-    "down_4pct": 50
+    "up_from_open": 379,
+    "down_from_open": 404,
+    "up_on_volume": 30,
+    "down_on_volume": 26,
+    "up_4pct": 45,
+    "down_4pct": 106
   },
   "sectors": [
     {
       "sector": "Basic Materials",
-      "n": 9,
-      "pct_above_50sma": 0.0,
+      "n": 20,
+      "pct_above_50sma": 15.0,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "sector": "Communication Services",
-      "n": 2,
+      "n": 5,
       "pct_above_50sma": 100.0,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "sector": "Consumer Cyclical",
-      "n": 13,
-      "pct_above_50sma": 38.5,
+      "n": 26,
+      "pct_above_50sma": 30.8,
       "delta_wow": null,
       "delta_mom": null
     },
@@ -51,77 +51,140 @@
     },
     {
       "sector": "Energy",
-      "n": 2,
-      "pct_above_50sma": 100.0,
+      "n": 6,
+      "pct_above_50sma": 66.7,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "sector": "Financial Services",
-      "n": 18,
-      "pct_above_50sma": 88.9,
+      "n": 42,
+      "pct_above_50sma": 71.4,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "sector": "Healthcare",
-      "n": 15,
-      "pct_above_50sma": 13.3,
+      "n": 29,
+      "pct_above_50sma": 34.5,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "sector": "Industrials",
-      "n": 21,
-      "pct_above_50sma": 57.1,
+      "n": 38,
+      "pct_above_50sma": 50.0,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "sector": "Real Estate",
-      "n": 6,
-      "pct_above_50sma": 33.3,
+      "n": 10,
+      "pct_above_50sma": 50.0,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "sector": "Technology",
-      "n": 21,
-      "pct_above_50sma": 81.0,
+      "n": 35,
+      "pct_above_50sma": 82.9,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "sector": "Utilities",
-      "n": 3,
-      "pct_above_50sma": 33.3,
+      "n": 9,
+      "pct_above_50sma": 22.2,
       "delta_wow": null,
       "delta_mom": null
     }
   ],
   "industries": [
     {
+      "industry": "Aerospace & Defense",
+      "n": 6,
+      "pct_above_50sma": 33.3,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
       "industry": "Asset Management",
+      "n": 10,
+      "pct_above_50sma": 90.0,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
+      "industry": "Auto Parts",
+      "n": 7,
+      "pct_above_50sma": 28.6,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
+      "industry": "Banks - Regional",
+      "n": 14,
+      "pct_above_50sma": 35.7,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
+      "industry": "Biotechnology",
+      "n": 12,
+      "pct_above_50sma": 41.7,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
+      "industry": "Gold",
+      "n": 7,
+      "pct_above_50sma": 0.0,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
+      "industry": "Medical Instruments & Supplies",
       "n": 5,
-      "pct_above_50sma": 100.0,
+      "pct_above_50sma": 20.0,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "industry": "Semiconductor Equipment & Materials",
-      "n": 6,
+      "n": 8,
+      "pct_above_50sma": 100.0,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
+      "industry": "Semiconductors",
+      "n": 7,
       "pct_above_50sma": 100.0,
       "delta_wow": null,
       "delta_mom": null
     },
     {
       "industry": "Software - Application",
+      "n": 6,
+      "pct_above_50sma": 66.7,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
+      "industry": "Software - Infrastructure",
       "n": 5,
-      "pct_above_50sma": 60.0,
+      "pct_above_50sma": 100.0,
+      "delta_wow": null,
+      "delta_mom": null
+    },
+    {
+      "industry": "Specialty Chemicals",
+      "n": 6,
+      "pct_above_50sma": 33.3,
       "delta_wow": null,
       "delta_mom": null
     }
   ],
-  "built_at": "2026-05-18T15:53:23.398144+00:00",
+  "built_at": "2026-05-18T16:26:59.099485+00:00",
   "mcap_floor": 2000000000.0
 }
