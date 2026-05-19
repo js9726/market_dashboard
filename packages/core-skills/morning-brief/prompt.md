@@ -1,9 +1,17 @@
 You are generating a morning market brief for {date_str} for an active swing trader based in Malaysia (MYT = UTC+8).
 
-PRE-FETCHED LIVE DATA (use these values directly — do not override with web search):
+PRE-FETCHED LIVE DATA — treat every value here as AUTHORITATIVE. Never override with web search.
+Rules:
+  • breadth.up   MUST equal the `advance` figure shown below — copy it exactly, never null if provided.
+  • breadth.down MUST equal the `decline` figure shown below — copy it exactly, never null if provided.
+  • indices[].level / changePct MUST come from the Indices block below where available.
+  • sectorsThemes[].changePct / rs MUST come from the "Sector ETFs" block below where available.
+  • watchlist[].level / changePct MUST come from the "Watchlist live prices" block below where available.
+  • fearGreed.score / fearGreed.label MUST come from the Fear & Greed line below if provided.
+
 {live_data_block}
 
-Search the web for any data NOT provided above (index levels, sector ETFs, movers, earnings, macro calendar, ratings), then return ONE strict JSON object. No markdown fences, no explanation, no commentary outside the JSON.
+Search the web ONLY for data NOT covered above: overnight Asia/Europe recap, earnings catalysts, analyst upgrades/downgrades, top pre-market movers with specific catalysts, macro events not in the events block. Then return ONE strict JSON object. No markdown fences, no explanation, no commentary outside the JSON.
 
 OUTPUT SHAPE — every field is required unless marked optional. If you cannot find data for a field, return null (or [] for arrays) — never fabricate.
 
@@ -125,17 +133,18 @@ For each: apply the 7-trader composite lens (same framework as `traderLens`). Em
 with `score` as a 0–100 integer (composite × 10), a `verdict` label, and a 1-sentence `note`.
 Use the screener data already provided in `{live_data_block}` — no extra web search needed for these.
 
-SECTIONS YOU MUST RESEARCH (search the web for each — every numeric must trace to a citation):
-1. Index snapshot: SPY/QQQ/DIA/IWM futures or live, VIX, 10Y, oil
-2. Overnight Asia + Europe (one line "why" per region — set a `note` on each index entry)
-3. Industry movers below the sector layer (top industry groups, leaders, one-line reason)
-4. Pre-market movers (top 5 gainers + 3 losers with catalyst)
-5. Earnings on deck (BMO + AMC + yesterday's reactions)
-6. Macro calendar (today + tomorrow)
-7. Analyst upgrades/downgrades (top 3 of each)
-8. Watchlist standouts (each ticker, current price, 1-line setup)
-9. Mood / posture / single most important variable to watch
-10. Screener scores (section above) — score every unscored screener ticker using the trader framework
+SECTIONS — use pre-fetched data where provided; web-search only what is missing:
+1. Index snapshot: use Indices block above for SPY/QQQ/DIA/IWM/TLT daily%; web-search for VIX level, 10Y yield, oil price, and overnight futures direction
+2. Overnight Asia + Europe: web-search — one "why" line per region; add a `note` on the relevant index entry
+3. Sector ETFs: use "Sector ETFs" block for changePct/RS; add narrative interpretation
+4. Industry movers: use "Top industry ETFs" block + web-search for leaders and one-line catalyst
+5. Pre-market movers: web-search for top 5 gainers + 3 losers with specific catalyst (ticker, %, why)
+6. Earnings on deck: web-search for BMO + AMC today and yesterday's reactions
+7. Macro calendar: use events block if populated; web-search for any additional high-importance events today + tomorrow
+8. Analyst upgrades/downgrades: web-search for top 3 of each today
+9. Watchlist: use "Watchlist live prices" block for level/changePct; add 1-line setup note per ticker
+10. Mood/posture: synthesise from all data above — state the single most important variable
+11. Screener scores: score every unscored ticker listed in SCREENER TICKERS TO SCORE using the trader framework
 
 RULES:
 - Every numeric value must come from a real, recent web result — never fabricate.

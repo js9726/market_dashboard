@@ -175,35 +175,147 @@ def _fetch_live_prices(tickers: list[str]) -> dict[str, dict]:
     return results
 
 
+_PUBLIC_DIR = (
+    ROOT.parent.parent.parent / "apps" / "market_dashboard" / "public" / "market-dashboard"
+)
+_BACKEND_DATA_DIR = ROOT.parent.parent.parent / "apps" / "market_dashboard_backend" / "data"
+
+
+def _candidate_paths(filename: str) -> list[Path]:
+    """Return ordered candidate locations for a data file."""
+    return [
+        _PUBLIC_DIR / filename,
+        _BACKEND_DATA_DIR / filename,
+        ROOT / filename,
+    ]
+
+
 def _fetch_breadth_from_disk() -> dict | None:
     """
-    Read the latest breadth.json written by breadth_scan.py. Looks in the same
-    candidate paths as tv_screeners.json so the cron and local runs both work.
-    Returns the `market` sub-dict (advance/decline/new_highs/new_lows/universe_size),
+    Read the latest breadth.json written by breadth_scan.py.
+    Returns the full data dict (with market/momentum/sectors/industries keys),
     or None if the file is missing/malformed.
     """
-    candidates = [
-        ROOT.parent.parent.parent / "apps" / "market_dashboard" / "public" / "market-dashboard" / "breadth.json",
-        ROOT.parent.parent.parent / "apps" / "market_dashboard_backend" / "data" / "breadth.json",
-        ROOT / "breadth.json",
-    ]
-    for path in candidates:
+    for path in _candidate_paths("breadth.json"):
         if not path.exists():
             continue
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
-            market = data.get("market") if isinstance(data, dict) else None
-            if isinstance(market, dict):
-                return market
+            if isinstance(data, dict) and "market" in data:
+                return data          # return full dict, not just market sub-dict
         except Exception:
             continue
     return None
+
+
+def _load_snapshot() -> dict | None:
+    """
+    Read snapshot.json produced by build_data.py.
+    Returns the parsed dict or None if unavailable.
+    """
+    for path in _candidate_paths("snapshot.json"):
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and "groups" in data:
+                return data
+        except Exception:
+            continue
+    return None
+
+
+def _load_events() -> list[dict]:
+    """
+    Read events.json produced by build_data.py.
+    Returns a list of event dicts or [] if unavailable/empty.
+    """
+    for path in _candidate_paths("events.json"):
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(data, list):
+                return data
+        except Exception:
+            continue
+    return []
+
+
+def _format_snapshot_section(snapshot: dict) -> str:
+    """
+    Render a compact snapshot.json summary for the live_data_block.
+    Groups: Indices, Sel Sectors (XLK, XLF, etc.), Industries (first 5 by |daily|).
+    Format: TICKER  daily%  5d%  20d%  RS  grade
+    """
+    lines: list[str] = []
+    groups = snapshot.get("groups", {})
+
+    def _row(item: dict) -> str:
+        t = item.get("ticker", "?")
+        d = item.get("daily")
+        fd = item.get("5d")
+        td = item.get("20d")
+        rs = item.get("rs")
+        ab = item.get("abc", "")
+        d_s  = f"{'+' if d  and d  > 0 else ''}{d:.2f}%"  if d  is not None else "N/A"
+        fd_s = f"{'+' if fd and fd > 0 else ''}{fd:.2f}%"  if fd is not None else "N/A"
+        td_s = f"{'+' if td and td > 0 else ''}{td:.2f}%"  if td is not None else "N/A"
+        rs_s = f"{int(rs)}" if rs is not None else "N/A"
+        return f"    {t:<6} daily={d_s}  5d={fd_s}  20d={td_s}  RS={rs_s}  grade={ab}"
+
+    # --- Indices ---
+    indices = groups.get("Indices", [])
+    if indices:
+        lines.append("  Indices (from snapshot.json — authoritative, use these for index levels):")
+        for item in indices:
+            lines.append(_row(item))
+
+    # --- Sector ETFs ---
+    sectors = groups.get("Sel Sectors", [])
+    if sectors:
+        lines.append("  Sector ETFs (from snapshot.json — authoritative, use for sectorsThemes):")
+        for item in sectors:
+            lines.append(_row(item))
+
+    # --- Top industry ETFs (sorted by abs daily move) ---
+    industries = groups.get("Industries", [])
+    if industries:
+        top = sorted(industries, key=lambda x: abs(x.get("daily") or 0), reverse=True)[:8]
+        lines.append("  Top industry ETFs (from snapshot.json):")
+        for item in top:
+            lines.append(_row(item))
+
+    built = snapshot.get("built_at", "unknown")
+    lines.append(f"  snapshot.json built_at: {built}")
+    return "\n".join(lines)
+
+
+def _format_events_section(events: list[dict]) -> str:
+    """Render events.json as a compact calendar block."""
+    if not events:
+        return ""
+    lines = ["  Economic calendar (from events.json — authoritative):"]
+    for ev in events[:10]:
+        time = ev.get("time") or ev.get("date") or "TBD"
+        name = ev.get("name") or ev.get("event") or "?"
+        cons = ev.get("consensus") or ev.get("forecast") or ""
+        prev = ev.get("previous") or ""
+        row = f"    {time}  {name}"
+        if cons:
+            row += f"  consensus={cons}"
+        if prev:
+            row += f"  prev={prev}"
+        lines.append(row)
+    return "\n".join(lines)
 
 
 def _build_live_block(
     fear_greed: tuple[int | None, str | None],
     live_prices: dict[str, dict],
     breadth: dict | None = None,
+    snapshot: dict | None = None,
+    events: list[dict] | None = None,
 ) -> str:
     lines: list[str] = []
 
@@ -211,18 +323,37 @@ def _build_live_block(
     if fg_score is not None:
         lines.append(f"  Fear & Greed Index: {fg_score}/100 ({fg_label})")
 
+    # ── Breadth — copy verbatim into breadth.up / breadth.down ───────────────
     if breadth:
+        market = breadth.get("market", breadth)   # full dict or already market sub-dict
         lines.append(
-            "  Market breadth (from breadth_scan.py — authoritative, copy into breadth.up/breadth.down exactly, never invent):"
+            "  Market breadth (from breadth_scan.py — AUTHORITATIVE. "
+            "Copy advance→breadth.up, decline→breadth.down EXACTLY. Never invent or web-search these.):"
         )
-        lines.append(f"    advance: {breadth.get('advance')}")
-        lines.append(f"    decline: {breadth.get('decline')}")
-        lines.append(f"    new_highs: {breadth.get('new_highs')}")
-        lines.append(f"    new_lows: {breadth.get('new_lows')}")
-        lines.append(f"    universe_size: {breadth.get('universe_size')}")
+        lines.append(f"    advance  (→ breadth.up):   {market.get('advance')}")
+        lines.append(f"    decline  (→ breadth.down):  {market.get('decline')}")
+        lines.append(f"    new_highs: {market.get('new_highs')}  new_lows: {market.get('new_lows')}")
+        lines.append(f"    universe_size: {market.get('universe_size')}")
+        lines.append(f"    breadth built_at: {breadth.get('built_at', 'unknown')}")
 
+        # Sector % above 50SMA from breadth_scan
+        sectors_b = breadth.get("sectors", [])
+        if sectors_b:
+            lines.append("  Sector % above 50-SMA (breadth_scan universe):")
+            for s in sectors_b:
+                lines.append(f"    {s.get('sector')}: {s.get('pct_above_50sma')}%  (n={s.get('n')})")
+
+    # ── Snapshot (indices + sector ETFs) ─────────────────────────────────────
+    if snapshot:
+        lines.append(_format_snapshot_section(snapshot))
+
+    # ── Economic calendar ────────────────────────────────────────────────────
+    if events:
+        lines.append(_format_events_section(events))
+
+    # ── Watchlist live prices ─────────────────────────────────────────────────
     if live_prices:
-        lines.append("  Watchlist live prices (as of brief generation — use exactly):")
+        lines.append("  Watchlist live prices (yfinance — use for watchlist[].level and changePct):")
         for ticker, d in live_prices.items():
             price = d.get("price")
             chg = d.get("changePct")
@@ -243,10 +374,18 @@ def _build_prompt(
     fear_greed: tuple[int | None, str | None] = (None, None),
     live_prices: dict[str, dict] | None = None,
     breadth: dict | None = None,
+    snapshot: dict | None = None,
+    events: list[dict] | None = None,
     screener_unscored: list[str] | None = None,
 ) -> str:
     template = (ROOT / "prompt.md").read_text(encoding="utf-8")
-    live_block = _build_live_block(fear_greed, live_prices or {}, breadth=breadth)
+    live_block = _build_live_block(
+        fear_greed,
+        live_prices or {},
+        breadth=breadth,
+        snapshot=snapshot,
+        events=events,
+    )
     unscored_str = (
         ", ".join(screener_unscored) if screener_unscored
         else "none (all screener tickers already scored)"
@@ -577,14 +716,27 @@ def main() -> None:
     print(f"[cli_run] Fetching live prices for {len(watchlist)} tickers...", file=sys.stderr)
     live_prices = _fetch_live_prices(watchlist)
 
-    breadth = _fetch_breadth_from_disk()
-    if breadth:
+    breadth_data = _fetch_breadth_from_disk()
+    if breadth_data:
+        m = breadth_data.get("market", {})
         print(
-            f"[cli_run] Breadth from disk: advance={breadth.get('advance')} decline={breadth.get('decline')} universe={breadth.get('universe_size')}",
+            f"[cli_run] Breadth from disk: advance={m.get('advance')} decline={m.get('decline')} "
+            f"new_highs={m.get('new_highs')} new_lows={m.get('new_lows')} universe={m.get('universe_size')} "
+            f"built_at={breadth_data.get('built_at', '?')}",
             file=sys.stderr,
         )
     else:
         print("[cli_run] Breadth: no breadth.json found — LLM will return null", file=sys.stderr)
+
+    snapshot = _load_snapshot()
+    if snapshot:
+        n_groups = len(snapshot.get("groups", {}))
+        print(f"[cli_run] Snapshot loaded: {n_groups} groups, built_at={snapshot.get('built_at','?')}", file=sys.stderr)
+    else:
+        print("[cli_run] Snapshot: no snapshot.json found — LLM will web-search for sector/index data", file=sys.stderr)
+
+    events = _load_events()
+    print(f"[cli_run] Events: {len(events)} calendar events loaded", file=sys.stderr)
 
     screener_unscored = _screener_unscored_tickers()
     if screener_unscored:
@@ -596,7 +748,9 @@ def main() -> None:
         date_str, watchlist,
         fear_greed=fear_greed,
         live_prices=live_prices,
-        breadth=breadth,
+        breadth=breadth_data,
+        snapshot=snapshot,
+        events=events,
         screener_unscored=screener_unscored,
     )
 
