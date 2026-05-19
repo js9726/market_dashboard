@@ -11,6 +11,10 @@ export interface TickerRow {
   long: string[];
   short: string[];
   abc: string | null;
+  // Optional — populated by build_data.py from 2026-05-19. Snapshots produced
+  // before that day omit these keys; UI must treat them as nullable.
+  rvol?: number | null;
+  off_52w_high_pct?: number | null;
 }
 
 export interface MarketSnapshot {
