@@ -140,28 +140,75 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
         return None
+    perf_1m  = hit.get("Perf.1M") or 0
+    perf_1w  = hit.get("Perf.W")  or 0
+    chg_day  = hit.get("change")  or 0
+
+    # Pre-compute hard caps so the LLM doesn't have to re-derive them.
+    # These rules mirror Minervini/Qullamaggie discipline: never chase
+    # a stock that's already parabolic or that has moved too far today.
+    cap_notes = []
+    score_cap = 100
+    if abs(perf_1m) > 100:
+        score_cap = min(score_cap, 35)
+        cap_notes.append(f"Perf.1M={perf_1m:.1f}% → PARABOLIC (>100% in 1M): cap 35")
+    elif abs(perf_1m) > 60:
+        score_cap = min(score_cap, 55)
+        cap_notes.append(f"Perf.1M={perf_1m:.1f}% → very extended (>60% in 1M): cap 55")
+    elif abs(perf_1m) > 40:
+        score_cap = min(score_cap, 65)
+        cap_notes.append(f"Perf.1M={perf_1m:.1f}% → extended (>40% in 1M): cap 65")
+    if abs(chg_day) > 30:
+        score_cap = min(score_cap, 45)
+        cap_notes.append(f"Today={chg_day:.1f}% → too large to buy today (>30%): cap 45")
+    elif abs(chg_day) > 20:
+        score_cap = min(score_cap, 60)
+        cap_notes.append(f"Today={chg_day:.1f}% → gap-up day (>20%), wait for pullback: cap 60")
+
+    cap_block = (
+        "\n\nHARD CAPS ALREADY COMPUTED (do not exceed these):\n"
+        + "\n".join(f"  • {n}" for n in cap_notes)
+        + f"\n  → Your score MUST be ≤ {score_cap}."
+        if cap_notes else ""
+    )
+
     payload = {
         "model": "deepseek-chat",
         "messages": [
             {
                 "role": "system",
                 "content": (
-                    "You are a momentum-style trader screening a setup. Output strict JSON with shape: "
-                    '{"score": 0-100, "verdict": "GO"|"WAIT"|"PASS", "thesis": "1 sentence reason"}.\n'
-                    "Score >= 80 → GO. 50-79 → WAIT. <50 → PASS.\n"
-                    "Apply Minervini/Qullamaggie filters: prefer A-grade trend (price > rising MAs), "
-                    "high RVOL, near pivot or fresh breakout, sector strength."
+                    "You are a disciplined momentum swing trader scoring a setup for TODAY's entry "
+                    "quality — not whether the stock is strong, but whether there is a clean, "
+                    "low-risk entry available RIGHT NOW.\n\n"
+                    'Output ONLY strict JSON: {"score": 0-100, "verdict": "GO"|"WAIT"|"PASS", '
+                    '"thesis": "1 sentence max 20 words"}\n'
+                    "Score >= 80 → GO (clean entry today). 50-79 → WAIT (setup needs time). "
+                    "<50 → PASS (too risky or extended).\n\n"
+                    "SCORING RULES — apply in order:\n"
+                    "1. If Perf.1M > 100%: PASS (≤35). Stock is parabolic — Minervini would never "
+                    "buy this far extended from any base.\n"
+                    "2. If Perf.1M > 60%: WAIT max (≤55). Very extended — expect mean reversion.\n"
+                    "3. If Perf.1M > 40%: WAIT max (≤65). Likely far from MA support.\n"
+                    "4. If today's change > 30%: PASS (≤45). Way too extended intraday — "
+                    "Qullamaggie does NOT chase 30%+ gap days.\n"
+                    "5. If today's change > 20%: WAIT max (≤60). Already moved — "
+                    "wait for ORH next day or first pullback.\n"
+                    "POSITIVE FACTORS (only within the caps above):\n"
+                    "+ RVOL > 3 and today 5-15%: institutional interest, tight base → +15\n"
+                    "+ Perf.1M < 20% (not yet extended) and RVOL > 2: fresh breakout possible → +10\n"
+                    "+ Market cap $2B+ with strong sector: reduces fade risk → +5"
                 ),
             },
             {
                 "role": "user",
                 "content": (
-                    f"Score {ticker}.\n"
+                    f"Score entry quality for {ticker} today.{cap_block}\n\n"
                     f"Price: {hit.get('close')}\n"
-                    f"Change today: {hit.get('change')}%\n"
-                    f"RVOL: {hit.get('relative_volume_10d_calc')}\n"
-                    f"Perf 1W: {hit.get('Perf.W')}%\n"
-                    f"Perf 1M: {hit.get('Perf.1M')}%\n"
+                    f"Change today: {chg_day:.2f}%\n"
+                    f"RVOL (10d): {hit.get('relative_volume_10d_calc')}\n"
+                    f"Perf 1W: {perf_1w:.2f}%\n"
+                    f"Perf 1M: {perf_1m:.2f}%\n"
                     f"Sector: {hit.get('sector')}\n"
                     f"Industry: {hit.get('industry')}\n"
                     f"Market cap: {hit.get('market_cap_basic')}\n"
@@ -169,8 +216,8 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
                 ),
             },
         ],
-        "max_tokens": 300,
-        "temperature": 0.1,
+        "max_tokens": 200,
+        "temperature": 0.0,
     }
     req = urllib.request.Request(
         "https://api.deepseek.com/v1/chat/completions",
