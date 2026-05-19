@@ -36,7 +36,11 @@ htmlcov/
 
 # Local run scripts (may contain secrets)
 run_daily.bat
+run_daily.ps1
 run_daily.log
+DAILY.md
+test_ingest.py
+watch_quotes.py
 .vercel
 
 # Session learning logs (local scratch pad — promote lessons to CLAUDE.md manually)

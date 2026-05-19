@@ -20,7 +20,10 @@ const lastRerunAt = new Map<BriefProvider, number>();
 
 export async function POST(req: Request) {
   const session = await auth();
-  if (session?.user?.role !== "owner") {
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (session.user.role !== "owner") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

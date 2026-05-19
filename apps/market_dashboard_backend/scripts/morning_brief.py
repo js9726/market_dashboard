@@ -130,7 +130,9 @@ def generate_gemini(prompt: str, out_dir: str) -> bool:
             print(f"[Gemini] Written to {out_path}")
             return True
         except Exception as e:
-            print(f"[Gemini] Error (attempt {attempt + 1}): {e}")
+            # Mask {e} — Gemini calls put the API key in the request URL params,
+            # and some exception chains preserve the URL, which would leak.
+            print(f"[Gemini] Error (attempt {attempt + 1}): {type(e).__name__}")
             if attempt < 2:
                 time.sleep(2 ** attempt)
 
@@ -184,7 +186,7 @@ def generate_openai(prompt: str, out_dir: str) -> bool:
             print(f"[OpenAI] Written to {out_path}")
             return True
         except Exception as e:
-            print(f"[OpenAI] Error (attempt {attempt + 1}): {e}")
+            print(f"[OpenAI] Error (attempt {attempt + 1}): {type(e).__name__}")
             if attempt < 2:
                 time.sleep(2 ** attempt)
 
@@ -241,7 +243,7 @@ def generate_claude(prompt: str, out_dir: str) -> bool:
             print(f"[Claude] Written to {out_path}")
             return True
         except Exception as e:
-            print(f"[Claude] Error (attempt {attempt + 1}): {e}")
+            print(f"[Claude] Error (attempt {attempt + 1}): {type(e).__name__}")
             if attempt < 2:
                 time.sleep(2 ** attempt)
 
@@ -320,8 +322,6 @@ def _post_to_ingest(post_to, post_key, provider, json_body_str, generated_by):
     if not post_to or not post_key:
         return
     import hashlib
-    import urllib.error
-    import urllib.request as _ur
     try:
         structured = json.loads(json_body_str)
     except json.JSONDecodeError:
@@ -334,24 +334,19 @@ def _post_to_ingest(post_to, post_key, provider, json_body_str, generated_by):
         "generatedBy": generated_by,
         "inputHash": hashlib.sha256(json_body_str.encode("utf-8")).hexdigest(),
     }
-    body = json.dumps(payload).encode("utf-8")
-    req = _ur.Request(
-        post_to,
-        data=body,
-        method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + post_key,
-        },
-    )
     try:
-        with _ur.urlopen(req, timeout=30) as r:
-            r.read()
+        resp = requests.post(
+            post_to,
+            json=payload,
+            headers={"Authorization": "Bearer " + post_key},
+            timeout=30,
+        )
+        if resp.status_code >= 400:
+            print(f"[ingest] {provider}: HTTP {resp.status_code} {resp.text[:200]}")
+            return
         print(f"[ingest] posted {provider} to {post_to}")
-    except urllib.error.HTTPError as e:
-        print(f"[ingest] {provider}: HTTP {e.code} {e.read().decode('utf-8', 'ignore')[:200]}")
     except Exception as e:
-        print(f"[ingest] {provider}: {e}")
+        print(f"[ingest] {provider}: {type(e).__name__}")
 
 
 def main():

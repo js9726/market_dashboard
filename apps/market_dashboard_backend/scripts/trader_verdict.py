@@ -20,6 +20,9 @@ import sys
 import time
 import datetime
 
+# Shared JSON safety helpers — keep bare NaN out of browser-facing files.
+from build_data import sanitize_json, safe_json_dumps  # noqa: E402
+
 # ---------------------------------------------------------------------------
 # Load .env from repo root (no-op in CI where secrets are already exported)
 # ---------------------------------------------------------------------------
@@ -476,7 +479,7 @@ def main():
     result["date"] = date_str  # always stamp today
 
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
+        f.write(safe_json_dumps(sanitize_json(result), indent=2))
 
     source = result.get("_source", "?")
     n = len(result.get("traders", []))

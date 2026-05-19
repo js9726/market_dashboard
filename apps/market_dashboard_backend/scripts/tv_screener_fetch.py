@@ -28,6 +28,9 @@ import time
 import urllib.error
 import urllib.request
 
+# Shared JSON safety helpers — keep bare NaN out of browser-facing files.
+from build_data import sanitize_json, safe_json_dumps  # noqa: E402
+
 
 def _load_env():
     here = os.path.dirname(os.path.abspath(__file__))
@@ -208,7 +211,7 @@ def main():
     }
     out_path = os.path.join(args.out_dir, "tv_screeners.json")
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(out, f, indent=2, default=str)
+        f.write(safe_json_dumps(sanitize_json(out), indent=2, default=str))
     print(f"[tv] wrote {out_path}")
 
 

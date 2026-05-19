@@ -13,22 +13,15 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    console.log('\n=== API Request ===');
-    console.log('Received request body:', JSON.stringify(body, null, 2));
 
     if (!body.tickers || !Array.isArray(body.tickers)) {
-      console.error('Invalid request: tickers array is missing or invalid');
       return NextResponse.json(
         { error: 'Invalid request: tickers array is required' },
         { status: 400 }
       );
     }
 
-    // Format tickers (remove $ symbol and trim)
     const formattedTickers = formatTickers(body.tickers);
-    console.log('\n=== Formatted Tickers ===');
-    console.log('Original tickers:', body.tickers);
-    console.log('Formatted tickers:', formattedTickers);
 
     const state = {
       data: {
@@ -42,25 +35,21 @@ export async function POST(request: Request) {
       }
     };
 
-    console.log('\n=== Analysis State ===');
-    console.log('State:', JSON.stringify(state, null, 2));
-
     try {
-      console.log('\n=== Starting Analysis ===');
-      // Run fundamental analysis first
       const fundamentalResult = await fundamentalsAgent(state);
-      
-      // Only run technical analysis if OpenAI is available
+
+      // Only run technical analysis if DeepSeek is available (the technical
+      // agent calls DeepSeek for signal reasoning).
       let technicalResult: Awaited<ReturnType<typeof technicalAgent>> = {
         messages: [] as AgentMessage[],
         data: { ...state.data, analyst_signals: { technical_agent: {} } },
       };
-      
-      if (process.env.GEMINI_API_KEY) {
+
+      if (process.env.DEEPSEEK_API_KEY) {
         try {
           technicalResult = await technicalAgent(state);
         } catch (error) {
-          console.log("Technical analysis unavailable:", error);
+          console.error("Technical analysis unavailable:", error);
         }
       }
 
@@ -79,13 +68,8 @@ export async function POST(request: Request) {
 
       return NextResponse.json(response);
     } catch (error) {
-      console.error('\n=== Analysis Error ===');
-      console.error('Error details:', error);
-      
+      console.error('Analysis error:', error);
       if (error instanceof Error) {
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-        
         if (error.message.includes('404') || error.message.includes('not found')) {
           return NextResponse.json(
             { error: `Stock symbol not found. Please check the symbol and try again.` },
@@ -103,12 +87,7 @@ export async function POST(request: Request) {
       );
     }
   } catch (error) {
-    console.error('\n=== API Route Error ===');
-    console.error('Error details:', error);
-    if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
+    console.error('API route error:', error);
     return NextResponse.json(
       { error: 'Failed to process request' },
       { status: 500 }

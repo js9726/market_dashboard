@@ -17,6 +17,7 @@ const WORKFLOW_NAV = [
 
 const TOOL_NAV = [
   { href: "/dashboard/scanner", label: "Scanner", icon: "search" },
+  { href: "/dashboard/themes", label: "Theme Radar", icon: "search" },
   { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
   { href: "/dashboard/journal", label: "Journal", icon: "journal" },
   { href: "/dashboard/playbooks", label: "Playbooks", icon: "template" },
@@ -48,6 +49,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard/scanner": {
     title: "Scanner",
     subtitle: "Watchlist and setup candidates",
+  },
+  "/dashboard/themes": {
+    title: "Theme Radar",
+    subtitle: "Heating - Accumulate - Cooling",
   },
   "/dashboard/chat": {
     title: "AI Chat",

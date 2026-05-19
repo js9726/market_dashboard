@@ -60,6 +60,9 @@ except ImportError as e:
     print(f"Missing dep: {e}. pip install yfinance pandas numpy")
     sys.exit(1)
 
+# Shared JSON safety helpers — keep bare NaN out of browser-facing files.
+from build_data import sanitize_json, safe_json_dumps  # noqa: E402
+
 
 # --------------------------------------------------------------------------
 # .env loader (mirrors morning_brief.py / build_data.py pattern)
@@ -171,17 +174,6 @@ SECTOR_ETFS = {
 # --------------------------------------------------------------------------
 # Per-ticker computation
 # --------------------------------------------------------------------------
-
-def _chunks(seq: Iterable, n: int) -> Iterable[list]:
-    buf = []
-    for x in seq:
-        buf.append(x)
-        if len(buf) >= n:
-            yield buf
-            buf = []
-    if buf:
-        yield buf
-
 
 def _classify_stage(close_today: float, sma30wk: float, sma30wk_slope: float) -> int:
     """
@@ -448,7 +440,7 @@ def main():
 
     out_path = os.path.join(args.out_dir, "breadth.json")
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(today, f, indent=2, default=str)
+        f.write(safe_json_dumps(sanitize_json(today), indent=2, default=str))
     print(f"[breadth] wrote {out_path}")
     print(f"[breadth] highs={today['market']['new_highs']} "
           f"lows={today['market']['new_lows']} "

@@ -141,5 +141,113 @@
         "pct_above_50sma": 50.0
       }
     ]
+  },
+  {
+    "date": "2026-05-19",
+    "market": {
+      "new_highs": 17,
+      "new_lows": 18,
+      "advance": 229,
+      "decline": 218,
+      "stage_counts": {
+        "1": 128,
+        "2": 114,
+        "3": 62,
+        "4": 151
+      },
+      "universe_size": 484
+    },
+    "momentum": {
+      "up_from_open": 206,
+      "down_from_open": 233,
+      "up_on_volume": 88,
+      "down_on_volume": 76,
+      "up_4pct": 40,
+      "down_4pct": 75
+    },
+    "sectors": [
+      {
+        "sector": "Basic Materials",
+        "n": 11,
+        "pct_above_50sma": 0.0
+      },
+      {
+        "sector": "Communication Services",
+        "n": 3,
+        "pct_above_50sma": 100.0
+      },
+      {
+        "sector": "Consumer Cyclical",
+        "n": 15,
+        "pct_above_50sma": 33.3
+      },
+      {
+        "sector": "Consumer Defensive",
+        "n": 4,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "sector": "Energy",
+        "n": 6,
+        "pct_above_50sma": 66.7
+      },
+      {
+        "sector": "Financial Services",
+        "n": 25,
+        "pct_above_50sma": 88.0
+      },
+      {
+        "sector": "Healthcare",
+        "n": 20,
+        "pct_above_50sma": 30.0
+      },
+      {
+        "sector": "Industrials",
+        "n": 25,
+        "pct_above_50sma": 48.0
+      },
+      {
+        "sector": "Real Estate",
+        "n": 9,
+        "pct_above_50sma": 55.6
+      },
+      {
+        "sector": "Technology",
+        "n": 26,
+        "pct_above_50sma": 80.8
+      },
+      {
+        "sector": "Utilities",
+        "n": 4,
+        "pct_above_50sma": 25.0
+      }
+    ],
+    "industries": [
+      {
+        "industry": "Asset Management",
+        "n": 9,
+        "pct_above_50sma": 88.9
+      },
+      {
+        "industry": "Biotechnology",
+        "n": 9,
+        "pct_above_50sma": 44.4
+      },
+      {
+        "industry": "Semiconductor Equipment & Materials",
+        "n": 6,
+        "pct_above_50sma": 100.0
+      },
+      {
+        "industry": "Semiconductors",
+        "n": 5,
+        "pct_above_50sma": 100.0
+      },
+      {
+        "industry": "Software - Application",
+        "n": 6,
+        "pct_above_50sma": 66.7
+      }
+    ]
   }
 ]

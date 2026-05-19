@@ -71,17 +71,7 @@ Minimum code that solves the problem. Nothing speculative.
 
 ---
 
-## 3. Surgical Changes
-
-Touch only what you must. Match existing style.
-
-- Don't refactor adjacent code, comments, or formatting.
-- Remove orphans **your** changes created — leave pre-existing dead code alone (mention it).
-- Every changed line should trace directly to the user's request.
-
----
-
-## 4. Goal-Driven Execution
+## 3. Goal-Driven Execution
 
 Define success criteria. Loop until verified.
 
@@ -94,7 +84,7 @@ Define success criteria. Loop until verified.
 
 ---
 
-## 5. Project-Specific Conventions
+## 4. Project-Specific Conventions
 
 ### Python data pipeline
 - Output goes to `--out-dir` (default `data/`). Never hardcode paths.
@@ -130,7 +120,7 @@ Define success criteria. Loop until verified.
 
 ---
 
-## 6. Environment Variables
+## 5. Environment Variables
 
 | Variable | Required | Purpose |
 |---|---|---|
@@ -152,7 +142,7 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 
 ---
 
-## 7. Common Pitfalls
+## 6. Common Pitfalls
 
 | Symptom | Fix |
 |---|---|
@@ -169,7 +159,7 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 
 ---
 
-## 8. Subagents — Default to Cheaper Models
+## 7. Subagents — Default to Cheaper Models
 
 **Always prefer a subagent for routine, lower-thinking work.** Spawn via the Agent tool with `model: sonnet` (or `haiku` for trivial lookups). Reserve Opus for complex design, large-diff review, or when Sonnet has visibly underperformed in this session.
 
@@ -194,7 +184,7 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 
 ---
 
-## 9. Session Learnings (`.learnings/`, gitignored)
+## 8. Session Learnings (`.learnings/`, gitignored)
 
 `LEARNINGS.md` (pitfalls), `ERRORS.md` (build/pipeline failures), `FEATURE_REQUESTS.md` (ideas). When an entry recurs 2+ times, promote it manually into the Common Pitfalls table above. **Never** enable a `PostToolUse` hook that pipes Claude stdout into `.learnings/` — tool output can contain key fragments.
 
