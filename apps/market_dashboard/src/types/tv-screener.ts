@@ -19,10 +19,19 @@ export interface TvScreenerHit {
   "Perf.1M"?: number | null;
   "ATR.percent"?: number | null;
 
-  // Populated by the optional DeepSeek auto-score pass (top 5 only).
+  // Populated by the optional DeepSeek 4-stage auto-score pass.
   score?: number | null;
   verdict?: "GO" | "WAIT" | "PASS" | null;
   thesis?: string | null;
+  /** Setup pattern classified by the scoring engine. */
+  pattern?: "EP" | "BREAKOUT" | "PULLBACK" | "PARABOLIC" | "STAGE4-BOUNCE" | "UNCLEAR" | null;
+  /** 4-stage sub-scores (each 0-25). */
+  stages?: {
+    s1_trend:   number;  // Trend Leadership / RS
+    s2_pattern: number;  // Pattern Quality
+    s3_timing:  number;  // Entry Timing
+    s4_risk:    number;  // Risk Quality
+  } | null;
 }
 
 export interface TvScreener {

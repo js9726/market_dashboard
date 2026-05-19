@@ -1,0 +1,109 @@
+name: Refresh Market Data (Intraday Light)
+
+# WK-1 split — this file is the INTRADAY LIGHT job. Six ticks per US trading
+# day, runs only the cheap-and-fast pipeline:
+#   - build_data.py        (~30 sec, refreshes per-ticker snapshot + RS chart)
+#   - tv_screener_fetch.py (~10 sec, refreshes TradingView screener hits)
+#
+# Skipped vs the daily heavy run (intentional):
+#   - breadth_scan.py      ~5 min, daily metric only — full-universe scan
+#   - morning_brief.py     ~$1-2/run × 4 LLM providers, daily-only by design
+#   - trader_verdict.py    ~$0.30/run, daily-only by design
+#
+# Off-peak minutes (:07/:37) — WK-4 in ROADMAP.md.
+#
+#   13:37 14:07 14:37 15:07 15:37   first two hours of US trading
+#   20:37                            post-close snapshot
+#
+# Total: 6 ticks/day, ~30/week. Each tick commits a refreshed snapshot.json
+# only — no LLM-generated assets touched.
+
+on:
+  schedule:
+    - cron: '37 13 * * 1-5'          # ~market open  (09:37 ET EDT)
+    - cron: '7,37 14 * * 1-5'        # 10:07 & 10:37 ET
+    - cron: '7,37 15 * * 1-5'        # 11:07 & 11:37 ET
+    - cron: '37 20 * * 1-5'          # ~post-close   (16:37 ET EDT)
+  workflow_dispatch: {}
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: apps/market_dashboard_backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # ── Step 1: market data (snapshot, events, charts) — required ─────────
+      - name: Build market data
+        run: python scripts/build_data.py --out-dir data
+
+      # ── Step 2: TradingView screener hits — required ──────────────────────
+      # No DeepSeek scoring here; that runs once daily in the heavy workflow.
+      # If TradingView blocks this IP (common in CI), the script exits non-zero
+      # but does NOT overwrite the output — last good data is preserved.
+      - name: Fetch TV screeners (no scoring)
+        continue-on-error: true
+        run: python scripts/tv_screener_fetch.py --out-dir data
+        env:
+          # TV_SESSION_ID: TradingView sessionid cookie — bypasses CI IP block.
+          # See refresh_data.yml for instructions on obtaining this value.
+          TV_SESSION_ID: ${{ secrets.TV_SESSION_ID }}
+
+      # ── Step 3: sync to Next.js public folder ─────────────────────────────
+      - name: Sync data into Next.js public folder
+        working-directory: apps/market_dashboard
+        run: |
+          mkdir -p public/market-dashboard/charts
+          cp ../market_dashboard_backend/data/snapshot.json     public/market-dashboard/
+          cp ../market_dashboard_backend/data/events.json        public/market-dashboard/
+          cp ../market_dashboard_backend/data/meta.json          public/market-dashboard/
+          cp ../market_dashboard_backend/data/tv_screeners.json  public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/charts/*.png       public/market-dashboard/charts/ 2>/dev/null || true
+
+      # ── Step 4: sanitize JSON (replace NaN/Infinity with null) ────────────
+      - name: Sanitize JSON
+        working-directory: apps/market_dashboard
+        run: |
+          python3 -c "
+          import re, pathlib
+          for p in pathlib.Path('public/market-dashboard').glob('*.json'):
+              raw = p.read_text()
+              fixed = re.sub(r'\bNaN\b|\bInfinity\b|\b-Infinity\b', 'null', raw)
+              if fixed != raw:
+                  p.write_text(fixed)
+                  print(f'Sanitized {p.name}')
+          print('JSON sanitization complete')
+          "
+
+      # ── Step 5: commit and push ───────────────────────────────────────────
+      - name: Commit updated data
+        working-directory: .
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f apps/market_dashboard/public/market-dashboard
+          echo "=== Staged changes ==="
+          git diff --cached --name-status || true
+          if git diff --cached --quiet; then
+            echo "No data changes — nothing to commit."
+          else
+            git commit -m "chore: intraday refresh [skip ci]"
+            git push
+          fi

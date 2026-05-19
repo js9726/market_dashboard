@@ -1,22 +1,34 @@
 """
-TradingView screener fetcher + DeepSeek auto-scorer.
+TradingView screener fetcher + 4-stage DeepSeek scorer.
 
 Runs each screener defined in `tv-screeners.json` against the unofficial
 scanner.tradingview.com endpoint. Optionally calls DeepSeek to score the top
-N hits per screener (cheap, ~40 calls/day total at top-10).
+N hits per screener using a 4-stage framework drawn from the LLM Traders Wiki:
+
+  Stage 1 — Trend Leadership (RS)   : Is this a true market leader?
+  Stage 2 — Pattern Quality          : VCP / EP / pullback — how clean?
+  Stage 3 — Entry Timing             : Can we enter safely TODAY?
+  Stage 4 — Risk Quality             : Institutional grade, volume, stop distance
+
+Scores are pre-computed deterministically in Python (from Minervini/Qullamaggie/
+Alex/Jeff/SRx rules embedded from the wiki) and passed to DeepSeek for sector
+context + thesis. The LLM cannot hallucinate past the Python-computed caps.
 
 Outputs:
   data/tv_screeners.json — { fetched_at, screeners: [ { id, name, hits[] } ] }
 
 Usage:
-  python apps/market_dashboard_backend/scripts/tv_screener_fetch.py [--out-dir data] [--score] [--score-top 10]
+  python scripts/tv_screener_fetch.py [--out-dir data] [--score] [--score-top 10]
+
+CI TradingView IP-block workaround:
+  Set TV_SESSION_ID env var (or GitHub Secret) to your TradingView sessionid
+  cookie value. Authenticated requests bypass the IP block.
+  Get it from: Chrome → DevTools → Application → Cookies → tradingview.com → sessionid
+  Add as GitHub Secret → referenced in workflow as TV_SESSION_ID.
 
 Notes:
   - Saved-screener IDs (1R7JpXRD etc.) are NOT directly fetchable by URL.
-    The query is approximated in tv-screeners.json — refine it whenever you
-    notice a mismatch with what your real TV screener returns.
-  - DeepSeek scoring is opt-in via --score flag. Skipped silently if
-    DEEPSEEK_API_KEY missing.
+    The query is approximated in tv-screeners.json — refine whenever needed.
   - If ALL screeners return zero hits (TradingView blocking CI IPs), the
     script exits without overwriting the output file so stale-but-valid data
     is preserved rather than replaced with empty rows.
@@ -56,19 +68,47 @@ _load_env()
 
 SCANNER_URL = "https://scanner.tradingview.com/america/scan"
 
-# Browser-like headers to reduce the chance of IP-based blocking in CI.
-# TradingView's scanner API is public but blocks known cloud provider IPs.
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Content-Type": "application/json",
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Origin": "https://www.tradingview.com",
-    "Referer": "https://www.tradingview.com/",
-}
+def _build_headers() -> dict:
+    """
+    Build request headers for the TradingView scanner.
+
+    TV_SESSION_ID workaround for CI IP blocks
+    -----------------------------------------
+    TradingView blocks known cloud-provider IPs (GitHub Actions uses Azure
+    ranges). Authenticated requests bypass this. To enable:
+
+    1. Log into TradingView in Chrome.
+    2. Open DevTools → Application → Cookies → tradingview.com → sessionid
+    3. Copy the value.
+    4. Add it as GitHub Secret TV_SESSION_ID in your repo Settings.
+    5. Reference it in both workflow files:
+         env:
+           TV_SESSION_ID: ${{ secrets.TV_SESSION_ID }}
+
+    The session expires every 30-90 days — you will need to refresh it.
+    When it expires, the script falls back to the anonymous (likely blocked)
+    path and the zero-hit guard preserves the last good data.
+    """
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.tradingview.com",
+        "Referer": "https://www.tradingview.com/",
+    }
+    session_id = os.environ.get("TV_SESSION_ID", "").strip()
+    if session_id:
+        headers["Cookie"] = f"sessionid={session_id}"
+        print("[tv] Using TV_SESSION_ID cookie for authenticated request")
+    else:
+        print("[tv] No TV_SESSION_ID set — using anonymous request (may be blocked in CI)")
+    return headers
+
+HEADERS = _build_headers()
 
 _MAX_RETRIES = 3
 _RETRY_DELAY = 5  # seconds
@@ -133,44 +173,182 @@ def fetch_screener(screener_cfg: dict, columns: list) -> list:
 
 
 # --------------------------------------------------------------------------
-# DeepSeek auto-scorer
+# 4-Stage scoring engine (wiki-derived, Python-deterministic)
 # --------------------------------------------------------------------------
+#
+# Rules are extracted from the LLM Traders Wiki and embedded here so they
+# work both in CI (no wiki access) and locally. The 4 stages mirror the
+# trader frameworks used in the trade-analyser skill:
+#
+#  Stage 1 — Trend Leadership / RS
+#    Source: Minervini SEPA trend template, Steve Jacobs "97 Club", Alex's RS
+#    composite, Qullamaggie breakout scan (top 1-2% RS over 1/3/6 months).
+#    Rule: Only stocks in top RS quartile qualify for GO. Negative-1M stocks
+#    are Stage 4 downtrends — avoid unless there's a fresh EP catalyst.
+#
+#  Stage 2 — Pattern Quality
+#    Source: Minervini VCP (tight base after strong move), Qullamaggie EP
+#    (10%+ gap, neglected before, huge vol), SRxTrades breakout/MA-pullback,
+#    Alex 21dma pullback (0-1x ATR from 21ema, earnings 7+ days away).
+#    Rule: Best patterns are VCP (1M 10-40%, 1W tight, RVOL > 2) or EP
+#    (today > 10%, 1M < 30%, RVOL > 3). Parabolic or very-extended = low.
+#
+#  Stage 3 — Entry Timing
+#    Source: Jeff Sun LoD < 60% ATR rule; Qullamaggie ORH trigger with
+#    LOD stop; SRxTrades "first green 30M candle" entry; Alex first-hour
+#    or last-30-min entry.
+#    Rule: Today's move > 20% = gap-day, entry risk high; > 30% = PASS.
+#    Best entry window = 3-15% move with clear pullback structure forming.
+#
+#  Stage 4 — Risk Quality
+#    Source: Jeff Sun RVOL > 100% required; Alex $10B+ liquid leaders,
+#    $250M+ daily liquidity; Qullamaggie avoids >30% overnight; all traders
+#    require stop < 1-1.5x ATR.
+#    Rule: RVOL < 1 = no institutional confirmation = avoid. Mcap < $300M
+#    = thin, fade-prone. Mcap > $1B + RVOL > 2 = institutional grade.
+
+def _compute_stages(hit: dict) -> dict:
+    """
+    Deterministic 4-stage sub-scores from screener data.
+    Each stage scores 0-25. Total 0-100 = raw composite.
+    """
+    perf_1m = float(hit.get("Perf.1M") or 0)
+    perf_1w = float(hit.get("Perf.W")  or 0)
+    chg_day = float(hit.get("change")  or 0)
+    rvol    = float(hit.get("relative_volume_10d_calc") or 0)
+    mcap    = float(hit.get("market_cap_basic")         or 0)
+
+    # ── Stage 1: Trend Leadership / RS ──────────────────────────────────────
+    # Top RS leaders show strong 1M performance without being parabolic.
+    # Negative-1M = Stage 4 downtrend = 0-2 pts except for EP bounces.
+    if   perf_1m > 80:  s1 = 5   # parabolic → topping risk (Stage 3 territory)
+    elif perf_1m > 50:  s1 = 10  # very extended, RS still positive
+    elif perf_1m > 25:  s1 = 18  # strong leader — top 5-10% RS
+    elif perf_1m > 10:  s1 = 22  # solid Stage 2 uptrend
+    elif perf_1m > 2:   s1 = 15  # moderate uptrend, not a clear leader
+    elif perf_1m > -5:  s1 = 8   # flat / basing (Stage 1)
+    elif perf_1m > -20: s1 = 4   # lagging (Stage 4 territory)
+    else:               s1 = 1   # deep downtrend — EP bounce only
+
+    # Bonus: 1W confirms the 1M direction with momentum
+    if perf_1w > 5 and 5 < perf_1m < 60:
+        s1 = min(25, s1 + 3)
+
+    # ── Stage 2: Pattern Quality ─────────────────────────────────────────────
+    # Classify the setup based on 1M vs today's move vs RVOL.
+    # EP: neglected stock (1M flat/down) + big gap today (>10%) + huge RVOL
+    # VCP/Breakout: trending stock (1M 10-40%) + controlled move today + volume
+    # Pullback: trending stock, quiet day, volume drying up
+    # Parabolic: everything already moved too far — no clean base
+    is_ep          = chg_day > 8  and perf_1m < 30  and rvol > 2.5
+    is_breakout    = 3 < chg_day < 20 and 8 < perf_1m < 50 and rvol > 1.5
+    is_pullback    = abs(chg_day) < 5 and perf_1m > 5 and rvol >= 0.8
+    is_parabolic   = perf_1m > 70 or (chg_day > 25 and perf_1m > 30)
+    is_stage4      = perf_1m < -15
+
+    if   is_parabolic:  s2 = 3   # Qullamaggie SKIP IF: already in parabolic phase
+    elif is_stage4:     s2 = 5   # Stage 4 — only viable as EP day-0 entry
+    elif is_ep:         s2 = 22  # Qullamaggie EP: neglected + big catalyst + volume
+    elif is_breakout:   s2 = 20  # Minervini/SRx: Stage 2 breakout from base
+    elif is_pullback:   s2 = 18  # Alex/SRx: orderly pullback to MA structure
+    else:               s2 = 10  # unclear / mixed signals
+
+    # RVOL bonus — Jeff Sun rule: RVOL > 2 is the institutional confirmation bar
+    if rvol >= 3:   s2 = min(25, s2 + 3)
+    elif rvol >= 2: s2 = min(25, s2 + 1)
+    elif rvol < 1:  s2 = max(0,  s2 - 4)  # below-average volume = skip for Jeff/SRx
+
+    # ── Stage 3: Entry Timing ───────────────────────────────────────────────
+    # How much runway is left today to make a clean, low-risk entry?
+    # Qullamaggie: ORH trigger with LOD stop. Jeff: LoD < 60% ATR.
+    # Alex: first hour or last 30 min. SRx: first green 30M candle.
+    # All traders agree: if it moved 20%+ already today → wait or skip.
+    if   abs(chg_day) > 30:  s3 = 2   # way too extended — ORH long gone
+    elif abs(chg_day) > 20:  s3 = 6   # gap day — wait for next session ORH
+    elif abs(chg_day) > 15:  s3 = 10  # still big — entry risk elevated
+    elif abs(chg_day) > 10:  s3 = 16  # manageable — use intraday pivot
+    elif abs(chg_day) > 5:   s3 = 22  # ideal range — clean entry available
+    elif abs(chg_day) > 1:   s3 = 18  # quiet move — pullback/base entry
+    else:                     s3 = 12  # flat — basing or stuck
+
+    # EP exception: for true EPs (neglected + 10%+ gap + RVOL>3),
+    # the gap itself IS the entry signal (Qullamaggie buys the ORH)
+    if is_ep and rvol >= 3 and 10 <= abs(chg_day) <= 25:
+        s3 = max(s3, 20)
+
+    # ── Stage 4: Risk Quality ───────────────────────────────────────────────
+    # Institutional eligibility, volume confirmation, stop workability.
+    # Alex scan: mcap > $10B + daily liq $250M+. SRx: $300M+. Qullamaggie: $500M+.
+    # Jeff: RVOL > 100% mandatory.
+    s4 = 0
+    # Market cap tier (institutional accessibility)
+    if   mcap >= 10e9: s4 += 10  # liquid leaders tier (Alex universe)
+    elif mcap >= 2e9:  s4 += 8   # mid-cap institutional
+    elif mcap >= 500e6:s4 += 5   # Qullamaggie minimum
+    elif mcap >= 300e6:s4 += 3   # SRxTrades minimum
+    else:              s4 += 0   # micro-cap — fade risk, avoid
+
+    # RVOL tier (volume confirmation strength)
+    if   rvol >= 4:  s4 += 10  # exceptional — institutions clearly active
+    elif rvol >= 3:  s4 += 8
+    elif rvol >= 2:  s4 += 5
+    elif rvol >= 1:  s4 += 2
+    else:            s4 += 0   # below-average volume — Jeff hard skip
+
+    # Extension penalty — the further from the base, the harder the stop
+    if   perf_1m > 80: s4 = max(0, s4 - 8)
+    elif perf_1m > 60: s4 = max(0, s4 - 5)
+    elif perf_1m > 40: s4 = max(0, s4 - 2)
+
+    s4 = min(25, s4)
+
+    raw = s1 + s2 + s3 + s4
+    return {
+        "s1_trend":   round(s1),
+        "s2_pattern": round(s2),
+        "s3_timing":  round(s3),
+        "s4_risk":    round(s4),
+        "raw":        round(raw),
+        # Pattern label for thesis context
+        "pattern": (
+            "PARABOLIC" if is_parabolic else
+            "EP"        if is_ep        else
+            "BREAKOUT"  if is_breakout  else
+            "PULLBACK"  if is_pullback  else
+            "STAGE4-BOUNCE" if is_stage4 else
+            "UNCLEAR"
+        ),
+    }
+
 
 def _deepseek_score(ticker: str, hit: dict) -> dict | None:
+    """
+    Call DeepSeek to add sector/industry context and write the thesis.
+    The 4-stage sub-scores are pre-computed in Python — DeepSeek cannot
+    override them, only adjust the composite score by ±5 per stage based
+    on sector context it knows and we do not.
+    """
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
         return None
-    perf_1m  = hit.get("Perf.1M") or 0
-    perf_1w  = hit.get("Perf.W")  or 0
-    chg_day  = hit.get("change")  or 0
 
-    # Pre-compute hard caps so the LLM doesn't have to re-derive them.
-    # These rules mirror Minervini/Qullamaggie discipline: never chase
-    # a stock that's already parabolic or that has moved too far today.
-    cap_notes = []
-    score_cap = 100
-    if abs(perf_1m) > 100:
-        score_cap = min(score_cap, 35)
-        cap_notes.append(f"Perf.1M={perf_1m:.1f}% → PARABOLIC (>100% in 1M): cap 35")
-    elif abs(perf_1m) > 60:
-        score_cap = min(score_cap, 55)
-        cap_notes.append(f"Perf.1M={perf_1m:.1f}% → very extended (>60% in 1M): cap 55")
-    elif abs(perf_1m) > 40:
-        score_cap = min(score_cap, 65)
-        cap_notes.append(f"Perf.1M={perf_1m:.1f}% → extended (>40% in 1M): cap 65")
-    if abs(chg_day) > 30:
-        score_cap = min(score_cap, 45)
-        cap_notes.append(f"Today={chg_day:.1f}% → too large to buy today (>30%): cap 45")
-    elif abs(chg_day) > 20:
-        score_cap = min(score_cap, 60)
-        cap_notes.append(f"Today={chg_day:.1f}% → gap-up day (>20%), wait for pullback: cap 60")
+    stages = _compute_stages(hit)
+    raw    = stages["raw"]   # deterministic baseline 0-100
 
-    cap_block = (
-        "\n\nHARD CAPS ALREADY COMPUTED (do not exceed these):\n"
-        + "\n".join(f"  • {n}" for n in cap_notes)
-        + f"\n  → Your score MUST be ≤ {score_cap}."
-        if cap_notes else ""
+    # Build a compact stage block for the LLM
+    stage_block = (
+        f"Stage scores (Python-deterministic, do NOT change more than ±5 each):\n"
+        f"  S1 Trend Leadership : {stages['s1_trend']}/25\n"
+        f"  S2 Pattern Quality  : {stages['s2_pattern']}/25  [{stages['pattern']}]\n"
+        f"  S3 Entry Timing     : {stages['s3_timing']}/25\n"
+        f"  S4 Risk Quality     : {stages['s4_risk']}/25\n"
+        f"  Raw composite       : {raw}/100\n"
     )
+
+    perf_1m = float(hit.get("Perf.1M") or 0)
+    perf_1w = float(hit.get("Perf.W")  or 0)
+    chg_day = float(hit.get("change")  or 0)
+    rvol    = float(hit.get("relative_volume_10d_calc") or 0)
 
     payload = {
         "model": "deepseek-chat",
@@ -178,45 +356,33 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
             {
                 "role": "system",
                 "content": (
-                    "You are a disciplined momentum swing trader scoring a setup for TODAY's entry "
-                    "quality — not whether the stock is strong, but whether there is a clean, "
-                    "low-risk entry available RIGHT NOW.\n\n"
-                    'Output ONLY strict JSON: {"score": 0-100, "verdict": "GO"|"WAIT"|"PASS", '
-                    '"thesis": "1 sentence max 20 words"}\n'
-                    "Score >= 80 → GO (clean entry today). 50-79 → WAIT (setup needs time). "
-                    "<50 → PASS (too risky or extended).\n\n"
-                    "SCORING RULES — apply in order:\n"
-                    "1. If Perf.1M > 100%: PASS (≤35). Stock is parabolic — Minervini would never "
-                    "buy this far extended from any base.\n"
-                    "2. If Perf.1M > 60%: WAIT max (≤55). Very extended — expect mean reversion.\n"
-                    "3. If Perf.1M > 40%: WAIT max (≤65). Likely far from MA support.\n"
-                    "4. If today's change > 30%: PASS (≤45). Way too extended intraday — "
-                    "Qullamaggie does NOT chase 30%+ gap days.\n"
-                    "5. If today's change > 20%: WAIT max (≤60). Already moved — "
-                    "wait for ORH next day or first pullback.\n"
-                    "POSITIVE FACTORS (only within the caps above):\n"
-                    "+ RVOL > 3 and today 5-15%: institutional interest, tight base → +15\n"
-                    "+ Perf.1M < 20% (not yet extended) and RVOL > 2: fresh breakout possible → +10\n"
-                    "+ Market cap $2B+ with strong sector: reduces fade risk → +5"
+                    "You are a disciplined momentum trader scoring setups using a 4-stage framework "
+                    "(Minervini SEPA + Qullamaggie EP/Breakout + Alex 21dma pullback + SRxTrades/Jeff volume rules).\n\n"
+                    "The 4 stage sub-scores were computed in Python using wiki rules. Your job:\n"
+                    "1. Review the stage scores and adjust the composite ±5 TOTAL based on sector "
+                    "context, industry tailwind/headwind, or contradictions you know about.\n"
+                    "2. Translate the composite into GO (≥80) / WAIT (50-79) / PASS (<50).\n"
+                    "3. Write a 1-sentence thesis (max 25 words) naming the setup type and the key risk.\n\n"
+                    'Output ONLY this JSON (no markdown): '
+                    '{"score":<int 0-100>,"verdict":"GO"|"WAIT"|"PASS","thesis":"<text>","stages":{'
+                    '"s1_trend":<int>,"s2_pattern":<int>,"s3_timing":<int>,"s4_risk":<int>}}'
                 ),
             },
             {
                 "role": "user",
                 "content": (
-                    f"Score entry quality for {ticker} today.{cap_block}\n\n"
-                    f"Price: {hit.get('close')}\n"
-                    f"Change today: {chg_day:.2f}%\n"
-                    f"RVOL (10d): {hit.get('relative_volume_10d_calc')}\n"
-                    f"Perf 1W: {perf_1w:.2f}%\n"
-                    f"Perf 1M: {perf_1m:.2f}%\n"
-                    f"Sector: {hit.get('sector')}\n"
-                    f"Industry: {hit.get('industry')}\n"
-                    f"Market cap: {hit.get('market_cap_basic')}\n"
-                    "Return ONLY the JSON object."
+                    f"Ticker: {ticker}\n"
+                    f"Sector: {hit.get('sector', 'N/A')} | Industry: {hit.get('industry', 'N/A')}\n"
+                    f"Price: ${hit.get('close')} | Today: {chg_day:+.1f}% | "
+                    f"1W: {perf_1w:+.1f}% | 1M: {perf_1m:+.1f}%\n"
+                    f"RVOL: {rvol:.2f} | MCap: ${(hit.get('market_cap_basic') or 0)/1e9:.1f}B\n\n"
+                    f"{stage_block}\n"
+                    "Does the sector/industry context change any stage score? "
+                    "Adjust composite (±5 max total) and write thesis."
                 ),
             },
         ],
-        "max_tokens": 200,
+        "max_tokens": 250,
         "temperature": 0.0,
     }
     req = urllib.request.Request(
@@ -234,22 +400,41 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
         text = data["choices"][0]["message"]["content"].strip()
         if text.startswith("```"):
             lines = text.splitlines()
-            text = "\n".join(l for l in lines if not l.strip().startswith("```"))
-        return json.loads(text)
+            text = "\n".join(ln for ln in lines if not ln.strip().startswith("```"))
+        result = json.loads(text)
+        # Merge stages from Python computation (authoritative) with LLM output
+        result["stages"] = {
+            "s1_trend":   result.get("stages", {}).get("s1_trend",   stages["s1_trend"]),
+            "s2_pattern": result.get("stages", {}).get("s2_pattern", stages["s2_pattern"]),
+            "s3_timing":  result.get("stages", {}).get("s3_timing",  stages["s3_timing"]),
+            "s4_risk":    result.get("stages", {}).get("s4_risk",    stages["s4_risk"]),
+        }
+        result["pattern"] = stages["pattern"]
+        return result
     except Exception as e:
         print(f"[tv:score] {ticker}: {e}")
-        return None
+        # Fall back to Python-only score without thesis
+        verdict = "GO" if raw >= 80 else "WAIT" if raw >= 50 else "PASS"
+        return {
+            "score":   raw,
+            "verdict": verdict,
+            "thesis":  f"{stages['pattern']} setup; scored without LLM context.",
+            "stages":  {k: stages[k] for k in ("s1_trend","s2_pattern","s3_timing","s4_risk")},
+            "pattern": stages["pattern"],
+        }
 
 
 def score_top(hits: list, n: int) -> None:
-    """Mutate hits[:n] to add 'score' / 'verdict' / 'thesis'."""
-    for i, hit in enumerate(hits[:n]):
+    """Mutate hits[:n] to add score/verdict/thesis/stages/pattern."""
+    for hit in hits[:n]:
         result = _deepseek_score(hit["ticker"], hit)
         if result:
-            hit["score"] = result.get("score")
+            hit["score"]   = result.get("score")
             hit["verdict"] = result.get("verdict")
-            hit["thesis"] = result.get("thesis")
-        time.sleep(0.5)  # polite
+            hit["thesis"]  = result.get("thesis")
+            hit["stages"]  = result.get("stages")   # {s1_trend, s2_pattern, s3_timing, s4_risk}
+            hit["pattern"] = result.get("pattern")  # EP / BREAKOUT / PULLBACK / PARABOLIC / …
+        time.sleep(0.6)  # polite — DeepSeek rate limit
 
 
 # --------------------------------------------------------------------------

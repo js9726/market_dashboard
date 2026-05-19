@@ -1,29 +1,23 @@
-name: Refresh Market Data & Morning Brief
+name: Refresh Market Data & Morning Brief (Daily)
 
-# Full pipeline (snapshot + breadth + TV screeners + 4-provider brief + trader
-# verdict) runs in three windows around the US session, Mon–Fri (times in UTC,
-# locked to EDT — during EST these all shift +1h in market terms, acceptable
-# drift for a Malaysia-based owner).
+# WK-1 split — this file is the DAILY HEAVY job. Once per US trading day.
+# Runs the full pipeline including the expensive bits (breadth scan of ~5000
+# tickers + 4-provider morning brief LLM calls + trader verdict).
 #
-# Times use off-peak minutes (:07 / :37) to dodge the GH Actions cron throttle
-# at :00/:15/:30/:45. Historically ~50% of scheduled ticks were being dropped
-# at peak slots; off-peak minutes substantially improve fire-rate. Logged as
-# WK-4 in ROADMAP.md.
+# Intraday refreshes (the cheap ones — snapshot + TV screener only) live in
+# refresh_data_intraday.yml. Together they replace the original 7-ticks-of-
+# everything design that cost ~$10/day in LLM and 70+ min of CI compute.
 #
-#   13:07            ~30 min pre-market   (09:07 ET EDT — was 09:00)
-#   13:37 14:07 14:37 15:07 15:37   first 2 hours of market, every ~30 min
-#   20:37            ~30 min post-close   (16:37 ET EDT — was 16:30)
+# Times use off-peak minutes (:07) to dodge the GH Actions cron throttle at
+# :00/:15/:30/:45 (WK-4 in ROADMAP.md).
 #
-# Total: 7 ticks/day, ~35/week. Each tick commits fresh data/* JSON which
-# triggers a Vercel redeploy (~140 builds/month, within Hobby tier).
+#   13:07            ~30 min pre-market   (09:07 ET EDT)
+#
+# Total: 1 tick/day, ~5/week. The intraday workflow handles the other 6 ticks.
 
 on:
   schedule:
-    - cron: '7 13 * * 1-5'           # ~pre-market   (09:07 ET EDT)
-    - cron: '37 13 * * 1-5'          # ~market open  (09:37 ET EDT)
-    - cron: '7,37 14 * * 1-5'        # 10:07 & 10:37 ET (first hour of trading)
-    - cron: '7,37 15 * * 1-5'        # 11:07 & 11:37 ET (second hour of trading)
-    - cron: '37 20 * * 1-5'          # ~post-close   (16:37 ET EDT)
+    - cron: '7 13 * * 1-5'           # ~pre-market   (09:07 ET EDT) — daily heavy
   workflow_dispatch: {}
 
 env:
@@ -68,6 +62,11 @@ jobs:
         run: python scripts/tv_screener_fetch.py --out-dir data --score --score-top 10
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          # TV_SESSION_ID: your TradingView sessionid cookie value.
+          # Add as a GitHub Secret to bypass IP-based blocks on cloud runners.
+          # Get it from Chrome → DevTools → Application → Cookies → tradingview.com → sessionid
+          # Refresh every 30-90 days when it expires.
+          TV_SESSION_ID: ${{ secrets.TV_SESSION_ID }}
 
       # ── Step 2: morning brief — all 4 providers, pushed to Postgres ────────
       # The Python script writes HTML files to data/ and (when --post-to is set)

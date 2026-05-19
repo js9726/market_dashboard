@@ -281,6 +281,23 @@ export default function TvScreenerHits() {
   );
 }
 
+/**
+ * Build the hover tooltip for a scored row.
+ * Shows: thesis + 4-stage sub-scores (if available).
+ */
+function buildScoreTooltip(hit: TvScreenerHit, fallbackNote?: string | null): string {
+  const lines: string[] = [];
+  if (hit.thesis) lines.push(hit.thesis);
+  else if (fallbackNote) lines.push(fallbackNote);
+  if (hit.stages) {
+    const { s1_trend, s2_pattern, s3_timing, s4_risk } = hit.stages;
+    lines.push(
+      `S1 Trend/RS ${s1_trend}/25  S2 Pattern ${s2_pattern}/25  S3 Timing ${s3_timing}/25  S4 Risk ${s4_risk}/25`
+    );
+  }
+  return lines.join("\n") || "No thesis available";
+}
+
 function ScreenerTable({
   screener,
   manualScores,
@@ -353,12 +370,15 @@ function ScreenerTable({
                   <td className="px-3 py-2 text-right">
                     {score != null ? (
                       <span
-                        className="inline-flex rounded px-2 py-1 font-mono text-[11px] font-bold"
+                        className="inline-flex rounded px-2 py-1 font-mono text-[11px] font-bold cursor-help"
                         style={scoreStyle}
-                        title={hit.thesis ?? brief?.note ?? manual?.note ?? undefined}
+                        title={buildScoreTooltip(hit, brief?.note ?? manual?.note)}
                       >
                         {verdict ? `${verdict} ` : ""}
                         {score}
+                        {hit.pattern && hit.pattern !== "UNCLEAR"
+                          ? ` · ${hit.pattern}`
+                          : ""}
                       </span>
                     ) : (
                       <span className="font-mono text-[var(--fg-3)]">-</span>
