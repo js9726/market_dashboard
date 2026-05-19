@@ -1,0 +1,353 @@
+
+> market-dashboard@0.1.0 dev
+> next dev --turbopack --hostname 127.0.0.1 --port 3000
+
+   ▲ Next.js 15.5.15 (Turbopack)
+   - Local:        http://127.0.0.1:3000
+   - Network:      http://127.0.0.1:3000
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Compiled middleware in 229ms
+ ✓ Ready in 1394ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 4.3s
+ GET /login 200 in 4991ms
+ GET /login 200 in 121ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 518ms
+ GET /api/auth/session 200 in 2131ms
+ GET /api/auth/session 200 in 999ms
+ GET /login 307 in 256ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 507ms
+ GET /dashboard 200 in 817ms
+ ○ Compiling /api/morning-verdict ...
+ GET /api/auth/session 200 in 1270ms
+ ✓ Compiled /api/morning-verdict in 1364ms
+ GET /api/auth/session 200 in 465ms
+ GET /api/live-quotes 200 in 2029ms
+ GET /api/live-quotes 200 in 2152ms
+ GET /api/morning-verdict 200 in 2230ms
+ GET /api/morning-verdict 200 in 2255ms
+ GET /api/live-quotes 200 in 370ms
+ GET /api/live-quotes 200 in 326ms
+ GET /api/morning-verdict 200 in 424ms
+ GET /api/morning-verdict 200 in 463ms
+ GET /api/live-quotes 200 in 362ms
+ GET /api/live-quotes 200 in 338ms
+ GET /api/live-quotes 200 in 400ms
+ GET /api/live-quotes 200 in 357ms
+ GET /api/morning-verdict 200 in 454ms
+ GET /api/morning-verdict 200 in 454ms
+ GET /api/live-quotes 200 in 367ms
+ GET /api/live-quotes 200 in 402ms
+ GET /api/live-quotes 200 in 340ms
+ GET /api/live-quotes 200 in 395ms
+ GET /api/morning-verdict 200 in 431ms
+ GET /api/morning-verdict 200 in 391ms
+ GET /api/live-quotes 200 in 377ms
+ GET /api/live-quotes 200 in 367ms
+ GET /api/live-quotes 200 in 398ms
+ GET /api/live-quotes 200 in 349ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ GET /api/auth/session 200 in 1139ms
+ GET /api/auth/session 200 in 316ms
+ GET /api/morning-verdict 200 in 2093ms
+ GET /api/live-quotes 200 in 2317ms
+ GET /api/morning-verdict 200 in 2397ms
+ GET /api/live-quotes 200 in 2408ms
+ GET /api/morning-verdict 200 in 479ms
+ GET /api/auth/session 200 in 1109ms
+ GET /api/live-quotes 200 in 1133ms
+ GET /api/live-quotes 200 in 1165ms
+ GET /api/morning-verdict 200 in 1246ms
+ GET /api/auth/session 200 in 320ms
+ GET /api/live-quotes 200 in 443ms
+ GET /api/live-quotes 200 in 485ms
+ GET /api/morning-verdict 200 in 540ms
+ GET /api/morning-verdict 200 in 542ms
+ GET /api/auth/session 200 in 1025ms
+ GET /api/auth/session 200 in 340ms
+ ✓ Compiled /api/morning-verdict/rerun in 282ms
+ GET /api/live-quotes 200 in 373ms
+ GET /api/live-quotes 200 in 347ms
+ POST /api/morning-verdict/rerun?provider=gemini 200 in 41026ms
+ GET /api/morning-verdict 200 in 439ms
+ GET /api/morning-verdict 200 in 437ms
+ GET /api/morning-verdict 200 in 441ms
+ GET /api/live-quotes 200 in 406ms
+ GET /api/live-quotes 200 in 385ms
+ GET /api/live-quotes 200 in 420ms
+ GET /api/live-quotes 200 in 394ms
+ GET /api/morning-verdict 200 in 421ms
+ GET /api/auth/session 200 in 1169ms
+ GET /api/live-quotes 200 in 1199ms
+ GET /api/morning-verdict 200 in 1257ms
+ GET /api/live-quotes 200 in 1458ms
+ GET /api/auth/session 200 in 332ms
+ ✓ Compiled /dashboard/chat in 404ms
+ GET /dashboard/chat 200 in 517ms
+ ○ Compiling /dashboard/journal ...
+ ✓ Compiled /dashboard/journal in 1074ms
+ GET /dashboard/journal 200 in 1179ms
+ ✓ Compiled /api/journal/connection in 187ms
+ GET /api/journal/connection 200 in 2059ms
+ ✓ Compiled /api/journal/stats in 159ms
+ GET /api/journal/connection 200 in 353ms
+ GET /api/journal/stats 200 in 599ms
+ GET /api/journal/stats 200 in 418ms
+ GET /dashboard 200 in 164ms
+ GET /api/live-quotes 200 in 525ms
+ GET /api/live-quotes 200 in 675ms
+ GET /api/live-quotes 200 in 681ms
+ GET /api/morning-verdict 200 in 700ms
+ GET /api/morning-verdict 200 in 704ms
+ GET /api/morning-verdict 200 in 705ms
+ GET /api/live-quotes 200 in 362ms
+ GET /api/morning-verdict 200 in 392ms
+ GET /api/live-quotes 200 in 422ms
+ GET /api/live-quotes 200 in 413ms
+ GET /api/morning-verdict 200 in 409ms
+ GET /api/auth/session 200 in 1122ms
+ GET /api/live-quotes 200 in 1144ms
+ GET /api/live-quotes 200 in 1160ms
+ GET /api/morning-verdict 200 in 1212ms
+ GET /api/auth/session 200 in 351ms
+ GET /api/auth/session 200 in 1248ms
+ GET /api/live-quotes 200 in 1281ms
+ GET /api/live-quotes 200 in 1307ms
+ GET /api/morning-verdict 200 in 1347ms
+ GET /api/morning-verdict 200 in 1350ms
+ GET /api/auth/session 200 in 349ms
+ GET /api/live-quotes 200 in 399ms
+ GET /api/live-quotes 200 in 395ms
+ GET /api/morning-verdict 200 in 458ms
+ GET /api/morning-verdict 200 in 572ms
+ GET /api/live-quotes 200 in 405ms
+ GET /api/live-quotes 200 in 390ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ GET /api/auth/session 200 in 1162ms
+ GET /api/auth/session 200 in 325ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__1f812d94._.js:883:159
+
+  880     return `${bucket.toISOString()}|${provider}`;
+  881 }
+  882 async function readBucket(bucket) {
+→ 883     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/morning-verdict 500 in 6418ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].liveQuote.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__66f9a0f6._.js:233:163
+
+  230         status: 401
+  231     });
+  232 }
+→ 233 const rows = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].liveQuote.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/live-quotes 500 in 6515ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__1f812d94._.js:883:159
+
+  880     return `${bucket.toISOString()}|${provider}`;
+  881 }
+  882 async function readBucket(bucket) {
+→ 883     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/morning-verdict 500 in 6566ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].liveQuote.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__66f9a0f6._.js:233:163
+
+  230         status: 401
+  231     });
+  232 }
+→ 233 const rows = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].liveQuote.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/live-quotes 500 in 6634ms
+ GET /api/auth/session 200 in 1130ms
+ GET /api/live-quotes 200 in 1341ms
+ GET /api/live-quotes 200 in 1341ms
+ GET /api/morning-verdict 200 in 1476ms
+ GET /api/morning-verdict 200 in 1510ms
+ GET /api/auth/session 200 in 359ms
+ GET /api/auth/session 200 in 1022ms
+ GET /api/live-quotes 200 in 1049ms
+ GET /api/live-quotes 200 in 1054ms
+ GET /api/morning-verdict 200 in 1165ms
+ GET /api/morning-verdict 200 in 1199ms
+ GET /api/auth/session 200 in 325ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ GET /api/auth/session 200 in 1154ms
+ GET /api/auth/session 200 in 350ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__1f812d94._.js:883:159
+
+  880     return `${bucket.toISOString()}|${provider}`;
+  881 }
+  882 async function readBucket(bucket) {
+→ 883     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/morning-verdict 500 in 6234ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].liveQuote.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__66f9a0f6._.js:233:163
+
+  230         status: 401
+  231     });
+  232 }
+→ 233 const rows = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].liveQuote.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/live-quotes 500 in 6291ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].liveQuote.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__66f9a0f6._.js:233:163
+
+  230         status: 401
+  231     });
+  232 }
+→ 233 const rows = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].liveQuote.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/live-quotes 500 in 6351ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__1f812d94._.js:883:159
+
+  880     return `${bucket.toISOString()}|${provider}`;
+  881 }
+  882 async function readBucket(bucket) {
+→ 883     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/morning-verdict 500 in 6483ms
+ GET /api/auth/session 200 in 1064ms
+ GET /api/live-quotes 200 in 1247ms
+ GET /api/live-quotes 200 in 1250ms
+ GET /api/morning-verdict 200 in 1318ms
+ GET /api/morning-verdict 200 in 1321ms
+ GET /api/auth/session 200 in 315ms
+ GET /api/auth/session 200 in 1184ms
+ GET /api/live-quotes 200 in 1192ms
+ GET /api/live-quotes 200 in 1205ms
+ GET /api/morning-verdict 200 in 1243ms
+ GET /api/morning-verdict 200 in 1271ms
+ GET /api/auth/session 200 in 350ms
+ GET /api/auth/session 200 in 981ms
+ GET /api/auth/session 200 in 469ms
+ GET /api/live-quotes 200 in 546ms
+ GET /api/live-quotes 200 in 555ms
+ GET /api/morning-verdict 200 in 594ms
+ GET /api/morning-verdict 200 in 595ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ GET /api/auth/session 200 in 1150ms
+ GET /api/auth/session 200 in 329ms
+ GET /api/morning-verdict 200 in 5570ms
+ GET /api/morning-verdict 200 in 5574ms
+ GET /api/live-quotes 200 in 5883ms
+ GET /api/live-quotes 200 in 5886ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ GET /api/auth/session 200 in 1129ms
+ GET /api/auth/session 200 in 315ms
+ GET /api/morning-verdict 200 in 2089ms
+ GET /api/live-quotes 200 in 2285ms
+ GET /api/morning-verdict 200 in 2377ms
+ GET /api/live-quotes 200 in 2393ms
+ ○ Compiling /dashboard/settled ...
+ ✓ Compiled /dashboard/settled in 1227ms
+ GET /dashboard/settled 200 in 1325ms
+ ✓ Compiled /dashboard/bench in 417ms
+ GET /dashboard/bench 200 in 501ms
+ GET /dashboard/settled 200 in 104ms
+ ✓ Compiled /dashboard/analytics in 434ms
+ GET /dashboard/analytics 200 in 536ms
+ ✓ Compiled /dashboard/scanner in 410ms
+ GET /dashboard/scanner 200 in 491ms
+ ✓ Compiled /api/watchlist in 253ms
+ GET /api/watchlist 200 in 669ms
+ GET /api/watchlist 200 in 367ms
+ GET /dashboard/chat 200 in 123ms
+ GET /dashboard/journal 200 in 122ms
+ GET /api/journal/connection 200 in 379ms
+ GET /api/journal/connection 200 in 364ms
+ GET /api/journal/stats 200 in 486ms
+ GET /api/journal/stats 200 in 366ms
+ ✓ Compiled /dashboard/playbooks in 322ms
+ GET /dashboard/playbooks 200 in 409ms
+ ✓ Compiled /dashboard/replay in 329ms
+ GET /dashboard/replay 200 in 428ms
+ ✓ Compiled /dashboard/settings in 404ms
+ GET /dashboard/settings 200 in 511ms
+ GET /dashboard 200 in 177ms
+ GET /api/live-quotes 200 in 367ms
+ GET /api/morning-verdict 200 in 452ms
+ GET /api/live-quotes 200 in 457ms
+ GET /api/live-quotes 200 in 461ms
+ GET /api/live-quotes 200 in 428ms
+ GET /api/morning-verdict 200 in 549ms
+ GET /api/morning-verdict 200 in 559ms
+ GET /api/morning-verdict 200 in 453ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ GET /api/auth/session 200 in 1201ms
+ GET /api/auth/session 200 in 334ms
+ GET /api/live-quotes 200 in 5714ms
+ GET /api/live-quotes 200 in 5953ms
+ GET /api/morning-verdict 200 in 6136ms
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany()` invocation in
+C:\Users\jiesh\AI codes hub\market_dashboard\apps\market_dashboard\.next\server\chunks\[root-of-the-server]__1f812d94._.js:883:159
+
+  880     return `${bucket.toISOString()}|${provider}`;
+  881 }
+  882 async function readBucket(bucket) {
+→ 883     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].morningBriefCache.findMany(
+Can't reach database server at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-damp-haze-a1pgt4c7-pooler.ap-southeast-1.aws.neon.tech:5432`.
+ GET /api/morning-verdict 500 in 6338ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
