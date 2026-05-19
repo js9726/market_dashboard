@@ -35,5 +35,7 @@ export interface TvScreener {
 export interface TvScreenersFile {
   fetched_at: string;
   scored: boolean;
+  /** Number of top hits auto-scored per screener (added in v2). */
+  score_top?: number;
   screeners: TvScreener[];
 }

@@ -10,19 +10,28 @@ import {
 
 const FULL_MODULES   = ["price", "financialData", "summaryDetail", "defaultKeyStatistics", "assetProfile", "calendarEvents"] as const;
 const CORE_MODULES   = ["price", "financialData", "summaryDetail", "defaultKeyStatistics", "assetProfile"] as const;
+const PRICE_ONLY     = ["price"] as const;
 
-async function fetchStockData(ticker: string) {
+async function fetchStockData(ticker: string): Promise<{ summary: Record<string, unknown>; partial: boolean }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const yf = yahooFinance as any;
+  // Level 1: full modules including earnings calendar
   try {
-    // Try the full module set first (includes earnings dates via calendarEvents).
     const summary = await yf.quoteSummary(ticker, { modules: FULL_MODULES }, { skipValidation: true });
-    return summary as Record<string, unknown>;
-  } catch {
-    // calendarEvents (or another optional module) sometimes causes Yahoo Finance
-    // to reject the request for certain tickers.  Fall back to core modules only.
+    return { summary: summary as Record<string, unknown>, partial: false };
+  } catch { /* fall through */ }
+  // Level 2: core modules without calendarEvents
+  try {
     const summary = await yf.quoteSummary(ticker, { modules: CORE_MODULES }, { skipValidation: true });
-    return summary as Record<string, unknown>;
+    return { summary: summary as Record<string, unknown>, partial: false };
+  } catch { /* fall through */ }
+  // Level 3: price only (minimum viable for scoring)
+  try {
+    const summary = await yf.quoteSummary(ticker, { modules: PRICE_ONLY }, { skipValidation: true });
+    return { summary: summary as Record<string, unknown>, partial: true };
+  } catch {
+    // All attempts exhausted — caller will use screener hit data only
+    throw new Error(`Yahoo Finance unavailable for ${ticker}`);
   }
 }
 
@@ -38,6 +47,18 @@ function fmtBig(v: number | null | undefined): string {
   return `$${v.toFixed(2)}`;
 }
 
+/** Screener hit data optionally passed by the dashboard Score button. */
+type HitData = {
+  close?: number | null;
+  change?: number | null;
+  relative_volume_10d_calc?: number | null;
+  "Perf.W"?: number | null;
+  "Perf.1M"?: number | null;
+  market_cap_basic?: number | null;
+  sector?: string | null;
+  industry?: string | null;
+};
+
 export async function POST(request: Request) {
   const guard = await requireUserIdAndQuota();
   if (guard.error) return guard.error;
@@ -47,16 +68,27 @@ export async function POST(request: Request) {
     const body = await request.json();
     const ticker: string = (body.ticker ?? "").toUpperCase().trim();
     const provider: string | undefined = body.provider;
+    // Optional screener metadata — used as fallback when Yahoo Finance is unavailable
+    const hitData: HitData | undefined = body.hitData;
 
     if (!ticker) return NextResponse.json({ error: "ticker is required" }, { status: 400 });
 
-    let summary: Awaited<ReturnType<typeof fetchStockData>>;
+    let fetchResult: Awaited<ReturnType<typeof fetchStockData>> | null = null;
+    let yahooUnavailable = false;
     try {
-      summary = await fetchStockData(ticker);
+      fetchResult = await fetchStockData(ticker);
     } catch {
-      return NextResponse.json({ error: `Could not fetch data for ${ticker}. Check the symbol.` }, { status: 404 });
+      yahooUnavailable = true;
+      // If we have no screener data either, nothing we can do
+      if (!hitData) {
+        return NextResponse.json(
+          { error: `Could not fetch data for ${ticker}. Check the symbol or try again later.` },
+          { status: 404 }
+        );
+      }
     }
 
+    const summary = fetchResult?.summary ?? {};
     const p = (summary.price ?? {}) as Record<string, unknown>;
     const fd = (summary.financialData ?? {}) as Record<string, unknown>;
     const sd = (summary.summaryDetail ?? {}) as Record<string, unknown>;
@@ -64,22 +96,25 @@ export async function POST(request: Request) {
     const ap = (summary.assetProfile ?? {}) as Record<string, unknown>;
     const ce = (summary.calendarEvents ?? {}) as Record<string, unknown>;
 
-    const currentPrice = (p?.regularMarketPrice as number) ?? null;
+    // Primary: Yahoo Finance data. Fallback: screener hitData where available.
+    const currentPrice = (p?.regularMarketPrice as number) ?? hitData?.close ?? null;
     const prevClose = (p?.regularMarketPreviousClose as number) ?? null;
-    const changePct = currentPrice && prevClose ? ((currentPrice - prevClose) / prevClose) * 100 : null;
+    const changePct = currentPrice && prevClose
+      ? ((currentPrice - prevClose) / prevClose) * 100
+      : hitData?.change ?? null;
     const week52High = (sd?.fiftyTwoWeekHigh as number) ?? null;
     const week52Low = (sd?.fiftyTwoWeekLow as number) ?? null;
     const analystPT = (fd?.targetMeanPrice as number) ?? null;
     const earningsObj = (ce as { earnings?: { earningsDate?: { fmt?: string }[] } } | undefined)?.earnings;
     const earningsDate = earningsObj?.earningsDate?.[0]?.fmt ?? null;
-    const marketCap = (p?.marketCap as number) ?? null;
+    const marketCap = (p?.marketCap as number) ?? hitData?.market_cap_basic ?? null;
     const totalRevenue = (fd?.totalRevenue as number) ?? null;
     const grossMargins = (fd?.grossMargins as number) ?? null;
     const trailingEps = (ks?.trailingEps as number) ?? null;
     const forwardEps = (ks?.forwardEps as number) ?? null;
     const dividendYield = (sd?.dividendYield as number) ?? null;
-    const sector = (ap?.sector as string) ?? null;
-    const industry = (ap?.industry as string) ?? null;
+    const sector = (ap?.sector as string) ?? hitData?.sector ?? null;
+    const industry = (ap?.industry as string) ?? hitData?.industry ?? null;
     const exchange = (p?.exchangeName as string) ?? null;
     const name = (p?.longName as string) ?? (p?.shortName as string) ?? ticker;
     const forwardPE = (sd?.forwardPE as number) ?? null;
@@ -93,6 +128,22 @@ export async function POST(request: Request) {
     const earningsDays = earningsDate
       ? Math.round((new Date(earningsDate).getTime() - Date.now()) / 86400000)
       : null;
+
+    // Extra screener context available when Yahoo Finance is unavailable
+    const screenerExtra = yahooUnavailable && hitData
+      ? `\nSCREENER DATA (Yahoo Finance unavailable — score based on this data):
+- Today's Change: ${hitData.change != null ? (hitData.change >= 0 ? "+" : "") + fmt(hitData.change) + "%" : "N/A"}
+- RVOL (10d): ${hitData.relative_volume_10d_calc != null ? fmt(hitData.relative_volume_10d_calc) : "N/A"}
+- 1-Week Perf: ${hitData["Perf.W"] != null ? fmt(hitData["Perf.W"]) + "%" : "N/A"}
+- 1-Month Perf: ${hitData["Perf.1M"] != null ? fmt(hitData["Perf.1M"]) + "%" : "N/A"}
+- Market Cap: ${fmtBig(hitData.market_cap_basic ?? null)}
+NOTE: Full fundamental data unavailable. Base your score on the screener data above and general sector context.`
+      : (hitData && (hitData.relative_volume_10d_calc != null || hitData["Perf.W"] != null)
+          ? `\nSCREENER CONTEXT:
+- RVOL (10d): ${hitData.relative_volume_10d_calc != null ? fmt(hitData.relative_volume_10d_calc) : "N/A"}
+- 1-Week Perf: ${hitData["Perf.W"] != null ? fmt(hitData["Perf.W"]) + "%" : "N/A"}
+- 1-Month Perf: ${hitData["Perf.1M"] != null ? fmt(hitData["Perf.1M"]) + "%" : "N/A"}`
+          : "");
 
     const stockContext = `
 STOCK: ${ticker} — ${name}
@@ -119,7 +170,7 @@ FUNDAMENTALS:
 - Current Ratio: ${fmt(currentRatio)}
 - Free Cash Flow: ${fmtBig(freeCashflow)}
 - Dividend Yield: ${dividendYield != null ? fmt(dividendYield * 100) + "%" : "None"}
-`;
+${screenerExtra}`;
 
     const display: StockDisplayFields = {
       name,

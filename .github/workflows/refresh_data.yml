@@ -5,20 +5,25 @@ name: Refresh Market Data & Morning Brief
 # locked to EDT — during EST these all shift +1h in market terms, acceptable
 # drift for a Malaysia-based owner).
 #
-#   13:00            30 min pre-market (9:00 AM ET)
-#   13:30 14:00 14:30 15:00 15:30   first 2 hours of market, every 30 min
-#   20:30            30 min post-close (4:30 PM ET)
+# Times use off-peak minutes (:07 / :37) to dodge the GH Actions cron throttle
+# at :00/:15/:30/:45. Historically ~50% of scheduled ticks were being dropped
+# at peak slots; off-peak minutes substantially improve fire-rate. Logged as
+# WK-4 in ROADMAP.md.
+#
+#   13:07            ~30 min pre-market   (09:07 ET EDT — was 09:00)
+#   13:37 14:07 14:37 15:07 15:37   first 2 hours of market, every ~30 min
+#   20:37            ~30 min post-close   (16:37 ET EDT — was 16:30)
 #
 # Total: 7 ticks/day, ~35/week. Each tick commits fresh data/* JSON which
 # triggers a Vercel redeploy (~140 builds/month, within Hobby tier).
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'           # 30 min pre-market (09:00 ET EDT)
-    - cron: '30 13 * * 1-5'          # market open      (09:30 ET EDT)
-    - cron: '0,30 14 * * 1-5'        # 10:00 & 10:30 ET (first hour of trading)
-    - cron: '0,30 15 * * 1-5'        # 11:00 & 11:30 ET (second hour of trading)
-    - cron: '30 20 * * 1-5'          # 30 min post-close (16:30 ET EDT)
+    - cron: '7 13 * * 1-5'           # ~pre-market   (09:07 ET EDT)
+    - cron: '37 13 * * 1-5'          # ~market open  (09:37 ET EDT)
+    - cron: '7,37 14 * * 1-5'        # 10:07 & 10:37 ET (first hour of trading)
+    - cron: '7,37 15 * * 1-5'        # 11:07 & 11:37 ET (second hour of trading)
+    - cron: '37 20 * * 1-5'          # ~post-close   (16:37 ET EDT)
   workflow_dispatch: {}
 
 env:
@@ -55,10 +60,12 @@ jobs:
         timeout-minutes: 12
         run: python scripts/breadth_scan.py --out-dir data
 
-      # ── Step 1c: TradingView screener hits + DeepSeek auto-score top 5 ────
+      # ── Step 1c: TradingView screener hits + DeepSeek auto-score top 10 ───
+      # Note: if TradingView blocks this IP (common in CI), the script exits
+      # non-zero but does NOT overwrite the output — last good data is preserved.
       - name: Fetch TV screeners
         continue-on-error: true
-        run: python scripts/tv_screener_fetch.py --out-dir data --score
+        run: python scripts/tv_screener_fetch.py --out-dir data --score --score-top 10
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
 

@@ -49,7 +49,7 @@ function useBriefScreenerScores(): Record<string, ManualScore> {
             Math.round(numeric);
           out[ticker] = {
             score,
-            verdict: typeof v.verdict === "string" ? v.verdict : null,
+            verdict: normalizeVerdict(typeof v.verdict === "string" ? v.verdict : null),
             note: typeof v.note === "string" ? v.note : null,
           };
         }
@@ -105,6 +105,22 @@ function scoreTone(score: number | null | undefined): { background: string; colo
   return { background: "var(--loss-bg)", color: "var(--loss-fg)" };
 }
 
+/**
+ * Normalize any incoming verdict label to the canonical GO / WAIT / PASS
+ * vocabulary regardless of which scoring path produced it:
+ *   DeepSeek daily run  → already GO / WAIT / PASS
+ *   Manual Score button → STRONG BUY / BUY / HOLD / AVOID / STRONG AVOID
+ *   Morning brief       → BUY / HOLD / AVOID (or GO / WAIT / PASS)
+ */
+function normalizeVerdict(v: string | null | undefined): string | null {
+  if (!v) return null;
+  const u = v.toUpperCase().replace(/[-_]/g, " ");
+  if (u === "GO" || u === "STRONG BUY" || u === "BUY")       return "GO";
+  if (u === "WAIT" || u === "HOLD")                           return "WAIT";
+  if (u === "PASS" || u === "AVOID" || u === "STRONG AVOID") return "PASS";
+  return v; // return as-is if unknown (future-proof)
+}
+
 function extractManualScore(payload: Record<string, unknown>): ManualScore {
   // LLMs sometimes return numbers as strings (e.g. "7.5" instead of 7.5).
   // composite_score is on a 1–10 scale; multiply ×10 to match the 0–100 display scale.
@@ -114,7 +130,7 @@ function extractManualScore(payload: Record<string, unknown>): ManualScore {
     typeof raw === "string" ? parseFloat(raw) :
     null;
   const score = composite == null || isNaN(composite) ? null : Math.round(composite * 10);
-  const verdict = typeof payload.composite_verdict === "string" ? payload.composite_verdict : null;
+  const verdict = normalizeVerdict(typeof payload.composite_verdict === "string" ? payload.composite_verdict : null);
   const note = typeof payload.composite_note === "string" ? payload.composite_note : null;
   return { score, verdict, note };
 }
@@ -150,10 +166,22 @@ export default function TvScreenerHits() {
     setScoringKey(key);
     setScoreError(null);
     try {
+      // Pass screener hit data so the API can fall back to it if Yahoo Finance
+      // is unavailable for this ticker (e.g. HALO, DOCS, etc.)
+      const hitData = {
+        close: hit.close,
+        change: hit.change,
+        relative_volume_10d_calc: hit.relative_volume_10d_calc,
+        "Perf.W": hit["Perf.W"],
+        "Perf.1M": hit["Perf.1M"],
+        market_cap_basic: hit.market_cap_basic,
+        sector: hit.sector,
+        industry: hit.industry,
+      };
       const response = await fetch("/api/analysis/stock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ticker: hit.ticker, provider: "deepseek" }),
+        body: JSON.stringify({ ticker: hit.ticker, provider: "deepseek", hitData }),
       });
       const payload = (await response.json()) as Record<string, unknown>;
       if (!response.ok || payload.error) {
@@ -178,7 +206,7 @@ export default function TvScreenerHits() {
         </div>
         <div className="flex items-center gap-3">
           <p className="t-caption t-mono">
-            {loading ? "Loading..." : error ? `Unavailable: ${error}` : data?.scored ? "Top 5 scored" : "Unscored"}
+            {loading ? "Loading..." : error ? `Unavailable: ${error}` : data?.scored ? `Top ${data.score_top ?? 10} scored` : "Unscored"}
           </p>
           {!loading && !error ? (
             <FreshnessBadge timestamp={data?.fetched_at} thresholds={SNAPSHOT_THRESHOLDS} />
@@ -291,7 +319,8 @@ function ScreenerTable({
               const brief = briefScores[hit.ticker];
               // Priority: auto-score (Python daily run) → CLI morning-brief score → manual button click
               const score = hit.score ?? brief?.score ?? manual?.score ?? null;
-              const verdict = hit.verdict ?? brief?.verdict ?? manual?.verdict ?? null;
+              // Normalize all verdicts to GO / WAIT / PASS regardless of source vocabulary
+              const verdict = normalizeVerdict(hit.verdict ?? brief?.verdict ?? manual?.verdict ?? null);
               const scoreStyle = scoreTone(score);
               return (
                 <tr key={key} className="border-b border-[var(--line)] last:border-0">

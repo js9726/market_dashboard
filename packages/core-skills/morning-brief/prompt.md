@@ -104,10 +104,11 @@ OUTPUT SHAPE — every field is required unless marked optional. If you cannot f
   "screenerScores": {
     "TICKER": {
       "score": <0-100|null>,
-      "verdict": "BUY" | "HOLD" | "AVOID" | "STRONG BUY" | "STRONG AVOID" | null,
+      "verdict": "GO" | "WAIT" | "PASS" | null,
       "note": "1-sentence trader-lens read on the setup quality"
     }
     /* include ALL screener tickers that do NOT already have a score field in tv_screeners.json */
+    /* GO = score >= 80 (strong momentum setup)  WAIT = 50-79  PASS = < 50 */
   },
   "citations": [
     "Reuters 07:12 ET — overnight Asia note",
@@ -144,7 +145,7 @@ SECTIONS — use pre-fetched data where provided; web-search only what is missin
 8. Analyst upgrades/downgrades: web-search for top 3 of each today
 9. Watchlist: use "Watchlist live prices" block for level/changePct; add 1-line setup note per ticker
 10. Mood/posture: synthesise from all data above — state the single most important variable
-11. Screener scores: score every unscored ticker listed in SCREENER TICKERS TO SCORE using the trader framework
+11. Screener scores: score every unscored ticker listed in SCREENER TICKERS TO SCORE using the trader framework. Emit verdict as "GO" (score ≥ 80) / "WAIT" (50-79) / "PASS" (< 50) — never use BUY/HOLD/AVOID here
 
 RULES:
 - Every numeric value must come from a real, recent web result — never fabricate.

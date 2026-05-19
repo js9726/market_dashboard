@@ -8,10 +8,13 @@ name: Yahoo Fallback Quotes
 # Cadence: every 5 min during US market hours (Mon–Fri 13:00–21:00 UTC).
 # That's ~96 invocations/week. GitHub Actions is generous enough; no commit
 # churn since this script doesn't write to git.
+#
+# Minute offset starts at :02 (and steps :07/:12/.../:57) to dodge the GH
+# Actions cron throttle at :00/:15/:30/:45. WK-4 in ROADMAP.md.
 
 on:
   schedule:
-    - cron: '*/5 13-21 * * 1-5'
+    - cron: '2-57/5 13-21 * * 1-5'
   workflow_dispatch: {}
 
 jobs:
