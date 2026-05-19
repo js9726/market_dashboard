@@ -211,17 +211,26 @@ def _compute_stages(hit: dict) -> dict:
     """
     Deterministic 4-stage sub-scores from screener data.
     Each stage scores 0-25. Total 0-100 = raw composite.
+
+    Three quality fixes (2026-05-20):
+      1. S1 weekly bonus guard — requires pre-existing trend, not just today's EP move
+      2. S3 premarket fade penalty — fading >15pp from premarket = distribution
+      3. S3 candle close-strength penalty — closing in bottom 35% of range = weakness
     """
-    perf_1m = float(hit.get("Perf.1M") or 0)
-    perf_1w = float(hit.get("Perf.W")  or 0)
-    chg_day = float(hit.get("change")  or 0)
-    rvol    = float(hit.get("relative_volume_10d_calc") or 0)
-    mcap    = float(hit.get("market_cap_basic")         or 0)
+    perf_1m       = float(hit.get("Perf.1M") or 0)
+    perf_1w       = float(hit.get("Perf.W")  or 0)
+    chg_day       = float(hit.get("change")  or 0)
+    rvol          = float(hit.get("relative_volume_10d_calc") or 0)
+    mcap          = float(hit.get("market_cap_basic")         or 0)
+    high_d        = float(hit.get("high")             or 0)
+    low_d         = float(hit.get("low")              or 0)
+    close_d       = float(hit.get("close")            or 0)
+    premarket_chg = float(hit.get("premarket_change") or 0)
 
     # ── Stage 1: Trend Leadership / RS ──────────────────────────────────────
     # Top RS leaders show strong 1M performance without being parabolic.
     # Negative-1M = Stage 4 downtrend = 0-2 pts except for EP bounces.
-    if   perf_1m > 80:  s1 = 5   # parabolic → topping risk (Stage 3 territory)
+    if   perf_1m > 80:  s1 = 5   # parabolic — topping risk (Stage 3 territory)
     elif perf_1m > 50:  s1 = 10  # very extended, RS still positive
     elif perf_1m > 25:  s1 = 18  # strong leader — top 5-10% RS
     elif perf_1m > 10:  s1 = 22  # solid Stage 2 uptrend
@@ -230,28 +239,37 @@ def _compute_stages(hit: dict) -> dict:
     elif perf_1m > -20: s1 = 4   # lagging (Stage 4 territory)
     else:               s1 = 1   # deep downtrend — EP bounce only
 
-    # Bonus: 1W confirms the 1M direction with momentum
-    if perf_1w > 5 and 5 < perf_1m < 60:
+    # FIX 1: Weekly bonus requires pre-existing trend strength, not just today's EP.
+    # Old: perf_1w > 5 and 5 < perf_1m < 60
+    #   Bug: on EP days perf_1w jumps because of TODAY's move, creating circular evidence.
+    #   A stock up 11% today shows perf_1w ~11% — that's all today, not prior leadership.
+    # New: also require (perf_1m - perf_1w) > 3 — the stock had positive momentum
+    #   BEFORE this week. Prevents an EP day from inflating its own S1 score.
+    prior_1m_trend = perf_1m - perf_1w  # approx 1M performance before this week
+    if perf_1w > 5 and 5 < perf_1m < 60 and prior_1m_trend > 3:
         s1 = min(25, s1 + 3)
 
     # ── Stage 2: Pattern Quality ─────────────────────────────────────────────
     # Classify the setup based on 1M vs today's move vs RVOL.
-    # EP: neglected stock (1M flat/down) + big gap today (>10%) + huge RVOL
+    # EP: neglected stock (1M flat/low) + big gap today (>8%) + huge RVOL.
+    #   Note: perf_1m < 15 (tightened from 30) — Qullamaggie EP requires a neglected
+    #   base. A stock already up 20-29% before the catalyst is closer to a 2nd EP
+    #   or extended breakout, which carries more failure risk.
     # VCP/Breakout: trending stock (1M 10-40%) + controlled move today + volume
     # Pullback: trending stock, quiet day, volume drying up
     # Parabolic: everything already moved too far — no clean base
-    is_ep          = chg_day > 8  and perf_1m < 30  and rvol > 2.5
-    is_breakout    = 3 < chg_day < 20 and 8 < perf_1m < 50 and rvol > 1.5
-    is_pullback    = abs(chg_day) < 5 and perf_1m > 5 and rvol >= 0.8
-    is_parabolic   = perf_1m > 70 or (chg_day > 25 and perf_1m > 30)
-    is_stage4      = perf_1m < -15
+    is_ep        = chg_day > 8 and perf_1m < 15 and rvol > 2.5
+    is_breakout  = 3 < chg_day < 20 and 8 < perf_1m < 50 and rvol > 1.5
+    is_pullback  = abs(chg_day) < 5 and perf_1m > 5 and rvol >= 0.8
+    is_parabolic = perf_1m > 70 or (chg_day > 25 and perf_1m > 30)
+    is_stage4    = perf_1m < -15
 
-    if   is_parabolic:  s2 = 3   # Qullamaggie SKIP IF: already in parabolic phase
-    elif is_stage4:     s2 = 5   # Stage 4 — only viable as EP day-0 entry
-    elif is_ep:         s2 = 22  # Qullamaggie EP: neglected + big catalyst + volume
-    elif is_breakout:   s2 = 20  # Minervini/SRx: Stage 2 breakout from base
-    elif is_pullback:   s2 = 18  # Alex/SRx: orderly pullback to MA structure
-    else:               s2 = 10  # unclear / mixed signals
+    if   is_parabolic: s2 = 3   # Qullamaggie SKIP IF: already in parabolic phase
+    elif is_stage4:    s2 = 5   # Stage 4 — only viable as EP day-0 entry
+    elif is_ep:        s2 = 22  # Qullamaggie EP: neglected + big catalyst + volume
+    elif is_breakout:  s2 = 20  # Minervini/SRx: Stage 2 breakout from base
+    elif is_pullback:  s2 = 18  # Alex/SRx: orderly pullback to MA structure
+    else:              s2 = 10  # unclear / mixed signals
 
     # RVOL bonus — Jeff Sun rule: RVOL > 2 is the institutional confirmation bar
     if rvol >= 3:   s2 = min(25, s2 + 3)
@@ -263,18 +281,42 @@ def _compute_stages(hit: dict) -> dict:
     # Qullamaggie: ORH trigger with LOD stop. Jeff: LoD < 60% ATR.
     # Alex: first hour or last 30 min. SRx: first green 30M candle.
     # All traders agree: if it moved 20%+ already today → wait or skip.
-    if   abs(chg_day) > 30:  s3 = 2   # way too extended — ORH long gone
-    elif abs(chg_day) > 20:  s3 = 6   # gap day — wait for next session ORH
-    elif abs(chg_day) > 15:  s3 = 10  # still big — entry risk elevated
-    elif abs(chg_day) > 10:  s3 = 16  # manageable — use intraday pivot
-    elif abs(chg_day) > 5:   s3 = 22  # ideal range — clean entry available
-    elif abs(chg_day) > 1:   s3 = 18  # quiet move — pullback/base entry
-    else:                     s3 = 12  # flat — basing or stuck
+    if   abs(chg_day) > 30: s3 = 2   # way too extended — ORH long gone
+    elif abs(chg_day) > 20: s3 = 6   # gap day — wait for next session ORH
+    elif abs(chg_day) > 15: s3 = 10  # still big — entry risk elevated
+    elif abs(chg_day) > 10: s3 = 16  # manageable — use intraday pivot
+    elif abs(chg_day) > 5:  s3 = 22  # ideal range — clean entry available
+    elif abs(chg_day) > 1:  s3 = 18  # quiet move — pullback/base entry
+    else:                    s3 = 12  # flat — basing or stuck
 
     # EP exception: for true EPs (neglected + 10%+ gap + RVOL>3),
     # the gap itself IS the entry signal (Qullamaggie buys the ORH)
     if is_ep and rvol >= 3 and 10 <= abs(chg_day) <= 25:
         s3 = max(s3, 20)
+
+    # FIX 2: Premarket fade penalty — Qullamaggie EP must HOLD the gap.
+    # "Open high, go low" = distribution. Sellers absorbed all the buyers.
+    # Fade > 15pp from premarket peak to regular-session close = red flag.
+    # Only penalise when there was a meaningful premarket move (>5%) to begin with.
+    if premarket_chg > 5 and chg_day >= 0:
+        fade = premarket_chg - chg_day
+        if fade > 25:
+            s3 = max(0, s3 - 8)   # severe fade — almost all the gap given back
+        elif fade > 15:
+            s3 = max(0, s3 - 6)   # significant fade — distribution likely
+
+    # FIX 3: Candle close-strength penalty — where did price settle in today's range?
+    # Qullamaggie: EPs closing in the bottom third of their range are distribution days.
+    # Only meaningful on volatile days (range > 2% of price) to avoid penalising
+    # tight base days where close naturally sits near the middle of a tiny range.
+    if high_d > low_d > 0 and close_d > 0 and abs(chg_day) > 5:
+        day_range_pct = (high_d - low_d) / close_d
+        if day_range_pct > 0.02:          # meaningful intraday range
+            close_strength = (close_d - low_d) / (high_d - low_d)
+            if close_strength < 0.35:     # bottom third — distribution candle
+                s3 = max(0, s3 - 5)
+            elif close_strength < 0.50:   # below midpoint — weak close
+                s3 = max(0, s3 - 3)
 
     # ── Stage 4: Risk Quality ───────────────────────────────────────────────
     # Institutional eligibility, volume confirmation, stop workability.
@@ -282,18 +324,18 @@ def _compute_stages(hit: dict) -> dict:
     # Jeff: RVOL > 100% mandatory.
     s4 = 0
     # Market cap tier (institutional accessibility)
-    if   mcap >= 10e9: s4 += 10  # liquid leaders tier (Alex universe)
-    elif mcap >= 2e9:  s4 += 8   # mid-cap institutional
-    elif mcap >= 500e6:s4 += 5   # Qullamaggie minimum
-    elif mcap >= 300e6:s4 += 3   # SRxTrades minimum
-    else:              s4 += 0   # micro-cap — fade risk, avoid
+    if   mcap >= 10e9:  s4 += 10  # liquid leaders tier (Alex universe)
+    elif mcap >= 2e9:   s4 += 8   # mid-cap institutional
+    elif mcap >= 500e6: s4 += 5   # Qullamaggie minimum
+    elif mcap >= 300e6: s4 += 3   # SRxTrades minimum
+    else:               s4 += 0   # micro-cap — fade risk, avoid
 
     # RVOL tier (volume confirmation strength)
-    if   rvol >= 4:  s4 += 10  # exceptional — institutions clearly active
-    elif rvol >= 3:  s4 += 8
-    elif rvol >= 2:  s4 += 5
-    elif rvol >= 1:  s4 += 2
-    else:            s4 += 0   # below-average volume — Jeff hard skip
+    if   rvol >= 4: s4 += 10  # exceptional — institutions clearly active
+    elif rvol >= 3: s4 += 8
+    elif rvol >= 2: s4 += 5
+    elif rvol >= 1: s4 += 2
+    else:           s4 += 0   # below-average volume — Jeff hard skip
 
     # Extension penalty — the further from the base, the harder the stop
     if   perf_1m > 80: s4 = max(0, s4 - 8)
@@ -311,11 +353,11 @@ def _compute_stages(hit: dict) -> dict:
         "raw":        round(raw),
         # Pattern label for thesis context
         "pattern": (
-            "PARABOLIC" if is_parabolic else
-            "EP"        if is_ep        else
-            "BREAKOUT"  if is_breakout  else
-            "PULLBACK"  if is_pullback  else
-            "STAGE4-BOUNCE" if is_stage4 else
+            "PARABOLIC"     if is_parabolic else
+            "EP"            if is_ep        else
+            "BREAKOUT"      if is_breakout  else
+            "PULLBACK"      if is_pullback  else
+            "STAGE4-BOUNCE" if is_stage4    else
             "UNCLEAR"
         ),
     }
@@ -345,10 +387,33 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
         f"  Raw composite       : {raw}/100\n"
     )
 
-    perf_1m = float(hit.get("Perf.1M") or 0)
-    perf_1w = float(hit.get("Perf.W")  or 0)
-    chg_day = float(hit.get("change")  or 0)
-    rvol    = float(hit.get("relative_volume_10d_calc") or 0)
+    perf_1m       = float(hit.get("Perf.1M") or 0)
+    perf_1w       = float(hit.get("Perf.W")  or 0)
+    chg_day       = float(hit.get("change")  or 0)
+    rvol          = float(hit.get("relative_volume_10d_calc") or 0)
+    high_d        = float(hit.get("high")             or 0)
+    low_d         = float(hit.get("low")              or 0)
+    close_d       = float(hit.get("close")            or 0)
+    premarket_chg = float(hit.get("premarket_change") or 0)
+
+    # Build candle quality line for the LLM
+    if high_d > low_d > 0 and close_d > 0:
+        close_strength = (close_d - low_d) / (high_d - low_d)
+        candle_line = (
+            f"Candle: O={hit.get('open','?'):.2f} H={high_d:.2f} L={low_d:.2f} C={close_d:.2f} "
+            f"| Close strength: {close_strength:.2f} (0=LoD, 1=HoD)"
+        ) if isinstance(hit.get('open'), (int, float)) else (
+            f"Candle: H={high_d:.2f} L={low_d:.2f} C={close_d:.2f} "
+            f"| Close strength: {close_strength:.2f} (0=LoD, 1=HoD)"
+        )
+    else:
+        candle_line = "Candle: intraday range unavailable"
+        close_strength = None
+
+    premarket_line = (
+        f"Premarket: {premarket_chg:+.1f}% | Fade from premarket: {premarket_chg - chg_day:.1f}pp"
+        if premarket_chg != 0 else "Premarket: no data"
+    )
 
     payload = {
         "model": "deepseek-chat",
@@ -361,7 +426,7 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
                     "The 4 stage sub-scores were computed in Python using wiki rules. Your job:\n"
                     "1. Review the stage scores and adjust the composite ±5 TOTAL based on sector "
                     "context, industry tailwind/headwind, or contradictions you know about.\n"
-                    "2. Translate the composite into GO (≥80) / WAIT (50-79) / PASS (<50).\n"
+                    "2. Translate the composite into GO (>=80) / WAIT (50-79) / PASS (<50).\n"
                     "3. Write a 1-sentence thesis (max 25 words) naming the setup type and the key risk.\n\n"
                     'Output ONLY this JSON (no markdown): '
                     '{"score":<int 0-100>,"verdict":"GO"|"WAIT"|"PASS","thesis":"<text>","stages":{'
@@ -373,9 +438,11 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
                 "content": (
                     f"Ticker: {ticker}\n"
                     f"Sector: {hit.get('sector', 'N/A')} | Industry: {hit.get('industry', 'N/A')}\n"
-                    f"Price: ${hit.get('close')} | Today: {chg_day:+.1f}% | "
+                    f"Price: ${close_d:.2f} | Today: {chg_day:+.1f}% | "
                     f"1W: {perf_1w:+.1f}% | 1M: {perf_1m:+.1f}%\n"
-                    f"RVOL: {rvol:.2f} | MCap: ${(hit.get('market_cap_basic') or 0)/1e9:.1f}B\n\n"
+                    f"RVOL: {rvol:.2f} | MCap: ${(hit.get('market_cap_basic') or 0)/1e9:.1f}B\n"
+                    f"{candle_line}\n"
+                    f"{premarket_line}\n\n"
                     f"{stage_block}\n"
                     "Does the sector/industry context change any stage score? "
                     "Adjust composite (±5 max total) and write thesis."

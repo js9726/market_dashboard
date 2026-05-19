@@ -7,6 +7,12 @@ export interface TvScreenerHit {
   ticker: string;
   exchange: string | null;
   name?: string | null;
+  /** Day's open price (intraday snapshot). */
+  open?: number | null;
+  /** Day's high price (intraday snapshot). */
+  high?: number | null;
+  /** Day's low price (intraday snapshot). */
+  low?: number | null;
   close?: number | null;
   change?: number | null;
   volume?: number | null;

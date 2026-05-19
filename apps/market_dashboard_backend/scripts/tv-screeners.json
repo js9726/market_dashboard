@@ -92,8 +92,8 @@
     }
   ],
   "columns_to_fetch": [
-    "name", "close", "change", "volume", "relative_volume_10d_calc",
-    "market_cap_basic", "sector", "industry", "Perf.W", "Perf.1M",
-    "premarket_change", "ATRP"
+    "name", "open", "high", "low", "close", "change", "volume",
+    "relative_volume_10d_calc", "market_cap_basic", "sector", "industry",
+    "Perf.W", "Perf.1M", "premarket_change", "ATRP"
   ]
 }
