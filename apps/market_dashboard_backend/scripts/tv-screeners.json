@@ -5,11 +5,16 @@
       "id": "top-gainer",
       "name": "Top Gainer",
       "tv_url": "https://www.tradingview.com/screener/1R7JpXRD/",
+      "_filter_notes": "Mirrors the real TV screener: Chg>2.99%, MktCap>10B, Price>15, Vol>100K, SMA20>SMA100, Close>SMA50, Primary listing USA only",
       "query": {
         "filter": [
-          {"left": "change",                   "operation": "egreater", "right": 5},
-          {"left": "market_cap_basic",         "operation": "egreater", "right": 1000000000},
-          {"left": "average_volume_30d_calc",  "operation": "egreater", "right": 500000},
+          {"left": "change",                   "operation": "egreater", "right": 2.99},
+          {"left": "market_cap_basic",         "operation": "egreater", "right": 10000000000},
+          {"left": "close",                    "operation": "egreater", "right": 15},
+          {"left": "volume",                   "operation": "egreater", "right": 100000},
+          {"left": "SMA20",                    "operation": "greater",  "right": "SMA100"},
+          {"left": "close",                    "operation": "egreater", "right": "SMA50"},
+          {"left": "is_primary",               "operation": "equal",    "right": true},
           {"left": "exchange",                 "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
         ],
         "options": {"lang": "en"},
