@@ -25,7 +25,7 @@ export interface TvScreenerHit {
   "Perf.1M"?: number | null;
   "ATR.percent"?: number | null;
 
-  // Populated by the optional DeepSeek 4-stage auto-score pass.
+  // Populated by the algorithmic scorer (always) or upgraded by DeepSeek (when --score is used).
   score?: number | null;
   verdict?: "GO" | "WAIT" | "PASS" | null;
   thesis?: string | null;
@@ -38,6 +38,12 @@ export interface TvScreenerHit {
     s3_timing:  number;  // Entry Timing
     s4_risk:    number;  // Risk Quality
   } | null;
+  /**
+   * Score confidence source:
+   *   "deepseek"    — AI-upgraded score with sector/thesis context (once-daily DeepSeek pass)
+   *   "algorithmic" — deterministic Python rules only; no LLM context; medium confidence
+   */
+  score_source?: "deepseek" | "algorithmic" | null;
 }
 
 export interface TvScreener {
@@ -50,7 +56,11 @@ export interface TvScreener {
 export interface TvScreenersFile {
   fetched_at: string;
   scored: boolean;
-  /** Number of top hits auto-scored per screener (added in v2). */
+  /** Number of top hits DeepSeek-upgraded per screener (added in v2). */
   score_top?: number;
+  /** When the last DeepSeek scoring pass ran (null when algorithmic-only). */
+  deepseek_scored_at?: string | null;
+  /** Whether the US equity market was open when this data was fetched. */
+  market_was_open?: boolean;
   screeners: TvScreener[];
 }

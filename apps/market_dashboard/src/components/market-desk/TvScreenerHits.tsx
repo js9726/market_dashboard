@@ -92,17 +92,22 @@ function tvChartUrl(hit: TvScreenerHit): string {
   return `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSymbol(hit))}`;
 }
 
-function scoreTone(score: number | null | undefined): { background: string; color: string } {
+function scoreTone(
+  score: number | null | undefined,
+  source?: string | null,
+): { background: string; color: string; opacity?: number } {
   if (score == null) {
     return { background: "var(--bg-raised)", color: "var(--fg-3)" };
   }
+  // Algorithmic-only scores are dimmed slightly to convey lower confidence.
+  const opacity = source === "algorithmic" ? 0.75 : 1;
   if (score >= 80) {
-    return { background: "var(--gain-bg)", color: "var(--gain-fg)" };
+    return { background: "var(--gain-bg)", color: "var(--gain-fg)", opacity };
   }
   if (score >= 50) {
-    return { background: "var(--accent-soft-bg)", color: "var(--accent)" };
+    return { background: "var(--accent-soft-bg)", color: "var(--accent)", opacity };
   }
-  return { background: "var(--loss-bg)", color: "var(--loss-fg)" };
+  return { background: "var(--loss-bg)", color: "var(--loss-fg)", opacity };
 }
 
 /**
@@ -206,7 +211,11 @@ export default function TvScreenerHits() {
         </div>
         <div className="flex items-center gap-3">
           <p className="t-caption t-mono">
-            {loading ? "Loading..." : error ? `Unavailable: ${error}` : data?.scored ? `Top ${data.score_top ?? 10} scored` : "Unscored"}
+            {loading ? "Loading..." : error ? `Unavailable: ${error}` : (
+              data?.scored
+                ? `🤖 AI top ${data.score_top ?? 10} · algo all`
+                : "📐 Algo scores"
+            )}
           </p>
           {!loading && !error ? (
             <FreshnessBadge timestamp={data?.fetched_at} thresholds={SNAPSHOT_THRESHOLDS} />
@@ -240,11 +249,32 @@ export default function TvScreenerHits() {
             })}
           </div>
 
+          {/* Confidence banner — shown when market is open and data is not DeepSeek-scored */}
+          {data && data.market_was_open && !data.scored && (
+            <div className="mb-3 rounded border border-[var(--accent)] bg-[var(--accent-soft-bg)] px-3 py-2 text-[11px] text-[var(--accent)]">
+              ⚡ <strong>Intraday data</strong> — prices live from TradingView API.
+              Scores are <strong>algorithmic only</strong> (medium confidence). AI upgrade runs once daily at pre-market.
+            </div>
+          )}
+          {data && data.market_was_open && data.scored && (
+            <div className="mb-3 rounded border border-[var(--gain-fg)] bg-[var(--gain-bg)] px-3 py-2 text-[11px] text-[var(--gain-fg)]">
+              ✅ <strong>Intraday data</strong> — prices live from TradingView API · top {data.score_top} AI-scored by DeepSeek.
+            </div>
+          )}
+          {data && !data.market_was_open && (
+            <div className="mb-3 rounded border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-2 text-[11px] text-[var(--fg-3)]">
+              🌙 <strong>After-hours / pre-market data</strong> — scores based on last session close.
+              {data.deepseek_scored_at
+                ? ` AI-scored at ${new Date(data.deepseek_scored_at).toLocaleTimeString("en-MY", { timeZone: "Asia/Kuala_Lumpur", hour: "2-digit", minute: "2-digit" })} MYT.`
+                : " Algorithmic scores only — AI upgrade pending next pre-market run."}
+            </div>
+          )}
+
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="text-sm font-bold text-[var(--fg-1)]">{activeScreener.name}</h3>
               <p className="t-caption t-mono">
-                {data?.fetched_at ? `Fetched ${new Date(data.fetched_at).toLocaleTimeString()}` : "Daily snapshot"}
+                {data?.fetched_at ? `Prices at ${new Date(data.fetched_at).toLocaleTimeString("en-MY", { timeZone: "Asia/Kuala_Lumpur", hour: "2-digit", minute: "2-digit" })} MYT` : "Daily snapshot"}
               </p>
             </div>
             <div className="flex gap-2">
@@ -338,7 +368,9 @@ function ScreenerTable({
               const score = hit.score ?? brief?.score ?? manual?.score ?? null;
               // Normalize all verdicts to GO / WAIT / PASS regardless of source vocabulary
               const verdict = normalizeVerdict(hit.verdict ?? brief?.verdict ?? manual?.verdict ?? null);
-              const scoreStyle = scoreTone(score);
+              // Source tells the badge how much to dim: deepseek > algorithmic > unknown
+              const scoreSource = hit.score_source ?? (manual?.score != null ? "deepseek" : null);
+              const scoreStyle = scoreTone(score, scoreSource);
               return (
                 <tr key={key} className="border-b border-[var(--line)] last:border-0">
                   <td className="py-2 pr-3">
@@ -370,15 +402,24 @@ function ScreenerTable({
                   <td className="px-3 py-2 text-right">
                     {score != null ? (
                       <span
-                        className="inline-flex rounded px-2 py-1 font-mono text-[11px] font-bold cursor-help"
-                        style={scoreStyle}
+                        className="inline-flex flex-col items-end gap-0.5 cursor-help"
                         title={buildScoreTooltip(hit, brief?.note ?? manual?.note)}
                       >
-                        {verdict ? `${verdict} ` : ""}
-                        {score}
-                        {hit.pattern && hit.pattern !== "UNCLEAR"
-                          ? ` · ${hit.pattern}`
-                          : ""}
+                        <span
+                          className="inline-flex rounded px-2 py-1 font-mono text-[11px] font-bold"
+                          style={scoreStyle}
+                        >
+                          {verdict ? `${verdict} ` : ""}
+                          {score}
+                          {hit.pattern && hit.pattern !== "UNCLEAR"
+                            ? ` · ${hit.pattern}`
+                            : ""}
+                        </span>
+                        {scoreSource === "algorithmic" && (
+                          <span className="text-[9px] text-[var(--fg-3)] font-normal">
+                            algo only
+                          </span>
+                        )}
                       </span>
                     ) : (
                       <span className="font-mono text-[var(--fg-3)]">-</span>

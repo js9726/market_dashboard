@@ -19,6 +19,7 @@ const TOOL_NAV = [
   { href: "/dashboard/scanner", label: "Scanner", icon: "search" },
   { href: "/dashboard/themes", label: "Theme Radar", icon: "search" },
   { href: "/dashboard/rvol", label: "RVOL Overview", icon: "search" },
+  { href: "/dashboard/rrg", label: "Rotation Graph", icon: "analytics" },
   { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
   { href: "/dashboard/journal", label: "Journal", icon: "journal" },
   { href: "/dashboard/playbooks", label: "Playbooks", icon: "template" },
@@ -58,6 +59,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard/rvol": {
     title: "RVOL Overview",
     subtitle: "Relative volume + distance from 52W high",
+  },
+  "/dashboard/rrg": {
+    title: "Rotation Graph",
+    subtitle: "Industry ETFs - RS vs 1M momentum",
   },
   "/dashboard/chat": {
     title: "AI Chat",
