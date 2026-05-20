@@ -500,9 +500,12 @@ def fetch_history_with_fallback(ticker, period_days):
 
 def get_stock_data(ticker_symbol, charts_dir):
     try:
-        # Fetch short and long history with yfinance → stooq fallback
+        # Fetch short and long history with yfinance → stooq fallback.
+        # `daily` extended to 400d (~52 trading weeks plus buffer) so we can
+        # compute off_52w_high_pct without a second HTTP call. Existing
+        # 50/90-day metrics still only slice the tail.
         hist  = fetch_history_with_fallback(ticker_symbol, 30)
-        daily = fetch_history_with_fallback(ticker_symbol, 90)
+        daily = fetch_history_with_fallback(ticker_symbol, 400)
 
         if hist is not None:
             hist = hist.dropna(subset=['Close', 'Open', 'High', 'Low'])
@@ -523,6 +526,7 @@ def get_stock_data(ticker_symbol, charts_dir):
                     "5d": None, "20d": None, "atr_pct": None,
                     "dist_sma50_atr": None, "rs": None, "rs_chart": None,
                     "long": long_etfs, "short": short_etfs, "abc": None,
+                    "rvol": None, "off_52w_high_pct": None,
                 }
             return None  # all sources exhausted
 
@@ -540,6 +544,36 @@ def get_stock_data(ticker_symbol, charts_dir):
         atr_pct = (atr / current_close) * 100 if atr and current_close else None
         dist_sma50_atr = (100 * (current_close / sma50 - 1) / atr_pct) if (sma50 and atr_pct and atr_pct != 0) else None
         abc_rating = calculate_abc_rating(daily)
+
+        # ── Feature 3 (RVOL Overview) — relative volume + distance from 52W high.
+        # rvol = today_vol / mean(prior 30 days), excluding today from the avg so
+        # we never compare today against an average that already includes today.
+        rvol = None
+        try:
+            vol = hist['Volume'].dropna() if hist is not None else None
+            if vol is not None and len(vol) >= 6:
+                today_vol = float(vol.iloc[-1])
+                prior = vol.iloc[:-1]
+                # 30 days if we have them, else whatever's available (min 5 days).
+                window = prior.iloc[-30:] if len(prior) >= 30 else prior
+                avg_vol = float(window.mean())
+                if avg_vol > 0:
+                    rvol = today_vol / avg_vol
+        except Exception:
+            rvol = None
+
+        # off_52w_high_pct = (current_close / max(prior 252 closes)) - 1, as a %.
+        # Negative or zero. 0 means at all-time high in the window.
+        off_52w_high_pct = None
+        try:
+            closes = daily['Close'].dropna()
+            if len(closes) > 0:
+                window = closes.iloc[-252:] if len(closes) >= 252 else closes
+                high = float(window.max())
+                if high > 0:
+                    off_52w_high_pct = (float(current_close) / high - 1) * 100
+        except Exception:
+            off_52w_high_pct = None
 
         rs_sts = None
         rrs_data = None
@@ -577,7 +611,9 @@ def get_stock_data(ticker_symbol, charts_dir):
             "rs_chart": rs_chart_path,
             "long": long_etfs,
             "short": short_etfs,
-            "abc": abc_rating
+            "abc": abc_rating,
+            "rvol": round(rvol, 2) if rvol is not None else None,
+            "off_52w_high_pct": round(off_52w_high_pct, 2) if off_52w_high_pct is not None else None,
         }
     except Exception as e:
         print("Error", ticker_symbol, e)

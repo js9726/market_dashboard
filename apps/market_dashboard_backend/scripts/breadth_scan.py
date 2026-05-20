@@ -411,6 +411,18 @@ def _compute_deltas(history: list, today: dict) -> dict:
 
 # --------------------------------------------------------------------------
 
+def _compute_drop_stats(fetched: int, attempted: int) -> dict:
+    """Return drop-rate counters for logging + threshold checks."""
+    dropped = max(0, attempted - fetched)
+    drop_rate = (dropped / attempted) if attempted else 0.0
+    return {
+        "attempted": attempted,
+        "fetched": fetched,
+        "dropped": dropped,
+        "drop_rate": round(drop_rate, 4),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", default="data")
@@ -418,6 +430,20 @@ def main():
     parser.add_argument("--limit", type=int, default=None,
                         help="Cap universe to N tickers (for fast smoke test)")
     parser.add_argument("--mcap-floor", type=float, default=2_000_000_000.0)
+    parser.add_argument(
+        "--drop-rate-warn",
+        type=float,
+        default=0.10,
+        help="Print a loud WARNING when the per-ticker drop rate exceeds this fraction. "
+             "Default 0.10 (10%%). The aggregate is still written.",
+    )
+    parser.add_argument(
+        "--drop-rate-fail",
+        type=float,
+        default=0.50,
+        help="Exit non-zero when the drop rate exceeds this fraction. "
+             "Default 0.50 (50%%) — catastrophic-only, so a flaky day still ships partial data.",
+    )
     args = parser.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -432,9 +458,24 @@ def main():
         universe = universe[: args.limit]
 
     metrics = fetch_all_metrics(universe, max_workers=args.max_workers)
+
+    drop = _compute_drop_stats(fetched=len(metrics), attempted=len(universe))
+    pct = drop["drop_rate"] * 100
+    print(
+        f"[breadth] coverage: fetched={drop['fetched']}/{drop['attempted']} "
+        f"({100 - pct:.1f}% success, {drop['dropped']} dropped, drop_rate={pct:.2f}%)"
+    )
+    if drop["drop_rate"] > args.drop_rate_warn:
+        print(
+            f"[breadth] WARNING: drop rate {pct:.2f}% exceeds threshold "
+            f"{args.drop_rate_warn * 100:.0f}% — breadth counts may understate the universe.",
+            file=sys.stderr,
+        )
+
     today = aggregate(metrics, mcap_floor=args.mcap_floor)
     today["built_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     today["mcap_floor"] = args.mcap_floor
+    today["coverage"] = drop
 
     today = update_history(args.out_dir, today)
 
@@ -445,6 +486,14 @@ def main():
     print(f"[breadth] highs={today['market']['new_highs']} "
           f"lows={today['market']['new_lows']} "
           f"adv={today['market']['advance']} dec={today['market']['decline']}")
+
+    if drop["drop_rate"] > args.drop_rate_fail:
+        print(
+            f"[breadth] FATAL: drop rate {pct:.2f}% exceeds fail-threshold "
+            f"{args.drop_rate_fail * 100:.0f}% — the data is too thin to trust.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
 
 if __name__ == "__main__":

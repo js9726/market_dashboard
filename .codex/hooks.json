@@ -1,0 +1,40 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'C:\\Users\\jiesh\\AI codes hub\\market_dashboard\\.codex\\hooks\\check-ts.sh'",
+            "timeout": 30,
+            "statusMessage": "Type-checking..."
+          },
+          {
+            "type": "command",
+            "command": "bash 'C:\\Users\\jiesh\\AI codes hub\\market_dashboard\\.codex\\hooks\\lint.sh'",
+            "timeout": 30,
+            "statusMessage": "Running ESLint..."
+          },
+          {
+            "type": "command",
+            "command": "bash 'C:\\Users\\jiesh\\AI codes hub\\market_dashboard\\.codex\\hooks\\build.sh'",
+            "timeout": 120,
+            "statusMessage": "Checking Next.js build..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'C:\\Users\\jiesh\\AI codes hub\\market_dashboard\\.codex\\hooks\\self-improvement-reminder.sh'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

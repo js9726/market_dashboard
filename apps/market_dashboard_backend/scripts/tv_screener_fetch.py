@@ -491,16 +491,47 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
         }
 
 
+def algo_score_all(hits: list) -> None:
+    """
+    Mutate ALL hits with deterministic 4-stage scores (free, no API call).
+    Sets score_source="algorithmic" so the dashboard can show a confidence badge.
+    Always runs — even without --score — so intraday refreshes never lose scores.
+    """
+    for hit in hits:
+        stages = _compute_stages(hit)
+        hit["score"]        = stages["raw"]
+        hit["verdict"]      = (
+            "GO"   if stages["raw"] >= 80 else
+            "WAIT" if stages["raw"] >= 50 else
+            "PASS"
+        )
+        hit["thesis"]       = f"{stages['pattern']} setup; algorithmic score only."
+        hit["stages"]       = {
+            "s1_trend":   stages["s1_trend"],
+            "s2_pattern": stages["s2_pattern"],
+            "s3_timing":  stages["s3_timing"],
+            "s4_risk":    stages["s4_risk"],
+        }
+        hit["pattern"]      = stages["pattern"]
+        hit["score_source"] = "algorithmic"
+
+
 def score_top(hits: list, n: int) -> None:
-    """Mutate hits[:n] to add score/verdict/thesis/stages/pattern."""
+    """
+    Mutate hits[:n] — upgrades algorithmic scores to DeepSeek AI scores.
+    algo_score_all() must have already run so every hit has a baseline score.
+    DeepSeek can adjust the composite ±5 per stage and add a real thesis.
+    Sets score_source="deepseek" on hits it successfully upgrades.
+    """
     for hit in hits[:n]:
         result = _deepseek_score(hit["ticker"], hit)
         if result:
-            hit["score"]   = result.get("score")
-            hit["verdict"] = result.get("verdict")
-            hit["thesis"]  = result.get("thesis")
-            hit["stages"]  = result.get("stages")   # {s1_trend, s2_pattern, s3_timing, s4_risk}
-            hit["pattern"] = result.get("pattern")  # EP / BREAKOUT / PULLBACK / PARABOLIC / …
+            hit["score"]        = result.get("score")
+            hit["verdict"]      = result.get("verdict")
+            hit["thesis"]       = result.get("thesis")
+            hit["stages"]       = result.get("stages")   # {s1_trend, s2_pattern, s3_timing, s4_risk}
+            hit["pattern"]      = result.get("pattern")  # EP / BREAKOUT / PULLBACK / PARABOLIC / …
+            hit["score_source"] = "deepseek"
         time.sleep(0.6)  # polite — DeepSeek rate limit
 
 
@@ -529,20 +560,46 @@ def main():
     screeners_out = []
     total_hits = 0
 
+    # Determine if the US equity market was open when this fetch ran.
+    # NYSE regular session: Mon-Fri 09:30-16:00 ET.
+    try:
+        import zoneinfo
+        _et = zoneinfo.ZoneInfo("America/New_York")
+    except Exception:
+        import pytz  # fallback for older Python/CI images
+        _et = pytz.timezone("America/New_York")
+    _now_et = datetime.datetime.now(_et)
+    _market_was_open = (
+        _now_et.weekday() < 5
+        and datetime.time(9, 30) <= _now_et.time() <= datetime.time(16, 0)
+    )
+
+    deepseek_scored_at = None  # set below only when DeepSeek runs
+
     for sc in config["screeners"]:
         print(f"[tv] fetching {sc['id']}…")
         hits = fetch_screener(sc, columns)
         print(f"[tv] {sc['id']}: {len(hits)} hits")
         total_hits += len(hits)
-        if args.score and hits:
-            print(f"[tv] scoring top {args.score_top} of {sc['id']} with DeepSeek…")
-            score_top(hits, args.score_top)
+
+        if hits:
+            # Always apply free algorithmic scoring — never skip this step.
+            # This ensures intraday refreshes always have scores even without --score.
+            algo_score_all(hits)
+
+            if args.score:
+                print(f"[tv] upgrading top {args.score_top} of {sc['id']} to DeepSeek AI scores…")
+                score_top(hits, args.score_top)
+
         screeners_out.append({
             "id": sc["id"],
             "name": sc["name"],
             "tv_url": sc.get("tv_url"),
             "hits": hits,
         })
+
+    if args.score:
+        deepseek_scored_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     # Safety guard: if ALL screeners returned 0 hits, TradingView is almost
     # certainly blocking this IP. Don't overwrite the output — preserve the
@@ -557,14 +614,27 @@ def main():
 
     out = {
         "fetched_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        # True only when DeepSeek AI upgraded the algorithmic scores.
         "scored": bool(args.score),
         "score_top": args.score_top if args.score else 0,
+        # Timestamp of the last DeepSeek pass (null when algorithmic-only).
+        "deepseek_scored_at": deepseek_scored_at,
+        # Whether the US equity market was open when this data was fetched.
+        # Drives the confidence level shown on the dashboard:
+        #   True  → intraday prices; scores age quickly (recheck every 30 min)
+        #   False → EOD/pre-market prices; scores remain valid until next session
+        "market_was_open": _market_was_open,
         "screeners": screeners_out,
     }
     out_path = os.path.join(args.out_dir, "tv_screeners.json")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(safe_json_dumps(sanitize_json(out), indent=2, default=str))
-    print(f"[tv] wrote {out_path} ({total_hits} total hits, top {args.score_top} scored per screener)")
+    score_label = (
+        f"DeepSeek top {args.score_top} + algo all"
+        if args.score else
+        "algo all (no DeepSeek)"
+    )
+    print(f"[tv] wrote {out_path} ({total_hits} total hits, {score_label}, market_open={_market_was_open})")
 
 
 if __name__ == "__main__":
