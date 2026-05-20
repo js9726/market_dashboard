@@ -8,8 +8,9 @@ import TradeLog from "./TradeLog";
 import CalendarView from "./CalendarView";
 import EquityCurve from "./EquityCurve";
 import AddTradeModal from "./AddTradeModal";
+import DailyJournal from "./DailyJournal";
 
-type Tab = "overview" | "trades" | "calendar";
+type Tab = "overview" | "trades" | "calendar" | "daily";
 
 type Connection = {
   id: string;
@@ -79,6 +80,7 @@ export default function JournalShell() {
     { id: "overview", label: "Overview" },
     { id: "trades", label: "Trades" },
     { id: "calendar", label: "Calendar" },
+    { id: "daily", label: "Daily" },
   ];
 
   return (
@@ -136,6 +138,7 @@ export default function JournalShell() {
       {tab === "calendar" && (
         stats ? <CalendarView calendarData={stats.calendarData} /> : <p className="text-slate-500 text-sm">No data yet.</p>
       )}
+      {tab === "daily" && <DailyJournal />}
 
       {showAddModal && <AddTradeModal onClose={() => setShowAddModal(false)} />}
     </div>

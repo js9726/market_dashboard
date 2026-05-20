@@ -190,6 +190,33 @@ Step "Workflow cron minutes off-peak (WK-4)" {
     if ($bad) { throw "Found peak-slot cron entries: $($bad.Line -join '; ')" }
 }
 
+# 17. Feature 7.1 Daily Journal Entry wired (Prisma + API + UI + tests)
+Step "Daily Journal Entry wired (Feature 7.1)" {
+    $schema = Join-Path $app "prisma/schema.prisma"
+    if (-not (Select-String -Path $schema -Pattern '^model JournalEntry')) {
+        throw "prisma/schema.prisma missing JournalEntry model"
+    }
+    $migration = Join-Path $app "prisma/migrations/20260520120000_add_journal_entries/migration.sql"
+    if (-not (Test-Path $migration)) { throw ("Missing migration: " + $migration) }
+    $files = @(
+        (Join-Path $app "src/lib/journal/mood.ts"),
+        (Join-Path $app "src/components/journal/MoodEmojiPicker.tsx"),
+        (Join-Path $app "src/components/journal/DailyJournal.tsx"),
+        (Join-Path $app "src/app/api/journal/entry/route.ts"),
+        (Join-Path $app "src/lib/__tests__/mood.test.ts")
+    )
+    foreach ($f in $files) {
+        if (-not (Test-Path $f)) { throw ("Missing: " + $f) }
+    }
+    $shell = Join-Path $app "src/components/journal/JournalShell.tsx"
+    if (-not (Select-String -Path $shell -Pattern "DailyJournal")) {
+        throw "JournalShell.tsx does not render DailyJournal"
+    }
+    if (-not (Select-String -Path $shell -Pattern "id: `"daily`"")) {
+        throw "JournalShell.tsx missing 'daily' sub-tab"
+    }
+}
+
 # 16. Feature 1 Rotation Graph wired (classifier + Recharts + route + nav)
 Step "Rotation Graph wired (Feature 1)" {
     $files = @(

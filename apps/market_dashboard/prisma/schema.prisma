@@ -66,12 +66,13 @@ model User {
   dailyScansLimit  Int      @default(20)
   lastQuotaResetAt DateTime @default(now())
 
-  accounts    Account[]
-  sessions    Session[]
-  connection  SpreadsheetConnection?
-  trades      Trade[]
-  watchlist   Watchlist[]
-  scanResults ScanResult[]
+  accounts       Account[]
+  sessions       Session[]
+  connection     SpreadsheetConnection?
+  trades         Trade[]
+  watchlist      Watchlist[]
+  scanResults    ScanResult[]
+  journalEntries JournalEntry[]
 }
 
 model SpreadsheetConnection {
@@ -229,6 +230,35 @@ model MorningBriefCache {
   @@unique([bucketAt, provider])
   @@index([provider, bucketAt(sort: Desc)])
   @@index([generatedAt(sort: Desc)])
+}
+
+// ── Feature 7: Daily trading journal entries ─────────────────────────────────
+//
+// One row per (user, entryDate). Stores the "soft" reflective layer of the
+// journal — mood, sleep, market conditions, free-form notes, and links to
+// charts the user wants to remember. Trades for that date stay in the Trade
+// model and are joined client-side by date.
+//
+// Image attachments (Feature 7.2) will reuse this row by appending Vercel
+// Blob URLs to `attachmentUrls` once Blob is wired. `tvLinks` is split out
+// because TV chart URLs are common, lightweight, and need no storage backend.
+//
+model JournalEntry {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entryDate        DateTime @db.Date  // YYYY-MM-DD, one per user per day
+  moodEmoji        String?  // single grapheme like "😊" — see lib/journal/mood.ts
+  sleepHours       Decimal? @db.Decimal(4, 2)  // 0.00–24.00
+  marketConditions String?  // free-text or one of the enum values in lib/journal/mood.ts
+  notes            String?  @db.Text
+  tvLinks          Json     @default("[]")  // array of strings (TradingView or any URL)
+  attachmentUrls   Json     @default("[]")  // populated by Feature 7.2 — Vercel Blob URLs
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([userId, entryDate])
+  @@index([userId, entryDate(sort: Desc)])
 }
 
 // LiveQuote is upserted by external producers (moomoo daemon or Yahoo fallback
