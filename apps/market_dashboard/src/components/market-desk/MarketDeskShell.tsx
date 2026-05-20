@@ -19,6 +19,8 @@ const TOOL_NAV = [
   { href: "/dashboard/scanner", label: "Scanner", icon: "search" },
   { href: "/dashboard/themes", label: "Theme Radar", icon: "search" },
   { href: "/dashboard/rvol", label: "RVOL Overview", icon: "search" },
+  { href: "/dashboard/leaderboard", label: "Leaderboard", icon: "review" },
+  { href: "/dashboard/profile", label: "Profile", icon: "accounts" },
   { href: "/dashboard/rrg", label: "Rotation Graph", icon: "analytics" },
   { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
   { href: "/dashboard/journal", label: "Journal", icon: "journal" },
@@ -63,6 +65,14 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard/rrg": {
     title: "Rotation Graph",
     subtitle: "Industry ETFs - RS vs 1M momentum",
+  },
+  "/dashboard/leaderboard": {
+    title: "Leaderboard",
+    subtitle: "Composite score - consistency over raw P&L",
+  },
+  "/dashboard/profile": {
+    title: "Profile",
+    subtitle: "Username - bio - public visibility",
   },
   "/dashboard/chat": {
     title: "AI Chat",

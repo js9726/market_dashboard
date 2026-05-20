@@ -66,6 +66,18 @@ model User {
   dailyScansLimit  Int      @default(20)
   lastQuotaResetAt DateTime @default(now())
 
+  // ── Feature 5 + 8: public profile + leaderboard ───────────────────────────
+  // username is the URL handle (@handle in UI, stored without @). Lowercase
+  // alphanumeric + underscore, 3-30 chars. Unique. Nullable so existing rows
+  // and not-yet-claimed accounts coexist.
+  username             String?  @unique
+  bio                  String?  @db.VarChar(200)
+  dashboardTagline     String?  @db.VarChar(60)
+  publicProfileEnabled Boolean  @default(false)
+  // Tier is COMPUTED from trade stats in lib/profile/composite.ts — not stored
+  // as a column so it never goes stale. Cache it later if leaderboard reads
+  // become a hot path.
+
   accounts       Account[]
   sessions       Session[]
   connection     SpreadsheetConnection?

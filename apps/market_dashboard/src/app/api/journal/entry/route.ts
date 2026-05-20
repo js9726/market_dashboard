@@ -9,11 +9,12 @@
  *     sleepHours:       number | null,           // 0..12
  *     marketConditions: string | null,           // one of MARKET_CONDITIONS
  *     notes:            string | null,
- *     tvLinks:          string[],                // free URL list
+ *     tvLinks:          string[],                // free URL list (max 10)
+ *     attachmentUrls:   string[],                // Vercel Blob URLs (max 5)
  *   }
  *
- * `attachmentUrls` is untouched here — Feature 7.2 (Vercel Blob) will add a
- * sibling route under /attachments.
+ * attachmentUrls are written by /api/journal/entry/attachments first via the
+ * @vercel/blob client-upload flow, then submitted here as part of the entry.
  */
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -23,6 +24,7 @@ import {
   isValidMood,
   isValidSleepHours,
 } from "@/lib/journal/mood";
+import { sanitiseAttachmentUrls } from "@/lib/journal/attachments";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +104,11 @@ export async function POST(req: Request) {
     ? tvLinksRaw.filter((u): u is string => typeof u === "string" && u.length > 0).slice(0, 10)
     : [];
 
+  // attachmentUrls — sanitised + de-duped + capped at MAX_ATTACHMENTS_PER_ENTRY (5).
+  // Any URL not on a Vercel Blob host is silently dropped so a malicious client
+  // can't store arbitrary off-platform URLs in our DB.
+  const attachmentUrls = sanitiseAttachmentUrls(body.attachmentUrls);
+
   const entry = await prisma.journalEntry.upsert({
     where: { userId_entryDate: { userId: session.user.id, entryDate: date } },
     create: {
@@ -112,6 +119,7 @@ export async function POST(req: Request) {
       marketConditions,
       notes,
       tvLinks,
+      attachmentUrls,
     },
     update: {
       moodEmoji,
@@ -119,6 +127,7 @@ export async function POST(req: Request) {
       marketConditions,
       notes,
       tvLinks,
+      attachmentUrls,
     },
   });
 

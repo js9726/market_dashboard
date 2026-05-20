@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import MoodEmojiPicker from "./MoodEmojiPicker";
 import {
   MARKET_CONDITIONS,
@@ -8,6 +9,13 @@ import {
   SLEEP_HOURS_MIN,
   moodLabel,
 } from "@/lib/journal/mood";
+import {
+  ALLOWED_MIME_TYPES,
+  MAX_ATTACHMENTS_PER_ENTRY,
+  MAX_FILE_SIZE_BYTES,
+  isAllowedMime,
+  isWithinSizeLimit,
+} from "@/lib/journal/attachments";
 
 interface JournalEntryDto {
   id: string;
@@ -48,6 +56,9 @@ export default function DailyJournal() {
   const [notes, setNotes] = useState<string>("");
   const [tvLinks, setTvLinks] = useState<string[]>([]);
   const [newLink, setNewLink] = useState<string>("");
+  const [attachments, setAttachments] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadEntry = useCallback(async (d: string) => {
     setLoading(true);
@@ -63,12 +74,14 @@ export default function DailyJournal() {
         setConditions(entry.marketConditions);
         setNotes(entry.notes ?? "");
         setTvLinks(Array.isArray(entry.tvLinks) ? entry.tvLinks : []);
+        setAttachments(Array.isArray(entry.attachmentUrls) ? entry.attachmentUrls : []);
       } else {
         setMood(null);
         setSleep("");
         setConditions(null);
         setNotes("");
         setTvLinks([]);
+        setAttachments([]);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load entry");
@@ -96,6 +109,42 @@ export default function DailyJournal() {
     setTvLinks((cur) => cur.filter((_, i) => i !== idx));
   }
 
+  function removeAttachment(idx: number) {
+    setAttachments((cur) => cur.filter((_, i) => i !== idx));
+  }
+
+  async function uploadAttachment(file: File) {
+    if (!isAllowedMime(file.type)) {
+      setError(`Unsupported file type: ${file.type || "(unknown)"}. Use PNG / JPEG / WebP / GIF.`);
+      return;
+    }
+    if (!isWithinSizeLimit(file.size)) {
+      setError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max ${MAX_FILE_SIZE_BYTES / 1024 / 1024} MB.`);
+      return;
+    }
+    if (attachments.length >= MAX_ATTACHMENTS_PER_ENTRY) {
+      setError(`Maximum ${MAX_ATTACHMENTS_PER_ENTRY} attachments per entry.`);
+      return;
+    }
+    setUploading(true);
+    setError(null);
+    try {
+      const pathname = `journal/${date}/${Date.now()}-${file.name}`;
+      const blob = await upload(pathname, file, {
+        access: "public",
+        handleUploadUrl: "/api/journal/entry/attachments",
+        contentType: file.type,
+      });
+      setAttachments((cur) => [...cur, blob.url]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Upload failed";
+      setError(`Upload failed: ${msg}`);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function save() {
     setSaving(true);
     setError(null);
@@ -112,6 +161,7 @@ export default function DailyJournal() {
           marketConditions: conditions,
           notes: notes || null,
           tvLinks,
+          attachmentUrls: attachments,
         }),
       });
       const payload = (await r.json()) as { error?: string };
@@ -258,6 +308,49 @@ export default function DailyJournal() {
               </li>
             ))}
           </ul>
+        ) : null}
+      </div>
+
+      <div className="mt-4">
+        <p className="t-overline">Attachments ({attachments.length}/{MAX_ATTACHMENTS_PER_ENTRY})</p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ALLOWED_MIME_TYPES.join(",")}
+            disabled={loading || uploading || attachments.length >= MAX_ATTACHMENTS_PER_ENTRY}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) uploadAttachment(f);
+            }}
+            className="text-[12px] file:mr-3 file:rounded file:border file:border-[var(--line)] file:bg-[var(--bg-raised)] file:px-3 file:py-1.5 file:text-[12px] file:font-medium file:cursor-pointer disabled:opacity-40"
+          />
+          {uploading ? <span className="t-caption text-[var(--accent)]">Uploading...</span> : null}
+        </div>
+        <p className="mt-1 t-caption">
+          PNG / JPEG / WebP / GIF, max {MAX_FILE_SIZE_BYTES / 1024 / 1024} MB per file.
+        </p>
+        {attachments.length > 0 ? (
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
+            {attachments.map((url, i) => (
+              <div key={`${i}:${url}`} className="relative rounded border border-[var(--line)] bg-[var(--bg-raised)] p-1">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt={`Attachment ${i + 1}`}
+                  className="aspect-square w-full rounded object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeAttachment(i)}
+                  title="Remove"
+                  className="absolute right-1 top-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white hover:bg-[var(--loss-fg)]"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
         ) : null}
       </div>
 

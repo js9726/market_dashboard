@@ -21,7 +21,10 @@ export default auth((req) => {
     pathname.startsWith("/api/morning-verdict/ingest") ||
     pathname.startsWith("/api/watchlist/export") ||
     pathname.startsWith("/api/live-quotes/ingest") ||
-    pathname.startsWith("/api/trades/import")
+    pathname.startsWith("/api/trades/import") ||
+    // Public profile pages — visible to anyone, gated server-side by
+    // publicProfileEnabled in /profile/[username]/page.tsx itself.
+    pathname.startsWith("/profile/")
   ) {
     return NextResponse.next();
   }
