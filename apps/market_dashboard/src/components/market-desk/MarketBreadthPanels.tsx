@@ -21,10 +21,6 @@ function formatMcap(value: number | null | undefined): string {
   return `$${value.toLocaleString()}+`;
 }
 
-function previousPct(now: number, delta: number | null | undefined): number | null {
-  return delta == null || Number.isNaN(delta) ? null : now - delta;
-}
-
 function deltaClass(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) return "text-[var(--fg-3)]";
   if (value > 0) return "gain";
@@ -124,19 +120,19 @@ function SectorMomentumTable({ rows }: { rows: SectorRow[] }) {
     <div className="brief-panel">
       <div className="mb-3 flex items-baseline justify-between gap-3">
         <p className="t-overline text-[var(--fg-3)]">Sector Momentum</p>
-        <p className="t-caption">% above 50-SMA, sorted by 1M change</p>
+        <p className="t-caption">
+          % above 50-SMA, sorted by 1M change. Deeper views: <a href="/dashboard/rrg" className="text-[var(--accent)] hover:underline">Rotation Graph</a> · <a href="/dashboard/themes" className="text-[var(--accent)] hover:underline">Theme Radar</a> · <a href="/dashboard/rvol" className="text-[var(--accent)] hover:underline">RVOL Overview</a>
+        </p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[620px] text-left text-[12px]">
+        <table className="w-full min-w-[480px] text-left text-[12px]">
           <thead className="text-[10px] uppercase tracking-[0.12em] text-[var(--fg-3)]">
             <tr className="border-b border-[var(--line)]">
               <th className="py-2 pr-3 font-bold">Sector</th>
               <th className="px-3 py-2 text-right font-bold">Now</th>
-              <th className="px-3 py-2 text-right font-bold">1W Ago</th>
-              <th className="px-3 py-2 text-right font-bold">1M Ago</th>
-              <th className="px-3 py-2 text-right font-bold">WoW</th>
-              <th className="px-3 py-2 text-right font-bold">MoM</th>
-              <th className="py-2 pl-3 text-right font-bold">Names</th>
+              <th className="px-3 py-2 text-right font-bold" title="Week-over-week change in % above 50-SMA">WoW</th>
+              <th className="px-3 py-2 text-right font-bold" title="Month-over-month change in % above 50-SMA">MoM</th>
+              <th className="py-2 pl-3 text-right font-bold" title="Number of constituent stocks (market cap > $2B) included in the rollup">Names</th>
             </tr>
           </thead>
           <tbody>
@@ -145,12 +141,6 @@ function SectorMomentumTable({ rows }: { rows: SectorRow[] }) {
                 <tr key={row.sector} className="border-b border-[var(--line)] last:border-0">
                   <td className="py-2 pr-3 font-semibold text-[var(--fg-1)]">{row.sector}</td>
                   <td className="px-3 py-2 text-right font-mono">{formatPct(row.pct_above_50sma)}</td>
-                  <td className="px-3 py-2 text-right font-mono text-[var(--fg-2)]">
-                    {formatPct(previousPct(row.pct_above_50sma, row.delta_wow))}
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono text-[var(--fg-2)]">
-                    {formatPct(previousPct(row.pct_above_50sma, row.delta_mom))}
-                  </td>
                   <td className={`px-3 py-2 text-right font-mono ${deltaClass(row.delta_wow)}`}>
                     {formatPct(row.delta_wow, true)}
                   </td>
@@ -162,7 +152,7 @@ function SectorMomentumTable({ rows }: { rows: SectorRow[] }) {
               ))
             ) : (
               <tr>
-                <td className="py-3 text-[var(--fg-3)]" colSpan={7}>
+                <td className="py-3 text-[var(--fg-3)]" colSpan={5}>
                   Sector breadth will appear after the daily breadth scan writes breadth.json.
                 </td>
               </tr>

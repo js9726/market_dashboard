@@ -190,6 +190,119 @@ Step "Workflow cron minutes off-peak (WK-4)" {
     if ($bad) { throw "Found peak-slot cron entries: $($bad.Line -join '; ')" }
 }
 
+# 21. Feature 9 Design system adoption (logos + route-based data-mode auto-binder)
+Step "Design system adoption (Feature 9)" {
+    foreach ($asset in @('icons.svg', 'logo-market-desk.svg', 'logo-twi-mark.svg', 'logo-twi-wordmark.svg')) {
+        $p = Join-Path $app ("public/ds/" + $asset)
+        if (-not (Test-Path -LiteralPath $p)) { throw ("Missing public/ds asset: " + $asset) }
+    }
+    $shell = Join-Path $app "src/components/market-desk/MarketDeskShell.tsx"
+    foreach ($needle in @('modeForPath', 'useRouteMode', 'ModeIndicator')) {
+        if (-not (Select-String -Path $shell -Pattern ([regex]::Escape($needle)))) {
+            throw "MarketDeskShell.tsx missing route-mode auto-binder: $needle"
+        }
+    }
+    if (Select-String -Path $shell -Pattern 'function ThemeToggle\(') {
+        throw "MarketDeskShell.tsx still defines the old ThemeToggle -- Feature 9 expects auto-binding only"
+    }
+}
+
+# 20. Feature 4 Multi-Agent Analysis (pipeline + moderator + route + UI)
+Step "Multi-Agent Analysis wired (Feature 4)" {
+    $files = @(
+        (Join-Path $app "src/lib/analysis/agents.ts"),
+        (Join-Path $app "src/lib/__tests__/moderator.test.ts"),
+        (Join-Path $app "src/app/api/analysis/multi-agent/route.ts"),
+        (Join-Path $app "src/components/analysis/MultiAgentAnalysisCard.tsx"),
+        (Join-Path $app "src/components/analysis/MultiAgentRunner.tsx"),
+        (Join-Path $app "src/app/dashboard/analysis/page.tsx")
+    )
+    foreach ($f in $files) {
+        if (-not (Test-Path -LiteralPath $f)) { throw ("Missing: " + $f) }
+    }
+    $lib = Join-Path $app "src/lib/analysis/agents.ts"
+    foreach ($p in @('runDataAgent', 'runRiskAgent', 'runModerator', 'AGENT_WEIGHTS')) {
+        if (-not (Select-String -Path $lib -Pattern ([regex]::Escape($p)))) {
+            throw "agents.ts missing export: $p"
+        }
+    }
+    $shell = Join-Path $app "src/components/market-desk/MarketDeskShell.tsx"
+    if (-not (Select-String -Path $shell -Pattern '/dashboard/analysis')) {
+        throw "MarketDeskShell.tsx does not link /dashboard/analysis"
+    }
+}
+
+# 19. Feature 7.2 Image attachments via Vercel Blob (handleUpload + UI + sanitiser)
+Step "Image attachments via Vercel Blob (Feature 7.2)" {
+    $pkg = Join-Path $app "package.json"
+    if (-not (Select-String -Path $pkg -Pattern '"@vercel/blob"')) {
+        throw "package.json missing @vercel/blob dependency"
+    }
+    $files = @(
+        (Join-Path $app "src/lib/journal/attachments.ts"),
+        (Join-Path $app "src/lib/__tests__/attachments.test.ts"),
+        (Join-Path $app "src/app/api/journal/entry/attachments/route.ts")
+    )
+    foreach ($f in $files) {
+        if (-not (Test-Path -LiteralPath $f)) { throw ("Missing: " + $f) }
+    }
+    $route = Join-Path $app "src/app/api/journal/entry/attachments/route.ts"
+    foreach ($p in @('handleUpload', 'BLOB_READ_WRITE_TOKEN', 'allowedContentTypes')) {
+        if (-not (Select-String -Path $route -Pattern ([regex]::Escape($p)))) {
+            throw "attachments/route.ts missing: $p"
+        }
+    }
+    $entry = Join-Path $app "src/app/api/journal/entry/route.ts"
+    if (-not (Select-String -Path $entry -Pattern 'sanitiseAttachmentUrls')) {
+        throw "/api/journal/entry does not validate attachmentUrls"
+    }
+    $daily = Join-Path $app "src/components/journal/DailyJournal.tsx"
+    foreach ($p in @('@vercel/blob/client', 'uploadAttachment', 'MAX_ATTACHMENTS_PER_ENTRY')) {
+        if (-not (Select-String -Path $daily -Pattern ([regex]::Escape($p)))) {
+            throw "DailyJournal.tsx missing: $p"
+        }
+    }
+}
+
+# 18. Feature 5+8 Profile + Leaderboard wired (Prisma + API + UI + middleware + tests)
+Step "Profile + Leaderboard wired (Features 5 + 8)" {
+    $schema = Join-Path $app "prisma/schema.prisma"
+    foreach ($field in @('username\s+String\?\s+@unique', 'bio\s+String\?', 'dashboardTagline\s+String\?', 'publicProfileEnabled\s+Boolean')) {
+        if (-not (Select-String -Path $schema -Pattern $field)) {
+            throw "prisma/schema.prisma missing field matching $field"
+        }
+    }
+    $migration = Join-Path $app "prisma/migrations/20260520180000_add_profile_fields/migration.sql"
+    if (-not (Test-Path $migration)) { throw ("Missing migration: " + $migration) }
+    $files = @(
+        (Join-Path $app "src/lib/profile/tiers.ts"),
+        (Join-Path $app "src/lib/profile/composite.ts"),
+        (Join-Path $app "src/lib/__tests__/tiers.test.ts"),
+        (Join-Path $app "src/lib/__tests__/composite.test.ts"),
+        (Join-Path $app "src/app/api/user/profile/route.ts"),
+        (Join-Path $app "src/app/api/leaderboard/route.ts"),
+        (Join-Path $app "src/components/profile/ProfileEditForm.tsx"),
+        (Join-Path $app "src/components/profile/LeaderboardTable.tsx"),
+        (Join-Path $app "src/app/dashboard/profile/page.tsx"),
+        (Join-Path $app "src/app/dashboard/leaderboard/page.tsx"),
+        (Join-Path $app "src/app/profile/[username]/page.tsx")
+    )
+    foreach ($f in $files) {
+        # -LiteralPath so the [username] dynamic segment isn't treated as a glob.
+        if (-not (Test-Path -LiteralPath $f)) { throw ("Missing: " + $f) }
+    }
+    $mw = Join-Path $app "src/middleware.ts"
+    if (-not (Select-String -Path $mw -Pattern '/profile/')) {
+        throw "middleware.ts does not allow-list /profile/ public pages"
+    }
+    $shell = Join-Path $app "src/components/market-desk/MarketDeskShell.tsx"
+    foreach ($nav in @('/dashboard/leaderboard', '/dashboard/profile')) {
+        if (-not (Select-String -Path $shell -Pattern $nav)) {
+            throw "MarketDeskShell.tsx missing nav entry: $nav"
+        }
+    }
+}
+
 # 17. Feature 7.1 Daily Journal Entry wired (Prisma + API + UI + tests)
 Step "Daily Journal Entry wired (Feature 7.1)" {
     $schema = Join-Path $app "prisma/schema.prisma"

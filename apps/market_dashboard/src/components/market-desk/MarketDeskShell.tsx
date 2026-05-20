@@ -123,7 +123,7 @@ function ModeIndicator({ mode }: { mode: "light" | "dark" }) {
       className="inline-flex items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--bg-surface)] px-3 py-1 text-[11px] font-mono uppercase tracking-[0.1em] text-[var(--fg-3)]"
       title={`Surface mode is set by route (Journal = light, Market Desk = dark). This is read-only.`}
     >
-      <Icon name={mode === "dark" ? "moon" : "sun"} />
+      <Icon className="h-3 w-3" name={mode === "dark" ? "moon" : "sun"} />
       {mode}
     </span>
   );

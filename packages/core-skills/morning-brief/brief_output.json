@@ -2,522 +2,162 @@
   "mood": {
     "label": "CAUTIOUSLY-RISK-ON",
     "posture": "RAISE-THE-BAR",
-    "summary": "Defensive rotation is the dominant tape story today — XLP +1.49%, XLE +1.92%, XLF +1.25% outperform while XLK drops -1.08% (intraday -1.84%). Breadth is nearly flat (229 up vs 218 down) confirming a directionless churn ahead of NVDA earnings AMC Wednesday. The single most important variable: NVDA Q2 guidance vs the $87B consensus — a miss triggers a tech-led flush, a beat extends the AI rally."
+    "summary": "NVDA reports AMC tonight and FOMC May minutes hit 14:00 ET — Stage-2 backdrop intact (VIX 17.82, F&G 61 Greed) but the single most important variable today is NVDA Q1 print + guide. Sit on hands until the print clears or only take A+ EP setups with hard LOD stops."
   },
   "breadth": {
-    "up": 229,
-    "down": 218
+    "up": null,
+    "down": null
   },
   "fearGreed": {
-    "score": 63,
+    "score": 61,
     "label": "Greed"
   },
   "indices": [
-    {
-      "symbol": "SPY",
-      "name": "S&P 500 ETF",
-      "level": 735.38,
-      "changePct": -0.07,
-      "note": "daily -0.07%, 5d -0.09%, 20d +4.22%, RS 80 — large-cap holding near ATH",
-      "citation": "Source: snapshot.json built 2026-05-19T07:54Z"
-    },
-    {
-      "symbol": "QQQ",
-      "name": "Nasdaq-100 ETF",
-      "level": 706.55,
-      "changePct": -0.43,
-      "note": "daily -0.43%, 5d -1.04%, 20d +9.14%, RS 40 — tech-heavy index under pressure",
-      "citation": "Source: snapshot.json built 2026-05-19T07:54Z"
-    },
-    {
-      "symbol": "IWM",
-      "name": "Russell 2000 ETF",
-      "level": null,
-      "changePct": -0.59,
-      "note": "daily -0.59%, 5d -3.28%, 20d -0.50%, RS 0 — small-caps lagging sharply",
-      "citation": "Source: snapshot.json built 2026-05-19T07:54Z"
-    },
-    {
-      "symbol": "DIA",
-      "name": "Dow Jones ETF",
-      "level": null,
-      "changePct": 0.33,
-      "note": "daily +0.33%, 5d +0.04%, 20d +0.60%, RS 30 — Dow outperforming on defensive names",
-      "citation": "Source: snapshot.json built 2026-05-19T07:54Z"
-    },
-    {
-      "symbol": "TLT",
-      "name": "20Y Treasury Bond ETF",
-      "level": null,
-      "changePct": -0.12,
-      "note": "daily -0.12%, 5d -2.34%, 20d -3.65%, grade C — bonds soft, yields elevated",
-      "citation": "Source: snapshot.json built 2026-05-19T07:54Z"
-    },
-    {
-      "symbol": "^VIX",
-      "name": "CBOE Volatility Index",
-      "level": 17.80,
-      "changePct": -3.31,
-      "note": "Declining vol — below 18 = structural bull backdrop still intact",
-      "citation": "Source: Yahoo Finance / Barchart May 19 2026"
-    },
-    {
-      "symbol": "IBIT",
-      "name": "Bitcoin ETF",
-      "level": null,
-      "changePct": -2.88,
-      "note": "daily -2.88%, 5d -6.33% — crypto complex under pressure, risk-off signal",
-      "citation": "Source: snapshot.json built 2026-05-19T07:54Z"
-    }
+    { "symbol": "SPY",  "name": "S&P 500",      "level": null,  "changePct": 0.26, "note": "May 19 close +0.26%; ESM26 futures +0.23% pre-mkt — bid but limited",                  "citation": "Yahoo Finance / Barchart 05/19" },
+    { "symbol": "QQQ",  "name": "Nasdaq 100",   "level": null,  "changePct": 0.49, "note": "Leadership tape; NQM26 futures +0.35% pre-mkt — semis bid into print",                "citation": "Yahoo Finance 05/19" },
+    { "symbol": "DIA",  "name": "Dow Jones",    "level": null,  "changePct": 0.24, "note": "Steady, no panic flows",                                                                "citation": "Yahoo Finance 05/19" },
+    { "symbol": "IWM",  "name": "Russell 2000", "level": null,  "changePct": null, "note": "Small-cap data unavailable at generation time",                                         "citation": "data unavailable" },
+    { "symbol": "^VIX", "name": "VIX",          "level": 17.82, "changePct": null, "note": "Low-vol regime; complacency risk into binary print",                                    "citation": "CBOE 05/19 12:02 ET" },
+    { "symbol": "^TNX", "name": "10Y Yield",    "level": null,  "changePct": null, "note": "Yield level not fetched — FOMC minutes 14:00 ET is the trigger",                        "citation": "data unavailable" },
+    { "symbol": "CL=F", "name": "WTI Crude",    "level": null,  "changePct": null, "note": "Data unavailable at generation time",                                                   "citation": "data unavailable" }
   ],
-  "indicesNarrative": "Divergent tape: S&P 500 nearly flat (-0.07%) while Nasdaq (-0.43%) and small-caps (-0.59%) lag — a telling spread. The Dow (+0.33%) outperforms on defensive positioning. Bitcoin proxy IBIT -2.88% confirms risk-off tilt. Breadth is near-neutral (229 advance / 218 decline) on a universe of 484, confirming the market is churning, not breaking down.",
+  "indicesNarrative": "Closed-firm Mon/Tue/Wed-eve into NVDA night — SPY/QQQ both green on May 19, VIX at 17.82 reflects complacency rather than fear. Futures point modestly higher pre-mkt but the tape is hostage to two events: NVDA AMC and FOMC minutes 14:00 ET. Index trend intact; no edge in fresh longs before the print.",
   "sectorsThemes": [
-    {
-      "symbol": "XLK",
-      "name": "Technology",
-      "changePct": -1.08,
-      "rs": 70,
-      "note": "Leading sector DOWN today (-1.08%) — notable tech weakness ahead of NVDA earnings Wednesday"
-    },
-    {
-      "symbol": "XLF",
-      "name": "Financials",
-      "changePct": 1.25,
-      "rs": 25,
-      "note": "Outperforming today (+1.25%) — defensive rotation into financials as tech sells off"
-    },
-    {
-      "symbol": "XLP",
-      "name": "Consumer Staples",
-      "changePct": 1.49,
-      "rs": 50,
-      "note": "Strong outperformer (+1.49%, +3% 5d) — classic defensive rotation signal alongside financials"
-    },
-    {
-      "symbol": "XLE",
-      "name": "Energy",
-      "changePct": 1.92,
-      "rs": 25,
-      "note": "Energy leading today (+1.92%, +6% 5d) — oil-driven recovery play; grade B but momentum real"
-    },
-    {
-      "symbol": "XLRE",
-      "name": "Real Estate",
-      "changePct": 1.20,
-      "rs": 15,
-      "note": "Rate-sensitive REITs rebounding (+1.20%) alongside bond stability"
-    },
-    {
-      "symbol": "XLC",
-      "name": "Communication Services",
-      "changePct": 0.78,
-      "rs": 15,
-      "note": "Modest outperformer — defensive comms names carrying the communication sector"
-    },
-    {
-      "symbol": "XLY",
-      "name": "Consumer Discretionary",
-      "changePct": -0.18,
-      "rs": 0,
-      "note": "Lagging — tariff uncertainty + rotation out of cyclicals; 5d -2.56%, 20d -2.96%"
-    },
-    {
-      "symbol": "XLV",
-      "name": "Health Care",
-      "changePct": 0.43,
-      "rs": 25,
-      "note": "Holding up (+0.43%); health tech names (LQDA, SIBN) showing biotech momentum"
-    },
-    {
-      "symbol": "XLI",
-      "name": "Industrials",
-      "changePct": -0.38,
-      "rs": 15,
-      "note": "Mild underperformance; 5d -2.45% suggests broader cyclical weakness"
-    }
+    { "symbol": "XLK", "name": "Technology",          "changePct": null,  "rs": null, "note": "Daily change not fetched; semis sub-theme leads — see SMH/ALAB/MRVL/CRDO" },
+    { "symbol": "SMH", "name": "Semiconductors",      "changePct": null,  "rs": null, "note": "SMH closed $543.96 (May 19) — leadership group; ALAB/MRVL/ARM/CRDO all multi-percent up" },
+    { "symbol": "XLV", "name": "Health Care",         "changePct": 1.10,  "rs": null, "note": "Defensive leader on the day (+1.10%)" },
+    { "symbol": "XLY", "name": "Consumer Discretion", "changePct": -1.11, "rs": null, "note": "Soft; retail/discretionary lag" },
+    { "symbol": "XLI", "name": "Industrial",          "changePct": -1.18, "rs": null, "note": "Cyclical weakness vs defensives" },
+    { "symbol": "XLF", "name": "Financial",           "changePct": -1.24, "rs": null, "note": "Heaviest sector loser on May 19" },
+    { "symbol": "XLC", "name": "Communication Svcs",  "changePct": null,  "rs": null, "note": "data unavailable" },
+    { "symbol": "XLE", "name": "Energy",              "changePct": null,  "rs": null, "note": "data unavailable" },
+    { "symbol": "XLP", "name": "Consumer Staples",    "changePct": null,  "rs": null, "note": "data unavailable" },
+    { "symbol": "XLU", "name": "Utilities",           "changePct": null,  "rs": null, "note": "data unavailable" },
+    { "symbol": "XLB", "name": "Materials",           "changePct": null,  "rs": null, "note": "data unavailable" },
+    { "symbol": "XLRE","name": "Real Estate",         "changePct": null,  "rs": null, "note": "data unavailable" }
   ],
-  "sectorsNarrative": "Clear defensive rotation today: XLP +1.49%, XLE +1.92%, XLF +1.25%, XLRE +1.20% all outperform while XLK leads declines at -1.08% (intraday -1.84%). This is a risk-off tilt within an otherwise healthy market structure — the tape is rotating to defensives ahead of NVDA's binary earnings event Wednesday.",
-  "industryNarrative": "Electronic Equipment/Instruments and Semiconductors are the leading industry groups this week, with RAL (+19% +32% 1M), NOVT (+14% +28% 1M), AMBQ (+45% +127% 1M), and KOPN (+100% 1M) showing extraordinary momentum. Restaurants (ARMK +8.6% +16.3% PM, WEN +16.9%) saw institutional buying on earnings catalysts — a notable rotation into consumer services.",
+  "sectorsNarrative": "Surface rotation on May 19 was defensives-up / cyclicals-down (XLV +1.10% leading; XLF/XLI/XLY all -1%+). Under that read, semis kept printing fresh closing strength (ALAB +13%, CRDO +8%, MRVL +4%) — the leadership group is unchanged even as broad sectors mixed. The whole picture re-rates tonight on NVDA.",
+  "industryNarrative": "Semiconductors are the only industry with multiple A-quality closes on the day and clear money flow; outside semis the tape is either modest-up (recreational, biotech selective) or red. Concentrated leadership = concentrated event risk: one NVDA print can re-rate the entire group up or down.",
   "industryMovers": [
-    {
-      "industry": "Electronic Equipment/Instruments",
-      "sector": "Electronic Technology",
-      "changePct": 12.0,
-      "perf1W": 20.0,
-      "perf1M": 28.0,
-      "breadthPct": null,
-      "deltaWow": null,
-      "leaders": [
-        { "ticker": "RAL", "changePct": 19.37, "rvol": 5.33, "source": "TV Screener Top Gainer" },
-        { "ticker": "NOVT", "changePct": 13.72, "rvol": 3.19, "source": "TV Screener Premarket Movers" },
-        { "ticker": "Q", "changePct": 9.87, "rvol": 2.39, "source": "TV Screener Premarket Movers" }
-      ],
-      "note": "Broad-based institutional buying across electronic equipment on AI hardware/infrastructure spending — multiple EP-style breakouts simultaneously"
-    },
-    {
-      "industry": "Restaurants",
-      "sector": "Consumer Services",
-      "changePct": 12.0,
-      "perf1W": 15.0,
-      "perf1M": 11.0,
-      "breadthPct": null,
-      "deltaWow": null,
-      "leaders": [
-        { "ticker": "ARMK", "changePct": 8.64, "rvol": 2.77, "source": "TV Screener Premarket Movers" },
-        { "ticker": "WEN", "changePct": 16.86, "rvol": 5.50, "source": "TV Screener Best Winners" }
-      ],
-      "note": "Restaurant sector seeing unusual institutional volume on earnings catalysts — rotation out of high-beta AI names into consumer services"
-    },
     {
       "industry": "Semiconductors",
       "sector": "Electronic Technology",
-      "changePct": 8.0,
-      "perf1W": 12.0,
-      "perf1M": 55.0,
+      "changePct": null,
+      "perf1W": null,
+      "perf1M": null,
       "breadthPct": null,
       "deltaWow": null,
       "leaders": [
-        { "ticker": "AMBQ", "changePct": 45.33, "rvol": 6.01, "source": "TV Screener Premarket Movers" },
-        { "ticker": "KOPN", "changePct": 7.65, "rvol": 2.52, "source": "TV Screener Premarket Movers" }
+        { "ticker": "ALAB", "changePct": 13.30, "rvol": 1.53, "source": "TV Top Gainer 05/19" },
+        { "ticker": "CRDO", "changePct": 8.14,  "rvol": 1.32, "source": "TV Top Gainer 05/19" },
+        { "ticker": "MRVL", "changePct": 4.34,  "rvol": 1.01, "source": "TV Top Gainer 05/19" },
+        { "ticker": "ARM",  "changePct": 3.73,  "rvol": 0.92, "source": "TV Top Gainer 05/19" }
       ],
-      "note": "Semiconductor names running hot ahead of NVDA earnings — AMBQ +127% 1M is climax-risk; KOPN +100% 1M is parabolic; both are AVOID for fresh entries"
+      "note": "Group leadership intact — ALAB +40% 1M; everyone watching how NVDA print rates the group tonight"
+    },
+    {
+      "industry": "Computer Peripherals",
+      "sector": "Electronic Technology",
+      "changePct": null,
+      "perf1W": null,
+      "perf1M": null,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [
+        { "ticker": "SNDK", "changePct": 3.77, "rvol": 0.82, "source": "TV Top Gainer 05/19" }
+      ],
+      "note": "SNDK +50% 1M but RVOL fading — chasing here is wrong timing"
+    },
+    {
+      "industry": "Pharmaceuticals: Other",
+      "sector": "Health Technology",
+      "changePct": null,
+      "perf1W": null,
+      "perf1M": null,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [
+        { "ticker": "JAZZ", "changePct": null, "rvol": null, "source": "TV Top Gainer 05/19" }
+      ],
+      "note": "Defensive bid in XLV showing up at the individual-name level"
     }
   ],
   "movers": [
-    {
-      "ticker": "AMBQ",
-      "side": "LONG",
-      "changePct": 45.33,
-      "why": "Semiconductor product breakthrough; +127% 1M, 6x RVOL — institutional momentum driving",
-      "traderLens": "Qullamaggie: second-EP risk after 127% run — avoid; SRxTrades: no clean pivot available"
-    },
-    {
-      "ticker": "ZBRA",
-      "side": "LONG",
-      "changePct": 11.44,
-      "why": "Zebra Technologies earnings beat; premarket extending +14.7%; 3.71x RVOL institutional confirmation",
-      "traderLens": "Minervini: clean Stage 2 EP; Ted Zhang: institutional flow confirmed; best large-cap setup today"
-    },
-    {
-      "ticker": "ARMK",
-      "side": "LONG",
-      "changePct": 8.64,
-      "why": "Aramark earnings beat + guidance raise; premarket +16.3% extending the move",
-      "traderLens": "Minervini: EP breakout from base on earnings catalyst; Clement Ang: A-grade institutional move"
-    },
-    {
-      "ticker": "LQDA",
-      "side": "LONG",
-      "changePct": 6.53,
-      "why": "Liquidia Corp pharma catalyst driving 46% 1-week gain — FDA or drug approval news",
-      "traderLens": "Qullamaggie: EP-FRESH template; first 1W pullback becomes the next entry"
-    },
-    {
-      "ticker": "NOVT",
-      "side": "LONG",
-      "changePct": 13.72,
-      "why": "Novanta Inc electronic equipment breakout; 25% 1W + 28% 1M with 3.19x RVOL",
-      "traderLens": "Minervini: Stage 2 VCP breakout; SRxTrades: clean pivot entry above ORH"
-    },
-    {
-      "ticker": "TSLA",
-      "side": "SHORT",
-      "changePct": -2.90,
-      "why": "Musk distraction + EV demand softness; giving back recent gains pre-market",
-      "traderLens": "Jeff: hard stop below $400; Minervini: not a buy in weak market tape today"
-    },
-    {
-      "ticker": "SAGT",
-      "side": "SHORT",
-      "changePct": -36.70,
-      "why": "Sagtec Global micro-cap collapse; no tradeable setup — avoid entirely",
-      "traderLens": "All traders: avoid; too illiquid and no fundamental anchor"
-    },
-    {
-      "ticker": "BTM",
-      "side": "SHORT",
-      "changePct": -28.04,
-      "why": "Bitcoin Depot negative catalyst; crypto-adjacent weakness following BTC correction",
-      "traderLens": "Jeff: hard stop violated; Clement Ang: no A-grade setup in downtrending name"
-    }
+    { "ticker": "ALAB", "side": "LONG",  "changePct": 13.30, "why": "Semis leadership continuation; +40% 1M extension into NVDA night",                "traderLens": "Qullamaggie: too-late chase; Minervini: Stage 2 confirmed but extended — wait for VCP reset" },
+    { "ticker": "CRDO", "side": "LONG",  "changePct": 8.14,  "why": "Semis-adjacent bounce; V-recovery from 50dma on May 19",                            "traderLens": "Clement: pattern unclear, not A-grade; SRxTrades: no clean coil, pass" },
+    { "ticker": "MRVL", "side": "LONG",  "changePct": 4.34,  "why": "Pullback in semis trend; sympathy bid",                                              "traderLens": "Alex/PrimeTrading: within ATR of 21dma but ATRP 6.3% is wide — wait NVDA print" },
+    { "ticker": "ARM",  "side": "LONG",  "changePct": 3.73,  "why": "Semis bid; +33% 1M",                                                                  "traderLens": "Minervini: extended; Jeff: RVOL < 1.0 fails mechanical entry filter" },
+    { "ticker": "SNDK", "side": "LONG",  "changePct": 3.77,  "why": "Storage bid; +50% 1M",                                                                "traderLens": "Qullamaggie: massively extended, EP window long closed — PASS" }
   ],
   "watchlist": [
-    {
-      "ticker": "NVDA",
-      "level": 222.75,
-      "changePct": null,
-      "abc": "A",
-      "note": "REPORTS AMC WEDNESDAY — hold existing positions, DO NOT add. Range $218-$231 on May 19. Q2 guidance ~$87B is the key beat-or-miss number. Blackwell + Vera Rubin transition in focus."
-    },
-    {
-      "ticker": "TSLA",
-      "level": 409.99,
-      "changePct": -2.90,
-      "abc": "B",
-      "note": "Fading from recent highs; $400 key support. Musk political risk elevated. Wait for 21EMA pullback and volume confirmation before re-entry."
-    },
-    {
-      "ticker": "AAPL",
-      "level": 297.84,
-      "changePct": -0.80,
-      "abc": "B",
-      "note": "Near key resistance; AI services update expected at WWDC. Tight range base forming. No entry until above $300 with volume."
-    },
-    {
-      "ticker": "MSFT",
-      "level": 423.54,
-      "changePct": 0.38,
-      "abc": "A",
-      "note": "Holding above 21EMA while peers soften — AI infrastructure story intact. Clement Ang setup: first pullback entry if it holds $420."
-    },
-    {
-      "ticker": "AMZN",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Data unavailable at generation time"
-    },
-    {
-      "ticker": "META",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Data unavailable at generation time"
-    },
-    {
-      "ticker": "GOOGL",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Data unavailable at generation time"
-    },
-    {
-      "ticker": "AMD",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Data unavailable at generation time — watch closely: AMD trades with NVDA on earnings day"
-    },
-    {
-      "ticker": "SMCI",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Data unavailable at generation time"
-    },
-    {
-      "ticker": "PLTR",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Data unavailable at generation time"
-    },
-    {
-      "ticker": "CRWD",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Data unavailable at generation time"
-    },
-    {
-      "ticker": "MSTR",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Data unavailable at generation time — Bitcoin proxy; watch BTC levels"
-    }
+    { "ticker": "APLD", "level": null, "changePct": null,  "abc": null, "note": "AI/data-center adj; rate vs NVDA reaction tonight" },
+    { "ticker": "RMBS", "level": null, "changePct": null,  "abc": "B",  "note": "Semis IP; in-sympathy but lower beta vs ALAB" },
+    { "ticker": "CRDO", "level": null, "changePct": 8.14,  "abc": "B",  "note": "V-recovery off 50dma + 8% close — DeepSeek WAIT (pattern unclear)" },
+    { "ticker": "AMKR", "level": null, "changePct": null,  "abc": "B",  "note": "Semis packaging; check daily vs ALAB" },
+    { "ticker": "POWL", "level": null, "changePct": null,  "abc": null, "note": "Data-center power infra; momentum name" },
+    { "ticker": "HUT",  "level": null, "changePct": null,  "abc": null, "note": "Crypto/compute hybrid — high vol, hostage to BTC tape" },
+    { "ticker": "FSLR", "level": null, "changePct": null,  "abc": null, "note": "Solar; macro-driven — watch yields into FOMC minutes" },
+    { "ticker": "ALAB", "level": null, "changePct": 13.30, "abc": "A",  "note": "Stage 2 semis #1 — but +40% 1M = NO fresh entry, only manage existing" },
+    { "ticker": "VICR", "level": null, "changePct": null,  "abc": null, "note": "Power components — niche semi-adj" },
+    { "ticker": "QBTS", "level": null, "changePct": null,  "abc": "C",  "note": "Quantum theme — speculative, only with hard stop" },
+    { "ticker": "VIAV", "level": null, "changePct": null,  "abc": null, "note": "Network/optical" },
+    { "ticker": "AVGO", "level": null, "changePct": null,  "abc": "A",  "note": "Mega-cap semis bellwether — NVDA print will rate AVGO tomorrow" }
   ],
   "traderLens": [
-    {
-      "name": "Minervini",
-      "view": "Market is in Stage 2 uptrend with S&P near ATH and VIX at 17.8 — healthy backdrop. However, NVDA binary event Wednesday creates event risk that warrants holding fire on new initiations. Focus on tight VCP bases breaking out on above-average volume post-earnings. ZBRA and NOVT are the cleanest Stage 2 candidates visible today."
-    },
-    {
-      "name": "Ted Zhang",
-      "view": "Institutional rotation is notable: money moving from pure AI/semiconductor names into consumer services (ARMK, WEN) and electronic equipment (ZBRA, RAL, NOVT). Follow the three-pillar thesis — sector momentum, institutional volume, and catalyst. ZBRA ticks all three."
-    },
-    {
-      "name": "Clement Ang",
-      "view": "Market context remains A-grade (uptrend, VIX declining, momentum intact) but pre-market softness and NVDA event risk demand we wait for A-grade setups only. ZBRA and NOVT are the two highest-confidence names. Do not force trades in a pre-earnings tape."
-    },
-    {
-      "name": "SRxTrades",
-      "view": "Multiple volume-confirmed technical pivots across the screener — RAL, NOVT, ZBRA, Q all showing clean breakouts on above-average volume. Standard playbook: identify the Opening Range High at open, wait for ORH confirmation, enter with LOD as stop. Never chase AMBQ or KOPN at these extensions."
-    },
-    {
-      "name": "Jeff",
-      "view": "HD beat earnings but stock went down — that is a warning signal. Discipline over conviction this week. Hard stops must be pre-set before the open. No new positions in earnings-adjacent names. Protect the 7-week gain streak; one bad NVDA reaction can wipe a week of PnL."
-    },
-    {
-      "name": "Qullamaggie",
-      "view": "LQDA is the cleanest EP-FRESH this week — pharma catalyst, 46% 1W from a flat 1M base, now consolidating before the next leg. ARMK shows EP characteristics with +16.3% premarket on earnings. SIBN is a micro-cap EP worth monitoring. Avoid KOPN (+100% 1M) and AMBQ (+127% 1M) — both are second-EP failure territory."
-    },
-    {
-      "name": "Composite",
-      "view": "RAISE THE BAR today. Market structure is healthy but NVDA earnings Wednesday is the dominant event. Best action: hold current winners, let any extended positions breathe, watch ZBRA and ARMK for opening confirmation. Top EP candidate for patient traders: LQDA on any morning pullback to the recent breakout base. Do not open new risk in speculative names ahead of NVDA."
-    }
+    { "name": "Minervini",   "view": "Stage 2 backdrop intact, but leadership concentrated in extended names — no fresh VCP triggers worth taking before NVDA prints" },
+    { "name": "Ted Zhang",   "view": "Semis-only leadership = thin rotation; institutional positioning is full into NVDA. Wait for post-print re-rate to find the next 3-pillar setup" },
+    { "name": "Clement Ang", "view": "Today is NOT an A-grade entry day. Sit out, save risk budget for the post-earnings reaction tape Wed afternoon / Thu open" },
+    { "name": "SRxTrades",   "view": "No clean coils setting up on watchlist; volume picture mixed. Pass on new entries, manage open positions with technical trailing stops" },
+    { "name": "Jeff",        "view": "Mechanical filter would block today: no RVOL conviction (most leaders < 1.0 RVOL), binary event in < 8 hours — NO trade" },
+    { "name": "Qullamaggie", "view": "Best EP candidates are the post-NVDA reaction names tonight/tomorrow; today's leaders are all extended past clean LOD-stop entry. Wait" },
+    { "name": "Composite",   "view": "RAISE-THE-BAR. Do nothing new pre-NVDA. Have a written plan for both outcomes (gap-up vs gap-down semis) ready by 4:15 ET" }
   ],
   "standout": {
-    "ticker": "ZBRA",
-    "side": "LONG",
-    "score": 78,
-    "sector": "Electronic Technology",
-    "rs": 80,
-    "grade": "A",
-    "thesis": "Zebra Technologies broke out on an earnings beat with 3.71x RVOL extending +14.7% in premarket — clean institutional EP-style breakout in Electronic Technology. $11.7B market cap makes it liquid and institutionally owned; prior 7.6% 1W and 7.7% 1M momentum confirms Stage 2 trend before the earnings catalyst.",
-    "entry": 245.0,
-    "stop": 228.0,
-    "target": 280.0,
-    "rrr": 2.1,
-    "tags": ["#EP-earnings", "#breakout", "#institutional", "#Minervini", "#stage2"]
+    "ticker": null,
+    "side": null,
+    "score": null,
+    "sector": null,
+    "rs": null,
+    "grade": null,
+    "thesis": "No standout today — every quality setup is either extended or hostage to NVDA's print. The disciplined play is no new entries pre-AMC.",
+    "entry": null,
+    "stop": null,
+    "target": null,
+    "rrr": null,
+    "tags": ["#no-trade", "#earnings-risk", "#raise-the-bar"]
   },
   "earnings": {
-    "bmo": [
-      {
-        "ticker": "HD",
-        "consensus": "EPS $3.41 / Rev $41.54B — REPORTED: beat EPS by +7.09%, Rev +0.16%; stock reaction -0.38% (buy-the-rumor-sell-the-news)"
-      }
-    ],
+    "bmo": [],
     "amc": [
-      {
-        "ticker": "NVDA",
-        "consensus": "EPS $1.77-1.78 / Rev $78-79.2B (+79% YoY); Q2 guidance ~$87B; Blackwell/Vera Rubin transition key variable — reports AMC Wednesday May 20"
-      },
-      {
-        "ticker": "WMT",
-        "consensus": "Reports BMO Thursday May 21 — retail bellwether for tariff impact"
-      }
+      { "ticker": "NVDA", "consensus": "EPS $1.78 (+120% YoY) / Rev $79.2B (+79.5% YoY) — Q2 guide is the key variable" }
     ],
-    "yesterdayReactions": [
-      {
-        "ticker": "HD",
-        "result": "beat EPS 7.09%, Rev +0.16%",
-        "movePct": -0.38
-      }
-    ]
+    "yesterdayReactions": []
   },
   "calendar": [
-    {
-      "time": "TBD ET",
-      "name": "Building Permits / Housing Starts (May 19)",
-      "consensus": "Data unavailable at generation time"
-    },
-    {
-      "time": "AMC Wed May 20",
-      "name": "NVDA Q1 FY2027 Earnings",
-      "consensus": "Rev $78-79.2B, EPS $1.77-1.78, Q2 guidance ~$87B"
-    },
-    {
-      "time": "BMO Thu May 21",
-      "name": "WMT Q1 FY2027 Earnings",
-      "consensus": "Key tariff-impact read for retail sector"
-    }
+    { "time": "14:00 ET", "name": "FOMC May Meeting Minutes",        "consensus": "Fed held 3.50–3.75% — watch dissent + Warsh (new Chair) tone" },
+    { "time": "16:20 ET", "name": "NVDA Q1 Earnings (AMC)",          "consensus": "EPS $1.78 / Rev $79.2B — Q2 guide is the trigger" }
   ],
   "ratings": {
     "upgrades": [
-      {
-        "ticker": "NVMI",
-        "firm": "BofA Securities",
-        "rating": "Buy",
-        "pt": 612
-      }
+      { "ticker": "NVMI", "firm": "BofA Securities", "rating": "Buy",        "pt": 612 },
+      { "ticker": "NBR",  "firm": "Piper Sandler",   "rating": "Overweight", "pt": 120 },
+      { "ticker": "F",    "firm": "RBC Capital",     "rating": "Outperform", "pt": 13 }
     ],
-    "downgrades": [
-      {
-        "ticker": "WIX",
-        "firm": "UBS",
-        "rating": "Neutral",
-        "pt": 68
-      },
-      {
-        "ticker": "JACK",
-        "firm": "Jefferies",
-        "rating": "Hold",
-        "pt": null
-      }
-    ]
+    "downgrades": []
   },
-  "alert": "NVDA reports AMC Wednesday May 20 — Q2 guidance ($87B consensus) will dictate direction for all tech. Raise the bar on new entries today. Hold winners, protect gains.",
-  "screenerScores": {
-    "ARMK": {
-      "score": 72,
-      "verdict": "BUY",
-      "note": "Aramark earnings beat driving +16.3% premarket on 2.77x RVOL — institutional EP-style breakout in Consumer Services; wait for ORH confirmation at open"
-    },
-    "ZBRA": {
-      "score": 78,
-      "verdict": "BUY",
-      "note": "Zebra Technologies earnings beat; clean large-cap breakout with 3.71x RVOL extending +14.7% premarket — Minervini Stage 2 EP in Electronic Technology"
-    },
-    "SE": {
-      "score": 70,
-      "verdict": "BUY",
-      "note": "Sea Limited ($52B) breaking out with 3.7x RVOL and consistent multi-timeframe momentum (11% 1W, 11% 1M) — SE Asia tech recovery play; liquid and institutional"
-    },
-    "VG": {
-      "score": 45,
-      "verdict": "HOLD",
-      "note": "Strong daily move (+14.2%) but flat 1-week (-0.34%) signals one-day catalyst spike, not a momentum trend — energy pipeline; wait for weekly trend confirmation"
-    },
-    "KOPN": {
-      "score": 32,
-      "verdict": "AVOID",
-      "note": "Kopin Corp up +100% in 1 month — parabolic extension; Qullamaggie second-EP failure risk; no new entries at this climax stage"
-    },
-    "SIBN": {
-      "score": 68,
-      "verdict": "BUY",
-      "note": "Fresh catalyst breakout from a flat 1-month base on 4.31x RVOL in Medical Specialties — Qullamaggie EP-FRESH template; size small given micro-cap ($615M)"
-    },
-    "NOVT": {
-      "score": 78,
-      "verdict": "BUY",
-      "note": "Novanta consistent multi-timeframe leader (25% 1W, 28% 1M) with 3.19x RVOL — Minervini Stage 2 with earnings EP characteristics; liquid at $5.7B MCap"
-    },
-    "Q": {
-      "score": 70,
-      "verdict": "BUY",
-      "note": "Large liquid electronic equipment leader (17% 1W, 28% 1M) with institutional momentum — Minervini Stage 2 continuation; moderate RVOL limits EP enthusiasm but trend is real"
-    },
-    "JD": {
-      "score": 50,
-      "verdict": "HOLD",
-      "note": "JD.com gradual momentum recovery but China macro risk (tariffs) and modest RVOL (2.64x) with flat premarket (+1%) dampen conviction — not a high-conviction breakout"
-    },
-    "LQDA": {
-      "score": 78,
-      "verdict": "BUY",
-      "note": "Liquidia Corp pharma catalyst EP-FRESH: 46% 1W and 40% 1M gains from a flat base — Qullamaggie top pick; wait for morning consolidation pullback near the breakout level"
-    },
-    "KRP": {
-      "score": 38,
-      "verdict": "AVOID",
-      "note": "Kimbell Royalty Partners showing 1-week decline (-2.4%) masking daily pop — MLP/royalty structure not a swing momentum setup; no institutional breakout signature"
-    },
-    "SFL": {
-      "score": 48,
-      "verdict": "HOLD",
-      "note": "SFL Corp shipping with solid 1M momentum (+17%) but premarket reversal (-2%) signals distribution into strength — wait for cleaner intraday setup before considering"
-    },
-    "URG": {
-      "score": 45,
-      "verdict": "HOLD",
-      "note": "UR-Energy uranium miner with decent 1M momentum (+24%) but sub-$2 price, AMEX micro-float dynamics, and speculative nature make it unsuitable for disciplined swing trading"
-    }
-  },
+  "alert": "NVDA AMC tonight + FOMC minutes 14:00 ET — no new pre-market entries; have post-print plan ready",
+  "screenerScores": {},
   "citations": [
-    "StockAnalysis.com — SPY May 18 close $735.38, QQQ $706.55, S&P 500 7,403.05",
-    "Yahoo Finance / Barchart — VIX 17.80, -3.31% as of May 19 2026",
-    "MacroMicro / CNN — Fear & Greed Index 63 (Greed) as of May 18-19 2026",
-    "StockAnalysis.com — Premarket May 19 2026: S&P futures -0.45%, Nasdaq -0.65%, Dow -0.21%",
-    "Yahoo Finance / CNBC — NVDA May 19 range $218.37-$230.63, close $222.75; TSLA $409.99 -2.90%; AAPL $297.84 -0.80%; MSFT $423.54 +0.38%",
-    "MarketBeat.com — HD Q1 2026 earnings reported BMO May 19: EPS beat +7.09%, Rev beat +0.16%, stock -0.38%",
-    "Motley Fool / Kiplinger — NVDA reports AMC May 20 2026; Rev consensus $78-79.2B, EPS $1.77-1.78, Q2 guidance ~$87B",
-    "IndexBox.io / Benzinga — BofA raises NVMI PT to $612 from $510; UBS cuts WIX to $68 Neutral; Jefferies lowers JACK PT",
-    "XLK SSGA / Morningstar — XLK YTD +21.26%; XLF +1.25% May 19; XLY -0.18% May 19",
-    "StockAnalysis.com — Premarket gainers May 19: AMST +237%, WNW +92.5%, MTVA +80.2%, MEHA +47.8%, HAO +43.3%",
-    "StockAnalysis.com — Premarket losers May 19: SAGT -36.7%, WOK -34.6%, BTM -28.0%, PMAX -25.6%, WGRX -25.5%",
-    "TV Screener snapshot May 13 2026 (tv_screeners.json) — screener hit data used for all screenerScores",
-    "Data unavailable at generation time: DIA, IWM, ^TNX, CL=F levels; AMZN, META, GOOGL, AMD, SMCI, PLTR, CRWD, MSTR watchlist prices; market breadth up/down counts; AGL, INSM, ATEC, LEGN, MRAM, ERO, METC, PRCT, PSN, ALKS, OSCR, HUM, SIM, HALO, PBT, APC, RZLV, CGON, NPWR, DSX, KLC screener entries not read"
+    "Yahoo Finance 05/19 — SPY +0.26%, QQQ +0.49%, DIA +0.24% close",
+    "Barchart 05/19 — ESM26 futures +0.23%, NQM26 futures +0.35%",
+    "CBOE 05/19 12:02 ET — VIX 17.82",
+    "CNN Fear & Greed 05/19 — 61 (Greed)",
+    "TradingView Top Gainer screener fetched 2026-05-20 10:21 UTC — ALAB/MRVL/CRDO/ARM/SNDK leaders",
+    "Motley Fool / Earnings Whispers 05/19 — NVDA AMC EPS $1.78 / Rev $79.2B consensus, +120% / +79.5% YoY",
+    "Kiplinger 05/14 — FOMC May minutes scheduled 14:00 ET on 05/20; Fed held 3.50–3.75%, Warsh assuming Chair",
+    "State Street Sector Tracker — XLV +1.10%, XLY -1.11%, XLI -1.18%, XLF -1.24% (05/19)",
+    "VanEck 05/19 — SMH close $543.96",
+    "Globe & Mail 05/19 — 39 upgrades / 46 downgrades market-wide; NVMI/NBR/F price-target raises cited",
+    "Data unavailable at generation time: breadth advance/decline counts, 10Y yield, IWM, oil, sector ETFs (XLK/XLE/XLC/XLP/XLU/XLB/XLRE), individual watchlist live prices"
   ]
 }

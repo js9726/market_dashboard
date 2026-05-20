@@ -63,6 +63,11 @@ except ImportError as e:
 # Shared JSON safety helpers — keep bare NaN out of browser-facing files.
 from build_data import sanitize_json, safe_json_dumps  # noqa: E402
 
+# yfinance → stooq fallback (WK-2 lite). In CI yfinance was silently dropping
+# ~90% of tickers; stooq is far more reliable per-ticker. Same DataFrame shape
+# either way (Date index, Open/High/Low/Close/Volume columns).
+from build_data import fetch_history_with_fallback  # noqa: E402
+
 
 # --------------------------------------------------------------------------
 # .env loader (mirrors morning_brief.py / build_data.py pattern)
@@ -199,13 +204,18 @@ def _classify_stage(close_today: float, sma30wk: float, sma30wk_slope: float) ->
 
 
 def fetch_metrics_for(ticker: str) -> dict | None:
-    """Fetch OHLCV + metadata for a single ticker. Returns metric dict or None."""
+    """Fetch OHLCV + metadata for a single ticker. Returns metric dict or None.
+
+    WK-2 lite: history comes from fetch_history_with_fallback which tries
+    yfinance first then falls back to stooq. Metadata (.info) is best-effort
+    via yfinance — failures degrade gracefully to None sector/industry.
+    """
     try:
-        t = yf.Ticker(ticker)
-        # 1y daily — enough for 52w high/low + 30wk MA + 21-day comparison
-        df = t.history(period="1y", interval="1d", auto_adjust=False)
+        # 365 days = ~52 trading weeks plus buffer for the 30-week MA.
+        df = fetch_history_with_fallback(ticker, 365)
         if df is None or len(df) < 60:
             return None
+        t = yf.Ticker(ticker)  # only for the .info call below
         close = df["Close"]
         opens = df["Open"]
         vol = df["Volume"]
