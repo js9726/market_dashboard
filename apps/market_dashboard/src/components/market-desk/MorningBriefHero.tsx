@@ -8,6 +8,7 @@ import type { StructuredBrief } from "@/types/structured-brief";
 import MarketBreadthPanels from "./MarketBreadthPanels";
 import FreshnessBadge from "./FreshnessBadge";
 import { BRIEF_THRESHOLDS, LIVE_QUOTE_THRESHOLDS } from "@/lib/freshness";
+import { selectBriefProvider } from "@/lib/brief/provider-selection";
 
 const INDICES = [
   { symbol: "SPX", fallbackSymbol: "SPY" },
@@ -101,27 +102,19 @@ function changeClass(value: number | null | undefined): string {
   return "";
 }
 
-function providerEntries(data: ReturnType<typeof useMorningVerdict>["data"]) {
-  return data ? (Object.keys(data.providers) as BriefProviderName[]) : [];
-}
-
 export default function MorningBriefHero({ isOwner = false }: MorningBriefHeroProps) {
   const verdict = useMorningVerdict();
   const liveQuotes = useLiveQuotes();
-  const [selected, setSelected] = useState<BriefProviderName>("deepseek");
+  const [selected, setSelected] = useState<BriefProviderName | null>(null);
   const [rerunMessage, setRerunMessage] = useState<string | null>(null);
 
-  const availableProviders = useMemo<BriefProviderName[]>(() => {
-    return providerEntries(verdict.data).filter((p) => verdict.data?.providers[p]);
-  }, [verdict.data]);
-
-  const effectiveProvider: BriefProviderName | null = useMemo(() => {
+  const selectedBrief = useMemo(() => {
     if (!verdict.data) return null;
-    if (verdict.data.providers[selected]) return selected;
-    return availableProviders[0] ?? null;
-  }, [selected, availableProviders, verdict.data]);
+    return selectBriefProvider(verdict.data.providers, selected);
+  }, [selected, verdict.data]);
 
-  const entry = effectiveProvider && verdict.data ? verdict.data.providers[effectiveProvider] : null;
+  const effectiveProvider = selectedBrief?.provider ?? null;
+  const entry = selectedBrief?.entry ?? null;
   const briefView = asBriefView(entry?.structured ?? entry?.verdict);
   const briefSummary =
     briefView.moodLabel && briefView.moodSummary && briefView.moodLabel !== briefView.moodSummary
@@ -133,7 +126,7 @@ export default function MorningBriefHero({ isOwner = false }: MorningBriefHeroPr
     const res = await verdict.rerunProvider(provider);
     if (res.ok) {
       setRerunMessage(`${PROVIDER_LABEL[provider]} refreshed.`);
-      setSelected(provider);
+      setSelected(null);
     } else if (res.retryInSec) {
       setRerunMessage(`Rate limited. Try again in ${res.retryInSec}s.`);
     } else {

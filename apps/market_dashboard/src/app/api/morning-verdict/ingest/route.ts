@@ -24,6 +24,7 @@
 import { NextResponse } from "next/server";
 import { ALL_PROVIDERS, bucketOf, type BriefProvider } from "@/lib/brief/bucket";
 import { ingestRow } from "@/server/brief-cache";
+import { normalizeBriefProvider } from "@/lib/brief/provider-selection";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const provider = body.provider as string | undefined;
+  const provider = normalizeBriefProvider(body.provider as string | undefined);
   const htmlBody = body.htmlBody as string | undefined;
   const generatedBy = body.generatedBy as string | undefined;
   const inputHash = body.inputHash as string | undefined;
@@ -87,5 +88,12 @@ export async function POST(req: Request) {
     costUsd: typeof body.costUsd === "number" ? body.costUsd : null,
   });
 
-  return NextResponse.json({ ok: true, id: row.id, bucketAt: row.bucketAt.toISOString() });
+  return NextResponse.json({
+    ok: true,
+    id: row.id,
+    provider,
+    bucketAt: row.bucketAt.toISOString(),
+    generatedBy,
+    hasStructuredJson: structuredJson != null,
+  });
 }

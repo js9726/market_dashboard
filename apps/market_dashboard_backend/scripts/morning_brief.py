@@ -344,7 +344,15 @@ def _post_to_ingest(post_to, post_key, provider, json_body_str, generated_by):
         if resp.status_code >= 400:
             print(f"[ingest] {provider}: HTTP {resp.status_code} {resp.text[:200]}")
             return
-        print(f"[ingest] posted {provider} to {post_to}")
+        try:
+            posted = resp.json()
+        except Exception:
+            posted = {}
+        print(
+            f"[ingest] posted provider={posted.get('provider', provider)} "
+            f"bucketAt={posted.get('bucketAt', '?')} generatedBy={posted.get('generatedBy', generated_by)} "
+            f"structured={posted.get('hasStructuredJson', True)}"
+        )
     except Exception as e:
         print(f"[ingest] {provider}: {type(e).__name__}")
 

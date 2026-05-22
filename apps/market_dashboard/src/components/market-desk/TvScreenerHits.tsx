@@ -5,6 +5,7 @@ import { useTvScreeners } from "@/hooks/useTvScreeners";
 import type { TvScreener, TvScreenerHit } from "@/types/tv-screener";
 import FreshnessBadge from "./FreshnessBadge";
 import { SNAPSHOT_THRESHOLDS } from "@/lib/freshness";
+import { selectFreshestBriefProvider, type BriefProviderMap } from "@/lib/brief/provider-selection";
 
 type ManualScore = {
   score: number | null;
@@ -13,8 +14,8 @@ type ManualScore = {
 };
 
 /**
- * Reads screener scores that the Claude CLI morning-brief embeds in the
- * StructuredBrief under `screenerScores`. Fetched once on mount (browser
+ * Reads screener scores that the freshest successful morning brief embeds in
+ * the StructuredBrief under `screenerScores`. Fetched once on mount (browser
  * cache re-uses the same response the MorningBriefHero is already polling).
  * Scores are 0-100 as emitted by the CLI (already scaled).
  */
@@ -27,9 +28,8 @@ function useBriefScreenerScores(): Record<string, ManualScore> {
         if (!data || typeof data !== "object") return;
         const providers = (data as Record<string, unknown>).providers;
         if (!providers || typeof providers !== "object") return;
-        const claude = (providers as Record<string, unknown>).claude;
-        if (!claude || typeof claude !== "object") return;
-        const structured = (claude as Record<string, unknown>).structured;
+        const selected = selectFreshestBriefProvider(providers as Partial<BriefProviderMap>);
+        const structured = selected?.entry.structured;
         if (!structured || typeof structured !== "object") return;
         const raw = (structured as Record<string, unknown>).screenerScores;
         if (!raw || typeof raw !== "object") return;

@@ -52,6 +52,10 @@ def _hash(s: str) -> str:
     return hashlib.sha256(s.encode()).hexdigest()[:16]
 
 
+def _stored_provider(provider: str) -> str:
+    return "deepseek" if provider == "deepseek-search" else provider
+
+
 def _push(structured_json: object, provider: str) -> dict:
     base = os.environ.get("VERCEL_INGEST_URL", "").rstrip("/")
     key = os.environ.get("BRIEF_INGEST_KEY", "")
@@ -61,9 +65,10 @@ def _push(structured_json: object, provider: str) -> dict:
     url = f"{base}/api/morning-verdict/ingest"
     payload_str = json.dumps(structured_json)
     ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M")
+    stored_provider = _stored_provider(provider)
     body = json.dumps(
         {
-            "provider": provider,
+            "provider": stored_provider,
             "htmlBody": "",
             "structuredJson": structured_json,
             "verdictJson": structured_json,
@@ -806,6 +811,12 @@ def main() -> None:
     if args.post:
         print("[cli_run] Pushing to dashboard...", file=sys.stderr)
         result = _push(structured, args.provider)
+        print(
+            f"[cli_run] Ingest readback: provider={result.get('provider','?')} "
+            f"bucketAt={result.get('bucketAt','?')} generatedBy={result.get('generatedBy','?')} "
+            f"structured={result.get('hasStructuredJson', False)}",
+            file=sys.stderr,
+        )
         print(
             f"[cli_run] ✓ Pushed: bucketAt={result.get('bucketAt','?')} id={result.get('id','?')}",
             file=sys.stderr,

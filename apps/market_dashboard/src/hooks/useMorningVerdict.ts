@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { BriefProviderName } from "@/lib/brief/provider-selection";
 
-export type BriefProviderName = "deepseek" | "gemini" | "openai" | "claude";
+export type { BriefProviderName };
 
 export interface ProviderEntry {
   html: string;
