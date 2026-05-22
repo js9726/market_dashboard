@@ -1,6 +1,11 @@
 /**
- * GET  /api/journal/entry?date=YYYY-MM-DD  -> JournalEntry | null
+ * GET  /api/journal/entry?date=YYYY-MM-DD  -> DailyReflection | null
  * POST /api/journal/entry                  -> upsert by (userId, entryDate)
+ *
+ * Note: model renamed `JournalEntry` → `DailyReflection` in 2026-05 schema
+ * migration. URL kept stable for backwards compat with DailyJournal.tsx.
+ * The model name `JournalEntry` is now used for per-trade analysis (different
+ * concept entirely — see /api/journal/[tradeId] route).
  *
  * Body (POST):
  *   {
@@ -46,7 +51,7 @@ export async function GET(req: Request) {
   if (!date) {
     return NextResponse.json({ error: "Invalid or missing ?date=YYYY-MM-DD" }, { status: 400 });
   }
-  const entry = await prisma.journalEntry.findUnique({
+  const entry = await prisma.dailyReflection.findUnique({
     where: { userId_entryDate: { userId: session.user.id, entryDate: date } },
   });
   return NextResponse.json(entry);
@@ -109,7 +114,7 @@ export async function POST(req: Request) {
   // can't store arbitrary off-platform URLs in our DB.
   const attachmentUrls = sanitiseAttachmentUrls(body.attachmentUrls);
 
-  const entry = await prisma.journalEntry.upsert({
+  const entry = await prisma.dailyReflection.upsert({
     where: { userId_entryDate: { userId: session.user.id, entryDate: date } },
     create: {
       userId: session.user.id,

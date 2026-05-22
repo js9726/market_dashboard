@@ -8,7 +8,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   const { id } = await params;
 
-  const trade = await prisma.trade.findUnique({
+  const trade = await prisma.tradeRecord.findUnique({
     where: { id, userId: session.user.id },
     select: { id: true },
   });

@@ -131,7 +131,7 @@ async function main() {
       // Match Trade row by (userId, ticker, tradeDate)
       const tradeDate = new Date(dateStr + "T00:00:00.000Z");
       const tradeDateNext = new Date(tradeDate.getTime() + 24 * 60 * 60 * 1000);
-      const trade = await prisma.trade.findFirst({
+      const trade = await prisma.tradeRecord.findFirst({
         where: {
           userId: user.id,
           ticker: ticker.toUpperCase(),

@@ -54,7 +54,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
     dashboardTagline: string | null;
     publicProfileEnabled: boolean;
     username: string | null;
-    trades: {
+    tradeRecords: {
       pnl: unknown;
       buyPrice: unknown;
       quantity: unknown;
@@ -74,7 +74,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         dashboardTagline: true,
         publicProfileEnabled: true,
         username: true,
-        trades: {
+        tradeRecords: {
           where: { pnl: { not: null } },
           select: { pnl: true, buyPrice: true, quantity: true, tradeDate: true },
           orderBy: { tradeDate: "asc" },
@@ -91,7 +91,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const pnls: number[] = [];
   const pctReturns: number[] = [];
   let wins = 0;
-  for (const t of user.trades) {
+  for (const t of user.tradeRecords) {
     const pnl = Number(t.pnl);
     if (Number.isNaN(pnl)) continue;
     pnls.push(pnl);

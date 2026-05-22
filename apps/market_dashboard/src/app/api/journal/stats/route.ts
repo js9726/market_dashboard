@@ -20,7 +20,7 @@ export async function GET() {
 
   const userId = session.user.id;
 
-  const trades = await prisma.trade.findMany({
+  const trades = await prisma.tradeRecord.findMany({
     where: { userId },
     orderBy: { tradeDate: "asc" },
   });

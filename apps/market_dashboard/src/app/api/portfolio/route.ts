@@ -1,0 +1,183 @@
+/**
+ * GET /api/portfolio — authed user's broker accounts + positions + live P&L.
+ *
+ * Returns:
+ * {
+ *   accounts: [
+ *     {
+ *       id, alias, presetName, currency, isLive,
+ *       positions: [
+ *         { id, ticker, qty, avgCost, currency,
+ *           currentPrice, marketValue, unrealizedPl, unrealizedPlPct,
+ *           openedAt, lastFillAt, priceObservedAt, priceSource, stale }
+ *       ],
+ *       totals: { cost, marketValue, unrealizedPl, unrealizedPlPct }
+ *     }
+ *   ],
+ *   grandTotals: { cost, marketValue, unrealizedPl, unrealizedPlPct },
+ *   asOf: ISO timestamp
+ * }
+ *
+ * Live prices come from MarketQuote (refreshed every 5 min by /api/cron/refresh-quotes).
+ * If no MarketQuote row exists for a position's ticker, the position is returned with
+ * currentPrice=null and stale=true so the UI can show a placeholder.
+ *
+ * Per-user data isolation: only returns accounts where userId = session user.
+ */
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+
+const STALE_THRESHOLD_MS = 15 * 60 * 1000;  // 15 min — quote older than this is "stale"
+
+function toNum(d: unknown): number {
+  if (d == null) return 0;
+  const n = Number(d);
+  return Number.isFinite(n) ? n : 0;
+}
+
+export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Fetch the user's active accounts with positions in one round-trip.
+  const accounts = await prisma.userBrokerAccount.findMany({
+    where: { userId: session.user.id, isActive: true },
+    orderBy: { createdAt: "asc" },
+    include: {
+      preset: { select: { name: true, currency: true, region: true } },
+      positions: { orderBy: { ticker: "asc" } },
+    },
+  });
+
+  // Collect distinct tickers and fetch quotes in one query.
+  const tickers = new Set<string>();
+  for (const acct of accounts) {
+    for (const p of acct.positions) tickers.add(p.ticker);
+  }
+
+  const quotes = tickers.size
+    ? await prisma.marketQuote.findMany({
+        where: { symbol: { in: Array.from(tickers) } },
+        select: { symbol: true, price: true, changePct: true, observedAt: true, source: true },
+      })
+    : [];
+
+  // Find the latest TradeRecord per (brokerAccountId, ticker) so rows can deep-link
+  // to the journal editor without a second round-trip from the UI.
+  const accountIds = accounts.map((a) => a.id);
+  const tradeRecords =
+    accountIds.length && tickers.size
+      ? await prisma.tradeRecord.findMany({
+          where: {
+            brokerAccountId: { in: accountIds },
+            ticker: { in: Array.from(tickers) },
+          },
+          select: { id: true, brokerAccountId: true, ticker: true, executedAt: true, tradeDate: true },
+          orderBy: [{ executedAt: "desc" }, { tradeDate: "desc" }],
+        })
+      : [];
+  // Index by (accountId|ticker) → first match wins (already sorted desc)
+  const tradeIdMap = new Map<string, string>();
+  for (const t of tradeRecords) {
+    if (!t.brokerAccountId) continue;
+    const key = `${t.brokerAccountId}|${t.ticker}`;
+    if (!tradeIdMap.has(key)) tradeIdMap.set(key, t.id);
+  }
+
+  const quoteMap = new Map(quotes.map((q) => [q.symbol, q]));
+  const now = Date.now();
+
+  // Compute per-account and grand totals.
+  let grandCost = 0;
+  let grandMV = 0;
+
+  const enrichedAccounts = accounts.map((acct) => {
+    let acctCost = 0;
+    let acctMV = 0;
+
+    const positions = acct.positions.map((p) => {
+      const qty = toNum(p.qty);
+      const avgCost = toNum(p.avgCost);
+      const cost = qty * avgCost;
+
+      const quote = quoteMap.get(p.ticker);
+      const currentPrice = quote ? toNum(quote.price) : null;
+      const marketValue = currentPrice != null ? qty * currentPrice : null;
+      const unrealizedPl = marketValue != null ? marketValue - cost : null;
+      const unrealizedPlPct =
+        unrealizedPl != null && cost !== 0 ? (unrealizedPl / Math.abs(cost)) * 100 : null;
+
+      const priceObservedAt = quote?.observedAt ?? null;
+      const stale =
+        priceObservedAt == null ||
+        now - priceObservedAt.getTime() > STALE_THRESHOLD_MS;
+
+      acctCost += cost;
+      if (marketValue != null) acctMV += marketValue;
+
+      const latestTradeRecordId =
+        tradeIdMap.get(`${acct.id}|${p.ticker}`) ?? null;
+
+      return {
+        id: p.id,
+        ticker: p.ticker,
+        qty,
+        avgCost,
+        currency: p.currency,
+        currentPrice,
+        marketValue,
+        unrealizedPl,
+        unrealizedPlPct,
+        changePct: quote?.changePct ? toNum(quote.changePct) : null,
+        openedAt: p.openedAt,
+        lastFillAt: p.lastFillAt,
+        priceObservedAt,
+        priceSource: quote?.source ?? null,
+        stale,
+        latestTradeRecordId,
+      };
+    });
+
+    grandCost += acctCost;
+    grandMV += acctMV;
+
+    const acctUnrealizedPl = acctMV - acctCost;
+    const acctUnrealizedPlPct = acctCost !== 0 ? (acctUnrealizedPl / Math.abs(acctCost)) * 100 : null;
+
+    return {
+      id: acct.id,
+      alias: acct.alias,
+      presetName: acct.preset.name,
+      currency: acct.displayCurrency ?? acct.preset.currency,
+      region: acct.preset.region,
+      isLive: acct.isLive,
+      positions,
+      totals: {
+        cost: acctCost,
+        marketValue: acctMV,
+        unrealizedPl: acctUnrealizedPl,
+        unrealizedPlPct: acctUnrealizedPlPct,
+      },
+    };
+  });
+
+  const grandUnrealizedPl = grandMV - grandCost;
+  const grandUnrealizedPlPct =
+    grandCost !== 0 ? (grandUnrealizedPl / Math.abs(grandCost)) * 100 : null;
+
+  return NextResponse.json({
+    accounts: enrichedAccounts,
+    grandTotals: {
+      cost: grandCost,
+      marketValue: grandMV,
+      unrealizedPl: grandUnrealizedPl,
+      unrealizedPlPct: grandUnrealizedPlPct,
+    },
+    asOf: new Date().toISOString(),
+  });
+}

@@ -1,0 +1,34 @@
+# dashboard-bridge.example.toml — copy to ~/.config/dashboard-bridge.toml
+# and fill in the values from your dashboard.
+
+[dashboard]
+# Your dashboard's public URL
+url = "https://market-dashboard-ivory.vercel.app"
+# Plaintext bridge token from /dashboard/settings/brokers → Generate token
+# (the token is shown once — paste it here, then chmod 600 this file)
+token = "mdb_REPLACE_ME"
+
+[broker]
+# Must match a UserBrokerAccount.alias on your dashboard
+account_alias = "moomoo Malaysia"
+# For diagnostics in the dashboard
+type = "MOOMOO_FUTUMY"
+
+[opend]
+# Where moomoo OpenD is listening
+host = "127.0.0.1"
+port = 11111
+# Your REAL moomoo margin account id (NOT paper)
+# Find it with: python -m bridge dry-run after running `get_accounts.py` once
+acc_id = 286260077786655984
+# FUTUMY / FUTUSG / FUTUINC / etc.
+security_firm = "FUTUMY"
+# US / HK / SG
+market = "US"
+
+[sync]
+# Poll every N seconds. 60 is reasonable for a swing trader.
+interval_sec = 60
+# Fetch the last N days of fills on each poll. The dashboard dedups by
+# brokerFillId so re-pulling is cheap; this just bounds the request size.
+fill_lookback_days = 1

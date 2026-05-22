@@ -78,13 +78,22 @@ model User {
   // as a column so it never goes stale. Cache it later if leaderboard reads
   // become a hot path.
 
-  accounts       Account[]
-  sessions       Session[]
-  connection     SpreadsheetConnection?
-  trades         Trade[]
-  watchlist      Watchlist[]
-  scanResults    ScanResult[]
-  journalEntries JournalEntry[]
+  accounts            Account[]
+  sessions            Session[]
+  connection          SpreadsheetConnection?
+  tradeRecords        TradeRecord[]
+  watchlist           Watchlist[]
+  scanResults         ScanResult[]
+  // Soft daily reflection (formerly `JournalEntry`) — mood, sleep, notes.
+  // Renamed in 2026-05 schema migration to make room for per-trade JournalEntry.
+  dailyReflections    DailyReflection[]
+  // Per-trade journal analysis (trade-analyser output home).
+  tradeJournalEntries JournalEntry[]
+  // Multi-broker (Phase 0+ feature, gated behind NEXT_PUBLIC_FEATURE_BROKER_JOURNAL).
+  brokerAccounts      UserBrokerAccount[]
+  brokerPresets       BrokerPreset[]
+  bridgeToken         BrokerBridgeToken?
+  csvImportMappings   CsvImportMapping[]
 }
 
 model SpreadsheetConnection {
@@ -99,17 +108,43 @@ model SpreadsheetConnection {
   lastSyncedAt  DateTime?
   createdAt     DateTime  @default(now())
 
-  trades Trade[]
+  trades TradeRecord[]
 }
 
-model Trade {
-  id           String                @id @default(cuid())
+// ── TradeRecord (formerly `Trade`) ───────────────────────────────────────────
+//
+// Schema rename, NOT a Postgres table rename. `@@map("Trade")` keeps the
+// existing table in place so all historical data and indexes stay valid.
+// All 16 API/lib files updated 2026-05 to use `prisma.tradeRecord`.
+//
+// Position lifecycle row: one TradeRecord per "trade" (entry + up to 3 trims
+// + final exit). TradeFill is the raw audit log of every broker fill — see
+// the `fills` relation below.
+//
+model TradeRecord {
+  id           String                 @id @default(cuid())
   userId       String
-  connectionId String
-  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  connection   SpreadsheetConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  // connectionId becomes NULLABLE — manual / bridge / CSV trades don't have a
+  // SpreadsheetConnection. Set when source = 'SHEET'.
+  connectionId String?
+  user         User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connection   SpreadsheetConnection? @relation(fields: [connectionId], references: [id], onDelete: SetNull)
 
-  // Core execution fields
+  // ── NEW (2026-05): multi-broker fields ───────────────────────────────────
+  // 'SHEET' | 'MANUAL' | 'BRIDGE' | 'CSV' — kept as String for codebase
+  // consistency (existing role/signal columns also use String).
+  source           String             @default("SHEET")
+  // Nullable: legacy sheet trades have no broker account; new entries do.
+  brokerAccountId  String?
+  brokerAccount    UserBrokerAccount? @relation(fields: [brokerAccountId], references: [id], onDelete: SetNull)
+  // Sub-day precision execution time. tradeDate is kept for date-based grouping
+  // and matches existing UI; executedAt is the precise fill timestamp from
+  // bridge data. For manual entries, executedAt mirrors tradeDate + 09:30 ET.
+  executedAt       DateTime?
+  // Used to de-dupe bridge syncs. Bridge sends broker's order/deal id.
+  brokerOrderId    String?
+
+  // ── Core execution fields (existing) ─────────────────────────────────────
   ticker    String
   tradeDate DateTime?
   buyPrice  Decimal?  @db.Decimal(12, 4)
@@ -144,20 +179,26 @@ model Trade {
   verdictGeneratedAt DateTime?
 
   verdictHistory TradeVerdictHistory[]
+  journalEntry   JournalEntry?
+  fills          TradeFill[]
 
+  @@unique([brokerAccountId, brokerOrderId], name: "brokerAccount_brokerOrderId")
   @@index([userId, tradeDate])
+  @@index([brokerAccountId, executedAt])
+  @@index([source])
+  @@map("Trade")
 }
 
 model TradeVerdictHistory {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   tradeId   String
-  trade     Trade     @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  trade     TradeRecord @relation(fields: [tradeId], references: [id], onDelete: Cascade)
   ticker    String
   tradeDate DateTime?
   model     String
   provider  String
   // 'trader-debate' (6-persona scorer) | 'agent-pipeline' (5-agent role-based)
-  style     String    @default("trader-debate")
+  style     String      @default("trader-debate")
   // 'day-0' (initial scoring at journal time) | 'day-14-rescore' (heuristic outcome check)
   kind           String   @default("day-0")
   // Populated only when kind='day-14-rescore'. Shape:
@@ -167,7 +208,7 @@ model TradeVerdictHistory {
   outcomeMetrics Json?
   verdict   Json
   score     Float?
-  createdAt DateTime  @default(now())
+  createdAt DateTime    @default(now())
 
   @@index([tradeId])
   @@index([ticker, tradeDate])
@@ -211,41 +252,27 @@ model ScanResult {
 }
 
 // ── Phase 5: Unified Conviction Desk — brief cache + live quotes ──────────────
-//
-// MorningBriefCache stores both the long-form HTML brief AND the structured
-// trader-verdict JSON for a given 15-minute bucket × provider. Cadence:
-//   - Pre-market (13:00 UTC weekdays): all 4 providers — deepseek, gemini,
-//     openai, claude (rich web-search-grounded run)
-//   - Intraday (13:30–15:30 UTC weekdays, every 15 min): deepseek + gemini
-//     (fast snapshot-only run, lazy-fetched by /api/morning-verdict)
-//   - Owner-triggered: any provider, any time (5-min rate limit per provider)
-//
-// `bucketAt` is floor(generatedAt, 15 min) in UTC. The unique [bucketAt,provider]
-// pair lets multiple providers coexist in the same bucket and lets owner reruns
-// upsert in place.
-//
+
 model MorningBriefCache {
   id             String   @id @default(cuid())
   bucketAt       DateTime
-  provider       String   // 'deepseek' | 'gemini' | 'openai' | 'claude'
-  htmlBody       String   @db.Text  // legacy — empty for new rows; keeps backwards compat
-  verdictJson    Json?    // legacy — same row's structuredJson is preferred for the UI
-  structuredJson Json?    // PRIMARY: full StructuredBrief shape consumed by the UI
+  provider       String
+  htmlBody       String   @db.Text
+  verdictJson    Json?
+  structuredJson Json?
   generatedAt    DateTime @default(now())
-  generatedBy    String   // 'cron-premarket' | 'intraday-lazy' | 'owner-rerun:<email>'
-  inputHash      String   // sha256 of snapshot.json — skip regen if unchanged
+  generatedBy    String
+  inputHash      String
   tokensIn       Int?
   tokensOut      Int?
   costUsd        Decimal? @db.Decimal(10, 6)
-  errorMsg       String?  // populated if the provider call failed (still upserts row)
+  errorMsg       String?
 
   @@unique([bucketAt, provider])
   @@index([provider, bucketAt(sort: Desc)])
   @@index([generatedAt(sort: Desc)])
 }
 
-// Synced from llm_traders_wiki/verdicts/js by npm run sync:wiki --post.
-// Stored in Postgres so deployed dashboard users can read the audit archive.
 model WikiAudit {
   period     String   @id // YYYY-MM
   markdown   String   @db.Text
@@ -275,18 +302,17 @@ model WikiTradeVerdict {
   @@index([tradeDate(sort: Desc)])
 }
 
-// ── Feature 7: Daily trading journal entries ─────────────────────────────────
+// ── DailyReflection (formerly `JournalEntry`) ───────────────────────────────
 //
-// One row per (user, entryDate). Stores the "soft" reflective layer of the
-// journal — mood, sleep, market conditions, free-form notes, and links to
-// charts the user wants to remember. Trades for that date stay in the Trade
-// model and are joined client-side by date.
+// Soft daily reflection: mood, sleep, market conditions, free-form notes,
+// chart links, attachments. One row per (user, entryDate).
 //
-// Image attachments (Feature 7.2) will reuse this row by appending Vercel
-// Blob URLs to `attachmentUrls` once Blob is wired. `tvLinks` is split out
-// because TV chart URLs are common, lightweight, and need no storage backend.
+// Renamed from `JournalEntry` in 2026-05 multi-broker schema migration so the
+// `JournalEntry` model name could be repurposed for per-trade analysis.
+// Postgres table also renamed from "JournalEntry" to "DailyReflection" so
+// the new JournalEntry model can claim its own fresh table.
 //
-model JournalEntry {
+model DailyReflection {
   id               String   @id @default(cuid())
   userId           String
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -304,10 +330,232 @@ model JournalEntry {
   @@index([userId, entryDate(sort: Desc)])
 }
 
-// LiveQuote is upserted by external producers (moomoo daemon or Yahoo fallback
-// workflow). Single row per symbol — we don't need history here (Postgres isn't
-// the right store for tick history). The `source` + `observedAt` columns let
-// the UI flag stale rows and decide which producer wins.
+// ── JournalEntry (NEW 2026-05) — per-trade analysis ─────────────────────────
+//
+// One row per TradeRecord. This is the home for trade-analyser output:
+// setup classification, priming pattern, 7-trader rubric scores, fundamental
+// grade, evolution note, wiki references.
+//
+// Distinct from DailyReflection (which is the daily mood/sleep/notes layer).
+// Distinct from TradeVerdictHistory (which is the multi-version AI scoring
+// audit log — many rows per trade for re-scoring runs).
+//
+model JournalEntry {
+  id                String      @id @default(cuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradeRecordId     String      @unique
+  tradeRecord       TradeRecord @relation(fields: [tradeRecordId], references: [id], onDelete: Cascade)
+
+  // Setup classification (see skills/trade-analyser SKILL.md Step 2.5)
+  setupType         String      // EP-FRESH | POST-GAP-VCP | BO-VCP | BO-CB | PB-21EMA | MA-PULLBACK | POCKET-PIVOT | ORH-INTRADAY | PARABOLIC | EP-SECOND | CONTINUATION | OTHER
+  primingPattern    String?     // INSIDE-BAR | UPSIDE-REVERSAL | POSITIVE-EXPECTATION-BREAKER | TIGHT-SETUP-DAY | NONE
+  setupJustification String?    @db.Text  // 1-2 sentence wiki-cited explanation
+
+  // 7-trader rubric — { [traderName]: { entry, risk, setup, total, wouldEnter, why } }
+  traderScores      Json
+
+  // Fundamental score (冷眼 A/B/C framework — see wiki/fundamental-analysis.md)
+  fundamentalGrade  String?     // A | B | C
+  fundamentalData   Json?       // { growth, profitability, valuation, balanceSheet }
+
+  compositeScore    Decimal     @db.Decimal(4, 2)  // 0.00–10.00
+  bestStyleMatch    String?     // trader name
+  weakestDimension  String?     // explanation
+
+  entryVerdict      String      // GOOD | ACCEPTABLE | POOR
+  evolutionNote     String?     @db.Text
+  patternNote       String?     @db.Text  // vs last 5 trades — recurring weakness/improvement
+
+  wikiRefs          String[]    // array of wiki paths consulted
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+// ── BrokerPreset (NEW 2026-05) ───────────────────────────────────────────────
+//
+// Fee formula presets. Built-in presets seeded by migration; users can clone
+// and customise. feeFormula schema:
+//   {
+//     commission: { type: 'fixed'|'perShare'|'perTrade', value, minimum?, applyTo?: 'BUY'|'SELL'|'BOTH' },
+//     secFee:     { type: 'perShare', value, minimum?, applyTo?: 'SELL' },
+//     tafFee:     { type: 'perShare', value, minimum?, applyTo?: 'SELL' },
+//     exchangeFee:{ type: 'perTrade', value, applyTo?: 'BUY'|'SELL'|'BOTH' }
+//   }
+//
+model BrokerPreset {
+  id          String   @id @default(cuid())
+  // Globally unique name for built-ins; per-user-scoped for user clones.
+  name        String
+  region      String   // 'US' | 'HK' | 'SG' | 'MY' | 'CN' | 'AU' | 'CA' | 'JP'
+  currency    String   // 'USD' | 'HKD' | 'SGD' | 'MYR' | ...
+  feeFormula  Json
+  isBuiltIn   Boolean  @default(false)
+  // userId is NULL for built-in presets, set for user-cloned ones.
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  accounts    UserBrokerAccount[]
+
+  @@unique([userId, name])
+  @@index([isBuiltIn])
+}
+
+// ── UserBrokerAccount (NEW 2026-05) ─────────────────────────────────────────
+//
+// Links a User to a BrokerPreset and stores per-account metadata. A user may
+// have multiple accounts (e.g. "Main margin", "IRA", "Paper trading").
+// `brokerAccountId` is the external broker's own account ID (e.g. moomoo
+// 286260077786655984 or IBKR U1234567) — only set for bridge/CSV sources.
+//
+model UserBrokerAccount {
+  id              String       @id @default(cuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  presetId        String
+  preset          BrokerPreset @relation(fields: [presetId], references: [id], onDelete: Restrict)
+  // User-defined display name, e.g. "Main margin", "IRA".
+  alias           String
+  // External broker's own account identifier (nullable for manual-only accounts).
+  brokerAccountId String?
+  // Multi-currency display preference for this account.
+  displayCurrency String?
+  isActive        Boolean      @default(true)
+  isLive          Boolean      @default(false)  // false = paper trading
+  createdAt       DateTime     @default(now())
+
+  positions     Position[]
+  fills         TradeFill[]
+  tradeRecords  TradeRecord[]
+
+  @@unique([userId, alias])
+  @@index([userId])
+}
+
+// ── BrokerBridgeToken (NEW 2026-05) ─────────────────────────────────────────
+//
+// Per-user HMAC token for the local bridge daemon to authenticate against
+// /api/bridge/sync. Phase 3 feature — schema landed in Phase 0 so the bridge
+// can be developed in parallel.
+//
+// `tokenHash` is sha256(plaintext); plaintext is shown to the user ONCE on
+// generation and never stored. Bridge stores plaintext in
+// ~/.config/dashboard-bridge.toml (chmod 600).
+//
+model BrokerBridgeToken {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash     String    @unique
+  // Optional label so a user with multiple machines knows which token is which.
+  label         String?
+  createdAt     DateTime  @default(now())
+  lastHeartbeat DateTime?
+  revokedAt     DateTime?
+
+  @@index([lastHeartbeat])
+}
+
+// ── Position (NEW 2026-05) ──────────────────────────────────────────────────
+//
+// Current position snapshot per (brokerAccount, ticker). One row per held
+// position. Refreshed by:
+//   - Bridge sync (Phase 3): exact broker data, overwrites snapshot
+//   - Manual entry: increments/decrements from TradeFill aggregation
+//   - CSV import: same as manual, batched
+//
+// avgCost stored in the position's local currency (matches broker's reporting).
+//
+model Position {
+  id                 String            @id @default(cuid())
+  brokerAccountId    String
+  brokerAccount      UserBrokerAccount @relation(fields: [brokerAccountId], references: [id], onDelete: Cascade)
+  ticker             String            // 'US.HUT', 'HK.00700', etc.
+  qty                Decimal           @db.Decimal(18, 4)
+  avgCost            Decimal           @db.Decimal(12, 4)
+  currency           String            // matches broker's local currency
+  // Cached fields refreshed by MarketQuote join (so we don't recompute on every read)
+  currentPrice       Decimal?          @db.Decimal(12, 4)
+  marketValue        Decimal?          @db.Decimal(18, 4)
+  unrealizedPl       Decimal?          @db.Decimal(18, 4)
+  unrealizedPlPct    Decimal?          @db.Decimal(8, 4)
+  openedAt           DateTime
+  lastFillAt         DateTime
+  asOf               DateTime          @default(now())
+
+  @@unique([brokerAccountId, ticker])
+  @@index([brokerAccountId])
+  @@index([ticker])
+}
+
+// ── TradeFill (NEW 2026-05) ─────────────────────────────────────────────────
+//
+// Immutable audit log of every broker fill. Distinct from TradeRecord (the
+// mutable position-lifecycle row): one TradeRecord can have many TradeFills
+// (entry + each trim + final exit).
+//
+// Populated by:
+//   - Manual entry: 1 fill per saved trade
+//   - Bridge sync: 1 fill per broker deal/execution event
+//   - CSV import: 1 fill per CSV row
+//
+// brokerFillId is the broker's own fill/execution id — used to de-dupe
+// re-imports and bridge re-syncs.
+//
+model TradeFill {
+  id              String            @id @default(cuid())
+  // Nullable: a fill exists in the bridge stream before a TradeRecord lifecycle
+  // is associated (the reconciler links them later).
+  tradeRecordId   String?
+  tradeRecord     TradeRecord?      @relation(fields: [tradeRecordId], references: [id], onDelete: SetNull)
+  brokerAccountId String
+  brokerAccount   UserBrokerAccount @relation(fields: [brokerAccountId], references: [id], onDelete: Cascade)
+  brokerFillId    String?           // broker's deal_id / execId — null for manual entries
+  ticker          String
+  side            String            // 'BUY' | 'SELL'
+  qty             Decimal           @db.Decimal(18, 4)
+  price           Decimal           @db.Decimal(12, 4)
+  executedAt      DateTime
+  fees            Decimal?          @db.Decimal(12, 4)
+  currency        String?
+  source          String            // 'MANUAL' | 'BRIDGE' | 'CSV'
+  createdAt       DateTime          @default(now())
+
+  @@unique([brokerAccountId, brokerFillId], name: "brokerAccount_brokerFillId")
+  @@index([brokerAccountId, executedAt(sort: Desc)])
+  @@index([tradeRecordId])
+  @@index([ticker, executedAt(sort: Desc)])
+}
+
+// ── CsvImportMapping (NEW 2026-05) ──────────────────────────────────────────
+//
+// Stores user-confirmed CSV column mappings per broker so re-imports don't
+// require remapping each time. Keyed by (user, broker name).
+//
+model CsvImportMapping {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brokerName   String   // matches a BrokerPreset.name when possible, free text otherwise
+  // Header → field name mapping, e.g. { "Symbol": "ticker", "Trade Date": "executedAt" }
+  columnMap    Json
+  dateFormat   String?  // e.g. 'MM/dd/yyyy'
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, brokerName])
+}
+
+// ── LiveQuote (EXISTING — unchanged) ────────────────────────────────────────
+//
+// Brief tickers (SPY/QQQ/XLK/...). Upserted by morning-brief workflow.
+// Kept separate from MarketQuote (portfolio prices) to preserve existing
+// /api/live-quotes contracts and avoid the brief ever depending on a Position
+// being open.
 //
 model LiveQuote {
   symbol     String   @id // 'SPY', 'QQQ', 'XLK', ...
@@ -319,4 +567,32 @@ model LiveQuote {
   ingestedAt DateTime @default(now())
 
   @@index([source, observedAt(sort: Desc)])
+}
+
+// ── MarketQuote (NEW 2026-05) ───────────────────────────────────────────────
+//
+// Shared price layer for portfolio tickers. Refreshed every 5 min by
+// /api/cron/refresh-quotes worker — only fetches tickers currently held in
+// at least one Position row (cost-controlled).
+//
+// Separate from LiveQuote because:
+//   - LiveQuote is for the brief's small fixed ticker set
+//   - MarketQuote covers the broader user-portfolio universe
+//   - Different SLAs (brief: 1-min via push; portfolio: 5-min via yfinance)
+//   - Different sources (LiveQuote: moomoo/yahoo; MarketQuote: yahoo/opend/byok)
+//
+model MarketQuote {
+  symbol     String   @id  // 'US.HUT', 'HK.00700', etc.
+  price      Decimal  @db.Decimal(12, 4)
+  changePct  Decimal? @db.Decimal(8, 4)
+  prevClose  Decimal? @db.Decimal(12, 4)
+  dayHigh    Decimal? @db.Decimal(12, 4)
+  dayLow     Decimal? @db.Decimal(12, 4)
+  volume     BigInt?
+  source     String   // 'yahoo' | 'opend' | 'polygon' | 'iex'
+  observedAt DateTime
+  ingestedAt DateTime @default(now())
+
+  @@index([source, observedAt(sort: Desc)])
+  @@index([observedAt(sort: Desc)])
 }

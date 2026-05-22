@@ -6,16 +6,31 @@ import { signOut } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Icon from "./Icon";
 import MarketTape from "./MarketTape";
+import { features } from "@/lib/features";
 
-const WORKFLOW_NAV = [
+// Nav items can declare a `featureFlag` (key of features) — when the flag is
+// false, the item is filtered out at render time. Keeps nav arrays declarative.
+type NavItem = {
+  href: string;
+  label: string;
+  icon: string;
+  count?: string;
+  exact?: boolean;
+  featureFlag?: keyof typeof features;
+};
+
+const WORKFLOW_NAV: NavItem[] = [
   { href: "/dashboard", label: "Conviction Desk", icon: "dashboard", count: "5", exact: true },
+  // Portfolio sits second — natural flow from "ideas" → "executed positions".
+  // Gated behind brokerJournal flag; invisible for users who haven't opted in.
+  { href: "/dashboard/portfolio", label: "Portfolio", icon: "portfolio", featureFlag: "brokerJournal" },
   { href: "/dashboard/pitch", label: "New Pitch", icon: "plus" },
   { href: "/dashboard/bench", label: "Bench", icon: "template", count: "1" },
   { href: "/dashboard/settled", label: "Settled", icon: "review", count: "2" },
   { href: "/dashboard/analytics", label: "Analytics", icon: "analytics" },
 ];
 
-const TOOL_NAV = [
+const TOOL_NAV: NavItem[] = [
   { href: "/dashboard/scanner", label: "Scanner", icon: "search" },
   { href: "/dashboard/themes", label: "Theme Radar", icon: "search" },
   { href: "/dashboard/rvol", label: "RVOL Overview", icon: "search" },
@@ -92,6 +107,23 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
     title: "Trade Audits",
     subtitle: "Monthly grade-A/B/C trade rubric reviews from llm_traders_wiki",
   },
+  // ── Phase 0 multi-broker journal pages (feature-gated) ────────────────────
+  "/dashboard/portfolio": {
+    title: "Portfolio",
+    subtitle: "Live broker positions and P&L",
+  },
+  "/dashboard/portfolio/new": {
+    title: "New trade",
+    subtitle: "Manually log a trade with auto-calculated fees",
+  },
+  "/dashboard/portfolio/import": {
+    title: "CSV import",
+    subtitle: "Bulk import from Schwab, Fidelity, IBKR, or moomoo exports",
+  },
+  "/dashboard/settings/brokers": {
+    title: "Broker accounts",
+    subtitle: "Link brokers, configure fee presets, manage bridge tokens",
+  },
 };
 
 function isActive(pathname: string, href: string, exact?: boolean) {
@@ -136,12 +168,18 @@ function ThemeToggle() {
   );
 }
 
+function visibleNav(items: NavItem[]): NavItem[] {
+  return items.filter((i) => !i.featureFlag || features[i.featureFlag]);
+}
+
 export default function MarketDeskShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const page = useMemo(
     () => PAGE_TITLES[pathname] ?? { title: "Market Desk JS", subtitle: "Working In Progress" },
     [pathname],
   );
+  const workflowNav = useMemo(() => visibleNav(WORKFLOW_NAV), []);
+  const toolNav = useMemo(() => visibleNav(TOOL_NAV), []);
 
   return (
     <div className="market-desk-shell">
@@ -158,7 +196,7 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
 
           <nav className="market-nav" aria-label="Workflow">
             <span className="market-nav__label">Workflow</span>
-            {WORKFLOW_NAV.map((item) => (
+            {workflowNav.map((item) => (
               <Link
                 className={`market-nav__item ${
                   isActive(pathname, item.href, item.exact) ? "is-active" : ""
@@ -175,7 +213,7 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
 
           <nav className="market-nav" aria-label="Tools">
             <span className="market-nav__label">Tools</span>
-            {TOOL_NAV.map((item) => (
+            {toolNav.map((item) => (
               <Link
                 className={`market-nav__item ${isActive(pathname, item.href) ? "is-active" : ""}`}
                 href={item.href}

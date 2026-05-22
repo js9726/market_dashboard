@@ -31,8 +31,8 @@ export async function GET(req: Request) {
   };
 
   const [total, trades] = await Promise.all([
-    prisma.trade.count({ where }),
-    prisma.trade.findMany({
+    prisma.tradeRecord.count({ where }),
+    prisma.tradeRecord.findMany({
       where,
       orderBy: { tradeDate: "desc" },
       skip: (page - 1) * limit,

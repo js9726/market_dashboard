@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   const accessToken = await getGoogleAccessToken(session.user.id);
   await appendTradeRow(connection.spreadsheetId, connection.sheetTab, colMap, body, accessToken);
 
-  const trade = await prisma.trade.create({
+  const trade = await prisma.tradeRecord.create({
     data: {
       userId: session.user.id,
       connectionId: connection.id,

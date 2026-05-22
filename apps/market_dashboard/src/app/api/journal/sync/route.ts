@@ -49,8 +49,8 @@ export async function POST() {
 
   try {
   await prisma.$transaction([
-    prisma.trade.deleteMany({ where: { connectionId: connection.id } }),
-    prisma.trade.createMany({
+    prisma.tradeRecord.deleteMany({ where: { connectionId: connection.id } }),
+    prisma.tradeRecord.createMany({
       data: trades.map((t) => ({
         userId: session.user.id,
         connectionId: connection.id,
@@ -99,7 +99,7 @@ export async function POST() {
   const connectionId = connection.id;
   after(async () => {
     try {
-      const unscored = await prisma.trade.findMany({
+      const unscored = await prisma.tradeRecord.findMany({
         where: { userId, connectionId, verdictScore: null, buyPrice: { not: null } },
         take: 20,
         select: { id: true },

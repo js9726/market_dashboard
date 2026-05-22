@@ -47,7 +47,7 @@ export async function generateTradeVerdict(
   userId: string,
   opts: { provider?: string; tier?: LLMTier; style?: ReviewStyle } = {}
 ): Promise<VerdictResult> {
-  const dbTrade = await prisma.trade.findUnique({
+  const dbTrade = await prisma.tradeRecord.findUnique({
     where: { id: tradeId, userId },
   });
   if (!dbTrade || !dbTrade.buyPrice) throw new Error("Trade not found or missing buy price");
@@ -141,7 +141,7 @@ export async function generateTradeVerdict(
         score: overallScore,
       },
     }),
-    prisma.trade.update({
+    prisma.tradeRecord.update({
       where: { id: tradeId },
       data: {
         verdict: review as Prisma.InputJsonValue,

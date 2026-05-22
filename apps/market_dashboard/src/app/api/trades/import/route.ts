@@ -161,7 +161,7 @@ export async function POST(req: Request) {
 
   // ── Find existing trade (match on connectionId + ticker + tradeDate) ──────
   // If tradeDate is null, match on connectionId + ticker + null date only.
-  const existing = await prisma.trade.findFirst({
+  const existing = await prisma.tradeRecord.findFirst({
     where: {
       connectionId,
       ticker,
@@ -201,14 +201,14 @@ export async function POST(req: Request) {
   let action: "created" | "updated";
 
   if (existing) {
-    trade = await prisma.trade.update({
+    trade = await prisma.tradeRecord.update({
       where: { id: existing.id },
       data: tradeData,
       select: { id: true },
     });
     action = "updated";
   } else {
-    trade = await prisma.trade.create({
+    trade = await prisma.tradeRecord.create({
       data: {
         userId: ownerId,
         connectionId,
@@ -247,7 +247,7 @@ export async function POST(req: Request) {
     verdictId = history.id;
 
     // Also update the live cache on the Trade row itself
-    await prisma.trade.update({
+    await prisma.tradeRecord.update({
       where: { id: trade.id },
       data: {
         verdict: verdictJson,

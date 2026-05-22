@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
     // tradeId path: fetch from DB, check cache, generate and save verdict
     if (tradeId) {
-      const dbTrade = await prisma.trade.findUnique({
+      const dbTrade = await prisma.tradeRecord.findUnique({
         where: { id: tradeId, userId },
       });
       if (!dbTrade) {

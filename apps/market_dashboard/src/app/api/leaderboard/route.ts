@@ -64,7 +64,7 @@ export async function GET() {
       image: true,
       bio: true,
       dashboardTagline: true,
-      trades: {
+      tradeRecords: {
         where: { pnl: { not: null } },
         select: { pnl: true, buyPrice: true, quantity: true, tradeDate: true },
         orderBy: { tradeDate: "asc" },
@@ -76,7 +76,7 @@ export async function GET() {
     const pnls: number[] = [];
     const pctReturns: number[] = [];
     let wins = 0;
-    for (const t of u.trades) {
+    for (const t of u.tradeRecords) {
       const pnl = Number(t.pnl);
       if (Number.isNaN(pnl)) continue;
       pnls.push(pnl);
