@@ -190,20 +190,103 @@ Step "Workflow cron minutes off-peak (WK-4)" {
     if ($bad) { throw "Found peak-slot cron entries: $($bad.Line -join '; ')" }
 }
 
-# 21. Feature 9 Design system adoption (logos + route-based data-mode auto-binder)
+# 22. G1 Trade Audits wired (DB-backed wiki sync + parser + API + UI)
+Step "Trade Audits wired (DB-backed wiki integration)" {
+    $sync = Join-Path $app "scripts/sync-wiki.mjs"
+    if (-not (Test-Path -LiteralPath $sync)) { throw ("Missing sync-wiki.mjs: " + $sync) }
+    $files = @(
+        (Join-Path $app "src/lib/wiki/audits.ts"),
+        (Join-Path $app "src/lib/__tests__/audits.test.ts"),
+        (Join-Path $app "src/app/api/wiki/audits/route.ts"),
+        (Join-Path $app "src/app/api/wiki/audits/[period]/route.ts"),
+        (Join-Path $app "src/app/api/wiki/audits/ingest/route.ts"),
+        (Join-Path $app "src/app/api/wiki/trades/[date]/[ticker]/[stage]/route.ts"),
+        (Join-Path $app "src/components/audits/AuditsView.tsx"),
+        (Join-Path $app "src/app/dashboard/audits/page.tsx"),
+        (Join-Path $app "prisma/migrations/20260521100000_add_wiki_audit_cache/migration.sql")
+    )
+    foreach ($f in $files) {
+        if (-not (Test-Path -LiteralPath $f)) { throw ("Missing: " + $f) }
+    }
+    $pkg = Join-Path $app "package.json"
+    if (-not (Select-String -Path $pkg -Pattern '"sync:wiki"')) {
+        throw "package.json missing sync:wiki script"
+    }
+    $shell = Join-Path $app "src/components/market-desk/MarketDeskShell.tsx"
+    if (-not (Select-String -Path $shell -Pattern '/dashboard/audits')) {
+        throw "MarketDeskShell.tsx does not link /dashboard/audits"
+    }
+    $parser = Join-Path $app "src/lib/wiki/audits.ts"
+    foreach ($p in @('parseAudit', 'AuditReport', 'WikiManifest')) {
+        if (-not (Select-String -Path $parser -Pattern ([regex]::Escape($p)))) {
+            throw "audits.ts missing export: $p"
+        }
+    }
+    $schema = Join-Path $app "prisma/schema.prisma"
+    foreach ($p in @('model WikiAudit', 'model WikiTradeVerdict')) {
+        if (-not (Select-String -Path $schema -Pattern ([regex]::Escape($p)))) {
+            throw "schema.prisma missing: $p"
+        }
+    }
+    $middleware = Join-Path $app "src/middleware.ts"
+    if (-not (Select-String -Path $middleware -Pattern '/api/wiki/audits/ingest')) {
+        throw "middleware.ts must allow bearer-token wiki audit ingest"
+    }
+}
+
+# 21. Feature 9 Design system adoption (logos + intentional persistent ThemeToggle)
 Step "Design system adoption (Feature 9)" {
     foreach ($asset in @('icons.svg', 'logo-market-desk.svg', 'logo-twi-mark.svg', 'logo-twi-wordmark.svg')) {
         $p = Join-Path $app ("public/ds/" + $asset)
         if (-not (Test-Path -LiteralPath $p)) { throw ("Missing public/ds asset: " + $asset) }
     }
     $shell = Join-Path $app "src/components/market-desk/MarketDeskShell.tsx"
-    foreach ($needle in @('modeForPath', 'useRouteMode', 'ModeIndicator')) {
+    # Persistent user ThemeToggle is intentional for this branch. It still must
+    # bind data-mode on html/body so design tokens resolve.
+    if (-not (Select-String -Path $shell -Pattern 'setAttribute\("data-mode"')) {
+        throw "MarketDeskShell.tsx no longer sets data-mode on the document body"
+    }
+    foreach ($needle in @('ThemeToggle', 'localStorage', 'mds-theme-mode')) {
         if (-not (Select-String -Path $shell -Pattern ([regex]::Escape($needle)))) {
-            throw "MarketDeskShell.tsx missing route-mode auto-binder: $needle"
+            throw "MarketDeskShell.tsx missing persistent theme toggle marker: $needle"
         }
     }
-    if (Select-String -Path $shell -Pattern 'function ThemeToggle\(') {
-        throw "MarketDeskShell.tsx still defines the old ThemeToggle -- Feature 9 expects auto-binding only"
+}
+
+# 23. Morning Brief freshness: freshest successful provider wins everywhere.
+Step "Morning Brief freshest provider selection wired" {
+    $selector = Join-Path $app "src/lib/brief/provider-selection.ts"
+    $selectorTest = Join-Path $app "src/lib/__tests__/brief-provider-selection.test.ts"
+    foreach ($f in @($selector, $selectorTest)) {
+        if (-not (Test-Path -LiteralPath $f)) { throw ("Missing: " + $f) }
+    }
+    foreach ($p in @('selectFreshestBriefProvider', 'selectBriefProvider', 'normalizeBriefProvider')) {
+        if (-not (Select-String -Path $selector -Pattern ([regex]::Escape($p)))) {
+            throw "provider-selection.ts missing export: $p"
+        }
+    }
+    foreach ($f in @(
+        (Join-Path $app "src/components/market-desk/MorningBriefHero.tsx"),
+        (Join-Path $app "src/components/market-desk/SpotlightAndIdeas.tsx"),
+        (Join-Path $app "src/components/market-desk/TvScreenerHits.tsx")
+    )) {
+        if (-not (Select-String -Path $f -Pattern 'selectFreshestBriefProvider|selectBriefProvider')) {
+            throw "$f is not using shared brief provider selection"
+        }
+    }
+    $ingest = Join-Path $app "src/app/api/morning-verdict/ingest/route.ts"
+    if (-not (Select-String -Path $ingest -Pattern 'normalizeBriefProvider')) {
+        throw "morning-verdict ingest must normalize provider aliases"
+    }
+}
+
+# 24. Cross-platform app build wrapper exists.
+Step "Next build script is cross-platform" {
+    $build = Join-Path $app "scripts/build.mjs"
+    if (-not (Test-Path -LiteralPath $build)) { throw "Missing scripts/build.mjs" }
+    $pkg = Join-Path $app "package.json"
+    if (-not (Select-String -Path $pkg -Pattern '"build": "node scripts/build.mjs"')) {
+        throw "package.json build script must call node scripts/build.mjs"
     }
 }
 

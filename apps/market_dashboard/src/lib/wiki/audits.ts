@@ -1,0 +1,188 @@
+/**
+ * Audit Markdown parser.
+ *
+ * Source format (from llm_traders_wiki/verdicts/js/_audit_YYYY-MM.md):
+ *
+ *   # Audit Report — 2025-07
+ *
+ *   **Trades reviewed**: 6
+ *   **Match grades**: A=2, B=2, C=2
+ *   **Drift cases**: 2
+ *
+ *   ## Grade A
+ *   - ANET 2025-07-03: +11.2% in 14d — Target $113.00 reached ...
+ *
+ *   ## Grade B
+ *   - CRCL 2025-07-15: -15.6% in 14d — ...
+ *
+ *   ## Grade C
+ *   - SMTC 2025-07-15: +7.5% in 14d — Whipsaw: stop too tight
+ *
+ *   ## Suggested wiki updates (Safe-mode)
+ *   - `rubric-stop-too-tight`: Predicted stop $47.74 would have ...
+ *
+ * Parser extracts a typed `AuditReport` so the UI can render structured cells
+ * + lets us search/group across months without re-parsing markdown each time.
+ */
+
+export type Grade = "A" | "B" | "C";
+
+export interface AuditTradeRow {
+  grade: Grade;
+  ticker: string;
+  date: string;        // YYYY-MM-DD
+  pctIn14d: number | null;  // -15.6, +11.2, etc.
+  outcome: string;     // "Target $113.00 reached", "Whipsaw: stop too tight", ...
+}
+
+export interface AuditSuggestion {
+  rubric: string;      // "rubric-stop-too-tight"
+  reason: string;      // free text after the colon
+}
+
+export interface AuditReport {
+  period: string;       // YYYY-MM
+  tradesReviewed: number | null;
+  gradeCounts: Record<Grade, number>;
+  driftCases: number | null;
+  trades: AuditTradeRow[];
+  suggestions: AuditSuggestion[];
+  warnings: string[];   // anything the parser couldn't make sense of
+}
+
+const TRADE_LINE_RE =
+  // "- ANET 2025-07-03: +11.2% in 14d — Target $113.00 reached ..."
+  // The em-dash / hyphen separator is a single non-ASCII char; matched as
+  // [—–-]+ explicitly to avoid needing the /u flag (project targets ES5).
+  /^-\s+([A-Z][A-Z0-9.]{0,7})\s+(\d{4}-\d{2}-\d{2}):\s+([-+]?[\d.]+)%\s+in\s+\d+d\s+[—–-]+\s*(.+)$/;
+
+const SUGGESTION_LINE_RE =
+  // "- `rubric-stop-too-tight`: Predicted stop $47.74 would have ..."
+  /^-\s+`([^`]+)`:\s+(.+)$/;
+
+const META_LINE_RE = /^\*\*([A-Za-z\s-]+)\*\*:\s+(.+)$/;
+const GRADE_HEADING_RE = /^##\s+Grade\s+([ABC])\b/i;
+const SUGGESTIONS_HEADING_RE = /^##\s+Suggested\s+wiki\s+updates/i;
+
+export function parseAudit(markdown: string, period: string): AuditReport {
+  const lines = markdown.split(/\r?\n/);
+  const warnings: string[] = [];
+
+  let tradesReviewed: number | null = null;
+  const gradeCounts: Record<Grade, number> = { A: 0, B: 0, C: 0 };
+  let driftCases: number | null = null;
+
+  const trades: AuditTradeRow[] = [];
+  const suggestions: AuditSuggestion[] = [];
+
+  type Section = "preamble" | "grade-A" | "grade-B" | "grade-C" | "suggestions" | "other";
+  let section: Section = "preamble";
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+
+    // Section switches
+    const gradeMatch = line.match(GRADE_HEADING_RE);
+    if (gradeMatch) {
+      const g = gradeMatch[1].toUpperCase() as Grade;
+      section = `grade-${g}` as Section;
+      continue;
+    }
+    if (SUGGESTIONS_HEADING_RE.test(line)) {
+      section = "suggestions";
+      continue;
+    }
+    if (line.startsWith("## ")) {
+      section = "other";
+      continue;
+    }
+
+    // Preamble meta
+    if (section === "preamble") {
+      const m = line.match(META_LINE_RE);
+      if (m) {
+        const key = m[1].trim().toLowerCase();
+        const value = m[2].trim();
+        if (key === "trades reviewed") {
+          const n = parseInt(value, 10);
+          if (Number.isFinite(n)) tradesReviewed = n;
+        } else if (key === "match grades") {
+          // "A=2, B=2, C=2"
+          for (const piece of value.split(/,\s*/)) {
+            const gm = piece.match(/^([ABC])\s*=\s*(\d+)$/i);
+            if (gm) gradeCounts[gm[1].toUpperCase() as Grade] = parseInt(gm[2], 10);
+          }
+        } else if (key === "drift cases") {
+          const n = parseInt(value, 10);
+          if (Number.isFinite(n)) driftCases = n;
+        }
+      }
+      continue;
+    }
+
+    // Trade rows in grade sections
+    if (section === "grade-A" || section === "grade-B" || section === "grade-C") {
+      const m = line.match(TRADE_LINE_RE);
+      if (m) {
+        const grade = section.slice(-1) as Grade;
+        const pct = parseFloat(m[3]);
+        trades.push({
+          grade,
+          ticker: m[1],
+          date: m[2],
+          pctIn14d: Number.isFinite(pct) ? pct : null,
+          outcome: m[4].trim(),
+        });
+      } else if (line.startsWith("- ")) {
+        warnings.push(`Trade row failed regex in ${section}: ${line.slice(0, 80)}`);
+      }
+      continue;
+    }
+
+    // Suggestions
+    if (section === "suggestions") {
+      const m = line.match(SUGGESTION_LINE_RE);
+      if (m) {
+        suggestions.push({ rubric: m[1], reason: m[2].trim() });
+      } else if (line.startsWith("- ")) {
+        warnings.push(`Suggestion row failed regex: ${line.slice(0, 80)}`);
+      }
+    }
+  }
+
+  return {
+    period,
+    tradesReviewed,
+    gradeCounts,
+    driftCases,
+    trades,
+    suggestions,
+    warnings,
+  };
+}
+
+/**
+ * Lightweight summary used by the audit list view — derive from the manifest
+ * + a cheap-to-read header, no full parse needed for the list.
+ */
+export interface AuditManifestEntry {
+  period: string;
+  url: string;
+  size_bytes: number;
+}
+
+export interface WikiManifest {
+  generated_at: string;
+  source?: string;
+  audits_count: number;
+  trades_count: number;
+  audits: AuditManifestEntry[];
+  trades: Array<{
+    date: string;
+    ticker: string;
+    year: string;
+    day0_url?: string;
+    day14_url?: string;
+  }>;
+}

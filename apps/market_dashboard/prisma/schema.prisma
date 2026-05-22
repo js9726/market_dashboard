@@ -244,6 +244,37 @@ model MorningBriefCache {
   @@index([generatedAt(sort: Desc)])
 }
 
+// Synced from llm_traders_wiki/verdicts/js by npm run sync:wiki --post.
+// Stored in Postgres so deployed dashboard users can read the audit archive.
+model WikiAudit {
+  period     String   @id // YYYY-MM
+  markdown   String   @db.Text
+  parsedJson Json
+  sourcePath String?
+  sizeBytes  Int?
+  ingestedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([updatedAt(sort: Desc)])
+}
+
+model WikiTradeVerdict {
+  id              String   @id @default(cuid())
+  tradeDate       DateTime @db.Date
+  ticker          String
+  year            String
+  day0Json        Json?
+  day14Json       Json?
+  day0SourcePath  String?
+  day14SourcePath String?
+  ingestedAt      DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([tradeDate, ticker])
+  @@index([ticker, tradeDate(sort: Desc)])
+  @@index([tradeDate(sort: Desc)])
+}
+
 // ── Feature 7: Daily trading journal entries ─────────────────────────────────
 //
 // One row per (user, entryDate). Stores the "soft" reflective layer of the

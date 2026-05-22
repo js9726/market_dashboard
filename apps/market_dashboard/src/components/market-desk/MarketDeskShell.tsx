@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Icon from "./Icon";
 import MarketTape from "./MarketTape";
 
@@ -25,6 +25,7 @@ const TOOL_NAV = [
   { href: "/dashboard/rrg", label: "Rotation Graph", icon: "analytics" },
   { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
   { href: "/dashboard/journal", label: "Journal", icon: "journal" },
+  { href: "/dashboard/audits", label: "Trade Audits", icon: "review" },
   { href: "/dashboard/playbooks", label: "Playbooks", icon: "template" },
   { href: "/dashboard/replay", label: "Replay", icon: "replay" },
   { href: "/dashboard/settings", label: "Settings", icon: "accounts" },
@@ -87,6 +88,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
     title: "Journal",
     subtitle: "Trades - calendar - analytics",
   },
+  "/dashboard/audits": {
+    title: "Trade Audits",
+    subtitle: "Monthly grade-A/B/C trade rubric reviews from llm_traders_wiki",
+  },
 };
 
 function isActive(pathname: string, href: string, exact?: boolean) {
@@ -94,44 +99,45 @@ function isActive(pathname: string, href: string, exact?: boolean) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/**
- * Feature 9 — `data-mode` is determined by route, not by user preference.
- * Per the design-system README: Market Desk surfaces are always dark + orange,
- * Journal surfaces are always light + emerald. No user-facing toggle.
- *
- * The boundary: anything under `/dashboard/journal*` is Journal (light);
- * everything else is Market Desk (dark). Returns the resolved mode for use
- * in the topbar mode indicator (read-only).
- */
-function modeForPath(pathname: string): "light" | "dark" {
-  return pathname.startsWith("/dashboard/journal") ? "light" : "dark";
-}
+const THEME_STORAGE_KEY = "mds-theme-mode";
 
-function useRouteMode(pathname: string): "light" | "dark" {
-  const mode = modeForPath(pathname);
+function ThemeToggle() {
+  const [mode, setMode] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === "light" || stored === "dark") setMode(stored);
+  }, []);
+
   useEffect(() => {
     document.documentElement.setAttribute("data-mode", mode);
     document.body.setAttribute("data-mode", mode);
     document.body.classList.add("ds-base");
+    window.localStorage.setItem(THEME_STORAGE_KEY, mode);
   }, [mode]);
-  return mode;
-}
 
-function ModeIndicator({ mode }: { mode: "light" | "dark" }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--bg-surface)] px-3 py-1 text-[11px] font-mono uppercase tracking-[0.1em] text-[var(--fg-3)]"
-      title={`Surface mode is set by route (Journal = light, Market Desk = dark). This is read-only.`}
-    >
-      <Icon className="h-3 w-3" name={mode === "dark" ? "moon" : "sun"} />
-      {mode}
-    </span>
+    <div className="inline-flex rounded-full border border-[var(--line)] bg-[var(--bg-surface)] p-1">
+      {(["dark", "light"] as const).map((item) => (
+        <button
+          aria-pressed={mode === item}
+          className={`mds-button h-7 rounded-full border-0 px-3 text-[11px] ${
+            mode === item ? "mds-button--primary" : ""
+          }`}
+          key={item}
+          onClick={() => setMode(item)}
+          type="button"
+        >
+          <Icon name={item === "dark" ? "moon" : "sun"} />
+          {item.toUpperCase()}
+        </button>
+      ))}
+    </div>
   );
 }
 
 export default function MarketDeskShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const mode = useRouteMode(pathname);
   const page = useMemo(
     () => PAGE_TITLES[pathname] ?? { title: "Market Desk JS", subtitle: "Working In Progress" },
     [pathname],
@@ -200,7 +206,7 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
               <span className="market-topbar__subtitle">{page.subtitle}</span>
             </div>
             <div className="market-topbar__actions">
-              <ModeIndicator mode={mode} />
+              <ThemeToggle />
               <button className="mds-button mds-button--icon" title="Notifications" type="button">
                 <Icon name="eye" />
               </button>
