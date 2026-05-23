@@ -1,0 +1,30 @@
+name: Refresh Portfolio Quotes
+
+# Hits /api/cron/refresh-quotes which queries DISTINCT held tickers from the
+# Position table and upserts MarketQuote rows from Yahoo Finance.
+#
+# Lives in GitHub Actions (not Vercel Cron) because Vercel Hobby restricts
+# crons to daily frequency. Cadence: every 5 min during US market hours
+# (Mon-Fri 13:00-21:00 UTC).
+#
+# Minute offset :03 dodges GH Actions throttle peaks at :00 and the sister
+# yahoo_fallback_quotes.yml run at :02.
+
+on:
+  schedule:
+    - cron: '3-58/5 13-21 * * 1-5'
+  workflow_dispatch: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping refresh-quotes endpoint
+        env:
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+        run: |
+          curl --silent --show-error --fail \
+            --max-time 60 \
+            "${VERCEL_INGEST_URL%/}/api/cron/refresh-quotes?secret=${BRIEF_INGEST_KEY}" \
+            | jq .
