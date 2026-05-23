@@ -38,11 +38,21 @@ class DashboardClient:
             "Content-Type": "application/json",
         }
         try:
-            r = requests.post(url, headers=headers, json=body, timeout=DEFAULT_TIMEOUT_SEC)
+            # allow_redirects=False so a misconfigured middleware that 302's
+            # us to /login surfaces as a 3xx error instead of silently
+            # following to a 200 HTML page.
+            r = requests.post(
+                url, headers=headers, json=body,
+                timeout=DEFAULT_TIMEOUT_SEC, allow_redirects=False,
+            )
         except requests.RequestException as e:
             log.error("Sync HTTP request failed: %s", e)
             return {"ok": False, "error": str(e)}
 
+        if 300 <= r.status_code < 400:
+            log.error("Sync redirected (%d) -- middleware likely intercepting. Body: %s",
+                      r.status_code, r.text[:200])
+            return {"ok": False, "error": f"redirect_{r.status_code}"}
         if r.status_code == 401:
             log.error("Auth failed (401): %s", r.text[:200])
             return {"ok": False, "error": "auth"}
@@ -53,8 +63,10 @@ class DashboardClient:
             log.error("Sync %d: %s", r.status_code, r.text[:200])
             return {"ok": False, "error": f"status_{r.status_code}"}
 
+        # If status was 200 but body isn't JSON, the route handler probably
+        # crashed or middleware injected HTML. Treat as failure so we know.
         try:
             return r.json()  # type: ignore[no-any-return]
         except ValueError:
-            log.warning("Sync response not JSON: %s", r.text[:200])
-            return {"ok": True}
+            log.error("Sync 200 but response is not JSON: %s", r.text[:200])
+            return {"ok": False, "error": "non_json_response"}

@@ -91,7 +91,6 @@ class MoomooSync:
             end=end.strftime("%Y-%m-%d"),
             trd_env=TrdEnv.REAL,
             acc_id=self.cfg.opend.acc_id,
-            refresh_cache=True,
         )
         if ret != RET_OK:
             log.error("history_deal_list_query failed: %s", data)

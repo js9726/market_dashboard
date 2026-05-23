@@ -23,6 +23,10 @@ export default auth((req) => {
     pathname.startsWith("/api/watchlist/export") ||
     pathname.startsWith("/api/live-quotes/ingest") ||
     pathname.startsWith("/api/trades/import") ||
+    // Bridge daemon uses bearer-token auth (BrokerBridgeToken.tokenHash) plus
+    // X-Timestamp replay protection. Token endpoint stays session-authed
+    // because only logged-in users generate/revoke their own tokens.
+    pathname.startsWith("/api/bridge/sync") ||
     // Public profile pages — visible to anyone, gated server-side by
     // publicProfileEnabled in /profile/[username]/page.tsx itself.
     pathname.startsWith("/profile/")

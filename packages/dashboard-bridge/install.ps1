@@ -1,4 +1,4 @@
-# install.ps1 — dashboard-bridge Windows installer
+# install.ps1 -- dashboard-bridge Windows installer
 #
 # What it does:
 #   1. Creates a Python virtualenv in .venv\
@@ -25,7 +25,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# ── Paths ────────────────────────────────────────────────────────────────────
+# --- Paths ------------------------------------------------------------------
 
 $BridgeDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $VenvDir = Join-Path $BridgeDir ".venv"
@@ -35,7 +35,7 @@ $ConfigPath = Join-Path $ConfigDir "dashboard-bridge.toml"
 $ExampleConfig = Join-Path $BridgeDir "dashboard-bridge.example.toml"
 $TaskName = "DashboardBridge"
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# --- Helpers ----------------------------------------------------------------
 
 function Get-PythonExe {
     $candidates = @("python", "python3", "py")
@@ -58,7 +58,7 @@ function Prompt-NonEmpty {
     }
 }
 
-# ── 1. Create venv + install deps ────────────────────────────────────────────
+# --- 1. Create venv + install deps ------------------------------------------
 
 if (-not (Test-Path $VenvDir)) {
     Write-Host "Creating virtualenv at $VenvDir ..."
@@ -70,17 +70,17 @@ Write-Host "Installing/upgrading bridge dependencies ..."
 & $VenvPython -m pip install --upgrade pip --quiet
 & $VenvPython -m pip install -r (Join-Path $BridgeDir "requirements.txt") --quiet
 
-# ── 2. Write config (interactive unless -UseExistingConfig) ─────────────────
+# --- 2. Write config (interactive unless -UseExistingConfig) ----------------
 
 if (-not $UseExistingConfig) {
     if ((Test-Path $ConfigPath) -and (-not $Reconfigure)) {
-        Write-Host "Config already exists at $ConfigPath — keeping it (use -Reconfigure to rewrite)."
+        Write-Host "Config already exists at $ConfigPath -- keeping it (use -Reconfigure to rewrite)."
     } else {
         Write-Host ""
-        Write-Host "── Bridge configuration ─────────────────────────────────────"
+        Write-Host "--- Bridge configuration ---"
         $dashUrl = Prompt-NonEmpty "Dashboard URL" "https://market-dashboard-ivory.vercel.app"
         Write-Host ""
-        Write-Host "Open $dashUrl/dashboard/settings/brokers and click `"Generate token`"."
+        Write-Host "Open $dashUrl/dashboard/settings/brokers and click 'Generate token'."
         Write-Host "Paste the token below (you'll only see it once on the dashboard):"
         $token = Prompt-NonEmpty "Bridge token"
         $alias = Prompt-NonEmpty "Broker account alias (must match dashboard)" "moomoo Malaysia"
@@ -118,13 +118,13 @@ fill_lookback_days = 1
     }
 }
 
-# ── 3. Register scheduled task ───────────────────────────────────────────────
+# --- 3. Register scheduled task ---------------------------------------------
 
 if (-not $SkipTask) {
     Write-Host ""
-    Write-Host "── Registering scheduled task '$TaskName' ──────────────────────"
+    Write-Host "--- Registering scheduled task '$TaskName' ---"
     if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue) {
-        Write-Host "Existing task found — unregistering it first ..."
+        Write-Host "Existing task found -- unregistering it first ..."
         Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
     }
 
@@ -147,7 +147,7 @@ if (-not $SkipTask) {
         -RestartCount 5 -RestartInterval (New-TimeSpan -Minutes 1) `
         -Hidden
 
-    # Run as the current user (interactive — no admin needed)
+    # Run as the current user (interactive -- no admin needed)
     $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive
 
     Register-ScheduledTask `
@@ -165,7 +165,7 @@ if (-not $SkipTask) {
 }
 
 Write-Host ""
-Write-Host "── Install complete ─────────────────────────────────────────────"
+Write-Host "--- Install complete ---"
 Write-Host "  Config:        $ConfigPath"
 Write-Host "  Logs:          $env:USERPROFILE\.dashboard-bridge.log"
 Write-Host "  Scheduled task: $TaskName"
