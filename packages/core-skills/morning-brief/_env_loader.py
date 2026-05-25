@@ -81,6 +81,7 @@ def load_env(verbose: bool = False) -> int:
         candidates += [
             project_root / "apps" / "market_dashboard" / ".env.local",
             project_root / "apps" / "market_dashboard" / ".env",
+            project_root / ".env",  # ← root .env (where VERCEL_INGEST_URL + provider API keys actually live)
         ]
 
     loaded = 0
@@ -89,11 +90,15 @@ def load_env(verbose: bool = False) -> int:
             continue
         pairs = _parse_dotenv(path)
         for key, value in pairs.items():
-            if key not in os.environ:
+            # Treat empty string in os.environ as unset — .env.local often has
+            # stubs like FOO="" that should NOT shadow a real value in root .env.
+            existing = os.environ.get(key, "")
+            if not existing:
                 os.environ[key] = value
                 loaded += 1
         if verbose:
             print(f"[env] loaded {len(pairs)} vars from {path}", file=sys.stderr)
-        break  # stop at the first file that exists
+        # Continue to merge values from later candidates that are not already set —
+        # so root .env can fill in keys missing from apps/.env.local
 
     return loaded
