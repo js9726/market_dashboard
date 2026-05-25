@@ -1,9 +1,9 @@
 {
-  "fetched_at": "2026-05-23T14:37:47.821279+00:00",
-  "scored": true,
-  "score_top": 10,
-  "deepseek_scored_at": "2026-05-23T14:37:47.821225+00:00",
-  "market_was_open": false,
+  "fetched_at": "2026-05-25T16:10:27.631551+00:00",
+  "scored": false,
+  "score_top": 0,
+  "deepseek_scored_at": null,
+  "market_was_open": true,
   "screeners": [
     {
       "id": "top-gainer",
@@ -28,9 +28,9 @@
           "Perf.1M": 37.29128877726618,
           "premarket_change": 6.012658227848097,
           "ATRP": 5.098107708947346,
-          "score": 72,
+          "score": 67,
           "verdict": "WAIT",
-          "thesis": "Breakout with massive volume but extreme gap and fade risk; wait for consolidation or pullback entry.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 21,
@@ -38,7 +38,7 @@
             "s4_risk": 15
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HPQ",
@@ -58,17 +58,17 @@
           "Perf.1M": 20.01902044698049,
           "premarket_change": 3.1963470319634832,
           "ATRP": 4.106782224311122,
-          "score": 70,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "Breakout with strong volume but extreme fade from premarket suggests exhaustion; risk of reversal high.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 23,
-            "s3_timing": 8,
-            "s4_risk": 17
+            "s3_timing": 10,
+            "s4_risk": 18
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "QBTS",
@@ -88,9 +88,9 @@
           "Perf.1M": 40.60258249641319,
           "premarket_change": 2.292152292152292,
           "ATRP": 8.04120967849916,
-          "score": 78,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "Breakout with extreme volume but fading from premarket high; risk of intraday exhaustion.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 18,
             "s2_pattern": 23,
@@ -98,7 +98,7 @@
             "s4_risk": 16
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "CRDO",
@@ -118,9 +118,9 @@
           "Perf.1M": 17.03461579680634,
           "premarket_change": 1.5409276591344012,
           "ATRP": 7.544228252004413,
-          "score": 65,
+          "score": 60,
           "verdict": "WAIT",
-          "thesis": "Strong trend but unclear pattern and high fade risk; wait for tighter consolidation or pullback to 21dma.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 10,
@@ -128,7 +128,7 @@
             "s4_risk": 12
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "NTAP",
@@ -148,9 +148,9 @@
           "Perf.1M": 23.98576512455517,
           "premarket_change": 0.012102142079148469,
           "ATRP": 3.45742383162409,
-          "score": 82,
-          "verdict": "GO",
-          "thesis": "Strong breakout on massive volume with sector tailwind, risk is gap fill after 12% intraday range.",
+          "score": 77,
+          "verdict": "WAIT",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 21,
@@ -158,7 +158,7 @@
             "s4_risk": 15
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "SWKS",
@@ -178,9 +178,9 @@
           "Perf.1M": 33.82042539373275,
           "premarket_change": 0.1903725863475667,
           "ATRP": 4.424910150672874,
-          "score": 55,
+          "score": 53,
           "verdict": "WAIT",
-          "thesis": "Gap-up breakout on huge volume but pattern unclear; risk of exhaustion after 33% monthly surge.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 6,
@@ -188,7 +188,7 @@
             "s4_risk": 10
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "QCOM",
@@ -208,9 +208,9 @@
           "Perf.1M": 74.29742388758784,
           "premarket_change": 0.35612201864954357,
           "ATRP": 6.35557274597556,
-          "score": 31,
+          "score": 36,
           "verdict": "PASS",
-          "thesis": "Parabolic gap-up after 74% monthly surge; extreme risk of mean reversion and failed breakout.",
+          "thesis": "PARABOLIC setup; algorithmic score only.",
           "stages": {
             "s1_trend": 10,
             "s2_pattern": 3,
@@ -218,7 +218,7 @@
             "s4_risk": 7
           },
           "pattern": "PARABOLIC",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HPE",
@@ -238,9 +238,9 @@
           "Perf.1M": 30.124653739612185,
           "premarket_change": 1.9428907859876472,
           "ATRP": 3.8283415721022203,
-          "score": 72,
+          "score": 69,
           "verdict": "WAIT",
-          "thesis": "Breakout with strong trend but high fade risk from premarket; wait for consolidation or pullback entry.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 20,
@@ -248,7 +248,7 @@
             "s4_risk": 12
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "P",
@@ -268,9 +268,9 @@
           "Perf.1M": 24.234221399059702,
           "premarket_change": 2.088607594936716,
           "ATRP": 5.062958299189083,
-          "score": 68,
+          "score": 63,
           "verdict": "WAIT",
-          "thesis": "Strong trend but unclear pattern and high fade from premarket suggest waiting for a tighter entry.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 10,
@@ -278,7 +278,7 @@
             "s4_risk": 12
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "ZM",
@@ -298,9 +298,9 @@
           "Perf.1M": 13.959007551240559,
           "premarket_change": 12.08268733850129,
           "ATRP": 4.6631537848910805,
-          "score": 78,
+          "score": 74,
           "verdict": "WAIT",
-          "thesis": "Breakout with strong trend but weak close and high fade risk; wait for better entry.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 20,
@@ -308,7 +308,7 @@
             "s4_risk": 12
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "GNRC",
@@ -785,9 +785,9 @@
           "Perf.1M": 40.64413095554965,
           "premarket_change": 4.2649727767695165,
           "ATRP": 7.923887961494517,
-          "score": 70,
+          "score": 67,
           "verdict": "WAIT",
-          "thesis": "Breakout with extreme volume but fading from premarket high; risk of exhaustion after 40% monthly gain.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 18,
             "s2_pattern": 23,
@@ -795,7 +795,7 @@
             "s4_risk": 16
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HLIT",
@@ -815,9 +815,9 @@
           "Perf.1M": 39.70588235294116,
           "premarket_change": 13.307086614173238,
           "ATRP": 5.058698498222318,
-          "score": 72,
+          "score": 69,
           "verdict": "WAIT",
-          "thesis": "Breakout with huge volume but extreme gap and fade risk; wait for consolidation or pullback to 14.30.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 23,
@@ -825,7 +825,7 @@
             "s4_risk": 15
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HYLN",
@@ -845,9 +845,9 @@
           "Perf.1M": 218.61702127659578,
           "premarket_change": 2.8571428571428594,
           "ATRP": 7.696546421791267,
-          "score": 15,
+          "score": 20,
           "verdict": "PASS",
-          "thesis": "Parabolic gap-up with extreme fade from premarket; high risk of reversal or exhaustion.",
+          "thesis": "PARABOLIC setup; algorithmic score only.",
           "stages": {
             "s1_trend": 5,
             "s2_pattern": 6,
@@ -855,7 +855,7 @@
             "s4_risk": 7
           },
           "pattern": "PARABOLIC",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "INFQ",
@@ -875,9 +875,9 @@
           "Perf.1M": 8.493696084936968,
           "premarket_change": 8.027210884353753,
           "ATRP": 10.601468347187524,
-          "score": 78,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "EP breakout with massive volume but fading from premarket high; risk of intraday reversal.",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 25,
@@ -885,7 +885,7 @@
             "s4_risk": 18
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "UTI",
@@ -905,9 +905,9 @@
           "Perf.1M": 7.543624161073832,
           "premarket_change": 7.377049180327856,
           "ATRP": 5.481531845706064,
-          "score": 80,
-          "verdict": "GO",
-          "thesis": "EP breakout with massive volume, but fade from premarket high and weak close strength add caution.",
+          "score": 77,
+          "verdict": "WAIT",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 25,
@@ -915,7 +915,7 @@
             "s4_risk": 18
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "QBTS",
@@ -935,9 +935,9 @@
           "Perf.1M": 40.60258249641319,
           "premarket_change": 2.292152292152292,
           "ATRP": 8.04120967849916,
-          "score": 78,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "Breakout with strong volume but fading from premarket high suggests caution on entry timing.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 18,
             "s2_pattern": 23,
@@ -945,7 +945,7 @@
             "s4_risk": 16
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "IMAX",
@@ -965,9 +965,9 @@
           "Perf.1M": 9.24322814856184,
           "premarket_change": 14.551357733175912,
           "ATRP": 4.315894397513506,
-          "score": 80,
-          "verdict": "GO",
-          "thesis": "EP breakout with strong volume, but watch for gap-fill risk after 15% surge.",
+          "score": 76,
+          "verdict": "WAIT",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 25,
@@ -975,7 +975,7 @@
             "s4_risk": 16
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HPQ",
@@ -995,17 +995,17 @@
           "Perf.1M": 20.01902044698049,
           "premarket_change": 3.1963470319634832,
           "ATRP": 4.106782224311122,
-          "score": 70,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "Breakout with extreme volume but poor entry timing due to fade from premarket high.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 23,
-            "s3_timing": 8,
+            "s3_timing": 10,
             "s4_risk": 18
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "PTON",
@@ -1027,7 +1027,7 @@
           "ATRP": 5.3964256277690605,
           "score": 83,
           "verdict": "GO",
-          "thesis": "EP breakout with strong volume and trend, risk is fade from premarket high.",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 25,
@@ -1035,7 +1035,7 @@
             "s4_risk": 16
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "DAO",
@@ -1055,9 +1055,9 @@
           "Perf.1M": 22.843601895734597,
           "premarket_change": null,
           "ATRP": 8.360129902583605,
-          "score": 80,
-          "verdict": "GO",
-          "thesis": "Breakout with strong trend and volume, but risk from wide intraday range and low S4 score.",
+          "score": 77,
+          "verdict": "WAIT",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 23,
@@ -1065,7 +1065,7 @@
             "s4_risk": 13
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "CVCO",
@@ -1438,7 +1438,7 @@
           "change": 5.162084530160026,
           "volume": 10789758,
           "relative_volume_10d_calc": 2.1897924967786597,
-          "market_cap_basic": 32126246023,
+          "market_cap_basic": 31998106023,
           "sector": "Technology Services",
           "industry": "Information Technology Services",
           "Perf.W": 6.814487558871323,
@@ -1544,7 +1544,7 @@
           "ATRP": 7.303698983166631,
           "score": 52,
           "verdict": "WAIT",
-          "thesis": "High RVOL fade from premarket suggests distribution; wait for base confirmation or lower risk entry.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 8,
             "s2_pattern": 13,
@@ -1552,7 +1552,7 @@
             "s4_risk": 13
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "FJET",
@@ -1572,9 +1572,9 @@
           "Perf.1M": 10.769230769230772,
           "premarket_change": 2.3067961165048416,
           "ATRP": 9.839054983057444,
-          "score": 57,
+          "score": 62,
           "verdict": "WAIT",
-          "thesis": "EP breakout with massive RVOL but extreme fade from premarket and poor entry timing.",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 25,
@@ -1582,7 +1582,7 @@
             "s4_risk": 13
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "GSM",
@@ -1602,9 +1602,9 @@
           "Perf.1M": -7.343412526997837,
           "premarket_change": null,
           "ATRP": 5.8204192354828646,
-          "score": 52,
+          "score": 50,
           "verdict": "WAIT",
-          "thesis": "Pullback to 21dma with high RVOL but weak trend and unclear pattern; risk of false breakout.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 4,
             "s2_pattern": 13,
@@ -1612,7 +1612,7 @@
             "s4_risk": 15
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "RGTI",
@@ -1632,9 +1632,9 @@
           "Perf.1M": 40.64413095554965,
           "premarket_change": 4.2649727767695165,
           "ATRP": 7.923887961494517,
-          "score": 70,
+          "score": 67,
           "verdict": "WAIT",
-          "thesis": "Breakout with massive volume but extreme fade from premarket high suggests exhaustion risk.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 18,
             "s2_pattern": 23,
@@ -1642,7 +1642,7 @@
             "s4_risk": 16
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HLIT",
@@ -1662,9 +1662,9 @@
           "Perf.1M": 39.70588235294116,
           "premarket_change": 13.307086614173238,
           "ATRP": 5.058698498222318,
-          "score": 72,
+          "score": 69,
           "verdict": "WAIT",
-          "thesis": "Breakout with massive volume but extreme gap and fade risk; wait for consolidation or pullback entry.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 23,
@@ -1672,7 +1672,7 @@
             "s4_risk": 15
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HYLN",
@@ -1692,9 +1692,9 @@
           "Perf.1M": 218.61702127659578,
           "premarket_change": 2.8571428571428594,
           "ATRP": 7.696546421791267,
-          "score": 15,
+          "score": 20,
           "verdict": "PASS",
-          "thesis": "Parabolic gap-up with extreme fade from premarket; high risk of reversal or exhaustion.",
+          "thesis": "PARABOLIC setup; algorithmic score only.",
           "stages": {
             "s1_trend": 5,
             "s2_pattern": 6,
@@ -1702,7 +1702,7 @@
             "s4_risk": 7
           },
           "pattern": "PARABOLIC",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "CRNC",
@@ -1722,9 +1722,9 @@
           "Perf.1M": 23.232323232323235,
           "premarket_change": 0.20639834881322344,
           "ATRP": 7.168572216463989,
-          "score": 80,
-          "verdict": "GO",
-          "thesis": "Breakout with massive volume and strong trend, but fade from premarket and wide range add risk.",
+          "score": 77,
+          "verdict": "WAIT",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 23,
@@ -1732,7 +1732,7 @@
             "s4_risk": 13
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "INFQ",
@@ -1752,9 +1752,9 @@
           "Perf.1M": 8.493696084936968,
           "premarket_change": 8.027210884353753,
           "ATRP": 10.601468347187524,
-          "score": 78,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "EP breakout with massive volume but fading from premarket high; risk of intraday reversal.",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 25,
@@ -1762,7 +1762,7 @@
             "s4_risk": 18
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "UTI",
@@ -1782,9 +1782,9 @@
           "Perf.1M": 7.543624161073832,
           "premarket_change": 7.377049180327856,
           "ATRP": 5.481531845706064,
-          "score": 80,
-          "verdict": "GO",
-          "thesis": "EP breakout with massive volume, but fade from premarket high and weak close strength add caution.",
+          "score": 77,
+          "verdict": "WAIT",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 25,
@@ -1792,7 +1792,7 @@
             "s4_risk": 18
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "QBTS",
@@ -1812,9 +1812,9 @@
           "Perf.1M": 40.60258249641319,
           "premarket_change": 2.292152292152292,
           "ATRP": 8.04120967849916,
-          "score": 78,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "Breakout with extreme volume but fading from premarket high; risk of intraday exhaustion.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 18,
             "s2_pattern": 23,
@@ -1822,7 +1822,7 @@
             "s4_risk": 16
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "IMAX",
@@ -2299,9 +2299,9 @@
           "Perf.1M": 9.24322814856184,
           "premarket_change": 14.551357733175912,
           "ATRP": 4.315894397513506,
-          "score": 80,
-          "verdict": "GO",
-          "thesis": "EP breakout with massive volume, but gap risk from +15% day needs tight stop.",
+          "score": 76,
+          "verdict": "WAIT",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 25,
@@ -2309,7 +2309,7 @@
             "s4_risk": 16
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HLIT",
@@ -2329,9 +2329,9 @@
           "Perf.1M": 39.70588235294116,
           "premarket_change": 13.307086614173238,
           "ATRP": 5.058698498222318,
-          "score": 72,
+          "score": 69,
           "verdict": "WAIT",
-          "thesis": "Breakout with massive volume but extreme gap and fade risk; wait for consolidation or pullback entry.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 23,
@@ -2339,7 +2339,7 @@
             "s4_risk": 15
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "EL",
@@ -2359,9 +2359,9 @@
           "Perf.1M": 15.074918566775235,
           "premarket_change": 13.293625649474098,
           "ATRP": 4.395924736997903,
-          "score": 82,
-          "verdict": "GO",
-          "thesis": "Breakout with strong volume and trend, but risk of fade from premarket high.",
+          "score": 77,
+          "verdict": "WAIT",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 21,
@@ -2369,7 +2369,7 @@
             "s4_risk": 15
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "ZM",
@@ -2389,9 +2389,9 @@
           "Perf.1M": 13.959007551240559,
           "premarket_change": 12.08268733850129,
           "ATRP": 4.6631537848910805,
-          "score": 78,
+          "score": 74,
           "verdict": "WAIT",
-          "thesis": "Breakout with strong trend but weak close and high fade risk; wait for better entry.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 20,
@@ -2399,7 +2399,7 @@
             "s4_risk": 12
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "SG",
@@ -2419,9 +2419,9 @@
           "Perf.1M": 45.75260804769,
           "premarket_change": 10.801781737193751,
           "ATRP": 6.52275044333296,
-          "score": 58,
+          "score": 60,
           "verdict": "WAIT",
-          "thesis": "Breakout with huge volume but weak close and poor risk/reward; wait for better entry or pullback.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 18,
             "s2_pattern": 20,
@@ -2429,7 +2429,7 @@
             "s4_risk": 5
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "AVK",
@@ -2449,9 +2449,9 @@
           "Perf.1M": 1.7628205128205037,
           "premarket_change": 10.759493670886071,
           "ATRP": 1.6720972459869081,
-          "score": 26,
+          "score": 31,
           "verdict": "PASS",
-          "thesis": "Weak trend and unclear pattern with poor risk quality; avoid despite premarket spike.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 8,
             "s2_pattern": 6,
@@ -2459,7 +2459,7 @@
             "s4_risk": 5
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "MAAS",
@@ -2479,9 +2479,9 @@
           "Perf.1M": 34.96583143507973,
           "premarket_change": 10.506912442396318,
           "ATRP": 10.291618946993317,
-          "score": 76,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "Breakout with strong trend but risk score low due to wide range and fade from premarket.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 20,
@@ -2489,7 +2489,7 @@
             "s4_risk": 10
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "ELVR",
@@ -2502,16 +2502,16 @@
           "change": 10.842262933517683,
           "volume": 134832,
           "relative_volume_10d_calc": 0.9595723088178568,
-          "market_cap_basic": 1873898102.60687,
+          "market_cap_basic": 1868939797.9772003,
           "sector": "Non-Energy Minerals",
           "industry": "Other Metals/Minerals",
           "Perf.W": 20.234970628671412,
           "Perf.1M": 29.11018655214065,
           "premarket_change": 10.035718400737405,
           "ATRP": 5.6373016837302465,
-          "score": 45,
+          "score": 43,
           "verdict": "PASS",
-          "thesis": "Gap-up on high RVOL but unclear pattern and poor risk/reward; avoid chasing extended move.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 6,
@@ -2519,7 +2519,7 @@
             "s4_risk": 5
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "INTA",
@@ -2539,9 +2539,9 @@
           "Perf.1M": -10.6830122591944,
           "premarket_change": 9.940944881889761,
           "ATRP": 7.347625170240324,
-          "score": 22,
+          "score": 27,
           "verdict": "PASS",
-          "thesis": "Weak trend and unclear pattern with poor risk quality; avoid despite premarket spike.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 4,
             "s2_pattern": 6,
@@ -2549,7 +2549,7 @@
             "s4_risk": 5
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "FLO",
@@ -2569,9 +2569,9 @@
           "Perf.1M": -8.419838523644747,
           "premarket_change": 9.81597717546363,
           "ATRP": 5.317289039243383,
-          "score": 40,
+          "score": 37,
           "verdict": "PASS",
-          "thesis": "Gap-up on high volume but weak trend and unclear pattern; fade risk high after premarket exhaustion.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 4,
             "s2_pattern": 10,
@@ -2579,7 +2579,7 @@
             "s4_risk": 7
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "ISOU",
@@ -2712,7 +2712,7 @@
           "change": 6.648284313725496,
           "volume": 8163195,
           "relative_volume_10d_calc": 0.9181709863481932,
-          "market_cap_basic": 77877875288.01207,
+          "market_cap_basic": 78138805679.02669,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
           "Perf.W": 2.6843657817109254,
@@ -3056,9 +3056,9 @@
           "Perf.1M": 2.5938830816879666,
           "premarket_change": null,
           "ATRP": 1.3301872346264123,
-          "score": 58,
+          "score": 55,
           "verdict": "WAIT",
-          "thesis": "Marine shipping pullback with low RVOL; unclear pattern and weak timing suggest waiting for volume confirmation.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 13,
@@ -3066,7 +3066,7 @@
             "s4_risk": 15
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "SHO/PH",
@@ -3086,9 +3086,9 @@
           "Perf.1M": 2.2815533980582465,
           "premarket_change": null,
           "ATRP": 1.596218330140758,
-          "score": 56,
+          "score": 61,
           "verdict": "WAIT",
-          "thesis": "Pullback to 21dma with high RVOL but weak close and unclear pattern; risk of failed breakout.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 13,
@@ -3096,7 +3096,7 @@
             "s4_risk": 15
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "TAC",
@@ -3116,9 +3116,9 @@
           "Perf.1M": 10.235580828594635,
           "premarket_change": 1.0370370370370412,
           "ATRP": 3.3231708074782604,
-          "score": 78,
+          "score": 76,
           "verdict": "WAIT",
-          "thesis": "Pullback in strong uptrend with high RVOL, but entry timing weak due to intraday fade and close strength.",
+          "thesis": "PULLBACK setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 21,
@@ -3126,7 +3126,7 @@
             "s4_risk": 18
           },
           "pattern": "PULLBACK",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "IMAX",
@@ -3146,9 +3146,9 @@
           "Perf.1M": 9.24322814856184,
           "premarket_change": 14.551357733175912,
           "ATRP": 4.315894397513506,
-          "score": 80,
-          "verdict": "GO",
-          "thesis": "EP breakout with strong volume, but watch for gap-fill risk after +15% day.",
+          "score": 76,
+          "verdict": "WAIT",
+          "thesis": "EP setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 25,
@@ -3156,7 +3156,7 @@
             "s4_risk": 16
           },
           "pattern": "EP",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "HPQ",
@@ -3176,17 +3176,17 @@
           "Perf.1M": 20.01902044698049,
           "premarket_change": 3.1963470319634832,
           "ATRP": 4.106782224311122,
-          "score": 70,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "Breakout with extreme volume but fading from premarket high; risk of exhaustion after 15% day.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 23,
-            "s3_timing": 8,
-            "s4_risk": 17
+            "s3_timing": 10,
+            "s4_risk": 18
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "DRH",
@@ -3206,9 +3206,9 @@
           "Perf.1M": 3.27868852459018,
           "premarket_change": null,
           "ATRP": 2.3692644699530856,
-          "score": 53,
+          "score": 51,
           "verdict": "WAIT",
-          "thesis": "Pullback to 21dma in REIT with strong RVOL but unclear pattern needs confirmation.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 11,
@@ -3216,7 +3216,7 @@
             "s4_risk": 13
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "GSL",
@@ -3236,9 +3236,9 @@
           "Perf.1M": 0.7152317880794785,
           "premarket_change": -2.7845627747923807,
           "ATRP": 3.2194460671840024,
-          "score": 44,
+          "score": 46,
           "verdict": "PASS",
-          "thesis": "Heavy volume breakdown from range, no leadership or pattern; avoid until base forms.",
+          "thesis": "UNCLEAR setup; algorithmic score only.",
           "stages": {
             "s1_trend": 8,
             "s2_pattern": 11,
@@ -3246,7 +3246,7 @@
             "s4_risk": 10
           },
           "pattern": "UNCLEAR",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "LION",
@@ -3266,9 +3266,9 @@
           "Perf.1M": 28.657487091222034,
           "premarket_change": 5.654531371030212,
           "ATRP": 4.1172663043857005,
-          "score": 68,
+          "score": 65,
           "verdict": "WAIT",
-          "thesis": "Breakout with strong trend but poor entry timing due to fade from premarket high.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 21,
@@ -3276,7 +3276,7 @@
             "s4_risk": 13
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "NTAP",
@@ -3296,9 +3296,9 @@
           "Perf.1M": 23.98576512455517,
           "premarket_change": 0.012102142079148469,
           "ATRP": 3.45742383162409,
-          "score": 80,
-          "verdict": "GO",
-          "thesis": "Breakout on massive volume with strong trend, but risk of gap fill after 12% intraday range.",
+          "score": 77,
+          "verdict": "WAIT",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 25,
             "s2_pattern": 21,
@@ -3306,7 +3306,7 @@
             "s4_risk": 15
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "TX",
@@ -3326,9 +3326,9 @@
           "Perf.1M": 9.355364207586696,
           "premarket_change": null,
           "ATRP": 3.385669918998805,
-          "score": 72,
+          "score": 67,
           "verdict": "WAIT",
-          "thesis": "Breakout with strong volume but steel sector lacks tailwind; risk of failed follow-through.",
+          "thesis": "BREAKOUT setup; algorithmic score only.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 21,
@@ -3336,7 +3336,7 @@
             "s4_risk": 13
           },
           "pattern": "BREAKOUT",
-          "score_source": "deepseek"
+          "score_source": "algorithmic"
         },
         {
           "ticker": "TRN",
@@ -3379,7 +3379,7 @@
           "change": -3.758305647840517,
           "volume": 1429,
           "relative_volume_10d_calc": 2.4364876385336744,
-          "market_cap_basic": 2214054738.23996,
+          "market_cap_basic": 2216435165.54614,
           "sector": "Technology Services",
           "industry": "Information Technology Services",
           "Perf.W": -1.2989077930918327,
