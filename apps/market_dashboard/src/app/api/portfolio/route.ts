@@ -93,12 +93,23 @@ export async function GET() {
   const now = Date.now();
 
   // Compute per-account and grand totals.
-  let grandCost = 0;
+  //
+  // P&L totals only include positions WITH a live quote. If a position has
+  // no quote, we still surface its cost in `costAll` (the "Cost basis" tile),
+  // but exclude it from the market value, P&L, and return calculations -- so
+  // missing quotes don't manifest as a fake -100% loss.
+  let grandCostAll = 0;       // sum of cost across ALL positions (display: "Cost basis")
+  let grandCostPriced = 0;    // sum of cost across positions WITH quotes
   let grandMV = 0;
+  let grandPriced = 0;
+  let grandUnpriced = 0;
 
   const enrichedAccounts = accounts.map((acct) => {
-    let acctCost = 0;
+    let acctCostAll = 0;
+    let acctCostPriced = 0;
     let acctMV = 0;
+    let acctPriced = 0;
+    let acctUnpriced = 0;
 
     const positions = acct.positions.map((p) => {
       const qty = toNum(p.qty);
@@ -117,8 +128,14 @@ export async function GET() {
         priceObservedAt == null ||
         now - priceObservedAt.getTime() > STALE_THRESHOLD_MS;
 
-      acctCost += cost;
-      if (marketValue != null) acctMV += marketValue;
+      acctCostAll += cost;
+      if (marketValue != null) {
+        acctCostPriced += cost;
+        acctMV += marketValue;
+        acctPriced++;
+      } else {
+        acctUnpriced++;
+      }
 
       const latestTradeRecordId =
         tradeIdMap.get(`${acct.id}|${p.ticker}`) ?? null;
@@ -143,11 +160,19 @@ export async function GET() {
       };
     });
 
-    grandCost += acctCost;
+    grandCostAll += acctCostAll;
+    grandCostPriced += acctCostPriced;
     grandMV += acctMV;
+    grandPriced += acctPriced;
+    grandUnpriced += acctUnpriced;
 
-    const acctUnrealizedPl = acctMV - acctCost;
-    const acctUnrealizedPlPct = acctCost !== 0 ? (acctUnrealizedPl / Math.abs(acctCost)) * 100 : null;
+    // P&L only meaningful for priced positions. If no positions priced, null out
+    // so the UI shows "—" instead of a fake 0 or -100%.
+    const acctUnrealizedPl = acctPriced > 0 ? acctMV - acctCostPriced : null;
+    const acctUnrealizedPlPct =
+      acctUnrealizedPl != null && acctCostPriced > 0
+        ? (acctUnrealizedPl / Math.abs(acctCostPriced)) * 100
+        : null;
 
     return {
       id: acct.id,
@@ -157,26 +182,32 @@ export async function GET() {
       region: acct.preset.region,
       isLive: acct.isLive,
       positions,
+      pricedCount: acctPriced,
+      unpricedCount: acctUnpriced,
       totals: {
-        cost: acctCost,
-        marketValue: acctMV,
+        cost: acctCostAll,
+        marketValue: acctPriced > 0 ? acctMV : null,
         unrealizedPl: acctUnrealizedPl,
         unrealizedPlPct: acctUnrealizedPlPct,
       },
     };
   });
 
-  const grandUnrealizedPl = grandMV - grandCost;
+  const grandUnrealizedPl = grandPriced > 0 ? grandMV - grandCostPriced : null;
   const grandUnrealizedPlPct =
-    grandCost !== 0 ? (grandUnrealizedPl / Math.abs(grandCost)) * 100 : null;
+    grandUnrealizedPl != null && grandCostPriced > 0
+      ? (grandUnrealizedPl / Math.abs(grandCostPriced)) * 100
+      : null;
 
   return NextResponse.json({
     accounts: enrichedAccounts,
     grandTotals: {
-      cost: grandCost,
-      marketValue: grandMV,
+      cost: grandCostAll,
+      marketValue: grandPriced > 0 ? grandMV : null,
       unrealizedPl: grandUnrealizedPl,
       unrealizedPlPct: grandUnrealizedPlPct,
+      pricedCount: grandPriced,
+      unpricedCount: grandUnpriced,
     },
     asOf: new Date().toISOString(),
   });

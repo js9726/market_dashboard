@@ -20,14 +20,26 @@ import { toYahooSymbol, fromYahooSymbol } from "@/lib/symbol-format";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;  // Vercel function timeout (seconds)
 
-const YAHOO_QUOTE_URL = "https://query1.finance.yahoo.com/v7/finance/quote";
-const BATCH_SIZE = 50;
+// Yahoo /v7/finance/quote started returning 401 to anonymous clients in 2025.
+// The /v8/finance/chart/<symbol> endpoint still works without auth and exposes
+// all the same fields in chart.result[0].meta. One request per symbol.
+const YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart";
 
 type YahooQuote = {
   symbol: string;
   regularMarketPrice?: number;
   regularMarketChangePercent?: number;
   regularMarketPreviousClose?: number;
+  regularMarketDayHigh?: number;
+  regularMarketDayLow?: number;
+  regularMarketVolume?: number;
+};
+
+type YahooChartMeta = {
+  symbol?: string;
+  regularMarketPrice?: number;
+  chartPreviousClose?: number;
+  previousClose?: number;
   regularMarketDayHigh?: number;
   regularMarketDayLow?: number;
   regularMarketVolume?: number;
@@ -46,25 +58,38 @@ function authorized(req: Request): boolean {
   return false;
 }
 
-async function fetchYahooBatch(symbols: string[]): Promise<YahooQuote[]> {
-  if (symbols.length === 0) return [];
-  const url = `${YAHOO_QUOTE_URL}?symbols=${encodeURIComponent(symbols.join(","))}`;
+async function fetchOneYahoo(symbol: string): Promise<YahooQuote | null> {
+  const url = `${YAHOO_CHART_URL}/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
   const res = await fetch(url, {
-    headers: {
-      // Yahoo blocks bare fetch without UA in some regions
-      "User-Agent": "Mozilla/5.0 (compatible; MarketDashboardBot/1.0)",
-    },
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; MarketDashboardBot/1.0)" },
   });
   if (!res.ok) {
-    throw new Error(`Yahoo quote API ${res.status}: ${await res.text()}`);
+    throw new Error(`Yahoo chart ${symbol} HTTP ${res.status}`);
   }
   const json = (await res.json()) as {
-    quoteResponse?: { result?: YahooQuote[]; error?: unknown };
+    chart?: { result?: Array<{ meta?: YahooChartMeta }>; error?: unknown };
   };
-  if (json.quoteResponse?.error) {
-    throw new Error(`Yahoo error: ${JSON.stringify(json.quoteResponse.error)}`);
+  if (json.chart?.error) {
+    throw new Error(`Yahoo chart error ${symbol}: ${JSON.stringify(json.chart.error)}`);
   }
-  return json.quoteResponse?.result ?? [];
+  const meta = json.chart?.result?.[0]?.meta;
+  if (!meta || meta.regularMarketPrice == null) return null;
+
+  const prevClose = meta.chartPreviousClose ?? meta.previousClose;
+  const changePct =
+    prevClose != null && prevClose > 0
+      ? ((meta.regularMarketPrice - prevClose) / prevClose) * 100
+      : undefined;
+
+  return {
+    symbol,
+    regularMarketPrice: meta.regularMarketPrice,
+    regularMarketChangePercent: changePct,
+    regularMarketPreviousClose: prevClose,
+    regularMarketDayHigh: meta.regularMarketDayHigh,
+    regularMarketDayLow: meta.regularMarketDayLow,
+    regularMarketVolume: meta.regularMarketVolume,
+  };
 }
 
 export async function GET(req: Request) {
@@ -92,17 +117,22 @@ export async function GET(req: Request) {
     internalBySymbol.set(yahooSymbols[i], internal);
   });
 
-  // 3. Fetch in batches
+  // 3. Fetch one quote per symbol (Yahoo chart endpoint is per-symbol).
+  // Run them in parallel with a soft concurrency cap (don't hammer Yahoo).
   const allQuotes: YahooQuote[] = [];
   const errors: string[] = [];
+  const CONCURRENCY = 6;
 
-  for (let i = 0; i < yahooSymbols.length; i += BATCH_SIZE) {
-    const batch = yahooSymbols.slice(i, i + BATCH_SIZE);
-    try {
-      const quotes = await fetchYahooBatch(batch);
-      allQuotes.push(...quotes);
-    } catch (e) {
-      errors.push(e instanceof Error ? e.message : String(e));
+  for (let i = 0; i < yahooSymbols.length; i += CONCURRENCY) {
+    const batch = yahooSymbols.slice(i, i + CONCURRENCY);
+    const results = await Promise.allSettled(batch.map(fetchOneYahoo));
+    for (let j = 0; j < results.length; j++) {
+      const r = results[j];
+      if (r.status === "fulfilled") {
+        if (r.value) allQuotes.push(r.value);
+      } else {
+        errors.push(r.reason instanceof Error ? r.reason.message : String(r.reason));
+      }
     }
   }
 

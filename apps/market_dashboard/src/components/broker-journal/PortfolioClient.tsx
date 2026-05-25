@@ -30,10 +30,12 @@ type Account = {
   region: string;
   isLive: boolean;
   positions: Position[];
+  pricedCount: number;
+  unpricedCount: number;
   totals: {
     cost: number;
-    marketValue: number;
-    unrealizedPl: number;
+    marketValue: number | null;
+    unrealizedPl: number | null;
     unrealizedPlPct: number | null;
   };
 };
@@ -42,9 +44,11 @@ type PortfolioData = {
   accounts: Account[];
   grandTotals: {
     cost: number;
-    marketValue: number;
-    unrealizedPl: number;
+    marketValue: number | null;
+    unrealizedPl: number | null;
     unrealizedPlPct: number | null;
+    pricedCount: number;
+    unpricedCount: number;
   };
   asOf: string;
 };
@@ -172,9 +176,18 @@ export default function PortfolioClient() {
           <div style={{ fontSize: "1.25rem", fontWeight: 600 }}>{fmt(data.grandTotals.marketValue)}</div>
         </div>
         <div>
-          <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>Unrealised P&amp;L</div>
+          <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>
+            Unrealised P&amp;L
+            {data.grandTotals.unpricedCount > 0 && (
+              <span title="Excludes positions awaiting live quote" style={{ color: "#f59e0b", marginLeft: "0.25rem" }}>
+                · {data.grandTotals.pricedCount}/{data.grandTotals.pricedCount + data.grandTotals.unpricedCount} priced
+              </span>
+            )}
+          </div>
           <div style={{ fontSize: "1.25rem", fontWeight: 600, color: pnlColor(data.grandTotals.unrealizedPl) }}>
-            {data.grandTotals.unrealizedPl >= 0 ? "+" : ""}{fmt(data.grandTotals.unrealizedPl)}
+            {data.grandTotals.unrealizedPl != null
+              ? `${data.grandTotals.unrealizedPl >= 0 ? "+" : ""}${fmt(data.grandTotals.unrealizedPl)}`
+              : "—"}
           </div>
         </div>
         <div>
@@ -213,9 +226,16 @@ export default function PortfolioClient() {
               </span>
             </h2>
             <div style={{ fontSize: "0.9rem", color: pnlColor(acct.totals.unrealizedPl) }}>
-              {acct.totals.unrealizedPl >= 0 ? "+" : ""}{fmt(acct.totals.unrealizedPl)}{" "}
+              {acct.totals.unrealizedPl != null
+                ? `${acct.totals.unrealizedPl >= 0 ? "+" : ""}${fmt(acct.totals.unrealizedPl)}`
+                : "Awaiting quotes"}
               {acct.totals.unrealizedPlPct != null && (
-                <span>({acct.totals.unrealizedPlPct >= 0 ? "+" : ""}{fmt(acct.totals.unrealizedPlPct)}%)</span>
+                <span> ({acct.totals.unrealizedPlPct >= 0 ? "+" : ""}{fmt(acct.totals.unrealizedPlPct)}%)</span>
+              )}
+              {acct.unpricedCount > 0 && acct.pricedCount > 0 && (
+                <span style={{ color: "#f59e0b", marginLeft: "0.25rem" }}>
+                  · {acct.pricedCount}/{acct.pricedCount + acct.unpricedCount} priced
+                </span>
               )}
             </div>
           </header>
