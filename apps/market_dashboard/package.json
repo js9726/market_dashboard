@@ -10,6 +10,7 @@
     "wiki:refresh": "node -e \"const {execSync}=require('node:child_process');const cwd='../../../llm_traders_wiki';for(const op of ['JS','XX']){execSync(`python scripts/audit_trades.py --backfill-entered --journal-user ${op}`,{cwd,stdio:'inherit'});execSync(`python scripts/audit_trades.py --rescore --journal-user ${op}`,{cwd,stdio:'inherit'});}\"",
     "wiki:refresh:post": "npm run wiki:refresh && npm run sync:wiki:post",
     "wiki:screener:push": "node -e \"const {execSync}=require('node:child_process');const cwd='../../../llm_traders_wiki';for(const op of ['JS','XX']){execSync(`python scripts/push_screener_picks.py --post --journal-user ${op} --min-score 60`,{cwd,stdio:'inherit'});}\"",
+    "breadth:tv": "node -e \"const {execSync}=require('node:child_process');execSync('python scripts/breadth_scan_tv.py --out-dir data',{cwd:'../market_dashboard_backend',stdio:'inherit'});\"",
     "breadth:opend": "node -e \"const {execSync}=require('node:child_process');execSync('python scripts/breadth_scan_opend.py --out-dir data',{cwd:'../market_dashboard_backend',stdio:'inherit'});\"",
     "breadth:opend:sector-cache": "node -e \"const {execSync}=require('node:child_process');execSync('python scripts/breadth_scan_opend.py --build-sector-cache --out-dir data',{cwd:'../market_dashboard_backend',stdio:'inherit'});\"",
     "skills:sync": "node ../../scripts/skill-sync.mjs",

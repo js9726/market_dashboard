@@ -47,11 +47,14 @@ cd /d "%WIKI%"
 python scripts\push_screener_picks.py --post --journal-user JS --min-score 60 >> "%LOG%" 2>&1
 python scripts\push_screener_picks.py --post --journal-user XX --min-score 60 >> "%LOG%" 2>&1
 
-REM ── Step 3: Breadth scan via OpenD (mcap>$2B subset, ~13 min) ───────────────
+REM ── Step 3: Breadth scan via TradingView screener API (free, ~2 sec) ────────
+REM Replaces the OpenD path because moomoo free tier caps history-kline calls
+REM at ~80/day. TradingView's bulk screener endpoint returns 2700+ tickers
+REM with sector/SMA/perf pre-computed in one request, no auth, no rate limit.
 echo. >> "%LOG%"
-echo [step 3/5] breadth_scan_opend (limit 2000) >> "%LOG%"
+echo [step 3/5] breadth_scan_tv >> "%LOG%"
 cd /d "%BACKEND%"
-python scripts\breadth_scan_opend.py --out-dir data --limit 2000 >> "%LOG%" 2>&1
+python scripts\breadth_scan_tv.py --out-dir data >> "%LOG%" 2>&1
 if errorlevel 1 (
   echo [step 3/5] FAILED — continuing anyway >> "%LOG%"
 )
