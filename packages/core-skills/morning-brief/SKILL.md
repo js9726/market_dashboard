@@ -42,6 +42,32 @@ PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/GPT-4o tabs)
 > **The push to the dashboard is MANDATORY — always run Step 4.**
 > The brief is useless sitting in memory. Step 4 is what puts it live for viewers.
 
+### Step 0 — Fetch live prices from moomoo OpenD (preferred over yfinance)
+
+Run `fetch_opend_live.py` to get real-time quotes, pre-market data, and RVOL from the
+locally running OpenD instance before generating the brief. This replaces stale snapshot
+prices with live data and adds pre-market context that yfinance cannot provide.
+
+```powershell
+cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
+
+# Output to a file so Step 3 can read it directly into {live_data_block}
+python fetch_opend_live.py --out opend_live.json
+
+# Or: pipe directly and capture for use in the prompt
+python fetch_opend_live.py
+```
+
+If OpenD is not running (CI / GitHub Actions): skip this step — `cli_run.py` falls back to
+yfinance automatically. For manual Claude CLI runs, always do Step 0 first.
+
+The script reads these extra fields for each ticker:
+- `pre_price` / `pre_chg` — pre-market price and change % (before 9:30 AM ET)
+- `after_price` / `after_chg` — after-hours price and change % (after 4:00 PM ET)
+- `rvol` — relative volume vs 10-day average (key entry filter)
+
+Enrich the `$FULL_WATCHLIST` with the OpenD tickers if you have them, then proceed to Step 1.
+
 ### Step 1 — Read Jie's TV Watchlist via Chrome
 
 Navigate Chrome to the watchlist URL. The user must be logged in to TradingView in Chrome.
@@ -89,7 +115,11 @@ external provider APIs and is used in PATH B; do NOT use it in this step.
 3. **Fill the prompt slots locally:**
    - `{date_str}` — today's date in Malaysia time (MYT = UTC+8).
    - `{watchlist_str}` — `$FULL_WATCHLIST` from Steps 1–2.
-   - `{live_data_block}` — fetch CNN Fear & Greed (`https://production.dataviz.cnn.io/index/fearandgreed/graphdata`) and yfinance live prices for the watchlist, OR leave a brief "unavailable" stub if those endpoints fail. Do not hold up Step 3 on these — the WebSearch in step 4 will fill any gaps.
+   - `{live_data_block}` — **use OpenD output from Step 0 if available** (read `opend_live.json`
+     or the stdout from `fetch_opend_live.py`). If Step 0 was skipped, fetch CNN Fear & Greed
+     (`https://production.dataviz.cnn.io/index/fearandgreed/graphdata`) and call yfinance as
+     fallback, OR leave a brief "unavailable" stub. Do not hold up Step 3 on data fetching —
+     the WebSearch in Step 4 will fill any gaps.
 4. **Use your WebSearch tool** to research the sections enumerated in `prompt.md`
    (indices/breadth/sectors/industry movers/earnings/economic calendar/Fear & Greed).
    Every numeric value you emit must be traceable to a citation you actually fetched.

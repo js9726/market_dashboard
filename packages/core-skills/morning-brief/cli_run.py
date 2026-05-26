@@ -128,14 +128,65 @@ def _fetch_fear_and_greed() -> tuple[int | None, str | None]:
     return None, None
 
 
-def _fetch_live_prices(tickers: list[str]) -> dict[str, dict]:
+def _fetch_live_prices_opend(
+    tickers: list[str],
+    host: str = "127.0.0.1",
+    port: int = 11111,
+) -> dict[str, dict]:
     """
-    Fetch current price + change% via yfinance for each ticker.
-    Returns {TICKER: {price: float|None, changePct: float|None}}.
-    Capped at 25 tickers to stay within a 30 s window.
+    Fetch real-time prices from moomoo OpenD.
+    Returns {TICKER: {price, changePct, rvol, prePrice, preChangePct, afterPrice, afterChangePct}}.
+    Preferred over yfinance: pre-market aware, RVOL, no bot detection.
     """
     if not tickers:
         return {}
+    try:
+        from fetch_opend_live import fetch_snapshots
+    except ImportError:
+        return {}
+
+    rows = fetch_snapshots(tickers, host=host, port=port)
+    if not rows:
+        return {}
+
+    result: dict[str, dict] = {}
+    for r in rows:
+        t = r["ticker"]
+        result[t] = {
+            "price":        r["last"],
+            "changePct":    r["change_pct"],
+            "rvol":         r["rvol"],
+            "prePrice":     r["pre_price"],
+            "preChangePct": r["pre_chg"],
+            "afterPrice":   r["after_price"],
+            "afterChangePct": r["after_chg"],
+        }
+
+    found = sum(1 for v in result.values() if v.get("price") is not None)
+    print(f"[cli_run] OpenD live prices: {found}/{len(tickers)} resolved", file=sys.stderr)
+    return result
+
+
+def _fetch_live_prices(tickers: list[str]) -> dict[str, dict]:
+    """
+    Fetch current price + change% — tries OpenD first (pre-market aware, RVOL),
+    falls back to yfinance (GitHub Actions / no OpenD).
+    Returns {TICKER: {price: float|None, changePct: float|None, ...}}.
+    """
+    if not tickers:
+        return {}
+
+    # Try OpenD first
+    opend_host = os.environ.get("OPEND_HOST", "127.0.0.1")
+    opend_port = int(os.environ.get("OPEND_PORT", "11111"))
+    try:
+        result = _fetch_live_prices_opend(tickers, host=opend_host, port=opend_port)
+        if result:
+            return result
+    except Exception as e:
+        print(f"[cli_run] OpenD fetch failed ({e}), falling back to yfinance", file=sys.stderr)
+
+    # yfinance fallback (used in CI / when OpenD is not running)
     try:
         import yfinance as yf  # optional dep; installed in the GH Actions runner
     except ImportError:
@@ -358,13 +409,28 @@ def _build_live_block(
 
     # ── Watchlist live prices ─────────────────────────────────────────────────
     if live_prices:
-        lines.append("  Watchlist live prices (yfinance — use for watchlist[].level and changePct):")
+        source = "OpenD (real-time)" if any(d.get("rvol") for d in live_prices.values()) else "yfinance"
+        lines.append(f"  Watchlist live prices ({source} — use for watchlist[].level and changePct):")
         for ticker, d in live_prices.items():
             price = d.get("price")
             chg = d.get("changePct")
             if price is not None:
                 chg_str = f"{'+' if chg and chg > 0 else ''}{chg:.2f}%" if chg is not None else "N/A"
-                lines.append(f"    {ticker}: ${price:.2f} ({chg_str})")
+                row = f"    {ticker}: ${price:.2f} ({chg_str})"
+                rvol = d.get("rvol")
+                if rvol is not None:
+                    row += f"  RVOL={rvol:.1f}x"
+                pre_p = d.get("prePrice")
+                pre_c = d.get("preChangePct")
+                if pre_p and pre_c is not None:
+                    pre_str = f"{'+' if pre_c > 0 else ''}{pre_c:.2f}%"
+                    row += f"  pre=${pre_p:.2f}({pre_str})"
+                aft_p = d.get("afterPrice")
+                aft_c = d.get("afterChangePct")
+                if aft_p and aft_c is not None:
+                    aft_str = f"{'+' if aft_c > 0 else ''}{aft_c:.2f}%"
+                    row += f"  aft=${aft_p:.2f}({aft_str})"
+                lines.append(row)
             else:
                 lines.append(f"    {ticker}: price unavailable")
 

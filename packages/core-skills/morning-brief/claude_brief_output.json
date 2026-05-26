@@ -1,0 +1,133 @@
+{
+  "mood": {
+    "label": "EXTENDED-RISK-ON",
+    "posture": "TRIM_TIGHTEN",
+    "summary": "Semis/AI infra dominating again with CRDO +12.9% on guidance, NTAP +12.4% post-earnings beat, ARM +2.8%, SNOW +4.0%. Indices steady (SPY +0.39%) but watchlist beneath shows divergence — NVDA -1.9% sell-the-news fade. With 25% historical drift from too-tight stops on momentum names (see wiki/rubric-stop-too-tight.md), discipline today is sizing + ATR-floor stops, NOT chasing the EP-day pops."
+  },
+  "breadth": {
+    "advancers": null,
+    "decliners": null,
+    "newHighs": null,
+    "newLows": null,
+    "note": "Pre-open: sector ETFs mostly green (XLK, XLF, XLY, XLI, XLU all +). XLE flat. SMH led overnight on CRDO/ARM strength."
+  },
+  "fearGreed": {
+    "value": null,
+    "label": "n/a",
+    "note": "CNN F&G feed not fetched this run; DeepSeek tab carries the polled value if needed."
+  },
+  "indices": [
+    { "symbol": "SPY", "name": "S&P 500", "level": 745.64, "changePct": 0.39, "note": "Holding above key 740 shelf; pre-mkt $746.20 +0.47%", "citation": "OpenD snapshot 2026-05-26 01:40 UTC" },
+    { "symbol": "QQQ", "name": "NASDAQ-100", "level": null, "changePct": null, "note": "Leading tech bid into open", "citation": "OpenD snapshot" },
+    { "symbol": "IWM", "name": "Russell 2000", "level": null, "changePct": null, "note": "Small caps lagging; watch breadth", "citation": "OpenD snapshot" },
+    { "symbol": "DIA", "name": "Dow", "level": null, "changePct": null, "note": "—", "citation": "OpenD snapshot" }
+  ],
+  "indicesNarrative": "S&P holding +0.4% with most sector ETFs green. The leadership is in semis (SMH/CIBR/IGV strength overnight), with utilities (XLU +0.78%) acting as a hedge. Watch for whether QQQ leads or follows — if QQQ green and IWM red, that's narrow-tech leadership requiring extra caution on small-cap chases.",
+  "sectorsThemes": [
+    { "theme": "AI infrastructure", "tickers": ["CRDO", "ARM", "MRVL", "ALAB", "SNOW"], "note": "Continuation of NVDA-day rally; CRDO +12.9% on guidance is the new EP-FRESH candidate" },
+    { "theme": "Storage / Enterprise tech", "tickers": ["NTAP"], "note": "NTAP +12.4% on earnings beat + raised guidance — score 82/GO" },
+    { "theme": "Consumer recovery laggards", "tickers": ["PTON"], "note": "PTON +10.2% EP setup, screener score 83 highest of day" }
+  ],
+  "sectorsNarrative": "AI infra remains the dominant theme but is getting crowded — CRDO/ARM extended, MRVL +3%, SNOW +4%. The cleaner setups today are the day-1 EPs (NTAP) and the laggard pivots (PTON 21EMA bounce after sideways base). Avoid chasing CRDO/ARM at full extension; wait for first 21EMA pullback.",
+  "industryNarrative": "Semiconductors specifically (per OpenD: ARM +2.8%, MRVL +3%, ALAB +3%) are the engine. Computer Processing Hardware (DELL, HPQ, HPE) had a Friday spike — watch for pullback continuation today vs full distribution. NTAP's earnings beat is sector-specific (Computer Peripherals); not yet a broad enterprise tech reset.",
+  "industryMovers": [
+    { "ticker": "CRDO", "industry": "Information Technology Services", "changePct": 12.94, "note": "Guidance-driven EP; RVOL 1.2x (lower than peers — watch volume on day 2)" },
+    { "ticker": "NTAP", "industry": "Computer Peripherals", "changePct": 12.4, "note": "Earnings beat + raised guidance; RVOL 2.6x; screener verdict GO 82/100" },
+    { "ticker": "PTON", "industry": "Consumer Services", "changePct": 10.2, "note": "EP-FRESH; RVOL 3.0x; screener verdict GO 83/100 (highest of session)" }
+  ],
+  "movers": [
+    {
+      "ticker": "CRDO",
+      "changePct": 12.94,
+      "level": 218.41,
+      "rvol": 1.2,
+      "thesis": "EP on guidance — but RVOL only 1.2x suggests weaker conviction than NTAP/PTON. Stop should be 1.5x ATR below entry not the prior-day low (see wiki/rubric-stop-too-tight.md).",
+      "traderLens": "@Qullamaggie"
+    },
+    {
+      "ticker": "NTAP",
+      "changePct": 12.4,
+      "level": 139.36,
+      "rvol": 2.6,
+      "thesis": "Cleanest EP of the day: earnings catalyst, RVOL 2.6x, holding upper end of range. ATR-based stop ~$133. Watch for first-day-of-EP pullback into 21EMA for second entry.",
+      "traderLens": "@Qullamaggie"
+    },
+    {
+      "ticker": "PTON",
+      "changePct": 10.2,
+      "level": null,
+      "rvol": 3.0,
+      "thesis": "EP-FRESH on a recovery laggard. Screener verdict GO 83 (highest of session) but consumer-services context is unusual — verify volume holds in first hour.",
+      "traderLens": "@SRxTrades"
+    }
+  ],
+  "watchlist": [
+    { "ticker": "NVDA", "level": 215.33, "changePct": -1.9, "abc": "B", "note": "Sell-the-news post-beat; holding $215 21EMA support. If breaks, opens up $208 retest." },
+    { "ticker": "MSFT", "level": 418.57, "changePct": -0.12, "abc": "B", "note": "Flat; constructive consolidation near highs." },
+    { "ticker": "AAPL", "level": 308.82, "changePct": 1.26, "abc": "A", "note": "Steady leadership; no setup signal today." },
+    { "ticker": "AMZN", "level": 266.32, "changePct": -0.8, "abc": "B", "note": "Mild fade; watch 21EMA." },
+    { "ticker": "META", "level": 610.26, "changePct": 0.47, "abc": "A", "note": "Holding $608 pivot." },
+    { "ticker": "GOOGL", "level": 382.97, "changePct": -1.21, "abc": "B", "note": "Underperforming peers." },
+    { "ticker": "ALAB", "level": 306.88, "changePct": 3.04, "abc": "A", "note": "Continuation in AI infra; second-leg from base." },
+    { "ticker": "CRDO", "level": 218.41, "changePct": 12.94, "abc": "A", "note": "EP day — see movers." },
+    { "ticker": "MRVL", "level": 196.33, "changePct": 2.96, "abc": "A", "note": "AI infra co-mover." },
+    { "ticker": "ARM", "level": 306.51, "changePct": 2.78, "abc": "A", "note": "Continuation; near prior pivot $310." },
+    { "ticker": "DDOG", "level": 222.32, "changePct": 1.96, "abc": "B", "note": "Steady; no edge today." },
+    { "ticker": "SNOW", "level": 172.20, "changePct": 4.02, "abc": "A", "note": "Cloud-tech follow-on bid." }
+  ],
+  "traderLens": [
+    { "name": "@Qullamaggie", "view": "NTAP is the cleanest EP-FRESH today: catalyst, RVOL >2x, range hold. ATR-floor stop ~$133. PTON tempting but consumer-services context is off-rubric." },
+    { "name": "@markminervini", "view": "Wait. Most of today's movers are day-1 EPs, not VCP breakouts. ALAB closest to Stage-2 continuation but pre-pivot." },
+    { "name": "@PrimeTrading_", "view": "NVDA pulling back to 21EMA at $215 is a tradeable level IF it holds today's open." },
+    { "name": "@SRxTrades", "view": "PTON if it tightens; NTAP for the swing." },
+    { "name": "@jfsrev", "view": "PTON RVOL 3.0x best of session. NTAP 2.6x acceptable. CRDO 1.2x below threshold — pass." },
+    { "name": "@Clement_Ang17", "view": "NVDA $215 pullback is the cleanest liquid-leader 21EMA test on the screen." },
+    { "name": "@TedHZhang", "view": "NTAP has earnings catalyst + guidance raise + sector tailwind — three pillars align. Position size accordingly." }
+  ],
+  "standout": {
+    "ticker": "NTAP",
+    "side": "LONG",
+    "score": 82,
+    "sector": "Electronic Technology",
+    "rs": null,
+    "grade": "A",
+    "entry": 139.36,
+    "stop": 133.00,
+    "target": 160.00,
+    "rrr": 3.3,
+    "tags": ["EP-FRESH", "earnings-beat", "guidance-raise", "RVOL-2.6x"],
+    "thesis": "Earnings beat + raised guidance + sector tailwind = three-pillar align (@TedHZhang). RVOL 2.6x, clean range hold. Day-1 entry risky at $139.36 — preferred is day-2-3 pullback into post-gap shelf. ATR-floor stop ~$133 per wiki/rubric-stop-too-tight.md."
+  },
+  "earnings": {
+    "preMarket": [
+      { "ticker": "NTAP", "result": "beat, raised guidance", "movePct": 12.4 }
+    ],
+    "afterClose": []
+  },
+  "calendar": [
+    { "time": "10:00 ET", "name": "Consumer Confidence (May)", "consensus": "105.0" },
+    { "time": "10:00 ET", "name": "New Home Sales (Apr)", "consensus": "680K" }
+  ],
+  "ratings": {
+    "upgrades": [],
+    "downgrades": []
+  },
+  "alert": "Day-1 EP chasing is the highest-drift mistake in your audit history (15 stop-too-tight whipsaws across 7 months, 25% of all trades). Today's EPs (CRDO, NTAP, PTON) are tempting — but use 1.5×ATR(14) floor stops, not prior-low. See wiki/rubric-stop-too-tight.md.",
+  "screenerScores": {
+    "PTON": 86,
+    "UTI": 80,
+    "EL": 79,
+    "HPQ": 78,
+    "QBTS": 78,
+    "NTAP": 78,
+    "INFQ": 78,
+    "IMAX": 78,
+    "CRNC": 78
+  },
+  "citations": [
+    "OpenD live snapshot 2026-05-26 01:40 UTC (32 tickers)",
+    "tv_screeners.json fresh fetch 2026-05-26 10:46 UTC (DeepSeek top-8 + algo)",
+    "wiki/risk-management.md + wiki/rubric-stop-too-tight.md (stop-distance floor by setup type)",
+    "wiki/trader-styles.md (7-trader rubric)"
+  ]
+}
