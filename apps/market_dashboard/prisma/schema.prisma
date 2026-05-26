@@ -274,19 +274,27 @@ model MorningBriefCache {
 }
 
 model WikiAudit {
-  period     String   @id // YYYY-MM
-  markdown   String   @db.Text
-  parsedJson Json
-  sourcePath String?
-  sizeBytes  Int?
-  ingestedAt DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  operatorLabel String   @default("JS")
+  period        String // YYYY-MM
+  markdown      String   @db.Text
+  parsedJson    Json
+  sourcePath    String?
+  sizeBytes     Int?
+  ingestedAt    DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
+  @@id([operatorLabel, period])
+  @@index([period(sort: Desc)])
   @@index([updatedAt(sort: Desc)])
 }
 
 model WikiTradeVerdict {
   id              String   @id @default(cuid())
+  operatorLabel   String   @default("JS")
+  /// "journal" (entered trade — rolled up into the monthly audit),
+  /// "analysis" (chat ad-hoc score — kept in Analysis History tab).
+  /// Screener picks live in WikiScreenerPick, not here.
+  intent          String   @default("journal")
   tradeDate       DateTime @db.Date
   ticker          String
   year            String
@@ -297,9 +305,39 @@ model WikiTradeVerdict {
   ingestedAt      DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  @@unique([tradeDate, ticker])
+  @@unique([operatorLabel, tradeDate, ticker])
   @@index([ticker, tradeDate(sort: Desc)])
   @@index([tradeDate(sort: Desc)])
+  @@index([intent, tradeDate(sort: Desc)])
+}
+
+/// Daily screener snapshot. Lightweight — no full LLM verdict per ticker.
+/// Captures "what the screener flagged on date X" so we can compute
+/// conversion rate (screener → journaled trade) and surface missed setups.
+model WikiScreenerPick {
+  id               String   @id @default(cuid())
+  operatorLabel    String   @default("JS")
+  /// The day the screener was run, not the trade entry date.
+  pickDate         DateTime @db.Date
+  ticker           String
+  /// Optional: setup_classification guess (e.g. "EP-FRESH", "BO-CB").
+  setupClassification String?
+  /// Which screener / criteria matched. e.g. "qullamaggie-ep", "rs-leaders".
+  screenSource     String
+  /// Free-form notes — RVOL, sector, why it caught your eye, etc.
+  notes            String?  @db.Text
+  /// Optional: source URL (TradingView screenshot, Finviz, etc.)
+  sourceUrl        String?
+  /// Optional: when a screener pick later gets journaled, link the Trade.id
+  /// here so conversion rate can be computed.
+  convertedTradeId String?
+  ingestedAt       DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([operatorLabel, pickDate, ticker, screenSource])
+  @@index([operatorLabel, pickDate(sort: Desc)])
+  @@index([ticker, pickDate(sort: Desc)])
+  @@index([screenSource, pickDate(sort: Desc)])
 }
 
 // ── DailyReflection (formerly `JournalEntry`) ───────────────────────────────

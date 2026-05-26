@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import AnalyticsView from "@/components/audits/AnalyticsView";
+import ScreenerView from "@/components/audits/ScreenerView";
 
-export default async function AnalyticsPage() {
+export default async function ScreenerHistoryPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
-  return <AnalyticsView />;
+  return <ScreenerView />;
 }

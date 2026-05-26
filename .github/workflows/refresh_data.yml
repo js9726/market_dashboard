@@ -137,7 +137,23 @@ jobs:
           git diff --cached --name-status || true
           if git diff --cached --quiet; then
             echo "No data changes — nothing to commit."
-          else
-            git commit -m "chore: refresh market data [skip ci]"
-            git push
+            exit 0
           fi
+          git commit -m "chore: refresh market data [skip ci]"
+          # Retry on race condition — `refresh_data_intraday.yml` and developer
+          # pushes can advance main between our checkout and push, causing
+          # "fetch first" rejection. Rebase + retry up to 5x.
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Pushed successfully on attempt $attempt."
+              exit 0
+            fi
+            echo "Push attempt $attempt rejected. Rebasing on origin/main..."
+            if ! git pull --rebase --autostash origin main; then
+              echo "Rebase failed on attempt $attempt; aborting."
+              git rebase --abort 2>/dev/null || true
+              exit 1
+            fi
+          done
+          echo "Push failed after 5 attempts."
+          exit 1

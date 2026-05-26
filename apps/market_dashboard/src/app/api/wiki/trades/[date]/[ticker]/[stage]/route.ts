@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+const OPERATOR_RE = /^[A-Z]{2,8}$/;
+
 interface RouteContext {
   params: Promise<{ date: string; ticker: string; stage: string }>;
 }
@@ -14,7 +16,13 @@ function dateOnly(date: string): Date {
   return new Date(`${date}T00:00:00.000Z`);
 }
 
-export async function GET(_req: Request, context: RouteContext) {
+function normaliseOperator(raw: string | null): string {
+  if (!raw) return "JS";
+  const trimmed = raw.trim().toUpperCase();
+  return OPERATOR_RE.test(trimmed) ? trimmed : "JS";
+}
+
+export async function GET(req: Request, context: RouteContext) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -28,10 +36,18 @@ export async function GET(_req: Request, context: RouteContext) {
     return NextResponse.json({ error: "Invalid stage" }, { status: 400 });
   }
 
+  const url = new URL(req.url);
+  const operatorLabel = normaliseOperator(url.searchParams.get("operator"));
   const normalizedTicker = ticker.toUpperCase();
   try {
     const row = await prisma.wikiTradeVerdict.findUnique({
-      where: { tradeDate_ticker: { tradeDate: dateOnly(date), ticker: normalizedTicker } },
+      where: {
+        operatorLabel_tradeDate_ticker: {
+          operatorLabel,
+          tradeDate: dateOnly(date),
+          ticker: normalizedTicker,
+        },
+      },
     });
     const payload = stage === "day0" ? row?.day0Json : row?.day14Json;
     if (payload) return NextResponse.json(payload);
@@ -40,11 +56,13 @@ export async function GET(_req: Request, context: RouteContext) {
   }
 
   const year = date.slice(0, 4);
+  // Local dev fallback: public/wiki/trades/{operator}/{year}/{date}_{ticker}_{stage}.json
   const filePath = path.join(
     process.cwd(),
     "public",
     "wiki",
     "trades",
+    operatorLabel,
     year,
     `${date}_${normalizedTicker}_${stage}.json`,
   );
@@ -53,7 +71,10 @@ export async function GET(_req: Request, context: RouteContext) {
     return NextResponse.json(JSON.parse(raw));
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-      return NextResponse.json({ error: `No ${stage} verdict for ${normalizedTicker} ${date}` }, { status: 404 });
+      return NextResponse.json(
+        { error: `No ${stage} verdict for ${operatorLabel}/${normalizedTicker} ${date}` },
+        { status: 404 },
+      );
     }
     const msg = err instanceof Error ? err.message : "unknown error";
     return NextResponse.json({ error: `Read failed: ${msg}` }, { status: 500 });
