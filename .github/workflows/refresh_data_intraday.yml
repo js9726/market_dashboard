@@ -1,6 +1,6 @@
 name: Refresh Market Data (Intraday Light)
 
-# WK-1 split — this file is the INTRADAY LIGHT job. Six ticks per US trading
+# WK-1 split — this file is the INTRADAY LIGHT job. Three ticks per US trading
 # day, runs only the cheap-and-fast pipeline:
 #   - build_data.py        (~30 sec, refreshes per-ticker snapshot + RS chart)
 #   - tv_screener_fetch.py (~10 sec, refreshes TradingView screener hits)
@@ -10,21 +10,25 @@ name: Refresh Market Data (Intraday Light)
 #   - morning_brief.py     ~$1-2/run × 4 LLM providers, daily-only by design
 #   - trader_verdict.py    ~$0.30/run, daily-only by design
 #
-# Off-peak minutes (:07/:37) — WK-4 in ROADMAP.md.
+# Off-peak minutes (:03/:33) — WK-4 in ROADMAP.md.
 #
-#   13:37 14:07 14:37 15:07 15:37   first two hours of US trading
-#   20:37                            post-close snapshot
+#   13:33                            3 min after US market open
+#   14:03                            33 min after US market open
+#   20:33                            33 min after US market close
 #
-# Total: 6 ticks/day, ~30/week. Each tick commits a refreshed snapshot.json
-# only — no LLM-generated assets touched.
+# Total: 3 ticks/day, ~15/week. Each tick commits refreshed snapshot/screener
+# data only — no LLM-generated assets touched.
 
 on:
   schedule:
-    - cron: '37 13 * * 1-5'          # ~market open  (09:37 ET EDT)
-    - cron: '7,37 14 * * 1-5'        # 10:07 & 10:37 ET
-    - cron: '7,37 15 * * 1-5'        # 11:07 & 11:37 ET
-    - cron: '37 20 * * 1-5'          # ~post-close   (16:37 ET EDT)
+    - cron: '33 13 * * 1-5'          # 3 min after open (09:33 ET EDT)
+    - cron: '3 14 * * 1-5'           # 33 min after open (10:03 ET EDT)
+    - cron: '33 20 * * 1-5'          # 33 min post-market (16:33 ET EDT)
   workflow_dispatch: {}
+
+concurrency:
+  group: market-dashboard-refresh-data
+  cancel-in-progress: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
@@ -105,5 +109,12 @@ jobs:
             echo "No data changes — nothing to commit."
           else
             git commit -m "chore: intraday refresh [skip ci]"
-            git push
+            BRANCH="${GITHUB_REF_NAME:-main}"
+            for i in 1 2 3; do
+              if git push; then
+                break
+              fi
+              echo "Push failed, rebasing and retrying ($i/3)"
+              git pull --rebase --autostash -X theirs origin "$BRANCH"
+            done
           fi

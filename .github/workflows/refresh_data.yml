@@ -8,17 +8,21 @@ name: Refresh Market Data & Morning Brief (Daily)
 # refresh_data_intraday.yml. Together they replace the original 7-ticks-of-
 # everything design that cost ~$10/day in LLM and 70+ min of CI compute.
 #
-# Times use off-peak minutes (:07) to dodge the GH Actions cron throttle at
+# Times use off-peak minutes to dodge the GH Actions cron throttle at
 # :00/:15/:30/:45 (WK-4 in ROADMAP.md).
 #
-#   13:07            ~30 min pre-market   (09:07 ET EDT)
+#   13:03            27 min pre-market    (09:03 ET EDT)
 #
-# Total: 1 tick/day, ~5/week. The intraday workflow handles the other 6 ticks.
+# Total: 1 tick/day, ~5/week. The intraday workflow handles the other 3 ticks.
 
 on:
   schedule:
-    - cron: '7 13 * * 1-5'           # ~pre-market   (09:07 ET EDT) — daily heavy
+    - cron: '3 13 * * 1-5'           # 27 min pre-market (09:03 ET EDT) — daily heavy
   workflow_dispatch: {}
+
+concurrency:
+  group: market-dashboard-refresh-data
+  cancel-in-progress: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
@@ -149,7 +153,7 @@ jobs:
               exit 0
             fi
             echo "Push attempt $attempt rejected. Rebasing on origin/main..."
-            if ! git pull --rebase --autostash origin main; then
+            if ! git pull --rebase --autostash -X theirs origin main; then
               echo "Rebase failed on attempt $attempt; aborting."
               git rebase --abort 2>/dev/null || true
               exit 1
