@@ -958,5 +958,533 @@
         "pct_above_50sma": 50.0
       }
     ]
+  },
+  {
+    "date": "2026-05-27",
+    "market": {
+      "new_highs": 12,
+      "new_lows": 2,
+      "advance": 1262,
+      "decline": 965,
+      "stage_counts": {
+        "1": 261,
+        "2": 719,
+        "3": 766,
+        "4": 430
+      },
+      "universe_size": 2254
+    },
+    "momentum": {
+      "up_from_open": 1239,
+      "down_from_open": 985,
+      "up_on_volume": 17,
+      "down_on_volume": 17,
+      "up_4pct": 159,
+      "down_4pct": 66
+    },
+    "sectors": [
+      {
+        "sector": "Commercial Services",
+        "n": 53,
+        "pct_above_50sma": 50.9
+      },
+      {
+        "sector": "Communications",
+        "n": 12,
+        "pct_above_50sma": 75.0
+      },
+      {
+        "sector": "Consumer Durables",
+        "n": 37,
+        "pct_above_50sma": 64.9
+      },
+      {
+        "sector": "Consumer Non-Durables",
+        "n": 58,
+        "pct_above_50sma": 63.8
+      },
+      {
+        "sector": "Consumer Services",
+        "n": 75,
+        "pct_above_50sma": 60.0
+      },
+      {
+        "sector": "Distribution Services",
+        "n": 25,
+        "pct_above_50sma": 40.0
+      },
+      {
+        "sector": "Electronic Technology",
+        "n": 153,
+        "pct_above_50sma": 83.0
+      },
+      {
+        "sector": "Energy Minerals",
+        "n": 47,
+        "pct_above_50sma": 21.3
+      },
+      {
+        "sector": "Finance",
+        "n": 314,
+        "pct_above_50sma": 71.0
+      },
+      {
+        "sector": "Health Services",
+        "n": 31,
+        "pct_above_50sma": 61.3
+      },
+      {
+        "sector": "Health Technology",
+        "n": 159,
+        "pct_above_50sma": 54.7
+      },
+      {
+        "sector": "Industrial Services",
+        "n": 69,
+        "pct_above_50sma": 62.3
+      },
+      {
+        "sector": "Miscellaneous",
+        "n": 8,
+        "pct_above_50sma": 37.5
+      },
+      {
+        "sector": "Non-Energy Minerals",
+        "n": 36,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "sector": "Process Industries",
+        "n": 45,
+        "pct_above_50sma": 46.7
+      },
+      {
+        "sector": "Producer Manufacturing",
+        "n": 111,
+        "pct_above_50sma": 65.8
+      },
+      {
+        "sector": "Retail Trade",
+        "n": 63,
+        "pct_above_50sma": 52.4
+      },
+      {
+        "sector": "Technology Services",
+        "n": 189,
+        "pct_above_50sma": 67.2
+      },
+      {
+        "sector": "Transportation",
+        "n": 45,
+        "pct_above_50sma": 75.6
+      },
+      {
+        "sector": "Utilities",
+        "n": 54,
+        "pct_above_50sma": 48.1
+      }
+    ],
+    "industries": [
+      {
+        "industry": "Aerospace & Defense",
+        "n": 41,
+        "pct_above_50sma": 63.4
+      },
+      {
+        "industry": "Agricultural Commodities/Milling",
+        "n": 5,
+        "pct_above_50sma": 20.0
+      },
+      {
+        "industry": "Air Freight/Couriers",
+        "n": 9,
+        "pct_above_50sma": 77.8
+      },
+      {
+        "industry": "Airlines",
+        "n": 9,
+        "pct_above_50sma": 88.9
+      },
+      {
+        "industry": "Apparel/Footwear",
+        "n": 16,
+        "pct_above_50sma": 75.0
+      },
+      {
+        "industry": "Apparel/Footwear Retail",
+        "n": 12,
+        "pct_above_50sma": 66.7
+      },
+      {
+        "industry": "Auto Parts: OEM",
+        "n": 13,
+        "pct_above_50sma": 61.5
+      },
+      {
+        "industry": "Beverages: Non-Alcoholic",
+        "n": 8,
+        "pct_above_50sma": 75.0
+      },
+      {
+        "industry": "Biotechnology",
+        "n": 45,
+        "pct_above_50sma": 51.1
+      },
+      {
+        "industry": "Building Products",
+        "n": 8,
+        "pct_above_50sma": 62.5
+      },
+      {
+        "industry": "Cable/Satellite TV",
+        "n": 5,
+        "pct_above_50sma": 40.0
+      },
+      {
+        "industry": "Casinos/Gaming",
+        "n": 10,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "industry": "Chemicals: Major Diversified",
+        "n": 6,
+        "pct_above_50sma": 100.0
+      },
+      {
+        "industry": "Chemicals: Specialty",
+        "n": 12,
+        "pct_above_50sma": 41.7
+      },
+      {
+        "industry": "Computer Peripherals",
+        "n": 7,
+        "pct_above_50sma": 100.0
+      },
+      {
+        "industry": "Computer Processing Hardware",
+        "n": 9,
+        "pct_above_50sma": 100.0
+      },
+      {
+        "industry": "Construction Materials",
+        "n": 7,
+        "pct_above_50sma": 28.6
+      },
+      {
+        "industry": "Containers/Packaging",
+        "n": 10,
+        "pct_above_50sma": 40.0
+      },
+      {
+        "industry": "Contract Drilling",
+        "n": 8,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "industry": "Data Processing Services",
+        "n": 19,
+        "pct_above_50sma": 68.4
+      },
+      {
+        "industry": "Electric Utilities",
+        "n": 36,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "industry": "Electrical Products",
+        "n": 25,
+        "pct_above_50sma": 84.0
+      },
+      {
+        "industry": "Electronic Components",
+        "n": 7,
+        "pct_above_50sma": 85.7
+      },
+      {
+        "industry": "Electronic Equipment/Instruments",
+        "n": 16,
+        "pct_above_50sma": 87.5
+      },
+      {
+        "industry": "Electronic Production Equipment",
+        "n": 14,
+        "pct_above_50sma": 85.7
+      },
+      {
+        "industry": "Engineering & Construction",
+        "n": 25,
+        "pct_above_50sma": 56.0
+      },
+      {
+        "industry": "Environmental Services",
+        "n": 5,
+        "pct_above_50sma": 40.0
+      },
+      {
+        "industry": "Finance/Rental/Leasing",
+        "n": 27,
+        "pct_above_50sma": 66.7
+      },
+      {
+        "industry": "Financial Publishing/Services",
+        "n": 8,
+        "pct_above_50sma": 62.5
+      },
+      {
+        "industry": "Food: Specialty/Candy",
+        "n": 13,
+        "pct_above_50sma": 53.8
+      },
+      {
+        "industry": "Gas Distributors",
+        "n": 11,
+        "pct_above_50sma": 45.5
+      },
+      {
+        "industry": "Homebuilding",
+        "n": 10,
+        "pct_above_50sma": 90.0
+      },
+      {
+        "industry": "Hospital/Nursing Management",
+        "n": 8,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "industry": "Hotels/Resorts/Cruise lines",
+        "n": 13,
+        "pct_above_50sma": 76.9
+      },
+      {
+        "industry": "Household/Personal Care",
+        "n": 10,
+        "pct_above_50sma": 80.0
+      },
+      {
+        "industry": "Industrial Machinery",
+        "n": 44,
+        "pct_above_50sma": 65.9
+      },
+      {
+        "industry": "Industrial Specialties",
+        "n": 7,
+        "pct_above_50sma": 71.4
+      },
+      {
+        "industry": "Information Technology Services",
+        "n": 33,
+        "pct_above_50sma": 57.6
+      },
+      {
+        "industry": "Insurance Brokers/Services",
+        "n": 8,
+        "pct_above_50sma": 12.5
+      },
+      {
+        "industry": "Integrated Oil",
+        "n": 20,
+        "pct_above_50sma": 10.0
+      },
+      {
+        "industry": "Internet Retail",
+        "n": 7,
+        "pct_above_50sma": 42.9
+      },
+      {
+        "industry": "Internet Software/Services",
+        "n": 23,
+        "pct_above_50sma": 65.2
+      },
+      {
+        "industry": "Investment Banks/Brokers",
+        "n": 27,
+        "pct_above_50sma": 48.1
+      },
+      {
+        "industry": "Investment Managers",
+        "n": 34,
+        "pct_above_50sma": 67.6
+      },
+      {
+        "industry": "Investment Trusts/Mutual Funds",
+        "n": 7,
+        "pct_above_50sma": 28.6
+      },
+      {
+        "industry": "Life/Health Insurance",
+        "n": 7,
+        "pct_above_50sma": 71.4
+      },
+      {
+        "industry": "Major Banks",
+        "n": 28,
+        "pct_above_50sma": 89.3
+      },
+      {
+        "industry": "Managed Health Care",
+        "n": 8,
+        "pct_above_50sma": 87.5
+      },
+      {
+        "industry": "Marine Shipping",
+        "n": 9,
+        "pct_above_50sma": 44.4
+      },
+      {
+        "industry": "Medical Specialties",
+        "n": 54,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "industry": "Medical/Nursing Services",
+        "n": 14,
+        "pct_above_50sma": 57.1
+      },
+      {
+        "industry": "Miscellaneous Commercial Services",
+        "n": 37,
+        "pct_above_50sma": 45.9
+      },
+      {
+        "industry": "Motor Vehicles",
+        "n": 8,
+        "pct_above_50sma": 62.5
+      },
+      {
+        "industry": "Movies/Entertainment",
+        "n": 9,
+        "pct_above_50sma": 77.8
+      },
+      {
+        "industry": "Multi-Line Insurance",
+        "n": 17,
+        "pct_above_50sma": 52.9
+      },
+      {
+        "industry": "Oil & Gas Pipelines",
+        "n": 17,
+        "pct_above_50sma": 58.8
+      },
+      {
+        "industry": "Oil & Gas Production",
+        "n": 13,
+        "pct_above_50sma": 15.4
+      },
+      {
+        "industry": "Oil Refining/Marketing",
+        "n": 10,
+        "pct_above_50sma": 40.0
+      },
+      {
+        "industry": "Oilfield Services/Equipment",
+        "n": 14,
+        "pct_above_50sma": 92.9
+      },
+      {
+        "industry": "Other Consumer Services",
+        "n": 16,
+        "pct_above_50sma": 68.8
+      },
+      {
+        "industry": "Other Metals/Minerals",
+        "n": 10,
+        "pct_above_50sma": 70.0
+      },
+      {
+        "industry": "Other Transportation",
+        "n": 6,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "industry": "Packaged Software",
+        "n": 114,
+        "pct_above_50sma": 70.2
+      },
+      {
+        "industry": "Pharmaceuticals: Major",
+        "n": 59,
+        "pct_above_50sma": 61.0
+      },
+      {
+        "industry": "Precious Metals",
+        "n": 9,
+        "pct_above_50sma": 0.0
+      },
+      {
+        "industry": "Property/Casualty Insurance",
+        "n": 10,
+        "pct_above_50sma": 30.0
+      },
+      {
+        "industry": "Real Estate Development",
+        "n": 9,
+        "pct_above_50sma": 44.4
+      },
+      {
+        "industry": "Real Estate Investment Trusts",
+        "n": 89,
+        "pct_above_50sma": 87.6
+      },
+      {
+        "industry": "Recreational Products",
+        "n": 8,
+        "pct_above_50sma": 62.5
+      },
+      {
+        "industry": "Regional Banks",
+        "n": 44,
+        "pct_above_50sma": 81.8
+      },
+      {
+        "industry": "Restaurants",
+        "n": 16,
+        "pct_above_50sma": 37.5
+      },
+      {
+        "industry": "Savings Banks",
+        "n": 5,
+        "pct_above_50sma": 100.0
+      },
+      {
+        "industry": "Semiconductors",
+        "n": 49,
+        "pct_above_50sma": 98.0
+      },
+      {
+        "industry": "Specialty Insurance",
+        "n": 6,
+        "pct_above_50sma": 33.3
+      },
+      {
+        "industry": "Specialty Stores",
+        "n": 27,
+        "pct_above_50sma": 63.0
+      },
+      {
+        "industry": "Telecommunications Equipment",
+        "n": 10,
+        "pct_above_50sma": 50.0
+      },
+      {
+        "industry": "Trucking",
+        "n": 9,
+        "pct_above_50sma": 100.0
+      },
+      {
+        "industry": "Trucks/Construction/Farm Machinery",
+        "n": 11,
+        "pct_above_50sma": 36.4
+      },
+      {
+        "industry": "Wholesale Distributors",
+        "n": 13,
+        "pct_above_50sma": 30.8
+      },
+      {
+        "industry": "Wireless Telecommunications",
+        "n": 7,
+        "pct_above_50sma": 57.1
+      }
+    ]
   }
 ]
