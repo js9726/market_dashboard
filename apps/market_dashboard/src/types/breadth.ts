@@ -38,8 +38,12 @@ export interface IndustryRow {
 }
 
 export interface BreadthSnapshot {
-  built_at: string;
-  mcap_floor: number;
+  built_at?: string;
+  as_of?: string;
+  generated_by?: string;
+  mcap_floor?: number;
+  mcap_fetch?: number;
+  universe_size?: number;
   market: MarketBreadth;
   momentum: MomentumBreadth;
   sectors: SectorRow[];

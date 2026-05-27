@@ -1,0 +1,107 @@
+name: Refresh Market Breadth
+
+# Dedicated breadth refresh for the Conviction Desk.
+# Uses TradingView screener data so the dashboard updates from the same source
+# family as the visible market heatmap instead of waiting for the daily heavy job.
+
+on:
+  schedule:
+    - cron: '3 13 * * 1-5'           # 27 min pre-market (09:03 ET EDT)
+    - cron: '33 13 * * 1-5'          # 3 min after open (09:33 ET EDT)
+    - cron: '3 14 * * 1-5'           # 33 min after open (10:03 ET EDT)
+    - cron: '33 20 * * 1-5'          # 33 min post-market (16:33 ET EDT)
+  workflow_dispatch: {}
+
+concurrency:
+  group: market-dashboard-refresh-data
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  breadth:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: apps/market_dashboard_backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Compute TradingView market breadth
+        timeout-minutes: 12
+        run: python scripts/breadth_scan_tv.py --out-dir data
+
+      - name: Sync breadth into public folder
+        working-directory: apps/market_dashboard
+        run: |
+          mkdir -p public/market-dashboard
+          cp ../market_dashboard_backend/data/breadth.json public/market-dashboard/
+          cp ../market_dashboard_backend/data/breadth_history.json public/market-dashboard/
+
+      - name: Sanitize JSON
+        working-directory: apps/market_dashboard
+        run: |
+          python3 -c "
+          import re, pathlib
+          for p in pathlib.Path('public/market-dashboard').glob('breadth*.json'):
+              raw = p.read_text()
+              fixed = re.sub(r'\bNaN\b|\bInfinity\b|\b-Infinity\b', 'null', raw)
+              if fixed != raw:
+                  p.write_text(fixed)
+                  print(f'Sanitized {p.name}')
+          print('JSON sanitization complete')
+          "
+
+      - name: Commit updated breadth
+        working-directory: .
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f apps/market_dashboard_backend/data/breadth.json \
+                     apps/market_dashboard_backend/data/breadth_history.json \
+                     apps/market_dashboard/public/market-dashboard/breadth.json \
+                     apps/market_dashboard/public/market-dashboard/breadth_history.json
+          echo "=== Staged changes ==="
+          git diff --cached --name-status || true
+          if git diff --cached --quiet; then
+            echo "No breadth changes - nothing to commit."
+            exit 0
+          fi
+
+          HOUR_UTC=$(date -u +%H)
+          if [ "$HOUR_UTC" = "13" ]; then
+            TAG="open-snapshot"
+          elif [ "$HOUR_UTC" = "20" ]; then
+            TAG="close-snapshot"
+          else
+            TAG="manual"
+          fi
+
+          git commit -m "chore: refresh breadth ($TAG) [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Pushed successfully on attempt $attempt."
+              exit 0
+            fi
+            echo "Push attempt $attempt rejected. Rebasing on origin/main..."
+            if ! git pull --rebase --autostash -X theirs origin main; then
+              echo "Rebase failed on attempt $attempt; aborting."
+              git rebase --abort 2>/dev/null || true
+              exit 1
+            fi
+          done
+          echo "Push failed after 5 attempts."
+          exit 1

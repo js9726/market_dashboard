@@ -269,6 +269,8 @@ def main() -> int:
     snapshot = {
         "as_of": datetime.now(timezone.utc).isoformat(),
         "generated_by": "breadth_scan_tv",
+        "mcap_floor": args.mcap_floor,
+        "mcap_fetch": args.mcap_fetch,
         "universe_size": len(metrics),
         **aggregate(metrics, mcap_floor=args.mcap_floor),
     }
