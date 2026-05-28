@@ -1,0 +1,172 @@
+name: Refresh Pre-Open Brief (Daily 30min Before Market Open)
+
+# Phase 3b of the pre-open CI + journal revamp plan
+# (see apps/market_dashboard/docs/PLAN-pre-open-ci-and-journal-revamp.md).
+#
+# ONE consolidated cron job that runs 30 min before US market open every
+# trading day (Mon-Fri, US holidays auto-skipped). Replaces the heavy parts
+# of refresh_data.yml — the breadth/screener split workflows still run on
+# their own cadence; this one OWNS the pre-open run.
+#
+# Pipeline:
+#   1. Skip if not a US trading day (pandas_market_calendars)
+#   2. build_data.py        → snapshot, indices, sector ETFs
+#   3. breadth_scan.py      → full universe + sectors (~5000 tickers)
+#   4. tv_screener_fetch.py → 5 screeners, DeepSeek-scored top 10
+#   5. morning_brief.py     → Claude + DeepSeek + Gemini (OpenAI skipped per
+#                             $5/day cost cap; on-demand only via /refresh button)
+#   6. Sync data to public folder
+#   7. Sanitise JSON (NaN → null)
+#   8. Commit + push (with -X theirs rebase retry on race)
+#
+# Cron: 13:00 UTC Mon-Fri = 09:00 ET EDT (= 21:00 MYT for Jie).
+#
+# Concurrency: lock prevents overlap; new run waits + skips if old still
+# finishing (matches the cancel-in-progress=false pattern used by refresh_data.yml).
+#
+# Cost target: ~$3.50/run (1.50 Claude + 0.30 DeepSeek + 0.80 Gemini +
+#               0.30 A-list scoring + 0.50 screener scoring).
+
+on:
+  schedule:
+    - cron: '0 13 * * 1-5'           # 30 min pre-market (09:00 ET EDT)
+  workflow_dispatch: {}
+
+concurrency:
+  group: market-dashboard-refresh-premarket
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  premarket:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: apps/market_dashboard_backend
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive   # pulls wiki submodule (Phase 3a)
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # ── Step 0: holiday gate ─────────────────────────────────────────────
+      - name: Skip if not a US trading day
+        id: trading_day
+        continue-on-error: false   # fatal: stops all subsequent steps
+        run: python scripts/check_trading_day.py
+
+      # ── Step 1: market data (snapshot, events, charts) ───────────────────
+      - name: Build market data
+        if: success()
+        run: python scripts/build_data.py --out-dir data
+
+      # ── Step 2: market breadth ───────────────────────────────────────────
+      - name: Compute market breadth
+        if: success()
+        continue-on-error: true   # non-fatal; brief can still ship without breadth
+        timeout-minutes: 15
+        run: python scripts/breadth_scan.py --out-dir data
+
+      # ── Step 3: TradingView screener hits ────────────────────────────────
+      - name: Fetch TV screeners with DeepSeek scoring
+        if: success()
+        continue-on-error: true
+        run: python scripts/tv_screener_fetch.py --out-dir data --score --score-top 10
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          TV_SESSION_ID:    ${{ secrets.TV_SESSION_ID }}
+
+      # ── Step 4: morning brief (Claude SDK + DeepSeek + Gemini) ──────────
+      # OpenAI explicitly skipped per $5/day cost cap (see PLAN). User can
+      # trigger on-demand via dashboard "Refresh GPT-4o" button.
+      - name: Generate morning brief (Claude + DeepSeek + Gemini)
+        if: success()
+        continue-on-error: true
+        run: |
+          python scripts/morning_brief.py --out-dir data \
+            --providers claude,deepseek,gemini \
+            --post-to "${VERCEL_INGEST_URL%/}/api/morning-verdict/ingest" \
+            --post-key "$BRIEF_INGEST_KEY" \
+            --generated-by cron-premarket
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DEEPSEEK_API_KEY:  ${{ secrets.DEEPSEEK_API_KEY }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+
+      # ── Step 5: sync to public folder for Vercel ────────────────────────
+      - name: Sync data into Next.js public folder
+        if: success()
+        working-directory: apps/market_dashboard
+        run: |
+          mkdir -p public/market-dashboard/charts
+          cp ../market_dashboard_backend/data/snapshot.json          public/market-dashboard/
+          cp ../market_dashboard_backend/data/events.json             public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/meta.json               public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/breadth.json            public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/breadth_history.json    public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/tv_screeners.json       public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/charts/*.png             public/market-dashboard/charts/ 2>/dev/null || true
+
+      # ── Step 6: sanitize JSON ────────────────────────────────────────────
+      - name: Sanitize JSON
+        if: success()
+        working-directory: apps/market_dashboard
+        run: |
+          python3 -c "
+          import re, pathlib
+          for p in pathlib.Path('public/market-dashboard').glob('*.json'):
+              raw = p.read_text()
+              fixed = re.sub(r'\bNaN\b|\bInfinity\b|\b-Infinity\b', 'null', raw)
+              if fixed != raw:
+                  p.write_text(fixed)
+                  print(f'Sanitized {p.name}')
+          "
+
+      # ── Step 7: commit and push ──────────────────────────────────────────
+      - name: Commit updated pre-open data
+        if: success()
+        working-directory: .
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f apps/market_dashboard_backend/data \
+                     apps/market_dashboard/public/market-dashboard
+          echo "=== Staged changes ==="
+          git diff --cached --name-status | head -20 || true
+          if git diff --cached --quiet; then
+            echo "No data changes — nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore: pre-open refresh [skip ci]"
+          # Race-tolerant push: refresh_data_intraday + refresh_breadth may
+          # advance main between checkout and push. Rebase + retry up to 5x
+          # with -X theirs (data files always prefer the later run).
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Pushed successfully on attempt $attempt."
+              exit 0
+            fi
+            echo "Push attempt $attempt rejected. Rebasing on origin/main..."
+            if ! git pull --rebase --autostash -X theirs origin main; then
+              echo "Rebase failed on attempt $attempt; aborting."
+              git rebase --abort 2>/dev/null || true
+              exit 1
+            fi
+          done
+          echo "Push failed after 5 attempts."
+          exit 1
