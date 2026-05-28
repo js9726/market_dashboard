@@ -1,11 +1,26 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
-function run(label, args, opts = {}) {
+const isWindows = process.platform === "win32";
+
+function localBin(name) {
+  return join(process.cwd(), "node_modules", ".bin", isWindows ? `${name}.cmd` : name);
+}
+
+function run(label, binName, args, opts = {}) {
   console.log(`[build] ${label}`);
-  const command = process.platform === "win32" ? "cmd.exe" : "npx";
-  const commandArgs =
-    process.platform === "win32" ? ["/d", "/s", "/c", "npx.cmd", ...args] : args;
+
+  const binPath = localBin(binName);
+  if (!existsSync(binPath)) {
+    console.error(`[build] Missing local ${binName} binary at ${binPath}`);
+    console.error("[build] Run npm install or npm ci before npm run build.");
+    process.exit(1);
+  }
+
+  const command = isWindows ? "cmd.exe" : binPath;
+  const commandArgs = isWindows ? ["/d", "/s", "/c", `"${binPath}"`, ...args] : args;
   const result = spawnSync(command, commandArgs, { stdio: "inherit", shell: false });
   if (result.error) {
     console.error(`[build] ${label} failed to start: ${result.error.message}`);
@@ -17,8 +32,9 @@ function run(label, args, opts = {}) {
 
 run(
   "mark rolled-back migration if present",
-  ["prisma", "migrate", "resolve", "--rolled-back", "20260426000000_add_trade_plan_and_verdict_fields"],
+  "prisma",
+  ["migrate", "resolve", "--rolled-back", "20260426000000_add_trade_plan_and_verdict_fields"],
   { allowFailure: true },
 );
-run("apply migrations", ["prisma", "migrate", "deploy"]);
-run("next build", ["next", "build"]);
+run("apply migrations", "prisma", ["migrate", "deploy"]);
+run("next build", "next", ["build"]);
