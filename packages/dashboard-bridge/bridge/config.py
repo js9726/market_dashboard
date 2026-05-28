@@ -26,6 +26,10 @@ except ImportError:
 class DashboardConfig:
     url: str
     token: str
+    # NEW Phase: live-quotes ingest key. Optional — if absent, the bridge
+    # only pushes positions/fills/equity; live quotes (replacing the
+    # broken Yahoo Fallback workflow) are skipped.
+    live_quote_key: str | None = None
 
 
 @dataclass(frozen=True)
@@ -47,6 +51,11 @@ class OpenDConfig:
 class SyncConfig:
     interval_sec: int
     fill_lookback_days: int
+    # Comma-separated extra tickers to push live quotes for, beyond the
+    # tickers in the user's current positions. e.g. "SPY,QQQ,NVDA,CRDO".
+    # Defaults to a small index/sector set so the dashboard always has
+    # fresh SPY/QQQ even when no positions are open.
+    live_quote_extras: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -88,11 +97,25 @@ def load_config(path: Path | None = None) -> Config:
 
     # Allow env var override for the token (so it can stay out of the TOML)
     token = os.environ.get("DASHBOARD_BRIDGE_TOKEN") or _require(dash, "token", "dashboard")
+    # Live-quote key (optional) — separate secret to keep blast radius small.
+    live_quote_key = (
+        os.environ.get("DASHBOARD_BRIDGE_LIVE_QUOTE_KEY")
+        or dash.get("live_quote_key")
+    )
+
+    extras_raw = sync.get("live_quote_extras", "SPY,QQQ,IWM,DIA")
+    if isinstance(extras_raw, str):
+        extras = tuple(s.strip().upper() for s in extras_raw.split(",") if s.strip())
+    elif isinstance(extras_raw, list):
+        extras = tuple(str(s).strip().upper() for s in extras_raw if s)
+    else:
+        extras = ()
 
     return Config(
         dashboard=DashboardConfig(
             url=str(_require(dash, "url", "dashboard")).rstrip("/"),
             token=str(token),
+            live_quote_key=str(live_quote_key) if live_quote_key else None,
         ),
         broker=BrokerConfig(
             account_alias=str(_require(broker, "account_alias", "broker")),
@@ -108,5 +131,6 @@ def load_config(path: Path | None = None) -> Config:
         sync=SyncConfig(
             interval_sec=int(sync.get("interval_sec", 60)),
             fill_lookback_days=int(sync.get("fill_lookback_days", 1)),
+            live_quote_extras=extras,
         ),
     )

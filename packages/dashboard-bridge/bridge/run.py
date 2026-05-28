@@ -71,6 +71,19 @@ def _sync_once(dry: bool = False) -> bool:
     client = DashboardClient(cfg)
     result = client.sync(positions, fills, equity=equity)
     log.info("Sync result: %s", result)
+
+    # ── Live quotes push (Phase hotfix — replaces yahoo_fallback_quotes.yml).
+    # Non-fatal: failure here does NOT block positions/fills/equity sync above.
+    try:
+        from .live_quotes import fetch_live_quotes, push_live_quotes
+        held = [p.get("ticker", "") for p in positions if p.get("ticker")]
+        quotes = fetch_live_quotes(cfg, held)
+        if quotes:
+            lq_result = push_live_quotes(cfg, quotes)
+            log.info("Live-quote push: %d quotes, result=%s", len(quotes), lq_result)
+    except Exception as e:
+        log.warning("Live-quote push failed (non-fatal): %s", e)
+
     return bool(result.get("ok"))
 
 

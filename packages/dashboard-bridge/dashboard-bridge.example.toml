@@ -7,6 +7,12 @@ url = "https://market-dashboard-ivory.vercel.app"
 # Plaintext bridge token from /dashboard/settings/brokers → Generate token
 # (the token is shown once — paste it here, then chmod 600 this file)
 token = "mdb_REPLACE_ME"
+# Optional: live-quote ingest key (replaces the retired Yahoo Fallback workflow).
+# When set, the bridge daemon pushes real-time prices from moomoo to
+# /api/live-quotes/ingest for held tickers + sync.live_quote_extras below.
+# Without it, /dashboard/portfolio P/L will go stale within minutes.
+# Get it from your dashboard's Vercel env: LIVE_QUOTE_INGEST_KEY
+# live_quote_key = "..."
 
 [broker]
 # Must match a UserBrokerAccount.alias on your dashboard
@@ -32,3 +38,8 @@ interval_sec = 60
 # Fetch the last N days of fills on each poll. The dashboard dedups by
 # brokerFillId so re-pulling is cheap; this just bounds the request size.
 fill_lookback_days = 1
+# Extra tickers to push live quotes for (in addition to held positions).
+# Defaults to the major US index ETFs so the dashboard's market tape always
+# has a fresh reference. Add your watchlist if you want live RVOL/price for
+# names you don't currently hold.
+live_quote_extras = "SPY,QQQ,IWM,DIA,SMH,XLK,NVDA,CRDO,ARM,MRVL"
