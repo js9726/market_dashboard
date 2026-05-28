@@ -72,14 +72,15 @@ export function extractCandidates(brief: BriefAnyShape | null): ExtractedCandida
       found.set(t, { ...c, ticker: t });
     } else {
       // merge: prefer non-null new fields, accumulate tags
+      const existingRecord = existing as unknown as Record<string, unknown>;
       for (const k of Object.keys(c) as (keyof ExtractedCandidate)[]) {
         if (k === "tags") continue;
-        if ((existing as Record<string, unknown>)[k] == null && c[k] != null) {
-          (existing as Record<string, unknown>)[k] = c[k];
+        if (existingRecord[k] == null && c[k] != null) {
+          existingRecord[k] = c[k];
         }
       }
       if (c.tags) {
-        existing.tags = [...new Set([...(existing.tags ?? []), ...c.tags])];
+        existing.tags = Array.from(new Set([...(existing.tags ?? []), ...c.tags]));
       }
     }
   };
@@ -197,7 +198,7 @@ export function extractCandidates(brief: BriefAnyShape | null): ExtractedCandida
   // ── Final filter: require ALL three criteria after merging ──────────────
   // (RVOL may have been filled in late from industryMovers / screener)
   const final: ExtractedCandidate[] = [];
-  for (const c of found.values()) {
+  for (const c of Array.from(found.values())) {
     if (meetsFilter(c.day0Score ?? null, c.day0Verdict ?? null, c.day0Rvol ?? null)) {
       final.push(c);
     }
