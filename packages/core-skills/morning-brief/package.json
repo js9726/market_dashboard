@@ -1,0 +1,22 @@
+{
+  "name": "@market-dashboard/morning-brief",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Claude-based morning brief generator (Phase 3c of pre-open CI revamp). Generates the Claude tab StructuredBrief and POSTs it to the dashboard ingest endpoint.",
+  "type": "module",
+  "scripts": {
+    "brief": "tsx claude_sdk_runner.ts",
+    "brief:dry": "tsx claude_sdk_runner.ts --dry-run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

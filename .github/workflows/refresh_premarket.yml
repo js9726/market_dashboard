@@ -62,6 +62,16 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
+      # ── Phase 3c MVP: Node + Claude SDK runner ───────────────────────────
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Claude SDK runner deps
+        working-directory: packages/core-skills/morning-brief
+        run: npm install --no-audit --no-fund
+
       # ── Step 0: holiday gate ─────────────────────────────────────────────
       - name: Skip if not a US trading day
         id: trading_day
@@ -89,24 +99,41 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TV_SESSION_ID:    ${{ secrets.TV_SESSION_ID }}
 
-      # ── Step 4: morning brief (Claude SDK + DeepSeek + Gemini) ──────────
-      # OpenAI explicitly skipped per $5/day cost cap (see PLAN). User can
-      # trigger on-demand via dashboard "Refresh GPT-4o" button.
-      - name: Generate morning brief (Claude + DeepSeek + Gemini)
+      # ── Step 4a: Python morning brief (DeepSeek + Gemini only) ──────────
+      # Claude tab now powered by the Node-based SDK runner below (Phase 3c).
+      # OpenAI skipped per $5/day cost cap; on-demand only via dashboard button.
+      - name: Generate morning brief (DeepSeek + Gemini)
         if: success()
         continue-on-error: true
         run: |
           python scripts/morning_brief.py --out-dir data \
-            --providers claude,deepseek,gemini \
+            --providers deepseek,gemini \
             --post-to "${VERCEL_INGEST_URL%/}/api/morning-verdict/ingest" \
             --post-key "$BRIEF_INGEST_KEY" \
             --generated-by cron-premarket
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DEEPSEEK_API_KEY:  ${{ secrets.DEEPSEEK_API_KEY }}
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+
+      # ── Step 4b: Claude SDK runner (Node — Phase 3c MVP) ────────────────
+      # Direct Anthropic SDK with manual wiki context loading from the
+      # wiki-source submodule. Migrate to @anthropic-ai/claude-agent-sdk
+      # with skills/tools in a follow-up once this proves stable.
+      - name: Generate Claude tab brief (Node SDK runner)
+        if: success()
+        continue-on-error: true
+        working-directory: packages/core-skills/morning-brief
+        run: npm run brief
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+          BRIEF_GENERATED_BY: cron-premarket:claude-sdk
+          # Override data/wiki dirs to match the CI workspace layout
+          BRIEF_DATA_DIR: ${{ github.workspace }}/apps/market_dashboard_backend/data
+          WIKI_DIR:       ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
 
       # ── Step 5: sync to public folder for Vercel ────────────────────────
       - name: Sync data into Next.js public folder
