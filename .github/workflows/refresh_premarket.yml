@@ -49,9 +49,23 @@ jobs:
         working-directory: apps/market_dashboard_backend
 
     steps:
+      # Checkout the main repo. Submodule clone happens separately + non-fatal
+      # because the wiki-source submodule is a PRIVATE repo and needs a deploy
+      # key (see packages/dashboard-bridge/docs/WIKI_DEPLOY_KEY.md). Until that
+      # is set up, the brief runs without wiki context (still produces valid
+      # output; trader-style rubric just isn't embedded in the prompt).
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive   # pulls wiki submodule (Phase 3a)
+
+      - name: Fetch wiki submodule (non-fatal)
+        continue-on-error: true
+        run: |
+          if git submodule update --init --recursive 2>&1; then
+            echo "wiki-source submodule pulled OK"
+          else
+            echo "::warning::wiki-source submodule unreachable (likely missing deploy key). Brief will run without wiki context."
+            # Create an empty wiki dir so the SDK runner's reader doesn't crash.
+            mkdir -p packages/core-skills/wiki-source/wiki
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
