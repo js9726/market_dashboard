@@ -1,0 +1,82 @@
+name: Post-Close Journal (Daily)
+
+# Phase 5 of pre-open CI + journal revamp plan
+# (see apps/market_dashboard/docs/PLAN-pre-open-ci-and-journal-revamp.md).
+#
+# Runs 30 min after US market close every trading day (Mon-Fri, US holidays
+# auto-skipped). Owns the post-close journal generation + A-list day-14 rescore.
+#
+# Pipeline:
+#   1. Skip if not a US trading day (pandas_market_calendars)
+#   2. day14_rescore.py — walk ACTIVE A-list candidates aged 14 trading
+#      sessions and compute MFE/MAE/outcome via yfinance. POST to
+#      /api/a-list/<id>/day14 which auto-flips status to HIT_TARGET /
+#      STOPPED_OUT / EXPIRED.
+#   3. (Future Phase 5b) journal_close skill — for each closed trade today,
+#      AI-score via Claude SDK + wiki rules, persist JournalEntry, render
+#      chart snapshots.
+#
+# Cron: 20:30 UTC Mon-Fri = 16:30 ET EDT (= 04:30 MYT next day for Jie).
+# Jie is asleep at this hour — that's why the work runs cloud-side using
+# the broker-bridge daemon's pre-cached fills (Phase 4) instead of waiting
+# for Jie's PC to be online.
+
+on:
+  schedule:
+    - cron: '30 20 * * 1-5'           # 30 min post-close (16:30 ET EDT)
+  workflow_dispatch: {}
+
+concurrency:
+  group: market-dashboard-journal-close
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  journal:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: apps/market_dashboard_backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # ── Step 0: holiday gate ─────────────────────────────────────────────
+      - name: Skip if not a US trading day
+        run: python scripts/check_trading_day.py
+
+      # ── Step 1: Day-14 A-list rescore (Phase 5 core) ─────────────────────
+      - name: Day-14 A-list MFE/MAE rescore
+        if: success()
+        continue-on-error: true
+        run: python scripts/day14_rescore.py
+        env:
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+
+      # ── Step 2: (placeholder for Phase 5b) per-trade journal entries ────
+      # When implemented, this step will:
+      #   - Read today's closed trades from /api/portfolio/closed-today
+      #     (sourced from TradeFill via the dashboard-bridge daemon)
+      #   - For each trade, call the journal-close skill (Claude SDK)
+      #   - Render entry + day-14 chart snapshots
+      #   - POST to /api/journal/entries/ingest
+      #   - Auto-suggest wiki updates to wiki/_skill-suggestions.md
+      - name: (Phase 5b stub) Per-trade journal entries
+        if: success()
+        run: |
+          echo "Phase 5b not yet implemented — per-trade journaling deferred."
+          echo "Day-14 A-list rescore completed. JournalEntry per-trade pipeline pending."

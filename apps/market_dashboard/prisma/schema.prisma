@@ -98,6 +98,8 @@ model User {
   aListCandidates     AListCandidate[]
   // Daily equity timeline (Phase 4 of pre-open CI revamp).
   equitySnapshots     EquitySnapshot[]
+  // Frozen morning-brief snapshots (Phase 5 of pre-open CI revamp).
+  briefSnapshots      BriefSnapshot[]
 }
 
 model SpreadsheetConnection {
@@ -440,6 +442,37 @@ model AListCandidate {
   @@index([status, pickDate(sort: Desc)])
   @@index([day14Outcome, pickDate(sort: Desc)])
   @@index([sector, pickDate(sort: Desc)])
+}
+
+/// BriefSnapshot — immutable frozen copy of a morning brief at a moment in
+/// time. Referenced by JournalEntry (which AI brief was active when the user
+/// entered this trade?) and AListCandidate (which brief promoted this pick?)
+/// so we can replay the AI's reasoning vs the eventual outcome.
+///
+/// Distinct from MorningBriefCache: MorningBriefCache is the LIVE current
+/// brief per (bucket, provider) and gets overwritten by re-runs. BriefSnapshot
+/// is the archival copy referenced by historical journal entries forever.
+///
+/// Phase 5 — populated by the post-close journal workflow.
+model BriefSnapshot {
+  id              String   @id @default(cuid())
+  userId          String
+  /// When the brief was originally bucketed (e.g. 2026-05-27T13:00:00Z for
+  /// the 09:00 ET pre-open run).
+  bucketAt        DateTime
+  provider        String   // "claude" | "deepseek" | "gemini" | "openai"
+  /// Full StructuredBrief shape — same as MorningBriefCache.structuredJson.
+  structuredJson  Json
+  /// Provenance: which CI run created the source brief.
+  generatedBy     String
+  /// When this snapshot was frozen for journal/A-list reference.
+  capturedAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bucketAt, provider])
+  @@index([userId, bucketAt(sort: Desc)])
+  @@index([provider, bucketAt(sort: Desc)])
 }
 
 /// Daily equity snapshot — captured by the dashboard-bridge daemon when it
