@@ -70,10 +70,10 @@ model User {
   // username is the URL handle (@handle in UI, stored without @). Lowercase
   // alphanumeric + underscore, 3-30 chars. Unique. Nullable so existing rows
   // and not-yet-claimed accounts coexist.
-  username             String?  @unique
-  bio                  String?  @db.VarChar(200)
-  dashboardTagline     String?  @db.VarChar(60)
-  publicProfileEnabled Boolean  @default(false)
+  username             String? @unique
+  bio                  String? @db.VarChar(200)
+  dashboardTagline     String? @db.VarChar(60)
+  publicProfileEnabled Boolean @default(false)
   // Tier is COMPUTED from trade stats in lib/profile/composite.ts — not stored
   // as a column so it never goes stale. Cache it later if leaderboard reads
   // become a hot path.
@@ -133,16 +133,16 @@ model TradeRecord {
   // ── NEW (2026-05): multi-broker fields ───────────────────────────────────
   // 'SHEET' | 'MANUAL' | 'BRIDGE' | 'CSV' — kept as String for codebase
   // consistency (existing role/signal columns also use String).
-  source           String             @default("SHEET")
+  source          String             @default("SHEET")
   // Nullable: legacy sheet trades have no broker account; new entries do.
-  brokerAccountId  String?
-  brokerAccount    UserBrokerAccount? @relation(fields: [brokerAccountId], references: [id], onDelete: SetNull)
+  brokerAccountId String?
+  brokerAccount   UserBrokerAccount? @relation(fields: [brokerAccountId], references: [id], onDelete: SetNull)
   // Sub-day precision execution time. tradeDate is kept for date-based grouping
   // and matches existing UI; executedAt is the precise fill timestamp from
   // bridge data. For manual entries, executedAt mirrors tradeDate + 09:30 ET.
-  executedAt       DateTime?
+  executedAt      DateTime?
   // Used to de-dupe bridge syncs. Bridge sends broker's order/deal id.
-  brokerOrderId    String?
+  brokerOrderId   String?
 
   // ── Core execution fields (existing) ─────────────────────────────────────
   ticker    String
@@ -151,7 +151,7 @@ model TradeRecord {
   quantity  Decimal?  @db.Decimal(12, 2)
   pnl       Decimal?  @db.Decimal(12, 2) // NULL = open trade
   exitPrice Decimal?  @db.Decimal(12, 4)
-  side      String?   // "Long" | "Short"
+  side      String? // "Long" | "Short"
   fees      Decimal?  @db.Decimal(12, 2)
   notes     String?
   rawRow    Json // full row stored for re-parsing without re-fetching
@@ -161,10 +161,10 @@ model TradeRecord {
   proposedEntry Decimal? @db.Decimal(12, 4) // "Proposed Buy Price"
   proposedSL    Decimal? @db.Decimal(12, 4) // "Proposed SL Price"
   proposedTP    Decimal? @db.Decimal(12, 4) // "Proposed TP Price"
-  rrr           Decimal? @db.Decimal(6, 2)  // "RRR"
-  riskPct       Decimal? @db.Decimal(6, 2)  // "Risk (%)"
-  rewardPct     Decimal? @db.Decimal(6, 2)  // "Reward (%)"
-  positionPct   Decimal? @db.Decimal(6, 2)  // "Position (%)"
+  rrr           Decimal? @db.Decimal(6, 2) // "RRR"
+  riskPct       Decimal? @db.Decimal(6, 2) // "Risk (%)"
+  rewardPct     Decimal? @db.Decimal(6, 2) // "Reward (%)"
+  positionPct   Decimal? @db.Decimal(6, 2) // "Position (%)"
   currency      String?
   platform      String?
   industry      String?
@@ -190,30 +190,30 @@ model TradeRecord {
 }
 
 model TradeVerdictHistory {
-  id        String      @id @default(cuid())
-  tradeId   String
-  trade     TradeRecord @relation(fields: [tradeId], references: [id], onDelete: Cascade)
-  ticker    String
-  tradeDate DateTime?
-  model     String
-  provider  String
+  id             String      @id @default(cuid())
+  tradeId        String
+  trade          TradeRecord @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  ticker         String
+  tradeDate      DateTime?
+  model          String
+  provider       String
   // 'trader-debate' (6-persona scorer) | 'agent-pipeline' (5-agent role-based)
-  style     String      @default("trader-debate")
+  style          String      @default("trader-debate")
   // 'day-0' (initial scoring at journal time) | 'day-14-rescore' (heuristic outcome check)
-  kind           String   @default("day-0")
+  kind           String      @default("day-0")
   // Populated only when kind='day-14-rescore'. Shape:
   // { actual_close_d14, actual_pct_move_14d, actual_high_d14, actual_low_d14,
   //   predicted_exit_price, predicted_stop_price, match_grade ('A'|'B'|'C'),
   //   match_notes, drift_detected, wiki_changes_suggested[] }
   outcomeMetrics Json?
-  verdict   Json
-  score     Float?
-  createdAt DateTime    @default(now())
+  verdict        Json
+  score          Float?
+  createdAt      DateTime    @default(now())
 
   @@index([tradeId])
   @@index([ticker, tradeDate])
-  @@index([kind, createdAt])  // for cron: find day-0 verdicts 14+ days old
-  @@index([tradeId, kind])    // for cron: check if day-14-rescore already exists
+  @@index([kind, createdAt]) // for cron: find day-0 verdicts 14+ days old
+  @@index([tradeId, kind]) // for cron: check if day-14-rescore already exists
 }
 
 // ── Phase 4: Multi-tenant scanner + agent pipeline ───────────────────────────
@@ -315,29 +315,113 @@ model WikiTradeVerdict {
 /// Captures "what the screener flagged on date X" so we can compute
 /// conversion rate (screener → journaled trade) and surface missed setups.
 model WikiScreenerPick {
-  id               String   @id @default(cuid())
-  operatorLabel    String   @default("JS")
+  id                  String   @id @default(cuid())
+  operatorLabel       String   @default("JS")
   /// The day the screener was run, not the trade entry date.
-  pickDate         DateTime @db.Date
-  ticker           String
+  pickDate            DateTime @db.Date
+  ticker              String
   /// Optional: setup_classification guess (e.g. "EP-FRESH", "BO-CB").
   setupClassification String?
   /// Which screener / criteria matched. e.g. "qullamaggie-ep", "rs-leaders".
-  screenSource     String
+  screenSource        String
   /// Free-form notes — RVOL, sector, why it caught your eye, etc.
-  notes            String?  @db.Text
+  notes               String?  @db.Text
   /// Optional: source URL (TradingView screenshot, Finviz, etc.)
-  sourceUrl        String?
+  sourceUrl           String?
   /// Optional: when a screener pick later gets journaled, link the Trade.id
   /// here so conversion rate can be computed.
-  convertedTradeId String?
-  ingestedAt       DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  convertedTradeId    String?
+  ingestedAt          DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   @@unique([operatorLabel, pickDate, ticker, screenSource])
   @@index([operatorLabel, pickDate(sort: Desc)])
   @@index([ticker, pickDate(sort: Desc)])
   @@index([screenSource, pickDate(sort: Desc)])
+}
+
+/// A-list candidate — daily strict-quality picks that meet ALL three filters:
+///   1. DeepSeek score >= 80
+///   2. Verdict == "GO"
+///   3. RVOL >= 1.5x
+///
+/// Promoted automatically from the pre-open brief. Tracked across 14 sessions
+/// with day-0 entry thesis and day-14 outcome (MFE / MAE / outcome score).
+/// Surfaced on the dedicated /a-list page with filters by date / sector /
+/// setup / status / score.
+///
+/// Differs from `WikiScreenerPick` which is a softer log of every flagged ticker.
+/// A-list is the strict subset worth actively monitoring.
+model AListCandidate {
+  id                  String   @id @default(cuid())
+  operatorLabel       String   @default("JS")
+  /// Date the candidate was promoted (= brief date, pre-open).
+  pickDate            DateTime @db.Date
+  ticker              String
+  /// Setup classification at pick time (BO-CB, EP-FRESH, PB-21EMA, etc.).
+  setupClassification String?
+  /// Which screener URL surfaced this (e.g. "best-winners", "vcp-200ma", "premarket").
+  screenSource        String?
+  sector              String?
+  industry            String?
+
+  // ── Day-0 entry proposal (from brief) ──────────────────────────────────
+  entryZone         Decimal?  @db.Decimal(12, 4)
+  stop              Decimal?  @db.Decimal(12, 4)
+  target            Decimal?  @db.Decimal(12, 4)
+  rrr               Decimal?  @db.Decimal(6, 2)
+  /// 0-100 DeepSeek/Claude composite at pick day.
+  day0Score         Int?
+  /// "GO" | "WAIT" | "PASS"
+  day0Verdict       String?
+  day0Rvol          Decimal?  @db.Decimal(6, 2)
+  day0Thesis        String?   @db.Text
+  /// Trader-style lens that fits best (e.g. "@Qullamaggie", "@markminervini").
+  day0TraderLens    String?
+  /// Link to the brief that promoted this candidate (frozen reference).
+  day0BriefBucketAt DateTime?
+  day0BriefProvider String?
+  /// Price at pick close (or pre-mkt if pick happened pre-mkt).
+  day0Price         Decimal?  @db.Decimal(12, 4)
+
+  // ── Day-14 outcome (computed on day 14 via cron) ───────────────────────
+  /// Highest close above entry over 14 sessions.
+  day14Mfe          Decimal?  @db.Decimal(12, 4)
+  /// Lowest close below entry over 14 sessions.
+  day14Mae          Decimal?  @db.Decimal(12, 4)
+  /// MFE in R units (Mfe / risk where risk = entry - stop).
+  day14MfeR         Decimal?  @db.Decimal(6, 2)
+  /// MAE in R units.
+  day14MaeR         Decimal?  @db.Decimal(6, 2)
+  /// 0-10 outcome score per the audit rubric.
+  day14Score        Decimal?  @db.Decimal(4, 2)
+  /// Brief AI commentary on the outcome.
+  day14Verdict      String?   @db.Text
+  /// Re-run of the 7 trader-style scorecard at day-14.
+  day14TraderScores Json?
+  /// Did price hit target / stop / neither.
+  day14Outcome      String? // "HIT_TARGET" | "STOPPED_OUT" | "PARTIAL" | "FADE" | "DRIFT"
+  day14ComputedAt   DateTime?
+
+  // ── Status lifecycle ────────────────────────────────────────────────────
+  /// "ACTIVE" | "EXPIRED" | "HIT_TARGET" | "STOPPED_OUT" | "MANUALLY_CLOSED" | "CONVERTED"
+  status           String  @default("ACTIVE")
+  /// If user actually entered the trade, link to the TradeRecord.
+  convertedTradeId String?
+
+  // ── Free-form ───────────────────────────────────────────────────────────
+  notes String? @db.Text
+  tags  Json? // e.g. ["earnings", "AI-infra", "post-gap-VCP"]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([operatorLabel, pickDate, ticker])
+  @@index([operatorLabel, pickDate(sort: Desc)])
+  @@index([ticker, pickDate(sort: Desc)])
+  @@index([status, pickDate(sort: Desc)])
+  @@index([day14Outcome, pickDate(sort: Desc)])
+  @@index([sector, pickDate(sort: Desc)])
 }
 
 // ── DailyReflection (formerly `JournalEntry`) ───────────────────────────────
@@ -354,13 +438,13 @@ model DailyReflection {
   id               String   @id @default(cuid())
   userId           String
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entryDate        DateTime @db.Date  // YYYY-MM-DD, one per user per day
-  moodEmoji        String?  // single grapheme like "😊" — see lib/journal/mood.ts
-  sleepHours       Decimal? @db.Decimal(4, 2)  // 0.00–24.00
-  marketConditions String?  // free-text or one of the enum values in lib/journal/mood.ts
+  entryDate        DateTime @db.Date // YYYY-MM-DD, one per user per day
+  moodEmoji        String? // single grapheme like "😊" — see lib/journal/mood.ts
+  sleepHours       Decimal? @db.Decimal(4, 2) // 0.00–24.00
+  marketConditions String? // free-text or one of the enum values in lib/journal/mood.ts
   notes            String?  @db.Text
-  tvLinks          Json     @default("[]")  // array of strings (TradingView or any URL)
-  attachmentUrls   Json     @default("[]")  // populated by Feature 7.2 — Vercel Blob URLs
+  tvLinks          Json     @default("[]") // array of strings (TradingView or any URL)
+  attachmentUrls   Json     @default("[]") // populated by Feature 7.2 — Vercel Blob URLs
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -379,36 +463,36 @@ model DailyReflection {
 // audit log — many rows per trade for re-scoring runs).
 //
 model JournalEntry {
-  id                String      @id @default(cuid())
-  userId            String
-  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tradeRecordId     String      @unique
-  tradeRecord       TradeRecord @relation(fields: [tradeRecordId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradeRecordId String      @unique
+  tradeRecord   TradeRecord @relation(fields: [tradeRecordId], references: [id], onDelete: Cascade)
 
   // Setup classification (see skills/trade-analyser SKILL.md Step 2.5)
-  setupType         String      // EP-FRESH | POST-GAP-VCP | BO-VCP | BO-CB | PB-21EMA | MA-PULLBACK | POCKET-PIVOT | ORH-INTRADAY | PARABOLIC | EP-SECOND | CONTINUATION | OTHER
-  primingPattern    String?     // INSIDE-BAR | UPSIDE-REVERSAL | POSITIVE-EXPECTATION-BREAKER | TIGHT-SETUP-DAY | NONE
-  setupJustification String?    @db.Text  // 1-2 sentence wiki-cited explanation
+  setupType          String // EP-FRESH | POST-GAP-VCP | BO-VCP | BO-CB | PB-21EMA | MA-PULLBACK | POCKET-PIVOT | ORH-INTRADAY | PARABOLIC | EP-SECOND | CONTINUATION | OTHER
+  primingPattern     String? // INSIDE-BAR | UPSIDE-REVERSAL | POSITIVE-EXPECTATION-BREAKER | TIGHT-SETUP-DAY | NONE
+  setupJustification String? @db.Text // 1-2 sentence wiki-cited explanation
 
   // 7-trader rubric — { [traderName]: { entry, risk, setup, total, wouldEnter, why } }
-  traderScores      Json
+  traderScores Json
 
   // Fundamental score (冷眼 A/B/C framework — see wiki/fundamental-analysis.md)
-  fundamentalGrade  String?     // A | B | C
-  fundamentalData   Json?       // { growth, profitability, valuation, balanceSheet }
+  fundamentalGrade String? // A | B | C
+  fundamentalData  Json? // { growth, profitability, valuation, balanceSheet }
 
-  compositeScore    Decimal     @db.Decimal(4, 2)  // 0.00–10.00
-  bestStyleMatch    String?     // trader name
-  weakestDimension  String?     // explanation
+  compositeScore   Decimal @db.Decimal(4, 2) // 0.00–10.00
+  bestStyleMatch   String? // trader name
+  weakestDimension String? // explanation
 
-  entryVerdict      String      // GOOD | ACCEPTABLE | POOR
-  evolutionNote     String?     @db.Text
-  patternNote       String?     @db.Text  // vs last 5 trades — recurring weakness/improvement
+  entryVerdict  String // GOOD | ACCEPTABLE | POOR
+  evolutionNote String? @db.Text
+  patternNote   String? @db.Text // vs last 5 trades — recurring weakness/improvement
 
-  wikiRefs          String[]    // array of wiki paths consulted
+  wikiRefs String[] // array of wiki paths consulted
 
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt(sort: Desc)])
 }
@@ -425,19 +509,19 @@ model JournalEntry {
 //   }
 //
 model BrokerPreset {
-  id          String   @id @default(cuid())
+  id         String   @id @default(cuid())
   // Globally unique name for built-ins; per-user-scoped for user clones.
-  name        String
-  region      String   // 'US' | 'HK' | 'SG' | 'MY' | 'CN' | 'AU' | 'CA' | 'JP'
-  currency    String   // 'USD' | 'HKD' | 'SGD' | 'MYR' | ...
-  feeFormula  Json
-  isBuiltIn   Boolean  @default(false)
+  name       String
+  region     String // 'US' | 'HK' | 'SG' | 'MY' | 'CN' | 'AU' | 'CA' | 'JP'
+  currency   String // 'USD' | 'HKD' | 'SGD' | 'MYR' | ...
+  feeFormula Json
+  isBuiltIn  Boolean  @default(false)
   // userId is NULL for built-in presets, set for user-cloned ones.
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
 
-  accounts    UserBrokerAccount[]
+  accounts UserBrokerAccount[]
 
   @@unique([userId, name])
   @@index([isBuiltIn])
@@ -463,12 +547,12 @@ model UserBrokerAccount {
   // Multi-currency display preference for this account.
   displayCurrency String?
   isActive        Boolean      @default(true)
-  isLive          Boolean      @default(false)  // false = paper trading
+  isLive          Boolean      @default(false) // false = paper trading
   createdAt       DateTime     @default(now())
 
-  positions     Position[]
-  fills         TradeFill[]
-  tradeRecords  TradeRecord[]
+  positions    Position[]
+  fills        TradeFill[]
+  tradeRecords TradeRecord[]
 
   @@unique([userId, alias])
   @@index([userId])
@@ -509,21 +593,21 @@ model BrokerBridgeToken {
 // avgCost stored in the position's local currency (matches broker's reporting).
 //
 model Position {
-  id                 String            @id @default(cuid())
-  brokerAccountId    String
-  brokerAccount      UserBrokerAccount @relation(fields: [brokerAccountId], references: [id], onDelete: Cascade)
-  ticker             String            // 'US.HUT', 'HK.00700', etc.
-  qty                Decimal           @db.Decimal(18, 4)
-  avgCost            Decimal           @db.Decimal(12, 4)
-  currency           String            // matches broker's local currency
+  id              String            @id @default(cuid())
+  brokerAccountId String
+  brokerAccount   UserBrokerAccount @relation(fields: [brokerAccountId], references: [id], onDelete: Cascade)
+  ticker          String // 'US.HUT', 'HK.00700', etc.
+  qty             Decimal           @db.Decimal(18, 4)
+  avgCost         Decimal           @db.Decimal(12, 4)
+  currency        String // matches broker's local currency
   // Cached fields refreshed by MarketQuote join (so we don't recompute on every read)
-  currentPrice       Decimal?          @db.Decimal(12, 4)
-  marketValue        Decimal?          @db.Decimal(18, 4)
-  unrealizedPl       Decimal?          @db.Decimal(18, 4)
-  unrealizedPlPct    Decimal?          @db.Decimal(8, 4)
-  openedAt           DateTime
-  lastFillAt         DateTime
-  asOf               DateTime          @default(now())
+  currentPrice    Decimal?          @db.Decimal(12, 4)
+  marketValue     Decimal?          @db.Decimal(18, 4)
+  unrealizedPl    Decimal?          @db.Decimal(18, 4)
+  unrealizedPlPct Decimal?          @db.Decimal(8, 4)
+  openedAt        DateTime
+  lastFillAt      DateTime
+  asOf            DateTime          @default(now())
 
   @@unique([brokerAccountId, ticker])
   @@index([brokerAccountId])
@@ -552,15 +636,15 @@ model TradeFill {
   tradeRecord     TradeRecord?      @relation(fields: [tradeRecordId], references: [id], onDelete: SetNull)
   brokerAccountId String
   brokerAccount   UserBrokerAccount @relation(fields: [brokerAccountId], references: [id], onDelete: Cascade)
-  brokerFillId    String?           // broker's deal_id / execId — null for manual entries
+  brokerFillId    String? // broker's deal_id / execId — null for manual entries
   ticker          String
-  side            String            // 'BUY' | 'SELL'
+  side            String // 'BUY' | 'SELL'
   qty             Decimal           @db.Decimal(18, 4)
   price           Decimal           @db.Decimal(12, 4)
   executedAt      DateTime
   fees            Decimal?          @db.Decimal(12, 4)
   currency        String?
-  source          String            // 'MANUAL' | 'BRIDGE' | 'CSV'
+  source          String // 'MANUAL' | 'BRIDGE' | 'CSV'
   createdAt       DateTime          @default(now())
 
   @@unique([brokerAccountId, brokerFillId], name: "brokerAccount_brokerFillId")
@@ -575,15 +659,15 @@ model TradeFill {
 // require remapping each time. Keyed by (user, broker name).
 //
 model CsvImportMapping {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  brokerName   String   // matches a BrokerPreset.name when possible, free text otherwise
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brokerName String // matches a BrokerPreset.name when possible, free text otherwise
   // Header → field name mapping, e.g. { "Symbol": "ticker", "Trade Date": "executedAt" }
-  columnMap    Json
-  dateFormat   String?  // e.g. 'MM/dd/yyyy'
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  columnMap  Json
+  dateFormat String? // e.g. 'MM/dd/yyyy'
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@unique([userId, brokerName])
 }
@@ -600,7 +684,7 @@ model LiveQuote {
   price      Decimal  @db.Decimal(12, 4)
   changePct  Decimal? @db.Decimal(8, 4)
   volume     BigInt?
-  source     String   // 'moomoo' | 'yahoo'
+  source     String // 'moomoo' | 'yahoo'
   observedAt DateTime
   ingestedAt DateTime @default(now())
 
@@ -620,14 +704,14 @@ model LiveQuote {
 //   - Different sources (LiveQuote: moomoo/yahoo; MarketQuote: yahoo/opend/byok)
 //
 model MarketQuote {
-  symbol     String   @id  // 'US.HUT', 'HK.00700', etc.
+  symbol     String   @id // 'US.HUT', 'HK.00700', etc.
   price      Decimal  @db.Decimal(12, 4)
   changePct  Decimal? @db.Decimal(8, 4)
   prevClose  Decimal? @db.Decimal(12, 4)
   dayHigh    Decimal? @db.Decimal(12, 4)
   dayLow     Decimal? @db.Decimal(12, 4)
   volume     BigInt?
-  source     String   // 'yahoo' | 'opend' | 'polygon' | 'iex'
+  source     String // 'yahoo' | 'opend' | 'polygon' | 'iex'
   observedAt DateTime
   ingestedAt DateTime @default(now())
 
