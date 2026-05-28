@@ -99,7 +99,41 @@ def _load_screener_tickers() -> list:
 
 
 SCREENER_SYMBOLS = _load_screener_tickers()
-ALL_SYMBOLS = INDEX_SYMBOLS + SECTOR_SYMBOLS + SCREENER_SYMBOLS
+
+# moomoo OpenD free-tier quota = 100 symbols total (subscription).
+# Reserve headroom of 5 for any in-flight subscriptions / late additions.
+# Universe priority: indices > sector ETFs > top-N screener picks.
+MOOMOO_SUBSCRIPTION_QUOTA = 100
+SUBSCRIPTION_HEADROOM = 5
+MAX_SUBSCRIBED = MOOMOO_SUBSCRIPTION_QUOTA - SUBSCRIPTION_HEADROOM  # = 95
+
+# Dedupe across categories (screener may include SPY/QQQ/sector ETFs).
+_seen = set()
+def _dedupe(lst):
+    out = []
+    for s in lst:
+        if s not in _seen:
+            _seen.add(s)
+            out.append(s)
+    return out
+
+_INDEX = _dedupe(INDEX_SYMBOLS)
+_SECTORS = _dedupe(SECTOR_SYMBOLS)
+_SCREENER_REMAINING = _dedupe(SCREENER_SYMBOLS)
+# Reserve slots for indices + sectors first; fill remaining with top screener picks
+_top_screener_slots = max(0, MAX_SUBSCRIBED - len(_INDEX) - len(_SECTORS))
+ALL_SYMBOLS = _INDEX + _SECTORS + _SCREENER_REMAINING[:_top_screener_slots]
+
+if len(_SCREENER_REMAINING) > _top_screener_slots:
+    dropped = len(_SCREENER_REMAINING) - _top_screener_slots
+    print("[symbols] capping universe at %d (moomoo quota %d, headroom %d). "
+          "Dropped %d screener tickers." %
+          (len(ALL_SYMBOLS), MOOMOO_SUBSCRIPTION_QUOTA, SUBSCRIPTION_HEADROOM, dropped),
+          flush=True)
+else:
+    print("[symbols] universe = %d (indices=%d, sectors=%d, screener=%d)" %
+          (len(ALL_SYMBOLS), len(_INDEX), len(_SECTORS), len(_SCREENER_REMAINING)),
+          flush=True)
 
 
 def to_futu_code(sym):
@@ -179,14 +213,34 @@ def run_moomoo(throttle_s):
 
     ctx = OpenQuoteContext(host=host, port=port)
     futu_codes = [to_futu_code(s) for s in ALL_SYMBOLS]
-    ret, _ = ctx.subscribe(futu_codes, [SubType.QUOTE])
-    if ret != RET_OK:
-        print("[moomoo] subscribe failed: %s" % _, file=sys.stderr)
+
+    # Chunk subscribe — moomoo per-call subscribe limit is 50 symbols.
+    # We send in batches of 40 with a 0.5s delay so the OpenD client has time
+    # to ACK each chunk before the next request goes out.
+    SUBSCRIBE_BATCH = 40
+    SUBSCRIBE_DELAY_S = 0.5
+    subscribed_count = 0
+    failed_chunks = []
+    for i in range(0, len(futu_codes), SUBSCRIBE_BATCH):
+        chunk = futu_codes[i:i + SUBSCRIBE_BATCH]
+        ret_sub, err_sub = ctx.subscribe(chunk, [SubType.QUOTE])
+        if ret_sub != RET_OK:
+            failed_chunks.append("batch %d-%d: %s" % (i, i + len(chunk), err_sub))
+        else:
+            subscribed_count += len(chunk)
+        time.sleep(SUBSCRIBE_DELAY_S)
+
+    if subscribed_count == 0:
+        print("[moomoo] subscribe failed entirely: %s" % "; ".join(failed_chunks), file=sys.stderr)
         ctx.close()
         return False
 
-    print("[moomoo] connected to OpenD at %s:%d, subscribed %d symbols" %
-          (host, port, len(futu_codes)), flush=True)
+    if failed_chunks:
+        for fc in failed_chunks:
+            print("[moomoo] partial subscribe failure: %s" % fc, file=sys.stderr)
+
+    print("[moomoo] connected to OpenD at %s:%d, subscribed %d/%d symbols" %
+          (host, port, subscribed_count, len(futu_codes)), flush=True)
 
     last_push = {}  # symbol -> ts
 
