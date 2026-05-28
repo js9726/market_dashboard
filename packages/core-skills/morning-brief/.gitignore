@@ -1,0 +1,23 @@
+# Ephemeral runtime artifacts — regenerated on every brief / live-data run.
+# Kept on disk for local debugging; never useful to commit.
+
+# Per-provider brief outputs
+brief_output.json
+claude_brief_output.json
+*_brief_output.json
+*_brief_output.raw.txt
+codex_*_tab_*.json
+*_tab_*.json
+
+# OpenD live snapshots (replaced every refresh)
+opend_live.json
+opend_live_*.json
+opend_context.json
+
+# Index technicals (recomputed every CI run)
+index_technicals.json
+
+# Node SDK build output
+node_modules/
+dist/
+*.tsbuildinfo
