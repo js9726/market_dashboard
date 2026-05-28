@@ -12,6 +12,7 @@
 
 CREATE TABLE "AListCandidate" (
   "id"                  TEXT NOT NULL,
+  "userId"              TEXT NOT NULL,
   "operatorLabel"       TEXT NOT NULL DEFAULT 'JS',
   "pickDate"            DATE NOT NULL,
   "ticker"              TEXT NOT NULL,
@@ -19,6 +20,7 @@ CREATE TABLE "AListCandidate" (
   "screenSource"        TEXT,
   "sector"              TEXT,
   "industry"            TEXT,
+  "source"              TEXT NOT NULL DEFAULT 'AUTO',
 
   -- Day-0 entry proposal
   "entryZone"           DECIMAL(12, 4),
@@ -59,10 +61,10 @@ CREATE TABLE "AListCandidate" (
   CONSTRAINT "AListCandidate_pkey" PRIMARY KEY ("id")
 );
 
-CREATE UNIQUE INDEX "AListCandidate_operatorLabel_pickDate_ticker_key"
-  ON "AListCandidate" ("operatorLabel", "pickDate", "ticker");
-CREATE INDEX "AListCandidate_operatorLabel_pickDate_idx"
-  ON "AListCandidate" ("operatorLabel", "pickDate" DESC);
+CREATE UNIQUE INDEX "AListCandidate_userId_pickDate_ticker_key"
+  ON "AListCandidate" ("userId", "pickDate", "ticker");
+CREATE INDEX "AListCandidate_userId_pickDate_idx"
+  ON "AListCandidate" ("userId", "pickDate" DESC);
 CREATE INDEX "AListCandidate_ticker_pickDate_idx"
   ON "AListCandidate" ("ticker", "pickDate" DESC);
 CREATE INDEX "AListCandidate_status_pickDate_idx"
@@ -71,3 +73,7 @@ CREATE INDEX "AListCandidate_day14Outcome_pickDate_idx"
   ON "AListCandidate" ("day14Outcome", "pickDate" DESC);
 CREATE INDEX "AListCandidate_sector_pickDate_idx"
   ON "AListCandidate" ("sector", "pickDate" DESC);
+
+ALTER TABLE "AListCandidate"
+  ADD CONSTRAINT "AListCandidate_userId_fkey"
+  FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -54,8 +54,22 @@ export async function GET(req: Request) {
     ? new Date(`${qp.get("to")}T00:00:00.000Z`)
     : new Date(today.toISOString().slice(0, 10) + "T00:00:00.000Z");
 
+  // Multi-operator: scope to user. Owners read their own A-list; allowed
+  // viewers see the first owner's A-list (shared view).
+  let scopeUserId = session.user.id;
+  const role = (session.user as { role?: string }).role;
+  if (role !== "owner") {
+    const owner = await prisma.user.findFirst({
+      where: { role: "owner" },
+      select: { id: true },
+      orderBy: { createdAt: "asc" },
+    });
+    if (!owner) return NextResponse.json({ count: 0, nextCursor: null, items: [] });
+    scopeUserId = owner.id;
+  }
+
   const where: Prisma.AListCandidateWhereInput = {
-    operatorLabel: "JS",
+    userId: scopeUserId,
     pickDate: { gte: from, lte: to },
   };
 

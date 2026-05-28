@@ -49,6 +49,7 @@
  */
 import { NextResponse } from "next/server";
 import { Prisma, PrismaClient } from "@prisma/client";
+import { getOwnerUserId } from "@/server/a-list-extractor";
 
 const prisma = new PrismaClient();
 
@@ -106,6 +107,12 @@ export async function POST(req: Request) {
   }
 
   const operatorLabel = body.operatorLabel ?? "JS";
+  // Resolve target user — defaults to the owner. Future iterations can accept
+  // an explicit userId in the body (for multi-tenant fan-out).
+  const userId = await getOwnerUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "No owner-role user found" }, { status: 503 });
+  }
   const pickDate = new Date(`${body.pickDate}T00:00:00.000Z`);
 
   let inserted = 0;
@@ -121,14 +128,16 @@ export async function POST(req: Request) {
     const ticker = c.ticker.trim().toUpperCase();
     const existing = await prisma.aListCandidate.findUnique({
       where: {
-        operatorLabel_pickDate_ticker: { operatorLabel, pickDate, ticker },
+        userId_pickDate_ticker: { userId, pickDate, ticker },
       },
     });
 
     const data = {
+      userId,
       operatorLabel,
       pickDate,
       ticker,
+      source: "AUTO",
       setupClassification: c.setupClassification ?? null,
       screenSource: c.screenSource ?? null,
       sector: c.sector ?? null,

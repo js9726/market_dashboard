@@ -211,9 +211,15 @@ function dec(v: number | null | undefined): Prisma.Decimal | null {
 
 /**
  * Persist the extracted candidates for a given pickDate + brief reference.
- * Idempotent — upserts on (operatorLabel, pickDate, ticker). Re-runs are safe.
+ * Idempotent — upserts on (userId, pickDate, ticker). Re-runs are safe.
+ *
+ * Multi-operator: candidates are scoped to a single user. The brief itself is
+ * shared (one MorningBriefCache per bucket), but each user gets their own
+ * A-list. For V1 this is always the owner user; future iterations can fan out
+ * to every user with their own filter preferences.
  */
 export async function upsertCandidates(
+  userId: string,
   pickDate: Date,
   candidates: ExtractedCandidate[],
   briefBucketAt: Date,
@@ -226,18 +232,16 @@ export async function upsertCandidates(
   for (const c of candidates) {
     const existing = await prisma.aListCandidate.findUnique({
       where: {
-        operatorLabel_pickDate_ticker: {
-          operatorLabel,
-          pickDate,
-          ticker: c.ticker,
-        },
+        userId_pickDate_ticker: { userId, pickDate, ticker: c.ticker },
       },
     });
 
     const data = {
+      userId,
       operatorLabel,
       pickDate,
       ticker: c.ticker,
+      source: "AUTO",
       setupClassification: c.setupClassification ?? null,
       screenSource: c.screenSource ?? null,
       sector: c.sector ?? null,
@@ -267,4 +271,17 @@ export async function upsertCandidates(
   }
 
   return { inserted, updated };
+}
+
+/**
+ * Resolve the owner user that the brief A-list should be scoped to.
+ * For V1 there's a single owner; future iterations may fan-out to multi-owner.
+ */
+export async function getOwnerUserId(): Promise<string | null> {
+  const owner = await prisma.user.findFirst({
+    where: { role: "owner" },
+    select: { id: true },
+    orderBy: { createdAt: "asc" }, // earliest owner if multiple
+  });
+  return owner?.id ?? null;
 }

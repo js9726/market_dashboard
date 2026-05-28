@@ -21,7 +21,11 @@ type NavItem = {
 
 const WORKFLOW_NAV: NavItem[] = [
   { href: "/dashboard", label: "Conviction Desk", icon: "dashboard", count: "5", exact: true },
-  // Portfolio sits second — natural flow from "ideas" → "executed positions".
+  // A-List sits between the daily brief (Conviction Desk) and the executed
+  // book (Portfolio). It's the strict-quality picks promoted from every brief,
+  // tracked day-0 → day-14. See PLAN-pre-open-ci-and-journal-revamp.md.
+  { href: "/dashboard/a-list", label: "A-List", icon: "review" },
+  // Portfolio sits next — natural flow from "ideas" → "executed positions".
   // Gated behind brokerJournal flag; invisible for users who haven't opted in.
   { href: "/dashboard/portfolio", label: "Portfolio", icon: "portfolio", featureFlag: "brokerJournal" },
   { href: "/dashboard/pitch", label: "New Pitch", icon: "plus" },
@@ -50,6 +54,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard": {
     title: "Conviction Desk",
     subtitle: "Pipeline - Spotlight - Verdicts",
+  },
+  "/dashboard/a-list": {
+    title: "A-List",
+    subtitle: "Strict-quality picks - day-0 to day-14 outcome",
   },
   "/dashboard/pitch": {
     title: "New Pitch",

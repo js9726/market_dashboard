@@ -25,7 +25,7 @@ import { NextResponse } from "next/server";
 import { ALL_PROVIDERS, bucketOf, type BriefProvider } from "@/lib/brief/bucket";
 import { ingestRow } from "@/server/brief-cache";
 import { normalizeBriefProvider } from "@/lib/brief/provider-selection";
-import { extractCandidates, upsertCandidates } from "@/server/a-list-extractor";
+import { extractCandidates, upsertCandidates, getOwnerUserId } from "@/server/a-list-extractor";
 
 export const dynamic = "force-dynamic";
 
@@ -93,22 +93,31 @@ export async function POST(req: Request) {
   //     Runs after every successful brief ingest, regardless of provider.
   //     Idempotent — re-runs (same brief, different provider) upsert by (date, ticker).
   //     Failures are non-fatal: brief ingest still succeeds even if A-list update fails.
-  let aListSummary: { inserted: number; updated: number; total: number } | null = null;
+  let aListSummary: { inserted: number; updated: number; total: number; userId?: string } | null = null;
   try {
     if (structuredJson) {
       const candidates = extractCandidates(structuredJson as Record<string, unknown>);
       if (candidates.length > 0) {
-        // pickDate = UTC date of the bucket (briefs are bucketed in 15-min windows
-        // around US pre-market 9:00 ET; using bucket UTC date is consistent across
-        // providers for the same daily run).
-        const pickDate = new Date(row.bucketAt.toISOString().slice(0, 10) + "T00:00:00.000Z");
-        const result = await upsertCandidates(
-          pickDate,
-          candidates,
-          row.bucketAt,
-          provider,
-        );
-        aListSummary = { ...result, total: candidates.length };
+        // Multi-operator: scope candidates to the owner user. For V1 this is
+        // the single owner; future iterations can fan out across users.
+        const userId = await getOwnerUserId();
+        if (!userId) {
+          console.warn("[a-list-extractor] no owner-role user found — skipping A-list ingest");
+          aListSummary = { inserted: 0, updated: 0, total: candidates.length };
+        } else {
+          // pickDate = UTC date of the bucket (briefs are bucketed in 15-min windows
+          // around US pre-market 9:00 ET; using bucket UTC date is consistent across
+          // providers for the same daily run).
+          const pickDate = new Date(row.bucketAt.toISOString().slice(0, 10) + "T00:00:00.000Z");
+          const result = await upsertCandidates(
+            userId,
+            pickDate,
+            candidates,
+            row.bucketAt,
+            provider,
+          );
+          aListSummary = { ...result, total: candidates.length, userId };
+        }
       } else {
         aListSummary = { inserted: 0, updated: 0, total: 0 };
       }

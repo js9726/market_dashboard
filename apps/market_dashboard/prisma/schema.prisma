@@ -94,6 +94,8 @@ model User {
   brokerPresets       BrokerPreset[]
   bridgeToken         BrokerBridgeToken?
   csvImportMappings   CsvImportMapping[]
+  // A-list strict-quality candidates (Phase 1 of pre-open CI revamp).
+  aListCandidates     AListCandidate[]
 }
 
 model SpreadsheetConnection {
@@ -352,8 +354,17 @@ model WikiScreenerPick {
 ///
 /// Differs from `WikiScreenerPick` which is a softer log of every flagged ticker.
 /// A-list is the strict subset worth actively monitoring.
+///
+/// Multi-operator: keyed by userId. Each owner has their own A-list.
+/// Friends with `allowed` role view the owner's A-list (read-only) via
+/// dedicated route logic that resolves the requested owner from query/session.
 model AListCandidate {
   id                  String   @id @default(cuid())
+  /// Owner of this candidate. FK to User.id. CI ingest must resolve to an
+  /// owner-role user (today: derived from BRIEF_INGEST_KEY; future: scoped per
+  /// user-key). Backwards-compat field `operatorLabel` is kept as a denormalised
+  /// human label ("JS") for log / display purposes.
+  userId              String
   operatorLabel       String   @default("JS")
   /// Date the candidate was promoted (= brief date, pre-open).
   pickDate            DateTime @db.Date
@@ -364,6 +375,9 @@ model AListCandidate {
   screenSource        String?
   sector              String?
   industry            String?
+  /// Promotion source — auto from brief, or manual override from /a-list page.
+  /// "AUTO" (filter passed) | "MANUAL" (user added/promoted)
+  source              String   @default("AUTO")
 
   // ── Day-0 entry proposal (from brief) ──────────────────────────────────
   entryZone         Decimal?  @db.Decimal(12, 4)
@@ -416,8 +430,10 @@ model AListCandidate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([operatorLabel, pickDate, ticker])
-  @@index([operatorLabel, pickDate(sort: Desc)])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pickDate, ticker])
+  @@index([userId, pickDate(sort: Desc)])
   @@index([ticker, pickDate(sort: Desc)])
   @@index([status, pickDate(sort: Desc)])
   @@index([day14Outcome, pickDate(sort: Desc)])
