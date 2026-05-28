@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import Icon from "./Icon";
 import MarketTape from "./MarketTape";
+import FailureBanner from "./FailureBanner";
 import { features } from "@/lib/features";
 
 // Nav items can declare a `featureFlag` (key of features) — when the flag is
@@ -28,6 +29,8 @@ const WORKFLOW_NAV: NavItem[] = [
   // Portfolio sits next — natural flow from "ideas" → "executed positions".
   // Gated behind brokerJournal flag; invisible for users who haven't opted in.
   { href: "/dashboard/portfolio", label: "Portfolio", icon: "portfolio", featureFlag: "brokerJournal" },
+  // Equity timeline — Phase 6 (owner-only).
+  { href: "/dashboard/equity", label: "Equity", icon: "analytics" },
   { href: "/dashboard/pitch", label: "New Pitch", icon: "plus" },
   { href: "/dashboard/bench", label: "Bench", icon: "template", count: "1" },
   { href: "/dashboard/settled", label: "Settled", icon: "review", count: "2" },
@@ -58,6 +61,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard/a-list": {
     title: "A-List",
     subtitle: "Strict-quality picks - day-0 to day-14 outcome",
+  },
+  "/dashboard/equity": {
+    title: "Equity Timeline",
+    subtitle: "Daily total assets - drawdown periods highlighted",
   },
   "/dashboard/pitch": {
     title: "New Pitch",
@@ -269,6 +276,8 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
               </button>
             </div>
           </header>
+          {/* Phase 6: top-of-page alerts for stale brief / CI failure. */}
+          <FailureBanner />
           <div className="market-page">{children}</div>
         </main>
       </div>
