@@ -62,12 +62,25 @@ type IncomingPosition = {
   currency: string;
 };
 
+type IncomingEquity = {
+  snapshotDate: string; // YYYY-MM-DD
+  totalAssets: number;
+  cash: number;
+  marketVal: number;
+  unrealizedPl?: number | null;
+  realizedPlDay?: number | null;
+  equityPctChange?: number | null;
+  currencyCode?: string;
+};
+
 type Body = {
   brokerAccountAlias?: string;
   brokerType?: string;
   syncedAt?: string;
   positions?: IncomingPosition[];
   fills?: IncomingFill[];
+  /** Phase 4 — daily equity snapshot. Optional for backward-compat. */
+  equity?: IncomingEquity | null;
 };
 
 function err(message: string, status = 400) {
@@ -223,6 +236,56 @@ export async function POST(req: Request) {
     },
   });
 
+  // ── Phase 4: equity snapshot (optional, best-effort) ────────────────────
+  // Upserts on (userId, brokerAccountId, snapshotDate). Latest capture per
+  // day wins — bridge runs every 60s, so the final snapshot before the user
+  // closes their PC is what the /equity timeline shows for that day.
+  let equityUpserted = false;
+  if (body.equity && body.equity.snapshotDate && body.equity.totalAssets != null) {
+    try {
+      const e = body.equity;
+      // Normalize snapshotDate to UTC midnight for clean date-keyed grouping.
+      const snapshotDate = new Date(`${e.snapshotDate}T00:00:00.000Z`);
+      const data = {
+        userId: tokenRow.userId,
+        brokerAccountId: account.id,
+        snapshotDate,
+        capturedAt: now,
+        totalAssets: new Prisma.Decimal(e.totalAssets),
+        cash: new Prisma.Decimal(e.cash),
+        marketVal: new Prisma.Decimal(e.marketVal),
+        unrealizedPl: e.unrealizedPl != null ? new Prisma.Decimal(e.unrealizedPl) : null,
+        realizedPlDay: e.realizedPlDay != null ? new Prisma.Decimal(e.realizedPlDay) : null,
+        equityPctChange: e.equityPctChange != null ? new Prisma.Decimal(e.equityPctChange) : null,
+        currencyCode: e.currencyCode ?? accountCurrency,
+        source: "moomoo",
+      };
+      await prisma.equitySnapshot.upsert({
+        where: {
+          userId_brokerAccountId_snapshotDate: {
+            userId: tokenRow.userId,
+            brokerAccountId: account.id,
+            snapshotDate,
+          },
+        },
+        create: data,
+        update: {
+          capturedAt: data.capturedAt,
+          totalAssets: data.totalAssets,
+          cash: data.cash,
+          marketVal: data.marketVal,
+          unrealizedPl: data.unrealizedPl,
+          realizedPlDay: data.realizedPlDay,
+          equityPctChange: data.equityPctChange,
+          currencyCode: data.currencyCode,
+        },
+      });
+      equityUpserted = true;
+    } catch (e) {
+      console.error("[bridge/sync] equity upsert failed (non-fatal):", e);
+    }
+  }
+
   // ── Heartbeat ──────────────────────────────────────────────────────────
   await prisma.brokerBridgeToken.update({
     where: { id: tokenRow.id },
@@ -235,5 +298,6 @@ export async function POST(req: Request) {
     fillsSkipped,
     positionsUpserted,
     positionsRemoved: removed.count,
+    equityUpserted,
   });
 }

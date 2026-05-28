@@ -96,6 +96,8 @@ model User {
   csvImportMappings   CsvImportMapping[]
   // A-list strict-quality candidates (Phase 1 of pre-open CI revamp).
   aListCandidates     AListCandidate[]
+  // Daily equity timeline (Phase 4 of pre-open CI revamp).
+  equitySnapshots     EquitySnapshot[]
 }
 
 model SpreadsheetConnection {
@@ -438,6 +440,53 @@ model AListCandidate {
   @@index([status, pickDate(sort: Desc)])
   @@index([day14Outcome, pickDate(sort: Desc)])
   @@index([sector, pickDate(sort: Desc)])
+}
+
+/// Daily equity snapshot — captured by the dashboard-bridge daemon when it
+/// runs on Jie's PC (typically every 60s during MYT daytime). One row per
+/// (userId, brokerAccountId, snapshotDate). Latest snapshot per day wins.
+///
+/// Powers the /equity timeline page (Phase 6): plots daily equity curve,
+/// highlights drawdown periods, drills into per-trade attribution.
+///
+/// Multi-currency: account stores values in the broker's local currency
+/// (totalAssets / cash / marketVal). currencyCode lets the dashboard apply
+/// FX conversion at display time if needed.
+model EquitySnapshot {
+  id              String   @id @default(cuid())
+  userId          String
+  brokerAccountId String
+  /// Calendar date of the snapshot (UTC). Stored as Date for clean grouping
+  /// in queries like "give me all snapshots from May 2026".
+  snapshotDate    DateTime @db.Date
+  /// Precise capture time (UTC). Latest capture for a given snapshotDate is
+  /// considered authoritative for the daily equity curve.
+  capturedAt      DateTime @default(now())
+
+  // ── Broker-reported values (all in the account's local currency) ───────
+  totalAssets     Decimal  @db.Decimal(18, 4)
+  cash            Decimal  @db.Decimal(18, 4)
+  marketVal       Decimal  @db.Decimal(18, 4)
+  /// Sum of unrealized P/L across all current positions.
+  unrealizedPl    Decimal? @db.Decimal(18, 4)
+  /// Today's realized P/L (closed trades since market open).
+  realizedPlDay   Decimal? @db.Decimal(18, 4)
+  /// Convenience: % change vs prior-day totalAssets. Computed daemon-side.
+  equityPctChange Decimal? @db.Decimal(8, 4)
+  /// Account currency (USD, HKD, etc.) — matches the local moomoo account.
+  currencyCode    String   @default("USD")
+
+  /// "moomoo" | "manual" | "csv" — provenance for the row.
+  source          String   @default("moomoo")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, brokerAccountId, snapshotDate])
+  @@index([userId, snapshotDate(sort: Desc)])
+  @@index([brokerAccountId, snapshotDate(sort: Desc)])
 }
 
 // ── DailyReflection (formerly `JournalEntry`) ───────────────────────────────

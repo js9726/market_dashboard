@@ -52,7 +52,8 @@ class MoomooSync:
         try:
             positions = self._positions(ctx)
             fills = self._fills(ctx)
-            return {"positions": positions, "fills": fills}
+            equity = self._equity(ctx)
+            return {"positions": positions, "fills": fills, "equity": equity}
         finally:
             ctx.close()
 
@@ -113,6 +114,68 @@ class MoomooSync:
                 "currency": "USD" if self.cfg.opend.market.upper() == "US" else "HKD",
             })
         return rows
+
+
+    # ── Equity snapshot (Phase 4 — feeds /equity timeline page) ─────────
+    def _equity(self, ctx: OpenSecTradeContext) -> dict[str, Any] | None:
+        """
+        Pull current account totals via accinfo_query and return a single
+        equity snapshot dict. Returns None on error (sync still succeeds for
+        positions+fills; equity is best-effort).
+
+        Reported in the account's local currency (USD for FUTUMY/US, HKD for
+        HK accounts). The dashboard normalises display via currencyCode.
+        """
+        try:
+            ret, data = ctx.accinfo_query(
+                trd_env=TrdEnv.REAL,
+                acc_id=self.cfg.opend.acc_id,
+                refresh_cache=True,
+            )
+        except Exception as e:
+            log.warning("accinfo_query exception (non-fatal): %s", e)
+            return None
+        if ret != RET_OK:
+            log.warning("accinfo_query failed (non-fatal): %s", data)
+            return None
+        if data is None or len(data) == 0:
+            return None
+
+        row = data.iloc[0]
+        currency = (
+            "USD" if self.cfg.opend.market.upper() == "US"
+            else ("HKD" if self.cfg.opend.market.upper() == "HK" else "USD")
+        )
+
+        def _f(key: str) -> float | None:
+            v = row.get(key)
+            try:
+                return float(v) if v is not None else None
+            except (TypeError, ValueError):
+                return None
+
+        # moomoo accinfo_query returns: total_assets, cash, market_val,
+        # frozen_cash, avl_withdrawal_cash, power, available_funds, etc.
+        # Field names vary by market; us_cash/hk_cash also available.
+        total_assets = _f("total_assets")
+        cash = _f("us_cash") if currency == "USD" else _f("cash")
+        if cash is None:
+            cash = _f("cash") or 0.0
+        market_val = _f("market_val")
+        unrealized_pl = _f("unrealized_pl")  # may not exist; falls back to None
+
+        if total_assets is None or market_val is None:
+            log.warning("equity snapshot missing required fields; skipping")
+            return None
+
+        return {
+            "snapshotDate": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),
+            "totalAssets": total_assets,
+            "cash": cash or 0.0,
+            "marketVal": market_val,
+            "unrealizedPl": unrealized_pl,
+            "currencyCode": currency,
+        }
 
 
 def _iso(v: Any) -> str:

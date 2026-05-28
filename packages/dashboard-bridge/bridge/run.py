@@ -54,16 +54,22 @@ def _sync_once(dry: bool = False) -> bool:
 
     positions = snapshot["positions"]
     fills = snapshot["fills"]
-    log.info("Fetched %d positions and %d fills from moomoo", len(positions), len(fills))
+    equity = snapshot.get("equity")  # Phase 4 — optional, best-effort
+    log.info(
+        "Fetched %d positions, %d fills, equity=%s from moomoo",
+        len(positions), len(fills),
+        f"${equity['totalAssets']:.2f} {equity['currencyCode']}" if equity else "n/a",
+    )
 
     if dry:
         log.info("Dry run — not posting to dashboard.")
         log.info("Sample position: %s", positions[0] if positions else "n/a")
         log.info("Sample fill: %s", fills[0] if fills else "n/a")
+        log.info("Equity snapshot: %s", equity)
         return True
 
     client = DashboardClient(cfg)
-    result = client.sync(positions, fills)
+    result = client.sync(positions, fills, equity=equity)
     log.info("Sync result: %s", result)
     return bool(result.get("ok"))
 

@@ -23,15 +23,25 @@ class DashboardClient:
     def __init__(self, cfg: Config):
         self.cfg = cfg
 
-    def sync(self, positions: list[dict[str, Any]], fills: list[dict[str, Any]]) -> dict[str, Any]:
+    def sync(
+        self,
+        positions: list[dict[str, Any]],
+        fills: list[dict[str, Any]],
+        equity: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         url = f"{self.cfg.dashboard.url}/api/bridge/sync"
-        body = {
+        body: dict[str, Any] = {
             "brokerAccountAlias": self.cfg.broker.account_alias,
             "brokerType": self.cfg.broker.type,
             "syncedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "positions": positions,
             "fills": fills,
         }
+        # Phase 4: equity snapshot is optional in the payload to stay backward-
+        # compatible with older dashboard /api/bridge/sync versions. The route
+        # ignores unknown fields if equity_snapshots isn't supported yet.
+        if equity is not None:
+            body["equity"] = equity
         headers = {
             "Authorization": f"Bearer {self.cfg.dashboard.token}",
             "X-Timestamp": str(int(time.time())),
