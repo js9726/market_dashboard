@@ -399,6 +399,30 @@ def _build_live_block(
             for s in sectors_b:
                 lines.append(f"    {s.get('sector')}: {s.get('pct_above_50sma')}%  (n={s.get('n')})")
 
+    # ── Index technicals (ATR / RSI / MACD / extension) ──────────────────────
+    # Auto-read from index_technicals.json if compute_index_technicals.py was run.
+    tech_path = ROOT / "index_technicals.json"
+    if tech_path.exists():
+        try:
+            tech = json.loads(tech_path.read_text(encoding="utf-8"))
+            if tech:
+                lines.append("  INDEX TECHNICALS (daily bars — copy verbatim into `technicals` field of StructuredBrief):")
+                for sym, t in tech.items():
+                    flags = []
+                    if t.get("overbought"): flags.append("OVERBOUGHT")
+                    if t.get("curving_down"): flags.append("MACD-CURVING-DOWN")
+                    if t.get("bear_cross_imminent"): flags.append("BEAR-CROSS-NEAR")
+                    flag_str = f" [{','.join(flags)}]" if flags else ""
+                    lines.append(
+                        f"    {sym}: ${t['close']:.2f}  ATR=${t['atr14']:.2f}  "
+                        f"21EMA dist={t['dist_21_atr']:+.2f}ATR  50EMA dist={t['dist_50_atr']:+.2f}ATR  "
+                        f"RSI={t['rsi14']:.1f}  MACD={t['macd_dir']}  "
+                        f"ENTRY_RISK={t['entry_risk']}{flag_str}"
+                    )
+                lines.append("    (technicals.<symbol> in output schema — write technicalsNarrative interpreting these.)")
+        except Exception as e:
+            lines.append(f"  (index_technicals.json present but unreadable: {e})")
+
     # ── Snapshot (indices + sector ETFs) ─────────────────────────────────────
     if snapshot:
         lines.append(_format_snapshot_section(snapshot))

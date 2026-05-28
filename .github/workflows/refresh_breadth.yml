@@ -1,19 +1,28 @@
-name: Refresh Market Breadth
+name: Refresh Breadth (Open + Close)
 
-# Dedicated breadth refresh for the Conviction Desk.
-# Uses TradingView screener data so the dashboard updates from the same source
-# family as the visible market heatmap instead of waiting for the daily heavy job.
+# Dedicated 2x-daily breadth scan — runs at US market OPEN (9:37 ET) and
+# POST-CLOSE (16:37 ET). The main refresh_data.yml only runs once pre-market;
+# the intraday workflow explicitly skips breadth for cost reasons.
+#
+# This workflow exists because the Market Breadth panel on the Conviction Desk
+# was showing pre-open data hours into the trading session — the panel needs
+# at least 2 refreshes per day (intraday read + post-close snapshot) to stay
+# meaningful for active traders.
+#
+# breadth_scan.py walks the full NYSE + Nasdaq composite (~5000 tickers) and
+# computes new highs/lows, advance/decline, stage analysis, sector %above-50SMA.
+# Runtime: 5-12 min. Output: breadth.json + breadth_history.json.
 
 on:
   schedule:
-    - cron: '3 13 * * 1-5'           # 27 min pre-market (09:03 ET EDT)
-    - cron: '33 13 * * 1-5'          # 3 min after open (09:33 ET EDT)
-    - cron: '3 14 * * 1-5'           # 33 min after open (10:03 ET EDT)
-    - cron: '33 20 * * 1-5'          # 33 min post-market (16:33 ET EDT)
+    # ET EDT (UTC-4) — May through early November.
+    # Use :43 to stay off-peak and avoid colliding with refresh_data_intraday.yml at :33.
+    - cron: '43 13 * * 1-5'   # 13 min after market open    (09:43 ET EDT)
+    - cron: '43 20 * * 1-5'   # 43 min after post-close     (16:43 ET EDT)
   workflow_dispatch: {}
 
 concurrency:
-  group: market-dashboard-refresh-data
+  group: market-dashboard-refresh-breadth
   cancel-in-progress: false
 
 env:
@@ -40,17 +49,21 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
-      - name: Compute TradingView market breadth
-        timeout-minutes: 12
-        run: python scripts/breadth_scan_tv.py --out-dir data
+      # ── Step 1: full-universe breadth scan ───────────────────────────────────
+      - name: Compute market breadth
+        continue-on-error: true
+        timeout-minutes: 15
+        run: python scripts/breadth_scan.py --out-dir data
 
+      # ── Step 2: sync breadth data into Next.js public folder ────────────────
       - name: Sync breadth into public folder
         working-directory: apps/market_dashboard
         run: |
           mkdir -p public/market-dashboard
-          cp ../market_dashboard_backend/data/breadth.json public/market-dashboard/
-          cp ../market_dashboard_backend/data/breadth_history.json public/market-dashboard/
+          cp ../market_dashboard_backend/data/breadth.json          public/market-dashboard/ 2>/dev/null || true
+          cp ../market_dashboard_backend/data/breadth_history.json  public/market-dashboard/ 2>/dev/null || true
 
+      # ── Step 3: sanitize JSON (replace NaN/Infinity with null) ──────────────
       - name: Sanitize JSON
         working-directory: apps/market_dashboard
         run: |
@@ -65,6 +78,7 @@ jobs:
           print('JSON sanitization complete')
           "
 
+      # ── Step 4: commit and push (breadth only) ───────────────────────────────
       - name: Commit updated breadth
         working-directory: .
         run: |
@@ -77,10 +91,10 @@ jobs:
           echo "=== Staged changes ==="
           git diff --cached --name-status || true
           if git diff --cached --quiet; then
-            echo "No breadth changes - nothing to commit."
+            echo "No breadth changes — nothing to commit."
             exit 0
           fi
-
+          # Tag commit message with which run this was (open vs close) for audit
           HOUR_UTC=$(date -u +%H)
           if [ "$HOUR_UTC" = "13" ]; then
             TAG="open-snapshot"
@@ -89,8 +103,10 @@ jobs:
           else
             TAG="manual"
           fi
-
           git commit -m "chore: refresh breadth ($TAG) [skip ci]"
+          # Retry on race condition with refresh_data_intraday.yml — same -X theirs
+          # strategy as refresh_data.yml so data-file conflicts always resolve in favour
+          # of the more recent run.
           for attempt in 1 2 3 4 5; do
             if git push; then
               echo "Pushed successfully on attempt $attempt."

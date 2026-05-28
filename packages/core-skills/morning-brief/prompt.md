@@ -35,6 +35,23 @@ OUTPUT SHAPE — every field is required unless marked optional. If you cannot f
     // include SPY, QQQ, DIA, IWM, ^VIX, ^TNX (10Y yield), CL=F (oil) where relevant
   ],
   "indicesNarrative": "1-3 sentences interpreting the index action — leadership, breadth, what's driving the tape",
+  "technicals": {
+    // Per-index daily-bar technicals — copy values from index_technicals.json verbatim.
+    // Provided by compute_index_technicals.py at Step 0.5 of the skill.
+    // Used by the dashboard to colour the entry-risk badge on each index card.
+    "SPY": {
+      "close": <number>, "atr14": <number>, "atr_pct": <number>,
+      "ema21": <number>, "ema50": <number>, "ma200": <number|null>,
+      "dist_21_atr": <number>, "dist_50_atr": <number>, "dist_200_atr": <number|null>,
+      "rsi14": <number>, "macd": <number>, "macd_signal": <number>, "macd_hist": <number>,
+      "macd_dir": "RISING"|"FALLING"|"FLAT",
+      "curving_down": <bool>, "bear_cross_imminent": <bool>,
+      "overbought": <bool>, "oversold": <bool>,
+      "entry_risk": "EXTREME-EXTENDED"|"EXTENDED"|"FAIR"|"AT-MA"|"OVERSOLD-PB"|"UNKNOWN"
+    }
+    // repeat for QQQ, DIA, and any extras (IWM, SMH)
+  },
+  "technicalsNarrative": "1-3 sentences interpreting the per-index ATR/RSI/MACD picture. State which index is safest to enter (FAIR/AT-MA) vs dangerous (EXTREME-EXTENDED). Reference MACD curving-down or bear-cross-imminent if true. The dashboard renders entry-risk badges from these values — never fabricate.",
   "sectorsThemes": [
     { "symbol": "XLK", "name": "Technology", "changePct": <number|null>, "rs": <0-100|null>, "note": "1-line read" }
     // include relevant sector ETFs: XLK, SMH, XLC, XLY, XLF, XLV, XLI, XLE, XLP, XLU, XLB, XLRE
@@ -135,6 +152,11 @@ with `score` as a 0–100 integer (composite × 10), a `verdict` label, and a 1-
 Use the screener data already provided in `{live_data_block}` — no extra web search needed for these.
 
 SECTIONS — use pre-fetched data where provided; web-search only what is missing:
+0. Index technicals: use the INDEX TECHNICALS block from {live_data_block} verbatim — copy each field into `technicals.<symbol>`. Write `technicalsNarrative` interpreting:
+   - Which index has the WORST entry-risk (EXTREME-EXTENDED) — DO NOT chase that one
+   - Which index is FAIR or AT-MA — entries there are higher quality
+   - If RSI > 70: call out OVERBOUGHT; if MACD curving_down OR bear_cross_imminent: warn about momentum cooling
+   - If indices are extended, posture should be `WAIT` or `TRIM_TIGHTEN`, NOT `GO`
 1. Index snapshot: use Indices block above for SPY/QQQ/DIA/IWM/TLT daily%; web-search for VIX level, 10Y yield, oil price, and overnight futures direction
 2. Overnight Asia + Europe: web-search — one "why" line per region; add a `note` on the relevant index entry
 3. Sector ETFs: use "Sector ETFs" block for changePct/RS; add narrative interpretation

@@ -66,7 +66,39 @@ The script reads these extra fields for each ticker:
 - `after_price` / `after_chg` — after-hours price and change % (after 4:00 PM ET)
 - `rvol` — relative volume vs 10-day average (key entry filter)
 
-Enrich the `$FULL_WATCHLIST` with the OpenD tickers if you have them, then proceed to Step 1.
+Enrich the `$FULL_WATCHLIST` with the OpenD tickers if you have them, then proceed to Step 0.5.
+
+### Step 0.5 — Compute index technicals (ATR / RSI / MACD / extension) — MANDATORY
+
+Compute daily-bar technicals for SPY / QQQ / DIA so the brief can grade **entry-risk per index**.
+The user needs to know whether chasing index breakouts is dangerous before any setup analysis.
+
+```powershell
+python compute_index_technicals.py --tickers SPY,QQQ,DIA
+# Optional: include IWM, SMH, etc.
+python compute_index_technicals.py --tickers SPY,QQQ,DIA,IWM,SMH
+```
+
+This writes `index_technicals.json` containing per-index:
+- `atr14`, `ema21`, `ema50`, `ma200`
+- `dist_21_atr` / `dist_50_atr` / `dist_200_atr` (distance in ATR units)
+- `rsi14` + `overbought` (>70) / `oversold` (<30) flags
+- `macd`, `macd_signal`, `macd_hist`, `macd_dir` (RISING/FALLING/FLAT)
+- `curving_down` (histogram falling while line > signal — momentum cooling)
+- `bear_cross_imminent` (line about to cross below signal)
+- `entry_risk` classification per the rubric:
+
+| `entry_risk` | Distance from 21EMA | Meaning |
+|---|---|---|
+| `EXTREME-EXTENDED` | ≥ +3 ATR | Don't chase — mean reversion ~70% within 5-10 sessions |
+| `EXTENDED` | +2 to +3 ATR | Wait for first pullback |
+| `FAIR` | +0.5 to +2 ATR | Normal mid-range entry zone |
+| `AT-MA` | -0.5 to +0.5 ATR | Favourable entry zone |
+| `OVERSOLD-PB` | ≤ -0.5 ATR | Potential reversal play |
+
+The brief's `technicals` field and `technicalsNarrative` MUST cite these numbers and
+classify each index. If QQQ shows EXTREME-EXTENDED + RSI > 70 + MACD curving down,
+the brief's `posture` should reflect that — typically `WAIT` or `TRIM_TIGHTEN`, not `GO`.
 
 ### Step 1 — Read Jie's TV Watchlist via Chrome
 

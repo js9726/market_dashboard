@@ -44,7 +44,8 @@ export default function MarketBreadthPanels() {
         <div>
           <p className="t-overline text-[var(--fg-3)]">Market Breadth</p>
           <p className="t-caption">
-            NYSE + Nasdaq composite attempt, {universeText}; sector and industry breadth at {formatMcap(data?.mcap_floor)}
+            NYSE + Nasdaq composite attempt, {universeText}
+            {data?.mcap_floor != null && `; sector and industry breadth at ${formatMcap(data.mcap_floor)}`}
           </p>
         </div>
         {loading ? (
@@ -52,7 +53,9 @@ export default function MarketBreadthPanels() {
         ) : error ? (
           <p className="t-caption t-mono">Unavailable: {error}</p>
         ) : (
-          <FreshnessBadge timestamp={data?.built_at} thresholds={SNAPSHOT_THRESHOLDS} />
+          /* Fallback: breadth_scan.py writes `built_at`; breadth_scan_tv.py writes `as_of`.
+             Use whichever exists so the freshness badge always renders correctly. */
+          <FreshnessBadge timestamp={data?.built_at ?? data?.as_of} thresholds={SNAPSHOT_THRESHOLDS} />
         )}
       </div>
 
