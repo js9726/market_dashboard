@@ -27,6 +27,10 @@ export default auth((req) => {
     // auth, hit by Vercel cron, the bridge daemon, and external uptime crons).
     // Must bypass session middleware or the 307→/login breaks the JSON contract.
     pathname.startsWith("/api/breadth") ||
+    // Journal machine endpoints: closed-today (cron reads via bearer) +
+    // entries/ingest (cron writes AI-scored JournalEntry via bearer).
+    pathname.startsWith("/api/journal/closed-today") ||
+    pathname.startsWith("/api/journal/entries/ingest") ||
     // Bridge daemon uses bearer-token auth (BrokerBridgeToken.tokenHash) plus
     // X-Timestamp replay protection. Token endpoint stays session-authed
     // because only logged-in users generate/revoke their own tokens.

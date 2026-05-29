@@ -45,6 +45,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Wiki submodule for the journaler's trader-style context (deploy key).
+      - name: Load wiki deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.WIKI_SSH_KEY }}
+
+      - name: Fetch wiki submodule
+        continue-on-error: true
+        run: |
+          git submodule set-url packages/core-skills/wiki-source git@github.com:js9726/trade-analyser_skill.git 2>/dev/null || true
+          git submodule update --init --recursive || mkdir -p packages/core-skills/wiki-source/wiki
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -53,6 +65,15 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install journaler deps
+        working-directory: packages/core-skills/morning-brief
+        run: npm install --no-audit --no-fund
 
       # ── Step 0: holiday gate ─────────────────────────────────────────────
       - name: Skip if not a US trading day
@@ -67,16 +88,35 @@ jobs:
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
 
-      # ── Step 2: (placeholder for Phase 5b) per-trade journal entries ────
-      # When implemented, this step will:
-      #   - Read today's closed trades from /api/portfolio/closed-today
-      #     (sourced from TradeFill via the dashboard-bridge daemon)
-      #   - For each trade, call the journal-close skill (Claude SDK)
-      #   - Render entry + day-14 chart snapshots
-      #   - POST to /api/journal/entries/ingest
-      #   - Auto-suggest wiki updates to wiki/_skill-suggestions.md
-      - name: (Phase 5b stub) Per-trade journal entries
+      # ── Step 2: Per-trade AI journaling (Phase 5b — the "final end") ────
+      # For each trade closed today (and not yet journaled), Claude scores it
+      # against the 7-trader rubric + wiki rules and persists a JournalEntry.
+      # Reads /api/journal/closed-today, writes /api/journal/entries/ingest.
+      - name: AI-journal today's closed trades (Claude SDK)
         if: success()
+        continue-on-error: true
+        working-directory: packages/core-skills/morning-brief
+        run: npm run journal
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+          WIKI_DIR: ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
+
+      # ── Step 3: Wiki audit sync — Trade Audits page → today ─────────────
+      # Runs sync_to_dashboard.py from the wiki submodule so the Trade Audits
+      # page reflects the latest verdicts (was stuck at March).
+      - name: Sync wiki audits to dashboard
+        if: success()
+        continue-on-error: true
+        working-directory: packages/core-skills/wiki-source
         run: |
-          echo "Phase 5b not yet implemented — per-trade journaling deferred."
-          echo "Day-14 A-list rescore completed. JournalEntry per-trade pipeline pending."
+          if [ -f scripts/sync_to_dashboard.py ]; then
+            pip install -r scripts/requirements.txt 2>/dev/null || true
+            python scripts/sync_to_dashboard.py --post 2>&1 || echo "::warning::wiki audit sync failed (non-fatal)"
+          else
+            echo "::warning::sync_to_dashboard.py not found in wiki submodule"
+          fi
+        env:
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}

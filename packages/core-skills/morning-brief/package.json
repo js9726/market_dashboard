@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "brief": "tsx claude_sdk_runner.ts",
-    "brief:dry": "tsx claude_sdk_runner.ts --dry-run"
+    "brief:dry": "tsx claude_sdk_runner.ts --dry-run",
+    "journal": "tsx journal_close_runner.ts",
+    "journal:dry": "tsx journal_close_runner.ts --dry-run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.40.0"
