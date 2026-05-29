@@ -92,17 +92,18 @@ jobs:
       # For each trade closed today (and not yet journaled), Claude scores it
       # against the 7-trader rubric + wiki rules and persists a JournalEntry.
       # Reads /api/journal/closed-today, writes /api/journal/entries/ingest.
-      - name: AI-journal today's closed trades (Claude SDK)
+      - name: AI-journal today's closed trades (Agent SDK, subscription auth)
         if: success()
         continue-on-error: true
         working-directory: packages/core-skills/morning-brief
         run: npm run journal
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          # DeepSeek fallback — used automatically if Claude is unavailable
-          # (credit balance / rate limit). Honors "Claude AND DeepSeek /
-          # any available AI provider" and keeps journaling working when one
-          # provider's balance runs out.
+          # Claude via the Agent SDK under the subscription (CLAUDE_CODE_OAUTH_TOKEN),
+          # not a metered API token. Generate once: `claude setup-token`.
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # DeepSeek fallback — used automatically if the subscription is
+          # unavailable (rate limit / not configured). Honors "Claude AND
+          # DeepSeek / any available AI provider" so journaling never stalls.
           DEEPSEEK_API_KEY:  ${{ secrets.DEEPSEEK_API_KEY }}
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}

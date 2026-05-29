@@ -15,19 +15,23 @@
  * cloud journaler and the local interactive analyser produce comparable output.
  *
  * Usage (in journal_close.yml, 30 min post-close):
- *   ANTHROPIC_API_KEY=... VERCEL_INGEST_URL=... BRIEF_INGEST_KEY=... \
- *     WIKI_DIR=.../wiki-source/wiki npm run journal
+ *   CLAUDE_CODE_OAUTH_TOKEN=... VERCEL_INGEST_URL=... BRIEF_INGEST_KEY=... \
+ *     DEEPSEEK_API_KEY=... WIKI_DIR=.../wiki-source/wiki npm run journal
+ *
+ *   Claude runs via the Agent SDK under the subscription (CLAUDE_CODE_OAUTH_TOKEN);
+ *   DeepSeek is the fallback when the subscription is unavailable. No metered
+ *   Anthropic API token needed.
  *
  *   # Dry run (score + print, no POST):
  *   npm run journal:dry
  */
-import Anthropic from "@anthropic-ai/sdk";
+import { query } from "@anthropic-ai/claude-agent-sdk";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const MODEL = process.env.CLAUDE_MODEL ?? "claude-sonnet-4-5-20250929";
+const MODEL = process.env.CLAUDE_MODEL; // undefined => Claude Code default model
 const DRY_RUN = process.argv.includes("--dry-run");
 const BASE = (process.env.VERCEL_INGEST_URL ?? "").replace(/\/$/, "");
 const KEY = process.env.BRIEF_INGEST_KEY ?? "";
@@ -95,7 +99,31 @@ async function deepseekJson(system: string, user: string): Promise<string> {
   return json.choices?.[0]?.message?.content ?? "";
 }
 
-async function scoreTrade(client: Anthropic, wiki: string, t: ClosedTrade): Promise<object> {
+/**
+ * Score one trade via the Claude Agent SDK — drives Claude Code under the
+ * SUBSCRIPTION (CLAUDE_CODE_OAUTH_TOKEN / logged-in CLI), NOT the metered
+ * Anthropic API token. Pure system+user → JSON; no tools, single turn.
+ */
+async function claudeCodeJson(system: string, user: string): Promise<string> {
+  let out = "";
+  const response = query({
+    prompt: user,
+    options: {
+      systemPrompt: system,
+      allowedTools: [],
+      permissionMode: "bypassPermissions",
+      maxTurns: 1,
+      ...(MODEL ? { model: MODEL } : {}),
+    },
+  });
+  for await (const m of response) {
+    if (m.type === "result" && m.subtype === "success") out = m.result ?? "";
+  }
+  if (!out) throw new Error("Claude Code returned no result");
+  return out;
+}
+
+async function scoreTrade(wiki: string, t: ClosedTrade): Promise<object> {
   const pnlPct = t.buyPrice && t.exitPrice
     ? (((t.exitPrice - t.buyPrice) / t.buyPrice) * 100 * (t.side === "Short" ? -1 : 1)).toFixed(2)
     : "n/a";
@@ -143,14 +171,12 @@ Score it. Be honest about entry quality vs the plan and the outcome.`;
 
   if (!forceDeepseek) {
     try {
-      const resp = await client.messages.create({
-        model: MODEL, max_tokens: 2000, system,
-        messages: [{ role: "user", content: user }],
-      });
-      text = resp.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map((b) => b.text).join("");
+      // Claude via the Agent SDK → uses the Claude Code SUBSCRIPTION
+      // (CLAUDE_CODE_OAUTH_TOKEN / logged-in CLI), NOT a metered API token.
+      text = await claudeCodeJson(system, user);
     } catch (e) {
-      // Claude unavailable (credit balance / rate limit) → fall back to DeepSeek.
-      console.error(`[journal] Claude failed for ${t.ticker} (${e instanceof Error ? e.message.slice(0, 80) : e}); trying DeepSeek...`);
+      // Claude unavailable (subscription rate limit / not logged in) → DeepSeek.
+      console.error(`[journal] Claude Code failed for ${t.ticker} (${e instanceof Error ? e.message.slice(0, 80) : e}); trying DeepSeek...`);
       text = await deepseekJson(system, user);
       usedProvider = "deepseek";
     }
@@ -176,20 +202,21 @@ async function ingest(entry: object): Promise<void> {
 }
 
 async function main() {
-  if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY required");
+  // No ANTHROPIC_API_KEY required — Claude runs via the Agent SDK under the
+  // Claude Code subscription. DeepSeek is the fallback if the subscription is
+  // unavailable. Only requirement: at least one of {subscription, DeepSeek key}.
   if (!DRY_RUN && (!BASE || !KEY)) throw new Error("VERCEL_INGEST_URL + BRIEF_INGEST_KEY required");
 
   const trades = await fetchClosedTrades();
   console.error(`[journal] ${trades.length} closed trade(s) to journal`);
   if (trades.length === 0) return;
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const wiki = loadWiki();
 
   for (const t of trades) {
     try {
       console.error(`[journal] scoring ${t.ticker}...`);
-      const entry = await scoreTrade(client, wiki, t);
+      const entry = await scoreTrade(wiki, t);
       if (DRY_RUN) {
         console.log(JSON.stringify(entry, null, 2));
       } else {

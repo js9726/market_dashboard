@@ -147,15 +147,17 @@ jobs:
 
       # ── Step 4b: Claude SDK runner (Node — Phase 3c MVP) ────────────────
       # Direct Anthropic SDK with manual wiki context loading from the
-      # wiki-source submodule. Migrate to @anthropic-ai/claude-agent-sdk
-      # with skills/tools in a follow-up once this proves stable.
-      - name: Generate Claude tab brief (Node SDK runner)
+      # Drives the morning-brief SKILL via the Claude Agent SDK under the
+      # Claude Code SUBSCRIPTION (CLAUDE_CODE_OAUTH_TOKEN) — not a metered
+      # Anthropic API token. Generate the token once with `claude setup-token`
+      # on a Max/Pro plan and store it as the CLAUDE_CODE_OAUTH_TOKEN secret.
+      - name: Generate Claude tab brief (Agent SDK + skill, subscription auth)
         if: success()
         continue-on-error: true
         working-directory: packages/core-skills/morning-brief
         run: npm run brief
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
           BRIEF_GENERATED_BY: cron-premarket:claude-sdk
