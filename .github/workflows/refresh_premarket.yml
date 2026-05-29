@@ -49,21 +49,26 @@ jobs:
         working-directory: apps/market_dashboard_backend
 
     steps:
-      # Checkout the main repo. Submodule clone happens separately + non-fatal
-      # because the wiki-source submodule is a PRIVATE repo and needs a deploy
-      # key (see packages/dashboard-bridge/docs/WIKI_DEPLOY_KEY.md). Until that
-      # is set up, the brief runs without wiki context (still produces valid
-      # output; trader-style rubric just isn't embedded in the prompt).
       - uses: actions/checkout@v4
 
-      - name: Fetch wiki submodule (non-fatal)
-        continue-on-error: true
+      # Load the read-only deploy key for the PRIVATE wiki submodule
+      # (trade-analyser_skill). Key is stored as the WIKI_SSH_KEY secret;
+      # public half is a deploy key on the wiki repo. See
+      # packages/dashboard-bridge/docs/WIKI_DEPLOY_KEY.md.
+      - name: Load wiki deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.WIKI_SSH_KEY }}
+
+      - name: Fetch wiki submodule
+        continue-on-error: true   # still non-fatal: brief ships w/o wiki if clone hiccups
         run: |
-          if git submodule update --init --recursive 2>&1; then
-            echo "wiki-source submodule pulled OK"
+          # Rewrite submodule URL to SSH so the deploy key applies, then init.
+          git submodule set-url packages/core-skills/wiki-source git@github.com:js9726/trade-analyser_skill.git 2>/dev/null || true
+          if git submodule update --init --recursive; then
+            echo "wiki-source submodule pulled OK (deploy key)"
           else
-            echo "::warning::wiki-source submodule unreachable (likely missing deploy key). Brief will run without wiki context."
-            # Create an empty wiki dir so the SDK runner's reader doesn't crash.
+            echo "::warning::wiki submodule clone failed — brief runs without wiki context."
             mkdir -p packages/core-skills/wiki-source/wiki
           fi
 

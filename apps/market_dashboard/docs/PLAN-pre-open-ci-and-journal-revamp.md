@@ -1,9 +1,67 @@
 # Plan — Pre-Open CI + Multi-Provider AI + Journal Revamp
 
 **Owner:** Jie Sheng
-**Status:** AWAITING APPROVAL — Round 4 of clarifying questions completed
+**Status:** IN PROGRESS — Phases 1-3 shipped; breadth + live-quote reliability overhaul shipped 2026-05-29
 **Created:** 2026-05-28
+**Last revised:** 2026-05-29 (Revision 2 — reliability architecture)
 **Target completion:** ~2-3 weeks (Phase 1-6 incremental ship)
+
+---
+
+## REVISION 2 (2026-05-29) — Reliability & "Automation Vibe" Architecture
+
+**Problem observed:** "the whole workflow is still not giving me an automation
+vibe — I need to check whether GitHub is running, the market breadth is still
+not updating."
+
+**Root cause:** Critical data (breadth, live quotes) depended on SINGLE fragile
+triggers: GH Actions cron (skips silently under load) writing FILES that needed
+git-commit → Vercel-rebuild to appear. Plus yfinance 401-blocking the runner IP.
+Any single failure = stale data + no signal.
+
+**The principle now enforced for every critical data point:**
+
+> **Redundant triggers → idempotent endpoint → DB push (never git-commit) → freshness badge.**
+> No single point of failure. The user never has to "check if the workflow ran."
+
+### Market breadth — SOLVED (was the worst offender)
+
+| Old | New |
+|---|---|
+| breadth_scan.py scans ~5000 tickers (5-12 min, yfinance 401s) | TradingView scanner `totalCount` — 1 call per metric, **884ms total** on Vercel |
+| Writes file → git commit → Vercel rebuild | `/api/breadth/refresh` computes server-side → upserts Postgres → dashboard reads instantly |
+| Single GH cron trigger (skips silently) | **4 redundant triggers**: Vercel Cron (3×/weekday) + bridge daemon + external uptime cron (cron-job.org) + GH Actions legacy |
+| No freshness signal | `/api/breadth` returns `_meta.refreshedAt`; panel badge shows age; polls every 5 min |
+
+Files: `src/server/breadth-scanner.ts`, `/api/breadth/refresh`, `/api/breadth`,
+`/api/cron/refresh-breadth`, `MarketBreadthSnapshot` model, `breadth_fast.py` (Python equivalent).
+
+**Why TV scanner instead of "scrape a service":** It IS the scrape — TradingView's
+`scanner.tradingview.com/america/scan` returns aggregate counts (advancers,
+decliners, new highs/lows, % above SMA, per sector) in one HTTP call each.
+Verified reachable from Vercel serverless IPs (not datacenter-blocked).
+
+### Live quotes — SOLVED (fixes stale TENB price)
+
+| Old | New |
+|---|---|
+| yahoo_fallback_quotes.yml — 401-failing for a week | **DELETED** |
+| Position prices went stale | dashboard-bridge daemon pushes moomoo live quotes every 60s → `/api/live-quotes/ingest` |
+
+Files: `packages/dashboard-bridge/bridge/live_quotes.py`, config `live_quote_key` + `live_quote_extras`.
+
+### Reliability layers (defense in depth)
+
+1. **Cloud-primary (no PC needed):** Vercel Cron hits the refresh endpoints on schedule.
+2. **Local-authoritative (when PC on):** dashboard-bridge daemon pushes moomoo data every 60s.
+3. **Zero-dependency backup:** external uptime cron (cron-job.org / UptimeRobot) can hit
+   `/api/breadth/refresh?key=...` — survives even if BOTH Vercel cron and PC are down.
+4. **Freshness badges everywhere:** every panel shows "Xm ago"; stale = visible, not silent.
+
+### Deploy key — DONE
+
+Wiki submodule (private `trade-analyser_skill`) now has a read-only deploy key;
+private half stored as `WIKI_SSH_KEY` GH secret. Workflows use `webfactory/ssh-agent`.
 
 ---
 
