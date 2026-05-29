@@ -1,15 +1,8 @@
 /**
  * /api/cron/refresh-breadth
  *
- * Vercel Cron entry (schedule in vercel.json — pre-open, midday, post-close on
- * weekdays). Recomputes market breadth via the TradingView scanner and upserts
- * the Postgres snapshot.
- *
- * This is the CLOUD reliability layer for breadth — runs 24/7 regardless of
- * whether the user's PC is on or whether GH Actions fired. Combined with:
- *   - the bridge daemon (local trigger when PC on)
- *   - an optional external uptime cron hitting /api/breadth/refresh?key=...
- * breadth stays fresh without the user ever checking if a workflow ran.
+ * Optional cron entry for breadth. The primary operational path is now the
+ * local dashboard-bridge daemon hitting /api/breadth/refresh once post-close.
  *
  * Auth: Vercel Cron sends `Authorization: Bearer <CRON_SECRET>` when CRON_SECRET
  * is set. Matches the existing /api/cron/rescore-day14 pattern.

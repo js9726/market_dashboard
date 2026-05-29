@@ -1,5 +1,5 @@
 """
-Live-quote pusher — replaces the broken yahoo_fallback_quotes.yml workflow.
+Live-quote pusher for the local dashboard-bridge daemon.
 
 Pulls real-time quotes from moomoo OpenD for the union of:
   - tickers in the user's current positions (so /dashboard/portfolio shows

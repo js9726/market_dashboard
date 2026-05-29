@@ -210,6 +210,38 @@ function dec(v: number | null | undefined): Prisma.Decimal | null {
   return v == null || Number.isNaN(v) ? null : new Prisma.Decimal(v);
 }
 
+function fmt(v: number | null | undefined): string {
+  return v == null || Number.isNaN(v) ? "-" : String(v);
+}
+
+function decimalNumber(v: Prisma.Decimal | null | undefined): number | null {
+  return v == null ? null : v.toNumber();
+}
+
+function changeLine(label: string, before: number | string | null | undefined, after: number | string | null | undefined): string | null {
+  if (before == null && after == null) return null;
+  if (String(before ?? "") === String(after ?? "")) return null;
+  return `${label} ${before ?? "-"} -> ${after ?? "-"}`;
+}
+
+function buildAuditNotes(c: ExtractedCandidate, rerankLines: string[]): string {
+  const parts = [
+    "A-LIST",
+    c.screenSource ? `source=${c.screenSource}` : null,
+    c.setupClassification ? `setup=${c.setupClassification}` : null,
+    c.day0Verdict ? `verdict=${c.day0Verdict}` : null,
+    c.day0Score != null ? `score=${c.day0Score}` : null,
+    c.day0Rvol != null ? `rvol=${fmt(c.day0Rvol)}x` : null,
+    c.entryZone != null ? `entry=${fmt(c.entryZone)}` : null,
+    c.stop != null ? `stop=${fmt(c.stop)}` : null,
+    c.target != null ? `target=${fmt(c.target)}` : null,
+    c.rrr != null ? `rrr=${fmt(c.rrr)}` : null,
+    c.day0TraderLens ? `lens=${c.day0TraderLens}` : null,
+  ].filter(Boolean);
+  const rerank = rerankLines.length ? `RERANK ${rerankLines.join("; ")}` : null;
+  return [parts.join(" | "), rerank, c.day0Thesis].filter(Boolean).join("\n");
+}
+
 /**
  * Persist the extracted candidates for a given pickDate + brief reference.
  * Idempotent — upserts on (userId, pickDate, ticker). Re-runs are safe.
@@ -236,6 +268,17 @@ export async function upsertCandidates(
         userId_pickDate_ticker: { userId, pickDate, ticker: c.ticker },
       },
     });
+    const rerankLines = existing
+      ? [
+          changeLine("score", existing.day0Score, c.day0Score),
+          changeLine("verdict", existing.day0Verdict, c.day0Verdict),
+          changeLine("setup", existing.setupClassification, c.setupClassification),
+          changeLine("entry", decimalNumber(existing.entryZone), c.entryZone),
+          changeLine("stop", decimalNumber(existing.stop), c.stop),
+          changeLine("target", decimalNumber(existing.target), c.target),
+          changeLine("rrr", decimalNumber(existing.rrr), c.rrr),
+        ].filter((line): line is string => Boolean(line))
+      : [];
 
     const data = {
       userId,
@@ -269,6 +312,31 @@ export async function upsertCandidates(
       await prisma.aListCandidate.create({ data });
       inserted++;
     }
+
+    await prisma.wikiScreenerPick.upsert({
+      where: {
+        operatorLabel_pickDate_ticker_screenSource: {
+          operatorLabel,
+          pickDate,
+          ticker: c.ticker,
+          screenSource: "a-list",
+        },
+      },
+      create: {
+        operatorLabel,
+        pickDate,
+        ticker: c.ticker,
+        setupClassification: c.setupClassification ?? null,
+        screenSource: "a-list",
+        notes: buildAuditNotes(c, rerankLines),
+        sourceUrl: c.screenSource ? `brief://${briefProvider}/${c.screenSource}` : `brief://${briefProvider}`,
+      },
+      update: {
+        setupClassification: c.setupClassification ?? null,
+        notes: buildAuditNotes(c, rerankLines),
+        sourceUrl: c.screenSource ? `brief://${briefProvider}/${c.screenSource}` : `brief://${briefProvider}`,
+      },
+    });
   }
 
   return { inserted, updated };

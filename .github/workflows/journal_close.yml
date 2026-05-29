@@ -88,6 +88,23 @@ jobs:
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
 
+      # Runs sync_to_dashboard.py from the wiki submodule so Trade Audits
+      # reflects day-14 rescores before the close journaler runs.
+      - name: Sync wiki audits to dashboard
+        if: success()
+        continue-on-error: true
+        working-directory: packages/core-skills/wiki-source
+        run: |
+          if [ -f scripts/sync_to_dashboard.py ]; then
+            pip install -r scripts/requirements.txt 2>/dev/null || true
+            python scripts/sync_to_dashboard.py --post 2>&1 || echo "::warning::wiki audit sync failed (non-fatal)"
+          else
+            echo "::warning::sync_to_dashboard.py not found in wiki submodule"
+          fi
+        env:
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+
       # ── Step 2: Per-trade AI journaling (Phase 5b — the "final end") ────
       # For each trade closed today (and not yet journaled), Claude scores it
       # against the 7-trader rubric + wiki rules and persists a JournalEntry.
@@ -110,21 +127,3 @@ jobs:
           WIKI_DIR: ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
           # 4-day lookback covers a long weekend; widen for holiday gaps.
           JOURNAL_LOOKBACK_DAYS: "4"
-
-      # ── Step 3: Wiki audit sync — Trade Audits page → today ─────────────
-      # Runs sync_to_dashboard.py from the wiki submodule so the Trade Audits
-      # page reflects the latest verdicts (was stuck at March).
-      - name: Sync wiki audits to dashboard
-        if: success()
-        continue-on-error: true
-        working-directory: packages/core-skills/wiki-source
-        run: |
-          if [ -f scripts/sync_to_dashboard.py ]; then
-            pip install -r scripts/requirements.txt 2>/dev/null || true
-            python scripts/sync_to_dashboard.py --post 2>&1 || echo "::warning::wiki audit sync failed (non-fatal)"
-          else
-            echo "::warning::sync_to_dashboard.py not found in wiki submodule"
-          fi
-        env:
-          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
-          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}

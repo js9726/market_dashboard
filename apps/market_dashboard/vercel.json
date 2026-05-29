@@ -9,28 +9,20 @@
       "schedule": "0 14 * * *"
     },
     {
-      "path": "/api/cron/refresh-breadth",
+      "path": "/api/cron/refresh-screeners",
+      "schedule": "3 13 * * 1-5"
+    },
+    {
+      "path": "/api/cron/refresh-screeners",
       "schedule": "33 13 * * 1-5"
     },
     {
-      "path": "/api/cron/refresh-breadth",
-      "schedule": "0 18 * * 1-5"
-    },
-    {
-      "path": "/api/cron/refresh-breadth",
-      "schedule": "5 20 * * 1-5"
+      "path": "/api/cron/refresh-screeners",
+      "schedule": "3 14 * * 1-5"
     },
     {
       "path": "/api/cron/refresh-screeners",
-      "schedule": "35 13 * * 1-5"
-    },
-    {
-      "path": "/api/cron/refresh-screeners",
-      "schedule": "0 15 * * 1-5"
-    },
-    {
-      "path": "/api/cron/refresh-screeners",
-      "schedule": "0 19 * * 1-5"
+      "schedule": "33 20 * * 1-5"
     }
   ]
 }

@@ -50,6 +50,8 @@ def _sync_once(dry: bool = False) -> bool:
         snapshot = sync.fetch()
     except Exception as e:  # broad — log and report
         log.exception("moomoo fetch failed: %s", e)
+        if not dry:
+            _run_scheduled_refreshes(cfg)
         return False
 
     positions = snapshot["positions"]
@@ -72,7 +74,7 @@ def _sync_once(dry: bool = False) -> bool:
     result = client.sync(positions, fills, equity=equity)
     log.info("Sync result: %s", result)
 
-    # ── Live quotes push (Phase hotfix — replaces yahoo_fallback_quotes.yml).
+    # Live quotes push: local bridge is now the primary live-price path.
     # Non-fatal: failure here does NOT block positions/fills/equity sync above.
     try:
         from .live_quotes import fetch_live_quotes, push_live_quotes
@@ -84,7 +86,24 @@ def _sync_once(dry: bool = False) -> bool:
     except Exception as e:
         log.warning("Live-quote push failed (non-fatal): %s", e)
 
+    _run_scheduled_refreshes(cfg)
     return bool(result.get("ok"))
+
+
+def _run_scheduled_refreshes(cfg) -> None:
+    """Run calendar-gated refresh tasks that should survive broker errors."""
+    try:
+        from .breadth import maybe_refresh_breadth
+
+        result = maybe_refresh_breadth(cfg)
+        if result.skipped:
+            log.debug("Breadth refresh skipped: %s", result.skipped)
+        elif result.ok:
+            log.info("Breadth refresh result: %s", result.response)
+        else:
+            log.warning("Breadth refresh failed: %s", result.error or result.response)
+    except Exception as e:
+        log.warning("Breadth refresh check failed (non-fatal): %s", e)
 
 
 def _loop() -> None:
@@ -119,6 +138,7 @@ def main() -> None:
     sub.add_parser("run", help="Run the polling loop indefinitely")
     sub.add_parser("once", help="Perform one sync and exit")
     sub.add_parser("dry-run", help="Fetch from moomoo but skip the HTTP POST")
+    sub.add_parser("breadth", help="Force one market-breadth refresh and exit")
     args = parser.parse_args()
 
     if args.cmd == "run":
@@ -129,6 +149,13 @@ def main() -> None:
     elif args.cmd == "dry-run":
         ok = _sync_once(dry=True)
         sys.exit(0 if ok else 1)
+    elif args.cmd == "breadth":
+        from .breadth import maybe_refresh_breadth
+
+        cfg = load_config()
+        result = maybe_refresh_breadth(cfg, force=True)
+        log.info("Breadth refresh: %s", result.response or result.skipped or result.error)
+        sys.exit(0 if result.ok else 1)
 
 
 if __name__ == "__main__":

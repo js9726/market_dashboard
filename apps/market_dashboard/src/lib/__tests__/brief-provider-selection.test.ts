@@ -2,13 +2,19 @@ import { describe, expect, it } from "vitest";
 import {
   normalizeBriefProvider,
   selectBriefProvider,
+  selectFreshestBriefWithContent,
   selectFreshestBriefProvider,
   type BriefProviderMap,
 } from "@/lib/brief/provider-selection";
 
-function entry(generatedAt: string, opts: { error?: string | null; stale?: boolean } = {}) {
+function entry(
+  generatedAt: string,
+  opts: { error?: string | null; stale?: boolean; ideas?: boolean } = {},
+) {
   return {
-    structured: { mood: { label: "test" } },
+    structured: opts.ideas
+      ? { mood: { label: "test" }, movers: [{ ticker: "NVDA" }] }
+      : { mood: { label: "test" } },
     generatedAt,
     error: opts.error ?? null,
     stale: opts.stale,
@@ -77,5 +83,18 @@ describe("brief provider selection", () => {
     expect(normalizeBriefProvider("deepseek-search")).toBe("deepseek");
     expect(normalizeBriefProvider("gemini")).toBe("gemini");
     expect(normalizeBriefProvider("unknown")).toBeNull();
+  });
+
+  it("keeps Live Ideas on the current bucket before stale fallback ideas", () => {
+    const providers: BriefProviderMap = {
+      deepseek: entry("2026-05-20T13:00:00.000Z", { stale: true, ideas: true }),
+      gemini: entry("2026-05-20T14:00:00.000Z"),
+      openai: null,
+      claude: null,
+    };
+
+    const selected = selectFreshestBriefWithContent(providers);
+    expect(selected?.provider).toBe("gemini");
+    expect(selected?.entry.stale).not.toBe(true);
   });
 });

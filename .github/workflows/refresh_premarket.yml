@@ -1,35 +1,34 @@
-name: Refresh Pre-Open Brief (Daily 30min Before Market Open)
+name: Refresh Pre-Open Brief (Daily 27min Before Market Open)
 
 # Phase 3b of the pre-open CI + journal revamp plan
 # (see apps/market_dashboard/docs/PLAN-pre-open-ci-and-journal-revamp.md).
 #
-# ONE consolidated cron job that runs 30 min before US market open every
-# trading day (Mon-Fri, US holidays auto-skipped). Replaces the heavy parts
-# of refresh_data.yml — the breadth/screener split workflows still run on
-# their own cadence; this one OWNS the pre-open run.
+# ONE consolidated cron job that runs 27 min before US market open every
+# trading day (Mon-Fri, US holidays auto-skipped). Replaces the old
+# refresh_data.yml heavy path. TV screeners run on their own cadence; breadth
+# runs post-close from the local dashboard-bridge daemon.
 #
 # Pipeline:
 #   1. Skip if not a US trading day (pandas_market_calendars)
 #   2. build_data.py        → snapshot, indices, sector ETFs
-#   3. breadth_scan.py      → full universe + sectors (~5000 tickers)
-#   4. tv_screener_fetch.py → 5 screeners, DeepSeek-scored top 10
-#   5. morning_brief.py     → Claude + DeepSeek + Gemini (OpenAI skipped per
+#   3. tv_screener_fetch.py → 5 screeners, DeepSeek-scored top 10
+#   4. morning_brief.py     → Claude + DeepSeek + Gemini (OpenAI skipped per
 #                             $5/day cost cap; on-demand only via /refresh button)
-#   6. Sync data to public folder
-#   7. Sanitise JSON (NaN → null)
-#   8. Commit + push (with -X theirs rebase retry on race)
+#   5. Sync data to public folder
+#   6. Sanitise JSON (NaN → null)
+#   7. Commit + push (with -X theirs rebase retry on race)
 #
-# Cron: 13:00 UTC Mon-Fri = 09:00 ET EDT (= 21:00 MYT for Jie).
+# Cron: 13:03 UTC Mon-Fri = 09:03 ET EDT, 27 min before market open.
 #
 # Concurrency: lock prevents overlap; new run waits + skips if old still
-# finishing (matches the cancel-in-progress=false pattern used by refresh_data.yml).
+# finishing (matches the cancel-in-progress=false pattern used by the old split jobs).
 #
 # Cost target: ~$3.50/run (1.50 Claude + 0.30 DeepSeek + 0.80 Gemini +
 #               0.30 A-list scoring + 0.50 screener scoring).
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'           # 30 min pre-market (09:00 ET EDT)
+    - cron: '3 13 * * 1-5'           # 27 min pre-market (09:03 ET EDT)
   workflow_dispatch: {}
 
 concurrency:
@@ -102,23 +101,7 @@ jobs:
         if: success()
         run: python scripts/build_data.py --out-dir data
 
-      # ── Step 2: market breadth — trigger the FAST TV-scanner endpoint ────
-      # Breadth no longer runs the slow ~5000-ticker breadth_scan.py here.
-      # It lives behind /api/breadth/refresh (TV scanner counts, ~1s) which
-      # Vercel Cron also hits independently. This step is just one more
-      # redundant trigger so pre-open breadth is guaranteed fresh.
-      - name: Refresh market breadth (fast endpoint)
-        if: success()
-        continue-on-error: true
-        run: |
-          curl -sS --max-time 75 \
-            "${VERCEL_INGEST_URL%/}/api/breadth/refresh?key=${BRIEF_INGEST_KEY}&force=1" \
-            && echo "breadth refreshed" || echo "::warning::breadth refresh failed (Vercel cron will retry)"
-        env:
-          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
-          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
-
-      # ── Step 3: TradingView screener hits ────────────────────────────────
+      # ── Step 2: TradingView screener hits ────────────────────────────────
       - name: Fetch TV screeners with DeepSeek scoring
         if: success()
         continue-on-error: true
@@ -210,7 +193,7 @@ jobs:
             exit 0
           fi
           git commit -m "chore: pre-open refresh [skip ci]"
-          # Race-tolerant push: refresh_data_intraday + refresh_breadth may
+          # Race-tolerant push: refresh_data_intraday may
           # advance main between checkout and push. Rebase + retry up to 5x
           # with -X theirs (data files always prefer the later run).
           for attempt in 1 2 3 4 5; do

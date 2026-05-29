@@ -15,6 +15,8 @@ Every 60 seconds (default), the bridge:
 1. Pulls your current positions from moomoo OpenD
 2. Pulls trade fills since last sync
 3. Posts both to your dashboard via authenticated HTTPS
+4. Pushes live quotes for held tickers + configured watch tickers when `live_quote_key` is set
+5. Triggers market breadth once per US trading day after the close when `brief_ingest_key` is set
 
 The dashboard then surfaces live P&L in `/dashboard/portfolio`.
 
@@ -66,6 +68,9 @@ Logs go to `~/.dashboard-bridge.log`.
 [dashboard]
 url = "https://market-dashboard-ivory.vercel.app"
 token = "mdb_<your-token-here>"
+# Optional. Store secrets here or use env vars instead:
+# live_quote_key = "<LIVE_QUOTE_INGEST_KEY>"
+# brief_ingest_key = "<BRIEF_INGEST_KEY>"
 
 [broker]
 # Must match a UserBrokerAccount.alias on your dashboard
@@ -86,6 +91,19 @@ market = "US"
 interval_sec = 60
 # Fetch fills since N days ago on each sync (broker dedup will skip duplicates)
 fill_lookback_days = 1
+live_quote_extras = "SPY,QQQ,IWM,DIA,SMH,XLK,NVDA,CRDO,ARM,MRVL"
+breadth_post_close = true
+breadth_post_close_time = "16:33"
+breadth_timezone = "America/New_York"
+```
+
+`brief_ingest_key` can also be supplied as `DASHBOARD_BRIDGE_BRIEF_INGEST_KEY` or `BRIEF_INGEST_KEY`.
+`live_quote_key` can also be supplied as `DASHBOARD_BRIDGE_LIVE_QUOTE_KEY`.
+
+Force a one-off breadth refresh:
+
+```powershell
+.\.venv\Scripts\python.exe -m bridge breadth
 ```
 
 ## Security notes

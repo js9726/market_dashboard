@@ -67,7 +67,7 @@ jobs:
         run: python scripts/tv_screener_fetch.py --out-dir data
         env:
           # TV_SESSION_ID: TradingView sessionid cookie — bypasses CI IP block.
-          # See refresh_data.yml for instructions on obtaining this value.
+          # See refresh_premarket.yml for instructions on obtaining this value.
           TV_SESSION_ID: ${{ secrets.TV_SESSION_ID }}
 
       # ── Step 3: sync to Next.js public folder ─────────────────────────────

@@ -85,11 +85,22 @@ export function selectFreshestBriefWithContent(
   providers: Partial<Record<BriefProviderName, SelectableBriefEntry | null>> | null | undefined,
 ): SelectedBriefProvider | null {
   if (!providers) return null;
-  let best: SelectedBriefProvider | null = null;
-  for (const provider of BRIEF_PROVIDER_ORDER) {
-    const entry = providers[provider];
-    if (!hasIdeasContent(entry)) continue;
-    if (!best || timestamp(entry) > timestamp(best.entry)) best = { provider, entry };
-  }
-  return best ?? selectFreshestBriefProvider(providers);
+  const bestMatching = (predicate: (entry: SelectableBriefEntry) => boolean) => {
+    let best: SelectedBriefProvider | null = null;
+    for (const provider of BRIEF_PROVIDER_ORDER) {
+      const entry = providers[provider];
+      if (!entry || !predicate(entry)) continue;
+      if (!best || timestamp(entry) > timestamp(best.entry)) best = { provider, entry };
+    }
+    return best;
+  };
+
+  // Prefer current-bucket ideas. A stale fallback with movers should never
+  // outrank a current provider row just because the stale row has richer text.
+  return (
+    bestMatching((entry) => !entry.stale && hasIdeasContent(entry)) ??
+    bestMatching((entry) => !entry.stale && hasStructuredPayload(entry)) ??
+    bestMatching((entry) => hasIdeasContent(entry)) ??
+    selectFreshestBriefProvider(providers)
+  );
 }

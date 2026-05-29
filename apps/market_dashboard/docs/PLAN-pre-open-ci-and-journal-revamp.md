@@ -118,7 +118,7 @@ private half stored as `WIKI_SSH_KEY` GH secret. Workflows use `webfactory/ssh-a
                       │ For each closed trade today: score + journal entry + chart
                       │ For each A-list aged 14d: MFE/MAE rescore + outcome
                       │
-16:43 ET / 04:43 MYT │ BREADTH POST-CLOSE (existing — refresh_breadth.yml)
+16:33 ET / 04:33 MYT │ BREADTH POST-CLOSE (local dashboard-bridge)
 ```
 
 ---
@@ -128,16 +128,17 @@ private half stored as `WIKI_SSH_KEY` GH secret. Workflows use `webfactory/ssh-a
 ### Cloud (GitHub Actions + Vercel + Postgres)
 
 **New workflows:**
-- `refresh_premarket.yml` — daily 9:00 ET, replaces heavy parts of `refresh_data.yml`. Uses Claude Agent SDK + DeepSeek + Gemini.
+- `refresh_premarket.yml` — daily 9:03 ET, replaces heavy parts of `refresh_data.yml`. Uses Claude Agent SDK + DeepSeek + Gemini.
 - `journal_close.yml` — daily 16:30 ET, post-close journal + day-14 A-list rescore.
 
 **Kept:**
 - `refresh_data_intraday.yml` (your 3-tick retiming)
-- `refresh_breadth.yml` (2× daily, just shipped)
-- `refresh_portfolio_quotes.yml` / `yahoo_fallback_quotes.yml`
+- DB-backed TV screener refresh via Vercel Cron + intraday workflow
 
 **Deprecated:**
-- `refresh_data.yml` (split into `refresh_premarket.yml` + `refresh_breadth.yml`)
+- `refresh_data.yml` (split into `refresh_premarket.yml` + `refresh_data_intraday.yml`)
+- `refresh_breadth.yml` (moved to local dashboard-bridge once post-close)
+- `refresh_portfolio_quotes.yml` / `yahoo_fallback_quotes.yml` (replaced by bridge live quotes)
 
 **New API endpoints:**
 - `POST /api/broker-sync/fills` — daemon pushes fills

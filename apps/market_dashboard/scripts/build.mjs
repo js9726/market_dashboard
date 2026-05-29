@@ -19,9 +19,12 @@ function run(label, binName, args, opts = {}) {
     process.exit(1);
   }
 
-  const command = isWindows ? "cmd.exe" : binPath;
-  const commandArgs = isWindows ? ["/d", "/s", "/c", `"${binPath}"`, ...args] : args;
-  const result = spawnSync(command, commandArgs, { stdio: "inherit", shell: false });
+  const result = isWindows
+    ? spawnSync("cmd.exe", ["/d", "/c", "call", binPath, ...args], {
+        stdio: "inherit",
+        shell: false,
+      })
+    : spawnSync(binPath, args, { stdio: "inherit", shell: false });
   if (result.error) {
     console.error(`[build] ${label} failed to start: ${result.error.message}`);
   }

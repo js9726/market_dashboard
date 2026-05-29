@@ -25,7 +25,7 @@ const WORKFLOW_NAV: NavItem[] = [
   // A-List sits between the daily brief (Conviction Desk) and the executed
   // book (Portfolio). It's the strict-quality picks promoted from every brief,
   // tracked day-0 → day-14. See PLAN-pre-open-ci-and-journal-revamp.md.
-  { href: "/dashboard/a-list", label: "A-List", icon: "review" },
+  { href: "/dashboard/trades", label: "Trades Hub", icon: "journal" },
   // Portfolio sits next — natural flow from "ideas" → "executed positions".
   // Gated behind brokerJournal flag; invisible for users who haven't opted in.
   { href: "/dashboard/portfolio", label: "Portfolio", icon: "portfolio", featureFlag: "brokerJournal" },
@@ -34,7 +34,6 @@ const WORKFLOW_NAV: NavItem[] = [
   { href: "/dashboard/pitch", label: "New Pitch", icon: "plus" },
   { href: "/dashboard/bench", label: "Bench", icon: "template", count: "1" },
   { href: "/dashboard/settled", label: "Settled", icon: "review", count: "2" },
-  { href: "/dashboard/analytics", label: "Analytics", icon: "analytics" },
 ];
 
 const TOOL_NAV: NavItem[] = [
@@ -46,8 +45,6 @@ const TOOL_NAV: NavItem[] = [
   { href: "/dashboard/profile", label: "Profile", icon: "accounts" },
   { href: "/dashboard/rrg", label: "Rotation Graph", icon: "analytics" },
   { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
-  { href: "/dashboard/journal", label: "Journal", icon: "journal" },
-  { href: "/dashboard/audits", label: "Trade Audits", icon: "review" },
   { href: "/dashboard/playbooks", label: "Playbooks", icon: "template" },
   { href: "/dashboard/replay", label: "Replay", icon: "replay" },
   { href: "/dashboard/settings", label: "Settings", icon: "accounts" },
@@ -61,6 +58,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard/a-list": {
     title: "A-List",
     subtitle: "Strict-quality picks - day-0 to day-14 outcome",
+  },
+  "/dashboard/trades": {
+    title: "Trades Hub",
+    subtitle: "A-List - Journal - Trade Audits - Analytics",
   },
   "/dashboard/equity": {
     title: "Equity Timeline",

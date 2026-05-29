@@ -7,12 +7,15 @@ url = "https://market-dashboard-ivory.vercel.app"
 # Plaintext bridge token from /dashboard/settings/brokers → Generate token
 # (the token is shown once — paste it here, then chmod 600 this file)
 token = "mdb_REPLACE_ME"
-# Optional: live-quote ingest key (replaces the retired Yahoo Fallback workflow).
+# Optional: live-quote ingest key for local moomoo live prices.
 # When set, the bridge daemon pushes real-time prices from moomoo to
 # /api/live-quotes/ingest for held tickers + sync.live_quote_extras below.
 # Without it, /dashboard/portfolio P/L will go stale within minutes.
 # Get it from your dashboard's Vercel env: LIVE_QUOTE_INGEST_KEY
 # live_quote_key = "..."
+# Optional: machine ingest key for local post-close breadth refresh.
+# Use the same value as Vercel/GitHub BRIEF_INGEST_KEY.
+# brief_ingest_key = "..."
 
 [broker]
 # Must match a UserBrokerAccount.alias on your dashboard
@@ -43,3 +46,8 @@ fill_lookback_days = 1
 # has a fresh reference. Add your watchlist if you want live RVOL/price for
 # names you don't currently hold.
 live_quote_extras = "SPY,QQQ,IWM,DIA,SMH,XLK,NVDA,CRDO,ARM,MRVL"
+# Run /api/breadth/refresh once per US trading day after the close from this
+# local daemon. The state file ~/.dashboard-bridge-state.json prevents repeats.
+breadth_post_close = true
+breadth_post_close_time = "16:33"
+breadth_timezone = "America/New_York"

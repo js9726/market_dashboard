@@ -2,12 +2,8 @@
  * GET/POST /api/breadth/refresh
  *
  * Recomputes market breadth via the TradingView scanner and upserts the
- * snapshot into Postgres. This is the RELIABLE breadth path — any scheduler
- * can hit it, and they're redundant:
- *   - Vercel Cron (vercel.json) — cloud, 24/7, no PC needed
- *   - External uptime cron (cron-job.org / UptimeRobot) — zero-dependency backup
- *   - dashboard-bridge daemon (local) — when PC is on
- *   - GH Actions — legacy backup
+ * snapshot into Postgres. The dashboard-bridge daemon hits this once per US
+ * trading day after the close.
  *
  * Whoever fires first wins; the rest see "already fresh" and skip the recompute.
  * No git commit, no Vercel rebuild — the dashboard reads the new row instantly.

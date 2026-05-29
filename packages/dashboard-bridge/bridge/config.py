@@ -27,9 +27,11 @@ class DashboardConfig:
     url: str
     token: str
     # NEW Phase: live-quotes ingest key. Optional — if absent, the bridge
-    # only pushes positions/fills/equity; live quotes (replacing the
-    # broken Yahoo Fallback workflow) are skipped.
+    # only pushes positions/fills/equity; live quotes are skipped.
     live_quote_key: str | None = None
+    # Shared machine-ingest key used for non-broker refresh endpoints such as
+    # /api/breadth/refresh. Optional so broker sync still works without it.
+    brief_ingest_key: str | None = None
 
 
 @dataclass(frozen=True)
@@ -56,6 +58,9 @@ class SyncConfig:
     # Defaults to a small index/sector set so the dashboard always has
     # fresh SPY/QQQ even when no positions are open.
     live_quote_extras: tuple[str, ...] = ()
+    breadth_post_close: bool = True
+    breadth_post_close_time: str = "16:33"
+    breadth_timezone: str = "America/New_York"
 
 
 @dataclass(frozen=True)
@@ -73,6 +78,18 @@ def _require(d: dict[str, Any], key: str, section: str) -> Any:
     if key not in d:
         sys.exit(f"Config error: [{section}].{key} is required")
     return d[key]
+
+
+def _bool(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return default
 
 
 def load_config(path: Path | None = None) -> Config:
@@ -102,6 +119,11 @@ def load_config(path: Path | None = None) -> Config:
         os.environ.get("DASHBOARD_BRIDGE_LIVE_QUOTE_KEY")
         or dash.get("live_quote_key")
     )
+    brief_ingest_key = (
+        os.environ.get("DASHBOARD_BRIDGE_BRIEF_INGEST_KEY")
+        or os.environ.get("BRIEF_INGEST_KEY")
+        or dash.get("brief_ingest_key")
+    )
 
     extras_raw = sync.get("live_quote_extras", "SPY,QQQ,IWM,DIA")
     if isinstance(extras_raw, str):
@@ -116,6 +138,7 @@ def load_config(path: Path | None = None) -> Config:
             url=str(_require(dash, "url", "dashboard")).rstrip("/"),
             token=str(token),
             live_quote_key=str(live_quote_key) if live_quote_key else None,
+            brief_ingest_key=str(brief_ingest_key) if brief_ingest_key else None,
         ),
         broker=BrokerConfig(
             account_alias=str(_require(broker, "account_alias", "broker")),
@@ -132,5 +155,8 @@ def load_config(path: Path | None = None) -> Config:
             interval_sec=int(sync.get("interval_sec", 60)),
             fill_lookback_days=int(sync.get("fill_lookback_days", 1)),
             live_quote_extras=extras,
+            breadth_post_close=_bool(sync.get("breadth_post_close"), True),
+            breadth_post_close_time=str(sync.get("breadth_post_close_time", "16:33")),
+            breadth_timezone=str(sync.get("breadth_timezone", "America/New_York")),
         ),
     )

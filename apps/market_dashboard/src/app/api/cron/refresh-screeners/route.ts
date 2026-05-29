@@ -1,9 +1,9 @@
 /**
  * /api/cron/refresh-screeners
  *
- * Vercel Cron entry (schedule in vercel.json — market hours, weekdays).
- * Recomputes the 5 TV screeners and upserts the Postgres snapshot. Cloud
- * reliability layer — fires regardless of GitHub Actions cron or PC uptime.
+ * Vercel Cron entry (schedule in vercel.json: 27 min pre-open, 3 min after
+ * open, 33 min after open, and 33 min post-close on weekdays). Recomputes
+ * the 5 TV screeners and upserts the Postgres snapshot.
  *
  * Auth: Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`.
  */

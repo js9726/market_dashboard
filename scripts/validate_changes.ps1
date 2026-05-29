@@ -54,10 +54,10 @@ Step "CLAUDE.md has exactly 8 numbered sections (1..8)" {
 }
 
 # 2. Python scripts all import cleanly
-Step "All 7 Python scripts import without error" {
+Step "Core Python scripts import without error" {
     Push-Location (Join-Path $be "scripts")
     try {
-        python -c "import importlib; [importlib.import_module(m) for m in ['build_data','breadth_scan','morning_brief','trader_verdict','tv_screener_fetch','live_quote_daemon','yahoo_quote_push']]; print('imports OK')"
+        python -c "import importlib; [importlib.import_module(m) for m in ['build_data','breadth_scan','morning_brief','trader_verdict','tv_screener_fetch','live_quote_daemon']]; print('imports OK')"
     } finally { Pop-Location }
 }
 
@@ -182,11 +182,11 @@ Step "breadth_scan.py has drop-rate observability (WK-3)" {
 
 # 13. Cron schedules dodge :00/:30 peak slots (WK-4)
 Step "Workflow cron minutes off-peak (WK-4)" {
-    $rd = Join-Path $repo ".github/workflows/refresh_data.yml"
+    $rd = Join-Path $repo ".github/workflows/refresh_premarket.yml"
     $ri = Join-Path $repo ".github/workflows/refresh_data_intraday.yml"
-    $yh = Join-Path $repo ".github/workflows/yahoo_fallback_quotes.yml"
-    # Disallow any '0 13', '0 14', '30 13', etc. cron expressions
-    $bad = Select-String -Path $rd, $ri, $yh -Pattern "^\s*-\s*cron:\s*'(0|30)\s"
+    # Disallow any '0 13', '0 14', '30 13', etc. cron expressions.
+    # The Yahoo fallback workflow was retired in favour of dashboard-bridge live quotes.
+    $bad = Select-String -Path $rd, $ri -Pattern "^\s*-\s*cron:\s*'(0|30)\s"
     if ($bad) { throw "Found peak-slot cron entries: $($bad.Line -join '; ')" }
 }
 
@@ -213,8 +213,8 @@ Step "Trade Audits wired (DB-backed wiki integration)" {
         throw "package.json missing sync:wiki script"
     }
     $shell = Join-Path $app "src/components/market-desk/MarketDeskShell.tsx"
-    if (-not (Select-String -Path $shell -Pattern '/dashboard/audits')) {
-        throw "MarketDeskShell.tsx does not link /dashboard/audits"
+    if (-not (Select-String -Path $shell -Pattern '/dashboard/trades')) {
+        throw "MarketDeskShell.tsx does not link /dashboard/trades"
     }
     $parser = Join-Path $app "src/lib/wiki/audits.ts"
     foreach ($p in @('parseAudit', 'AuditReport', 'WikiManifest')) {
@@ -270,7 +270,7 @@ Step "Morning Brief freshest provider selection wired" {
         (Join-Path $app "src/components/market-desk/SpotlightAndIdeas.tsx"),
         (Join-Path $app "src/components/market-desk/TvScreenerHits.tsx")
     )) {
-        if (-not (Select-String -Path $f -Pattern 'selectFreshestBriefProvider|selectBriefProvider')) {
+        if (-not (Select-String -Path $f -Pattern 'selectFreshestBriefProvider|selectBriefProvider|selectFreshestBriefWithContent')) {
             throw "$f is not using shared brief provider selection"
         }
     }
@@ -470,14 +470,21 @@ Step "RVOL Overview wired (Feature 3)" {
 
 # 14. WK-1 split: daily heavy + intraday light workflows exist with correct steps
 Step "Workflow split into daily heavy + intraday light (WK-1)" {
-    $rd = Join-Path $repo ".github/workflows/refresh_data.yml"
+    $rd = Join-Path $repo ".github/workflows/refresh_premarket.yml"
     $ri = Join-Path $repo ".github/workflows/refresh_data_intraday.yml"
+    if (-not (Test-Path $rd)) { throw "refresh_premarket.yml is missing" }
     if (-not (Test-Path $ri)) { throw "refresh_data_intraday.yml is missing" }
-    # Daily must invoke all 5 scripts
-    $dailyContent = Get-Content $rd -Raw
-    foreach ($script in @('build_data.py','breadth_scan.py','tv_screener_fetch.py','morning_brief.py','trader_verdict.py')) {
+    # Daily pre-market must invoke market data, screeners, and morning brief.
+    $dailyLines = Get-Content $rd | Where-Object { $_ -notmatch '^\s*#' }
+    $dailyContent = $dailyLines -join "`n"
+    foreach ($script in @('build_data.py','tv_screener_fetch.py','morning_brief.py')) {
         if ($dailyContent -notmatch "python\s+scripts/$([regex]::Escape($script))") {
-            throw "daily refresh_data.yml missing invocation of $script"
+            throw "daily refresh_premarket.yml missing invocation of $script"
+        }
+    }
+    foreach ($script in @('breadth_scan.py','trader_verdict.py')) {
+        if ($dailyContent -match "python\s+scripts/$([regex]::Escape($script))") {
+            throw "refresh_premarket.yml should not invoke retired heavy script $script"
         }
     }
     # Intraday must NOT invoke the heavy LLM scripts (check actual run: lines, not comments)

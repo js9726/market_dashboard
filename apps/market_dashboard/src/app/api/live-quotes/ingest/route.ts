@@ -1,13 +1,8 @@
 /**
  * POST /api/live-quotes/ingest
  *
- * Machine-only endpoint. Called by:
- *   - The local moomoo OpenD daemon (Python `live_quote_daemon.py`) — every 15 s
- *     while the user's PC is on, with `source: "moomoo"`.
- *   - The Yahoo fallback workflow (`.github/workflows/yahoo_fallback_quotes.yml`)
- *     — every 5 min during US market hours, with `source: "yahoo"`. The
- *     workflow first checks /api/live-quotes/last-update and skips if moomoo
- *     posted within the last 2 min.
+ * Machine-only endpoint. Called by the local dashboard-bridge daemon while
+ * the user's PC is on, with `source: "moomoo"`.
  *
  * Auth: `Authorization: Bearer <LIVE_QUOTE_INGEST_KEY>`.
  *
@@ -22,8 +17,7 @@
  *
  * Upserts each quote by symbol primary key. Returns counts. When mode is
  * "fallback", a row is skipped if the existing row was observed within the
- * last 90 s — this lets the Yahoo workflow safely run while moomoo is also
- * pushing without overwriting fresher local-tier data.
+ * last 90 s, which protects fresher local-tier data during retries.
  */
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";

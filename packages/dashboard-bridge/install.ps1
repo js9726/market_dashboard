@@ -97,6 +97,9 @@ if (-not $UseExistingConfig) {
 [dashboard]
 url = "$dashUrl"
 token = "$token"
+# Optional secrets for live prices + local post-close breadth refresh:
+# live_quote_key = "LIVE_QUOTE_INGEST_KEY"
+# brief_ingest_key = "BRIEF_INGEST_KEY"
 
 [broker]
 account_alias = "$alias"
@@ -112,6 +115,10 @@ market = "$market"
 [sync]
 interval_sec = 60
 fill_lookback_days = 1
+live_quote_extras = "SPY,QQQ,IWM,DIA,SMH,XLK,NVDA,CRDO,ARM,MRVL"
+breadth_post_close = true
+breadth_post_close_time = "16:33"
+breadth_timezone = "America/New_York"
 "@
         Set-Content -Path $ConfigPath -Value $configContent -Encoding utf8
         Write-Host "Wrote $ConfigPath" -ForegroundColor Green
