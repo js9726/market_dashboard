@@ -257,6 +257,30 @@ model ScanResult {
   @@index([ticker])
 }
 
+/// Market breadth snapshot — DB-backed (push), so it updates without a git
+/// commit + Vercel rebuild. Powered by the TradingView scanner aggregate-count
+/// endpoint (see src/server/breadth-scanner.ts), refreshed by /api/breadth/refresh
+/// which any scheduler can trigger (Vercel cron, external uptime cron, bridge
+/// daemon — redundant triggers = reliability without checking if GH Actions ran).
+///
+/// One row per (bucketDate). Upserted — re-runs the same day overwrite.
+/// `snapshot` holds the full BreadthSnapshot JSON (matches types/breadth.ts).
+model MarketBreadthSnapshot {
+  id          String   @id @default(cuid())
+  /// UTC date this snapshot represents (one row per trading day).
+  bucketDate  DateTime @db.Date
+  /// Full BreadthSnapshot JSON (market, momentum, sectors, industries).
+  snapshot    Json
+  /// "tv-scanner" | "breadth_scan_py" | "breadth_fast_py" — provenance.
+  source      String   @default("tv-scanner")
+  refreshedAt DateTime @default(now())
+  /// Wall-clock ms the refresh took (for monitoring scanner health).
+  durationMs  Int?
+
+  @@unique([bucketDate])
+  @@index([refreshedAt(sort: Desc)])
+}
+
 // ── Phase 5: Unified Conviction Desk — brief cache + live quotes ──────────────
 
 model MorningBriefCache {

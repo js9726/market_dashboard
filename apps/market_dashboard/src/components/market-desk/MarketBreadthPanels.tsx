@@ -53,9 +53,13 @@ export default function MarketBreadthPanels() {
         ) : error ? (
           <p className="t-caption t-mono">Unavailable: {error}</p>
         ) : (
-          /* Fallback: breadth_scan.py writes `built_at`; breadth_scan_tv.py writes `as_of`.
-             Use whichever exists so the freshness badge always renders correctly. */
-          <FreshnessBadge timestamp={data?.built_at ?? data?.as_of} thresholds={SNAPSHOT_THRESHOLDS} />
+          /* Freshness priority: DB _meta.refreshedAt (push path) > built_at > as_of.
+             The DB-backed /api/breadth always carries _meta.refreshedAt; the
+             static-file fallback carries built_at/as_of. */
+          <FreshnessBadge
+            timestamp={data?._meta?.refreshedAt ?? data?.built_at ?? data?.as_of}
+            thresholds={SNAPSHOT_THRESHOLDS}
+          />
         )}
       </div>
 

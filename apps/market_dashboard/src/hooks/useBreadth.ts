@@ -6,37 +6,73 @@ import type { BreadthSnapshot } from "@/types/breadth";
 const BASE = "/market-dashboard";
 
 /**
- * Fetches the daily breadth snapshot from `public/market-dashboard/breadth.json`.
- * Refreshes once per page load (breadth is a daily metric — no polling needed).
+ * Fetches the daily breadth snapshot.
+ *
+ * DB-first: reads /api/breadth (Postgres, push-updated by the TV-scanner
+ * refresh endpoint — no git commit / Vercel rebuild lag). Falls back to the
+ * static breadth.json file if the DB has no row yet (backwards compat / first
+ * deploy). Polls every 5 min so an intraday breadth refresh shows up without
+ * a page reload.
+ *
+ * The `_meta.ageMs` from the API powers the freshness badge on the panel.
  */
 export function useBreadth() {
-  const [data, setData] = useState<BreadthSnapshot | null>(null);
+  const [data, setData] = useState<(BreadthSnapshot & { _meta?: BreadthMeta }) | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`${BASE}/breadth.json`, { cache: "no-store" })
-      .then((r) => {
+
+    async function load() {
+      // 1. Try the DB-backed API first.
+      try {
+        const r = await fetch(`/api/breadth`, { cache: "no-store" });
+        if (r.ok) {
+          const j = (await r.json()) as BreadthSnapshot & { _meta?: BreadthMeta };
+          if (!cancelled) {
+            setData(j);
+            setError(null);
+            setLoading(false);
+          }
+          return;
+        }
+      } catch {
+        /* fall through to file */
+      }
+
+      // 2. Fallback: static breadth.json (legacy / pre-first-refresh).
+      try {
+        const r = await fetch(`${BASE}/breadth.json`, { cache: "no-store" });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json() as Promise<BreadthSnapshot>;
-      })
-      .then((j) => {
+        const j = (await r.json()) as BreadthSnapshot;
         if (!cancelled) {
-          setData(j);
+          setData({ ...j, _meta: { source: "file-fallback", refreshedAt: j.as_of ?? j.built_at ?? null } });
           setLoading(false);
         }
-      })
-      .catch((e) => {
+      } catch (e) {
         if (!cancelled) {
           setError((e as Error).message);
           setLoading(false);
         }
-      });
+      }
+    }
+
+    load();
+    // Poll every 5 min so intraday breadth refreshes appear without reload.
+    const interval = setInterval(load, 5 * 60 * 1000);
     return () => {
       cancelled = true;
+      clearInterval(interval);
     };
   }, []);
 
   return { data, error, loading };
+}
+
+export interface BreadthMeta {
+  source: string;
+  refreshedAt: string | null;
+  ageMs?: number;
+  durationMs?: number | null;
 }
