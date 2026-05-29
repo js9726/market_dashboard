@@ -60,13 +60,39 @@ function loadWiki(): string {
   return out.join("\n\n---\n\n");
 }
 
+const LOOKBACK_DAYS = process.env.JOURNAL_LOOKBACK_DAYS ?? "5";
+
 async function fetchClosedTrades(): Promise<ClosedTrade[]> {
-  const res = await fetch(`${BASE}/api/journal/closed-today?lookbackDays=5`, {
+  const res = await fetch(`${BASE}/api/journal/closed-today?lookbackDays=${LOOKBACK_DAYS}`, {
     headers: { Authorization: `Bearer ${KEY}` },
   });
   if (!res.ok) throw new Error(`closed-today HTTP ${res.status}`);
   const json = (await res.json()) as { trades: ClosedTrade[] };
   return json.trades ?? [];
+}
+
+/**
+ * DeepSeek fallback (OpenAI-compatible API). Used when Claude is unavailable
+ * (credit balance, rate limit) OR when JOURNAL_PROVIDER=deepseek. Honors the
+ * goal's "Claude AND DeepSeek / any available AI provider" requirement and
+ * keeps the journaler working when one provider's balance runs out.
+ */
+async function deepseekJson(system: string, user: string): Promise<string> {
+  const key = process.env.DEEPSEEK_API_KEY;
+  if (!key) throw new Error("DEEPSEEK_API_KEY not set (Claude failed and no fallback)");
+  const res = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: [{ role: "system", content: system }, { role: "user", content: user }],
+      max_tokens: 2000,
+      response_format: { type: "json_object" },
+    }),
+  });
+  if (!res.ok) throw new Error(`DeepSeek HTTP ${res.status}: ${(await res.text()).slice(0, 160)}`);
+  const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+  return json.choices?.[0]?.message?.content ?? "";
 }
 
 async function scoreTrade(client: Anthropic, wiki: string, t: ClosedTrade): Promise<object> {
@@ -111,14 +137,32 @@ First char MUST be {, last MUST be }.`;
 
 Score it. Be honest about entry quality vs the plan and the outcome.`;
 
-  const resp = await client.messages.create({
-    model: MODEL, max_tokens: 2000, system,
-    messages: [{ role: "user", content: user }],
-  });
-  const text = resp.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map((b) => b.text).join("");
+  const forceDeepseek = (process.env.JOURNAL_PROVIDER ?? "").toLowerCase() === "deepseek";
+  let text = "";
+  let usedProvider = "claude";
+
+  if (!forceDeepseek) {
+    try {
+      const resp = await client.messages.create({
+        model: MODEL, max_tokens: 2000, system,
+        messages: [{ role: "user", content: user }],
+      });
+      text = resp.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map((b) => b.text).join("");
+    } catch (e) {
+      // Claude unavailable (credit balance / rate limit) → fall back to DeepSeek.
+      console.error(`[journal] Claude failed for ${t.ticker} (${e instanceof Error ? e.message.slice(0, 80) : e}); trying DeepSeek...`);
+      text = await deepseekJson(system, user);
+      usedProvider = "deepseek";
+    }
+  } else {
+    text = await deepseekJson(system, user);
+    usedProvider = "deepseek";
+  }
+
   const a = text.indexOf("{"), b = text.lastIndexOf("}");
   if (a < 0 || b < 0) throw new Error(`no JSON for ${t.ticker}: ${text.slice(0, 120)}`);
-  return { tradeRecordId: t.id, ...JSON.parse(text.slice(a, b + 1)) };
+  console.error(`[journal] ${t.ticker} scored via ${usedProvider}`);
+  return { tradeRecordId: t.id, scoredBy: usedProvider, ...JSON.parse(text.slice(a, b + 1)) };
 }
 
 async function ingest(entry: object): Promise<void> {

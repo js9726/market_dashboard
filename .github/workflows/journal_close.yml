@@ -99,9 +99,16 @@ jobs:
         run: npm run journal
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # DeepSeek fallback — used automatically if Claude is unavailable
+          # (credit balance / rate limit). Honors "Claude AND DeepSeek /
+          # any available AI provider" and keeps journaling working when one
+          # provider's balance runs out.
+          DEEPSEEK_API_KEY:  ${{ secrets.DEEPSEEK_API_KEY }}
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
           WIKI_DIR: ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
+          # 4-day lookback covers a long weekend; widen for holiday gaps.
+          JOURNAL_LOOKBACK_DAYS: "4"
 
       # ── Step 3: Wiki audit sync — Trade Audits page → today ─────────────
       # Runs sync_to_dashboard.py from the wiki submodule so the Trade Audits
