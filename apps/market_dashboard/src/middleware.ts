@@ -23,6 +23,10 @@ export default auth((req) => {
     pathname.startsWith("/api/watchlist/export") ||
     pathname.startsWith("/api/live-quotes/ingest") ||
     pathname.startsWith("/api/trades/import") ||
+    // Breadth: /api/breadth (public read) + /api/breadth/refresh (key/bearer
+    // auth, hit by Vercel cron, the bridge daemon, and external uptime crons).
+    // Must bypass session middleware or the 307→/login breaks the JSON contract.
+    pathname.startsWith("/api/breadth") ||
     // Bridge daemon uses bearer-token auth (BrokerBridgeToken.tokenHash) plus
     // X-Timestamp replay protection. Token endpoint stays session-authed
     // because only logged-in users generate/revoke their own tokens.
