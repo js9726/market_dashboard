@@ -281,6 +281,23 @@ model MarketBreadthSnapshot {
   @@index([refreshedAt(sort: Desc)])
 }
 
+/// Daily TV screener snapshot — DB-backed (push) so it refreshes reliably via
+/// Vercel cron hitting /api/screeners/refresh (TradingView scanner, proven to
+/// work from Vercel), instead of GitHub Actions cron which skipped intraday and
+/// left the screener stale during market hours. Mirrors MarketBreadthSnapshot.
+model ScreenerSnapshot {
+  id          String   @id @default(cuid())
+  bucketDate  DateTime @db.Date
+  /// Full tv_screeners.json shape: { fetched_at, market_was_open, screeners[] }.
+  snapshot    Json
+  source      String   @default("tv-scanner")
+  refreshedAt DateTime @default(now())
+  durationMs  Int?
+
+  @@unique([bucketDate])
+  @@index([refreshedAt(sort: Desc)])
+}
+
 // ── Phase 5: Unified Conviction Desk — brief cache + live quotes ──────────────
 
 model MorningBriefCache {

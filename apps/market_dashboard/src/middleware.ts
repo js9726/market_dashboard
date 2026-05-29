@@ -27,6 +27,9 @@ export default auth((req) => {
     // auth, hit by Vercel cron, the bridge daemon, and external uptime crons).
     // Must bypass session middleware or the 307→/login breaks the JSON contract.
     pathname.startsWith("/api/breadth") ||
+    // Screeners: same DB-backed pattern as breadth — public read on /api/screeners,
+    // key/bearer auth on /refresh.
+    pathname.startsWith("/api/screeners") ||
     // Journal machine endpoints: closed-today (cron reads via bearer) +
     // entries/ingest (cron writes AI-scored JournalEntry via bearer).
     pathname.startsWith("/api/journal/closed-today") ||
