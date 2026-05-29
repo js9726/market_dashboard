@@ -5,7 +5,7 @@ import { useMorningVerdict } from "@/hooks/useMorningVerdict";
 import type { StructuredBrief, BriefMover, BriefTraderView } from "@/types/structured-brief";
 import FreshnessBadge from "./FreshnessBadge";
 import { BRIEF_THRESHOLDS } from "@/lib/freshness";
-import { selectFreshestBriefProvider } from "@/lib/brief/provider-selection";
+import { selectFreshestBriefWithContent } from "@/lib/brief/provider-selection";
 
 type FilterKey = "All" | "Longs" | "Shorts" | "High conviction";
 const FILTERS: FilterKey[] = ["All", "Longs", "Shorts", "High conviction"];
@@ -45,7 +45,9 @@ export default function SpotlightAndIdeas() {
   const verdict = useMorningVerdict();
   const [filter, setFilter] = useState<FilterKey>("All");
 
-  const entry = verdict.data ? selectFreshestBriefProvider(verdict.data.providers)?.entry ?? null : null;
+  // Live Ideas needs a brief that actually HAS movers/standout — not just the
+  // freshest one (a fresh Gemini run with movers:[] would blank the panel).
+  const entry = verdict.data ? selectFreshestBriefWithContent(verdict.data.providers)?.entry ?? null : null;
   const brief = asStructuredBrief(entry?.structured ?? entry?.verdict);
   const standout = brief?.standout ?? null;
   const movers: BriefMover[] = useMemo(() => brief?.movers ?? [], [brief?.movers]);
