@@ -102,12 +102,21 @@ jobs:
         if: success()
         run: python scripts/build_data.py --out-dir data
 
-      # ── Step 2: market breadth ───────────────────────────────────────────
-      - name: Compute market breadth
+      # ── Step 2: market breadth — trigger the FAST TV-scanner endpoint ────
+      # Breadth no longer runs the slow ~5000-ticker breadth_scan.py here.
+      # It lives behind /api/breadth/refresh (TV scanner counts, ~1s) which
+      # Vercel Cron also hits independently. This step is just one more
+      # redundant trigger so pre-open breadth is guaranteed fresh.
+      - name: Refresh market breadth (fast endpoint)
         if: success()
-        continue-on-error: true   # non-fatal; brief can still ship without breadth
-        timeout-minutes: 15
-        run: python scripts/breadth_scan.py --out-dir data
+        continue-on-error: true
+        run: |
+          curl -sS --max-time 75 \
+            "${VERCEL_INGEST_URL%/}/api/breadth/refresh?key=${BRIEF_INGEST_KEY}&force=1" \
+            && echo "breadth refreshed" || echo "::warning::breadth refresh failed (Vercel cron will retry)"
+        env:
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
 
       # ── Step 3: TradingView screener hits ────────────────────────────────
       - name: Fetch TV screeners with DeepSeek scoring
