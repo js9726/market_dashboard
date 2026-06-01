@@ -31,19 +31,15 @@ const WORKFLOW_NAV: NavItem[] = [
   { href: "/dashboard/portfolio", label: "Portfolio", icon: "portfolio", featureFlag: "brokerJournal" },
   // Equity timeline — Phase 6 (owner-only).
   { href: "/dashboard/equity", label: "Equity", icon: "analytics" },
-  { href: "/dashboard/pitch", label: "New Pitch", icon: "plus" },
-  { href: "/dashboard/bench", label: "Bench", icon: "template", count: "1" },
-  { href: "/dashboard/settled", label: "Settled", icon: "review", count: "2" },
+  // Market Internals — Sectors / RVOL / Theme Radar / Rotation in one place.
+  { href: "/dashboard/internals", label: "Market Internals", icon: "analytics" },
 ];
 
 const TOOL_NAV: NavItem[] = [
   { href: "/dashboard/scanner", label: "Scanner", icon: "search" },
-  { href: "/dashboard/themes", label: "Theme Radar", icon: "search" },
-  { href: "/dashboard/rvol", label: "RVOL Overview", icon: "search" },
   { href: "/dashboard/analysis", label: "Multi-Agent Analysis", icon: "bolt" },
   { href: "/dashboard/leaderboard", label: "Leaderboard", icon: "review" },
   { href: "/dashboard/profile", label: "Profile", icon: "accounts" },
-  { href: "/dashboard/rrg", label: "Rotation Graph", icon: "analytics" },
   { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
   { href: "/dashboard/playbooks", label: "Playbooks", icon: "template" },
   { href: "/dashboard/replay", label: "Replay", icon: "replay" },
@@ -67,17 +63,9 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
     title: "Equity Timeline",
     subtitle: "Daily total assets - drawdown periods highlighted",
   },
-  "/dashboard/pitch": {
-    title: "New Pitch",
-    subtitle: "File a thesis",
-  },
-  "/dashboard/bench": {
-    title: "Bench",
-    subtitle: "Raw, pre-thesis ideas",
-  },
-  "/dashboard/settled": {
-    title: "Settled",
-    subtitle: "Closed positions - review",
+  "/dashboard/internals": {
+    title: "Market Internals",
+    subtitle: "Sectors - RVOL - Theme Radar - Rotation",
   },
   "/dashboard/analytics": {
     title: "Conviction Analytics",
@@ -264,10 +252,6 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
               <button className="mds-button mds-button--icon" title="Notifications" type="button">
                 <Icon name="eye" />
               </button>
-              <Link className="mds-button mds-button--primary" href="/dashboard/pitch">
-                <Icon name="plus" />
-                New Pitch
-              </Link>
               <button
                 className="mds-button"
                 onClick={() => signOut({ callbackUrl: "/login" })}

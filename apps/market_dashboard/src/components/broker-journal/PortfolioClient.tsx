@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { isUSMarketOpen, observedLabel } from "@/lib/market-clock";
 
 type Position = {
   id: string;
@@ -88,6 +89,8 @@ export default function PortfolioClient() {
   if (loading) return <div style={{ padding: "2rem" }}>Loading portfolio…</div>;
   if (!data) return <div style={{ padding: "2rem", color: "#b91c1c" }}>Failed to load.</div>;
 
+  const marketOpen = isUSMarketOpen();
+
   return (
     <div style={{ padding: "1.5rem" }}>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
@@ -95,6 +98,11 @@ export default function PortfolioClient() {
           <h1 style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>Portfolio</h1>
           <p style={{ color: "#666", margin: 0, fontSize: "0.85rem" }}>
             As of {new Date(data.asOf).toLocaleString()} {refreshing && <span>· refreshing…</span>}
+            {!marketOpen && (
+              <span style={{ marginLeft: "0.5rem", color: "#b45309", fontWeight: 600 }}>
+                · MARKET CLOSED — &ldquo;Today&rdquo; shows the last session, not live
+              </span>
+            )}
           </p>
         </div>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
@@ -282,8 +290,13 @@ export default function PortfolioClient() {
                     <td style={{ padding: "0.5rem" }}>{fmt(p.qty, 0)}</td>
                     <td style={{ padding: "0.5rem" }}>{fmt(p.avgCost, 4)}</td>
                     <td style={{ padding: "0.5rem" }}>{p.currentPrice != null ? fmt(p.currentPrice, 4) : "—"}</td>
-                    <td style={{ padding: "0.5rem", color: pnlColor(p.changePct) }}>
+                    <td style={{ padding: "0.5rem", color: (marketOpen && !p.stale) ? pnlColor(p.changePct) : "#9ca3af" }}>
                       {p.changePct != null ? `${p.changePct >= 0 ? "+" : ""}${fmt(p.changePct)}%` : "—"}
+                      {p.changePct != null && (!marketOpen || p.stale) && (
+                        <span style={{ display: "block", fontSize: "0.7rem", color: "#9ca3af" }}>
+                          as of {observedLabel(p.priceObservedAt) ?? "last session"}
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: "0.5rem" }}>{p.marketValue != null ? fmt(p.marketValue) : "—"}</td>
                     <td style={{ padding: "0.5rem", color: pnlColor(p.unrealizedPl) }}>

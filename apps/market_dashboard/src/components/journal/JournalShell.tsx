@@ -9,6 +9,7 @@ import CalendarView from "./CalendarView";
 import EquityCurve from "./EquityCurve";
 import AddTradeModal from "./AddTradeModal";
 import DailyJournal from "./DailyJournal";
+import JournalDigestCard from "./JournalDigestCard";
 
 type Tab = "overview" | "trades" | "calendar" | "daily";
 
@@ -64,14 +65,17 @@ export default function JournalShell() {
 
   if (!connection) {
     return (
-      <div className="py-16 text-center space-y-4">
-        <p className="text-slate-300 text-base">No spreadsheet connected yet.</p>
-        <button
-          onClick={() => router.push("/journal/connect")}
-          className="rounded-lg bg-blue-600 hover:bg-blue-500 px-5 py-2.5 text-sm font-medium transition"
-        >
-          Connect your Google Sheet →
-        </button>
+      <div className="space-y-6">
+        <JournalDigestCard />
+        <div className="py-16 text-center space-y-4">
+          <p className="text-slate-300 text-base">No spreadsheet connected — auto-journal still runs from your broker fills.</p>
+          <button
+            onClick={() => router.push("/journal/connect")}
+            className="rounded-lg bg-blue-600 hover:bg-blue-500 px-5 py-2.5 text-sm font-medium transition"
+          >
+            Connect your Google Sheet →
+          </button>
+        </div>
       </div>
     );
   }
@@ -85,6 +89,7 @@ export default function JournalShell() {
 
   return (
     <div className="space-y-5">
+      <JournalDigestCard />
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav className="flex gap-1 rounded-lg bg-slate-800/80 p-1">

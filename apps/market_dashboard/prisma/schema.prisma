@@ -83,7 +83,6 @@ model User {
   connection          SpreadsheetConnection?
   tradeRecords        TradeRecord[]
   watchlist           Watchlist[]
-  scanResults         ScanResult[]
   // Soft daily reflection (formerly `JournalEntry`) — mood, sleep, notes.
   // Renamed in 2026-05 schema migration to make room for per-trade JournalEntry.
   dailyReflections    DailyReflection[]
@@ -98,8 +97,6 @@ model User {
   aListCandidates     AListCandidate[]
   // Daily equity timeline (Phase 4 of pre-open CI revamp).
   equitySnapshots     EquitySnapshot[]
-  // Frozen morning-brief snapshots (Phase 5 of pre-open CI revamp).
-  briefSnapshots      BriefSnapshot[]
 }
 
 model SpreadsheetConnection {
@@ -233,27 +230,6 @@ model Watchlist {
 
   @@unique([userId, ticker])
   @@index([userId])
-  @@index([ticker])
-}
-
-model ScanResult {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ticker     String
-  // BUY | SELL | HOLD
-  signal     String
-  entry      Decimal? @db.Decimal(12, 4)
-  stop       Decimal? @db.Decimal(12, 4)
-  target     Decimal? @db.Decimal(12, 4)
-  confidence Float?
-  // { data: {...}, technical: {...}, chart: {...}, risk: {...}, moderator: {...} }
-  agents     Json
-  computedAt DateTime @default(now())
-  expiresAt  DateTime
-
-  @@index([userId, expiresAt])
-  @@index([userId, ticker])
   @@index([ticker])
 }
 
@@ -462,6 +438,55 @@ model AListCandidate {
   day14Outcome      String? // "HIT_TARGET" | "STOPPED_OUT" | "PARTIAL" | "FADE" | "DRIFT"
   day14ComputedAt   DateTime?
 
+  // ── HELD lane (bought position) — Phase 2-3 (2026-06) ─────────────────────
+  // A row can be REC-only (brief pick), HELD-only (off-book buy), or REC+HELD
+  // (on-book). The score>=80 / GO / RVOL>=1.5 bar only gates the REC badge;
+  // HELD membership is "a real fill landed in the account" — ungated. The entry
+  // grade is a learning overlay, not an admission test. See dashboard redesign memo.
+  /// True when this row tracks a real position you hold/held.
+  isHeld            Boolean   @default(false)
+  /// Open Position this row tracks (if still open).
+  heldPositionId    String?
+  /// Reconciled TradeRecord lifecycle (entry->exit), if linked.
+  heldTradeRecordId String?
+  /// First BUY fill time (= day-0 for HELD tracking).
+  entryFillAt       DateTime?
+  /// Realized entry (avg cost across BUY fills).
+  entryAvgCost      Decimal?  @db.Decimal(12, 4)
+  /// Shares held (peak) for sizing.
+  heldQty           Decimal?  @db.Decimal(18, 4)
+  /// on-book = matched a REC pick near entry; false = off-book / freelance.
+  onBook            Boolean?
+  /// Entry grade vs the A-list bar: "A" | "B" | "C".
+  entryGrade        String?
+  /// { score, rvol, setup, verdict, passedBar, vsBarNotes } snapshot at entry.
+  entryGradeJson    Json?
+
+  // ── 1R bases (BOTH, per redesign) ─────────────────────────────────────────
+  /// 1R using the stop you logged at entry: (entry - loggedStop), $/share.
+  rUnitLogged       Decimal?  @db.Decimal(12, 4)
+  /// 1R using the wiki ATR-floor stop (1.5xATR or 5d-low, wider; 1.2xATR PB-21EMA).
+  rUnitAtr          Decimal?  @db.Decimal(12, 4)
+  /// The ATR-floor stop price used for rUnitAtr.
+  atrFloorStop      Decimal?  @db.Decimal(12, 4)
+
+  // ── Savings metrics (computed at exit / day-14) ───────────────────────────
+  /// Realized R achieved from actual exits/trims (+ profit / - loss).
+  realizedRLogged   Decimal?  @db.Decimal(6, 2)
+  realizedRAtr      Decimal?  @db.Decimal(6, 2)
+  /// Realized-vs-full-R savings = full -1R loss minus actual loss ($ and R).
+  saveRealizedUsd   Decimal?  @db.Decimal(12, 2)
+  saveRealizedR     Decimal?  @db.Decimal(6, 2)
+  /// Soft-tranche (8EMA partial + 21EMA full) exit prices.
+  soft8emaExit      Decimal?  @db.Decimal(12, 4)
+  soft21emaExit     Decimal?  @db.Decimal(12, 4)
+  /// Soft-vs-Hard savings = riding to -1R hard stop minus soft-tranche exit.
+  saveSoftVsHardUsd Decimal?  @db.Decimal(12, 2)
+  saveSoftVsHardR   Decimal?  @db.Decimal(6, 2)
+  /// When/whether the hard stop was breached in-window.
+  hardStopHitAt     DateTime?
+  hardStopHitBasis  String?   // "LOGGED" | "ATR" | "BOTH"
+
   // ── Status lifecycle ────────────────────────────────────────────────────
   /// "ACTIVE" | "EXPIRED" | "HIT_TARGET" | "STOPPED_OUT" | "MANUALLY_CLOSED" | "CONVERTED"
   status           String  @default("ACTIVE")
@@ -475,7 +500,8 @@ model AListCandidate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyTracks PositionDailyTrack[]
 
   @@unique([userId, pickDate, ticker])
   @@index([userId, pickDate(sort: Desc)])
@@ -483,38 +509,51 @@ model AListCandidate {
   @@index([status, pickDate(sort: Desc)])
   @@index([day14Outcome, pickDate(sort: Desc)])
   @@index([sector, pickDate(sort: Desc)])
+  @@index([isHeld, pickDate(sort: Desc)])
+  @@index([heldPositionId])
 }
 
-/// BriefSnapshot — immutable frozen copy of a morning brief at a moment in
-/// time. Referenced by JournalEntry (which AI brief was active when the user
-/// entered this trade?) and AListCandidate (which brief promoted this pick?)
-/// so we can replay the AI's reasoning vs the eventual outcome.
-///
-/// Distinct from MorningBriefCache: MorningBriefCache is the LIVE current
-/// brief per (bucket, provider) and gets overwritten by re-runs. BriefSnapshot
-/// is the archival copy referenced by historical journal entries forever.
-///
-/// Phase 5 — populated by the post-close journal workflow.
-model BriefSnapshot {
-  id              String   @id @default(cuid())
-  userId          String
-  /// When the brief was originally bucketed (e.g. 2026-05-27T13:00:00Z for
-  /// the 09:00 ET pre-open run).
-  bucketAt        DateTime
-  provider        String   // "claude" | "deepseek" | "gemini" | "openai"
-  /// Full StructuredBrief shape — same as MorningBriefCache.structuredJson.
-  structuredJson  Json
-  /// Provenance: which CI run created the source brief.
-  generatedBy     String
-  /// When this snapshot was frozen for journal/A-list reference.
-  capturedAt      DateTime @default(now())
+/// PositionDailyTrack — one row per tracked A-list ticker per trading day, for
+/// the ~14 trading days after day-0. Captures the price path (OHLC + EMA8/EMA21
+/// + ATR14) and per-session flags so the tracker can compute WHEN the hard stop
+/// / 8EMA / 21EMA broke, and from that the Realized-vs-R and Soft-vs-Hard
+/// savings. Appended by the post-close daily cron. Phase 2-3 (2026-06).
+model PositionDailyTrack {
+  id          String         @id @default(cuid())
+  candidateId String
+  candidate   AListCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Trading-day index since day-0 (0..14).
+  dayIndex    Int
+  sessionDate DateTime @db.Date
 
-  @@unique([userId, bucketAt, provider])
-  @@index([userId, bucketAt(sort: Desc)])
-  @@index([provider, bucketAt(sort: Desc)])
+  open  Decimal? @db.Decimal(12, 4)
+  high  Decimal? @db.Decimal(12, 4)
+  low   Decimal? @db.Decimal(12, 4)
+  close Decimal? @db.Decimal(12, 4)
+  ema8  Decimal? @db.Decimal(12, 4)
+  ema21 Decimal? @db.Decimal(12, 4)
+  atr14 Decimal? @db.Decimal(12, 4)
+
+  // Per-session flags, evaluated on this session's close.
+  closeBelow8ema    Boolean @default(false)
+  closeBelow21ema   Boolean @default(false)
+  hardStopHitLogged Boolean @default(false)
+  hardStopHitAtr    Boolean @default(false)
+
+  /// Running MFE/MAE in R (vs entry, logged 1R base) through this session.
+  runMfeR Decimal? @db.Decimal(6, 2)
+  runMaeR Decimal? @db.Decimal(6, 2)
+
+  createdAt DateTime @default(now())
+
+  @@unique([candidateId, sessionDate])
+  @@index([candidateId, dayIndex])
 }
+
+// (BriefSnapshot dropped 2026-06-01 — unused; the A-list keeps denormalised
+//  day0Brief* refs and MorningBriefCache holds the live brief. Re-add if the
+//  auto-journal ever needs an immutable per-entry frozen brief.)
 
 /// Daily equity snapshot — captured by the dashboard-bridge daemon when it
 /// runs on Jie's PC (typically every 60s during MYT daytime). One row per

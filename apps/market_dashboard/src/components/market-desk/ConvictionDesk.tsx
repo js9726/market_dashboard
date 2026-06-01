@@ -5,13 +5,15 @@
  * Layout:
  *   1. MorningBriefHero  — live indices, trader read, standout, AI-selectable
  *                          full HTML brief, owner re-run controls
- *   2. LiveTapeRow        — sectors + watchlist, polled every 30s
- *   3. PipelineStages     — 6-stage pipeline cards (still hardcoded counts)
- *   4. SpotlightAndIdeas  — spotlight + live ideas row, verdict-driven
+ *   2. LiveTapeRow        — compact sector strip + watchlist, polled every 30s
+ *   3. SpotlightAndIdeas  — spotlight + live ideas row, verdict-driven
+ *
+ * Deep market-internals tools (RVOL / Theme Radar / Rotation) live on the
+ * dedicated /dashboard/internals tab. The fake hardcoded PipelineStages was
+ * removed 2026-06-01 to keep the desk client-facing clean.
  */
 import MorningBriefHero from "./MorningBriefHero";
 import LiveTapeRow from "./LiveTapeRow";
-import PipelineStages from "./PipelineStages";
 import SpotlightAndIdeas from "./SpotlightAndIdeas";
 import TvScreenerHits from "./TvScreenerHits";
 import WatchlistEditor from "./WatchlistEditor";
@@ -28,7 +30,6 @@ export default function ConvictionDesk({ isOwner = false }: ConvictionDeskProps)
       {/* Watchlist editor is owner-only — other viewers see the live tape but can't edit */}
       {isOwner && <WatchlistEditor />}
       <LiveTapeRow />
-      <PipelineStages />
       <SpotlightAndIdeas />
     </div>
   );

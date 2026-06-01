@@ -23,6 +23,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
+import { serializeCandidate } from "@/server/alist-serialize";
 
 const prisma = new PrismaClient();
 
@@ -74,44 +75,7 @@ export async function GET(req: Request) {
     orderBy: [{ day0Score: "desc" }, { ticker: "asc" }],
   });
 
-  const candidates = rows.map((r) => ({
-    id: r.id,
-    ticker: r.ticker,
-    setup: r.setupClassification,
-    screenSource: r.screenSource,
-    sector: r.sector,
-    industry: r.industry,
-    entry: r.entryZone?.toNumber() ?? null,
-    stop: r.stop?.toNumber() ?? null,
-    target: r.target?.toNumber() ?? null,
-    rrr: r.rrr?.toNumber() ?? null,
-    score: r.day0Score,
-    verdict: r.day0Verdict,
-    rvol: r.day0Rvol?.toNumber() ?? null,
-    thesis: r.day0Thesis,
-    traderLens: r.day0TraderLens,
-    briefProvider: r.day0BriefProvider,
-    briefBucketAt: r.day0BriefBucketAt?.toISOString() ?? null,
-    day0Price: r.day0Price?.toNumber() ?? null,
-    status: r.status,
-    convertedTradeId: r.convertedTradeId,
-    day14: r.day14ComputedAt
-      ? {
-          mfe: r.day14Mfe?.toNumber() ?? null,
-          mae: r.day14Mae?.toNumber() ?? null,
-          mfeR: r.day14MfeR?.toNumber() ?? null,
-          maeR: r.day14MaeR?.toNumber() ?? null,
-          score: r.day14Score?.toNumber() ?? null,
-          outcome: r.day14Outcome,
-          verdict: r.day14Verdict,
-          computedAt: r.day14ComputedAt.toISOString(),
-        }
-      : null,
-    tags: r.tags,
-    notes: r.notes,
-    createdAt: r.createdAt.toISOString(),
-    updatedAt: r.updatedAt.toISOString(),
-  }));
+  const candidates = rows.map(serializeCandidate);
 
   return NextResponse.json({
     pickDate: pickDate.toISOString().slice(0, 10),

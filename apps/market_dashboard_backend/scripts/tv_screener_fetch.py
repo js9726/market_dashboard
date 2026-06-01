@@ -537,6 +537,68 @@ def score_top(hits: list, n: int) -> None:
 
 # --------------------------------------------------------------------------
 
+def push_alist_candidates(screeners_out: list) -> None:
+    """POST screener hits that clear the A-list bar (score>=80, verdict GO,
+    rvol>=1.5x) to the dashboard so the REC lane populates. This is THE feed for
+    the recommended A-list — the morning brief does not carry per-ticker
+    score+RVOL. No-op unless DASHBOARD_URL + BRIEF_INGEST_KEY are set. Idempotent
+    on the ingest side (upsert by pickDate+ticker)."""
+    base = os.environ.get("DASHBOARD_URL") or os.environ.get("DASHBOARD_BASE_URL")
+    key = os.environ.get("BRIEF_INGEST_KEY")
+    if not base or not key:
+        print("[tv:alist] DASHBOARD_URL / BRIEF_INGEST_KEY not set — skipping REC A-list push")
+        return
+
+    pattern_to_setup = {
+        "EP": "EP-FRESH", "BREAKOUT": "BO-CB", "PULLBACK": "PB-21EMA", "PARABOLIC": "PARABOLIC",
+    }
+    best: dict = {}
+    for sc in screeners_out:
+        for hit in sc.get("hits", []):
+            ticker = (hit.get("ticker") or "").upper()
+            verdict = (hit.get("verdict") or "").upper()
+            try:
+                score = int(round(float(hit.get("score"))))
+            except (TypeError, ValueError):
+                continue
+            rvol_raw = hit.get("relative_volume_10d_calc")
+            rvol = float(rvol_raw) if rvol_raw is not None else None
+            if not ticker or score < 80 or verdict != "GO" or rvol is None or rvol < 1.5:
+                continue
+            cand = {
+                "ticker": ticker,
+                "day0Score": score,
+                "day0Verdict": verdict,
+                "day0Rvol": rvol,
+                "day0Thesis": hit.get("thesis"),
+                "setupClassification": pattern_to_setup.get((hit.get("pattern") or "").upper(), hit.get("pattern")),
+                "screenSource": sc.get("id"),
+                "day0Price": hit.get("close"),
+            }
+            if ticker not in best or score > best[ticker]["day0Score"]:
+                best[ticker] = cand
+
+    candidates = list(best.values())
+    if not candidates:
+        print("[tv:alist] no screener hits cleared the A-list bar (>=80 / GO / >=1.5x)")
+        return
+
+    pick_date = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+    payload = json.dumps({"pickDate": pick_date, "candidates": candidates}).encode("utf-8")
+    url = base.rstrip("/") + "/api/a-list/ingest"
+    req = urllib.request.Request(
+        url, data=payload, method="POST",
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=25) as r:
+            resp = json.loads(r.read().decode("utf-8"))
+        print(f"[tv:alist] pushed {len(candidates)} REC candidate(s): "
+              f"inserted={resp.get('inserted')} updated={resp.get('updated')}")
+    except Exception as e:
+        print(f"[tv:alist] REC push failed (non-fatal): {e}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", default="data")
@@ -635,6 +697,9 @@ def main():
         "algo all (no DeepSeek)"
     )
     print(f"[tv] wrote {out_path} ({total_hits} total hits, {score_label}, market_open={_market_was_open})")
+
+    # Populate the dashboard's REC A-list lane from screener hits that clear the bar.
+    push_alist_candidates(screeners_out)
 
 
 if __name__ == "__main__":

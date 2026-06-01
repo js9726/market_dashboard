@@ -1,8 +1,12 @@
 "use client";
 
 /**
- * AListTable — sortable table of A-list candidates.
+ * AListTable — sortable table of the MERGED A-List (REC + HELD in one board).
  * One row per (pickDate, ticker). Click a row to open the detail panel.
+ *
+ * Badges: REC (passed the screener bar) and/or HELD (a real position). HELD rows
+ * also carry an entry grade and the two savings metrics (Realized-vs-full-R and
+ * Soft-tranche-vs-Hard) once the daily tracker has run.
  */
 
 export interface AListRow {
@@ -37,6 +41,24 @@ export interface AListRow {
   } | null;
   tags: unknown;
   notes: string | null;
+
+  // ── Merged-board additions (REC / HELD) ──────────────────────────────────
+  badges?: string[];
+  onBook?: boolean | null;
+  isHeld?: boolean;
+  entryGrade?: string | null;
+  held?: { entryAvgCost: number | null; qty: number | null; entryFillAt: string | null } | null;
+  rUnitLogged?: number | null;
+  rUnitAtr?: number | null;
+  savings?: {
+    realizedR: number | null;
+    saveRealizedR: number | null;
+    saveRealizedUsd: number | null;
+    saveSoftVsHardR: number | null;
+    saveSoftVsHardUsd: number | null;
+    hardStopHitBasis: string | null;
+    hardStopHitAt: string | null;
+  };
 }
 
 interface Props {
@@ -53,18 +75,18 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
           <tr>
             <Th>Date</Th>
             <Th>Ticker</Th>
+            <Th>Badges</Th>
             <Th>Setup</Th>
             <Th align="right">Entry</Th>
             <Th align="right">Stop</Th>
-            <Th align="right">Target</Th>
-            <Th align="right">R:R</Th>
             <Th align="right">Score</Th>
+            <Th>Grade</Th>
             <Th align="right">RVOL</Th>
-            <Th>Trader Lens</Th>
             <Th>Sector</Th>
+            <Th align="right">Save vs 1R</Th>
+            <Th align="right">Soft↔Hard</Th>
             <Th align="right">Day-14 MFE</Th>
             <Th align="right">Day-14 MAE</Th>
-            <Th align="right">Day-14 Score</Th>
             <Th>Outcome</Th>
             <Th>Status</Th>
           </tr>
@@ -80,17 +102,18 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
             >
               <Td><span className="t-mono">{r.pickDate}</span></Td>
               <Td><strong>{r.ticker}</strong></Td>
+              <Td>{renderBadges(r.badges, r.onBook)}</Td>
               <Td>{r.setup ?? "-"}</Td>
               <Td align="right">{fmt(r.entry, 2)}</Td>
               <Td align="right">{fmt(r.stop, 2)}</Td>
-              <Td align="right">{fmt(r.target, 2)}</Td>
-              <Td align="right">{fmt(r.rrr, 1)}</Td>
               <Td align="right">
                 <strong style={{ color: scoreColor(r.score) }}>{r.score ?? "-"}</strong>
               </Td>
+              <Td>{renderGrade(r.entryGrade)}</Td>
               <Td align="right">{r.rvol != null ? `${r.rvol.toFixed(1)}x` : "-"}</Td>
-              <Td>{r.traderLens ?? "-"}</Td>
               <Td>{r.sector ?? "-"}</Td>
+              <Td align="right">{renderSaveR(r.savings?.saveRealizedR, r.savings?.saveRealizedUsd)}</Td>
+              <Td align="right">{renderSaveR(r.savings?.saveSoftVsHardR, r.savings?.saveSoftVsHardUsd)}</Td>
               <Td align="right">
                 {r.day14?.mfe != null ? (
                   <span>
@@ -109,13 +132,6 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
                       <span className="text-[var(--fg-3)]"> ({r.day14.maeR.toFixed(1)}R)</span>
                     )}
                   </span>
-                ) : "-"}
-              </Td>
-              <Td align="right">
-                {r.day14?.score != null ? (
-                  <strong style={{ color: outcomeColor(r.day14.score) }}>
-                    {r.day14.score.toFixed(1)}
-                  </strong>
                 ) : "-"}
               </Td>
               <Td>
@@ -154,17 +170,53 @@ function fmt(v: number | null, dp: number): string {
   return v == null ? "-" : v.toFixed(dp);
 }
 
+function renderBadges(badges?: string[], onBook?: boolean | null) {
+  if (!badges || badges.length === 0) return <span className="text-[var(--fg-3)]">-</span>;
+  return (
+    <span className="inline-flex flex-wrap items-center gap-1">
+      {badges.map((b) => (
+        <span
+          key={b}
+          className="rounded px-1.5 py-0.5 text-[10px] font-semibold"
+          style={{
+            background: b === "HELD" ? "var(--gain-bg, #14321f)" : "var(--bg-2)",
+            color: b === "HELD" ? "var(--gain-fg)" : "var(--fg-2)",
+          }}
+        >
+          {b}
+        </span>
+      ))}
+      {onBook === false ? (
+        <span className="text-[10px]" style={{ color: "var(--warn-fg)" }} title="bought but was not a recommended pick">
+          off-book
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function renderGrade(grade?: string | null) {
+  if (!grade) return <span className="text-[var(--fg-3)]">-</span>;
+  const color = grade === "A" ? "var(--gain-fg)" : grade === "B" ? "var(--warn-fg)" : "var(--loss-fg)";
+  return <strong style={{ color }}>{grade}</strong>;
+}
+
+function renderSaveR(saveR?: number | null, saveUsd?: number | null) {
+  if (saveR == null) return <span className="text-[var(--fg-3)]">-</span>;
+  const color = saveR >= 0 ? "var(--gain-fg)" : "var(--loss-fg)";
+  return (
+    <span style={{ color }}>
+      {saveR >= 0 ? "+" : ""}
+      {saveR.toFixed(2)}R
+      {saveUsd != null ? <span className="text-[var(--fg-3)]"> (${Math.round(saveUsd)})</span> : null}
+    </span>
+  );
+}
+
 function scoreColor(score: number | null): string {
   if (score == null) return "var(--fg-3)";
   if (score >= 80) return "var(--gain-fg)";
   if (score >= 60) return "var(--warn-fg)";
-  return "var(--loss-fg)";
-}
-
-function outcomeColor(score: number | null): string {
-  if (score == null) return "var(--fg-3)";
-  if (score >= 7) return "var(--gain-fg)";
-  if (score >= 4) return "var(--warn-fg)";
   return "var(--loss-fg)";
 }
 

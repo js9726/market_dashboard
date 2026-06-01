@@ -23,6 +23,14 @@
     {
       "path": "/api/cron/refresh-screeners",
       "schedule": "33 20 * * 1-5"
+    },
+    {
+      "path": "/api/cron/sync-held-alist",
+      "schedule": "30 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/track-positions",
+      "schedule": "40 21 * * 1-5"
     }
   ]
 }
