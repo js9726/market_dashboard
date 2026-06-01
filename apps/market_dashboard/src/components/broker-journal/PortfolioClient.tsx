@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { isUSMarketOpen, observedLabel } from "@/lib/market-clock";
+import { observedLabel, usMarketSession } from "@/lib/market-clock";
 
 type Position = {
   id: string;
@@ -89,7 +89,15 @@ export default function PortfolioClient() {
   if (loading) return <div style={{ padding: "2rem" }}>Loading portfolio…</div>;
   if (!data) return <div style={{ padding: "2rem", color: "#b91c1c" }}>Failed to load.</div>;
 
-  const marketOpen = isUSMarketOpen();
+  const marketSession = usMarketSession();
+  const marketOpen = marketSession === "REGULAR";
+  const hasFreshOpenDQuotes = data.accounts.some((acct) =>
+    acct.positions.some((p) => p.priceSource === "moomoo" && !p.stale),
+  );
+  const extendedSessionLive =
+    hasFreshOpenDQuotes && (marketSession === "PREMARKET" || marketSession === "AFTER_HOURS");
+  const positionChangeIsLive = (p: Position) =>
+    marketOpen ? !p.stale : extendedSessionLive && !p.stale && p.priceSource === "moomoo";
 
   return (
     <div style={{ padding: "1.5rem" }}>
@@ -98,7 +106,14 @@ export default function PortfolioClient() {
           <h1 style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>Portfolio</h1>
           <p style={{ color: "#666", margin: 0, fontSize: "0.85rem" }}>
             As of {new Date(data.asOf).toLocaleString()} {refreshing && <span>· refreshing…</span>}
-            {!marketOpen && (
+            {extendedSessionLive && (
+              <span style={{ marginLeft: "0.5rem", color: "#047857", fontWeight: 600 }}>
+                {" - "}
+                {marketSession === "PREMARKET" ? "PREMARKET" : "AFTER HOURS"}
+                {" - moomoo OpenD live quotes"}
+              </span>
+            )}
+            {!extendedSessionLive && !marketOpen && (
               <span style={{ marginLeft: "0.5rem", color: "#b45309", fontWeight: 600 }}>
                 · MARKET CLOSED — &ldquo;Today&rdquo; shows the last session, not live
               </span>
@@ -290,9 +305,9 @@ export default function PortfolioClient() {
                     <td style={{ padding: "0.5rem" }}>{fmt(p.qty, 0)}</td>
                     <td style={{ padding: "0.5rem" }}>{fmt(p.avgCost, 4)}</td>
                     <td style={{ padding: "0.5rem" }}>{p.currentPrice != null ? fmt(p.currentPrice, 4) : "—"}</td>
-                    <td style={{ padding: "0.5rem", color: (marketOpen && !p.stale) ? pnlColor(p.changePct) : "#9ca3af" }}>
+                    <td style={{ padding: "0.5rem", color: positionChangeIsLive(p) ? pnlColor(p.changePct) : "#9ca3af" }}>
                       {p.changePct != null ? `${p.changePct >= 0 ? "+" : ""}${fmt(p.changePct)}%` : "—"}
-                      {p.changePct != null && (!marketOpen || p.stale) && (
+                      {p.changePct != null && !positionChangeIsLive(p) && (
                         <span style={{ display: "block", fontSize: "0.7rem", color: "#9ca3af" }}>
                           as of {observedLabel(p.priceObservedAt) ?? "last session"}
                         </span>

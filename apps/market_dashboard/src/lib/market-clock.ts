@@ -12,13 +12,23 @@ function toEt(now: Date): Date {
   return new Date(now.toLocaleString("en-US", { timeZone: ET }));
 }
 
-/** NYSE regular session: Mon-Fri 09:30-16:00 ET. (Exchange holidays not modelled.) */
-export function isUSMarketOpen(now: Date = new Date()): boolean {
+export type USMarketSession = "PREMARKET" | "REGULAR" | "AFTER_HOURS" | "CLOSED";
+
+/** US equity session buckets: Mon-Fri 04:00-20:00 ET. (Exchange holidays not modelled.) */
+export function usMarketSession(now: Date = new Date()): USMarketSession {
   const et = toEt(now);
   const day = et.getDay(); // 0 Sun .. 6 Sat
-  if (day === 0 || day === 6) return false;
+  if (day === 0 || day === 6) return "CLOSED";
   const mins = et.getHours() * 60 + et.getMinutes();
-  return mins >= 9 * 60 + 30 && mins <= 16 * 60;
+  if (mins >= 4 * 60 && mins < 9 * 60 + 30) return "PREMARKET";
+  if (mins >= 9 * 60 + 30 && mins <= 16 * 60) return "REGULAR";
+  if (mins > 16 * 60 && mins <= 20 * 60) return "AFTER_HOURS";
+  return "CLOSED";
+}
+
+/** NYSE regular session: Mon-Fri 09:30-16:00 ET. (Exchange holidays not modelled.) */
+export function isUSMarketOpen(now: Date = new Date()): boolean {
+  return usMarketSession(now) === "REGULAR";
 }
 
 export function marketSessionLabel(now: Date = new Date()): "LIVE" | "CLOSED" {

@@ -18,8 +18,9 @@
  *   asOf: ISO timestamp
  * }
  *
- * Live prices come from MarketQuote (refreshed every 5 min by /api/cron/refresh-quotes).
- * If no MarketQuote row exists for a position's ticker, the position is returned with
+ * Live prices prefer LiveQuote rows pushed by the local dashboard bridge, then
+ * fall back to MarketQuote rows refreshed by /api/cron/refresh-quotes.
+ * If no quote row exists for a position's ticker, the position is returned with
  * currentPrice=null and stale=true so the UI can show a placeholder.
  *
  * Per-user data isolation: only returns accounts where userId = session user.
@@ -36,6 +37,11 @@ function toNum(d: unknown): number {
   if (d == null) return 0;
   const n = Number(d);
   return Number.isFinite(n) ? n : 0;
+}
+
+function plainSymbol(internalSymbol: string): string {
+  const [prefix, ticker] = internalSymbol.split(".", 2);
+  return ticker && prefix ? ticker : internalSymbol;
 }
 
 export async function GET() {
@@ -60,12 +66,33 @@ export async function GET() {
     for (const p of acct.positions) tickers.add(p.ticker);
   }
 
-  const quotes = tickers.size
-    ? await prisma.marketQuote.findMany({
-        where: { symbol: { in: Array.from(tickers) } },
-        select: { symbol: true, price: true, changePct: true, observedAt: true, source: true },
-      })
-    : [];
+  const tickerList = Array.from(tickers);
+  const liveTickerList = Array.from(new Set(tickerList.map(plainSymbol)));
+
+  const [marketQuotes, liveQuotes] = tickers.size
+    ? await Promise.all([
+        prisma.marketQuote.findMany({
+          where: { symbol: { in: tickerList } },
+          select: { symbol: true, price: true, changePct: true, observedAt: true, source: true },
+        }),
+        prisma.liveQuote.findMany({
+          where: { symbol: { in: liveTickerList } },
+          select: { symbol: true, price: true, changePct: true, observedAt: true, source: true },
+        }),
+      ])
+    : [[], []];
+
+  const liveQuoteMap = new Map(liveQuotes.map((q) => [q.symbol, q]));
+  const marketQuoteMap = new Map(marketQuotes.map((q) => [q.symbol, q]));
+  const quotes = tickerList
+    .map((ticker) => {
+      const live = liveQuoteMap.get(plainSymbol(ticker));
+      const market = marketQuoteMap.get(ticker);
+      if (!live) return market ? { ...market, symbol: ticker } : null;
+      if (!market) return { ...live, symbol: ticker };
+      return live.observedAt >= market.observedAt ? { ...live, symbol: ticker } : market;
+    })
+    .filter((q): q is NonNullable<typeof q> => q != null);
 
   // Find the latest TradeRecord per (brokerAccountId, ticker) so rows can deep-link
   // to the journal editor without a second round-trip from the UI.
@@ -75,7 +102,7 @@ export async function GET() {
       ? await prisma.tradeRecord.findMany({
           where: {
             brokerAccountId: { in: accountIds },
-            ticker: { in: Array.from(tickers) },
+            ticker: { in: tickerList },
           },
           select: { id: true, brokerAccountId: true, ticker: true, executedAt: true, tradeDate: true },
           orderBy: [{ executedAt: "desc" }, { tradeDate: "desc" }],
