@@ -1,0 +1,418 @@
+{
+  "mood": {
+    "label": "CAUTIOUSLY-RISK-ON",
+    "posture": "RAISE-THE-BAR",
+    "summary": "AI-driven enthusiasm in Asia is providing a positive lead, but US futures are slightly down and oil is spiking on geopolitical news, suggesting a cautious start to the week."
+  },
+  "breadth": {
+    "up": null,
+    "down": null
+  },
+  "fearGreed": {
+    "score": null,
+    "label": null
+  },
+  "indices": [
+    {
+      "symbol": "SPY",
+      "name": "S&P 500",
+      "level": 755.06,
+      "changePct": -0.19,
+      "note": "futures",
+      "citation": "Source: Investing.com"
+    },
+    {
+      "symbol": "QQQ",
+      "name": "Nasdaq 100",
+      "level": 736.41,
+      "changePct": -0.26,
+      "note": "futures",
+      "citation": "Source: Investing.com"
+    },
+    {
+      "symbol": "DIA",
+      "name": "Dow Jones",
+      "level": 509.87,
+      "changePct": -0.18,
+      "note": "futures",
+      "citation": "Source: Investing.com"
+    },
+    {
+      "symbol": "IWM",
+      "name": "Russell 2000",
+      "level": 288.08,
+      "changePct": -0.81,
+      "note": "futures",
+      "citation": "Source: Investing.com"
+    },
+    {
+      "symbol": "^VIX",
+      "name": "Volatility Index",
+      "level": 15.32,
+      "changePct": -2.67,
+      "note": "previous close",
+      "citation": "Source: Zacks Investment Research"
+    },
+    {
+      "symbol": "^TNX",
+      "name": "10Y Treasury Yield",
+      "level": 4.501,
+      "changePct": 0.0,
+      "note": "live",
+      "citation": "Source: TradingView"
+    },
+    {
+      "symbol": "CL=F",
+      "name": "Crude Oil (WTI)",
+      "level": 93.79,
+      "changePct": 7.36,
+      "note": "live",
+      "citation": "Source: Trading Economics"
+    }
+  ],
+  "indicesNarrative": "US index futures are pointing to a slightly lower open, with the small-cap Russell 2000 showing the most weakness. This follows a strong close on Friday. The main headwind appears to be a sharp spike in oil prices due to renewed US-Iran tensions, while the VIX remains subdued after falling on Friday.",
+  "technicals": {
+    "SPY": {
+      "close": 758.01,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    },
+    "QQQ": {
+      "close": 738.31,
+      "atr14": 3.0895,
+      "atr_pct": 0.0042,
+      "ema21": 733.72,
+      "ema50": 726.57,
+      "ma200": 692.23,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": 77,
+      "macd": 4.28,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": true,
+      "oversold": false,
+      "entry_risk": "EXTREME-EXTENDED"
+    },
+    "DIA": {
+      "close": 510.32,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    }
+  },
+  "technicalsNarrative": "The Nasdaq (QQQ) is technically overbought with a daily RSI of 77, indicating it is extremely extended and momentum is strong. Chasing new long entries here is high-risk. Other indices have less clear technical pictures at this time. It is prudent to wait for a pullback or consolidation before initiating new long positions in the market leader.",
+  "sectorsThemes": [
+    {
+      "symbol": "XLK",
+      "name": "Technology",
+      "changePct": 1.9,
+      "rs": null,
+      "note": "Hit a 52-week high on Friday, leading the market."
+    },
+    {
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": null,
+      "rs": null,
+      "note": "Expected to be strong today with crude oil up over 7%."
+    },
+    {
+      "symbol": "XLP",
+      "name": "Consumer Staples",
+      "changePct": -2,
+      "rs": null,
+      "note": "Was the worst performing sector on Friday."
+    }
+  ],
+  "sectorsNarrative": "Technology was the clear leader into the weekend, with XLK hitting new highs. Expect a rotation into Energy (XLE) today given the significant gap up in crude oil prices.",
+  "industryNarrative": "Semiconductors continue to be the primary driver of the market's advance, fueled by ongoing AI enthusiasm. This strength was evident in Asian markets overnight, particularly in South Korea.",
+  "industryMovers": [],
+  "movers": [
+    {
+      "ticker": "IBM",
+      "side": "LONG",
+      "changePct": 7.45,
+      "why": "Nvidia CEO announced plans for a new chip for PCs, boosting related hardware names.",
+      "traderLens": "Episodic pivot, potential for Qullamaggie style momentum."
+    },
+    {
+      "ticker": "NOW",
+      "side": "LONG",
+      "changePct": 7.55,
+      "why": "Also benefiting from Nvidia's announcement regarding new PC AI chips.",
+      "traderLens": "Sympathy play on a major catalyst."
+    },
+    {
+      "ticker": "MGM",
+      "side": "LONG",
+      "changePct": 11.17,
+      "why": "Unclear catalyst in pre-market, requires further investigation.",
+      "traderLens": "Gap up, requires watching the open for confirmation."
+    },
+    {
+      "ticker": "PLTR",
+      "side": "LONG",
+      "changePct": 2.61,
+      "why": "General strength in AI-related software names.",
+      "traderLens": "Minervini style setup, breaking out of a base."
+    },
+    {
+      "ticker": "DELL",
+      "side": "LONG",
+      "changePct": null,
+      "why": "Upgraded to Equal Weight from Underweight at Morgan Stanley.",
+      "traderLens": "Catalyst-driven move."
+    },
+    {
+      "ticker": "AMD",
+      "side": "SHORT",
+      "changePct": -3.41,
+      "why": "Traders cutting exposure to high-beta names despite positive market sentiment.",
+      "traderLens": "Relative weakness in a strong group."
+    },
+    {
+      "ticker": "MSTR",
+      "side": "SHORT",
+      "changePct": -2.58,
+      "why": "Announced the sale of 32 Bitcoin, its first sale since 2022, as Bitcoin price falls.",
+      "traderLens": "Negative catalyst, potential for trend breakdown."
+    },
+    {
+      "ticker": "WOLF",
+      "side": "SHORT",
+      "changePct": -8.0,
+      "why": "Weakness in some semiconductor names.",
+      "traderLens": "Profit-taking in a hot sector."
+    }
+  ],
+  "watchlist": [
+    {
+      "ticker": "NVDA",
+      "level": null,
+      "changePct": null,
+      "abc": "A",
+      "note": "Market leader, watch for response to CEO's comments at Computex."
+    },
+    {
+      "ticker": "TSLA",
+      "level": null,
+      "changePct": null,
+      "abc": "C",
+      "note": "Lagging, needs to reclaim key moving averages."
+    },
+    {
+      "ticker": "AAPL",
+      "level": null,
+      "changePct": null,
+      "abc": "B",
+      "note": "Consolidating, watch for a breakout."
+    },
+    {
+      "ticker": "MSFT",
+      "level": null,
+      "changePct": null,
+      "abc": "A",
+      "note": "Strong uptrend, near all-time highs."
+    },
+    {
+      "ticker": "AMZN",
+      "level": null,
+      "changePct": null,
+      "abc": "B",
+      "note": "Building a base, watch for increased volume."
+    },
+    {
+      "ticker": "META",
+      "level": null,
+      "changePct": null,
+      "abc": "B",
+      "note": "Testing resistance, a breakout could be powerful."
+    },
+    {
+      "ticker": "GOOGL",
+      "level": 377.74,
+      "changePct": -0.68,
+      "abc": "B",
+      "note": "Slightly down in pre-market, but holding its uptrend structure."
+    },
+    {
+      "ticker": "AMD",
+      "level": 498.5,
+      "changePct": -3.41,
+      "abc": "A",
+      "note": "Showing pre-market weakness despite recent strength. Overbought RSI at 76."
+    },
+    {
+      "ticker": "SMCI",
+      "level": null,
+      "changePct": null,
+      "abc": "A",
+      "note": "Key AI beneficiary, watch for continuation."
+    },
+    {
+      "ticker": "PLTR",
+      "level": 160.62,
+      "changePct": 2.61,
+      "abc": "A",
+      "note": "Strong pre-market move, breaking out of recent consolidation."
+    },
+    {
+      "ticker": "CRWD",
+      "level": null,
+      "changePct": null,
+      "abc": "B",
+      "note": "Cybersecurity leader, setting up nicely."
+    },
+    {
+      "ticker": "MSTR",
+      "level": 154.99,
+      "changePct": -2.58,
+      "abc": "C",
+      "note": "Weakening on news of Bitcoin sales, breaking key levels."
+    }
+  ],
+  "traderLens": [
+    {
+      "name": "Minervini",
+      "view": "Market is in a Stage 2 uptrend, but getting extended. Focus on A-grade setups and avoid chasing."
+    },
+    {
+      "name": "Ted Zhang",
+      "view": "Rotation is key. Money flows from tech to energy could be the play today."
+    },
+    {
+      "name": "Clement Ang",
+      "view": "Market context is positive but overbought. Entry grade is B. Be selective and patient."
+    },
+    {
+      "name": "SRxTrades",
+      "view": "Look for clean pivots and volume confirmation. Avoid chasing gaps at the open."
+    },
+    {
+      "name": "Jeff",
+      "view": "Stick to your rules. Honor stops. Don't let FOMO dictate your trades."
+    },
+    {
+      "name": "Qullamaggie",
+      "view": "Momentum is strong, but the best entries might be behind us. Look for episodic pivots on fresh news."
+    },
+    {
+      "name": "Composite",
+      "view": "The market is bullish but stretched. Raise the bar for new long entries. Consider taking partial profits on extended positions. Watch energy stocks for a potential short-term trade."
+    }
+  ],
+  "standout": null,
+  "earnings": {
+    "bmo": [],
+    "amc": [],
+    "yesterdayReactions": []
+  },
+  "calendar": [
+    {
+      "time": "08:30 ET",
+      "name": "Fed Waller Speaks",
+      "consensus": null
+    }
+  ],
+  "ratings": {
+    "upgrades": [
+      {
+        "ticker": "DELL",
+        "firm": "Morgan Stanley",
+        "rating": "Equal Weight",
+        "pt": 448
+      },
+      {
+        "ticker": "KSS",
+        "firm": "Citigroup",
+        "rating": "Buy",
+        "pt": 22
+      },
+      {
+        "ticker": "VAC",
+        "firm": "Goldman Sachs",
+        "rating": "Buy",
+        "pt": 100
+      }
+    ],
+    "downgrades": [
+      {
+        "ticker": "ACN",
+        "firm": "Truist",
+        "rating": "Hold",
+        "pt": 210
+      },
+      {
+        "ticker": "CZR",
+        "firm": "Deutsche Bank",
+        "rating": "Hold",
+        "pt": 31
+      },
+      {
+        "ticker": "RDW",
+        "firm": "Jefferies",
+        "rating": "Hold",
+        "pt": 24
+      }
+    ]
+  },
+  "alert": "Crude Oil (WTI) futures are up more than 7% on geopolitical news, watch energy stocks (XLE).",
+  "screenerScores": {},
+  "citations": [
+    "Saxo Bank, Market Quick Take - 1 June 2026",
+    "NDTV Profit, Asia Markets Today | June 1",
+    "Benzinga, What's Going On With AMD Stock Monday?",
+    "Investing.com, Pre-market Movers",
+    "Public.com, Trade Alphabet (GOOGL) Stock Pre-Market",
+    "Public.com, Trade Palantir Technologies (PLTR) Stock Pre-Market",
+    "Public.com, Trade Strategy Inc (MSTR) Stock Pre-Market",
+    "Share Talk, What happened overnight - Monday 1st June 2026",
+    "Investing.com, Crude Oil Futures Price Today (WTI)",
+    "24/7 Wall St., Here Are Monday's Top Wall Street Analyst Research Calls",
+    "TradingView, 10 Year Treasury Yield (US10Y) Price and Chart",
+    "Trading Economics, US 10 Year Treasury Note Yield",
+    "FT.com, WTI Crude Oil price information",
+    "Zacks Investment Research, Stock Market News for Jun 1, 2026",
+    "Investing.com, Invesco QQQ Trust ETF Technical Analysis",
+    "ADC, QQQ weekly: 25 - 29 May 2026",
+    "TheStreet, Stock Market Today (June 1, 2026)",
+    "Trading Economics, Crude Oil",
+    "Stocktwits, MSTR Stock Falls After Strategy Sells Bitcoin"
+  ]
+}
