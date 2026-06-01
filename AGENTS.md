@@ -4,6 +4,8 @@ Behavioral guidelines for AI-assisted development on this repo.
 
 **Bias:** caution over speed. For trivial tasks, use judgment.
 
+**Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard (breadth, screeners + REC A-list, quotes, HELD seed + track), run the morning brief, then present today's A-List (REC + HELD) in chat.
+
 ---
 
 ## Project Overview

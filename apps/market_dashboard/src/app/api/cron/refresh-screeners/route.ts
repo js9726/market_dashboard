@@ -10,6 +10,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { fetchScreeners } from "@/server/screener-scanner";
+import { ingestScreenerRec } from "@/server/a-list-extractor";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -36,5 +37,13 @@ export async function GET(request: Request) {
     create: { bucketDate: today, snapshot: file as object, source: "tv-scanner-cron", durationMs },
     update: { snapshot: file as object, source: "tv-scanner-cron", durationMs, refreshedAt: new Date() },
   });
-  return NextResponse.json({ ok: true, totalHits, marketOpen: file.market_was_open, durationMs, refreshedAt: row.refreshedAt.toISOString() });
+  // Feed the recommended (REC) A-list lane from the scored hits (score>=80/GO/rvol>=1.5).
+  let recCandidates = 0;
+  try {
+    recCandidates = (await ingestScreenerRec(file)).count;
+  } catch (e) {
+    console.error("[refresh-screeners] REC ingest failed (non-fatal):", e);
+  }
+
+  return NextResponse.json({ ok: true, totalHits, recCandidates, marketOpen: file.market_was_open, durationMs, refreshedAt: row.refreshedAt.toISOString() });
 }

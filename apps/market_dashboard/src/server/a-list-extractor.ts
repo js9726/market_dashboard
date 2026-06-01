@@ -354,3 +354,63 @@ export async function getOwnerUserId(): Promise<string | null> {
   });
   return owner?.id ?? null;
 }
+
+// ── Screener REC ingest (serverless) ────────────────────────────────────────
+// The recommended (REC) A-list lane is fed from the TV-screener SCORED hits —
+// NOT the morning brief, which carries no per-ticker score+rvol. Called by the
+// serverless /api/cron/refresh-screeners + /api/screeners/refresh after
+// fetchScreeners(), so REC populates on Vercel cron with no GitHub dependency.
+
+const SCREENER_PATTERN_TO_SETUP: Record<string, string> = {
+  EP: "EP-FRESH",
+  BREAKOUT: "BO-CB",
+  PULLBACK: "PB-21EMA",
+  PARABOLIC: "PARABOLIC",
+};
+
+interface ScoredScreenerFile {
+  screeners?: { id?: string; name?: string; hits?: Record<string, unknown>[] }[];
+}
+
+/** Extract REC candidates (score>=80, GO, rvol>=1.5x) from a scored screener file. */
+export function extractScreenerCandidates(file: ScoredScreenerFile | null | undefined): ExtractedCandidate[] {
+  const best = new Map<string, ExtractedCandidate>();
+  for (const sc of file?.screeners ?? []) {
+    for (const hit of sc.hits ?? []) {
+      const ticker = asStr(hit.ticker)?.toUpperCase() ?? null;
+      const score = asNum(hit.score);
+      const verdict = asStr(hit.verdict);
+      const rvol = asNum(hit.relative_volume_10d_calc);
+      if (!ticker || score == null || score < MIN_SCORE) continue;
+      if ((verdict ?? "").toUpperCase() !== "GO") continue;
+      if (rvol == null || rvol < MIN_RVOL) continue;
+      const pattern = asStr(hit.pattern);
+      const cand: ExtractedCandidate = {
+        ticker,
+        day0Score: score,
+        day0Verdict: "GO",
+        day0Rvol: rvol,
+        setupClassification: pattern ? SCREENER_PATTERN_TO_SETUP[pattern.toUpperCase()] ?? pattern : null,
+        screenSource: asStr(sc.id),
+        sector: asStr(hit.sector),
+        day0Price: asNum(hit.close),
+      };
+      const existing = best.get(ticker);
+      if (!existing || (cand.day0Score ?? 0) > (existing.day0Score ?? 0)) best.set(ticker, cand);
+    }
+  }
+  return Array.from(best.values());
+}
+
+/** Owner-scoped idempotent upsert of screener REC candidates for today. */
+export async function ingestScreenerRec(
+  file: ScoredScreenerFile | null | undefined,
+): Promise<{ count: number; inserted: number; updated: number }> {
+  const candidates = extractScreenerCandidates(file);
+  if (candidates.length === 0) return { count: 0, inserted: 0, updated: 0 };
+  const userId = await getOwnerUserId();
+  if (!userId) return { count: 0, inserted: 0, updated: 0 };
+  const today = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z");
+  const res = await upsertCandidates(userId, today, candidates, new Date(), "screener-cron");
+  return { count: candidates.length, ...res };
+}
