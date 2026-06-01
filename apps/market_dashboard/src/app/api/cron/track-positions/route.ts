@@ -186,7 +186,11 @@ export async function GET(req: Request) {
       const hardHitAt = hardHitLoggedAt ?? hardHitAtrAt;
       const hardBasis = hardHitLoggedAt && hardHitAtrAt ? "BOTH" : hardHitLoggedAt ? "LOGGED" : hardHitAtrAt ? "ATR" : null;
 
-      const windowComplete = lastIdx >= entryIdx + WINDOW || lastIdx === candles.length - 1;
+      // Truly complete only after 14 full sessions have elapsed since entry —
+      // NOT merely because we've reached the latest candle (that happens every
+      // day for an in-progress position, which would prematurely stamp a day-14
+      // outcome like DRIFT on a position still being held).
+      const windowComplete = lastIdx >= entryIdx + WINDOW;
       let outcome: string | null = null;
       let status = cand.status;
       if (hitTarget) {
