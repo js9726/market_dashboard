@@ -17,34 +17,10 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { computeComposite, type LeaderboardRow } from "@/lib/profile/composite";
+import { compositeInputFromTrades } from "@/lib/profile/trade-metrics";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
-
-function stddev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance =
-    values.reduce((acc, v) => acc + (v - mean) ** 2, 0) / values.length;
-  return Math.sqrt(variance);
-}
-
-function maxDrawdownFromPnlSequence(pnls: number[]): number {
-  // Walk the cumulative equity curve, tracking peak-to-trough.
-  if (pnls.length === 0) return 0;
-  let equity = 0;
-  let peak = 0;
-  let worstDd = 0;
-  for (const p of pnls) {
-    equity += p;
-    if (equity > peak) peak = equity;
-    if (peak > 0) {
-      const dd = (peak - equity) / peak;
-      if (dd > worstDd) worstDd = dd;
-    }
-  }
-  return worstDd;
-}
 
 export async function GET() {
   const session = await auth();
@@ -66,36 +42,14 @@ export async function GET() {
       dashboardTagline: true,
       tradeRecords: {
         where: { pnl: { not: null } },
-        select: { pnl: true, buyPrice: true, quantity: true, tradeDate: true },
+        select: { state: true, pnl: true, buyPrice: true, quantity: true, tradeDate: true },
         orderBy: { tradeDate: "asc" },
       },
     },
   });
 
   const aggregated: { row: LeaderboardRow }[] = users.map((u) => {
-    const pnls: number[] = [];
-    const pctReturns: number[] = [];
-    let wins = 0;
-    for (const t of u.tradeRecords) {
-      const pnl = Number(t.pnl);
-      if (Number.isNaN(pnl)) continue;
-      pnls.push(pnl);
-      if (pnl > 0) wins++;
-      const bp = t.buyPrice != null ? Number(t.buyPrice) : null;
-      const qty = t.quantity != null ? Number(t.quantity) : null;
-      if (bp != null && qty != null && bp > 0 && qty !== 0) {
-        const cost = bp * Math.abs(qty);
-        if (cost > 0) pctReturns.push(pnl / cost);
-      }
-    }
-    const totalPnl = pnls.reduce((a, b) => a + b, 0);
-    const composite = computeComposite({
-      closedTrades: pnls.length,
-      wins,
-      totalPnl,
-      maxDrawdownPct: maxDrawdownFromPnlSequence(pnls),
-      pnlStdDevPct: stddev(pctReturns),
-    });
+    const composite = computeComposite(compositeInputFromTrades(u.tradeRecords));
     return {
       row: {
         username: u.username!,

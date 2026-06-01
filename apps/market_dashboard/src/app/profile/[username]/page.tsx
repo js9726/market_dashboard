@@ -10,32 +10,13 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { computeComposite } from "@/lib/profile/composite";
+import { compositeInputFromTrades } from "@/lib/profile/trade-metrics";
 import { tierInfo } from "@/lib/profile/tiers";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ username: string }>;
-}
-
-function stddev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance =
-    values.reduce((acc, v) => acc + (v - mean) ** 2, 0) / values.length;
-  return Math.sqrt(variance);
-}
-
-function maxDrawdown(pnls: number[]): number {
-  let equity = 0;
-  let peak = 0;
-  let worst = 0;
-  for (const p of pnls) {
-    equity += p;
-    if (equity > peak) peak = equity;
-    if (peak > 0) worst = Math.max(worst, (peak - equity) / peak);
-  }
-  return worst;
 }
 
 export default async function PublicProfilePage({ params }: PageProps) {
@@ -55,6 +36,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
     publicProfileEnabled: boolean;
     username: string | null;
     tradeRecords: {
+      state: string | null;
       pnl: unknown;
       buyPrice: unknown;
       quantity: unknown;
@@ -76,7 +58,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         username: true,
         tradeRecords: {
           where: { pnl: { not: null } },
-          select: { pnl: true, buyPrice: true, quantity: true, tradeDate: true },
+          select: { state: true, pnl: true, buyPrice: true, quantity: true, tradeDate: true },
           orderBy: { tradeDate: "asc" },
         },
       },
@@ -88,29 +70,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   if (!user || !user.publicProfileEnabled) notFound();
 
-  const pnls: number[] = [];
-  const pctReturns: number[] = [];
-  let wins = 0;
-  for (const t of user.tradeRecords) {
-    const pnl = Number(t.pnl);
-    if (Number.isNaN(pnl)) continue;
-    pnls.push(pnl);
-    if (pnl > 0) wins++;
-    const bp = t.buyPrice != null ? Number(t.buyPrice) : null;
-    const qty = t.quantity != null ? Number(t.quantity) : null;
-    if (bp != null && qty != null && bp > 0 && qty !== 0) {
-      const cost = bp * Math.abs(qty);
-      if (cost > 0) pctReturns.push(pnl / cost);
-    }
-  }
-
-  const composite = computeComposite({
-    closedTrades: pnls.length,
-    wins,
-    totalPnl: pnls.reduce((a, b) => a + b, 0),
-    maxDrawdownPct: maxDrawdown(pnls),
-    pnlStdDevPct: stddev(pctReturns),
-  });
+  const composite = computeComposite(compositeInputFromTrades(user.tradeRecords));
 
   const tier = tierInfo(composite.tier);
 

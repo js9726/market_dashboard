@@ -11,7 +11,7 @@
 import { RANK_MIN_TRADES, tierForScore, type Tier } from "@/lib/profile/tiers";
 
 export interface CompositeInput {
-  /** Number of closed trades (pnl != null). */
+  /** Number of closed trades included in the public performance sample. */
   closedTrades: number;
   /** Number of wins (pnl > 0). */
   wins: number;
