@@ -50,6 +50,8 @@ export interface AListRow {
   held?: { entryAvgCost: number | null; qty: number | null; entryFillAt: string | null } | null;
   rUnitLogged?: number | null;
   rUnitAtr?: number | null;
+  atrFloorStop?: number | null;
+  entryGradeJson?: unknown;
   savings?: {
     realizedR: number | null;
     saveRealizedR: number | null;
