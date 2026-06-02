@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { TvScreenersFile } from "@/types/tv-screener";
 
 const BASE = "/market-dashboard";
+const STATIC_FALLBACK_MAX_AGE_MS = 15 * 60 * 1000;
 
 export function useTvScreeners() {
   const [data, setData] = useState<TvScreenersFile | null>(null);
@@ -23,11 +24,22 @@ export function useTvScreeners() {
           if (!cancelled) { setData(j); setError(null); setLoading(false); }
           return;
         }
-      } catch { /* fall through */ }
+        if (r.status !== 404) {
+          const j = (await r.json().catch(() => null)) as { error?: string } | null;
+          throw new Error(j?.error ?? `screeners API HTTP ${r.status}`);
+        }
+      } catch {
+        if (!cancelled) { setError("Live screener refresh failed; stale fallback suppressed."); setLoading(false); }
+        return;
+      }
       try {
         const r = await fetch(`${BASE}/tv_screeners.json`, { cache: "no-store" });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const j = (await r.json()) as TvScreenersFile;
+        const t = new Date(j.fetched_at).getTime();
+        if (!Number.isFinite(t) || Date.now() - t > STATIC_FALLBACK_MAX_AGE_MS) {
+          throw new Error("static screener fallback is stale");
+        }
         if (!cancelled) { setData(j); setLoading(false); }
       } catch (e) {
         if (!cancelled) { setError((e as Error).message); setLoading(false); }

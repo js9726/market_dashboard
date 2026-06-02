@@ -1,16 +1,12 @@
 /**
  * /api/cron/refresh-screeners
  *
- * Vercel Cron entry (schedule in vercel.json: 27 min pre-open, 3 min after
- * open, 33 min after open, and 33 min post-close on weekdays). Recomputes
- * the 5 TV screeners and upserts the Postgres snapshot.
- *
- * Auth: Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`.
+ * Vercel Cron entry for the TV screeners. Uses the same DB-backed refresh
+ * helper as /api/screeners/refresh so cron, bridge, and on-read self-heal all
+ * write the same snapshot and REC A-list side effect.
  */
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { fetchScreeners } from "@/server/screener-scanner";
-import { ingestScreenerRec } from "@/server/a-list-extractor";
+import { refreshScreenerSnapshot } from "@/server/screener-refresh";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -21,29 +17,19 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const today = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z");
-  let file, durationMs;
+  let result;
   try {
-    ({ file, durationMs } = await fetchScreeners());
+    result = await refreshScreenerSnapshot("tv-scanner-cron");
   } catch (e) {
     return NextResponse.json({ error: "scanner failed", detail: String(e) }, { status: 502 });
   }
-  const totalHits = file.screeners.reduce((n, s) => n + s.hits.length, 0);
-  if (totalHits === 0) {
-    return NextResponse.json({ error: "0 hits — not overwriting" }, { status: 502 });
-  }
-  const row = await prisma.screenerSnapshot.upsert({
-    where: { bucketDate: today },
-    create: { bucketDate: today, snapshot: file as object, source: "tv-scanner-cron", durationMs },
-    update: { snapshot: file as object, source: "tv-scanner-cron", durationMs, refreshedAt: new Date() },
-  });
-  // Feed the recommended (REC) A-list lane from the scored hits (score>=80/GO/rvol>=1.5).
-  let recCandidates = 0;
-  try {
-    recCandidates = (await ingestScreenerRec(file)).count;
-  } catch (e) {
-    console.error("[refresh-screeners] REC ingest failed (non-fatal):", e);
-  }
 
-  return NextResponse.json({ ok: true, totalHits, recCandidates, marketOpen: file.market_was_open, durationMs, refreshedAt: row.refreshedAt.toISOString() });
+  return NextResponse.json({
+    ok: true,
+    totalHits: result.totalHits,
+    recCandidates: result.recCandidates,
+    marketOpen: result.file.market_was_open,
+    durationMs: result.row.durationMs,
+    refreshedAt: result.row.refreshedAt.toISOString(),
+  });
 }

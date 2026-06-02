@@ -1,18 +1,19 @@
 /**
  * GET/POST /api/screeners/refresh
  *
- * Recomputes the 5 TV screeners via the TradingView scanner (server-side) and
- * upserts the snapshot into Postgres. The reliable screener path — any
- * scheduler can hit it (Vercel cron, external uptime cron, bridge daemon),
- * none depending on GitHub Actions cron firing.
+ * Recomputes the TV screeners via the TradingView scanner and upserts the
+ * snapshot into Postgres. Shares the same helper used by /api/screeners and
+ * /api/cron/refresh-screeners so all paths write the same shape.
  *
  * Auth: `Authorization: Bearer <BRIEF_INGEST_KEY>` OR `?key=<BRIEF_INGEST_KEY>`.
- * Query: ?force=1 to recompute even if today's snapshot is < 5 min old.
+ * Query: ?force=1 to recompute even if the latest snapshot is < 5 min old.
  */
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { fetchScreeners } from "@/server/screener-scanner";
-import { ingestScreenerRec } from "@/server/a-list-extractor";
+import {
+  getLatestScreenerRow,
+  isScreenerRowFresh,
+  refreshScreenerSnapshot,
+} from "@/server/screener-refresh";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -30,44 +31,33 @@ async function handle(req: Request) {
   if (!authorized(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const force = new URL(req.url).searchParams.get("force") === "1";
-  const today = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z");
 
   if (!force) {
-    const existing = await prisma.screenerSnapshot.findUnique({ where: { bucketDate: today } });
-    if (existing && Date.now() - existing.refreshedAt.getTime() < FRESH_WINDOW_MS) {
-      return NextResponse.json({ ok: true, skipped: "already fresh", refreshedAt: existing.refreshedAt.toISOString() });
+    const existing = await getLatestScreenerRow();
+    if (existing && isScreenerRowFresh(existing, Date.now(), FRESH_WINDOW_MS)) {
+      return NextResponse.json({
+        ok: true,
+        skipped: "already fresh",
+        refreshedAt: existing.refreshedAt.toISOString(),
+      });
     }
   }
 
-  let file, durationMs;
+  let result;
   try {
-    ({ file, durationMs } = await fetchScreeners());
+    result = await refreshScreenerSnapshot("tv-scanner");
   } catch (e) {
     return NextResponse.json({ error: "scanner failed", detail: String(e) }, { status: 502 });
   }
 
-  const totalHits = file.screeners.reduce((n, s) => n + s.hits.length, 0);
-  if (totalHits === 0) {
-    return NextResponse.json({ error: "0 hits — TV may have rate-limited; not overwriting" }, { status: 502 });
-  }
-
-  const row = await prisma.screenerSnapshot.upsert({
-    where: { bucketDate: today },
-    create: { bucketDate: today, snapshot: file as object, source: "tv-scanner", durationMs },
-    update: { snapshot: file as object, source: "tv-scanner", durationMs, refreshedAt: new Date() },
-  });
-
-  // Feed the recommended (REC) A-list lane from the scored hits (score>=80/GO/rvol>=1.5).
-  let recCandidates = 0;
-  try {
-    recCandidates = (await ingestScreenerRec(file)).count;
-  } catch (e) {
-    console.error("[screeners/refresh] REC ingest failed (non-fatal):", e);
-  }
-
   return NextResponse.json({
-    ok: true, bucketDate: today.toISOString().slice(0, 10), durationMs, totalHits, recCandidates,
-    marketOpen: file.market_was_open, refreshedAt: row.refreshedAt.toISOString(),
+    ok: true,
+    bucketDate: result.row.bucketDate.toISOString().slice(0, 10),
+    durationMs: result.row.durationMs,
+    totalHits: result.totalHits,
+    recCandidates: result.recCandidates,
+    marketOpen: result.file.market_was_open,
+    refreshedAt: result.row.refreshedAt.toISOString(),
   });
 }
 
