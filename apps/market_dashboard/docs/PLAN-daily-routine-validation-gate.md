@@ -37,7 +37,7 @@ locally.
 | `build_data.py` / `/api/market-snapshot` | Market Overview, Market Metrics, RVOL Overview, Theme Radar, Rotation Graph |
 | `tv_screener_fetch.py` / `/api/screeners` | TV Screener Hits, screener-derived REC candidates |
 | `breadth_scan_tv.py` / `/api/breadth` | Market Breadth, Momentum Breadth, Sector Momentum, Industry Rotation |
-| `cli_run.py --provider deepseek --post` | Morning Brief provider tab and A-list extraction through brief ingest |
+| `cli_run.py --provider deepseek-search --post` | Morning Brief provider tab and A-list extraction through brief ingest |
 | `push_screener_picks.py --post` | Screener History / wiki screener picks |
 
 ## Fixed (2026-06-02, continued from Codex handoff)
@@ -55,9 +55,14 @@ locally.
   unchecked (sentiment is non-core), so an unavailable reading degrades
   gracefully without failing the routine.
 
-## Next Workflow Fixes
+## Fixed (2026-06-02, AI brief/news gate)
 
-- Tighten AI brief/news validation after generation so provider output may not
-  label simulated news, ratings, or calendars as current market news. Missing
-  news must render as unavailable/stale with source metadata, not invented
-  context.
+- Added `packages/core-skills/morning-brief/validate_brief.py`, wired through
+  `cli_run.py`, to withhold ungrounded `earnings`, `ratings`, and `calendar`
+  sections after provider generation. The gate is provider-agnostic and
+  fail-closed: earnings/ratings need real citations; calendar can also pass
+  through the pre-fetched `events.json` feed.
+- Placeholder citations such as "data unavailable" do not count as live
+  grounding. Withheld sections are set to `null` and annotated under
+  `_validation.unavailable`, so the dashboard can show unavailable context
+  instead of simulated current news.

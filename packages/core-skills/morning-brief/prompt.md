@@ -172,5 +172,6 @@ SECTIONS — use pre-fetched data where provided; web-search only what is missin
 RULES:
 - Every numeric value must come from a real, recent web result — never fabricate.
 - If something is unavailable, write `null` and add an entry to `citations` explaining ("data unavailable at generation time").
+- NEWS GROUNDING (enforced post-generation): `earnings`, `ratings`, and `calendar` are dropped automatically unless `citations` includes a real live source citation (calendar also passes if a live events feed was supplied above). Placeholder citations such as "data unavailable" do not count. If you cannot cite a real source for an earnings result, analyst rating, or economic event, set that field to `null` — do NOT invent it. Ungrounded sections are withheld and shown as "Unavailable", so fabricating them only loses you the section.
 - Output ONLY the JSON object. The first character of your response MUST be `{`. The last character MUST be `}`.
 - No prose. No markdown. No code fences.

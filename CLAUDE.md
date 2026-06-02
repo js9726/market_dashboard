@@ -4,6 +4,15 @@ Behavioral guidelines for AI-assisted development on this repo.
 
 **Bias:** caution over speed. For trivial tasks, use judgment.
 
+**Freshness is a hard gate:** for market data, never fix only the UI. Verify the
+producer and the dashboard consumer. A daily routine is not done until
+`build_data.py` has refreshed VIX/indices/RVOL/theme/rotation data, screeners
+and breadth have refreshed, `npm run sync:market` has copied the static
+fallback, and `check_daily_freshness.py` passes. AI/news sections must use a
+search-grounded provider path and the `morning-brief/validate_brief.py` gate;
+ungrounded news, ratings, or calendar data must render unavailable, not
+simulated.
+
 **Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard (breadth, screeners + REC A-list, quotes, HELD seed + track), run the morning brief, then present today's A-List (REC + HELD) in chat.
 
 ---
@@ -18,7 +27,7 @@ Behavioral guidelines for AI-assisted development on this repo.
 | AI Agents | `apps/market_dashboard/agents/` | Fundamental (yahoo-finance2 + DeepSeek), Technical |
 | Runtime Skills | `packages/core-skills/` | LLM prompts + dual TS/Python handlers |
 | Auth | `apps/market_dashboard/src/middleware.ts` | NextAuth v5 (Google OAuth) + Prisma |
-| Automation | `.github/workflows/refresh_data.yml` | GitHub Actions (Mon–Fri, single 13:00 UTC pre-market run; intraday refreshes via `/api/morning-verdict` lazy regen) |
+| Automation | `.github/workflows/refresh_data.yml` | GitHub Actions (Mon-Fri, every 30 min from 12:00-18:30 UTC) |
 | Deployment | `apps/market_dashboard/vercel.json` + Vercel project settings | Vercel project targets `apps/market_dashboard` |
 
 ### Key Data Flow

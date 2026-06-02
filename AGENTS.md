@@ -4,6 +4,15 @@ Behavioral guidelines for AI-assisted development on this repo.
 
 **Bias:** caution over speed. For trivial tasks, use judgment.
 
+**Freshness is a hard gate:** for market data, never fix only the UI. Verify the
+producer and the dashboard consumer. A daily routine is not done until
+`build_data.py` has refreshed VIX/indices/RVOL/theme/rotation data, screeners
+and breadth have refreshed, `npm run sync:market` has copied the static
+fallback, and `check_daily_freshness.py` passes. AI/news sections must use a
+search-grounded provider path and the `morning-brief/validate_brief.py` gate;
+ungrounded news, ratings, or calendar data must render unavailable, not
+simulated.
+
 **Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard (breadth, screeners + REC A-list, quotes, HELD seed + track), run the morning brief, then present today's A-List (REC + HELD) in chat.
 
 ---

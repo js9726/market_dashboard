@@ -888,6 +888,21 @@ def main() -> None:
 
     print("[cli_run] ✓ JSON parsed successfully.", file=sys.stderr)
 
+    # Integrity gate: withhold ungrounded news so the dashboard never shows
+    # invented news/ratings/calendar as current. The prompt forbids
+    # fabrication, but instructions are not enforcement.
+    from validate_brief import sanitize_news
+    structured, withheld = sanitize_news(
+        structured, provider=args.provider, has_events=bool(events)
+    )
+    if withheld:
+        fields = ", ".join(w["field"] for w in withheld)
+        print(
+            f"[cli_run] withheld ungrounded sections [{fields}] - no source "
+            "citations; rendered Unavailable, not invented.",
+            file=sys.stderr,
+        )
+
     # Save to file if requested
     if args.out:
         out_path = Path(args.out)
