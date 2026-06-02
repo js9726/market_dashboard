@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { fetchMarketSnapshot } from "@/lib/market-snapshot-client";
 import type { MacroEvent, MarketMeta, MarketSnapshot, TickerRow } from "@/types/market-dashboard";
 
 const BASE = "/market-dashboard";
@@ -81,15 +82,14 @@ export default function MarketOverview() {
     let cancelled = false;
     (async () => {
       try {
-        const [s, e, m] = await Promise.all([
-          fetch(`${BASE}/snapshot.json`),
+        const [sj, e, m] = await Promise.all([
+          fetchMarketSnapshot(),
           fetch(`${BASE}/events.json`),
           fetch(`${BASE}/meta.json`),
         ]);
-        if (!s.ok) throw new Error(`snapshot ${s.status}`);
         if (!e.ok) throw new Error(`events ${e.status}`);
         if (!m.ok) throw new Error(`meta ${m.status}`);
-        const [sj, ej, mj] = await Promise.all([s.json(), e.json(), m.json()]);
+        const [ej, mj] = await Promise.all([e.json(), m.json()]);
         if (!cancelled) {
           setSnapshot(sj);
           setEvents(Array.isArray(ej) ? ej : []);

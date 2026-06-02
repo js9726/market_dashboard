@@ -1,21 +1,22 @@
 /**
  * GET /api/live-quotes
  *
- * Returns all rows in LiveQuote, overlaid with server-fetched Polygon index
- * snapshots for SPX/NDX/DJI/RUT/VIX when POLYGON_API_KEY is configured. Adds
- * a per-row staleness flag (stale = no update in >2 min). Used by the
- * Conviction Desk's live tape (indices, sectors, watchlist).
+ * Returns all rows in LiveQuote, overlaid with server-fetched index snapshots
+ * for SPX/NDX/DJI/RUT/VIX. Polygon is preferred when POLYGON_API_KEY exists;
+ * Yahoo chart is the fallback so VIX does not go stale when Polygon is absent.
+ * Adds a per-row staleness flag. During regular US market hours the feed must
+ * be recent; outside the session, the latest valid market-session print is OK.
+ * Used by the Conviction Desk's live tape (indices, sectors, watchlist).
  *
  * Auth: requires a signed-in user.
  */
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { getLiveIndexQuotes } from "@/lib/live-index-quotes";
 
 export const dynamic = "force-dynamic";
-
-const STALE_MS = 2 * 60 * 1000;
 
 interface ApiQuoteRow {
   symbol: string;
@@ -38,7 +39,7 @@ export async function GET() {
       return [];
     }),
     getLiveIndexQuotes().catch((error) => {
-      console.error("[/api/live-quotes] Polygon index fetch failed:", error);
+      console.error("[/api/live-quotes] live index fetch failed:", error);
       return [];
     }),
   ]);
@@ -60,6 +61,7 @@ export async function GET() {
 
   const rows = Array.from(bySymbol.values()).sort((a, b) => a.symbol.localeCompare(b.symbol));
   const now = Date.now();
+  const staleMs = liveQuoteThresholdsForNow(new Date(now)).staleSec * 1000;
 
   // Determine the freshest source actively writing (moomoo wins if recent;
   // else yahoo). Helpful for the UI to badge "moomoo live" vs "yahoo delayed".
@@ -84,7 +86,7 @@ export async function GET() {
         volume: r.volume,
         source: r.source,
         observedAt: r.observedAt.toISOString(),
-        stale: now - r.observedAt.getTime() > STALE_MS,
+        stale: now - r.observedAt.getTime() > staleMs,
       })),
     },
     { headers: { "Cache-Control": "private, max-age=15" } },

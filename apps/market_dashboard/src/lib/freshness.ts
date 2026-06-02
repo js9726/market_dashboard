@@ -6,6 +6,10 @@ export interface FreshnessThresholds {
 }
 
 export const LIVE_QUOTE_THRESHOLDS: FreshnessThresholds = { agingSec: 60, staleSec: 120 };
+export const LIVE_QUOTE_OFF_HOURS_THRESHOLDS: FreshnessThresholds = {
+  agingSec: 18 * 60 * 60,
+  staleSec: 4 * 24 * 60 * 60,
+};
 export const BRIEF_THRESHOLDS:      FreshnessThresholds = { agingSec: 1800, staleSec: 3600 };
 export const SNAPSHOT_THRESHOLDS:   FreshnessThresholds = { agingSec: 7200, staleSec: 21600 };
 
@@ -24,6 +28,32 @@ function formatAge(ageSec: number, stale: boolean): string {
   const h = Math.floor(m / 60);
   const rem = m % 60;
   return rem ? `${prefix}${h}h ${rem}m ago` : `${prefix}${h}h ago`;
+}
+
+function nyPart(date: Date, type: Intl.DateTimeFormatPartTypes): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  return parts.find((part) => part.type === type)?.value ?? "";
+}
+
+export function isUsRegularSession(date = new Date()): boolean {
+  const weekday = nyPart(date, "weekday");
+  if (weekday === "Sat" || weekday === "Sun") return false;
+  const hourRaw = Number(nyPart(date, "hour"));
+  const minute = Number(nyPart(date, "minute"));
+  if (!Number.isFinite(hourRaw) || !Number.isFinite(minute)) return false;
+  const hour = hourRaw === 24 ? 0 : hourRaw;
+  const minutes = hour * 60 + minute;
+  return minutes >= 9 * 60 + 30 && minutes < 16 * 60;
+}
+
+export function liveQuoteThresholdsForNow(date = new Date()): FreshnessThresholds {
+  return isUsRegularSession(date) ? LIVE_QUOTE_THRESHOLDS : LIVE_QUOTE_OFF_HOURS_THRESHOLDS;
 }
 
 export function computeFreshness(

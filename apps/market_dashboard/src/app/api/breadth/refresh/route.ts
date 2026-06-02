@@ -2,28 +2,25 @@
  * GET/POST /api/breadth/refresh
  *
  * Recomputes market breadth via the TradingView scanner and upserts the
- * snapshot into Postgres. The dashboard-bridge daemon hits this once per US
- * trading day after the close.
+ * snapshot into Postgres. The dashboard-bridge daemon can hit this whenever
+ * the local bridge knows the market data should be fresh.
  *
- * Whoever fires first wins; the rest see "already fresh" and skip the recompute.
- * No git commit, no Vercel rebuild — the dashboard reads the new row instantly.
- *
- * Auth: `Authorization: Bearer <BRIEF_INGEST_KEY>` OR `?key=<BRIEF_INGEST_KEY>`
- * (the query-param form lets dumb external cron pingers authenticate via URL).
+ * Auth: `Authorization: Bearer <BRIEF_INGEST_KEY>` OR `?key=<BRIEF_INGEST_KEY>`.
  *
  * Query:
- *   ?force=1   recompute even if today's snapshot is < 10 min old
- *
- * GET and POST both work (uptime monitors usually only do GET).
+ *   ?force=1   recompute even if the latest snapshot is < 10 min old
  */
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { fetchBreadth } from "@/server/breadth-scanner";
+import {
+  getLatestBreadthRow,
+  isBreadthRowFresh,
+  refreshBreadthSnapshot,
+} from "@/server/breadth-refresh";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60; // serverless: allow up to 60s for the scanner
+export const maxDuration = 60;
 
-const FRESH_WINDOW_MS = 10 * 60 * 1000; // 10 min
+const FRESH_WINDOW_MS = 10 * 60 * 1000;
 
 function authorized(req: Request): boolean {
   const expected = process.env.BRIEF_INGEST_KEY;
@@ -34,6 +31,18 @@ function authorized(req: Request): boolean {
   return url.searchParams.get("key") === expected;
 }
 
+type RefreshSnapshotPayload = {
+  market?: {
+    advance?: number;
+    decline?: number;
+    new_highs?: number;
+    new_lows?: number;
+    universe_size?: number;
+  };
+  sectors?: unknown[];
+  industries?: unknown[];
+};
+
 async function handle(req: Request) {
   if (!authorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -41,14 +50,10 @@ async function handle(req: Request) {
 
   const url = new URL(req.url);
   const force = url.searchParams.get("force") === "1";
-  const today = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z");
 
-  // Skip recompute if a fresh snapshot already exists (redundant-trigger guard).
   if (!force) {
-    const existing = await prisma.marketBreadthSnapshot.findUnique({
-      where: { bucketDate: today },
-    });
-    if (existing && Date.now() - existing.refreshedAt.getTime() < FRESH_WINDOW_MS) {
+    const existing = await getLatestBreadthRow();
+    if (existing && isBreadthRowFresh(existing, Date.now(), FRESH_WINDOW_MS)) {
       return NextResponse.json({
         ok: true,
         skipped: "already fresh",
@@ -58,36 +63,31 @@ async function handle(req: Request) {
     }
   }
 
-  let snapshot, durationMs;
+  let row;
   try {
-    ({ snapshot, durationMs } = await fetchBreadth());
+    row = await refreshBreadthSnapshot("tv-scanner");
   } catch (e) {
     console.error("[breadth/refresh] fetch failed:", e);
     return NextResponse.json({ error: "scanner failed", detail: String(e) }, { status: 502 });
   }
 
-  // Sanity: adv+dec should be a meaningful fraction of universe (else TV rate-limited)
+  const snapshot = row.snapshot as RefreshSnapshotPayload;
   const m = snapshot.market;
-  if (m.advance + m.decline < m.universe_size * 0.4) {
-    console.warn("[breadth/refresh] low coverage — TV may have rate-limited");
+  if (m && (m.advance ?? 0) + (m.decline ?? 0) < (m.universe_size ?? 0) * 0.4) {
+    console.warn("[breadth/refresh] low coverage - TV may have rate-limited");
   }
-
-  const row = await prisma.marketBreadthSnapshot.upsert({
-    where: { bucketDate: today },
-    create: { bucketDate: today, snapshot: snapshot as object, source: "tv-scanner", durationMs },
-    update: { snapshot: snapshot as object, source: "tv-scanner", durationMs, refreshedAt: new Date() },
-  });
 
   return NextResponse.json({
     ok: true,
-    bucketDate: today.toISOString().slice(0, 10),
-    durationMs,
-    advance: m.advance,
-    decline: m.decline,
-    new_highs: m.new_highs,
-    new_lows: m.new_lows,
-    universe: m.universe_size,
-    sectors: snapshot.sectors.length,
+    bucketDate: row.bucketDate.toISOString().slice(0, 10),
+    durationMs: row.durationMs,
+    advance: m?.advance ?? 0,
+    decline: m?.decline ?? 0,
+    new_highs: m?.new_highs ?? 0,
+    new_lows: m?.new_lows ?? 0,
+    universe: m?.universe_size ?? 0,
+    sectors: snapshot.sectors?.length ?? 0,
+    industries: snapshot.industries?.length ?? 0,
     refreshedAt: row.refreshedAt.toISOString(),
   });
 }

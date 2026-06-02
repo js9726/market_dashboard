@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { fetchMarketSnapshot } from "@/lib/market-snapshot-client";
 
 type TapeRow = {
   ticker: string;
@@ -34,8 +35,7 @@ export default function MarketTape() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/market-dashboard/snapshot.json")
-      .then((res) => (res.ok ? res.json() : null))
+    fetchMarketSnapshot()
       .then((snapshot: Snapshot | null) => {
         if (cancelled || !snapshot?.groups?.Indices?.length) return;
         setRows(snapshot.groups.Indices.slice(0, 10));

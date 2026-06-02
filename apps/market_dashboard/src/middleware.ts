@@ -30,6 +30,7 @@ export default auth((req) => {
     // Screeners: same DB-backed pattern as breadth — public read on /api/screeners,
     // key/bearer auth on /refresh.
     pathname.startsWith("/api/screeners") ||
+    pathname.startsWith("/api/market-snapshot") ||
     // Journal machine endpoints: closed-today (cron reads via bearer) +
     // entries/ingest (cron writes AI-scored JournalEntry via bearer).
     pathname.startsWith("/api/journal/closed-today") ||

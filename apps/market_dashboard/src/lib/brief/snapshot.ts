@@ -16,6 +16,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { getLiveIndexQuotes } from "@/lib/live-index-quotes";
 import type { BreadthSnapshot, MarketBreadth } from "@/types/breadth";
 import type { TvScreenerHit, TvScreenersFile } from "@/types/tv-screener";
 
@@ -56,8 +57,16 @@ const PUBLIC_SNAPSHOT_PATH = path.join(PUBLIC_MARKET_DATA_DIR, "snapshot.json");
 const PUBLIC_TV_SCREENERS_PATH = path.join(PUBLIC_MARKET_DATA_DIR, "tv_screeners.json");
 const PUBLIC_BREADTH_PATH = path.join(PUBLIC_MARKET_DATA_DIR, "breadth.json");
 
-const INDEX_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "^VIX"];
+const INDEX_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "VIX"];
 const SECTOR_SYMBOLS = ["XLK", "XLF", "XLE", "XLV", "XLI", "XLY", "XLP", "XLU", "XLB", "XLRE", "XLC"];
+
+interface LiveOverlayRow {
+  symbol: string;
+  price: unknown;
+  changePct: unknown;
+  source: string;
+  observedAt: Date;
+}
 
 async function readJsonFile<T>(filePath: string): Promise<T | null> {
   try {
@@ -310,10 +319,17 @@ export async function composeSnapshot(watchlist: string[]): Promise<ComposedSnap
   const liveRows = await prisma.liveQuote.findMany({
     where: { symbol: { in: allSymbols } },
   });
-  const liveBySymbol = new Map(liveRows.map((r) => [r.symbol, r]));
+  const liveBySymbol = new Map<string, LiveOverlayRow>(liveRows.map((r) => [r.symbol, r]));
+  const liveIndexRows = await getLiveIndexQuotes().catch(() => []);
+  for (const row of liveIndexRows) {
+    if (row.symbol === "VIX") liveBySymbol.set(row.symbol, row);
+  }
 
   let liveAsOf: Date | null = null;
   for (const r of liveRows) {
+    if (!liveAsOf || r.observedAt > liveAsOf) liveAsOf = r.observedAt;
+  }
+  for (const r of liveIndexRows) {
     if (!liveAsOf || r.observedAt > liveAsOf) liveAsOf = r.observedAt;
   }
 
@@ -374,7 +390,7 @@ function buildMarketDirection(
   }
   if (parts.length === 0) return null;
 
-  const vix = indices["^VIX"];
+  const vix = indices.VIX ?? indices["^VIX"];
   const vixPart =
     vix && vix.changePct != null
       ? ` (VIX ${vix.changePct >= 0 ? "+" : ""}${vix.changePct.toFixed(2)}%)`

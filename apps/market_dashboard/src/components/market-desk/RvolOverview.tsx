@@ -99,8 +99,7 @@ export default function RvolOverview() {
 
       {rvolCoverage === 0 && !loading && !error ? (
         <p className="t-body-small text-[var(--fg-3)]">
-          RVOL data not yet present in <code>snapshot.json</code>. It will populate after the next{" "}
-          <code>build_data.py</code> run.
+          RVOL data not yet present in the live market snapshot.
         </p>
       ) : null}
 

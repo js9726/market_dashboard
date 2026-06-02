@@ -7,7 +7,7 @@ import { useLiveQuotes, type LiveQuoteRow } from "@/hooks/useLiveQuotes";
 import type { StructuredBrief } from "@/types/structured-brief";
 import MarketBreadthPanels from "./MarketBreadthPanels";
 import FreshnessBadge from "./FreshnessBadge";
-import { BRIEF_THRESHOLDS, LIVE_QUOTE_THRESHOLDS } from "@/lib/freshness";
+import { BRIEF_THRESHOLDS, liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { selectBriefProvider } from "@/lib/brief/provider-selection";
 
 const INDICES = [
@@ -266,6 +266,7 @@ function IndicesCard({
   briefIndices: StructuredBrief["indices"];
 }) {
   const briefBySymbol = new Map((briefIndices ?? []).map((row) => [row.symbol, row]));
+  const quoteThresholds = liveQuoteThresholdsForNow();
 
   // Freshest quote across SPY/QQQ/IWM/DIA — used to badge the panel header.
   const freshestObservedAt = INDICES.reduce<string | null>((latest, { symbol, fallbackSymbol }) => {
@@ -281,7 +282,7 @@ function IndicesCard({
         <p className="t-overline text-[var(--fg-3)]">
           Indices {activeSource ? <span className="t-caption">- {activeSource}</span> : null}
         </p>
-        <FreshnessBadge timestamp={freshestObservedAt} thresholds={LIVE_QUOTE_THRESHOLDS} />
+        <FreshnessBadge timestamp={freshestObservedAt} thresholds={quoteThresholds} />
       </div>
       <ul className="compact-list">
         {INDICES.map(({ symbol, fallbackSymbol }) => {

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { BreadthSnapshot } from "@/types/breadth";
 
 const BASE = "/market-dashboard";
+const STATIC_FALLBACK_MAX_AGE_MS = 15 * 60 * 1000;
 
 /**
  * Fetches the daily breadth snapshot.
@@ -37,8 +38,16 @@ export function useBreadth() {
           }
           return;
         }
+        if (r.status !== 404) {
+          const j = (await r.json().catch(() => null)) as { error?: string } | null;
+          throw new Error(j?.error ?? `breadth API HTTP ${r.status}`);
+        }
       } catch {
-        /* fall through to file */
+        if (!cancelled) {
+          setError("Live breadth refresh failed; stale fallback suppressed.");
+          setLoading(false);
+        }
+        return;
       }
 
       // 2. Fallback: static breadth.json (legacy / pre-first-refresh).
@@ -46,8 +55,13 @@ export function useBreadth() {
         const r = await fetch(`${BASE}/breadth.json`, { cache: "no-store" });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const j = (await r.json()) as BreadthSnapshot;
+        const ts = j.as_of ?? j.built_at ?? null;
+        const t = ts ? new Date(ts).getTime() : NaN;
+        if (!Number.isFinite(t) || Date.now() - t > STATIC_FALLBACK_MAX_AGE_MS) {
+          throw new Error("static breadth fallback is stale");
+        }
         if (!cancelled) {
-          setData({ ...j, _meta: { source: "file-fallback", refreshedAt: j.as_of ?? j.built_at ?? null } });
+          setData({ ...j, _meta: { source: "file-fallback", refreshedAt: ts } });
           setLoading(false);
         }
       } catch (e) {

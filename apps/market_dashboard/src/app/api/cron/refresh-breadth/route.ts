@@ -1,18 +1,25 @@
 /**
  * /api/cron/refresh-breadth
  *
- * Optional cron entry for breadth. The primary operational path is now the
- * local dashboard-bridge daemon hitting /api/breadth/refresh once post-close.
- *
- * Auth: Vercel Cron sends `Authorization: Bearer <CRON_SECRET>` when CRON_SECRET
- * is set. Matches the existing /api/cron/rescore-day14 pattern.
+ * Vercel cron entry for breadth. Uses the same DB-backed refresh helper as
+ * /api/breadth/refresh so cron, bridge, and on-read self-heal all write the
+ * same enriched sector/industry snapshot.
  */
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { fetchBreadth } from "@/server/breadth-scanner";
+import { refreshBreadthSnapshot } from "@/server/breadth-refresh";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
+
+type RefreshSnapshotPayload = {
+  market?: {
+    advance?: number;
+    decline?: number;
+    universe_size?: number;
+  };
+  sectors?: unknown[];
+  industries?: unknown[];
+};
 
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
@@ -23,31 +30,26 @@ export async function GET(request: Request) {
     }
   }
 
-  const today = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z");
-
-  let snapshot, durationMs;
+  let row;
   try {
-    ({ snapshot, durationMs } = await fetchBreadth());
+    row = await refreshBreadthSnapshot("tv-scanner-cron");
   } catch (e) {
     console.error("[cron/refresh-breadth] scanner failed:", e);
     return NextResponse.json({ error: "scanner failed", detail: String(e) }, { status: 502 });
   }
 
+  const snapshot = row.snapshot as RefreshSnapshotPayload;
   const m = snapshot.market;
-  const row = await prisma.marketBreadthSnapshot.upsert({
-    where: { bucketDate: today },
-    create: { bucketDate: today, snapshot: snapshot as object, source: "tv-scanner-cron", durationMs },
-    update: { snapshot: snapshot as object, source: "tv-scanner-cron", durationMs, refreshedAt: new Date() },
-  });
 
   return NextResponse.json({
     ok: true,
-    bucketDate: today.toISOString().slice(0, 10),
-    durationMs,
-    advance: m.advance,
-    decline: m.decline,
-    universe: m.universe_size,
-    sectors: snapshot.sectors.length,
+    bucketDate: row.bucketDate.toISOString().slice(0, 10),
+    durationMs: row.durationMs,
+    advance: m?.advance ?? 0,
+    decline: m?.decline ?? 0,
+    universe: m?.universe_size ?? 0,
+    sectors: snapshot.sectors?.length ?? 0,
+    industries: snapshot.industries?.length ?? 0,
     refreshedAt: row.refreshedAt.toISOString(),
   });
 }

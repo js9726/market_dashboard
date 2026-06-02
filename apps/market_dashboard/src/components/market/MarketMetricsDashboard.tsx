@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { fetchMarketSnapshot } from "@/lib/market-snapshot-client";
 import type { MarketSnapshot, TickerRow } from "@/types/market-dashboard";
 
 const BASE = "/market-dashboard";
@@ -298,8 +299,7 @@ export default function MarketMetricsDashboard() {
     let cancelled = false;
 
     // Snapshot
-    fetch(`${BASE}/snapshot.json`)
-      .then((r) => { if (!r.ok) throw new Error(`snapshot ${r.status}`); return r.json(); })
+    fetchMarketSnapshot()
       .then((d) => { if (!cancelled) setSnapshot(d); })
       .catch((e) => { if (!cancelled) setError(e.message); });
 

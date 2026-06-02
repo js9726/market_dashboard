@@ -11,14 +11,43 @@
  * Response: the BreadthSnapshot JSON + a `_meta` block with freshness info.
  */
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import {
+  getLatestBreadthRow,
+  isBreadthRowFresh,
+  refreshBreadthSnapshot,
+  serializeBreadthRow,
+} from "@/server/breadth-refresh";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function GET() {
-  const row = await prisma.marketBreadthSnapshot.findFirst({
-    orderBy: { refreshedAt: "desc" },
-  });
+  let row = await getLatestBreadthRow();
+  let autoRefreshed = false;
+
+  if (!isBreadthRowFresh(row)) {
+    try {
+      row = await refreshBreadthSnapshot("tv-scanner-read-refresh");
+      autoRefreshed = true;
+    } catch (error) {
+      console.error("[breadth] stale row refresh failed:", error);
+      if (!row) {
+        return NextResponse.json(
+          { error: "breadth refresh failed", detail: String(error) },
+          { status: 502, headers: { "Cache-Control": "no-store" } },
+        );
+      }
+      return NextResponse.json(
+        {
+          error: "breadth refresh failed; refusing to serve stale snapshot",
+          refreshedAt: row.refreshedAt.toISOString(),
+          ageMs: Date.now() - row.refreshedAt.getTime(),
+          detail: String(error),
+        },
+        { status: 503, headers: { "Cache-Control": "no-store" } },
+      );
+    }
+  }
 
   if (!row) {
     return NextResponse.json(
@@ -27,17 +56,7 @@ export async function GET() {
     );
   }
 
-  const snapshot = row.snapshot as Record<string, unknown>;
-  return NextResponse.json(
-    {
-      ...snapshot,
-      _meta: {
-        source: row.source,
-        refreshedAt: row.refreshedAt.toISOString(),
-        ageMs: Date.now() - row.refreshedAt.getTime(),
-        durationMs: row.durationMs,
-      },
-    },
-    { headers: { "Cache-Control": "no-store" } },
-  );
+  return NextResponse.json(serializeBreadthRow(row, { autoRefreshed }), {
+    headers: { "Cache-Control": "no-store" },
+  });
 }

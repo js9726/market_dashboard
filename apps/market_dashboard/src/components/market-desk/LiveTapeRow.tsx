@@ -2,7 +2,7 @@
 
 import { useLiveQuotes, type LiveQuoteRow } from "@/hooks/useLiveQuotes";
 import FreshnessBadge from "./FreshnessBadge";
-import { LIVE_QUOTE_THRESHOLDS } from "@/lib/freshness";
+import { liveQuoteThresholdsForNow } from "@/lib/freshness";
 
 const SECTORS: Array<{ symbol: string; label: string }> = [
   { symbol: "XLK", label: "Technology" },
@@ -28,7 +28,7 @@ function sourceBadge(activeSource: string | null, activeAt: string | null) {
   return (
     <span className="inline-flex items-center gap-2">
       <span className="t-caption">{activeSource}</span>
-      <FreshnessBadge timestamp={activeAt} thresholds={LIVE_QUOTE_THRESHOLDS} />
+      <FreshnessBadge timestamp={activeAt} thresholds={liveQuoteThresholdsForNow()} />
     </span>
   );
 }

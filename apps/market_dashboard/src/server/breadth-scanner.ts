@@ -28,6 +28,33 @@ const TV_SECTORS = [
 ];
 
 type Filter = { left: string; operation: string; right: unknown };
+type BreadthGroupKey = "sector" | "industry";
+
+interface TvScanRow {
+  d?: unknown[];
+}
+
+interface UniverseRow {
+  sector: string;
+  industry: string;
+  close: number;
+  sma50: number;
+}
+
+export interface BreadthGroupRow {
+  n: number;
+  pct_above_50sma: number;
+  delta_wow?: number | null;
+  delta_mom?: number | null;
+}
+
+export interface SectorBreadthRow extends BreadthGroupRow {
+  sector: string;
+}
+
+export interface IndustryBreadthRow extends BreadthGroupRow {
+  industry: string;
+}
 
 async function scanCount(filters: Filter[], retries = 2): Promise<number | null> {
   const payload = {
@@ -57,6 +84,74 @@ async function scanCount(filters: Filter[], retries = 2): Promise<number | null>
     }
   }
   return null;
+}
+
+async function scanUniverseRows(retries = 2): Promise<UniverseRow[]> {
+  const payload = {
+    filter: [MCAP, STOCK],
+    options: { lang: "en" },
+    range: [0, 10000],
+    columns: ["sector", "industry", "close", "SMA50"],
+    markets: ["america"],
+  };
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(SCANNER_URL, {
+        method: "POST",
+        headers: { "User-Agent": "Mozilla/5.0", "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(20000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = (await res.json()) as { data?: TvScanRow[] };
+      return (json.data ?? []).flatMap((row) => {
+        const [sector, industry, close, sma50] = row.d ?? [];
+        if (
+          typeof sector !== "string" ||
+          typeof industry !== "string" ||
+          typeof close !== "number" ||
+          typeof sma50 !== "number" ||
+          !Number.isFinite(close) ||
+          !Number.isFinite(sma50) ||
+          sma50 <= 0
+        ) {
+          return [];
+        }
+        return [{ sector, industry, close, sma50 }];
+      });
+    } catch (e) {
+      if (attempt === retries) {
+        console.error("[breadth-scanner] universe scan failed:", e);
+        return [];
+      }
+      await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
+    }
+  }
+  return [];
+}
+
+function buildGroups(rows: UniverseRow[], key: "sector"): SectorBreadthRow[];
+function buildGroups(rows: UniverseRow[], key: "industry"): IndustryBreadthRow[];
+function buildGroups(rows: UniverseRow[], key: BreadthGroupKey): Array<SectorBreadthRow | IndustryBreadthRow> {
+  const groups = new Map<string, { n: number; above: number }>();
+
+  for (const row of rows) {
+    const name = row[key];
+    if (!name) continue;
+    const cur = groups.get(name) ?? { n: 0, above: 0 };
+    cur.n += 1;
+    if (row.close > row.sma50) cur.above += 1;
+    groups.set(name, cur);
+  }
+
+  return Array.from(groups.entries())
+    .map(([name, x]) => ({
+      [key]: name,
+      n: x.n,
+      pct_above_50sma: Math.round((x.above / x.n) * 1000) / 10,
+    }))
+    .sort((a, b) => b.pct_above_50sma - a.pct_above_50sma) as unknown as Array<SectorBreadthRow | IndustryBreadthRow>;
 }
 
 /** Run an array of count-tasks with bounded concurrency. */
@@ -93,8 +188,8 @@ export interface BreadthSnapshot {
     up_on_volume: number; down_on_volume: number;
     up_4pct: number; down_4pct: number;
   };
-  sectors: { sector: string; n: number; pct_above_50sma: number }[];
-  industries: never[];
+  sectors: SectorBreadthRow[];
+  industries: IndustryBreadthRow[];
 }
 
 export async function fetchBreadth(): Promise<{ snapshot: BreadthSnapshot; durationMs: number }> {
@@ -119,31 +214,38 @@ export async function fetchBreadth(): Promise<{ snapshot: BreadthSnapshot; durat
     down_4pct: [ELT("change", -4), MCAP],
   };
   const keys = Object.keys(scalarTasks);
-  const scalarResults = await mapLimit(keys, 8, (k) => scanCount(scalarTasks[k]));
+  const [scalarResults, universeRows] = await Promise.all([
+    mapLimit(keys, 8, (k) => scanCount(scalarTasks[k])),
+    scanUniverseRows(),
+  ]);
   const v: Record<string, number> = {};
   keys.forEach((k, i) => { v[k] = scalarResults[i] ?? 0; });
 
   // ── Sector breadth (n + above-50SMA per sector, parallelized) ───────────
-  const sectorTasks = TV_SECTORS.flatMap((sec) => {
-    const sf: Filter = { left: "sector", operation: "in_range", right: [sec] };
-    return [{ sec, kind: "n" as const, filters: [sf, MCAP] },
-            { sec, kind: "above" as const, filters: [sf, GT("close", "SMA50"), MCAP] }];
-  });
-  const sectorResults = await mapLimit(sectorTasks, 8, (t) => scanCount(t.filters));
-  const sectorMap = new Map<string, { n: number; above: number }>();
-  sectorTasks.forEach((t, i) => {
-    const cur = sectorMap.get(t.sec) ?? { n: 0, above: 0 };
-    if (t.kind === "n") cur.n = sectorResults[i] ?? 0;
-    else cur.above = sectorResults[i] ?? 0;
-    sectorMap.set(t.sec, cur);
-  });
-  const sectors = Array.from(sectorMap.entries())
-    .filter(([, x]) => x.n > 0)
-    .map(([sector, x]) => ({
-      sector, n: x.n,
-      pct_above_50sma: Math.round((x.above / x.n) * 1000) / 10,
-    }))
-    .sort((a, b) => b.pct_above_50sma - a.pct_above_50sma);
+  let sectors = buildGroups(universeRows, "sector");
+  if (!sectors.length) {
+    const sectorTasks = TV_SECTORS.flatMap((sec) => {
+      const sf: Filter = { left: "sector", operation: "in_range", right: [sec] };
+      return [{ sec, kind: "n" as const, filters: [sf, MCAP] },
+              { sec, kind: "above" as const, filters: [sf, GT("close", "SMA50"), MCAP] }];
+    });
+    const sectorResults = await mapLimit(sectorTasks, 8, (t) => scanCount(t.filters));
+    const sectorMap = new Map<string, { n: number; above: number }>();
+    sectorTasks.forEach((t, i) => {
+      const cur = sectorMap.get(t.sec) ?? { n: 0, above: 0 };
+      if (t.kind === "n") cur.n = sectorResults[i] ?? 0;
+      else cur.above = sectorResults[i] ?? 0;
+      sectorMap.set(t.sec, cur);
+    });
+    sectors = Array.from(sectorMap.entries())
+      .filter(([, x]) => x.n > 0)
+      .map(([sector, x]) => ({
+        sector, n: x.n,
+        pct_above_50sma: Math.round((x.above / x.n) * 1000) / 10,
+      }))
+      .sort((a, b) => b.pct_above_50sma - a.pct_above_50sma);
+  }
+  const industries = buildGroups(universeRows, "industry").filter((row) => row.n >= 5);
 
   const now = new Date().toISOString();
   const snapshot: BreadthSnapshot = {
@@ -161,7 +263,7 @@ export async function fetchBreadth(): Promise<{ snapshot: BreadthSnapshot; durat
       up_4pct: v.up_4pct, down_4pct: v.down_4pct,
     },
     sectors,
-    industries: [],
+    industries,
   };
   return { snapshot, durationMs: Date.now() - started };
 }

@@ -15,6 +15,10 @@ export interface TickerRow {
   // before that day omit these keys; UI must treat them as nullable.
   rvol?: number | null;
   off_52w_high_pct?: number | null;
+  price?: number | null;
+  close?: number | null;
+  volume?: number | null;
+  exchange?: string | null;
 }
 
 export interface MarketSnapshot {
@@ -30,6 +34,16 @@ export interface MarketSnapshot {
     }
   >;
   fear_greed?: { value: number; label: string } | null;
+  _meta?: {
+    source?: string;
+    refreshedAt?: string;
+    ageMs?: number;
+    baseBuiltAt?: string;
+    overlayCount?: number;
+    missingTickers?: string[];
+    durationMs?: number;
+    message?: string;
+  };
 }
 
 export interface MacroEvent {
