@@ -6,8 +6,7 @@
  *
  * Phase 6 of pre-open CI + journal revamp plan.
  *
- * Auth: NextAuth session — owner-only (privacy: per Round 8, allowed viewers
- * do NOT see equity timeline — only the owner's A-list).
+ * Auth: NextAuth session. Approved users read only their own equity timeline.
  *
  * Query params:
  *   ?from=YYYY-MM-DD     default: 90 days ago
@@ -29,6 +28,7 @@
  */
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -40,10 +40,10 @@ export async function GET(req: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const role = (session.user as { role?: string }).role;
-  if (role !== "owner") {
-    return NextResponse.json({ error: "Equity timeline is owner-only" }, { status: 403 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  const userScopeId = scopeUserId(session)!;
 
   const url = new URL(req.url);
   const qp = url.searchParams;
@@ -63,7 +63,7 @@ export async function GET(req: Request) {
 
   // Resolve user's accounts (for label display).
   const accounts = await prisma.userBrokerAccount.findMany({
-    where: { userId: session.user.id, isActive: true },
+    where: { userId: userScopeId, isActive: true },
     include: { preset: true },
     orderBy: { createdAt: "asc" },
   });
@@ -71,7 +71,7 @@ export async function GET(req: Request) {
   // Fetch snapshots in range.
   const snapshots = await prisma.equitySnapshot.findMany({
     where: {
-      userId: session.user.id,
+      userId: userScopeId,
       snapshotDate: { gte: from, lte: to },
       ...(accountId ? { brokerAccountId: accountId } : {}),
     },

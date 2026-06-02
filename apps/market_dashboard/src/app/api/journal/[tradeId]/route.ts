@@ -26,6 +26,7 @@
  * Auth: session-based. Caller must own the TradeRecord.
  */
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
@@ -40,10 +41,14 @@ const VALID_GRADES = new Set(["A", "B", "C"]);
 export async function GET(_req: Request, { params }: Params) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   const { tradeId } = await params;
+  const userScopeId = scopeUserId(session)!;
 
   const trade = await prisma.tradeRecord.findFirst({
-    where: { id: tradeId, userId: session.user.id },
+    where: { id: tradeId, userId: userScopeId },
     select: { id: true },
   });
   if (!trade) return NextResponse.json({ error: "Trade not found" }, { status: 404 });
@@ -57,10 +62,14 @@ export async function GET(_req: Request, { params }: Params) {
 export async function POST(req: Request, { params }: Params) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   const { tradeId } = await params;
+  const userScopeId = scopeUserId(session)!;
 
   const trade = await prisma.tradeRecord.findFirst({
-    where: { id: tradeId, userId: session.user.id },
+    where: { id: tradeId, userId: userScopeId },
     select: { id: true },
   });
   if (!trade) return NextResponse.json({ error: "Trade not found" }, { status: 404 });
@@ -102,7 +111,7 @@ export async function POST(req: Request, { params }: Params) {
   }
 
   const data = {
-    userId: session.user.id,
+    userId: userScopeId,
     tradeRecordId: tradeId,
     setupType,
     primingPattern: typeof body.primingPattern === "string" ? body.primingPattern : null,

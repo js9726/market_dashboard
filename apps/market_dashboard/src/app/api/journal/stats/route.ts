@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Decimal } from "@prisma/client/runtime/library";
@@ -17,8 +18,11 @@ function stdDev(arr: number[]): number {
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
-  const userId = session.user.id;
+  const userId = scopeUserId(session)!;
 
   const trades = await prisma.tradeRecord.findMany({
     where: { userId },

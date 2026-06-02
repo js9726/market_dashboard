@@ -4,6 +4,7 @@
  * Used by the broker-settings UI to populate the preset dropdown.
  */
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -12,12 +13,16 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   const presets = await prisma.brokerPreset.findMany({
     where: {
       OR: [
         { isBuiltIn: true },
-        { userId: session.user.id },
+        { userId: userScopeId },
       ],
     },
     select: {

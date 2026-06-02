@@ -18,6 +18,7 @@
  * instead of a stack trace, so the rest of the journal still works.
  */
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 import {
@@ -39,7 +40,10 @@ export async function POST(req: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const userId = session.user.id;
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userId = scopeUserId(session)!;
 
   let body: HandleUploadBody;
   try {

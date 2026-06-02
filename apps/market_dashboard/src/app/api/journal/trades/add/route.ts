@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { getGoogleAccessToken } from "@/lib/token-refresh";
 import { appendTradeRow, DEFAULT_COL_MAP, ColMap } from "@/lib/google-sheets";
@@ -7,9 +8,13 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   const connection = await prisma.spreadsheetConnection.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: userScopeId },
   });
   if (!connection) return NextResponse.json({ error: "No spreadsheet connected" }, { status: 400 });
 
@@ -29,12 +34,12 @@ export async function POST(req: Request) {
     ? (connection.colMap as ColMap)
     : DEFAULT_COL_MAP;
 
-  const accessToken = await getGoogleAccessToken(session.user.id);
+  const accessToken = await getGoogleAccessToken(userScopeId);
   await appendTradeRow(connection.spreadsheetId, connection.sheetTab, colMap, body, accessToken);
 
   const trade = await prisma.tradeRecord.create({
     data: {
-      userId: session.user.id,
+      userId: userScopeId,
       connectionId: connection.id,
       ticker: body.ticker,
       tradeDate: body.tradeDate ? new Date(body.tradeDate) : null,

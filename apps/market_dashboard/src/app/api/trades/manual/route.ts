@@ -1,5 +1,5 @@
 /**
- * POST /api/trades/manual — manual trade entry (Tier 2 / Tier 3 users).
+ * POST /api/trades/manual - manual trade entry (Tier 2 / Tier 3 users).
  *
  * Body:
  * {
@@ -32,9 +32,10 @@
  *     or attaches to the most recent open TradeRecord for the same ticker+account
  *     when it's a trim/exit.
  *
- * Auth: session-based. Allowed/owner roles only (pending/denied rejected).
+ * Auth: session-based. Approved personal-book users only.
  */
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { calculateFees, type FeeFormula, type FeeSide } from "@/lib/fees";
 import { Prisma } from "@prisma/client";
@@ -70,15 +71,10 @@ function asNumber(v: unknown): number | null {
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return err("Unauthorized", 401);
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { id: true, role: true },
-  });
-  if (!user) return err("User not found", 404);
-  if (user.role !== "owner" && user.role !== "allowed") {
-    return err("Forbidden — manual journal requires 'allowed' role", 403);
+  if (!canSeePersonalBook(session)) {
+    return err("Forbidden - manual journal requires account approval", 403);
   }
+  const userScopeId = scopeUserId(session)!;
 
   let body: Body;
   try {
@@ -87,7 +83,7 @@ export async function POST(req: Request) {
     return err("Invalid JSON body");
   }
 
-  // ── Validate ────────────────────────────────────────────────────────────
+  // Validate request payload.
   const brokerAccountId = typeof body.brokerAccountId === "string" ? body.brokerAccountId : null;
   const ticker = typeof body.ticker === "string" ? body.ticker.trim().toUpperCase() : null;
   const side = typeof body.side === "string" ? body.side.toUpperCase() : null;
@@ -108,9 +104,9 @@ export async function POST(req: Request) {
   const proposedSL = asNumber(body.proposedSL);
   const proposedTP = asNumber(body.proposedTP);
 
-  // ── Verify the broker account belongs to the user ──────────────────────
+  // Verify the broker account belongs to the scoped user.
   const brokerAccount = await prisma.userBrokerAccount.findFirst({
-    where: { id: brokerAccountId, userId: user.id, isActive: true },
+    where: { id: brokerAccountId, userId: userScopeId, isActive: true },
     include: { preset: true },
   });
   if (!brokerAccount) {
@@ -122,7 +118,7 @@ export async function POST(req: Request) {
 
   const currency = brokerAccount.displayCurrency ?? brokerAccount.preset.currency;
 
-  // ── Transaction ─────────────────────────────────────────────────────────
+  // Transaction.
   // 1. Find OR create the lifecycle TradeRecord (one per open position).
   // 2. Insert the TradeFill row.
   // 3. Upsert Position (delete if qty -> 0).
@@ -133,7 +129,7 @@ export async function POST(req: Request) {
     const OPEN_STATES = ["OPEN", "SEMI-OPEN", "PLANNING"];
     let tradeRecord = await tx.tradeRecord.findFirst({
       where: {
-        userId: user.id,
+        userId: userScopeId,
         brokerAccountId,
         ticker,
         OR: [{ state: { in: OPEN_STATES } }, { state: null, pnl: null }],
@@ -142,12 +138,12 @@ export async function POST(req: Request) {
     });
 
     if (!tradeRecord) {
-      // New position — create lifecycle row only if this is a BUY (Long entry).
+      // New position: create lifecycle row only if this is a BUY (Long entry).
       // SELL without an open position is treated as an orphan fill (still
       // recorded in TradeFill for audit) but the TradeRecord stays minimal.
       tradeRecord = await tx.tradeRecord.create({
         data: {
-          userId: user.id,
+          userId: userScopeId,
           source: "MANUAL",
           brokerAccountId,
           ticker,
@@ -181,7 +177,7 @@ export async function POST(req: Request) {
 
       let pnl: Prisma.Decimal | null = null;
       if (closing && tradeRecord.buyPrice != null) {
-        // Realised P&L = (avgExit - avgBuy) × qty_closed - total fees
+        // Realised P&L = (avgExit - avgBuy) * qty_closed - total fees
         const buyPx = Number(tradeRecord.buyPrice);
         const sellPx = price;
         const tradeQty = Number(tradeRecord.quantity ?? qty);
@@ -273,7 +269,7 @@ export async function POST(req: Request) {
       } else {
         const newQty = Number(existingPosition.qty) - qty;
         if (newQty <= 0.0001) {
-          // Position closed — delete the row.
+          // Position closed: delete the row.
           await tx.position.delete({ where: { id: existingPosition.id } });
           positionId = existingPosition.id;  // returning id for response, even though deleted
         } else {

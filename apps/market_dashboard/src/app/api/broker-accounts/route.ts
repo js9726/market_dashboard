@@ -16,6 +16,7 @@
  * Auth: session-based. Caller owns/manages only their own accounts.
  */
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -24,9 +25,13 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   const accounts = await prisma.userBrokerAccount.findMany({
-    where: { userId: session.user.id, isActive: true },
+    where: { userId: userScopeId, isActive: true },
     include: { preset: { select: { name: true, region: true, currency: true } } },
     orderBy: { createdAt: "asc" },
   });
@@ -36,14 +41,10 @@ export async function GET() {
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { role: true },
-  });
-  if (!user || (user.role !== "owner" && user.role !== "allowed")) {
+  if (!canSeePersonalBook(session)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  const userScopeId = scopeUserId(session)!;
 
   let body: Record<string, unknown>;
   try {
@@ -64,7 +65,7 @@ export async function POST(req: Request) {
   try {
     const account = await prisma.userBrokerAccount.create({
       data: {
-        userId: session.user.id,
+        userId: userScopeId,
         presetId,
         alias,
         brokerAccountId: typeof body.brokerAccountId === "string" ? body.brokerAccountId : null,
@@ -84,12 +85,16 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id query param required" }, { status: 400 });
 
   const account = await prisma.userBrokerAccount.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, userId: userScopeId },
   });
   if (!account) return NextResponse.json({ error: "Not found" }, { status: 404 });
 

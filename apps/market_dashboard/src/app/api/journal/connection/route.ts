@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { DEFAULT_COL_MAP } from "@/lib/google-sheets";
@@ -6,9 +7,11 @@ import { DEFAULT_COL_MAP } from "@/lib/google-sheets";
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json(null, { status: 401 });
+  if (!canSeePersonalBook(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const userScopeId = scopeUserId(session)!;
 
   const connection = await prisma.spreadsheetConnection.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: userScopeId },
   });
   return NextResponse.json(connection);
 }
@@ -16,6 +19,8 @@ export async function GET() {
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const userScopeId = scopeUserId(session)!;
 
   const { spreadsheetId, sheetTab, headerRow, colMap } = await req.json() as {
     spreadsheetId: string;
@@ -25,9 +30,9 @@ export async function POST(req: Request) {
   };
 
   const connection = await prisma.spreadsheetConnection.upsert({
-    where: { userId: session.user.id },
+    where: { userId: userScopeId },
     create: {
-      userId: session.user.id,
+      userId: userScopeId,
       spreadsheetId,
       sheetTab,
       headerRow,

@@ -26,6 +26,7 @@
  * Per-user data isolation: only returns accounts where userId = session user.
  */
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -49,10 +50,14 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   // Fetch the user's active accounts with positions in one round-trip.
   const accounts = await prisma.userBrokerAccount.findMany({
-    where: { userId: session.user.id, isActive: true },
+    where: { userId: userScopeId, isActive: true },
     orderBy: { createdAt: "asc" },
     include: {
       preset: { select: { name: true, currency: true, region: true } },

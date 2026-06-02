@@ -4,7 +4,7 @@
  * Returns today's A-list candidates (or the most recent trading day's set if
  * no candidates exist for today yet).
  *
- * Auth: NextAuth session — owner or allowed role.
+ * Auth: NextAuth session. Approved users read their own personal A-list.
  *
  * Query params:
  *   ?date=YYYY-MM-DD     override "today" — useful for historical drill-in
@@ -24,6 +24,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
 import { serializeCandidate } from "@/server/alist-serialize";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 
 const prisma = new PrismaClient();
 
@@ -34,25 +35,15 @@ export async function GET(req: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const url = new URL(req.url);
   const dateParam = url.searchParams.get("date");
 
-  // Multi-operator: resolve the scope user.
-  // - Owners read their own A-list.
-  // - Allowed (read-only) viewers see the FIRST owner's A-list (shared view).
-  // - Pending/denied get nothing.
-  let scopeUserId = session.user.id;
-  const role = (session.user as { role?: string }).role;
-  if (role !== "owner") {
-    const owner = await prisma.user.findFirst({
-      where: { role: "owner" },
-      select: { id: true },
-      orderBy: { createdAt: "asc" },
-    });
-    if (!owner) return NextResponse.json({ pickDate: null, candidates: [] });
-    scopeUserId = owner.id;
-  }
+  // Multi-tenant: each user sees only their own A-list.
+  const userScopeId = scopeUserId(session)!;
 
   // Resolve target date — explicit ?date= or fall back to most recent pickDate
   let pickDate: Date;
@@ -60,7 +51,7 @@ export async function GET(req: Request) {
     pickDate = new Date(`${dateParam}T00:00:00.000Z`);
   } else {
     const latest = await prisma.aListCandidate.findFirst({
-      where: { userId: scopeUserId },
+      where: { userId: userScopeId },
       orderBy: { pickDate: "desc" },
       select: { pickDate: true },
     });
@@ -71,7 +62,7 @@ export async function GET(req: Request) {
   }
 
   const rows = await prisma.aListCandidate.findMany({
-    where: { userId: scopeUserId, pickDate },
+    where: { userId: userScopeId, pickDate },
     orderBy: [{ day0Score: "desc" }, { ticker: "asc" }],
   });
 

@@ -17,6 +17,7 @@
  * so the same row imported twice is deduped.
  */
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import {
   BROKER_FORMATS,
@@ -155,6 +156,8 @@ function parseRows(rows: string[][], fmt: BrokerFormat): { parsed: ParsedRow[]; 
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return err("Unauthorized", 401);
+  if (!canSeePersonalBook(session)) return err("Forbidden", 403);
+  const userScopeId = scopeUserId(session)!;
 
   let body: Body;
   try {
@@ -169,7 +172,7 @@ export async function POST(req: Request) {
 
   // Verify ownership of the broker account
   const brokerAccount = await prisma.userBrokerAccount.findFirst({
-    where: { id: body.brokerAccountId, userId: session.user.id, isActive: true },
+    where: { id: body.brokerAccountId, userId: userScopeId, isActive: true },
     include: { preset: true },
   });
   if (!brokerAccount) return err("brokerAccountId not found or not owned", 403);
@@ -305,9 +308,9 @@ export async function POST(req: Request) {
   // Remember mapping for next time
   try {
     await prisma.csvImportMapping.upsert({
-      where: { userId_brokerName: { userId: session.user.id, brokerName: format.name } },
+      where: { userId_brokerName: { userId: userScopeId, brokerName: format.name } },
       create: {
-        userId: session.user.id,
+        userId: userScopeId,
         brokerName: format.name,
         columnMap: format.map as unknown as Prisma.InputJsonValue,
       },

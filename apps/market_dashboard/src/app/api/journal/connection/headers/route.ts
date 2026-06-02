@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { getGoogleAccessToken } from "@/lib/token-refresh";
 import { fetchSheetRows, listSpreadsheetTabs } from "@/lib/google-sheets";
 import { NextResponse } from "next/server";
@@ -6,6 +7,10 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   const { spreadsheetId, sheetTab, headerRow = 14 } = await req.json() as {
     spreadsheetId: string;
@@ -15,7 +20,7 @@ export async function POST(req: Request) {
 
   let accessToken: string;
   try {
-    accessToken = await getGoogleAccessToken(session.user.id);
+    accessToken = await getGoogleAccessToken(userScopeId);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === "REAUTH_REQUIRED") {

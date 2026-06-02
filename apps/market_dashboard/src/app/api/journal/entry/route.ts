@@ -22,6 +22,7 @@
  * @vercel/blob client-upload flow, then submitted here as part of the entry.
  */
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import {
@@ -46,13 +47,17 @@ export async function GET(req: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
   const url = new URL(req.url);
   const date = parseDate(url.searchParams.get("date"));
   if (!date) {
     return NextResponse.json({ error: "Invalid or missing ?date=YYYY-MM-DD" }, { status: 400 });
   }
   const entry = await prisma.dailyReflection.findUnique({
-    where: { userId_entryDate: { userId: session.user.id, entryDate: date } },
+    where: { userId_entryDate: { userId: userScopeId, entryDate: date } },
   });
   return NextResponse.json(entry);
 }
@@ -62,6 +67,10 @@ export async function POST(req: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   let body: Record<string, unknown>;
   try {
@@ -115,9 +124,9 @@ export async function POST(req: Request) {
   const attachmentUrls = sanitiseAttachmentUrls(body.attachmentUrls);
 
   const entry = await prisma.dailyReflection.upsert({
-    where: { userId_entryDate: { userId: session.user.id, entryDate: date } },
+    where: { userId_entryDate: { userId: userScopeId, entryDate: date } },
     create: {
-      userId: session.user.id,
+      userId: userScopeId,
       entryDate: date,
       moodEmoji,
       sleepHours,

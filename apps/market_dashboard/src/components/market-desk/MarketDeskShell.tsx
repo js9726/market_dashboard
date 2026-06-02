@@ -29,7 +29,7 @@ const WORKFLOW_NAV: NavItem[] = [
   // Portfolio sits next — natural flow from "ideas" → "executed positions".
   // Gated behind brokerJournal flag; invisible for users who haven't opted in.
   { href: "/dashboard/portfolio", label: "Portfolio", icon: "portfolio", featureFlag: "brokerJournal" },
-  // Equity timeline — Phase 6 (owner-only).
+  // Equity timeline - each approved user sees their own account data.
   { href: "/dashboard/equity", label: "Equity", icon: "analytics" },
   // Market Internals — Sectors / RVOL / Theme Radar / Rotation in one place.
   { href: "/dashboard/internals", label: "Market Internals", icon: "analytics" },

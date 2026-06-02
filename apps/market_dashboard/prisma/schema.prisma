@@ -376,9 +376,9 @@ model WikiScreenerPick {
 /// Differs from `WikiScreenerPick` which is a softer log of every flagged ticker.
 /// A-list is the strict subset worth actively monitoring.
 ///
-/// Multi-operator: keyed by userId. Each owner has their own A-list.
-/// Friends with `allowed` role view the owner's A-list (read-only) via
-/// dedicated route logic that resolves the requested owner from query/session.
+/// Multi-tenant: keyed by userId. Each user has their own personal A-list
+/// and callers only read rows for their own userId. Shared market-wide REC
+/// picks are delivered through shared market-data routes, not owner fallback.
 model AListCandidate {
   id                  String   @id @default(cuid())
   /// Owner of this candidate. FK to User.id. CI ingest must resolve to an

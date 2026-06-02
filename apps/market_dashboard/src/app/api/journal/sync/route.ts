@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { getGoogleAccessToken } from "@/lib/token-refresh";
 import { fetchSheetRows, parseTradeRows, DEFAULT_COL_MAP, ColMap } from "@/lib/google-sheets";
@@ -11,15 +12,19 @@ export const maxDuration = 60;
 export async function POST() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   const connection = await prisma.spreadsheetConnection.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: userScopeId },
   });
   if (!connection) return NextResponse.json({ error: "No spreadsheet connected" }, { status: 400 });
 
   let accessToken: string;
   try {
-    accessToken = await getGoogleAccessToken(session.user.id);
+    accessToken = await getGoogleAccessToken(userScopeId);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === "REAUTH_REQUIRED") {
@@ -52,7 +57,7 @@ export async function POST() {
     prisma.tradeRecord.deleteMany({ where: { connectionId: connection.id } }),
     prisma.tradeRecord.createMany({
       data: trades.map((t) => ({
-        userId: session.user.id,
+        userId: userScopeId,
         connectionId: connection.id,
         ticker: t.ticker,
         tradeDate: t.tradeDate,
@@ -95,7 +100,7 @@ export async function POST() {
   const sampleRawDates = rows.slice(1, 4).map((r) => r[colMap.date]);
 
   // Generate verdicts after response is sent — after() keeps the function alive on Vercel
-  const userId = session.user.id;
+  const userId = userScopeId;
   const connectionId = connection.id;
   after(async () => {
     try {

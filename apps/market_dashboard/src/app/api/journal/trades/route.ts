@@ -1,10 +1,15 @@
 import { auth } from "@/auth";
+import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const userScopeId = scopeUserId(session)!;
 
   const { searchParams } = new URL(req.url);
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
@@ -17,7 +22,7 @@ export async function GET(req: Request) {
   const OPEN_STATES = ["OPEN", "SEMI-OPEN", "PLANNING"];
 
   const where = {
-    userId: session.user.id,
+    userId: userScopeId,
     ...(symbol ? { ticker: { contains: symbol } } : {}),
     ...(side ? { side } : {}),
     ...(stateFilter ? { state: stateFilter } : {}),
