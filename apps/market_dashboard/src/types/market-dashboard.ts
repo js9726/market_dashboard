@@ -33,7 +33,15 @@ export interface MarketSnapshot {
       "20d": [number, number];
     }
   >;
-  fear_greed?: { value: number; label: string } | null;
+  fear_greed?: {
+    value: number | null;
+    label: string;
+    /** "ok" = live reading; "unavailable" = fail-closed (source rejected/down). */
+    status?: "ok" | "unavailable";
+    source?: string;
+    as_of?: string | null;
+    error?: string;
+  } | null;
   _meta?: {
     source?: string;
     refreshedAt?: string;

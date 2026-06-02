@@ -692,26 +692,59 @@ def compute_breadth(tickers):
 
 
 def fetch_cnn_fear_greed():
-    """Fetch CNN stock market Fear & Greed index."""
-    if not _BS4_AVAILABLE:
-        return None
-    try:
-        resp = requests.get(
-            "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
-            headers={"User-Agent": "Mozilla/5.0"},
-            timeout=10,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        fg = data.get("fear_and_greed", {})
-        score = fg.get("score")
-        rating = fg.get("rating", "")
-        if score is None:
-            return None
-        return {"value": round(float(score), 1), "label": rating}
-    except Exception as e:
-        print(f"Warning: CNN Fear & Greed fetch failed: {e}")
-        return None
+    """Fetch CNN stock-market Fear & Greed index.
+
+    CNN's dataviz API returns HTTP 418 to bare User-Agents, so we send full
+    browser headers and retry once. On any failure we return a structured
+    fail-closed object (value=None, status="unavailable") instead of bare
+    None, so the dashboard can render an explicit "Unavailable (source: CNN)"
+    state rather than silently treating missing sentiment as fresh data.
+
+    Note: this endpoint returns JSON — it does NOT need BeautifulSoup, so the
+    old `_BS4_AVAILABLE` gate (which silently skipped F&G) is removed.
+    """
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.cnn.com/markets/fear-and-greed",
+        "Origin": "https://www.cnn.com",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+    }
+    url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+    last_err = None
+    for _attempt in range(2):
+        try:
+            resp = requests.get(url, headers=headers, timeout=10)
+            resp.raise_for_status()
+            fg = resp.json().get("fear_and_greed", {})
+            score = fg.get("score")
+            if score is None:
+                last_err = "missing score in CNN payload"
+                continue
+            return {
+                "value": round(float(score), 1),
+                "label": fg.get("rating") or "",
+                "status": "ok",
+                "source": "cnn",
+                "as_of": fg.get("timestamp"),
+            }
+        except Exception as e:  # noqa: BLE001
+            last_err = str(e)
+    print(f"Warning: CNN Fear & Greed fetch failed: {last_err}")
+    return {
+        "value": None,
+        "label": "Unavailable",
+        "status": "unavailable",
+        "source": "cnn",
+        "as_of": None,
+        "error": (last_err or "fetch failed")[:200],
+    }
 
 
 def main():

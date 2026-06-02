@@ -46,8 +46,11 @@ interface TraderVerdictData {
 }
 
 interface FearGreed {
-  value: number;
+  value: number | null;
   label: string;
+  status?: string;
+  source?: string;
+  as_of?: string | null;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -239,9 +242,14 @@ function HeroCard({
 }
 
 function FearGreedCard({ fg }: { fg: FearGreed | null }) {
-  const color = fg ? fearGreedColor(fg.value) : "#475569";
-  const label = fg ? fearGreedLabel(fg.value) : "—";
-  const arc = fg ? Math.round((fg.value / 100) * 180) : 0;
+  // Fail-closed: a structured {value:null, status:"unavailable"} object is
+  // truthy but has no reading — branch on `value`, not on `fg`, so an
+  // unavailable state never renders as a red "Extreme Fear" gauge.
+  const value = fg && fg.value != null && fg.status !== "unavailable" ? fg.value : null;
+  const unavailable = !!fg && value == null && fg.status === "unavailable";
+  const color = value != null ? fearGreedColor(value) : "#475569";
+  const label = value != null ? fearGreedLabel(value) : unavailable ? "Unavailable" : "—";
+  const arc = value != null ? Math.round((value / 100) * 180) : 0;
 
   // Simple arc gauge
   const r = 30, cx = 40, cy = 40;
@@ -267,21 +275,26 @@ function FearGreedCard({ fg }: { fg: FearGreed | null }) {
           {/* Background arc */}
           <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`} fill="none" stroke="#1e293b" strokeWidth={6} />
           {/* Value arc */}
-          {fg && (
+          {value != null && (
             <path
               d={`M ${startX} ${startY} A ${r} ${r} 0 ${largeArc} 1 ${endX} ${endY}`}
               fill="none" stroke={color} strokeWidth={6} strokeLinecap="round"
             />
           )}
           <text x={cx} y={cy - 2} textAnchor="middle" fill={color} fontSize={13} fontWeight={700} fontFamily="monospace">
-            {fg ? fg.value : "—"}
+            {value != null ? value : "—"}
           </text>
         </svg>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700, color, fontFamily: "monospace" }}>
-            {fg ? fg.value : "—"}
+            {value != null ? value : "—"}
           </div>
           <div style={{ fontSize: 10, color: "#64748b" }}>{label}</div>
+          {unavailable && (
+            <div style={{ fontSize: 9, color: "#475569" }} title={`source: ${fg?.source ?? "cnn"} (fetch failed)`}>
+              source: {fg?.source ?? "cnn"}
+            </div>
+          )}
         </div>
       </div>
     </div>

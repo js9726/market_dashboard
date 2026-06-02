@@ -40,11 +40,23 @@ locally.
 | `cli_run.py --provider deepseek --post` | Morning Brief provider tab and A-list extraction through brief ingest |
 | `push_screener_picks.py --post` | Screener History / wiki screener picks |
 
+## Fixed (2026-06-02, continued from Codex handoff)
+
+- **CNN Fear & Greed (shipped):** the bare `User-Agent` was rejected with HTTP
+  418, so `build_data.py` returned `fear_greed: null`. `fetch_cnn_fear_greed()`
+  now sends full browser headers (UA + Accept + Referer + Origin + Sec-Fetch-*)
+  and retries once. On failure it returns a structured **fail-closed** object
+  (`{value:null, label:"Unavailable", status:"unavailable", source:"cnn", as_of:null, error}`)
+  instead of bare `null`. The `MarketMetricsDashboard` Fear & Greed card now
+  branches on the value (not the truthy object) and renders an explicit
+  "Unavailable · source: cnn" state — never a fake red gauge. The spurious
+  `_BS4_AVAILABLE` gate (this endpoint is JSON, not HTML) was removed. Verified
+  live: score 56.5 "greed"; `tsc --noEmit` clean. The freshness gate leaves F&G
+  unchecked (sentiment is non-core), so an unavailable reading degrades
+  gracefully without failing the routine.
+
 ## Next Workflow Fixes
 
-- Replace the fragile CNN Fear & Greed-only fetch with a redundant source or a
-  fail-closed display state. Current `build_data.py` can return
-  `fear_greed: null` when CNN rejects the request.
 - Tighten AI brief/news validation after generation so provider output may not
   label simulated news, ratings, or calendars as current market news. Missing
   news must render as unavailable/stale with source metadata, not invented
