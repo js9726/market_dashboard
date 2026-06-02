@@ -8,7 +8,8 @@ REM   2. Refresh TV screener cache (with DeepSeek scoring for top 8 per screener
 REM   3. Push screener picks to /dashboard/screener-history (operators: JS, XX)
 REM   4. Breadth scan via TradingView bulk scanner
 REM   5. Sync data into Next.js public folder
-REM   6. Generate DeepSeek-tab morning brief
+REM   6. Validate generated data freshness
+REM   7. Generate DeepSeek Search-tab morning brief
 REM
 REM Pre-requisites:
 REM   - .env / .env.local has DEEPSEEK_API_KEY, BRIEF_INGEST_KEY, VERCEL_INGEST_URL
@@ -78,11 +79,21 @@ if errorlevel 1 (
   goto :error
 )
 
-REM Step 6: Morning brief (DeepSeek tab, fastest automated path).
+REM Step 6: validate freshness before posting an AI brief.
 echo. >> "%LOG%"
-echo [step 6/6] morning brief (DeepSeek tab) >> "%LOG%"
+echo [step 6/7] freshness check >> "%LOG%"
+cd /d "%BACKEND%"
+python scripts\check_daily_freshness.py --data-dir data --public-dir "%FRONTEND%\public\market-dashboard" --max-age-minutes 180 >> "%LOG%" 2>&1
+if errorlevel 1 (
+  echo [step 6/7] FAILED >> "%LOG%"
+  goto :error
+)
+
+REM Step 7: Morning brief (DeepSeek Search tab, fastest automated grounded path).
+echo. >> "%LOG%"
+echo [step 7/7] morning brief (DeepSeek Search tab) >> "%LOG%"
 cd /d "%REPO_ROOT%\packages\core-skills\morning-brief"
-python cli_run.py --provider deepseek --post >> "%LOG%" 2>&1
+python cli_run.py --provider deepseek-search --post >> "%LOG%" 2>&1
 
 echo. >> "%LOG%"
 echo [premarket-routine] completed %date% %time% >> "%LOG%"

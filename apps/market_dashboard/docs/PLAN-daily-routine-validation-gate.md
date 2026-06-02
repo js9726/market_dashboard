@@ -18,6 +18,12 @@ locally.
 
 - Run `build_data.py --out-dir data` before TV screeners, breadth, and
   `sync:market`.
+- Run `check_daily_freshness.py` after `sync:market`; fail the routine if
+  backend or public `snapshot.json`, `tv_screeners.json`, or `breadth.json`
+  are stale, malformed, missing, or suspiciously empty.
+- Use `cli_run.py --provider deepseek-search --post` for the local automated
+  brief so the AI/news section has web-search grounding instead of plain
+  non-search DeepSeek output.
 - Keep TV screeners and breadth fresh through the DB-backed `/api/screeners`
   and `/api/breadth` live paths.
 - Commit refreshed static fallback artifacts after manual daily runs when the
@@ -39,9 +45,7 @@ locally.
 - Replace the fragile CNN Fear & Greed-only fetch with a redundant source or a
   fail-closed display state. Current `build_data.py` can return
   `fear_greed: null` when CNN rejects the request.
-- Tighten AI brief/news generation so provider output may not label simulated
-  news, ratings, or calendars as current market news. Missing news must render
-  as unavailable/stale with source metadata, not invented context.
-- Add a post-routine health check that fails if `snapshot.built_at`,
-  `tv_screeners.fetched_at`, or `breadth.as_of` are outside the allowed market
-  interval.
+- Tighten AI brief/news validation after generation so provider output may not
+  label simulated news, ratings, or calendars as current market news. Missing
+  news must render as unavailable/stale with source metadata, not invented
+  context.
