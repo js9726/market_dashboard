@@ -4,8 +4,8 @@ Live-quote pusher for the local dashboard-bridge daemon.
 Pulls real-time quotes from moomoo OpenD for the union of:
   - tickers in the user's current positions (so /dashboard/portfolio shows
     fresh P/L for the user's actual book — fixes the TENB-stale issue)
-  - configurable extras from sync.live_quote_extras (defaults: SPY/QQQ/IWM/DIA
-    so dashboard always has a fresh index reference)
+  - configurable extras from sync.live_quote_extras (defaults: SPY/QQQ/IWM/DIA/VIX
+    so dashboard always has a fresh index and VIX reference)
 
 Pushes to /api/live-quotes/ingest with source="moomoo". Failure modes are
 non-fatal: a network error or OpenD hiccup logs a warning but doesn't break

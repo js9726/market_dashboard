@@ -45,7 +45,7 @@ fill_lookback_days = 1
 # Defaults to the major US index ETFs so the dashboard's market tape always
 # has a fresh reference. Add your watchlist if you want live RVOL/price for
 # names you don't currently hold.
-live_quote_extras = "SPY,QQQ,IWM,DIA,SMH,XLK,NVDA,CRDO,ARM,MRVL"
+live_quote_extras = "SPY,QQQ,IWM,DIA,VIX,SMH,XLK,NVDA,CRDO,ARM,MRVL"
 # Run /api/breadth/refresh once per US trading day after the close from this
 # local daemon. The state file ~/.dashboard-bridge-state.json prevents repeats.
 breadth_post_close = true

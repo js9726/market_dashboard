@@ -89,7 +89,7 @@ live_quote_ingest_key = "$BRIEF_INGEST_KEY"
 [sync]
 interval_sec = 60
 live_quote_key = "moomoo"
-live_quote_extras = ["SPY","QQQ","IWM","DIA","SMH","XLK","NVDA"]
+live_quote_extras = ["SPY","QQQ","IWM","DIA","VIX","SMH","XLK","NVDA"]
 breadth_post_close = true
 
 [fallback]

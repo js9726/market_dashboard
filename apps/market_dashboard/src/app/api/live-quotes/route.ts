@@ -3,7 +3,8 @@
  *
  * Returns all rows in LiveQuote, overlaid with server-fetched index snapshots
  * for SPX/NDX/DJI/RUT/VIX. Polygon is preferred when POLYGON_API_KEY exists;
- * Yahoo chart is the fallback so VIX does not go stale when Polygon is absent.
+ * Yahoo chart is a fallback only and can be delayed. Fresh bridge rows win
+ * over older index fallback rows.
  * Adds a per-row staleness flag. During regular US market hours the feed must
  * be recent; outside the session, the latest valid market-session print is OK.
  * Used by the Conviction Desk's live tape (indices, sectors, watchlist).
@@ -45,8 +46,15 @@ export async function GET() {
   ]);
 
   const bySymbol = new Map<string, ApiQuoteRow>();
+  const setIfFreshest = (row: ApiQuoteRow) => {
+    const existing = bySymbol.get(row.symbol);
+    if (!existing || row.observedAt.getTime() >= existing.observedAt.getTime()) {
+      bySymbol.set(row.symbol, row);
+    }
+  };
+
   for (const row of dbRows) {
-    bySymbol.set(row.symbol, {
+    setIfFreshest({
       symbol: row.symbol,
       price: Number(row.price),
       changePct: row.changePct == null ? null : Number(row.changePct),
@@ -56,7 +64,7 @@ export async function GET() {
     });
   }
   for (const row of liveIndexRows) {
-    bySymbol.set(row.symbol, row);
+    setIfFreshest(row);
   }
 
   const rows = Array.from(bySymbol.values()).sort((a, b) => a.symbol.localeCompare(b.symbol));

@@ -51,7 +51,7 @@ live_quote_ingest_key = "..."
 [sync]
 interval_sec = 60               # push live quotes every 60s
 live_quote_key = "moomoo"
-live_quote_extras = ["SPY","QQQ","IWM","DIA","SMH","XLK","NVDA"]  # always-fresh refs
+live_quote_extras = ["SPY","QQQ","IWM","DIA","VIX","SMH","XLK","NVDA"]  # always-fresh refs
 breadth_post_close = true
 breadth_post_close_time = "16:33"
 breadth_timezone = "America/New_York"

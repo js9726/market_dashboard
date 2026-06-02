@@ -56,7 +56,7 @@ class SyncConfig:
     # Comma-separated extra tickers to push live quotes for, beyond the
     # tickers in the user's current positions. e.g. "SPY,QQQ,NVDA,CRDO".
     # Defaults to a small index/sector set so the dashboard always has
-    # fresh SPY/QQQ even when no positions are open.
+    # fresh SPY/QQQ/VIX even when no positions are open.
     live_quote_extras: tuple[str, ...] = ()
     breadth_post_close: bool = True
     breadth_post_close_time: str = "16:33"
@@ -125,7 +125,7 @@ def load_config(path: Path | None = None) -> Config:
         or dash.get("brief_ingest_key")
     )
 
-    extras_raw = sync.get("live_quote_extras", "SPY,QQQ,IWM,DIA")
+    extras_raw = sync.get("live_quote_extras", "SPY,QQQ,IWM,DIA,VIX")
     if isinstance(extras_raw, str):
         extras = tuple(s.strip().upper() for s in extras_raw.split(",") if s.strip())
     elif isinstance(extras_raw, list):

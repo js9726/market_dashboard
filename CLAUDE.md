@@ -11,7 +11,9 @@ and breadth have refreshed, `npm run sync:market` has copied the static
 fallback, and `check_daily_freshness.py` passes. AI/news sections must use a
 search-grounded provider path and the `morning-brief/validate_brief.py` gate;
 ungrounded news, ratings, or calendar data must render unavailable, not
-simulated.
+simulated. During market hours, VIX freshness must come from Polygon or the
+local bridge/OpenD live-quote row; Yahoo chart fallback can be delayed and must
+never overwrite a fresher bridge row.
 
 **Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard (breadth, screeners + REC A-list, quotes, HELD seed + track), run the morning brief, then present today's A-List (REC + HELD) in chat.
 
