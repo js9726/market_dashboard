@@ -1,21 +1,21 @@
 {
-  "built_at": "2026-06-01T22:50:26.198416Z",
+  "built_at": "2026-06-02T12:00:13.756834Z",
   "groups": {
     "Indices": [
       {
         "ticker": "QQQE",
         "daily": 1.43,
-        "intra": 1.67,
+        "intra": 1.72,
         "5d": 3.75,
         "20d": 9.62,
         "atr_pct": 1.3,
-        "dist_sma50_atr": 9.64,
+        "dist_sma50_atr": 9.61,
         "rs": 100.0,
         "rs_chart": "data/charts/QQQE.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.05,
+        "rvol": 1.06,
         "off_52w_high_pct": 0.0
       },
       {
@@ -26,23 +26,23 @@
         "20d": 8.63,
         "atr_pct": 1.3,
         "dist_sma50_atr": 9.09,
-        "rs": 50.0,
+        "rs": 45.0,
         "rs_chart": "data/charts/MGK.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.03,
+        "rvol": 1.12,
         "off_52w_high_pct": 0.0
       },
       {
         "ticker": "QQQ",
         "daily": 0.6,
-        "intra": 0.76,
+        "intra": 0.77,
         "5d": 3.51,
         "20d": 10.17,
         "atr_pct": 1.4,
         "dist_sma50_atr": 9.55,
-        "rs": 20.0,
+        "rs": 25.0,
         "rs_chart": "data/charts/QQQ.png",
         "long": [
           "TQQQ"
@@ -51,13 +51,13 @@
           "SQQQ"
         ],
         "abc": "A",
-        "rvol": 0.8,
+        "rvol": 0.86,
         "off_52w_high_pct": 0.0
       },
       {
         "ticker": "IBIT",
         "daily": -2.74,
-        "intra": -0.3,
+        "intra": -0.31,
         "5d": -5.75,
         "20d": -8.95,
         "atr_pct": 2.9,
@@ -73,7 +73,7 @@
           "BITI"
         ],
         "abc": "B",
-        "rvol": 1.38,
+        "rvol": 1.39,
         "off_52w_high_pct": -43.2
       },
       {
@@ -89,7 +89,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.79,
+        "rvol": 0.83,
         "off_52w_high_pct": 0.0
       },
       {
@@ -107,7 +107,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.04,
+        "rvol": 1.14,
         "off_52w_high_pct": -0.15
       },
       {
@@ -127,18 +127,18 @@
           "TZA"
         ],
         "abc": "A",
-        "rvol": 0.86,
+        "rvol": 0.91,
         "off_52w_high_pct": -1.04
       },
       {
         "ticker": "TLT",
-        "daily": -0.34,
-        "intra": 0.65,
-        "5d": 0.93,
-        "20d": -0.16,
+        "daily": 0.05,
+        "intra": 0.64,
+        "5d": 1.33,
+        "20d": 0.23,
         "atr_pct": 0.8,
-        "dist_sma50_atr": -0.22,
-        "rs": 5.0,
+        "dist_sma50_atr": 0.27,
+        "rs": 25.0,
         "rs_chart": "data/charts/TLT.png",
         "long": [
           "TMF"
@@ -146,9 +146,9 @@
         "short": [
           "TMV"
         ],
-        "abc": "C",
+        "abc": "B",
         "rvol": 0.95,
-        "off_52w_high_pct": -4.85
+        "off_52w_high_pct": -4.48
       },
       {
         "ticker": "SPY",
@@ -158,7 +158,7 @@
         "20d": 5.26,
         "atr_pct": 0.9,
         "dist_sma50_atr": 8.39,
-        "rs": 98.0,
+        "rs": 10.0,
         "rs_chart": "data/charts/SPY.png",
         "long": [
           "SPXL",
@@ -169,13 +169,13 @@
           "SH"
         ],
         "abc": "A",
-        "rvol": 0.81,
+        "rvol": 0.92,
         "off_52w_high_pct": 0.0
       },
       {
         "ticker": "ETHA",
         "daily": -0.59,
-        "intra": 1.31,
+        "intra": 1.41,
         "5d": -2.95,
         "20d": -13.26,
         "atr_pct": 3.6,
@@ -203,7 +203,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.83,
+        "rvol": 0.93,
         "off_52w_high_pct": 0.0
       }
     ],
@@ -225,7 +225,7 @@
           "TECS"
         ],
         "abc": "A",
-        "rvol": 1.53,
+        "rvol": 1.54,
         "off_52w_high_pct": 0.0
       },
       {
@@ -243,7 +243,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.94,
+        "rvol": 1.06,
         "off_52w_high_pct": -3.36
       },
       {
@@ -267,7 +267,7 @@
       {
         "ticker": "XLF",
         "daily": -0.29,
-        "intra": 0.4,
+        "intra": 0.39,
         "5d": -0.98,
         "20d": -0.94,
         "atr_pct": 1.2,
@@ -281,7 +281,7 @@
           "FAZ"
         ],
         "abc": "A",
-        "rvol": 0.97,
+        "rvol": 0.98,
         "off_52w_high_pct": -8.34
       },
       {
@@ -319,7 +319,7 @@
           "SCC"
         ],
         "abc": "A",
-        "rvol": 1.33,
+        "rvol": 1.34,
         "off_52w_high_pct": -4.89
       },
       {
@@ -339,7 +339,7 @@
           "DRV"
         ],
         "abc": "A",
-        "rvol": 1.11,
+        "rvol": 1.35,
         "off_52w_high_pct": -3.29
       },
       {
@@ -359,7 +359,7 @@
           "SZK"
         ],
         "abc": "B",
-        "rvol": 1.77,
+        "rvol": 1.8,
         "off_52w_high_pct": -8.35
       },
       {
@@ -370,7 +370,7 @@
         "20d": -0.84,
         "atr_pct": 1.6,
         "dist_sma50_atr": 0.09,
-        "rs": 10.0,
+        "rs": 5.0,
         "rs_chart": "data/charts/XLB.png",
         "long": [
           "UYM"
@@ -379,13 +379,13 @@
           "SMN"
         ],
         "abc": "B",
-        "rvol": 2.31,
+        "rvol": 2.32,
         "off_52w_high_pct": -4.61
       },
       {
         "ticker": "XLE",
         "daily": 1.79,
-        "intra": 0.48,
+        "intra": 0.47,
         "5d": -3.68,
         "20d": -2.63,
         "atr_pct": 2.4,
@@ -399,7 +399,7 @@
           "ERY"
         ],
         "abc": "C",
-        "rvol": 1.34,
+        "rvol": 1.44,
         "off_52w_high_pct": -8.41
       },
       {
@@ -445,7 +445,7 @@
         "5d": 0.26,
         "20d": 1.29,
         "atr_pct": 1.4,
-        "dist_sma50_atr": 2.47,
+        "dist_sma50_atr": 2.43,
         "rs": 0.0,
         "rs_chart": "data/charts/KCE.png",
         "long": [],
@@ -467,23 +467,23 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.77,
+        "rvol": 0.79,
         "off_52w_high_pct": -13.47
       },
       {
         "ticker": "QQQE",
         "daily": 1.43,
-        "intra": 1.67,
+        "intra": 1.72,
         "5d": 3.75,
         "20d": 9.62,
         "atr_pct": 1.3,
-        "dist_sma50_atr": 9.64,
+        "dist_sma50_atr": 9.61,
         "rs": 100.0,
         "rs_chart": "data/charts/QQQE.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.05,
+        "rvol": 1.06,
         "off_52w_high_pct": 0.0
       },
       {
@@ -494,7 +494,7 @@
         "20d": 12.31,
         "atr_pct": 3.1,
         "dist_sma50_atr": 3.42,
-        "rs": 45.0,
+        "rs": 50.0,
         "rs_chart": "data/charts/JETS.png",
         "long": [],
         "short": [],
@@ -521,7 +521,7 @@
       {
         "ticker": "SMH",
         "daily": 1.48,
-        "intra": 2.1,
+        "intra": 1.96,
         "5d": 5.46,
         "20d": 19.22,
         "atr_pct": 3.1,
@@ -535,13 +535,13 @@
           "SOXS"
         ],
         "abc": "A",
-        "rvol": 0.84,
+        "rvol": 0.85,
         "off_52w_high_pct": 0.0
       },
       {
         "ticker": "CIBR",
         "daily": 5.74,
-        "intra": 4.29,
+        "intra": 4.22,
         "5d": 11.71,
         "20d": 36.93,
         "atr_pct": 2.6,
@@ -596,12 +596,12 @@
         "20d": 24.32,
         "atr_pct": 2.8,
         "dist_sma50_atr": 8.75,
-        "rs": 65.0,
+        "rs": 70.0,
         "rs_chart": "data/charts/IGV.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.89,
+        "rvol": 1.9,
         "off_52w_high_pct": -8.57
       },
       {
@@ -619,7 +619,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.66,
+        "rvol": 2.48,
         "off_52w_high_pct": -2.52
       },
       {
@@ -637,7 +637,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.13,
+        "rvol": 1.15,
         "off_52w_high_pct": -8.19
       },
       {
@@ -653,7 +653,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.69,
+        "rvol": 0.7,
         "off_52w_high_pct": -4.06
       },
       {
@@ -662,8 +662,8 @@
         "intra": 2.28,
         "5d": 7.53,
         "20d": 14.36,
-        "atr_pct": 3.0,
-        "dist_sma50_atr": 5.46,
+        "atr_pct": 3.1,
+        "dist_sma50_atr": 5.45,
         "rs": 5.0,
         "rs_chart": "data/charts/BLOK.png",
         "long": [],
@@ -675,7 +675,7 @@
       {
         "ticker": "AIQ",
         "daily": 3.15,
-        "intra": 2.1,
+        "intra": 2.07,
         "5d": 10.56,
         "20d": 22.21,
         "atr_pct": 2.2,
@@ -685,7 +685,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.65,
+        "rvol": 1.66,
         "off_52w_high_pct": 0.0
       },
       {
@@ -701,7 +701,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.14,
+        "rvol": 1.16,
         "off_52w_high_pct": -1.16
       },
       {
@@ -711,7 +711,7 @@
         "5d": 5.13,
         "20d": 4.48,
         "atr_pct": 1.7,
-        "dist_sma50_atr": 3.35,
+        "dist_sma50_atr": 3.31,
         "rs": 50.0,
         "rs_chart": "data/charts/PEJ.png",
         "long": [
@@ -739,7 +739,7 @@
           "WEBS"
         ],
         "abc": "A",
-        "rvol": 0.5,
+        "rvol": 0.52,
         "off_52w_high_pct": 0.0
       },
       {
@@ -755,7 +755,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.53,
+        "rvol": 0.54,
         "off_52w_high_pct": -6.7
       },
       {
@@ -775,7 +775,7 @@
           "KOLD"
         ],
         "abc": "A",
-        "rvol": 0.89,
+        "rvol": 0.9,
         "off_52w_high_pct": -36.17
       },
       {
@@ -791,7 +791,7 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 1.56,
+        "rvol": 1.57,
         "off_52w_high_pct": -6.08
       },
       {
@@ -809,7 +809,7 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 0.63,
+        "rvol": 0.65,
         "off_52w_high_pct": -32.4
       },
       {
@@ -827,13 +827,13 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.11,
+        "rvol": 1.15,
         "off_52w_high_pct": -6.69
       },
       {
         "ticker": "IBIT",
         "daily": -2.74,
-        "intra": -0.3,
+        "intra": -0.31,
         "5d": -5.75,
         "20d": -8.95,
         "atr_pct": 2.9,
@@ -849,7 +849,7 @@
           "BITI"
         ],
         "abc": "B",
-        "rvol": 1.38,
+        "rvol": 1.39,
         "off_52w_high_pct": -43.2
       },
       {
@@ -878,12 +878,12 @@
         "20d": -3.29,
         "atr_pct": 2.0,
         "dist_sma50_atr": -2.77,
-        "rs": 10.0,
+        "rs": 5.0,
         "rs_chart": "data/charts/IHI.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 1.13,
+        "rvol": 1.18,
         "off_52w_high_pct": -24.11
       },
       {
@@ -911,7 +911,7 @@
         "5d": 15.35,
         "20d": 1.39,
         "atr_pct": 6.1,
-        "dist_sma50_atr": 2.69,
+        "dist_sma50_atr": 2.68,
         "rs": 0.0,
         "rs_chart": "data/charts/MSOS.png",
         "long": [
@@ -919,7 +919,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.8,
+        "rvol": 0.83,
         "off_52w_high_pct": -23.62
       },
       {
@@ -930,12 +930,12 @@
         "20d": 3.18,
         "atr_pct": 1.8,
         "dist_sma50_atr": 3.5,
-        "rs": 60.0,
+        "rs": 55.0,
         "rs_chart": "data/charts/SOCL.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 6.12,
+        "rvol": 6.15,
         "off_52w_high_pct": -22.56
       },
       {
@@ -985,7 +985,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.18,
+        "rvol": 1.19,
         "off_52w_high_pct": 0.0
       },
       {
@@ -1005,7 +1005,7 @@
           "SARK"
         ],
         "abc": "A",
-        "rvol": 0.87,
+        "rvol": 0.95,
         "off_52w_high_pct": -12.18
       },
       {
@@ -1016,7 +1016,7 @@
         "20d": 8.05,
         "atr_pct": 2.4,
         "dist_sma50_atr": 4.1,
-        "rs": 55.0,
+        "rs": 60.0,
         "rs_chart": "data/charts/XTN.png",
         "long": [
           "TPOR"
@@ -1039,7 +1039,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.88,
+        "rvol": 0.93,
         "off_52w_high_pct": -2.97
       },
       {
@@ -1055,7 +1055,7 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 1.13,
+        "rvol": 1.21,
         "off_52w_high_pct": -8.86
       },
       {
@@ -1075,7 +1075,7 @@
           "GLL"
         ],
         "abc": "C",
-        "rvol": 0.99,
+        "rvol": 1.01,
         "off_52w_high_pct": -17.07
       },
       {
@@ -1085,13 +1085,13 @@
         "5d": -0.58,
         "20d": -3.72,
         "atr_pct": 1.4,
-        "dist_sma50_atr": -1.49,
+        "dist_sma50_atr": -1.48,
         "rs": 15.0,
         "rs_chart": "data/charts/GXC.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.39,
+        "rvol": 0.4,
         "off_52w_high_pct": -11.87
       },
       {
@@ -1107,7 +1107,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.64,
+        "rvol": 1.65,
         "off_52w_high_pct": -3.48
       },
       {
@@ -1118,7 +1118,7 @@
         "20d": -0.49,
         "atr_pct": 4.4,
         "dist_sma50_atr": -1.1,
-        "rs": 20.0,
+        "rs": 30.0,
         "rs_chart": "data/charts/GDX.png",
         "long": [
           "NUGT",
@@ -1129,7 +1129,7 @@
           "GDXD"
         ],
         "abc": "C",
-        "rvol": 1.22,
+        "rvol": 1.27,
         "off_52w_high_pct": -25.17
       },
       {
@@ -1145,7 +1145,7 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 1.58,
+        "rvol": 1.6,
         "off_52w_high_pct": -22.89
       },
       {
@@ -1165,7 +1165,7 @@
           "TZA"
         ],
         "abc": "A",
-        "rvol": 0.86,
+        "rvol": 0.91,
         "off_52w_high_pct": -1.04
       },
       {
@@ -1185,7 +1185,7 @@
           "DRIP"
         ],
         "abc": "C",
-        "rvol": 1.11,
+        "rvol": 1.15,
         "off_52w_high_pct": -10.79
       },
       {
@@ -1212,7 +1212,7 @@
         "20d": null,
         "atr_pct": 0.7,
         "dist_sma50_atr": 1.24,
-        "rs": 20.0,
+        "rs": 5.0,
         "rs_chart": "data/charts/EATZ.png",
         "long": [],
         "short": [],
@@ -1227,7 +1227,7 @@
         "5d": -0.51,
         "20d": -3.99,
         "atr_pct": 1.6,
-        "dist_sma50_atr": -1.67,
+        "dist_sma50_atr": -1.66,
         "rs": 10.0,
         "rs_chart": "data/charts/FXI.png",
         "long": [
@@ -1237,7 +1237,7 @@
           "YANG"
         ],
         "abc": "C",
-        "rvol": 0.79,
+        "rvol": 0.85,
         "off_52w_high_pct": -14.43
       },
       {
@@ -1253,13 +1253,13 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.67,
+        "rvol": 0.73,
         "off_52w_high_pct": -5.19
       },
       {
         "ticker": "ICLN",
         "daily": -2.25,
-        "intra": -1.16,
+        "intra": -1.45,
         "5d": 2.81,
         "20d": 9.98,
         "atr_pct": 3.0,
@@ -1285,7 +1285,7 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.72,
+        "rvol": 0.75,
         "off_52w_high_pct": -24.32
       },
       {
@@ -1301,7 +1301,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.87,
+        "rvol": 0.89,
         "off_52w_high_pct": -4.64
       },
       {
@@ -1337,7 +1337,7 @@
           "ZSL"
         ],
         "abc": "B",
-        "rvol": 0.66,
+        "rvol": 0.7,
         "off_52w_high_pct": -35.92
       },
       {
@@ -1348,14 +1348,14 @@
         "20d": -1.77,
         "atr_pct": 2.5,
         "dist_sma50_atr": 0.45,
-        "rs": 40.0,
+        "rs": 30.0,
         "rs_chart": "data/charts/XHB.png",
         "long": [
           "NAIL"
         ],
         "short": [],
         "abc": "B",
-        "rvol": 0.89,
+        "rvol": 0.96,
         "off_52w_high_pct": -14.68
       },
       {
@@ -1366,12 +1366,12 @@
         "20d": -3.58,
         "atr_pct": 1.9,
         "dist_sma50_atr": -0.88,
-        "rs": 15.0,
+        "rs": 10.0,
         "rs_chart": "data/charts/XHE.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 1.78,
+        "rvol": 1.79,
         "off_52w_high_pct": -15.61
       },
       {
@@ -1387,7 +1387,7 @@
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.87,
+        "rvol": 0.88,
         "off_52w_high_pct": -5.76
       },
       {
@@ -1407,7 +1407,7 @@
           "SCO"
         ],
         "abc": "B",
-        "rvol": 1.23,
+        "rvol": 1.24,
         "off_52w_high_pct": -11.41
       },
       {
@@ -1459,7 +1459,7 @@
           "LABD"
         ],
         "abc": "A",
-        "rvol": 0.94,
+        "rvol": 0.96,
         "off_52w_high_pct": -3.64
       },
       {
@@ -1486,12 +1486,12 @@
         "20d": 10.3,
         "atr_pct": 1.9,
         "dist_sma50_atr": 4.72,
-        "rs": 75.0,
+        "rs": 85.0,
         "rs_chart": "data/charts/CPER.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.61,
+        "rvol": 0.63,
         "off_52w_high_pct": -1.19
       },
       {
@@ -1507,7 +1507,7 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 1.35,
+        "rvol": 1.36,
         "off_52w_high_pct": -9.63
       },
       {
@@ -1523,18 +1523,18 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.87,
+        "rvol": 0.88,
         "off_52w_high_pct": -7.34
       },
       {
         "ticker": "PPH",
         "daily": -2.35,
-        "intra": -1.58,
+        "intra": -1.56,
         "5d": -2.58,
         "20d": -0.04,
         "atr_pct": 1.6,
         "dist_sma50_atr": 0.0,
-        "rs": 5.0,
+        "rs": 10.0,
         "rs_chart": "data/charts/PPH.png",
         "long": [
           "PILL"
@@ -1561,7 +1561,7 @@
           "FNGD"
         ],
         "abc": "A",
-        "rvol": 0.82,
+        "rvol": 0.83,
         "off_52w_high_pct": 0.0
       },
       {
@@ -1577,7 +1577,7 @@
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.79,
+        "rvol": 0.82,
         "off_52w_high_pct": -18.23
       },
       {
@@ -1609,7 +1609,7 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.49,
+        "rvol": 0.5,
         "off_52w_high_pct": -9.2
       }
     ],
@@ -1627,7 +1627,7 @@
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 1.41,
+        "rvol": 1.45,
         "off_52w_high_pct": -17.13
       },
       {
@@ -1638,7 +1638,7 @@
         "20d": 10.41,
         "atr_pct": 2.4,
         "dist_sma50_atr": 3.34,
-        "rs": 10.0,
+        "rs": 15.0,
         "rs_chart": "data/charts/ARGT.png",
         "long": [],
         "short": [],
@@ -1659,7 +1659,7 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.61,
+        "rvol": 0.63,
         "off_52w_high_pct": -3.73
       },
       {
@@ -1669,13 +1669,13 @@
         "5d": 1.54,
         "20d": 3.95,
         "atr_pct": 1.5,
-        "dist_sma50_atr": 3.2,
+        "dist_sma50_atr": 3.15,
         "rs": 20.0,
         "rs_chart": "data/charts/THD.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.16,
+        "rvol": 1.17,
         "off_52w_high_pct": -1.79
       },
       {
@@ -1685,13 +1685,13 @@
         "5d": -1.83,
         "20d": -14.1,
         "atr_pct": 2.0,
-        "dist_sma50_atr": -7.23,
+        "dist_sma50_atr": -7.21,
         "rs": 5.0,
         "rs_chart": "data/charts/EIDO.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.72,
+        "rvol": 0.74,
         "off_52w_high_pct": -33.14
       },
       {
@@ -1702,12 +1702,12 @@
         "20d": 0.53,
         "atr_pct": 1.1,
         "dist_sma50_atr": 2.52,
-        "rs": 25.0,
+        "rs": 35.0,
         "rs_chart": "data/charts/EWC.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.08,
+        "rvol": 1.1,
         "off_52w_high_pct": -0.17
       },
       {
@@ -1718,7 +1718,7 @@
         "20d": 6.77,
         "atr_pct": 2.0,
         "dist_sma50_atr": 3.75,
-        "rs": 35.0,
+        "rs": 40.0,
         "rs_chart": "data/charts/GREK.png",
         "long": [],
         "short": [],
@@ -1750,12 +1750,12 @@
         "20d": 2.72,
         "atr_pct": 1.5,
         "dist_sma50_atr": 2.91,
-        "rs": 45.0,
+        "rs": 50.0,
         "rs_chart": "data/charts/EWG.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.27,
+        "rvol": 1.29,
         "off_52w_high_pct": -2.42
       },
       {
@@ -1771,7 +1771,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.15,
+        "rvol": 1.16,
         "off_52w_high_pct": -4.75
       },
       {
@@ -1787,7 +1787,7 @@
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.47,
+        "rvol": 0.53,
         "off_52w_high_pct": -1.54
       },
       {
@@ -1805,7 +1805,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.83,
+        "rvol": 1.04,
         "off_52w_high_pct": 0.0
       },
       {
@@ -1816,12 +1816,12 @@
         "20d": 1.64,
         "atr_pct": 1.4,
         "dist_sma50_atr": 2.09,
-        "rs": 35.0,
+        "rs": 30.0,
         "rs_chart": "data/charts/IEUR.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.63,
+        "rvol": 0.66,
         "off_52w_high_pct": -1.56
       },
       {
@@ -1843,17 +1843,17 @@
       {
         "ticker": "ACWI",
         "daily": 0.35,
-        "intra": 0.35,
+        "intra": 0.32,
         "5d": 1.99,
         "20d": 4.91,
         "atr_pct": 1.1,
-        "dist_sma50_atr": 6.51,
-        "rs": 25.0,
+        "dist_sma50_atr": 6.45,
+        "rs": 30.0,
         "rs_chart": "data/charts/ACWI.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.75,
+        "rvol": 0.94,
         "off_52w_high_pct": 0.0
       },
       {
@@ -1862,7 +1862,7 @@
         "intra": 0.34,
         "5d": 0.04,
         "20d": 1.54,
-        "atr_pct": 1.3,
+        "atr_pct": 1.4,
         "dist_sma50_atr": 1.99,
         "rs": 15.0,
         "rs_chart": "data/charts/IEV.png",
@@ -1871,7 +1871,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.85,
+        "rvol": 0.86,
         "off_52w_high_pct": -2.15
       },
       {
@@ -1881,13 +1881,13 @@
         "5d": 1.44,
         "20d": 0.99,
         "atr_pct": 1.5,
-        "dist_sma50_atr": 1.37,
+        "dist_sma50_atr": 1.36,
         "rs": 30.0,
         "rs_chart": "data/charts/EWQ.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.68,
+        "rvol": 0.69,
         "off_52w_high_pct": -5.23
       },
       {
@@ -1897,7 +1897,7 @@
         "5d": 1.16,
         "20d": 2.72,
         "atr_pct": 1.5,
-        "dist_sma50_atr": 2.87,
+        "dist_sma50_atr": 2.86,
         "rs": 10.0,
         "rs_chart": "data/charts/EWI.png",
         "long": [],
@@ -1913,7 +1913,7 @@
         "5d": 1.44,
         "20d": 5.24,
         "atr_pct": 1.4,
-        "dist_sma50_atr": 3.54,
+        "dist_sma50_atr": 3.5,
         "rs": 5.0,
         "rs_chart": "data/charts/EWJ.png",
         "long": [
@@ -1921,7 +1921,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.79,
+        "rvol": 1.8,
         "off_52w_high_pct": -1.11
       },
       {
@@ -1939,7 +1939,7 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.0,
+        "rvol": 1.07,
         "off_52w_high_pct": -4.14
       },
       {
@@ -1955,7 +1955,7 @@
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 1.05,
+        "rvol": 1.11,
         "off_52w_high_pct": -13.34
       },
       {
@@ -1965,13 +1965,13 @@
         "5d": -0.67,
         "20d": 1.01,
         "atr_pct": 1.8,
-        "dist_sma50_atr": 1.09,
+        "dist_sma50_atr": 1.08,
         "rs": 35.0,
         "rs_chart": "data/charts/EWD.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.51,
+        "rvol": 1.52,
         "off_52w_high_pct": -4.82
       },
       {
@@ -2032,7 +2032,7 @@
         "20d": -2.3,
         "atr_pct": 1.3,
         "dist_sma50_atr": -0.75,
-        "rs": 0.0,
+        "rs": 5.0,
         "rs_chart": "data/charts/INDA.png",
         "long": [
           "INDL"
@@ -2059,7 +2059,7 @@
           "EDZ"
         ],
         "abc": "A",
-        "rvol": 1.08,
+        "rvol": 1.09,
         "off_52w_high_pct": 0.0
       },
       {
@@ -2077,7 +2077,7 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 0.65,
+        "rvol": 0.7,
         "off_52w_high_pct": -14.52
       },
       {
@@ -2093,7 +2093,7 @@
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 1.25,
+        "rvol": 1.26,
         "off_52w_high_pct": -11.13
       },
       {
@@ -2120,18 +2120,18 @@
         "20d": 18.28,
         "atr_pct": 2.4,
         "dist_sma50_atr": 10.06,
-        "rs": 65.0,
+        "rs": 70.0,
         "rs_chart": "data/charts/EWT.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.07,
+        "rvol": 1.08,
         "off_52w_high_pct": 0.0
       },
       {
         "ticker": "MCHI",
         "daily": 0.54,
-        "intra": 0.43,
+        "intra": 0.4,
         "5d": -0.25,
         "20d": -4.02,
         "atr_pct": 1.6,
@@ -2141,7 +2141,7 @@
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.88,
+        "rvol": 1.09,
         "off_52w_high_pct": -16.29
       }
     ]
@@ -2153,8 +2153,8 @@
         1.43
       ],
       "intra": [
-        -0.3,
-        1.67
+        -0.31,
+        1.72
       ],
       "5d": [
         -5.75,
