@@ -8,6 +8,46 @@
 
 ---
 
+## REVISION 3 (2026-06-02) — Final goal: multi-client SaaS (read-only)
+
+Direction confirmed with the operator: this becomes a **multi-client SaaS**,
+**read-only** (analysis + journal; no order routing). Two-plane data model:
+
+**Plane 1 — Shared market data (multi-tenant):** breadth, screeners, brief,
+market internals. Market-wide, computed ONCE server-side, served to all clients.
+Driven by an **always-on engine** (Linux x86 VM ~$5/mo, or Oracle ARM free tier)
+whose refresh scheduler pings `/api/{breadth,screeners,cron/refresh-*}` — NOT paid
+Vercel crons (Hobby = once-daily backstop only). See
+`packages/dashboard-bridge/deploy/vm-setup.sh` + `docs/HOMEPC-SERVER.md`.
+
+**Plane 2 — Per-client account data:** v1 = **CSV import + manual entry**
+(`/api/csv/import`, `/api/trades/manual`). Live per-client broker links (IBKR Web
+API OAuth / official IBKR↔Claude connector) are a LATER phase. The owner's
+**OpenD + IBKR remain the operator feed** (OpenD primary, IBKR fallback) on the
+engine box — never shared with clients (CLAUDE.md broker-safety rule).
+
+**Carried (shipped):** A-list = bought-position day-0→14 tracker (Realized-vs-R +
+Soft-vs-Hard, both 1R bases) · merged REC/HELD board · auto-journal + nightly
+digest · Market Internals tab · stale-data market-clock relabel · portfolio
+prefers fresh LiveQuote over stale MarketQuote.
+
+**Standing gates (must hold for every ticker analysis):**
+- **Step 0.6 Data Freshness (fail-closed)** — pull live OpenD first; STOP + flag on stale/unreachable/missing.
+- **Step 2.4 Tradeability Pre-Screen** — liquidity + extension + catalyst hard gate (extended/late or illiquid = PASS; a tight chart must not inflate the rubric).
+- **Always run the 7-trader rubric** for ticker analysis (no narrative substitute).
+
+**New build for SaaS v1 (next phases):**
+1. Per-user auth tiers + data isolation (each client sees only their own CSV/manual book + the shared market-data plane).
+2. Billing (e.g. Stripe) for paid tiers.
+3. Move the live cadence onto the engine VM (`refresh-pinger`) → free + live.
+4. Client onboarding: CSV import UX + manual-entry polish.
+5. (Later) live per-client broker connectors (IBKR OAuth).
+
+**Cost at goal:** ~$5/mo (engine VM) — or **$0** (Oracle ARM free + home PC) — +
+free Vercel/Neon + **Claude via subscription** (not metered API). Scales with paid clients.
+
+---
+
 ## REVISION 2 (2026-05-29) — Reliability & "Automation Vibe" Architecture
 
 **Problem observed:** "the whole workflow is still not giving me an automation

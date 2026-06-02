@@ -24,7 +24,12 @@ name: Post-Close Journal (Daily)
 on:
   schedule:
     - cron: '30 20 * * 1-5'           # 30 min post-close (16:30 ET EDT)
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: "Closed-trade lookback in days (use 400 for a one-time historical backfill of all past closes)"
+        required: false
+        default: "4"
 
 concurrency:
   group: market-dashboard-journal-close
@@ -126,4 +131,4 @@ jobs:
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
           WIKI_DIR: ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
           # 4-day lookback covers a long weekend; widen for holiday gaps.
-          JOURNAL_LOOKBACK_DAYS: "4"
+          JOURNAL_LOOKBACK_DAYS: ${{ github.event.inputs.lookback_days || '4' }}
