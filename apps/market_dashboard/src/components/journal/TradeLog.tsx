@@ -64,18 +64,18 @@ const PROVIDER_LABELS: Record<string, string> = {
 
 function verdictColor(v: string): string {
   const s = v?.toUpperCase() ?? "";
-  if (s.includes("STRONG BUY") || s.includes("GREAT")) return "bg-emerald-900/60 text-emerald-300 border-emerald-700";
-  if (s.includes("BUY") || s.includes("GOOD")) return "bg-green-900/60 text-green-300 border-green-700";
-  if (s.includes("ACCEPTABLE") || s.includes("HOLD") || s.includes("AVERAGE")) return "bg-yellow-900/60 text-yellow-300 border-yellow-700";
-  if (s.includes("STRONG AVOID") || s.includes("MISTAKE")) return "bg-red-900/60 text-red-300 border-red-700";
-  if (s.includes("AVOID") || s.includes("POOR")) return "bg-orange-900/60 text-orange-300 border-orange-700";
-  return "bg-slate-700/60 text-slate-300 border-slate-600";
+  if (s.includes("STRONG BUY") || s.includes("GREAT")) return "bg-[var(--gain-bg)] text-[var(--gain-fg)] border-[var(--gain-fg)]";
+  if (s.includes("BUY") || s.includes("GOOD")) return "bg-[var(--gain-bg)] text-[var(--gain-fg)] border-[var(--gain-fg)]";
+  if (s.includes("ACCEPTABLE") || s.includes("HOLD") || s.includes("AVERAGE")) return "bg-[var(--bg-raised)] text-[var(--warn-500)] border-[var(--warn-500)]";
+  if (s.includes("STRONG AVOID") || s.includes("MISTAKE")) return "bg-[var(--loss-bg)] text-[var(--loss-fg)] border-[var(--loss-fg)]";
+  if (s.includes("AVOID") || s.includes("POOR")) return "bg-[var(--loss-bg)] text-[var(--loss-fg)] border-[var(--loss-fg)]";
+  return "bg-[var(--bg-raised)] text-[var(--fg-2)] border-[var(--line)]";
 }
 
 function scoreColor(score: number): string {
-  if (score >= 7) return "text-emerald-400";
-  if (score >= 5) return "text-yellow-400";
-  return "text-red-400";
+  if (score >= 7) return "text-[var(--gain-fg)]";
+  if (score >= 5) return "text-[var(--warn-500)]";
+  return "text-[var(--loss-fg)]";
 }
 
 function scoreBadgeBg(score: number): string {
@@ -101,9 +101,9 @@ function ProviderBar({
 }) {
   return (
     <div className="flex items-center gap-3 flex-wrap">
-      <span className="text-xs text-slate-400 whitespace-nowrap">Analysis via</span>
+      <span className="text-xs text-[var(--fg-2)] whitespace-nowrap">Analysis via</span>
       {providers === null ? (
-        <div className="h-7 w-48 animate-pulse rounded bg-slate-800" />
+        <div className="h-7 w-48 animate-pulse rounded bg-[var(--bg-raised)]" />
       ) : (
         <div className="flex gap-2">
           {(["deepseek", "gemini", "openai", "anthropic"] as const).map((p) => {
@@ -115,9 +115,9 @@ function ProviderBar({
                 disabled={!available}
                 onClick={() => available && onSelect(p)}
                 className={`rounded px-3 py-1 text-xs font-medium border transition-colors
-                  ${!available ? "opacity-35 cursor-not-allowed border-slate-700 text-slate-500" :
-                    active ? "border-blue-500 bg-blue-900/40 text-blue-300" :
-                    "border-slate-600 text-slate-300 hover:border-slate-400"}`}
+                  ${!available ? "opacity-35 cursor-not-allowed border-[var(--line)] text-[var(--fg-3)]" :
+                    active ? "border-[var(--accent)] bg-[var(--accent-soft-bg)] text-[var(--accent)]" :
+                    "border-[var(--line)] text-[var(--fg-2)] hover:border-[var(--line-strong)]"}`}
                 title={!available ? `${PROVIDER_LABELS[p]} — API key not set` : PROVIDER_LABELS[p]}
               >
                 {PROVIDER_LABELS[p]}
@@ -129,7 +129,7 @@ function ProviderBar({
       <button
         onClick={onRun}
         disabled={!selected || loading || providers === null}
-        className="ml-auto rounded bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-1.5 text-xs font-medium text-white transition-colors"
+        className="ml-auto rounded bg-[var(--accent)] hover:bg-[var(--accent)] disabled:opacity-40 disabled:cursor-not-allowed px-4 py-1.5 text-xs font-medium text-[var(--fg-1)] transition-colors"
       >
         {loading ? "Analysing…" : hasResult ? "Re-run" : "Analyse"}
       </button>
@@ -139,7 +139,7 @@ function ProviderBar({
 
 function Spinner({ label }: { label: string }) {
   return (
-    <div className="flex flex-col items-center gap-3 py-12 text-slate-400">
+    <div className="flex flex-col items-center gap-3 py-12 text-[var(--fg-2)]">
       <svg className="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none">
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
@@ -236,16 +236,16 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 shadow-2xl"
+        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--bg-surface)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-5 py-3 backdrop-blur">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--line)] bg-[var(--bg-surface)] px-5 py-3 backdrop-blur">
           <div>
-            <span className="text-lg font-semibold text-white">{ticker}</span>
-            {result && <span className="ml-2 text-xs text-slate-400">{result.name} · {result.exchange}</span>}
-            {!result && <span className="ml-2 text-xs text-slate-400">AI Stock Analysis</span>}
+            <span className="text-lg font-semibold text-[var(--fg-1)]">{ticker}</span>
+            {result && <span className="ml-2 text-xs text-[var(--fg-2)]">{result.name} · {result.exchange}</span>}
+            {!result && <span className="ml-2 text-xs text-[var(--fg-2)]">AI Stock Analysis</span>}
           </div>
-          <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-white hover:bg-slate-700">
+          <button onClick={onClose} className="rounded p-1 text-[var(--fg-2)] hover:text-[var(--fg-1)] hover:bg-[var(--bg-raised)]">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -256,20 +256,20 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
           <ProviderBar providers={providers} selected={selectedProvider} onSelect={setSelectedProvider} onRun={runAnalysis} loading={loading} hasResult={!!result} />
 
           {loading && <Spinner label={`Analysing ${ticker} with ${PROVIDER_LABELS[selectedProvider] ?? "AI"}…`} />}
-          {error && <div className="rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-400">{error}</div>}
+          {error && <div className="rounded-lg bg-[var(--loss-bg)] border border-[var(--loss-fg)] px-4 py-3 text-sm text-[var(--loss-fg)]">{error}</div>}
 
           {result && (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                   { label: "Price", value: result.price ? `$${fmt2(result.price)}` : "—" },
-                  { label: "Change", value: result.price_change_pct != null ? (result.price_change_pct >= 0 ? "+" : "") + fmt2(result.price_change_pct) + "%" : "—", color: result.price_change_pct != null ? result.price_change_pct >= 0 ? "text-green-400" : "text-red-400" : "" },
+                  { label: "Change", value: result.price_change_pct != null ? (result.price_change_pct >= 0 ? "+" : "") + fmt2(result.price_change_pct) + "%" : "—", color: result.price_change_pct != null ? result.price_change_pct >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]" : "" },
                   { label: "52W Range", value: `$${fmt2(result.week52_low)} – $${fmt2(result.week52_high)}` },
                   { label: "Analyst PT", value: result.analyst_pt ? `$${fmt2(result.analyst_pt)}` : "—" },
                 ].map(({ label, value, color }) => (
-                  <div key={label} className="rounded-lg bg-slate-800/60 border border-slate-700 px-3 py-2">
-                    <div className="text-xs text-slate-500 mb-0.5">{label}</div>
-                    <div className={`text-sm font-semibold ${color ?? "text-white"}`}>{value}</div>
+                  <div key={label} className="rounded-lg bg-[var(--bg-raised)] border border-[var(--line)] px-3 py-2">
+                    <div className="text-xs text-[var(--fg-3)] mb-0.5">{label}</div>
+                    <div className={`text-sm font-semibold ${color ?? "text-[var(--fg-1)]"}`}>{value}</div>
                   </div>
                 ))}
               </div>
@@ -283,24 +283,24 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                   { label: "Div Yield", value: result.dividend_yield_pct != null ? fmt2(result.dividend_yield_pct) + "%" : "None" },
                   { label: "Earnings", value: result.earnings_date ? result.earnings_days != null && result.earnings_days >= 0 ? `${result.earnings_days}d` : result.earnings_date : "—" },
                 ].map(({ label, value }) => (
-                  <div key={label} className="rounded bg-slate-800/40 px-2 py-1.5">
-                    <div className="text-[10px] text-slate-500">{label}</div>
-                    <div className="text-xs font-medium text-slate-200">{value}</div>
+                  <div key={label} className="rounded bg-[var(--bg-raised)] px-2 py-1.5">
+                    <div className="text-[10px] text-[var(--fg-3)]">{label}</div>
+                    <div className="text-xs font-medium text-[var(--fg-1)]">{value}</div>
                   </div>
                 ))}
               </div>
 
               <div>
-                <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Trader Analysis</div>
+                <div className="text-xs font-medium text-[var(--fg-2)] uppercase tracking-wide mb-2">Trader Analysis</div>
                 <div className="space-y-2">
                   {(result.trader_analysis ?? []).map((t) => (
-                    <div key={t.handle} className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3">
+                    <div key={t.handle} className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-xs font-semibold text-slate-300 w-36 shrink-0">{t.handle}</span>
-                        <span className={`text-lg font-bold ${scoreColor(t.score)}`}>{t.score}<span className="text-xs text-slate-500">/10</span></span>
+                        <span className="text-xs font-semibold text-[var(--fg-2)] w-36 shrink-0">{t.handle}</span>
+                        <span className={`text-lg font-bold ${scoreColor(t.score)}`}>{t.score}<span className="text-xs text-[var(--fg-3)]">/10</span></span>
                         <span className={`ml-1 rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${verdictColor(t.verdict)}`}>{t.verdict}</span>
                       </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">{t.note}</p>
+                      <p className="text-xs text-[var(--fg-2)] leading-relaxed">{t.note}</p>
                     </div>
                   ))}
                 </div>
@@ -308,8 +308,8 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
 
               {result.entry_plan && (
                 <div>
-                  <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Suggested Entry Plan</div>
-                  <div className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="text-xs font-medium text-[var(--fg-2)] uppercase tracking-wide mb-2">Suggested Entry Plan</div>
+                  <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: "Entry Zone", value: result.entry_plan.zone },
                       { label: "Stop Loss", value: result.entry_plan.stop },
@@ -317,13 +317,13 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                       { label: "R:R", value: result.entry_plan.risk_reward ? `${result.entry_plan.risk_reward}:1` : "—" },
                     ].map(({ label, value }) => (
                       <div key={label}>
-                        <div className="text-[10px] text-slate-500 mb-0.5">{label}</div>
-                        <div className="text-sm font-semibold text-white">{value}</div>
+                        <div className="text-[10px] text-[var(--fg-3)] mb-0.5">{label}</div>
+                        <div className="text-sm font-semibold text-[var(--fg-1)]">{value}</div>
                       </div>
                     ))}
                     <div className="col-span-2 sm:col-span-4">
-                      <div className="text-[10px] text-slate-500 mb-0.5">Batching</div>
-                      <div className="text-xs text-slate-300">{result.entry_plan.batches}</div>
+                      <div className="text-[10px] text-[var(--fg-3)] mb-0.5">Batching</div>
+                      <div className="text-xs text-[var(--fg-2)]">{result.entry_plan.batches}</div>
                     </div>
                   </div>
                 </div>
@@ -332,32 +332,32 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
               {(result.bulls?.length > 0 || result.bears?.length > 0) && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-xs font-medium text-green-400 uppercase tracking-wide mb-2">Bulls</div>
-                    <ul className="space-y-1">{(result.bulls ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-slate-300"><span className="text-green-500 mt-0.5">▲</span>{b}</li>)}</ul>
+                    <div className="text-xs font-medium text-[var(--gain-fg)] uppercase tracking-wide mb-2">Bulls</div>
+                    <ul className="space-y-1">{(result.bulls ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-[var(--fg-2)]"><span className="text-[var(--gain-fg)] mt-0.5">▲</span>{b}</li>)}</ul>
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-red-400 uppercase tracking-wide mb-2">Bears</div>
-                    <ul className="space-y-1">{(result.bears ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-slate-300"><span className="text-red-500 mt-0.5">▼</span>{b}</li>)}</ul>
+                    <div className="text-xs font-medium text-[var(--loss-fg)] uppercase tracking-wide mb-2">Bears</div>
+                    <ul className="space-y-1">{(result.bears ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-[var(--fg-2)]"><span className="text-[var(--loss-fg)] mt-0.5">▼</span>{b}</li>)}</ul>
                   </div>
                 </div>
               )}
 
-              <div className="rounded-lg border border-slate-600 bg-slate-800/60 px-4 py-3 flex items-center gap-4">
+              <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3 flex items-center gap-4">
                 <div>
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wide">Composite Score</div>
-                  <span className={`text-3xl font-bold ${scoreColor(result.composite_score)}`}>{result.composite_score}<span className="text-sm text-slate-500">/10</span></span>
+                  <div className="text-[10px] text-[var(--fg-3)] uppercase tracking-wide">Composite Score</div>
+                  <span className={`text-3xl font-bold ${scoreColor(result.composite_score)}`}>{result.composite_score}<span className="text-sm text-[var(--fg-3)]">/10</span></span>
                 </div>
                 <div className="flex-1">
                   <span className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase ${verdictColor(result.composite_verdict)}`}>{result.composite_verdict}</span>
-                  <p className="mt-1 text-xs text-slate-400">{result.composite_note}</p>
-                  {result.best_match_trader && <p className="mt-1 text-[10px] text-slate-500">Best match: <span className="text-slate-300">{result.best_match_trader}</span></p>}
+                  <p className="mt-1 text-xs text-[var(--fg-2)]">{result.composite_note}</p>
+                  {result.best_match_trader && <p className="mt-1 text-[10px] text-[var(--fg-3)]">Best match: <span className="text-[var(--fg-2)]">{result.best_match_trader}</span></p>}
                 </div>
               </div>
             </>
           )}
 
           {!loading && !error && !result && (
-            <div className="py-8 text-center text-sm text-slate-500">Select a provider and click Analyse to get AI insights on {ticker}.</div>
+            <div className="py-8 text-center text-sm text-[var(--fg-3)]">Select a provider and click Analyse to get AI insights on {ticker}.</div>
           )}
         </div>
       </div>
@@ -459,42 +459,42 @@ function stateBadge(state: string | null) {
 type ReviewStyle = "trader-debate" | "agent-pipeline";
 
 const AGENT_LABELS: Record<keyof AgentPipelineResult["agents"], { label: string; accent: string }> = {
-  data: { label: "Data", accent: "text-blue-300 border-blue-700 bg-blue-900/30" },
-  technical: { label: "Technical", accent: "text-emerald-300 border-emerald-700 bg-emerald-900/30" },
-  chart: { label: "Chart", accent: "text-amber-300 border-amber-700 bg-amber-900/30" },
-  risk: { label: "Risk", accent: "text-rose-300 border-rose-700 bg-rose-900/30" },
+  data: { label: "Data", accent: "text-[var(--accent)] border-[var(--accent)] bg-[var(--accent-soft-bg)]" },
+  technical: { label: "Technical", accent: "text-[var(--gain-fg)] border-[var(--gain-fg)] bg-[var(--gain-bg)]" },
+  chart: { label: "Chart", accent: "text-[var(--warn-500)] border-[var(--warn-500)] bg-[var(--bg-raised)]" },
+  risk: { label: "Risk", accent: "text-[var(--loss-fg)] border-[var(--loss-fg)] bg-[var(--loss-bg)]" },
 };
 
 function signalColor(s: string): string {
-  if (s === "BUY") return "bg-emerald-900/60 text-emerald-300 border-emerald-700";
-  if (s === "SELL") return "bg-red-900/60 text-red-300 border-red-700";
-  return "bg-yellow-900/60 text-yellow-300 border-yellow-700";
+  if (s === "BUY") return "bg-[var(--gain-bg)] text-[var(--gain-fg)] border-[var(--gain-fg)]";
+  if (s === "SELL") return "bg-[var(--loss-bg)] text-[var(--loss-fg)] border-[var(--loss-fg)]";
+  return "bg-[var(--bg-raised)] text-[var(--warn-500)] border-[var(--warn-500)]";
 }
 
 function AgentPipelineView({ result }: { result: AgentPipelineResult }) {
   const { agents, moderator } = result;
   return (
     <div className="space-y-4">
-      <div className="text-xs font-medium text-slate-400 uppercase tracking-wide">Agent pipeline</div>
+      <div className="text-xs font-medium text-[var(--fg-2)] uppercase tracking-wide">Agent pipeline</div>
       <div className="space-y-2">
         {(["data", "technical", "chart", "risk"] as const).map((k) => {
           const agent = agents[k];
           const meta = AGENT_LABELS[k];
           return (
-            <div key={k} className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3">
+            <div key={k} className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
               <div className="flex items-center gap-2 mb-1">
                 <span className={`rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${meta.accent}`}>
                   {meta.label}
                 </span>
                 {k === "risk" && agents.risk.status && (
-                  <span className={`text-[10px] uppercase ${agents.risk.status === "approved" ? "text-emerald-400" : agents.risk.status === "warn" ? "text-amber-400" : "text-red-400"}`}>
+                  <span className={`text-[10px] uppercase ${agents.risk.status === "approved" ? "text-[var(--gain-fg)]" : agents.risk.status === "warn" ? "text-[var(--warn-500)]" : "text-[var(--loss-fg)]"}`}>
                     {agents.risk.status}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">{agent.summary}</p>
+              <p className="text-xs text-[var(--fg-2)] leading-relaxed">{agent.summary}</p>
               {k === "risk" && (
-                <div className="mt-2 flex flex-wrap gap-3 text-[10px] text-slate-500">
+                <div className="mt-2 flex flex-wrap gap-3 text-[10px] text-[var(--fg-3)]">
                   {agents.risk.suggested_size_pct != null && <span>Size: {agents.risk.suggested_size_pct.toFixed(1)}%</span>}
                   {agents.risk.rr != null && <span>R/R: {agents.risk.rr.toFixed(2)}</span>}
                   {agents.risk.stop_distance_pct != null && <span>Stop: {agents.risk.stop_distance_pct.toFixed(1)}%</span>}
@@ -505,16 +505,16 @@ function AgentPipelineView({ result }: { result: AgentPipelineResult }) {
         })}
       </div>
 
-      <div className="rounded-lg border border-slate-600 bg-slate-800/60 px-4 py-3">
+      <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
         <div className="flex items-center gap-3 mb-2 flex-wrap">
-          <span className="text-[10px] text-slate-500 uppercase tracking-wide">Moderator</span>
+          <span className="text-[10px] text-[var(--fg-3)] uppercase tracking-wide">Moderator</span>
           <span className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase ${signalColor(moderator.signal)}`}>
             {moderator.signal}
           </span>
           <span className={`text-2xl font-bold ${scoreColor(moderator.confidence)}`}>
-            {moderator.confidence.toFixed(1)}<span className="text-xs text-slate-500">/10</span>
+            {moderator.confidence.toFixed(1)}<span className="text-xs text-[var(--fg-3)]">/10</span>
           </span>
-          {moderator.consensus && <span className="text-[10px] text-slate-500">consensus {moderator.consensus}</span>}
+          {moderator.consensus && <span className="text-[10px] text-[var(--fg-3)]">consensus {moderator.consensus}</span>}
         </div>
         {(moderator.entry != null || moderator.stop != null || moderator.target != null) && (
           <div className="grid grid-cols-3 gap-3 mb-3 text-xs">
@@ -524,17 +524,17 @@ function AgentPipelineView({ result }: { result: AgentPipelineResult }) {
               { label: "Target", value: moderator.target },
             ].map(({ label, value }) => (
               <div key={label}>
-                <div className="text-[10px] text-slate-500">{label}</div>
-                <div className="font-semibold text-white">{value != null ? `$${value.toFixed(2)}` : "—"}</div>
+                <div className="text-[10px] text-[var(--fg-3)]">{label}</div>
+                <div className="font-semibold text-[var(--fg-1)]">{value != null ? `$${value.toFixed(2)}` : "—"}</div>
               </div>
             ))}
           </div>
         )}
-        <p className="text-xs text-slate-300 leading-relaxed">{moderator.reasoning}</p>
+        <p className="text-xs text-[var(--fg-2)] leading-relaxed">{moderator.reasoning}</p>
         {moderator.lesson && (
           <>
-            <div className="mt-3 text-[10px] text-slate-500 uppercase tracking-wide">Journal lesson</div>
-            <p className="text-xs text-slate-200 leading-relaxed italic">{moderator.lesson}</p>
+            <div className="mt-3 text-[10px] text-[var(--fg-3)] uppercase tracking-wide">Journal lesson</div>
+            <p className="text-xs text-[var(--fg-1)] leading-relaxed italic">{moderator.lesson}</p>
           </>
         )}
       </div>
@@ -621,23 +621,23 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 shadow-2xl"
+        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--bg-surface)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-5 py-3 backdrop-blur">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--line)] bg-[var(--bg-surface)] px-5 py-3 backdrop-blur">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-lg font-semibold text-white">{trade.ticker}</span>
-            <span className="text-xs text-slate-400">Trade Review</span>
-            <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${isOpen ? "bg-blue-900/50 text-blue-400" : pnlNum! >= 0 ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}>
+            <span className="text-lg font-semibold text-[var(--fg-1)]">{trade.ticker}</span>
+            <span className="text-xs text-[var(--fg-2)]">Trade Review</span>
+            <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${isOpen ? "bg-[var(--accent-soft-bg)] text-[var(--accent)]" : pnlNum! >= 0 ? "bg-[var(--gain-bg)] text-[var(--gain-fg)]" : "bg-[var(--loss-bg)] text-[var(--loss-fg)]"}`}>
               {isOpen ? "Open" : pnlNum! >= 0 ? "Win" : "Loss"}
             </span>
-            {isFromCache && !selectedHistoryId && <span className="text-[10px] text-slate-500 italic">cached</span>}
+            {isFromCache && !selectedHistoryId && <span className="text-[10px] text-[var(--fg-3)] italic">cached</span>}
             {history.length > 0 && (
               <select
                 value={selectedHistoryId}
                 onChange={(e) => e.target.value ? selectHistoryItem(e.target.value) : (setSelectedHistoryId(""), setResult(trade.verdict ? (trade.verdict as unknown as TradeReviewResult) : null), setIsFromCache(!!trade.verdict))}
-                className="rounded bg-slate-800 border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300 focus:outline-none"
+                className="rounded bg-[var(--bg-raised)] border border-[var(--line)] px-2 py-0.5 text-[10px] text-[var(--fg-2)] focus:outline-none"
               >
                 <option value="">Latest</option>
                 {history.map((h) => (
@@ -648,7 +648,7 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
               </select>
             )}
           </div>
-          <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-white hover:bg-slate-700 shrink-0">
+          <button onClick={onClose} className="rounded p-1 text-[var(--fg-2)] hover:text-[var(--fg-1)] hover:bg-[var(--bg-raised)] shrink-0">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -657,7 +657,7 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
 
         <div className="p-5 space-y-5">
           {/* Trade summary strip */}
-          <div className="rounded-lg bg-slate-800/40 border border-slate-700 px-4 py-3 grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-xs">
+          <div className="rounded-lg bg-[var(--bg-raised)] border border-[var(--line)] px-4 py-3 grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-xs">
             {[
               { label: "Side", value: trade.side ?? "—" },
               { label: "Entry", value: trade.buyPrice ? "$" + parseFloat(trade.buyPrice.toString()).toFixed(2) : "—" },
@@ -667,15 +667,15 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
               { label: "Strategy", value: trade.strategy ?? "—" },
             ].map(({ label, value }) => (
               <div key={label}>
-                <div className="text-slate-500 mb-0.5">{label}</div>
-                <div className="font-semibold text-slate-200">{value}</div>
+                <div className="text-[var(--fg-3)] mb-0.5">{label}</div>
+                <div className="font-semibold text-[var(--fg-1)]">{value}</div>
               </div>
             ))}
           </div>
 
           {/* Pre-trade plan strip (if available) */}
           {(trade.proposedEntry || trade.proposedSL || trade.proposedTP) && (
-            <div className="rounded-lg bg-slate-800/20 border border-slate-700/50 px-4 py-2 grid grid-cols-3 sm:grid-cols-5 gap-3 text-center text-xs">
+            <div className="rounded-lg bg-[var(--bg-raised)] border border-[var(--line)] px-4 py-2 grid grid-cols-3 sm:grid-cols-5 gap-3 text-center text-xs">
               {[
                 { label: "Plan Entry", value: trade.proposedEntry ? "$" + parseFloat(trade.proposedEntry.toString()).toFixed(2) : "—" },
                 { label: "Plan SL", value: trade.proposedSL ? "$" + parseFloat(trade.proposedSL.toString()).toFixed(2) : "—" },
@@ -684,8 +684,8 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
                 { label: "Risk %", value: trade.riskPct ? parseFloat(trade.riskPct.toString()).toFixed(1) + "%" : "—" },
               ].map(({ label, value }) => (
                 <div key={label}>
-                  <div className="text-slate-500 mb-0.5">{label}</div>
-                  <div className="font-medium text-slate-300">{value}</div>
+                  <div className="text-[var(--fg-3)] mb-0.5">{label}</div>
+                  <div className="font-medium text-[var(--fg-2)]">{value}</div>
                 </div>
               ))}
             </div>
@@ -693,8 +693,8 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
 
           {/* Review style toggle */}
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-500 uppercase tracking-wide">Review style</span>
-            <div className="inline-flex rounded-md border border-slate-700 bg-slate-800/60 p-0.5">
+            <span className="text-[var(--fg-3)] uppercase tracking-wide">Review style</span>
+            <div className="inline-flex rounded-md border border-[var(--line)] bg-[var(--bg-raised)] p-0.5">
               {(["trader-debate", "agent-pipeline"] as const).map((s) => (
                 <button
                   key={s}
@@ -702,8 +702,8 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
                   disabled={loading}
                   className={`rounded px-3 py-1 text-[11px] font-medium transition ${
                     selectedStyle === s
-                      ? "bg-emerald-600 text-white"
-                      : "text-slate-400 hover:text-slate-200"
+                      ? "bg-[var(--accent)] text-[var(--fg-1)]"
+                      : "text-[var(--fg-2)] hover:text-[var(--fg-1)]"
                   }`}
                 >
                   {s === "trader-debate" ? "Trader Debate" : "Agent Pipeline"}
@@ -711,7 +711,7 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
               ))}
             </div>
             {selectedStyle === "agent-pipeline" && (
-              <span className="text-[10px] text-amber-500/80">v0 — sparse snapshot, no live indicators</span>
+              <span className="text-[10px] text-[var(--warn-500)]">v0 — sparse snapshot, no live indicators</span>
             )}
           </div>
 
@@ -725,13 +725,13 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
             hasResult={!!result}
           />
           {providerNote && (
-            <div className="rounded bg-amber-900/20 border border-amber-800/40 px-3 py-1.5 text-[11px] text-amber-400">
+            <div className="rounded bg-[var(--bg-raised)] border border-[var(--warn-500)] px-3 py-1.5 text-[11px] text-[var(--warn-500)]">
               {providerNote}
             </div>
           )}
 
           {loading && <Spinner label={`Reviewing ${trade.ticker} trade…`} />}
-          {error && <div className="rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-400">{error}</div>}
+          {error && <div className="rounded-lg bg-[var(--loss-bg)] border border-[var(--loss-fg)] px-4 py-3 text-sm text-[var(--loss-fg)]">{error}</div>}
 
           {result && isAgentPipelineResult(result) && (
             <AgentPipelineView result={result} />
@@ -742,29 +742,29 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
               {/* Sector / industry header */}
               {(result.sector || result.industry) && (
                 <div className="flex gap-2 flex-wrap">
-                  {result.sector && <span className="rounded bg-slate-700/60 border border-slate-600 px-2 py-0.5 text-[10px] text-slate-300">{result.sector}</span>}
-                  {result.industry && <span className="rounded bg-slate-700/40 border border-slate-700 px-2 py-0.5 text-[10px] text-slate-400">{result.industry}</span>}
-                  {result.market_cap_tier && <span className="rounded bg-slate-700/40 border border-slate-700 px-2 py-0.5 text-[10px] text-slate-400">{result.market_cap_tier} Cap</span>}
+                  {result.sector && <span className="rounded bg-[var(--bg-raised)] border border-[var(--line)] px-2 py-0.5 text-[10px] text-[var(--fg-2)]">{result.sector}</span>}
+                  {result.industry && <span className="rounded bg-[var(--bg-raised)] border border-[var(--line)] px-2 py-0.5 text-[10px] text-[var(--fg-2)]">{result.industry}</span>}
+                  {result.market_cap_tier && <span className="rounded bg-[var(--bg-raised)] border border-[var(--line)] px-2 py-0.5 text-[10px] text-[var(--fg-2)]">{result.market_cap_tier} Cap</span>}
                 </div>
               )}
 
                               {/* 7-trader scoring rows */}
               <div>
-                <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Trader Perspectives</div>
+                <div className="text-xs font-medium text-[var(--fg-2)] uppercase tracking-wide mb-2">Trader Perspectives</div>
                 <div className="space-y-2">
                   {(result.trader_reviews ?? []).map((t) => {
                     const total = t.total_score ?? (t.entry_score + (t.risk_score ?? 0) + (t.setup_score ?? 0));
                     return (
-                      <div key={t.handle} className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3">
+                      <div key={t.handle} className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <span className="text-xs font-semibold text-slate-300 w-32 shrink-0">{t.handle}</span>
-                          <span className={`text-lg font-bold ${scoreColor(total)}`}>{total}<span className="text-xs text-slate-500">/10</span></span>
+                          <span className="text-xs font-semibold text-[var(--fg-2)] w-32 shrink-0">{t.handle}</span>
+                          <span className={`text-lg font-bold ${scoreColor(total)}`}>{total}<span className="text-xs text-[var(--fg-3)]">/10</span></span>
                           <span className={`rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${verdictColor(t.verdict)}`}>{t.verdict}</span>
-                          <span className="ml-auto text-[10px] text-slate-500">
+                          <span className="ml-auto text-[10px] text-[var(--fg-3)]">
                             Entry {t.entry_score}/4 · Risk {t.risk_score ?? "?"}/3 · Setup {t.setup_score ?? "?"}/3
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400 leading-relaxed">{t.note}</p>
+                        <p className="text-xs text-[var(--fg-2)] leading-relaxed">{t.note}</p>
                       </div>
                     );
                   })}
@@ -775,12 +775,12 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
               {(result.bull_case?.length > 0 || result.bear_case?.length > 0) && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-xs font-medium text-green-400 uppercase tracking-wide mb-2">Bull Case</div>
-                    <ul className="space-y-1">{(result.bull_case ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-slate-300"><span className="text-green-500 mt-0.5">▲</span>{b}</li>)}</ul>
+                    <div className="text-xs font-medium text-[var(--gain-fg)] uppercase tracking-wide mb-2">Bull Case</div>
+                    <ul className="space-y-1">{(result.bull_case ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-[var(--fg-2)]"><span className="text-[var(--gain-fg)] mt-0.5">▲</span>{b}</li>)}</ul>
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-red-400 uppercase tracking-wide mb-2">Bear Case</div>
-                    <ul className="space-y-1">{(result.bear_case ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-slate-300"><span className="text-red-500 mt-0.5">▼</span>{b}</li>)}</ul>
+                    <div className="text-xs font-medium text-[var(--loss-fg)] uppercase tracking-wide mb-2">Bear Case</div>
+                    <ul className="space-y-1">{(result.bear_case ?? []).map((b, i) => <li key={i} className="flex gap-2 text-xs text-[var(--fg-2)]"><span className="text-[var(--loss-fg)] mt-0.5">▼</span>{b}</li>)}</ul>
                   </div>
                 </div>
               )}
@@ -788,8 +788,8 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
               {/* Entry plan */}
               {result.entry_plan && (
                 <div>
-                  <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Entry Plan</div>
-                  <div className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3 space-y-3">
+                  <div className="text-xs font-medium text-[var(--fg-2)] uppercase tracking-wide mb-2">Entry Plan</div>
+                  <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3 space-y-3">
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
                       {[
                         { label: "Ideal Entry", value: result.entry_plan.ideal_entry },
@@ -799,19 +799,19 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
                         { label: "Position Size", value: result.entry_plan.position_size },
                       ].map(({ label, value }) => (
                         <div key={label}>
-                          <div className="text-slate-500 mb-0.5">{label}</div>
-                          <div className="font-semibold text-white">{value}</div>
+                          <div className="text-[var(--fg-3)] mb-0.5">{label}</div>
+                          <div className="font-semibold text-[var(--fg-1)]">{value}</div>
                         </div>
                       ))}
                     </div>
                     {result.entry_plan.batch_sells?.length > 0 && (
                       <div>
-                        <div className="text-[10px] text-slate-500 mb-1.5">Batch Exit Plan</div>
+                        <div className="text-[10px] text-[var(--fg-3)] mb-1.5">Batch Exit Plan</div>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {result.entry_plan.batch_sells.map((b, i) => (
-                            <div key={i} className="rounded bg-slate-700/40 border border-slate-600/50 px-2 py-1.5 text-center">
-                              <div className="text-[10px] text-slate-400">{b.tranche}</div>
-                              <div className="text-xs font-medium text-slate-200">{b.at}</div>
+                            <div key={i} className="rounded bg-[var(--bg-raised)] border border-[var(--line)] px-2 py-1.5 text-center">
+                              <div className="text-[10px] text-[var(--fg-2)]">{b.tranche}</div>
+                              <div className="text-xs font-medium text-[var(--fg-1)]">{b.at}</div>
                             </div>
                           ))}
                         </div>
@@ -822,28 +822,28 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
               )}
 
               {/* Composite score footer */}
-              <div className="rounded-lg border border-slate-600 bg-slate-800/60 px-4 py-3 flex items-start gap-4">
+              <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3 flex items-start gap-4">
                 <div className="shrink-0">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wide">Score</div>
+                  <div className="text-[10px] text-[var(--fg-3)] uppercase tracking-wide">Score</div>
                   <span className={`text-3xl font-bold ${scoreColor(result.overall_score)}`}>
-                    {result.overall_score}<span className="text-sm text-slate-500">/10</span>
+                    {result.overall_score}<span className="text-sm text-[var(--fg-3)]">/10</span>
                   </span>
                   <div className="mt-1">
                     <span className={`rounded border px-2 py-0.5 text-xs font-semibold uppercase ${verdictColor(result.overall_verdict)}`}>{result.overall_verdict}</span>
                   </div>
                 </div>
                 <div className="flex-1 space-y-1.5">
-                  {result.best_match && <p className="text-[10px] text-slate-500">Best match: <span className="text-slate-300 font-medium">{result.best_match}</span></p>}
-                  {result.weakest_dimension && <p className="text-[10px] text-slate-500">Weakest: <span className="text-amber-400">{result.weakest_dimension}</span></p>}
-                  <div className="text-[10px] text-slate-500 mt-1">Key Lesson</div>
-                  <p className="text-xs text-slate-300 leading-relaxed">{result.lesson}</p>
+                  {result.best_match && <p className="text-[10px] text-[var(--fg-3)]">Best match: <span className="text-[var(--fg-2)] font-medium">{result.best_match}</span></p>}
+                  {result.weakest_dimension && <p className="text-[10px] text-[var(--fg-3)]">Weakest: <span className="text-[var(--warn-500)]">{result.weakest_dimension}</span></p>}
+                  <div className="text-[10px] text-[var(--fg-3)] mt-1">Key Lesson</div>
+                  <p className="text-xs text-[var(--fg-2)] leading-relaxed">{result.lesson}</p>
                 </div>
               </div>
             </>
           )}
 
           {!loading && !error && !result && (
-            <div className="py-8 text-center text-sm text-slate-500">
+            <div className="py-8 text-center text-sm text-[var(--fg-3)]">
               Select a provider and click Analyse to get a detailed trade quality review.
             </div>
           )}

@@ -125,6 +125,11 @@ export async function GET(req: Request) {
     realized,
     accountValue,
     accountValueReliable,
+    // Reliable building blocks for a net-account-value line, independent of the
+    // (possibly wrong) broker total: live positions value + last known cash.
+    // The UI lets you override cash manually until the bridge acc_id is fixed.
+    positionsValue: Number(positionsValue.toFixed(2)),
+    latestCash: latest?.cash ?? null,
     reconciliation: expectedNet != null
       ? {
           expectedNet: Number(expectedNet.toFixed(2)),
