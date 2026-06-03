@@ -1,38 +1,61 @@
 /**
  * GET /api/equity/timeline
  *
- * Two-line equity view:
- *   1. `realized` — cumulative REALIZED P&L from the user's sheet closed trades.
- *      This is the reliable "real equity curve": it reflects actual booked
- *      trading performance and does NOT depend on the broker snapshot.
- *   2. `accountValue` — broker net account value (EquitySnapshot.totalAssets),
- *      shown ONLY when it reconciles with cash + live position value. The
- *      moomoo bridge has been observed reporting totals that are multiples of
- *      the real account (wrong acc_id / margin buying-power / aggregate view),
- *      so we fail-closed: if broker totals diverge >50% from (cash + positions)
- *      we mark `accountValueReliable=false` and the UI hides that line + warns
- *      rather than showing a fake number.
+ * Currency-aware equity view. Two facts drive this:
+ *   • Your sheet records realized P&L in MYR (verified: clean trades ≈ 4.7× the
+ *     USD price move). So the `realized` curve is MYR, summed across ALL closed
+ *     trades (the broker/market `currency` column is NOT the P&L currency).
+ *   • Your live broker account (cash + US positions) is USD.
+ * To put them on one curve, the UI toggles USD/MYR using a LIVE USD/MYR rate.
  *
- * Auth: NextAuth session, own data only.
- * Query: ?from=YYYY-MM-DD ?to=YYYY-MM-DD ?accountId=...
+ * Returns realized in MYR + the FX rate + USD net-value building blocks; the
+ * client converts to the selected display currency. Broker net-value is still
+ * gated by reconciliation (the wrong ~$103k total is never shown).
+ *
+ * Phase 2 (needs bridge): replace the sheet realized with MooMoo deal-history
+ * realized (native USD) where available — see EQUITY tasks.
  */
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
+import { liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-const RECONCILE_TOLERANCE = 0.5; // broker total may differ from cash+positions by ≤50%
+const RECONCILE_TOLERANCE = 0.5;
+
+function plainTicker(ticker: string): string {
+  return ticker.replace(/^[A-Za-z]{2}\./, "").toUpperCase();
+}
+
+// Live USD/MYR with a warm-instance cache + fail-closed (null when unknown —
+// the UI then stays in MYR rather than guessing a rate).
+let _fx: { rate: number; at: number } | null = null;
+async function getUsdMyr(): Promise<number | null> {
+  if (_fx && Date.now() - _fx.at < 3_600_000) return _fx.rate;
+  try {
+    const r = await fetch("https://api.frankfurter.app/latest?from=USD&to=MYR", {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (r.ok) {
+      const j = await r.json();
+      const rate = Number(j?.rates?.MYR);
+      if (Number.isFinite(rate) && rate > 0) {
+        _fx = { rate, at: Date.now() };
+        return rate;
+      }
+    }
+  } catch {
+    /* fall through to last-known / null */
+  }
+  return _fx?.rate ?? null;
+}
 
 export async function GET(req: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  if (!canSeePersonalBook(session)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canSeePersonalBook(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const userScopeId = scopeUserId(session)!;
 
   const qp = new URL(req.url).searchParams;
@@ -53,55 +76,29 @@ export async function GET(req: Request) {
     orderBy: { createdAt: "asc" },
   });
 
-  // Single-currency equity: you CANNOT sum USD + MYR. Use the connected
-  // account's currency (USD here; overridable via ?currency=) and EXCLUDE
-  // trades booked in other currencies (e.g. the lone MYR Affin Hwang trade),
-  // reporting the excluded set for transparency.
-  const equityCurrency = (
-    qp.get("currency") ?? accounts[0]?.displayCurrency ?? accounts[0]?.preset?.currency ?? "USD"
-  ).toUpperCase();
-
-  // ── Reliable line: cumulative realized P&L from the sheet (one currency) ────
+  // ── Reliable line: cumulative realized P&L from the sheet, in MYR ───────────
+  // ALL closed trades (the sheet stores P&L already converted to MYR).
   const closed = await prisma.tradeRecord.findMany({
     where: {
       userId: userScopeId,
       pnl: { not: null },
-      currency: equityCurrency,
       tradeDate: { not: null, gte: from, lte: to },
       ...(accountId ? { brokerAccountId: accountId } : {}),
     },
     select: { tradeDate: true, pnl: true },
     orderBy: { tradeDate: "asc" },
   });
-  // Closed trades in OTHER currencies, excluded from this curve (for a UI note).
-  const otherCurrency = await prisma.tradeRecord.groupBy({
-    by: ["currency"],
-    where: {
-      userId: userScopeId,
-      pnl: { not: null },
-      tradeDate: { not: null, gte: from, lte: to },
-      NOT: { currency: equityCurrency },
-      ...(accountId ? { brokerAccountId: accountId } : {}),
-    },
-    _count: true,
-    _sum: { pnl: true },
-  });
-  const excludedCurrencies = otherCurrency.map((g) => ({
-    currency: g.currency ?? "(none)",
-    count: g._count,
-    sumPnl: g._sum.pnl != null ? Number(g._sum.pnl) : null,
-  }));
   let running = 0;
   const realizedByDate = new Map<string, number>();
   for (const c of closed) {
     running += Number(c.pnl);
     realizedByDate.set(c.tradeDate!.toISOString().slice(0, 10), running);
   }
-  const realized = Array.from(realizedByDate.entries())
+  const realizedMyr = Array.from(realizedByDate.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, value]) => ({ date, value: Number(value.toFixed(2)) }));
 
-  // ── Broker account-value line (raw, then reconciled) ───────────────────────
+  // ── Broker account value (USD) + reconciliation guard ──────────────────────
   const snapshots = await prisma.equitySnapshot.findMany({
     where: {
       userId: userScopeId,
@@ -110,36 +107,63 @@ export async function GET(req: Request) {
     },
     orderBy: { snapshotDate: "asc" },
   });
-  const byDate = new Map<string, { totalAssets: number; cash: number; marketVal: number }>();
+  const byDate = new Map<string, { totalAssets: number; cash: number }>();
   for (const s of snapshots) {
     const k = s.snapshotDate.toISOString().slice(0, 10);
-    const cur = byDate.get(k) ?? { totalAssets: 0, cash: 0, marketVal: 0 };
+    const cur = byDate.get(k) ?? { totalAssets: 0, cash: 0 };
     cur.totalAssets += Number(s.totalAssets);
     cur.cash += Number(s.cash);
-    cur.marketVal += Number(s.marketVal);
     byDate.set(k, cur);
   }
   const accountValue = Array.from(byDate.entries())
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, v]) => ({
-      date,
-      totalAssets: Number(v.totalAssets.toFixed(2)),
-      cash: Number(v.cash.toFixed(2)),
-      marketVal: Number(v.marketVal.toFixed(2)),
-    }));
+    .map(([date, v]) => ({ date, totalAssets: Number(v.totalAssets.toFixed(2)), cash: Number(v.cash.toFixed(2)) }));
 
-  // ── Reconciliation guard ───────────────────────────────────────────────────
-  // expected net = latest cash + current live position value (the values that
-  // actually match the user's real holdings). If the broker's reported total is
-  // wildly off, the account-value line is not trustworthy.
   const positions = await prisma.position.findMany({
     where: { brokerAccount: { userId: userScopeId } },
-    select: { qty: true, avgCost: true, currentPrice: true },
+    select: { ticker: true, qty: true, avgCost: true, currentPrice: true, currency: true, asOf: true },
   });
-  const positionsValue = positions.reduce((sum, p) => {
-    const px = p.currentPrice != null ? Number(p.currentPrice) : Number(p.avgCost);
+  const usdPositions = positions.filter((p) => p.currency === "USD");
+  const positionSymbols = Array.from(new Set(usdPositions.map((p) => plainTicker(p.ticker))));
+  const liveQuotes = positionSymbols.length
+    ? await prisma.liveQuote.findMany({
+        where: { symbol: { in: positionSymbols } },
+        select: { symbol: true, price: true, observedAt: true, source: true },
+      })
+    : [];
+  const quoteBySymbol = new Map(liveQuotes.map((q) => [q.symbol, q]));
+  const staleMs = liveQuoteThresholdsForNow().staleSec * 1000;
+  let staleQuotes = 0;
+  let usedPositionCache = 0;
+  let usedAvgCost = 0;
+  let latestQuoteAtMs: number | null = null;
+
+  const positionsValue = usdPositions.reduce((sum, p) => {
+    const quote = quoteBySymbol.get(plainTicker(p.ticker));
+    const quoteFresh = quote ? Date.now() - quote.observedAt.getTime() <= staleMs : false;
+    if (quote?.observedAt && (latestQuoteAtMs == null || quote.observedAt.getTime() > latestQuoteAtMs)) {
+      latestQuoteAtMs = quote.observedAt.getTime();
+    }
+    if (quote && !quoteFresh) staleQuotes += 1;
+
+    let px: number;
+    if (quote && quoteFresh) {
+      px = Number(quote.price);
+    } else if (p.currentPrice != null) {
+      px = Number(p.currentPrice);
+      usedPositionCache += 1;
+    } else {
+      px = Number(p.avgCost);
+      usedAvgCost += 1;
+    }
     return sum + Number(p.qty) * px;
   }, 0);
+  const excludedPositionCurrencies = positions
+    .filter((p) => p.currency !== "USD")
+    .reduce<Record<string, number>>((acc, p) => {
+      acc[p.currency] = (acc[p.currency] ?? 0) + 1;
+      return acc;
+    }, {});
   const latest = accountValue.length ? accountValue[accountValue.length - 1] : null;
   const expectedNet = latest ? latest.cash + positionsValue : null;
   const brokerLatest = latest?.totalAssets ?? null;
@@ -148,29 +172,29 @@ export async function GET(req: Request) {
       ? Math.abs(brokerLatest - expectedNet) / expectedNet <= RECONCILE_TOLERANCE
       : false;
 
+  const fxUsdMyr = await getUsdMyr();
+
   return NextResponse.json({
-    realized,
-    currency: equityCurrency,
-    excludedCurrencies,
-    accountValue,
-    accountValueReliable,
-    // Reliable building blocks for a net-account-value line, independent of the
-    // (possibly wrong) broker total: live positions value + last known cash.
-    // The UI lets you override cash manually until the bridge acc_id is fixed.
+    // realized is MYR (sheet); net building blocks are USD (broker). The client
+    // converts to the chosen display currency with fxUsdMyr.
+    realizedMyr,
+    realizedCurrency: "MYR",
+    fxUsdMyr,
     positionsValue: Number(positionsValue.toFixed(2)),
+    positionsPricing: {
+      source: usedAvgCost > 0 ? "mixed" : (usedPositionCache > 0 ? "position-cache" : "live-quote"),
+      latestQuoteAt: latestQuoteAtMs == null ? null : new Date(latestQuoteAtMs).toISOString(),
+      liveQuoteCount: liveQuotes.length,
+      staleQuotes,
+      usedPositionCache,
+      usedAvgCost,
+      excludedPositionCurrencies,
+    },
     latestCash: latest?.cash ?? null,
+    accountValueReliable,
     reconciliation: expectedNet != null
-      ? {
-          expectedNet: Number(expectedNet.toFixed(2)),
-          brokerLatest,
-          positionsValue: Number(positionsValue.toFixed(2)),
-          latestCash: latest?.cash ?? null,
-        }
+      ? { expectedNet: Number(expectedNet.toFixed(2)), brokerLatest, positionsValue: Number(positionsValue.toFixed(2)), latestCash: latest?.cash ?? null }
       : null,
-    accounts: accounts.map((a) => ({
-      id: a.id,
-      alias: a.alias,
-      currency: a.displayCurrency ?? a.preset.currency,
-    })),
+    accounts: accounts.map((a) => ({ id: a.id, alias: a.alias, currency: a.displayCurrency ?? a.preset.currency })),
   });
 }

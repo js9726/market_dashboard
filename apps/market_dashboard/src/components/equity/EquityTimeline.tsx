@@ -3,13 +3,10 @@
 /**
  * EquityTimeline (/dashboard/equity).
  *
- * Two reliable lines, both independent of the broken broker total:
- *   • Realized P&L — cumulative booked P&L from sheet closed trades.
- *   • Net account value — (cash + live position value) projected back through
- *     time via the realized-P&L curve. Cash defaults to the last broker
- *     snapshot but can be overridden manually (persisted locally) until the
- *     bridge acc_id is fixed. We never plot the raw broker total when it fails
- *     reconciliation.
+ * Realized P&L comes from your sheet in MYR; the live account (cash + US
+ * positions) is USD. A USD/MYR toggle converts both onto one curve using a
+ * live USD/MYR rate. If the rate is unavailable we fail closed: show realized
+ * in MYR and the account value in USD without guessing a conversion.
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -17,29 +14,44 @@ import { useEffect, useMemo, useState } from "react";
 interface RealizedPoint { date: string; value: number }
 interface Reconciliation { expectedNet: number; brokerLatest: number | null; positionsValue: number; latestCash: number | null }
 interface Account { id: string; alias: string; currency: string }
-interface ExcludedCurrency { currency: string; count: number; sumPnl: number | null }
+interface PositionsPricing {
+  source: "live-quote" | "position-cache" | "mixed";
+  latestQuoteAt: string | null;
+  liveQuoteCount: number;
+  staleQuotes: number;
+  usedPositionCache: number;
+  usedAvgCost: number;
+  excludedPositionCurrencies: Record<string, number>;
+}
 interface Resp {
-  realized: RealizedPoint[];
-  currency: string;
-  excludedCurrencies: ExcludedCurrency[];
-  accountValueReliable: boolean;
+  realizedMyr: RealizedPoint[];
+  realizedCurrency: string;
+  fxUsdMyr: number | null;
   positionsValue: number;
+  positionsPricing: PositionsPricing;
   latestCash: number | null;
+  accountValueReliable: boolean;
   reconciliation: Reconciliation | null;
   accounts: Account[];
 }
 
 const CASH_KEY = "md-equity-cash-override";
+const CCY_KEY = "md-equity-ccy";
+type Ccy = "USD" | "MYR";
 
 export default function EquityTimeline() {
   const [data, setData] = useState<Resp | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [windowDays, setWindowDays] = useState(90);
-  const [cashOverride, setCashOverride] = useState<string>("");
+  const [cashOverride, setCashOverride] = useState("");
+  const [wantCcy, setWantCcy] = useState<Ccy>("USD");
 
   useEffect(() => {
-    if (typeof window !== "undefined") setCashOverride(window.localStorage.getItem(CASH_KEY) ?? "");
+    if (typeof window === "undefined") return;
+    setCashOverride(window.localStorage.getItem(CASH_KEY) ?? "");
+    const c = window.localStorage.getItem(CCY_KEY);
+    if (c === "USD" || c === "MYR") setWantCcy(c);
   }, []);
 
   useEffect(() => {
@@ -48,8 +60,7 @@ export default function EquityTimeline() {
     const to = new Date().toISOString().slice(0, 10);
     const fromD = new Date();
     fromD.setUTCDate(fromD.getUTCDate() - windowDays);
-    const from = fromD.toISOString().slice(0, 10);
-    fetch(`/api/equity/timeline?from=${from}&to=${to}`, { cache: "no-store" })
+    fetch(`/api/equity/timeline?from=${fromD.toISOString().slice(0, 10)}&to=${to}`, { cache: "no-store" })
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((j) => { if (!cancelled) { setData(j); setLoading(false); } })
       .catch((e) => { if (!cancelled) { setError((e as Error).message); setLoading(false); } });
@@ -58,26 +69,46 @@ export default function EquityTimeline() {
 
   function saveCash(v: string) {
     setCashOverride(v);
-    if (typeof window !== "undefined") {
-      if (v.trim() === "") window.localStorage.removeItem(CASH_KEY);
-      else window.localStorage.setItem(CASH_KEY, v);
+    if (typeof window === "undefined") return;
+    if (v.trim() === "") {
+      window.localStorage.removeItem(CASH_KEY);
+    } else {
+      window.localStorage.setItem(CASH_KEY, v);
     }
   }
+  function pickCcy(c: Ccy) {
+    setWantCcy(c);
+    if (typeof window !== "undefined") window.localStorage.setItem(CCY_KEY, c);
+  }
 
-  const realized = useMemo(() => (data?.realized ?? []).map((p) => ({ date: p.date, v: p.value })), [data]);
+  const fx = data?.fxUsdMyr ?? null;
+  const canConvert = fx != null && fx > 0;
+  // Realized is MYR natively; only show USD when we have a rate.
+  const ccy: Ccy = canConvert ? wantCcy : "MYR";
+  const sym = ccy === "MYR" ? "RM" : "$";
+
+  // Realized series in the display currency (MYR native → ÷fx for USD).
+  const realized = useMemo(() => {
+    const pts = data?.realizedMyr ?? [];
+    return pts.map((p) => ({ date: p.date, v: ccy === "USD" && fx ? p.value / fx : p.value }));
+  }, [data, ccy, fx]);
+
   const positionsValue = data?.positionsValue ?? 0;
-  const currency = data?.currency ?? "USD";
-  const excluded = data?.excludedCurrencies ?? [];
-  const cashNum = cashOverride.trim() !== "" ? Number(cashOverride) : (data?.latestCash ?? null);
-  const currentNet = cashNum != null ? cashNum + positionsValue : null;
+  const parsedCash = cashOverride.trim() !== "" ? Number(cashOverride) : null;
+  const cashNum =
+    parsedCash != null
+      ? (Number.isFinite(parsedCash) ? parsedCash : null)
+      : (data?.latestCash ?? null);
+  const netUsd = cashNum != null ? cashNum + positionsValue : null; // USD
+  const netInCcy = netUsd == null ? null : ccy === "MYR" ? (fx ? netUsd * fx : null) : netUsd;
 
-  // Net account value line: project current net back via the realized curve.
+  // Net-value line: project net (display ccy) back through the realized curve.
   const netSeries = useMemo(() => {
-    if (currentNet == null || realized.length === 0) return [];
+    if (netInCcy == null || realized.length === 0) return [];
     const totalRealized = realized[realized.length - 1].v;
-    const startingCapital = currentNet - totalRealized;
-    return realized.map((p) => ({ date: p.date, v: Number((startingCapital + p.v).toFixed(2)) }));
-  }, [currentNet, realized]);
+    const start = netInCcy - totalRealized;
+    return realized.map((p) => ({ date: p.date, v: Number((start + p.v).toFixed(2)) }));
+  }, [netInCcy, realized]);
 
   const stats = useMemo(() => computeStats(realized), [realized]);
   const allV = useMemo(() => [...realized.map((p) => p.v), ...netSeries.map((p) => p.v)], [realized, netSeries]);
@@ -90,11 +121,23 @@ export default function EquityTimeline() {
         <div>
           <p className="t-overline text-[var(--fg-3)]">Equity Timeline</p>
           <p className="t-caption">
-            Realized P&amp;L from your booked trades + net account value (cash + live positions).
-            Both are independent of the broker total, which is gated by reconciliation.
+            Realized P&amp;L (from your sheet, MYR) + net account value (cash + live positions, USD),
+            shown in {ccy}{canConvert ? ` at USD/MYR ${fx!.toFixed(3)}` : ""}.
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <div className="inline-flex gap-1 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-raised)] p-1">
+            {(["USD", "MYR"] as Ccy[]).map((c) => (
+              <button
+                key={c}
+                onClick={() => pickCcy(c)}
+                disabled={!canConvert && c === "USD"}
+                className={`rounded-[var(--radius-sm)] px-3 py-1 text-xs font-medium transition ${ccy === c ? "bg-[var(--accent)] text-[var(--accent-fg)]" : "text-[var(--fg-3)] hover:text-[var(--fg-1)] disabled:opacity-40"}`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
           <label className="t-caption flex items-center gap-1.5">
             Cash $
             <input
@@ -103,7 +146,7 @@ export default function EquityTimeline() {
               onChange={(e) => saveCash(e.target.value)}
               placeholder={data?.latestCash != null ? String(data.latestCash) : "cash"}
               className="w-24 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-2 py-1 text-xs text-[var(--fg-1)] focus:border-[var(--accent)] focus:outline-none"
-              title="Override cash to compute net account value (saved on this device)"
+              title="Override USD cash to compute net account value (saved on this device)"
             />
           </label>
           {[30, 90, 180, 365].map((d) => (
@@ -114,29 +157,43 @@ export default function EquityTimeline() {
         </div>
       </div>
 
+      {data && !canConvert && (
+        <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
+          <span className="font-semibold text-[var(--warn-500)]">Live USD/MYR unavailable.</span>{" "}
+          Showing realized P&amp;L in MYR; account value stays USD (can&apos;t combine without a rate).
+        </div>
+      )}
+      {data && (data.positionsPricing.usedAvgCost > 0 || data.positionsPricing.usedPositionCache > 0 || data.positionsPricing.staleQuotes > 0) && (
+        <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
+          <span className="font-semibold text-[var(--warn-500)]">Position pricing fallback.</span>{" "}
+          {data.positionsPricing.latestQuoteAt
+            ? `Latest quote ${new Date(data.positionsPricing.latestQuoteAt).toLocaleString()}. `
+            : "No live quote timestamp available. "}
+          {data.positionsPricing.usedAvgCost > 0
+            ? `${data.positionsPricing.usedAvgCost} position${data.positionsPricing.usedAvgCost !== 1 ? "s" : ""} valued at average cost. `
+            : null}
+          {data.positionsPricing.usedPositionCache > 0
+            ? `${data.positionsPricing.usedPositionCache} position${data.positionsPricing.usedPositionCache !== 1 ? "s" : ""} valued from cached broker price. `
+            : null}
+          {data.positionsPricing.staleQuotes > 0
+            ? `${data.positionsPricing.staleQuotes} stale live quote${data.positionsPricing.staleQuotes !== 1 ? "s" : ""} ignored.`
+            : null}
+        </div>
+      )}
       {data && !data.accountValueReliable && data.reconciliation && (
         <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
           <span className="font-semibold text-[var(--warn-500)]">Broker total ignored.</span>{" "}
           The bridge reported{" "}
           <span className="font-mono">{data.reconciliation.brokerLatest != null ? `$${fmt(data.reconciliation.brokerLatest)}` : "n/a"}</span>{" "}
-          (doesn&apos;t reconcile with cash + positions). Net value below is computed from cash + live positions instead.
-          Fix the moomoo <code>acc_id</code> (see EQUITY-ACCID-FIX.md) for an automatic figure.
+          (doesn&apos;t reconcile with cash + positions). Net value uses cash + live positions instead.
         </div>
       )}
 
-      {excluded.length > 0 && (
-        <p className="t-caption text-[var(--fg-3)]">
-          Excluded from this {currency} curve:{" "}
-          {excluded.map((e) => `${e.count} ${e.currency} trade${e.count !== 1 ? "s" : ""}`).join(", ")}
-          {" "}— can&apos;t sum across currencies.
-        </p>
-      )}
-
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label={`Net account value (${currency})`} value={currentNet != null ? `$${fmt(currentNet)}` : "—"} />
-        <Stat label={`Realized P&L (${currency})`} value={signed(stats.current)} color={stats.current >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
-        <Stat label={`${windowDays}d Realized`} value={signed(stats.change)} color={stats.change >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
-        <Stat label="Max Drawdown" value={`-$${fmt(stats.maxDd)}`} color="var(--loss-fg)" />
+        <Stat label={`Net account value (${netInCcy != null ? ccy : "USD"})`} value={netInCcy != null ? `${sym}${fmt(netInCcy)}` : netUsd != null ? `$${fmt(netUsd)}` : "—"} />
+        <Stat label={`Realized P&L (${ccy})`} value={signed(stats.current, sym)} color={stats.current >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
+        <Stat label={`${windowDays}d Realized`} value={signed(stats.change, sym)} color={stats.change >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
+        <Stat label="Max Drawdown" value={`-${sym}${fmt(stats.maxDd)}`} color="var(--loss-fg)" />
       </div>
 
       {loading ? (
@@ -182,8 +239,8 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
 function fmt(n: number): string {
   return Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-function signed(n: number): string {
-  return `${n >= 0 ? "+" : "-"}$${fmt(n)}`;
+function signed(n: number, sym: string): string {
+  return `${n >= 0 ? "+" : "-"}${sym}${fmt(n)}`;
 }
 
 function computeStats(points: { date: string; v: number }[]) {
