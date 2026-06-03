@@ -24,8 +24,11 @@ interface PositionsPricing {
   excludedPositionCurrencies: Record<string, number>;
 }
 interface Resp {
-  realizedMyr: RealizedPoint[];
+  realized: RealizedPoint[];
   realizedCurrency: string;
+  realizedGrossUsd: number;
+  realizedFeesUsd: number;
+  realizedNetUsd: number;
   fxUsdMyr: number | null;
   positionsValue: number;
   positionsPricing: PositionsPricing;
@@ -83,14 +86,14 @@ export default function EquityTimeline() {
 
   const fx = data?.fxUsdMyr ?? null;
   const canConvert = fx != null && fx > 0;
-  // Realized is MYR natively; only show USD when we have a rate.
-  const ccy: Ccy = canConvert ? wantCcy : "MYR";
+  // Realized + net value are USD natively; only show MYR when we have a rate.
+  const ccy: Ccy = canConvert ? wantCcy : "USD";
   const sym = ccy === "MYR" ? "RM" : "$";
 
-  // Realized series in the display currency (MYR native → ÷fx for USD).
+  // Realized series in the display currency (USD native → ×fx for MYR).
   const realized = useMemo(() => {
-    const pts = data?.realizedMyr ?? [];
-    return pts.map((p) => ({ date: p.date, v: ccy === "USD" && fx ? p.value / fx : p.value }));
+    const pts = data?.realized ?? [];
+    return pts.map((p) => ({ date: p.date, v: ccy === "MYR" && fx ? p.value * fx : p.value }));
   }, [data, ccy, fx]);
 
   const positionsValue = data?.positionsValue ?? 0;
@@ -121,8 +124,8 @@ export default function EquityTimeline() {
         <div>
           <p className="t-overline text-[var(--fg-3)]">Equity Timeline</p>
           <p className="t-caption">
-            Realized P&amp;L (from your sheet, MYR) + net account value (cash + live positions, USD),
-            shown in {ccy}{canConvert ? ` at USD/MYR ${fx!.toFixed(3)}` : ""}.
+            Realized P&amp;L (broker-true from MooMoo deals, net of fees, USD) + net account value
+            (cash + live positions, USD), shown in {ccy}{canConvert ? ` at USD/MYR ${fx!.toFixed(3)}` : ""}.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -131,7 +134,7 @@ export default function EquityTimeline() {
               <button
                 key={c}
                 onClick={() => pickCcy(c)}
-                disabled={!canConvert && c === "USD"}
+                disabled={!canConvert && c === "MYR"}
                 className={`rounded-[var(--radius-sm)] px-3 py-1 text-xs font-medium transition ${ccy === c ? "bg-[var(--accent)] text-[var(--accent-fg)]" : "text-[var(--fg-3)] hover:text-[var(--fg-1)] disabled:opacity-40"}`}
               >
                 {c}
@@ -160,7 +163,7 @@ export default function EquityTimeline() {
       {data && !canConvert && (
         <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
           <span className="font-semibold text-[var(--warn-500)]">Live USD/MYR unavailable.</span>{" "}
-          Showing realized P&amp;L in MYR; account value stays USD (can&apos;t combine without a rate).
+          Showing everything in USD; switch to MYR once the rate is back.
         </div>
       )}
       {data && (data.positionsPricing.usedAvgCost > 0 || data.positionsPricing.usedPositionCache > 0 || data.positionsPricing.staleQuotes > 0) && (
@@ -195,6 +198,13 @@ export default function EquityTimeline() {
         <Stat label={`${windowDays}d Realized`} value={signed(stats.change, sym)} color={stats.change >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
         <Stat label="Max Drawdown" value={`-${sym}${fmt(stats.maxDd)}`} color="var(--loss-fg)" />
       </div>
+
+      {data && data.realizedCurrency === "USD" && (
+        <p className="t-caption text-[var(--fg-3)]">
+          Broker realized (USD): gross ${fmt(data.realizedGrossUsd)} − fees ${fmt(data.realizedFeesUsd)} ={" "}
+          net {data.realizedNetUsd >= 0 ? "+" : "-"}${fmt(data.realizedNetUsd)} · MooMoo deal history (FIFO, net of fees).
+        </p>
+      )}
 
       {loading ? (
         <p className="t-caption t-mono">Loading equity timeline…</p>

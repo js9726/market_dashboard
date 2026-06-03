@@ -20,6 +20,7 @@ import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { prisma } from "@/lib/prisma";
+import { computeBrokerRealized } from "@/server/realized-pnl";
 
 export const dynamic = "force-dynamic";
 
@@ -76,27 +77,23 @@ export async function GET(req: Request) {
     orderBy: { createdAt: "asc" },
   });
 
-  // ── Reliable line: cumulative realized P&L from the sheet, in MYR ───────────
-  // ALL closed trades (the sheet stores P&L already converted to MYR).
-  const closed = await prisma.tradeRecord.findMany({
+  // ── Realized P&L: broker-true, net of fees, from MooMoo TradeFills (USD) ────
+  // Symmetric matching + per-fill fees (backfill_deals.py pulls deal history +
+  // order_fee_query). Computed over ALL fills up to `to` so the cumulative is
+  // correct, then windowed to [from, to] for display.
+  const fills = await prisma.tradeFill.findMany({
     where: {
-      userId: userScopeId,
-      pnl: { not: null },
-      tradeDate: { not: null, gte: from, lte: to },
+      brokerAccount: { userId: userScopeId },
+      currency: "USD",
+      executedAt: { lte: to },
       ...(accountId ? { brokerAccountId: accountId } : {}),
     },
-    select: { tradeDate: true, pnl: true },
-    orderBy: { tradeDate: "asc" },
+    orderBy: { executedAt: "asc" },
+    select: { ticker: true, side: true, qty: true, price: true, fees: true, executedAt: true },
   });
-  let running = 0;
-  const realizedByDate = new Map<string, number>();
-  for (const c of closed) {
-    running += Number(c.pnl);
-    realizedByDate.set(c.tradeDate!.toISOString().slice(0, 10), running);
-  }
-  const realizedMyr = Array.from(realizedByDate.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, value]) => ({ date, value: Number(value.toFixed(2)) }));
+  const brokerRealized = computeBrokerRealized(fills);
+  const fromKey = from.toISOString().slice(0, 10);
+  const realized = brokerRealized.points.filter((p) => p.date >= fromKey);
 
   // ── Broker account value (USD) + reconciliation guard ──────────────────────
   const snapshots = await prisma.equitySnapshot.findMany({
@@ -177,8 +174,11 @@ export async function GET(req: Request) {
   return NextResponse.json({
     // realized is MYR (sheet); net building blocks are USD (broker). The client
     // converts to the chosen display currency with fxUsdMyr.
-    realizedMyr,
-    realizedCurrency: "MYR",
+    realized,
+    realizedCurrency: "USD",
+    realizedGrossUsd: brokerRealized.grossUsd,
+    realizedFeesUsd: brokerRealized.feesUsd,
+    realizedNetUsd: brokerRealized.netUsd,
     fxUsdMyr,
     positionsValue: Number(positionsValue.toFixed(2)),
     positionsPricing: {
