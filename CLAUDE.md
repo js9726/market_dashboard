@@ -15,6 +15,13 @@ simulated. During market hours, VIX freshness must come from Polygon or the
 local bridge/OpenD live-quote row; Yahoo chart fallback can be delayed and must
 never overwrite a fresher bridge row.
 
+**Journal broker merge:** for currently held positions, the live `Position` row
+and freshest `LiveQuote`/broker snapshot are the source of truth for quantity,
+average cost, current price, state, and unrealized P&L. Matching sheet rows may
+only supply the plan (`proposedEntry`, stop, target, RRR, notes/strategy). Never
+display stale sheet P&L as live P&L, and do not create duplicate live + sheet
+rows for the same ticker/broker open holding.
+
 **Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard (breadth, screeners + REC A-list, quotes, HELD seed + track), run the morning brief, then present today's A-List (REC + HELD) in chat.
 
 ---

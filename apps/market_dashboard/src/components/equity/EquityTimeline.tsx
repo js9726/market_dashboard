@@ -21,6 +21,7 @@ interface EquityPoint {
   marketVal: number;
   unrealizedPl: number;
   equityPctChange: number | null;
+  source?: "broker" | "sheet";
 }
 
 interface Account {
@@ -31,6 +32,7 @@ interface Account {
 
 interface TimelineResp {
   count: number;
+  brokerStart?: string | null;
   accounts: Account[];
   points: EquityPoint[];
 }
@@ -80,8 +82,10 @@ export default function EquityTimeline() {
         <div>
           <p className="t-overline text-[var(--fg-3)]">Equity Timeline</p>
           <p className="t-caption">
-            Daily total assets from your moomoo account (via dashboard-bridge daemon).
+            Account equity — live broker total assets (moomoo / IBKR via the bridge daemon),
+            extended back through history with your sheet&apos;s realized P&amp;L.
             {(data?.accounts.length ?? 0) > 1 && ` Aggregated across ${data!.accounts.length} accounts.`}
+            {data?.brokerStart && ` Broker snapshots start ${data.brokerStart}.`}
           </p>
         </div>
         <div className="flex gap-2">
@@ -164,6 +168,10 @@ function computeStats(points: EquityPoint[]) {
   if (points.length === 0) {
     return { current: 0, peak: 0, changePct: 0, maxDdPct: 0, drawdowns: [] as { x0: number; x1: number }[] };
   }
+  if (points.length === 1) {
+    const current = points[0].totalAssets;
+    return { current, peak: current, changePct: 0, maxDdPct: 0, drawdowns: [] as { x0: number; x1: number }[] };
+  }
   const first = points[0].totalAssets;
   const current = points[points.length - 1].totalAssets;
   let peak = first;
@@ -204,6 +212,7 @@ function computeStats(points: EquityPoint[]) {
 
 function buildSvgPath(points: EquityPoint[]): string {
   if (points.length === 0) return "";
+  if (points.length === 1) return "M 400.0 140.0";
   const vals = points.map((p) => p.totalAssets);
   const min = Math.min(...vals);
   const max = Math.max(...vals);

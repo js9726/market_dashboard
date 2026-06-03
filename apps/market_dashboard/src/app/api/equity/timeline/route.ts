@@ -29,9 +29,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +56,8 @@ export async function GET(req: Request) {
   const to = qp.get("to") && /^\d{4}-\d{2}-\d{2}$/.test(qp.get("to")!)
     ? new Date(`${qp.get("to")}T00:00:00.000Z`)
     : new Date(today.toISOString().slice(0, 10) + "T00:00:00.000Z");
+  const fromKey = from.toISOString().slice(0, 10);
+  const toKey = to.toISOString().slice(0, 10);
 
   const accountId = qp.get("accountId");
 
@@ -114,13 +114,67 @@ export async function GET(req: Request) {
       equityPctChange: v.equityPctChange,
     }));
 
+  // ── Blend: extend the broker equity curve back through history using the
+  //    sheet's realized P&L. Account-value metric: broker totalAssets where it
+  //    exists; before the first broker snapshot, derive value from the running
+  //    sheet P&L anchored so it connects continuously to the broker data. ──────
+  const closed = await prisma.tradeRecord.findMany({
+    where: {
+      userId: userScopeId,
+      pnl: { not: null },
+      tradeDate: { not: null, lte: to },
+      ...(accountId ? { brokerAccountId: accountId } : {}),
+    },
+    select: { tradeDate: true, pnl: true },
+    orderBy: { tradeDate: "asc" },
+  });
+  let running = 0;
+  const cumByDate = new Map<string, number>();
+  for (const c of closed) {
+    running += Number(c.pnl);
+    cumByDate.set(c.tradeDate!.toISOString().slice(0, 10), running);
+  }
+  const cumDates = Array.from(cumByDate.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, cum]) => ({ date, cum }));
+  const cumDatesInRange = cumDates.filter((cd) => cd.date >= fromKey && cd.date <= toKey);
+
+  type BlendPoint = (typeof points)[number] & { source: "broker" | "sheet" };
+  let blended: BlendPoint[] = points.map((p) => ({ ...p, source: "broker" }));
+
+  if (points.length > 0 && cumDates.length > 0) {
+    const anchorDate = points[0].date;
+    const anchorEquity = points[0].totalAssets;
+    let cumAtAnchor = 0;
+    for (const cd of cumDates) if (cd.date <= anchorDate) cumAtAnchor = cd.cum;
+    const startingCapital = anchorEquity - cumAtAnchor;
+    const derived: BlendPoint[] = cumDates
+      .filter((cd) => cd.date >= fromKey && cd.date < anchorDate)
+      .map((cd) => ({
+        date: cd.date,
+        totalAssets: Number((startingCapital + cd.cum).toFixed(2)),
+        cash: 0, marketVal: 0, unrealizedPl: 0, equityPctChange: null,
+        source: "sheet",
+      }));
+    blended = [...derived, ...blended];
+  } else if (points.length === 0 && cumDates.length > 0) {
+    // No broker anchor yet: show the cumulative realized P&L line.
+    blended = cumDatesInRange.map((cd) => ({
+      date: cd.date, totalAssets: Number(cd.cum.toFixed(2)),
+      cash: 0, marketVal: 0, unrealizedPl: 0, equityPctChange: null, source: "sheet",
+    }));
+  }
+
+  const brokerStart = blended.find((p) => p.source === "broker")?.date ?? null;
+
   return NextResponse.json({
-    count: points.length,
+    count: blended.length,
+    brokerStart,
     accounts: accounts.map((a) => ({
       id: a.id,
       alias: a.alias,
       currency: a.displayCurrency ?? a.preset.currency,
     })),
-    points,
+    points: blended,
   });
 }

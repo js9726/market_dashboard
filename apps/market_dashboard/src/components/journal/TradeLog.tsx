@@ -29,6 +29,18 @@ type Trade = {
   verdict: Record<string, unknown> | null;
   verdictScore: number | null;
   verdictGeneratedAt: string | null;
+  // Broker-merge fields (from /api/journal/trades): live overlay + plan flags.
+  source?: "LIVE" | "SHEET";
+  sheetPnl?: number | null;
+  liveUnrealizedPl?: number | null;
+  liveUnrealizedPlPct?: number | null;
+  currentPrice?: Decimal | number | null;
+  priceObservedAt?: string | null;
+  priceSource?: string | null;
+  stale?: boolean;
+  broker?: string | null;
+  hasPlan?: boolean;
+  synthetic?: boolean;
 };
 
 type VerdictHistoryItem = {
@@ -67,9 +79,9 @@ function scoreColor(score: number): string {
 }
 
 function scoreBadgeBg(score: number): string {
-  if (score >= 7) return "bg-emerald-900/60 text-emerald-300 border-emerald-700";
-  if (score >= 5) return "bg-yellow-900/60 text-yellow-300 border-yellow-700";
-  return "bg-red-900/60 text-red-300 border-red-700";
+  if (score >= 7) return "border-[var(--gain-fg)] bg-[var(--gain-bg)] text-[var(--gain-fg)]";
+  if (score >= 5) return "border-[var(--warn-500)] text-[var(--warn-500)]";
+  return "border-[var(--loss-fg)] bg-[var(--loss-bg)] text-[var(--loss-fg)]";
 }
 
 function ProviderBar({
@@ -437,10 +449,10 @@ function stateBadge(state: string | null) {
   if (!state) return null;
   const s = state.toUpperCase();
   const cls =
-    s === "CLOSE" ? "bg-green-900/50 text-green-400 border-green-800" :
-    s === "OPEN" ? "bg-blue-900/50 text-blue-400 border-blue-800" :
-    s === "SEMI-OPEN" ? "bg-amber-900/50 text-amber-400 border-amber-800" :
-    "bg-slate-700/50 text-slate-400 border-slate-600";
+    s === "CLOSE" ? "border-[var(--gain-fg)] text-[var(--gain-fg)]" :
+    s === "OPEN" ? "border-[var(--accent)] text-[var(--accent)]" :
+    s === "SEMI-OPEN" ? "border-[var(--warn-500)] text-[var(--warn-500)]" :
+    "border-[var(--line)] text-[var(--fg-3)]";
   return <span className={`rounded border px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{state}</span>;
 }
 
@@ -850,11 +862,11 @@ function fmtNum(v: Decimal | null | undefined): string {
 }
 
 function fmtPnl(v: Decimal | null | undefined): { text: string; color: string } {
-  if (v === null || v === undefined) return { text: "Open", color: "text-slate-400" };
+  if (v === null || v === undefined) return { text: "Open", color: "text-[var(--fg-3)]" };
   const n = parseFloat(v.toString());
   return {
     text: `${n >= 0 ? "+" : ""}$${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
-    color: n >= 0 ? "text-green-400" : "text-red-400",
+    color: n >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]",
   };
 }
 
@@ -911,119 +923,132 @@ export default function TradeLog() {
       )}
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-wrap items-center gap-2">
         <input
           type="text"
           placeholder="Symbol"
           value={symbol}
           onChange={(e) => { setSymbol(e.target.value.toUpperCase()); setPage(1); }}
-          className="rounded bg-slate-800 border border-slate-700 px-3 py-1.5 text-sm w-28 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-28 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1.5 text-sm text-[var(--fg-1)] focus:border-[var(--accent)] focus:outline-none"
         />
-        <select
-          value={side}
-          onChange={(e) => { setSide(e.target.value); setPage(1); }}
-          className="rounded bg-slate-800 border border-slate-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-        >
-          <option value="">All Sides</option>
-          <option value="Long">Long</option>
-          <option value="Short">Short</option>
-        </select>
-        <select
-          value={result}
-          onChange={(e) => { setResult(e.target.value); setPage(1); }}
-          className="rounded bg-slate-800 border border-slate-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-        >
-          <option value="">All Results</option>
-          <option value="win">Win</option>
-          <option value="loss">Loss</option>
-          <option value="open">Open</option>
-        </select>
-        <select
-          value={stateFilter}
-          onChange={(e) => { setStateFilter(e.target.value); setPage(1); }}
-          className="rounded bg-slate-800 border border-slate-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-        >
-          <option value="">All States</option>
-          <option value="OPEN">OPEN</option>
-          <option value="SEMI-OPEN">SEMI-OPEN</option>
-          <option value="CLOSE">CLOSE</option>
-          <option value="PLANNING">PLANNING</option>
-        </select>
-        <span className="text-xs text-slate-500 ml-auto">{total} trade{total !== 1 ? "s" : ""}</span>
+        {[
+          { v: side, set: setSide, opts: [["", "All Sides"], ["Long", "Long"], ["Short", "Short"]] },
+          { v: result, set: setResult, opts: [["", "All Results"], ["win", "Win"], ["loss", "Loss"], ["open", "Open"]] },
+          { v: stateFilter, set: setStateFilter, opts: [["", "All States"], ["OPEN", "OPEN"], ["SEMI-OPEN", "SEMI-OPEN"], ["CLOSE", "CLOSE"], ["PLANNING", "PLANNING"]] },
+        ].map((f, fi) => (
+          <select
+            key={fi}
+            value={f.v}
+            onChange={(e) => { f.set(e.target.value); setPage(1); }}
+            className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1.5 text-sm text-[var(--fg-1)] focus:border-[var(--accent)] focus:outline-none"
+          >
+            {f.opts.map(([val, label]) => <option key={val} value={val}>{label}</option>)}
+          </select>
+        ))}
+        <span className="ml-auto text-xs text-[var(--fg-3)]">{total} trade{total !== 1 ? "s" : ""}</span>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-slate-800">
+      <div className="overflow-x-auto rounded-[var(--radius-md)] border border-[var(--line)]">
         <table className="w-full text-sm">
-          <thead className="bg-slate-800/80 text-slate-400 text-xs uppercase">
+          <thead className="bg-[var(--bg-raised)] text-xs uppercase text-[var(--fg-3)]">
             <tr>
               {["#", "Date", "Symbol", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "State", "Verdict", "Score"].map((h) => (
-                <th key={h} className="px-3 py-2 text-left whitespace-nowrap">{h}</th>
+                <th key={h} className="whitespace-nowrap px-3 py-2 text-left">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={12} className="px-3 py-6 text-center text-slate-500">Loading…</td></tr>
+              <tr><td colSpan={12} className="px-3 py-6 text-center text-[var(--fg-3)]">Loading…</td></tr>
             ) : trades.length === 0 ? (
-              <tr><td colSpan={12} className="px-3 py-6 text-center text-slate-500">No trades found</td></tr>
+              <tr><td colSpan={12} className="px-3 py-6 text-center text-[var(--fg-3)]">No trades found</td></tr>
             ) : trades.map((t, i) => {
               const { text: pnlText, color: pnlColor } = fmtPnl(t.pnl);
               const isOpen = t.pnl === null;
+              const isLive = t.source === "LIVE";
+              const liveU = t.liveUnrealizedPl;
               const verdict = t.verdict as TradeReviewResult | null;
               const verdictSummary = verdict
                 ? `${verdict.overall_verdict}${verdict.best_match ? " · " + verdict.best_match : ""}`
                 : null;
               return (
-                <tr key={t.id} className="border-t border-slate-800 hover:bg-slate-800/40">
-                  <td className="px-3 py-2 text-slate-500">{(page - 1) * 50 + i + 1}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">
+                <tr key={t.id} className="border-t border-[var(--line)] hover:bg-[var(--bg-raised)]">
+                  <td className="px-3 py-2 text-[var(--fg-3)]">{(page - 1) * 50 + i + 1}</td>
+                  <td className="whitespace-nowrap px-3 py-2 text-[var(--fg-2)]">
                     {t.tradeDate ? new Date(t.tradeDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" }) : "—"}
                   </td>
-                  <td className="px-3 py-2 font-medium">
-                    {isOpen ? (
-                      <button
-                        onClick={() => setStockTicker(t.ticker)}
-                        className="font-medium text-blue-400 hover:text-blue-300 hover:underline underline-offset-2 cursor-pointer"
-                        title="Click for AI stock analysis"
-                      >
-                        {t.ticker}
-                      </button>
-                    ) : t.ticker}
+                  <td className="px-3 py-2 font-medium text-[var(--fg-1)]">
+                    <span className="inline-flex items-center gap-1.5">
+                      {isOpen ? (
+                        <button
+                          onClick={() => setStockTicker(t.ticker)}
+                          className="cursor-pointer font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+                          title="Click for AI stock analysis"
+                        >
+                          {t.ticker}
+                        </button>
+                      ) : t.ticker}
+                      {isLive && (
+                        <span
+                          className="rounded border border-[var(--accent)] px-1 py-px text-[9px] font-semibold leading-none text-[var(--accent)]"
+                          title={`Live from ${t.broker ?? "broker"}${t.hasPlan ? " - plan from sheet" : ""}${t.priceSource ? ` - quote ${t.priceSource}` : ""}`}
+                        >
+                          {t.stale ? "LIVE?" : "LIVE"}
+                        </span>
+                      )}
+                    </span>
                   </td>
                   <td className="px-3 py-2">
                     {t.side ? (
-                      <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${t.side === "Long" ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}>
+                      <span className={`rounded border px-1.5 py-0.5 text-xs font-medium ${t.side === "Long" ? "border-[var(--gain-fg)] text-[var(--gain-fg)]" : "border-[var(--loss-fg)] text-[var(--loss-fg)]"}`}>
                         {t.side}
                       </span>
                     ) : "—"}
                   </td>
-                  <td className="px-3 py-2">{fmtNum(t.quantity)}</td>
-                  <td className="px-3 py-2">${fmtNum(t.buyPrice)}</td>
-                  <td className="px-3 py-2">{t.exitPrice ? `$${fmtNum(t.exitPrice)}` : "—"}</td>
-                  <td className="px-3 py-2">{t.fees ? `$${fmtNum(t.fees)}` : "—"}</td>
-                  <td className={`px-3 py-2 font-medium ${pnlColor}`}>{pnlText}</td>
+                  <td className="px-3 py-2 text-[var(--fg-1)]">{fmtNum(t.quantity)}</td>
+                  <td className="px-3 py-2 text-[var(--fg-1)]">${fmtNum(t.buyPrice)}</td>
+                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.exitPrice ? `$${fmtNum(t.exitPrice)}` : "—"}</td>
+                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.fees ? `$${fmtNum(t.fees)}` : "—"}</td>
+                  <td className="px-3 py-2 font-medium">
+                    {isLive && liveU != null ? (
+                      <span className={liveU >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]"}>
+                        {liveU >= 0 ? "+" : ""}${Math.abs(liveU).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        <span className="ml-1 text-[10px] text-[var(--fg-4)]">{t.stale ? "stale" : "live"}</span>
+                      </span>
+                    ) : isLive ? (
+                      <span className="text-[var(--fg-3)]" title={t.sheetPnl != null ? `Sheet P&L was ${t.sheetPnl}` : undefined}>
+                        Live quote pending
+                      </span>
+                    ) : t.pnl != null ? (
+                      <span className={pnlColor}>{pnlText}</span>
+                    ) : (
+                      <span className="text-[var(--fg-3)]">Open</span>
+                    )}
+                  </td>
                   <td className="px-3 py-2">{stateBadge(t.state)}</td>
                   {/* Verdict column: shows summary if cached, else notes */}
-                  <td className="px-3 py-2 max-w-xs">
-                    {verdictSummary ? (
+                  <td className="max-w-xs px-3 py-2">
+                    {verdictSummary && !t.synthetic ? (
                       <button
                         onClick={() => setReviewTrade(t)}
-                        className="text-left text-xs text-slate-300 hover:text-white truncate block max-w-[200px]"
+                        className="block max-w-[200px] truncate text-left text-xs text-[var(--fg-2)] hover:text-[var(--fg-1)]"
                         title={verdictSummary}
                       >
                         {verdictSummary}
                       </button>
                     ) : (
-                      <span className="text-xs text-slate-500 truncate block max-w-[160px]">{t.notes || "—"}</span>
+                      <span className="block max-w-[160px] truncate text-xs text-[var(--fg-3)]">{t.notes || "—"}</span>
                     )}
                   </td>
                   {/* Score column: badge if scored, else Analyse button */}
                   <td className="px-3 py-2">
-                    {t.verdictScore != null ? (
+                    {t.synthetic ? (
+                      <span className="text-xs text-[var(--fg-4)]">—</span>
+                    ) : t.verdictScore != null ? (
                       <button
                         onClick={() => setReviewTrade(t)}
-                        className={`rounded border px-2 py-0.5 text-xs font-semibold ${scoreBadgeBg(t.verdictScore)} hover:opacity-80 transition-opacity`}
+                        className={`rounded border px-2 py-0.5 text-xs font-semibold transition-opacity hover:opacity-80 ${scoreBadgeBg(t.verdictScore)}`}
                         title="Click to view full review"
                       >
                         {t.verdictScore.toFixed(1)}
@@ -1031,7 +1056,7 @@ export default function TradeLog() {
                     ) : (
                       <button
                         onClick={() => setReviewTrade(t)}
-                        className="rounded px-2 py-1 text-[10px] font-medium border border-slate-600 text-slate-400 hover:border-blue-500 hover:text-blue-400 transition-colors whitespace-nowrap"
+                        className="whitespace-nowrap rounded-[var(--radius-sm)] border border-[var(--line)] px-2 py-1 text-[10px] font-medium text-[var(--fg-3)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
                         title="AI trade review"
                       >
                         Analyse
@@ -1047,19 +1072,19 @@ export default function TradeLog() {
 
       {/* Pagination */}
       {pages > 1 && (
-        <div className="flex items-center gap-2 justify-end">
+        <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 px-3 py-1 text-sm"
+            className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1 text-sm text-[var(--fg-2)] transition hover:bg-[var(--bg-surface)] disabled:opacity-40"
           >
             ← Prev
           </button>
-          <span className="text-sm text-slate-400">Page {page} of {pages}</span>
+          <span className="text-sm text-[var(--fg-3)]">Page {page} of {pages}</span>
           <button
             onClick={() => setPage((p) => Math.min(pages, p + 1))}
             disabled={page === pages}
-            className="rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 px-3 py-1 text-sm"
+            className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1 text-sm text-[var(--fg-2)] transition hover:bg-[var(--bg-surface)] disabled:opacity-40"
           >
             Next →
           </button>

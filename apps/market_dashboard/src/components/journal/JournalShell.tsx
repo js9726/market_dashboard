@@ -15,7 +15,6 @@ import SyncButton from "./SyncButton";
 import StatsCards from "./StatsCards";
 import TradeLog from "./TradeLog";
 import CalendarView from "./CalendarView";
-import EquityCurve from "./EquityCurve";
 import AddTradeModal from "./AddTradeModal";
 import DailyJournal from "./DailyJournal";
 import JournalDigestCard from "./JournalDigestCard";
@@ -158,12 +157,12 @@ export default function JournalShell() {
             (stats ? (
               <div className="space-y-5">
                 <StatsCards stats={stats} />
-                <section className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-surface)] p-4 shadow-[var(--shadow-card)]">
-                  <h3 className="mb-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--fg-3)]">
-                    Equity curve
-                  </h3>
-                  <EquityCurve data={stats.equityCurve} />
-                </section>
+                <a
+                  href="/dashboard/equity"
+                  className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1.5 text-xs font-medium text-[var(--fg-2)] transition hover:bg-[var(--bg-surface)]"
+                >
+                  View account equity timeline
+                </a>
               </div>
             ) : (
               <p className="text-sm text-[var(--fg-3)]">No data yet — sync your sheet.</p>
