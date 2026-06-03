@@ -21,11 +21,15 @@ type CardProps = { label: string; value: string; positive?: boolean | null };
 
 function Card({ label, value, positive }: CardProps) {
   const color =
-    positive === true ? "text-green-400" : positive === false ? "text-red-400" : "text-slate-100";
+    positive === true
+      ? "text-[var(--gain-fg)]"
+      : positive === false
+        ? "text-[var(--loss-fg)]"
+        : "text-[var(--fg-1)]";
   return (
-    <div className="rounded-lg p-4" style={{ background: "#111b27", border: "1px solid #1e2d3d" }}>
-      <p className="text-xs text-slate-400 mb-1">{label}</p>
-      <p className={`text-lg font-semibold ${color}`}>{value}</p>
+    <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-surface)] p-4 shadow-[var(--shadow-card)]">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--fg-3)]">{label}</p>
+      <p className={`mt-1 font-mono text-lg font-semibold tabular-nums ${color}`}>{value}</p>
     </div>
   );
 }
@@ -39,19 +43,19 @@ export default function StatsCards({ stats }: { stats: Stats }) {
     stats.currentStreak > 0
       ? `${stats.currentStreak}W streak`
       : stats.currentStreak < 0
-      ? `${Math.abs(stats.currentStreak)}L streak`
-      : "—";
+        ? `${Math.abs(stats.currentStreak)}L streak`
+        : "—";
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Card label="Total P&L" value={fmt(stats.totalPnl)} positive={stats.totalPnl >= 0} />
         <Card label="Total Trades" value={`${stats.totalTrades} (${stats.openTrades} open)`} />
         <Card label="Win Rate" value={`${stats.winRate}%`} positive={stats.winRate >= 50} />
         <Card label="Profit Factor" value={stats.profitFactor.toFixed(2)} positive={stats.profitFactor >= 1} />
         <Card label="Avg R:R" value={stats.avgRR.toFixed(2)} positive={stats.avgRR >= 1} />
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Card label="Max Drawdown" value={`-$${stats.maxDrawdown.toLocaleString("en-US", { minimumFractionDigits: 2 })}`} positive={false} />
         <Card label="Sharpe Ratio" value={stats.sharpe.toFixed(2)} positive={stats.sharpe >= 1} />
         <Card label="Expectancy" value={fmt(stats.expectancy)} positive={stats.expectancy >= 0} />
@@ -59,7 +63,7 @@ export default function StatsCards({ stats }: { stats: Stats }) {
         <Card label="Worst Trade" value={fmt(stats.worstTrade)} positive={false} />
         <Card label="Streak" value={streakLabel} positive={stats.currentStreak > 0 ? true : stats.currentStreak < 0 ? false : null} />
       </div>
-      <div className="grid grid-cols-2 gap-3 max-w-xs">
+      <div className="grid max-w-xs grid-cols-2 gap-3">
         <Card label="Avg Win" value={fmt(stats.avgWin)} positive={true} />
         <Card label="Avg Loss" value={fmt(stats.avgLoss)} positive={false} />
       </div>

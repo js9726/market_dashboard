@@ -42,39 +42,42 @@ export default function CalendarView({ calendarData }: { calendarData: DayData[]
     else setMonth((m) => m + 1);
   }
 
+  const navBtn =
+    "rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1 text-sm text-[var(--fg-2)] transition hover:bg-[var(--bg-surface)]";
+
   return (
     <div className="space-y-4">
       {/* Month header */}
       <div className="flex items-center justify-between">
-        <button onClick={prevMonth} className="rounded bg-slate-700 hover:bg-slate-600 px-3 py-1 text-sm">←</button>
-        <h2 className="text-base font-semibold">{MONTHS[month]} {year}</h2>
-        <button onClick={nextMonth} className="rounded bg-slate-700 hover:bg-slate-600 px-3 py-1 text-sm">→</button>
+        <button onClick={prevMonth} className={navBtn} aria-label="Previous month">←</button>
+        <h2 className="text-base font-semibold text-[var(--fg-1)]">{MONTHS[month]} {year}</h2>
+        <button onClick={nextMonth} className={navBtn} aria-label="Next month">→</button>
       </div>
 
       {/* Monthly summary bar */}
-      <div className="grid grid-cols-4 gap-2 text-center text-sm rounded-lg p-3" style={{ background: "#111b27", border: "1px solid #1e2d3d" }}>
+      <div className="grid grid-cols-4 gap-2 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-surface)] p-3 text-center text-sm shadow-[var(--shadow-card)]">
         <div>
-          <p className="text-xs text-slate-400">Month P&L</p>
-          <p className={`font-semibold ${monthPnl >= 0 ? "text-green-400" : "text-red-400"}`}>
+          <p className="text-[11px] text-[var(--fg-3)]">Month P&L</p>
+          <p className={`font-mono font-semibold tabular-nums ${monthPnl >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]"}`}>
             {monthPnl >= 0 ? "+" : ""}${monthPnl.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
         </div>
         <div>
-          <p className="text-xs text-slate-400">Trades</p>
-          <p className="font-semibold">{monthTrades}</p>
+          <p className="text-[11px] text-[var(--fg-3)]">Trades</p>
+          <p className="font-mono font-semibold text-[var(--fg-1)]">{monthTrades}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-400">Trading Days</p>
-          <p className="font-semibold">{monthDays.length}</p>
+          <p className="text-[11px] text-[var(--fg-3)]">Trading Days</p>
+          <p className="font-mono font-semibold text-[var(--fg-1)]">{monthDays.length}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-400">Day Win Rate</p>
-          <p className={`font-semibold ${monthWr >= 50 ? "text-green-400" : "text-red-400"}`}>{monthWr}%</p>
+          <p className="text-[11px] text-[var(--fg-3)]">Day Win Rate</p>
+          <p className={`font-mono font-semibold ${monthWr >= 50 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]"}`}>{monthWr}%</p>
         </div>
       </div>
 
       {/* Day headers */}
-      <div className="grid grid-cols-7 gap-1 text-xs text-slate-500 text-center">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs text-[var(--fg-3)]">
         {DAYS.map((d) => <div key={d}>{d}</div>)}
       </div>
 
@@ -85,19 +88,24 @@ export default function CalendarView({ calendarData }: { calendarData: DayData[]
           const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const data = dayMap[dateStr];
           const isToday = dateStr === new Date().toISOString().slice(0, 10);
+          const cellBg = data
+            ? data.pnl >= 0
+              ? "border-[var(--gain-cell-bg)] bg-[var(--gain-cell-bg)]"
+              : "border-[var(--loss-cell-bg)] bg-[var(--loss-cell-bg)]"
+            : "border-[var(--line)] bg-[var(--bg-raised)]";
 
           return (
             <div
               key={i}
-              className={`rounded p-1.5 min-h-[56px] text-xs ${data ? (data.pnl >= 0 ? "bg-green-900/30 border border-green-800/40" : "bg-red-900/30 border border-red-800/40") : "bg-slate-800/30 border border-slate-700/30"} ${isToday ? "ring-1 ring-blue-500" : ""}`}
+              className={`min-h-[56px] rounded-[var(--radius-sm)] border p-1.5 text-xs ${cellBg} ${isToday ? "ring-1 ring-[var(--accent)]" : ""}`}
             >
-              <p className={`font-medium mb-0.5 ${isToday ? "text-blue-400" : "text-slate-400"}`}>{day}</p>
+              <p className={`mb-0.5 font-medium ${isToday ? "text-[var(--accent)]" : "text-[var(--fg-2)]"}`}>{day}</p>
               {data && (
                 <>
-                  <p className={`font-semibold ${data.pnl >= 0 ? "text-green-400" : "text-red-400"}`}>
+                  <p className={`font-mono font-semibold tabular-nums ${data.pnl >= 0 ? "text-[var(--gain-cell-fg)]" : "text-[var(--loss-cell-fg)]"}`}>
                     {data.pnl >= 0 ? "+" : ""}${Math.abs(data.pnl).toFixed(0)}
                   </p>
-                  <p className="text-slate-500">{data.trades}t</p>
+                  <p className="text-[var(--fg-3)]">{data.trades}t</p>
                 </>
               )}
             </div>

@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * JournalDigestCard — surfaces the weekly "what to learn" digest at the top of
- * the Journal. Zero per-trade effort: it reads /api/journal/digest, which is
- * computed from auto-journaled entries + the HELD A-list tracker.
+ * JournalDigestCard — the review-first hero of the Journal. Surfaces the weekly
+ * "what to learn" digest with zero per-trade effort: it reads
+ * /api/journal/digest, computed from auto-journaled broker fills + the HELD
+ * A-list tracker. Themed on the mode-aware design tokens.
  */
 import { useEffect, useState } from "react";
 
@@ -43,18 +44,20 @@ export default function JournalDigestCard() {
   if (failed || !d) return null;
 
   return (
-    <section className="rounded-xl border border-slate-700 bg-slate-900/60 p-4">
+    <section className="rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--bg-surface)] p-5 shadow-[var(--shadow-card)]">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-sm font-semibold text-slate-100">
+        <h3 className="text-sm font-semibold text-[var(--fg-1)]">
           This week — what to learn{" "}
-          <span className="font-normal text-slate-500">
+          <span className="font-normal text-[var(--fg-3)]">
             ({d.from} → {d.to})
           </span>
         </h3>
-        <span className="text-xs text-slate-500">auto-generated · zero effort</span>
+        <span className="rounded-[var(--radius-pill)] bg-[var(--accent-soft-bg)] px-2 py-0.5 text-[10px] font-medium text-[var(--accent)]">
+          auto · zero effort
+        </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4 lg:grid-cols-6">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         <Stat label="Closed" value={`${d.trades.closed}`} sub={d.trades.winRatePct != null ? `${d.trades.winRatePct}% win` : undefined} />
         <Stat label="Avg realized" value={R(d.savings.avgRealizedR)} />
         <Stat label="On-book R" value={R(d.discipline.onBookAvgR)} sub={`${d.discipline.onBookCount} trades`} good />
@@ -63,25 +66,27 @@ export default function JournalDigestCard() {
         <Stat label="Stop too tight" value={`${d.discipline.stopTooTightCount}`} sub="vs ATR-floor" warn={d.discipline.stopTooTightCount > 0} />
       </div>
 
-      <ul className="mt-4 space-y-1.5">
-        {d.takeaways.map((t, i) => (
-          <li key={i} className="flex gap-2 text-sm text-slate-300">
-            <span className="text-slate-500">▸</span>
-            <span>{t}</span>
-          </li>
-        ))}
-      </ul>
+      {d.takeaways.length > 0 && (
+        <ul className="mt-4 space-y-1.5">
+          {d.takeaways.map((t, i) => (
+            <li key={i} className="flex gap-2 text-sm text-[var(--fg-2)]">
+              <span className="text-[var(--accent)]">▸</span>
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
 
 function Stat({ label, value, sub, good, warn }: { label: string; value: string; sub?: string; good?: boolean; warn?: boolean }) {
-  const color = good ? "text-emerald-400" : warn ? "text-amber-400" : "text-slate-100";
+  const color = good ? "text-[var(--gain-fg)]" : warn ? "text-[var(--warn-500)]" : "text-[var(--fg-1)]";
   return (
-    <div className="rounded-lg bg-slate-800/60 px-3 py-2">
-      <div className="text-[10px] uppercase tracking-wider text-slate-500">{label}</div>
-      <div className={`text-base font-semibold tabular-nums ${color}`}>{value}</div>
-      {sub ? <div className="text-[10px] text-slate-500">{sub}</div> : null}
+    <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-2">
+      <div className="text-[10px] uppercase tracking-[0.08em] text-[var(--fg-3)]">{label}</div>
+      <div className={`font-mono text-base font-semibold tabular-nums ${color}`}>{value}</div>
+      {sub ? <div className="text-[10px] text-[var(--fg-3)]">{sub}</div> : null}
     </div>
   );
 }

@@ -41,19 +41,19 @@ export default function SyncButton({ lastSyncedAt, onSynced }: Props) {
   return (
     <div className="flex items-center gap-3">
       {result ? (
-        <span className="text-xs text-green-400">
-          Synced {result.synced} trades ({result.open} open, {result.closed} closed)
+        <span className="text-xs text-[var(--gain-fg)]">
+          Synced {result.synced} ({result.open} open, {result.closed} closed)
         </span>
       ) : syncedTime ? (
-        <span className="text-xs text-slate-400">Last synced {syncedTime}</span>
+        <span className="text-xs text-[var(--fg-3)]">Last synced {syncedTime}</span>
       ) : (
-        <span className="text-xs text-slate-500">Never synced</span>
+        <span className="text-xs text-[var(--fg-4)]">Never synced</span>
       )}
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {error && <span className="text-xs text-[var(--loss-fg)]">{error}</span>}
       <button
         onClick={handleSync}
         disabled={loading}
-        className="rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 px-3 py-1.5 text-xs font-medium transition"
+        className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1.5 text-xs font-medium text-[var(--fg-2)] transition hover:bg-[var(--bg-surface)] disabled:opacity-50"
       >
         {loading ? "Syncing…" : "Sync Now"}
       </button>
