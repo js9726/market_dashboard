@@ -1,136 +1,195 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-OFF",
+    "label": "CAUTIOUSLY-RISK-ON",
     "posture": "WAIT",
-    "summary": "US futures are pointing to a slightly lower open after a mixed session in Asia and a flat start in Europe. Key focus will be on upcoming economic data for clues on inflation and growth."
+    "summary": "AI-related names continue to show strength, but broader market futures are flat to slightly down. Europe opened lower, signaling some caution ahead of key US data."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": null,
-    "label": null
+    "score": 57,
+    "label": "Greed"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": 757.14,
-      "changePct": -0.18,
+      "level": 7617,
+      "changePct": -0.05,
       "note": "futures",
-      "citation": "Source: Investing.com [1]"
+      "citation": ""
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
-      "level": 742.46,
-      "changePct": -0.04,
+      "level": null,
+      "changePct": -0.08,
       "note": "futures",
-      "citation": "Source: Investing.com [1]"
+      "citation": ""
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
-      "level": 508.85,
-      "changePct": -0.51,
+      "level": null,
+      "changePct": -0.02,
       "note": "futures",
-      "citation": "Source: Investing.com [1]"
+      "citation": ""
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
-      "level": 288.76,
-      "changePct": -0.08,
+      "level": null,
+      "changePct": null,
       "note": "futures",
-      "citation": "Source: Investing.com [1]"
+      "citation": ""
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": null,
-      "changePct": null,
-      "note": "live"
+      "level": 16.27,
+      "changePct": 3.17,
+      "note": "live",
+      "citation": ""
     },
     {
       "symbol": "^TNX",
-      "name": "10-Yr Treasury Yield",
-      "level": null,
-      "changePct": null,
-      "note": "live"
+      "name": "10-Yr Treasury",
+      "level": 4.35,
+      "changePct": 0.15,
+      "note": "live",
+      "citation": ""
     },
     {
       "symbol": "CL=F",
       "name": "Crude Oil",
-      "level": 135.5,
-      "changePct": -0.57,
-      "note": "futures",
-      "citation": "Source: Benzinga [38]"
+      "level": 95.39,
+      "changePct": 2.1,
+      "note": "live",
+      "citation": ""
     }
   ],
-  "indicesNarrative": "U.S. index futures are slightly down, indicating a cautious start to the trading day. The Dow is showing the most weakness in the pre-market session. European markets are mixed, while Asian markets saw varied performance overnight, with Japan's Nikkei gaining while Hong Kong's Hang Seng edged lower.",
-  "technicals": null,
-  "technicalsNarrative": null,
+  "indicesNarrative": "US futures are mixed and little changed as traders assess the sustainability of recent record highs. Asian markets closed mixed, while European markets opened lower, weighed down by rising oil prices and geopolitical tensions. The VIX is ticking up, suggesting a slight increase in caution.",
+  "technicals": {
+    "SPY": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    },
+    "QQQ": {
+      "close": 746.16,
+      "atr14": 3.9,
+      "atr_pct": 0.0052,
+      "ema21": 712.1,
+      "ema50": 682.9,
+      "ma200": 629.9,
+      "dist_21_atr": 8.73,
+      "dist_50_atr": 16.22,
+      "dist_200_atr": 29.81,
+      "rsi14": 79.37,
+      "macd": 21.98,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": true,
+      "oversold": false,
+      "entry_risk": "EXTREME-EXTENDED"
+    },
+    "DIA": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    },
+    "IWM": {
+      "close": 291.66,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": 254.54,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": 64.37,
+      "macd": 4.82,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "FAIR"
+    }
+  },
+  "technicalsNarrative": "QQQ is extremely extended and overbought with an RSI near 80, making it a dangerous chase at these levels. IWM presents a much safer entry point, with a neutral RSI and a bullish MACD cross, indicating fair risk. Caution is warranted in the tech-heavy Nasdaq, while small caps may offer better risk-reward.",
   "sectorsThemes": [],
-  "sectorsNarrative": "Sector performance from the previous session was mixed. Technology and high-growth sectors will be in focus today, especially with ongoing discussions around AI infrastructure spending.",
-  "industryNarrative": "Semiconductor and AI-related industries continue to be a primary focus for traders. Cybersecurity stocks may also see activity ahead of earnings reports.",
+  "sectorsNarrative": "Data unavailable for sector performance on June 2, 2026.",
+  "industryNarrative": "Semiconductors and AI-related industries continue to be the primary drivers of market strength, while other sectors are showing more mixed performance.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "HPE",
+      "ticker": "ASML",
       "side": "LONG",
-      "changePct": 33.57,
-      "why": "Positive earnings report and strong guidance.",
-      "traderLens": "Qullamaggie - Episodic pivot on earnings surprise."
+      "changePct": 4.72,
+      "why": "Surging in pre-market trading, following the trend of other chip giants.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "GNRC",
+      "ticker": "RIO",
       "side": "LONG",
-      "changePct": 9.38,
-      "why": "Upgraded by a major analyst firm.",
-      "traderLens": "Growth trader - Catalyst-driven momentum."
+      "changePct": 3.19,
+      "why": "Miner Rio Tinto is up, indicating strength in the materials sector.",
+      "traderLens": "Ted Zhang"
     },
     {
-      "ticker": "AVGO",
+      "ticker": "NEAR",
       "side": "LONG",
-      "changePct": 6.95,
-      "why": "Broad strength in the semiconductor sector.",
-      "traderLens": "Ted Zhang - Sector rotation play."
+      "changePct": 8.41,
+      "why": "NEAR Protocol is showing significant gains in the crypto space.",
+      "traderLens": "Momentum"
     },
     {
-      "ticker": "SMCI",
-      "side": "LONG",
-      "changePct": 5.46,
-      "why": "Continued momentum in AI-related hardware stocks.",
-      "traderLens": "Minervini - Stage 2 uptrend with high relative strength."
-    },
-    {
-      "ticker": "VSCO",
-      "side": "LONG",
-      "changePct": 39,
-      "why": "Crushed Q1 2026 earnings expectations and lifted its full-year sales outlook.",
-      "traderLens": "Qullamaggie - Earnings-driven episodic pivot."
-    },
-    {
-      "ticker": "MSTR",
+      "ticker": "TSLA",
       "side": "SHORT",
-      "changePct": -3.06,
-      "why": "Weakness in cryptocurrencies, to which the company has significant exposure.",
-      "traderLens": "Swing trader - Fading weakness."
-    },
-    {
-      "ticker": "CRWD",
-      "side": "SHORT",
-      "changePct": -1.77,
-      "why": "Profit-taking ahead of earnings.",
-      "traderLens": "Swing trader - Short-term pullback."
-    },
-    {
-      "ticker": "AMZN",
-      "side": "SHORT",
-      "changePct": -1.16,
-      "why": "Broad market weakness and potential profit-taking in mega-cap tech.",
-      "traderLens": "Swing trader - Fading relative weakness."
+      "changePct": -1.0,
+      "why": "Declined in pre-market trading, lagging other major tech stocks.",
+      "traderLens": "Relative Weakness"
     }
   ],
   "watchlist": [
@@ -139,190 +198,225 @@
       "level": null,
       "changePct": null,
       "abc": "A",
-      "note": "Leading in the AI space, consolidating near highs."
+      "note": "Leading the AI charge, watch for continuation."
     },
     {
       "ticker": "TSLA",
-      "level": 417.96,
-      "changePct": 0.5,
-      "abc": "B",
-      "note": "Showing pre-market strength, watch for a break of recent resistance."
+      "level": 423.74,
+      "changePct": -1.0,
+      "abc": "C",
+      "note": "Showing pre-market weakness relative to the tech sector."
     },
     {
       "ticker": "AAPL",
-      "level": 306.01,
-      "changePct": -0.1,
+      "level": 314.60,
+      "changePct": -0.19,
       "abc": "B",
-      "note": "Slightly down in pre-market, testing support levels."
+      "note": "Slightly down in pre-market, consolidating near highs."
     },
     {
       "ticker": "MSFT",
-      "level": 463.37,
+      "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "A leader in the software space, watch for continued institutional buying."
+      "abc": "B",
+      "note": "Consolidating, needs to break out to new highs."
     },
     {
       "ticker": "AMZN",
-      "level": 258.22,
-      "changePct": -1.16,
-      "abc": "C",
-      "note": "Showing pre-market weakness, could be a potential short if it breaks support."
+      "level": null,
+      "changePct": null,
+      "abc": "B",
+      "note": "Trading within a range, looking for direction."
     },
     {
       "ticker": "META",
-      "level": 603.65,
-      "changePct": 0.53,
+      "level": null,
+      "changePct": null,
       "abc": "B",
-      "note": "Slightly up in pre-market, consolidating within a recent range."
+      "note": "Holding up well, but needs a catalyst."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Watch for reaction to news about its $80 billion offering."
+      "note": "Quietly consolidating, watch for a move."
     },
     {
       "ticker": "AMD",
-      "level": null,
-      "changePct": null,
+      "level": 533.63,
+      "changePct": 2.32,
       "abc": "A",
-      "note": "A key player in the semiconductor space, watch for sector strength."
+      "note": "Strong momentum, continuing its uptrend."
     },
     {
       "ticker": "SMCI",
-      "level": 49.45,
-      "changePct": 5.46,
+      "level": null,
+      "changePct": null,
       "abc": "A",
-      "note": "Strong pre-market move, a potential momentum play."
+      "note": "AI play, remains very volatile."
     },
     {
       "ticker": "PLTR",
-      "level": 156.27,
-      "changePct": -2.72,
-      "abc": "C",
-      "note": "Showing pre-market weakness, avoid for now."
+      "level": null,
+      "changePct": null,
+      "abc": "B",
+      "note": "Needs to clear resistance to continue higher."
     },
     {
       "ticker": "CRWD",
-      "level": 768.36,
-      "changePct": -1.77,
-      "abc": "C",
-      "note": "Down in pre-market ahead of earnings, high risk."
+      "level": null,
+      "changePct": null,
+      "abc": "B",
+      "note": "Cybersecurity leader, reports earnings after the close."
     },
     {
       "ticker": "MSTR",
-      "level": 145.19,
-      "changePct": -3.06,
+      "level": null,
+      "changePct": null,
       "abc": "C",
-      "note": "Weakness due to crypto exposure, potential short setup."
+      "note": "Moves with Bitcoin, which has been volatile."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a confirmed uptrend, but some chop is expected. Focus on A-grade setups with strong relative strength."
+      "view": "Market is in a confirmed uptrend, but some leaders are extended. Focus on proper setups, avoid chasing."
     },
     {
       "name": "Ted Zhang",
-      "view": "Money is flowing into AI and semiconductor stocks. Stay with the trend."
+      "view": "Rotation continues to favor Technology and AI-related names. Materials are also showing signs of life."
     },
     {
       "name": "Clement Ang",
-      "view": "The market is a bit extended. It's a time to be selective and not chase extended names."
+      "view": "Market context is positive, but with indices at highs, the grade for new entries is B. Be selective."
     },
     {
       "name": "SRxTrades",
-      "view": "Look for clean pivots and volume confirmation. Avoid chasing gaps."
+      "view": "Look for clean pivots and volume confirmation. Avoid chasing extended names like QQQ."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your trading plan. Honor your stops."
+      "view": "Stick to your rules. Don't get caught up in the FOMO. Manage risk."
     },
     {
       "name": "Qullamaggie",
-      "view": "Look for episodic pivots on strong earnings or news. Be ready to act decisively when a setup triggers."
+      "view": "Momentum is strong in specific pockets. Look for episodic pivots and breakouts on high volume."
     },
     {
       "name": "Composite",
-      "view": "The market is cautiously optimistic. Focus on longs in strong sectors like AI and semis, but be mindful of extended conditions. Keep stops tight."
+      "view": "The market is bullish but extended. It's a time to be patient and wait for high-quality setups to emerge rather than forcing trades. Watch for reactions to today's economic data."
     }
   ],
   "standout": null,
   "earnings": {
-    "bmo": [],
+    "bmo": [
+      {
+        "ticker": "M",
+        "consensus": "EPS $0.02 / Rev $4.61B"
+      },
+      {
+        "ticker": "VBNK",
+        "consensus": "EPS $0.28 / Rev $26.63M"
+      },
+      {
+        "ticker": "OLLI",
+        "consensus": "EPS $0.88 / Rev $665.93M"
+      },
+      {
+        "ticker": "MDT",
+        "consensus": "EPS $1.55 / Rev $9.62B"
+      }
+    ],
     "amc": [
       {
         "ticker": "CRWD",
-        "consensus": ""
+        "consensus": "EPS $0.88 / Rev $1.36B"
+      },
+      {
+        "ticker": "AVGO",
+        "consensus": "EPS $2.32 / Rev $22.10B"
+      },
+      {
+        "ticker": "VEEV",
+        "consensus": "EPS $2.02 / Rev $857.65M"
+      },
+      {
+        "ticker": "AI",
+        "consensus": "EPS -$0.38 / Rev $51.6M"
       }
     ],
     "yesterdayReactions": []
   },
   "calendar": [
     {
-      "time": "08:55 ET",
-      "name": "Redbook (YoY)",
+      "time": "08:15 ET",
+      "name": "ADP National Employment Report",
+      "consensus": null
+    },
+    {
+      "time": "09:45 ET",
+      "name": "S&P Global Services PMI",
+      "consensus": null
+    },
+    {
+      "time": "10:00 ET",
+      "name": "ISM Services PMI",
+      "consensus": null
+    },
+    {
+      "time": "10:00 ET",
+      "name": "Factory Orders",
+      "consensus": null
+    },
+    {
+      "time": "10:30 ET",
+      "name": "EIA Weekly Petroleum Status Report",
+      "consensus": null
+    },
+    {
+      "time": "14:00 ET",
+      "name": "Fed Beige Book",
       "consensus": null
     }
   ],
   "ratings": {
-    "upgrades": [],
-    "downgrades": []
+    "upgrades": [
+      {
+        "ticker": "AMD",
+        "firm": "Sanford C. Bernstein",
+        "rating": "Outperform",
+        "pt": 525
+      }
+    ],
+    "downgrades": [],
+    "initiations": [
+      {
+        "ticker": "TSLA",
+        "firm": "JPMorgan Chase & Co.",
+        "rating": "Sell",
+        "pt": null
+      }
+    ]
   },
-  "alert": null,
+  "alert": "Key economic data today includes ADP Employment, ISM Services, and the Fed's Beige Book, which could introduce volatility.",
   "screenerScores": {},
   "citations": [
-    "Investing.com [1]",
-    "Public.com [2]",
-    "Public.com [3]",
-    "Public.com [4]",
-    "Public.com [5]",
-    "Public.com [6]",
-    "Public.com [7]",
-    "Public.com [8]",
-    "Public.com [9]",
-    "Public.com [10]",
-    "Kraken [11]",
-    "Kraken [12]",
-    "Kraken [13]",
-    "Market Chameleon [14]",
-    "Market Chameleon [15]",
-    "Market Chameleon [16]",
-    "Market Chameleon [17]",
-    "Market Chameleon [18]",
-    "Market Chameleon [19]",
-    "Market Chameleon [20]",
-    "Bitget [21]",
-    "Nasdaq [22]",
-    "Investing.com [23]",
-    "Stocktwits [24]",
-    "Market Chameleon [25]",
-    "Investing.com [26]",
-    "Investing.com [27]",
-    "Investing.com [28]",
-    "Market Chameleon [29]",
-    "Investing.com [30]",
-    "Stock Analysis [31]",
-    "Robinhood [32]",
-    "Investing.com [33]",
-    "Investing.com [34]",
-    "Investing.com [35]",
-    "Stocktwits [36]",
-    "Robinhood [37]",
-    "Benzinga [38]",
-    "Barchart.com [39]",
-    "Barchart.com [40]",
-    "Robinhood [41]",
-    "Robinhood [42]",
-    "Robinhood [43]",
-    "Market Chameleon [44]",
-    "Investing.com [45]",
-    "Fidelity [46]",
-    "Barchart.com [47]",
-    "Pluang [48]",
-    "Robinhood [49]",
-    "Robinhood [50]"
+    "CNN Business (2026-06-02)",
+    "MarketBeat (2026-06-03)",
+    "GuruFocus (2026-06-03)",
+    "Finviz (2026-06-03)",
+    "Investing.com (2026-06-03)",
+    "Saxo Bank (2026-06-03)",
+    "Reddit r/EconReports (2026-06-03)",
+    "IndexBox (2026-06-03)",
+    "Public.com (2026-06-03)",
+    "Robinhood (2026-06-03)",
+    "CBOE (2026-06-03)",
+    "Financhill (2026-06-03)",
+    "TipRanks (2026-06-03)",
+    "stockearnings.com (2026-06-03)",
+    "Fidelity (2026-06-03)",
+    "Moody's Analytics (2026-06-03)"
   ]
 }
