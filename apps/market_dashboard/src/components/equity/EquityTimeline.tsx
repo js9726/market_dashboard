@@ -17,8 +17,11 @@ import { useEffect, useMemo, useState } from "react";
 interface RealizedPoint { date: string; value: number }
 interface Reconciliation { expectedNet: number; brokerLatest: number | null; positionsValue: number; latestCash: number | null }
 interface Account { id: string; alias: string; currency: string }
+interface ExcludedCurrency { currency: string; count: number; sumPnl: number | null }
 interface Resp {
   realized: RealizedPoint[];
+  currency: string;
+  excludedCurrencies: ExcludedCurrency[];
   accountValueReliable: boolean;
   positionsValue: number;
   latestCash: number | null;
@@ -63,6 +66,8 @@ export default function EquityTimeline() {
 
   const realized = useMemo(() => (data?.realized ?? []).map((p) => ({ date: p.date, v: p.value })), [data]);
   const positionsValue = data?.positionsValue ?? 0;
+  const currency = data?.currency ?? "USD";
+  const excluded = data?.excludedCurrencies ?? [];
   const cashNum = cashOverride.trim() !== "" ? Number(cashOverride) : (data?.latestCash ?? null);
   const currentNet = cashNum != null ? cashNum + positionsValue : null;
 
@@ -119,9 +124,17 @@ export default function EquityTimeline() {
         </div>
       )}
 
+      {excluded.length > 0 && (
+        <p className="t-caption text-[var(--fg-3)]">
+          Excluded from this {currency} curve:{" "}
+          {excluded.map((e) => `${e.count} ${e.currency} trade${e.count !== 1 ? "s" : ""}`).join(", ")}
+          {" "}— can&apos;t sum across currencies.
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="Net account value" value={currentNet != null ? `$${fmt(currentNet)}` : "—"} />
-        <Stat label="Realized P&L" value={signed(stats.current)} color={stats.current >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
+        <Stat label={`Net account value (${currency})`} value={currentNet != null ? `$${fmt(currentNet)}` : "—"} />
+        <Stat label={`Realized P&L (${currency})`} value={signed(stats.current)} color={stats.current >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
         <Stat label={`${windowDays}d Realized`} value={signed(stats.change)} color={stats.change >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
         <Stat label="Max Drawdown" value={`-$${fmt(stats.maxDd)}`} color="var(--loss-fg)" />
       </div>

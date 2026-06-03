@@ -53,17 +53,44 @@ export async function GET(req: Request) {
     orderBy: { createdAt: "asc" },
   });
 
-  // ── Reliable line: cumulative realized P&L from the sheet ──────────────────
+  // Single-currency equity: you CANNOT sum USD + MYR. Use the connected
+  // account's currency (USD here; overridable via ?currency=) and EXCLUDE
+  // trades booked in other currencies (e.g. the lone MYR Affin Hwang trade),
+  // reporting the excluded set for transparency.
+  const equityCurrency = (
+    qp.get("currency") ?? accounts[0]?.displayCurrency ?? accounts[0]?.preset?.currency ?? "USD"
+  ).toUpperCase();
+
+  // ── Reliable line: cumulative realized P&L from the sheet (one currency) ────
   const closed = await prisma.tradeRecord.findMany({
     where: {
       userId: userScopeId,
       pnl: { not: null },
+      currency: equityCurrency,
       tradeDate: { not: null, gte: from, lte: to },
       ...(accountId ? { brokerAccountId: accountId } : {}),
     },
     select: { tradeDate: true, pnl: true },
     orderBy: { tradeDate: "asc" },
   });
+  // Closed trades in OTHER currencies, excluded from this curve (for a UI note).
+  const otherCurrency = await prisma.tradeRecord.groupBy({
+    by: ["currency"],
+    where: {
+      userId: userScopeId,
+      pnl: { not: null },
+      tradeDate: { not: null, gte: from, lte: to },
+      NOT: { currency: equityCurrency },
+      ...(accountId ? { brokerAccountId: accountId } : {}),
+    },
+    _count: true,
+    _sum: { pnl: true },
+  });
+  const excludedCurrencies = otherCurrency.map((g) => ({
+    currency: g.currency ?? "(none)",
+    count: g._count,
+    sumPnl: g._sum.pnl != null ? Number(g._sum.pnl) : null,
+  }));
   let running = 0;
   const realizedByDate = new Map<string, number>();
   for (const c of closed) {
@@ -123,6 +150,8 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     realized,
+    currency: equityCurrency,
+    excludedCurrencies,
     accountValue,
     accountValueReliable,
     // Reliable building blocks for a net-account-value line, independent of the
