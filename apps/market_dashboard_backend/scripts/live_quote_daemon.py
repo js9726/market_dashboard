@@ -64,6 +64,7 @@ _load_env()
 
 INDEX_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA"]   # ^VIX handled separately (different futu code)
 SECTOR_SYMBOLS = ["XLK", "XLF", "XLE", "XLV", "XLI", "XLY", "XLP", "XLU", "XLB", "XLRE", "XLC"]
+VIX_SYMBOL = "VIX"
 
 # Fallback if tv_screeners.json is absent
 _FALLBACK_WATCHLIST = ["NVDA", "TSLA", "AAPL", "MSFT", "AMZN", "META",
@@ -139,6 +140,47 @@ else:
 def to_futu_code(sym):
     """Convert plain symbol to futu's US.SPY format."""
     return "US." + sym
+
+
+def fetch_yahoo_vix():
+    """OpenD does not quote VIX as US.VIX; fetch Yahoo chart and post as VIX."""
+    url = "https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1d&interval=1m"
+    req = urllib.request.Request(
+        url,
+        headers={
+            "Accept": "application/json",
+            "User-Agent": "Mozilla/5.0 (compatible; MarketDashboardBot/1.0)",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            payload = json.loads(r.read().decode("utf-8"))
+    except Exception as e:
+        print("[vix] Yahoo fallback failed: %s" % e, flush=True)
+        return None
+
+    result = (payload.get("chart", {}).get("result") or [None])[0] or {}
+    meta = result.get("meta") or {}
+    price = meta.get("regularMarketPrice")
+    prev_close = meta.get("chartPreviousClose") or meta.get("previousClose")
+    observed_raw = meta.get("regularMarketTime")
+    if not isinstance(price, (int, float)) or price <= 0:
+        return None
+    if isinstance(observed_raw, (int, float)) and observed_raw > 0:
+        observed_at = datetime.datetime.fromtimestamp(float(observed_raw), datetime.timezone.utc)
+    else:
+        observed_at = datetime.datetime.now(datetime.timezone.utc)
+    change_pct = None
+    if isinstance(prev_close, (int, float)) and prev_close > 0:
+        change_pct = (float(price) - float(prev_close)) / float(prev_close) * 100.0
+    return {
+        "symbol": VIX_SYMBOL,
+        "price": float(price),
+        "changePct": round(change_pct, 4) if change_pct is not None else None,
+        "volume": None,
+        "source": "yahoo-chart",
+        "observedAt": observed_at.isoformat(),
+    }
 
 
 # --------------------------------------------------------------------------
@@ -279,6 +321,13 @@ def run_moomoo(throttle_s):
                 })
                 last_push[sym] = now_ts
 
+            last_vix = last_push.get(VIX_SYMBOL, 0)
+            if now_ts - last_vix >= throttle_s:
+                vix = fetch_yahoo_vix()
+                if vix:
+                    batch.append(vix)
+                    last_push[VIX_SYMBOL] = now_ts
+
             if batch:
                 push_batch(batch)
 
@@ -296,11 +345,11 @@ def run_moomoo(throttle_s):
 
 def run_stub(throttle_s):
     print("[stub] random-walk mode for testing", flush=True)
-    state = {s: 100.0 + random.uniform(-10, 10) for s in ALL_SYMBOLS}
+    state = {s: 100.0 + random.uniform(-10, 10) for s in ALL_SYMBOLS + [VIX_SYMBOL]}
     while True:
         now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
         batch = []
-        for sym in ALL_SYMBOLS:
+        for sym in ALL_SYMBOLS + [VIX_SYMBOL]:
             state[sym] *= 1 + random.uniform(-0.001, 0.001)
             batch.append({
                 "symbol": sym,

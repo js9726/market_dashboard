@@ -37,6 +37,54 @@ def _plain_symbol(futu_code: str) -> str:
     return futu_code
 
 
+def _is_vix(ticker: str) -> bool:
+    return ticker.upper().replace("US.", "") in {"VIX", "^VIX"}
+
+
+def _fetch_yahoo_vix() -> dict[str, Any] | None:
+    """OpenD does not expose VIX as US.VIX; use Yahoo chart as fallback."""
+    url = "https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1d&interval=1m"
+    try:
+        r = requests.get(
+            url,
+            headers={
+                "Accept": "application/json",
+                "User-Agent": "Mozilla/5.0 (compatible; DashboardBridge/1.0)",
+            },
+            timeout=10,
+        )
+        r.raise_for_status()
+        payload = r.json()
+        result = (payload.get("chart", {}).get("result") or [None])[0] or {}
+        meta = result.get("meta") or {}
+        price = meta.get("regularMarketPrice")
+        prev_close = meta.get("chartPreviousClose") or meta.get("previousClose")
+        observed_raw = meta.get("regularMarketTime")
+        if not isinstance(price, (int, float)) or price <= 0:
+            return None
+        observed_at = (
+            datetime.datetime.fromtimestamp(float(observed_raw), datetime.timezone.utc)
+            if isinstance(observed_raw, (int, float)) and observed_raw > 0
+            else datetime.datetime.now(datetime.timezone.utc)
+        )
+        change_pct = (
+            ((float(price) - float(prev_close)) / float(prev_close) * 100)
+            if isinstance(prev_close, (int, float)) and prev_close > 0
+            else None
+        )
+        return {
+            "symbol": "VIX",
+            "price": float(price),
+            "changePct": round(change_pct, 4) if change_pct is not None else None,
+            "volume": None,
+            "source": "yahoo-chart",
+            "observedAt": observed_at.isoformat(),
+        }
+    except Exception as e:
+        log.warning("VIX Yahoo fallback failed (non-fatal): %s", e)
+        return None
+
+
 def fetch_live_quotes(
     cfg: Config,
     position_tickers: Sequence[str],
@@ -47,27 +95,34 @@ def fetch_live_quotes(
     """
     universe: list[str] = []
     seen: set[str] = set()
+    wants_vix = False
     for t in list(position_tickers) + list(cfg.sync.live_quote_extras):
+        if _is_vix(t):
+            wants_vix = True
+            continue
         code = _futu_code(t)
         if code not in seen:
             seen.add(code)
             universe.append(code)
 
     if not universe:
-        return []
+        vix = _fetch_yahoo_vix() if wants_vix else None
+        return [vix] if vix else []
 
     ctx = OpenQuoteContext(host=cfg.opend.host, port=cfg.opend.port)
     try:
         ret, df = ctx.get_market_snapshot(universe)
     except Exception as e:
         log.warning("get_market_snapshot raised (non-fatal): %s", e)
-        return []
+        vix = _fetch_yahoo_vix() if wants_vix else None
+        return [vix] if vix else []
     finally:
         ctx.close()
 
     if ret != RET_OK:
         log.warning("get_market_snapshot error (non-fatal): %s", df)
-        return []
+        vix = _fetch_yahoo_vix() if wants_vix else None
+        return [vix] if vix else []
 
     observed_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
     rows: list[dict[str, Any]] = []
@@ -90,6 +145,10 @@ def fetch_live_quotes(
         except Exception as e:
             log.debug("row parse skipped: %s", e)
             continue
+    if wants_vix:
+        vix = _fetch_yahoo_vix()
+        if vix:
+            rows.append(vix)
     return rows
 
 
