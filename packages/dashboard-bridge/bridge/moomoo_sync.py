@@ -97,23 +97,66 @@ class MoomooSync:
             log.error("history_deal_list_query failed: %s", data)
             return []
 
+        currency = "USD" if self.cfg.opend.market.upper() == "US" else "HKD"
         rows: list[dict[str, Any]] = []
+        order_qty: dict[str, float] = {}
         for _, row in data.iterrows():
             side_raw = str(row.get("trd_side", "")).upper()
             side = "BUY" if "BUY" in side_raw else ("SELL" if "SELL" in side_raw else None)
             if side is None:
                 continue
+            qty = float(row.get("qty", 0))
+            oid = str(row.get("order_id", ""))
+            order_qty[oid] = order_qty.get(oid, 0.0) + qty
             rows.append({
                 "brokerFillId": str(row.get("deal_id", "")),
+                "_orderId": oid,
                 "ticker": str(row["code"]),
                 "side": side,
-                "qty": float(row.get("qty", 0)),
+                "qty": qty,
                 "price": float(row.get("price", 0)),
                 "executedAt": _iso(row.get("create_time")),
-                "fees": None,  # moomoo doesn't return per-fill fees in this call
-                "currency": "USD" if self.cfg.opend.market.upper() == "US" else "HKD",
+                "fees": None,
+                "currency": currency,
             })
+
+        # The deal API returns no fees; order_fee_query does. Attach per-deal fees
+        # (order fee split across the order's deals by qty) so realized P&L is net
+        # of fees without needing a separate backfill. Best-effort (non-fatal).
+        order_fee = self._order_fees(ctx, [o for o in order_qty if o])
+        for r in rows:
+            oid = r.pop("_orderId", "")
+            oq = order_qty.get(oid, 0.0)
+            fee = order_fee.get(oid)
+            if fee is not None and oq > 0:
+                r["fees"] = round(fee * (r["qty"] / oq), 4)
         return rows
+
+    def _order_fees(self, ctx: OpenSecTradeContext, order_ids: list[str]) -> dict[str, float]:
+        """Per-order fees via order_fee_query, chunked. Non-fatal on error."""
+        fees: dict[str, float] = {}
+        for j in range(0, len(order_ids), 50):
+            try:
+                ret, data = ctx.order_fee_query(
+                    order_id_list=order_ids[j:j + 50],
+                    acc_id=self.cfg.opend.acc_id,
+                    trd_env=TrdEnv.REAL,
+                )
+            except Exception as e:  # noqa: BLE001
+                log.warning("order_fee_query exception (non-fatal): %s", e)
+                continue
+            if ret != RET_OK:
+                log.warning("order_fee_query failed (non-fatal): %s", data)
+                continue
+            for _, row in data.iterrows():
+                oid = str(row.get("order_id", ""))
+                fa = row.get("fee_amount")
+                if oid and fa is not None:
+                    try:
+                        fees[oid] = float(fa)
+                    except (TypeError, ValueError):
+                        pass
+        return fees
 
 
     # ── Equity snapshot (Phase 4 — feeds /equity timeline page) ─────────

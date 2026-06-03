@@ -145,6 +145,7 @@ export async function POST(req: Request) {
   // ── Insert new fills (dedup on brokerFillId) ────────────────────────────
   let fillsInserted = 0;
   let fillsSkipped = 0;
+  let fillsFeeUpdated = 0;
 
   for (const f of body.fills) {
     try {
@@ -161,6 +162,15 @@ export async function POST(req: Request) {
         },
       });
       if (existing) {
+        // Backfill a late-arriving fee onto an already-stored fill (a deal can
+        // sync before its order fee is finalized by the broker).
+        if (existing.fees == null && f.fees != null) {
+          await prisma.tradeFill.update({
+            where: { id: existing.id },
+            data: { fees: new Prisma.Decimal(f.fees) },
+          });
+          fillsFeeUpdated++;
+        }
         fillsSkipped++;
         continue;
       }
@@ -296,6 +306,7 @@ export async function POST(req: Request) {
     ok: true,
     fillsInserted,
     fillsSkipped,
+    fillsFeeUpdated,
     positionsUpserted,
     positionsRemoved: removed.count,
     equityUpserted,
