@@ -1,30 +1,20 @@
 /**
  * GET /api/equity/timeline
  *
- * Returns the user's daily equity timeline from EquitySnapshot rows
- * populated by the dashboard-bridge daemon (Phase 4).
+ * Two-line equity view:
+ *   1. `realized` — cumulative REALIZED P&L from the user's sheet closed trades.
+ *      This is the reliable "real equity curve": it reflects actual booked
+ *      trading performance and does NOT depend on the broker snapshot.
+ *   2. `accountValue` — broker net account value (EquitySnapshot.totalAssets),
+ *      shown ONLY when it reconciles with cash + live position value. The
+ *      moomoo bridge has been observed reporting totals that are multiples of
+ *      the real account (wrong acc_id / margin buying-power / aggregate view),
+ *      so we fail-closed: if broker totals diverge >50% from (cash + positions)
+ *      we mark `accountValueReliable=false` and the UI hides that line + warns
+ *      rather than showing a fake number.
  *
- * Phase 6 of pre-open CI + journal revamp plan.
- *
- * Auth: NextAuth session. Approved users read only their own equity timeline.
- *
- * Query params:
- *   ?from=YYYY-MM-DD     default: 90 days ago
- *   ?to=YYYY-MM-DD       default: today
- *   ?accountId=...       optional: scope to one broker account (default: all)
- *
- * Response:
- *   {
- *     count: number,
- *     accounts: [ { id, alias, currency } ],
- *     points: [
- *       { date, totalAssets, cash, marketVal, unrealizedPl, equityPctChange }
- *     ]
- *   }
- *
- * If user has multiple broker accounts, points are aggregated per day (sum
- * across accounts in their local currencies — multi-currency normalisation
- * is deferred to the frontend display layer).
+ * Auth: NextAuth session, own data only.
+ * Query: ?from=YYYY-MM-DD ?to=YYYY-MM-DD ?accountId=...
  */
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
@@ -32,6 +22,8 @@ import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+const RECONCILE_TOLERANCE = 0.5; // broker total may differ from cash+positions by ≤50%
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -43,32 +35,46 @@ export async function GET(req: Request) {
   }
   const userScopeId = scopeUserId(session)!;
 
-  const url = new URL(req.url);
-  const qp = url.searchParams;
-
+  const qp = new URL(req.url).searchParams;
   const today = new Date();
   const defaultFrom = new Date(today);
   defaultFrom.setUTCDate(defaultFrom.getUTCDate() - 90);
-
   const from = qp.get("from") && /^\d{4}-\d{2}-\d{2}$/.test(qp.get("from")!)
     ? new Date(`${qp.get("from")}T00:00:00.000Z`)
     : new Date(defaultFrom.toISOString().slice(0, 10) + "T00:00:00.000Z");
   const to = qp.get("to") && /^\d{4}-\d{2}-\d{2}$/.test(qp.get("to")!)
     ? new Date(`${qp.get("to")}T00:00:00.000Z`)
     : new Date(today.toISOString().slice(0, 10) + "T00:00:00.000Z");
-  const fromKey = from.toISOString().slice(0, 10);
-  const toKey = to.toISOString().slice(0, 10);
-
   const accountId = qp.get("accountId");
 
-  // Resolve user's accounts (for label display).
   const accounts = await prisma.userBrokerAccount.findMany({
     where: { userId: userScopeId, isActive: true },
     include: { preset: true },
     orderBy: { createdAt: "asc" },
   });
 
-  // Fetch snapshots in range.
+  // ── Reliable line: cumulative realized P&L from the sheet ──────────────────
+  const closed = await prisma.tradeRecord.findMany({
+    where: {
+      userId: userScopeId,
+      pnl: { not: null },
+      tradeDate: { not: null, gte: from, lte: to },
+      ...(accountId ? { brokerAccountId: accountId } : {}),
+    },
+    select: { tradeDate: true, pnl: true },
+    orderBy: { tradeDate: "asc" },
+  });
+  let running = 0;
+  const realizedByDate = new Map<string, number>();
+  for (const c of closed) {
+    running += Number(c.pnl);
+    realizedByDate.set(c.tradeDate!.toISOString().slice(0, 10), running);
+  }
+  const realized = Array.from(realizedByDate.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, value]) => ({ date, value: Number(value.toFixed(2)) }));
+
+  // ── Broker account-value line (raw, then reconciled) ───────────────────────
   const snapshots = await prisma.equitySnapshot.findMany({
     where: {
       userId: userScopeId,
@@ -77,104 +83,60 @@ export async function GET(req: Request) {
     },
     orderBy: { snapshotDate: "asc" },
   });
-
-  // Aggregate per day (sum across accounts in local currency for now).
-  const byDate = new Map<string, {
-    totalAssets: number;
-    cash: number;
-    marketVal: number;
-    unrealizedPl: number;
-    equityPctChange: number | null;
-  }>();
-
+  const byDate = new Map<string, { totalAssets: number; cash: number; marketVal: number }>();
   for (const s of snapshots) {
-    const dateKey = s.snapshotDate.toISOString().slice(0, 10);
-    const cur = byDate.get(dateKey) ?? {
-      totalAssets: 0, cash: 0, marketVal: 0, unrealizedPl: 0, equityPctChange: null,
-    };
+    const k = s.snapshotDate.toISOString().slice(0, 10);
+    const cur = byDate.get(k) ?? { totalAssets: 0, cash: 0, marketVal: 0 };
     cur.totalAssets += Number(s.totalAssets);
     cur.cash += Number(s.cash);
     cur.marketVal += Number(s.marketVal);
-    cur.unrealizedPl += Number(s.unrealizedPl ?? 0);
-    // For pct change, take the latest computed (per-account avg if multi)
-    if (s.equityPctChange != null) {
-      cur.equityPctChange = Number(s.equityPctChange);
-    }
-    byDate.set(dateKey, cur);
+    byDate.set(k, cur);
   }
-
-  const points = Array.from(byDate.entries())
+  const accountValue = Array.from(byDate.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, v]) => ({
       date,
       totalAssets: Number(v.totalAssets.toFixed(2)),
       cash: Number(v.cash.toFixed(2)),
       marketVal: Number(v.marketVal.toFixed(2)),
-      unrealizedPl: Number(v.unrealizedPl.toFixed(2)),
-      equityPctChange: v.equityPctChange,
     }));
 
-  // ── Blend: extend the broker equity curve back through history using the
-  //    sheet's realized P&L. Account-value metric: broker totalAssets where it
-  //    exists; before the first broker snapshot, derive value from the running
-  //    sheet P&L anchored so it connects continuously to the broker data. ──────
-  const closed = await prisma.tradeRecord.findMany({
-    where: {
-      userId: userScopeId,
-      pnl: { not: null },
-      tradeDate: { not: null, lte: to },
-      ...(accountId ? { brokerAccountId: accountId } : {}),
-    },
-    select: { tradeDate: true, pnl: true },
-    orderBy: { tradeDate: "asc" },
+  // ── Reconciliation guard ───────────────────────────────────────────────────
+  // expected net = latest cash + current live position value (the values that
+  // actually match the user's real holdings). If the broker's reported total is
+  // wildly off, the account-value line is not trustworthy.
+  const positions = await prisma.position.findMany({
+    where: { brokerAccount: { userId: userScopeId } },
+    select: { qty: true, avgCost: true, currentPrice: true },
   });
-  let running = 0;
-  const cumByDate = new Map<string, number>();
-  for (const c of closed) {
-    running += Number(c.pnl);
-    cumByDate.set(c.tradeDate!.toISOString().slice(0, 10), running);
-  }
-  const cumDates = Array.from(cumByDate.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, cum]) => ({ date, cum }));
-  const cumDatesInRange = cumDates.filter((cd) => cd.date >= fromKey && cd.date <= toKey);
-
-  type BlendPoint = (typeof points)[number] & { source: "broker" | "sheet" };
-  let blended: BlendPoint[] = points.map((p) => ({ ...p, source: "broker" }));
-
-  if (points.length > 0 && cumDates.length > 0) {
-    const anchorDate = points[0].date;
-    const anchorEquity = points[0].totalAssets;
-    let cumAtAnchor = 0;
-    for (const cd of cumDates) if (cd.date <= anchorDate) cumAtAnchor = cd.cum;
-    const startingCapital = anchorEquity - cumAtAnchor;
-    const derived: BlendPoint[] = cumDates
-      .filter((cd) => cd.date >= fromKey && cd.date < anchorDate)
-      .map((cd) => ({
-        date: cd.date,
-        totalAssets: Number((startingCapital + cd.cum).toFixed(2)),
-        cash: 0, marketVal: 0, unrealizedPl: 0, equityPctChange: null,
-        source: "sheet",
-      }));
-    blended = [...derived, ...blended];
-  } else if (points.length === 0 && cumDates.length > 0) {
-    // No broker anchor yet: show the cumulative realized P&L line.
-    blended = cumDatesInRange.map((cd) => ({
-      date: cd.date, totalAssets: Number(cd.cum.toFixed(2)),
-      cash: 0, marketVal: 0, unrealizedPl: 0, equityPctChange: null, source: "sheet",
-    }));
-  }
-
-  const brokerStart = blended.find((p) => p.source === "broker")?.date ?? null;
+  const positionsValue = positions.reduce((sum, p) => {
+    const px = p.currentPrice != null ? Number(p.currentPrice) : Number(p.avgCost);
+    return sum + Number(p.qty) * px;
+  }, 0);
+  const latest = accountValue.length ? accountValue[accountValue.length - 1] : null;
+  const expectedNet = latest ? latest.cash + positionsValue : null;
+  const brokerLatest = latest?.totalAssets ?? null;
+  const accountValueReliable =
+    brokerLatest != null && expectedNet != null && expectedNet > 0
+      ? Math.abs(brokerLatest - expectedNet) / expectedNet <= RECONCILE_TOLERANCE
+      : false;
 
   return NextResponse.json({
-    count: blended.length,
-    brokerStart,
+    realized,
+    accountValue,
+    accountValueReliable,
+    reconciliation: expectedNet != null
+      ? {
+          expectedNet: Number(expectedNet.toFixed(2)),
+          brokerLatest,
+          positionsValue: Number(positionsValue.toFixed(2)),
+          latestCash: latest?.cash ?? null,
+        }
+      : null,
     accounts: accounts.map((a) => ({
       id: a.id,
       alias: a.alias,
       currency: a.displayCurrency ?? a.preset.currency,
     })),
-    points: blended,
   });
 }

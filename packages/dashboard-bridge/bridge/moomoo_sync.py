@@ -168,6 +168,23 @@ class MoomooSync:
             log.warning("equity snapshot missing required fields; skipping")
             return None
 
+        # Reconciliation guard: for a cash account total_assets ≈ cash + market_val.
+        # A large divergence means accinfo is returning the WRONG account or a
+        # margin buying-power figure (observed: total_assets ~9x the real account).
+        # Log loudly so the snapshot is not silently trusted — the dashboard also
+        # re-checks this server-side and hides the account-value line until it
+        # reconciles. See docs/EQUITY-ACCID-FIX.md to verify acc_id.
+        expected = (cash or 0.0) + market_val
+        if expected > 0 and abs(total_assets - expected) / expected > 0.5:
+            log.warning(
+                "equity reconciliation FAILED: total_assets=%.2f vs cash+market_val=%.2f "
+                "(%.1fx). acc_id=%s may be the wrong account or a margin/aggregate view. "
+                "See docs/EQUITY-ACCID-FIX.md.",
+                total_assets, expected,
+                (total_assets / expected) if expected else 0.0,
+                self.cfg.opend.acc_id,
+            )
+
         return {
             "snapshotDate": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),
             "totalAssets": total_assets,
