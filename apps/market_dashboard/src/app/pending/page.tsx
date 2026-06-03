@@ -1,11 +1,12 @@
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
+import { canSeePersonalBook } from "@/lib/access";
 
 export default async function PendingPage() {
   const session = await auth();
 
-  // If already approved, send to dashboard
-  if (session?.user?.role === "allowed" || session?.user?.role === "owner") {
+  // If already approved (owner | member, incl. legacy "allowed"), send on.
+  if (canSeePersonalBook(session)) {
     redirect("/dashboard");
   }
 

@@ -1,11 +1,13 @@
 import { signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { canSeePersonalBook } from "@/lib/access";
 
 export default async function LoginPage() {
-  // Already signed in and approved → go straight to dashboard
+  // Already signed in and approved (owner | member, incl. legacy "allowed") →
+  // go straight to dashboard.
   const session = await auth();
-  if (session?.user?.role === "owner" || session?.user?.role === "allowed") {
+  if (canSeePersonalBook(session)) {
     redirect("/dashboard");
   }
 

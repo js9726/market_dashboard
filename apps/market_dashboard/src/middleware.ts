@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+import { roleOf } from "@/lib/access";
 
 export default auth((req) => {
   const session = req.auth;
@@ -51,10 +52,14 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const role = session.user?.role;
+  // Normalise via the single source of truth (access.ts): owner | member |
+  // pending | denied, with legacy "allowed" → member and unknown/absent →
+  // pending. This keeps the middleware and the API-route guards on ONE role
+  // model and stops an approved "member" from being wrongly signed out.
+  const role = roleOf(session);
 
-  // Approved roles can proceed
-  if (role === "owner" || role === "allowed") {
+  // Approved roles (owner + member) can proceed
+  if (role === "owner" || role === "member") {
     // Admin area: owner only
     if (pathname.startsWith("/admin") && role !== "owner") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
@@ -62,8 +67,8 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  // Pending / unknown → hold page
-  if (role === "pending" || !role) {
+  // Pending → hold page
+  if (role === "pending") {
     if (!pathname.startsWith("/pending")) {
       return NextResponse.redirect(new URL("/pending", req.url));
     }

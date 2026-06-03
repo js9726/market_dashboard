@@ -15,7 +15,8 @@ interface AppUser {
 
 const ROLE_COLORS: Record<string, string> = {
   owner:   "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  allowed: "bg-green-500/20 text-green-300 border-green-500/30",
+  member:  "bg-green-500/20 text-green-300 border-green-500/30",
+  allowed: "bg-green-500/20 text-green-300 border-green-500/30", // legacy alias
   pending: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
   denied:  "bg-red-500/20 text-red-300 border-red-500/30",
 };
@@ -134,13 +135,13 @@ export default function AdminPage() {
                       <span className="text-slate-600 text-xs">You</span>
                     ) : (
                       <div className="flex gap-2">
-                        {user.role !== "allowed" && (
+                        {user.role !== "member" && user.role !== "allowed" && (
                           <button
-                            onClick={() => setRole(user.id, "allowed")}
+                            onClick={() => setRole(user.id, "member")}
                             disabled={updating === user.id}
                             className="px-3 py-1 rounded-md text-xs font-medium bg-green-600 hover:bg-green-500 disabled:opacity-40 transition-colors"
                           >
-                            Allow
+                            Approve
                           </button>
                         )}
                         {user.role !== "denied" && (
@@ -178,7 +179,7 @@ export default function AdminPage() {
         </div>
 
         <p className="text-slate-600 text-xs mt-4">
-          Note: role changes take effect on the user&apos;s next sign-in (sessions last 24 hours).
+          Note: role changes propagate within about a minute — the user may just need to refresh the page (no re-login required).
         </p>
       </div>
     </div>

@@ -22,8 +22,12 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { userId, role } = await req.json();
-  if (!userId || !["allowed", "denied", "pending", "owner"].includes(role)) {
+  const { userId, role: rawRole } = await req.json();
+  // Canonical roles (access.ts): owner | member | pending | denied. Accept the
+  // legacy "allowed" and normalise it to "member" so the STORED vocabulary
+  // matches the middleware + API-route guards.
+  const role = rawRole === "allowed" ? "member" : rawRole;
+  if (!userId || !["member", "denied", "pending", "owner"].includes(role)) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
