@@ -22,9 +22,10 @@
  */
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { serializeCandidate } from "@/server/alist-serialize";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
+import { getOperatorUserId } from "@/server/operator";
 
 const prisma = new PrismaClient();
 
@@ -42,8 +43,18 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const dateParam = url.searchParams.get("date");
 
-  // Multi-tenant: each user sees only their own A-list.
-  const userScopeId = scopeUserId(session)!;
+  // SaaS visibility: REC picks are a SHARED operator resource (every approved
+  // user sees the same screener picks); HELD positions are PERSONAL to the
+  // caller. For the operator these two collapse to "their own rows" — a no-op
+  // for the single owner today, and correct once clients exist.
+  const selfId = scopeUserId(session)!;
+  const operatorId = (await getOperatorUserId()) ?? selfId;
+  const visibility: Prisma.AListCandidateWhereInput = {
+    OR: [
+      { userId: operatorId, isHeld: false }, // shared REC lane
+      { userId: selfId, isHeld: true },      // personal HELD lane
+    ],
+  };
 
   // Resolve target date — explicit ?date= or fall back to most recent pickDate
   let pickDate: Date;
@@ -51,7 +62,7 @@ export async function GET(req: Request) {
     pickDate = new Date(`${dateParam}T00:00:00.000Z`);
   } else {
     const latest = await prisma.aListCandidate.findFirst({
-      where: { userId: userScopeId },
+      where: visibility,
       orderBy: { pickDate: "desc" },
       select: { pickDate: true },
     });
@@ -62,7 +73,7 @@ export async function GET(req: Request) {
   }
 
   const rows = await prisma.aListCandidate.findMany({
-    where: { userId: userScopeId, pickDate },
+    where: { ...visibility, pickDate },
     orderBy: [{ day0Score: "desc" }, { ticker: "asc" }],
   });
 

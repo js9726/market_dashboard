@@ -30,6 +30,7 @@ import { auth } from "@/auth";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { serializeCandidate } from "@/server/alist-serialize";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
+import { getOperatorUserId } from "@/server/operator";
 
 const prisma = new PrismaClient();
 
@@ -59,11 +60,17 @@ export async function GET(req: Request) {
     ? new Date(`${qp.get("to")}T00:00:00.000Z`)
     : new Date(today.toISOString().slice(0, 10) + "T00:00:00.000Z");
 
-  // Multi-tenant: each user sees only their own A-list.
-  const userScopeId = scopeUserId(session)!;
+  // SaaS visibility: REC picks are a SHARED operator resource; HELD positions
+  // are PERSONAL. For the operator these collapse to "their own rows". See
+  // /api/a-list/today for the rationale.
+  const selfId = scopeUserId(session)!;
+  const operatorId = (await getOperatorUserId()) ?? selfId;
 
   const where: Prisma.AListCandidateWhereInput = {
-    userId: userScopeId,
+    OR: [
+      { userId: operatorId, isHeld: false }, // shared REC lane
+      { userId: selfId, isHeld: true },      // personal HELD lane
+    ],
     pickDate: { gte: from, lte: to },
   };
 

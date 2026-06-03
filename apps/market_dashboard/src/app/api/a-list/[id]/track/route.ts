@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
+import { getOperatorUserId } from "@/server/operator";
 
 export const dynamic = "force-dynamic";
 
@@ -22,11 +23,20 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const { id } = await ctx.params;
   const userScopeId = scopeUserId(session)!;
 
-  const cand = await prisma.aListCandidate.findUnique({ where: { id }, select: { userId: true } });
+  const cand = await prisma.aListCandidate.findUnique({
+    where: { id },
+    select: { userId: true, isHeld: true },
+  });
   if (!cand) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Multi-tenant: only the owning user may read a candidate's path.
-  if (cand.userId !== userScopeId) {
+  // Visibility: the caller's own row, OR a shared REC pick (operator-owned,
+  // not held). Mirrors /api/a-list/today + /history.
+  let allowed = cand.userId === userScopeId;
+  if (!allowed && !cand.isHeld) {
+    const operatorId = await getOperatorUserId();
+    allowed = operatorId != null && cand.userId === operatorId;
+  }
+  if (!allowed) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
