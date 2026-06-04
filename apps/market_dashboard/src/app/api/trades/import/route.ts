@@ -56,6 +56,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { resolveTradeUsd } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
 
@@ -86,7 +87,7 @@ function toDate(v: unknown): Date | null {
 const SHEET_ID = "140dOBA2S9la3vfW0rir5_H_nbvbgV4uGLysHl-1o19g";
 const SHEET_TAB = "T.Journal [JS]";
 
-async function resolveOwnerConnection(): Promise<{ userId: string; connectionId: string }> {
+async function resolveOwnerConnection(): Promise<{ userId: string; connectionId: string; fixedFxRate: number | null }> {
   const ownerEmail = process.env.OWNER_EMAIL;
   if (!ownerEmail) throw new Error("OWNER_EMAIL not set — cannot resolve owner for trade import");
 
@@ -123,7 +124,11 @@ async function resolveOwnerConnection(): Promise<{ userId: string; connectionId:
     });
   }
 
-  return { userId: owner.id, connectionId: connection.id };
+  return {
+    userId: owner.id,
+    connectionId: connection.id,
+    fixedFxRate: connection.fixedFxRate != null ? Number(connection.fixedFxRate) : null,
+  };
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
@@ -148,10 +153,12 @@ export async function POST(req: Request) {
   // ── Resolve owner + connection ────────────────────────────────────────────
   let ownerId: string;
   let connectionId: string;
+  let fixedRate: number | null = null;
   try {
     const resolved = await resolveOwnerConnection();
     ownerId = resolved.userId;
     connectionId = resolved.connectionId;
+    fixedRate = resolved.fixedFxRate;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: msg }, { status: 500 });
@@ -170,6 +177,14 @@ export async function POST(req: Request) {
     orderBy: { syncedAt: "desc" },
   });
 
+  // Currency normalization → USD (sheet P&L is MYR via a fixed rate; broker
+  // overlay/backfill supersede this where fills exist). See lib/currency.ts.
+  const rawPnlNum =
+    body.pnl == null || body.pnl === "" || !Number.isFinite(Number(body.pnl))
+      ? null
+      : Number(body.pnl);
+  const usd = resolveTradeUsd({ ticker, rawPnl: rawPnlNum, fixedRate, sheetBaseCurrency: "MYR" });
+
   const tradeData = {
     ticker,
     tradeDate,
@@ -178,6 +193,10 @@ export async function POST(req: Request) {
     quantity: toDecimal(body.quantity),
     exitPrice: toDecimal(body.exitPrice),
     pnl: toDecimal(body.pnl),
+    pnlUsd: usd.pnlUsd,
+    currencyCode: usd.currencyCode,
+    fxRate: usd.fxRate,
+    pnlSource: usd.pnlSource,
     fees: toDecimal(body.fees),
     notes: typeof body.notes === "string" ? body.notes : null,
     state: typeof body.state === "string" ? body.state : null,

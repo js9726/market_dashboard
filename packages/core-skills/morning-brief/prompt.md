@@ -118,6 +118,20 @@ OUTPUT SHAPE — every field is required unless marked optional. If you cannot f
     "downgrades": [{ "ticker": "MSFT", "firm": "Goldman", "rating": "Neutral", "pt": 380 }]
   },
   "alert": "<short banner text|null>",
+  "news": [
+    {
+      "headline": "Fed holds rates, signals one cut in 2026",
+      "impact": "HIGH",                       // HIGH | MED | LOW — market-moving weight
+      "tickers": ["SPY", "QQQ", "TLT"],       // tickers most affected (null if broad-macro)
+      "source": "Reuters 08:30 ET — https://reuters.com/...",  // publisher + link
+      "time": "08:30 ET"                       // when it broke (human or ISO)
+    }
+    // 3–6 of the single most market-moving items overnight + pre-market.
+    // HIGH = moves the whole tape or a major sector (Fed, CPI/jobs, megacap
+    // guidance cut, geopolitical shock, big M&A). MED = notable single-name or
+    // group catalyst. Skip LOW-impact noise. Each item MUST be web-grounded
+    // with a real source link — fabricated headlines are dropped.
+  ],
   "screenerScores": {
     "TICKER": {
       "score": <0-100|null>,
@@ -168,10 +182,11 @@ SECTIONS — use pre-fetched data where provided; web-search only what is missin
 9. Watchlist: use "Watchlist live prices" block for level/changePct; add 1-line setup note per ticker
 10. Mood/posture: synthesise from all data above — state the single most important variable
 11. Screener scores: score every unscored ticker listed in SCREENER TICKERS TO SCORE using the trader framework. Emit verdict as "GO" (score ≥ 80) / "WAIT" (50-79) / "PASS" (< 50) — never use BUY/HOLD/AVOID here
+12. High-impact news: web-search for the 3–6 most market-moving news items from overnight + pre-market and emit them in `news`. Rank by impact (HIGH > MED), tag the affected `tickers`, and include a real `source` link for each. These feed the daily-journal "high-impact news" widget — only include items you can ground with a live citation; fabricated headlines are dropped.
 
 RULES:
 - Every numeric value must come from a real, recent web result — never fabricate.
 - If something is unavailable, write `null` and add an entry to `citations` explaining ("data unavailable at generation time").
-- NEWS GROUNDING (enforced post-generation): `earnings`, `ratings`, and `calendar` are dropped automatically unless `citations` includes a real live source citation (calendar also passes if a live events feed was supplied above). Placeholder citations such as "data unavailable" do not count. If you cannot cite a real source for an earnings result, analyst rating, or economic event, set that field to `null` — do NOT invent it. Ungrounded sections are withheld and shown as "Unavailable", so fabricating them only loses you the section.
+- NEWS GROUNDING (enforced post-generation): `earnings`, `ratings`, `calendar`, and `news` are dropped automatically unless `citations` includes a real live source citation (calendar also passes if a live events feed was supplied above). Placeholder citations such as "data unavailable" do not count. If you cannot cite a real source for an earnings result, analyst rating, economic event, or news headline, set that field to `null` (or omit the item from `news`) — do NOT invent it. Ungrounded sections are withheld and shown as "Unavailable", so fabricating them only loses you the section.
 - Output ONLY the JSON object. The first character of your response MUST be `{`. The last character MUST be `}`.
 - No prose. No markdown. No code fences.

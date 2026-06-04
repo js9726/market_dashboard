@@ -25,6 +25,29 @@ export type SnapshotInput = {
   industry?: string | null;
   earningsDays?: number | null;
   halts90d?: number | null;
+
+  // ── Entry-date market context (WS3, 2026-06) ──────────────────────────────
+  // Optional enrichment keyed on the trade's entry date so the trader rubric can
+  // score against the market regime + theme that existed at the time. Built by
+  // src/lib/trade-snapshot.ts from MarketBreadthSnapshot + MorningBriefCache +
+  // ScreenerSnapshot. All optional — null when the snapshot for that date is
+  // missing (fail-closed; see `contextNotes`).
+  /** Market sentiment from MarketBreadthSnapshot (advancers/decliners share). */
+  marketSentiment?: "risk-on" | "risk-off" | "mixed" | null;
+  /** % of mcap>100M universe above its 50-DMA on the entry date. */
+  breadthPctAbove50?: number | null;
+  advanceDecline?: { advance: number | null; decline: number | null } | null;
+  /** Mood label + posture from the entry-date morning brief (StructuredBrief). */
+  marketMood?: string | null;
+  marketPosture?: string | null;
+  /** The ticker's own sector/industry momentum on the entry date. */
+  sectorMomentumPct?: number | null;
+  industryMomentumPct?: number | null;
+  /** Whether the ticker's industry/sector was a flagged "hot theme" that day. */
+  themeOnRadar?: boolean | null;
+  themeNote?: string | null;
+  /** Fail-closed audit trail: one note per missing/absent producer. */
+  contextNotes?: string[] | null;
 };
 
 export type TradeInput = {
@@ -127,6 +150,40 @@ function snapshotBlock(s: SnapshotInput): string {
     `- Days to next earnings: ${s.earningsDays ?? "N/A"}`,
     `- Halts in last 90d: ${s.halts90d ?? 0}`,
   ];
+
+  // ── Entry-date market context (optional, WS3) ─────────────────────────────
+  // Only emitted when buildTradeSnapshot populated these. Each line carries a
+  // value OR an explicit "N/A" so the model never assumes data it wasn't given.
+  const hasContext =
+    s.marketSentiment != null ||
+    s.breadthPctAbove50 != null ||
+    s.advanceDecline != null ||
+    s.marketMood != null ||
+    s.marketPosture != null ||
+    s.sectorMomentumPct != null ||
+    s.industryMomentumPct != null ||
+    s.themeOnRadar != null ||
+    (s.contextNotes != null && s.contextNotes.length > 0);
+
+  if (hasContext) {
+    lines.push("");
+    lines.push("Entry-date market context (real snapshots from the trade date — score against THIS regime, do not assume):");
+    lines.push(`- Market sentiment: ${s.marketSentiment ?? "N/A"}`);
+    lines.push(
+      `- Advance / decline: ${s.advanceDecline?.advance ?? "N/A"} / ${s.advanceDecline?.decline ?? "N/A"}`,
+    );
+    lines.push(`- Universe % above 50-DMA: ${fmtNum(s.breadthPctAbove50, 1, "%")}`);
+    lines.push(`- Market mood / posture: ${s.marketMood ?? "N/A"} / ${s.marketPosture ?? "N/A"}`);
+    lines.push(`- Sector momentum (%>50DMA or chg): ${fmtNum(s.sectorMomentumPct, 1)}`);
+    lines.push(`- Industry momentum: ${fmtNum(s.industryMomentumPct, 1)}`);
+    lines.push(
+      `- Theme on radar at entry: ${s.themeOnRadar == null ? "N/A" : s.themeOnRadar ? "YES" : "no"}${s.themeNote ? ` — ${s.themeNote}` : ""}`,
+    );
+    if (s.contextNotes && s.contextNotes.length) {
+      lines.push(`- Missing/stale context (fail-closed — do NOT invent): ${s.contextNotes.join("; ")}`);
+    }
+  }
+
   return lines.join("\n");
 }
 

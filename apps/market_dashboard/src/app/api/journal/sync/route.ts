@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getGoogleAccessToken } from "@/lib/token-refresh";
 import { fetchSheetRows, parseTradeRows, DEFAULT_COL_MAP, ColMap } from "@/lib/google-sheets";
 import { generateTradeVerdict } from "@/lib/generate-trade-verdict";
+import { resolveTradeUsd } from "@/lib/currency";
 import { NextResponse, after } from "next/server";
 
 // Allow up to 60 s for the background verdict generation after response is sent
@@ -52,36 +53,54 @@ export async function POST() {
 
   const trades = parseTradeRows(rows, colMap);
 
+  // Currency normalization: the sheet reports P&L in MYR via one fixed rate.
+  // Reverse it to USD at write time (broker-true overlay happens at read time /
+  // backfill). No fills here (sheet wipe+recreate), so this is the fixed-rate
+  // path; if no rate is set yet, pnlUsd stays null until the backfill detects it.
+  const fixedRate = connection.fixedFxRate != null ? Number(connection.fixedFxRate) : null;
+
   try {
   await prisma.$transaction([
     prisma.tradeRecord.deleteMany({ where: { connectionId: connection.id } }),
     prisma.tradeRecord.createMany({
-      data: trades.map((t) => ({
-        userId: userScopeId,
-        connectionId: connection.id,
-        ticker: t.ticker,
-        tradeDate: t.tradeDate,
-        buyPrice: t.buyPrice,
-        quantity: t.quantity,
-        pnl: t.pnl,
-        exitPrice: t.exitPrice,
-        side: t.side,
-        fees: t.fees,
-        notes: t.notes,
-        rawRow: t.rawRow,
-        proposedEntry: t.proposedEntry,
-        proposedSL: t.proposedSL,
-        proposedTP: t.proposedTP,
-        rrr: t.rrr,
-        riskPct: t.riskPct,
-        rewardPct: t.rewardPct,
-        positionPct: t.positionPct,
-        currency: t.currency,
-        platform: t.platform,
-        industry: t.industry,
-        strategy: t.strategy,
-        state: t.state,
-      })),
+      data: trades.map((t) => {
+        const usd = resolveTradeUsd({
+          ticker: t.ticker,
+          rawPnl: t.pnl,
+          fixedRate,
+          sheetBaseCurrency: "MYR",
+        });
+        return {
+          userId: userScopeId,
+          connectionId: connection.id,
+          ticker: t.ticker,
+          tradeDate: t.tradeDate,
+          buyPrice: t.buyPrice,
+          quantity: t.quantity,
+          pnl: t.pnl,
+          pnlUsd: usd.pnlUsd,
+          currencyCode: usd.currencyCode,
+          fxRate: usd.fxRate,
+          pnlSource: usd.pnlSource,
+          exitPrice: t.exitPrice,
+          side: t.side,
+          fees: t.fees,
+          notes: t.notes,
+          rawRow: t.rawRow,
+          proposedEntry: t.proposedEntry,
+          proposedSL: t.proposedSL,
+          proposedTP: t.proposedTP,
+          rrr: t.rrr,
+          riskPct: t.riskPct,
+          rewardPct: t.rewardPct,
+          positionPct: t.positionPct,
+          currency: t.currency,
+          platform: t.platform,
+          industry: t.industry,
+          strategy: t.strategy,
+          state: t.state,
+        };
+      }),
     }),
     prisma.spreadsheetConnection.update({
       where: { id: connection.id },
