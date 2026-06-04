@@ -62,18 +62,22 @@ The alias must match `account_alias` in `[ibkr]` in your config file exactly
 
 ---
 
-## Step 4 — Install ib_insync
+## Step 4 — Install ib_async
 
-The IBKR adapter requires the `ib_insync` Python library. Install it into the
-existing dashboard-bridge venv:
+The IBKR adapter requires an IBKR client library. Use **`ib_async`** — the
+maintained fork of ib_insync that works on Python 3.12+/3.14. (The legacy
+`ib_insync` crashes on *import* under modern Python: its `eventkit` dependency
+calls the removed `asyncio.get_event_loop_policy()`.) Install into the existing
+dashboard-bridge venv:
 
 ```powershell
 cd "C:\Users\$env:USERNAME\AI codes hub\market_dashboard\packages\dashboard-bridge"
-.\.venv\Scripts\python.exe -m pip install "ib_insync>=0.9.86"
+.\.venv\Scripts\python.exe -m pip install ib_async
 ```
 
-> `ib_insync` is also listed in `requirements.txt`, so re-running `install.ps1 -UseExistingConfig`
-> will pick it up automatically.
+> `ib_async` is also listed in `requirements.txt`, so re-running `install.ps1 -UseExistingConfig`
+> picks it up automatically. The adapter still falls back to `ib_insync` if that's
+> what you have on an older Python.
 
 ---
 

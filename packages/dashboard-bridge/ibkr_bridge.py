@@ -230,9 +230,12 @@ def _backfill(cfg, ibkr_cfg, months: int, post: bool, out: str) -> None:
     If that is unavailable (older GW), we fall back to ib.fills() and warn.
     """
     try:
-        from ib_insync import IB, ExecutionFilter
+        from ib_async import IB, ExecutionFilter
     except ImportError:
-        sys.exit("ib_insync is not installed. Run: pip install ib_insync")
+        try:
+            from ib_insync import IB, ExecutionFilter
+        except ImportError:
+            sys.exit("No IBKR client lib installed. Run: pip install ib_async")
 
     log.info("Starting IBKR backfill — %d months", months)
     _attach_ibkr(cfg, ibkr_cfg)
@@ -287,7 +290,10 @@ def _fetch_backfill_fills(ib, months: int) -> list[dict[str, Any]]:
     (since the last GW start). reqExecutions is persistent and returns up to
     7 days of history per call — we walk backwards in 7-day chunks.
     """
-    from ib_insync import ExecutionFilter
+    try:
+        from ib_async import ExecutionFilter
+    except ImportError:
+        from ib_insync import ExecutionFilter
     from bridge.ibkr_adapter import _normalize_ticker, _parse_ibkr_time
 
     seen: dict[str, dict[str, Any]] = {}

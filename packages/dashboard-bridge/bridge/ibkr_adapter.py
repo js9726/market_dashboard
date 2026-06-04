@@ -73,14 +73,19 @@ class IBKRSync:
         Connect to IB Gateway/TWS, pull all data, disconnect.
         Returns a dict with positions, fills, equity (mirroring MoomooSync.fetch).
         """
-        # Import here so the rest of the bridge still works even if ib_insync
-        # is not installed (MooMoo users don't need it).
+        # Import here so the rest of the bridge still works even if the IBKR
+        # client lib is not installed (MooMoo users don't need it). Prefer
+        # ib_async (maintained fork; works on Python 3.12+/3.14) and fall back
+        # to ib_insync on older Pythons.
         try:
-            from ib_insync import IB
+            from ib_async import IB
         except ImportError:
-            raise ImportError(
-                "ib_insync is not installed. Run: pip install ib_insync"
-            ) from None
+            try:
+                from ib_insync import IB
+            except ImportError:
+                raise ImportError(
+                    "No IBKR client lib installed. Run: pip install ib_async"
+                ) from None
 
         ibkr_cfg = self.cfg.ibkr  # type: ignore[attr-defined]  # added by load_config
         ib = IB()
