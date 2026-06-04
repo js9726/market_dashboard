@@ -97,6 +97,8 @@ model User {
   aListCandidates     AListCandidate[]
   // Daily equity timeline (Phase 4 of pre-open CI revamp).
   equitySnapshots     EquitySnapshot[]
+  // Daily-journal automation prefs (Doc URL + widget config). 2026-06.
+  journalPref         JournalPref?
 }
 
 model SpreadsheetConnection {
@@ -109,9 +111,29 @@ model SpreadsheetConnection {
   dateCol       Int       @default(1) // 0-indexed; col B = 1. Editable in UI if auto-detect fails.
   colMap        Json      @default("{}") // { ticker, date, buyPrice, qty, pnl, exitPrice, side, fees, notes }
   lastSyncedAt  DateTime?
+  // Single fixed USD→base rate the sheet uses to convert P&L/position to MYR.
+  // Reverse it (÷ rate) to recover USD for sheet-only trades. Auto-detected from
+  // broker-reconciled trades (lib/currency.ts detectFixedRate), editable in Settings.
+  fixedFxRate   Decimal?  @db.Decimal(12, 6)
   createdAt     DateTime  @default(now())
 
   trades TradeRecord[]
+}
+
+// ── JournalPref (NEW 2026-06) — daily-journal automation prefs ───────────────
+// Per-user singleton: the Google Doc URL the daily journal auto-writes to, the
+// widget toggles (morning brief / market brief / high-impact news / trade
+// entries / reflection), and an optional custom default template (Markdown).
+model JournalPref {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyDocUrl     String?
+  widgetPrefs     Json     @default("{}")
+  defaultTemplate String?  @db.Text
+  autoWrite       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // ── TradeRecord (formerly `Trade`) ───────────────────────────────────────────
@@ -169,6 +191,15 @@ model TradeRecord {
   rewardPct     Decimal? @db.Decimal(6, 2) // "Reward (%)"
   positionPct   Decimal? @db.Decimal(6, 2) // "Position (%)"
   currency      String?
+  // ── Currency normalization (2026-06) — everything reported in USD ─────────
+  // `currency` is the raw sheet label; `currencyCode` is the resolved ISO code;
+  // `pnlUsd` is P&L in USD via the authority ladder in lib/currency.ts; `fxRate`
+  // is the rate applied (if any); `pnlSource` ∈ broker | sheet-fixed-rate |
+  // native-usd | unconverted. See log.md 2026-06 currency-truth migration.
+  currencyCode  String?
+  pnlUsd        Decimal? @db.Decimal(12, 2)
+  fxRate        Decimal? @db.Decimal(12, 6)
+  pnlSource     String?
   platform      String?
   industry      String?
   strategy      String?
