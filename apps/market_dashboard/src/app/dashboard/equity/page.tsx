@@ -1,5 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import CoachingInsights from "@/components/equity/CoachingInsights";
+import EquityJournalOverview from "@/components/equity/EquityJournalOverview";
 import EquityTimeline from "@/components/equity/EquityTimeline";
 import JournalDigestCard from "@/components/journal/JournalDigestCard";
 import { canSeePersonalBook } from "@/lib/access";
@@ -17,6 +19,8 @@ export default async function EquityPage() {
   return (
     <div className="space-y-5">
       <JournalDigestCard />
+      <CoachingInsights />
+      <EquityJournalOverview />
       <EquityTimeline />
     </div>
   );

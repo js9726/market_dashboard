@@ -1,23 +1,19 @@
 "use client";
 
 /**
- * JournalShell — the Trades Hub "Journal" tab.
+ * JournalShell - the Trades Hub "Journal" tab.
  *
- * Connected-sheet analytics for Overview / Trades / Calendar / Daily.
- * Auto-journal is primary - a Google Sheet is an optional import, not the
- * empty-state centerpiece. Themed on mode-aware design tokens so it follows the
- * light/dark toggle.
+ * Journal is now focused on trade logs and the automated daily journal.
+ * Portfolio stats, calendar, and coaching live on the Equity page.
  */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SyncButton from "./SyncButton";
-import StatsCards from "./StatsCards";
 import TradeLog from "./TradeLog";
-import CalendarView from "./CalendarView";
 import AddTradeModal from "./AddTradeModal";
 import DailyJournal from "./DailyJournal";
 
-type Tab = "overview" | "trades" | "calendar" | "daily";
+type Tab = "trades" | "daily";
 
 type Connection = {
   id: string;
@@ -26,37 +22,15 @@ type Connection = {
   lastSyncedAt: string | null;
 };
 
-type Stats = {
-  totalPnl: number;
-  totalTrades: number;
-  openTrades: number;
-  winRate: number;
-  avgWin: number;
-  avgLoss: number;
-  profitFactor: number;
-  expectancy: number;
-  avgRR: number;
-  maxDrawdown: number;
-  sharpe: number;
-  bestTrade: number;
-  worstTrade: number;
-  currentStreak: number;
-  equityCurve: { date: string; cumulative: number }[];
-  calendarData: { date: string; pnl: number; trades: number }[];
-};
-
 const SUB_TABS: { id: Tab; label: string }[] = [
-  { id: "overview", label: "Overview" },
   { id: "trades", label: "Trades" },
-  { id: "calendar", label: "Calendar" },
   { id: "daily", label: "Daily" },
 ];
 
 export default function JournalShell() {
   const router = useRouter();
   const [connection, setConnection] = useState<Connection | null | undefined>(undefined);
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [tab, setTab] = useState<Tab>("overview");
+  const [tab, setTab] = useState<Tab>("trades");
   const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
@@ -65,30 +39,23 @@ export default function JournalShell() {
       .then((data: Connection | null) => setConnection(data));
   }, []);
 
-  useEffect(() => {
-    if (!connection) return;
-    fetch("/api/journal/stats")
-      .then((r) => r.json())
-      .then((data: Stats) => setStats(data));
-  }, [connection]);
-
   function refreshConnected() {
-    fetch("/api/journal/stats").then((r) => r.json()).then((d: Stats) => setStats(d));
-    fetch("/api/journal/connection").then((r) => r.json()).then((d: Connection | null) => setConnection(d));
+    fetch("/api/journal/connection")
+      .then((r) => r.json())
+      .then((d: Connection | null) => setConnection(d));
   }
 
   return (
     <div className="space-y-5">
       {connection === undefined ? (
-        <p className="py-10 text-center text-sm text-[var(--fg-3)]">Loading…</p>
+        <p className="py-10 text-center text-sm text-[var(--fg-3)]">Loading...</p>
       ) : !connection ? (
-        /* Auto-journal primary: the sheet is an optional enhancement, not a gate. */
         <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--bg-surface)] p-6 text-center shadow-[var(--shadow-card)]">
           <p className="text-sm text-[var(--fg-1)]">
-            Auto-journal is running from your broker fills — the weekly review above updates itself.
+            Auto-journal is running from your broker fills. Use Trades for logs and Daily for the generated journal.
           </p>
           <p className="mx-auto mt-1 max-w-md text-xs text-[var(--fg-3)]">
-            Optionally connect a Google Sheet to import full trade history and unlock the P&amp;L, equity-curve, and calendar views.
+            Equity now owns the stats, calendar, and coaching view. Optionally connect a Google Sheet to import full trade history.
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             <button
@@ -107,7 +74,6 @@ export default function JournalShell() {
         </div>
       ) : (
         <>
-          {/* Toolbar: sub-tabs + secondary actions */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <nav className="inline-flex gap-1 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-raised)] p-1">
               {SUB_TABS.map(({ id, label }) => {
@@ -147,28 +113,7 @@ export default function JournalShell() {
             </div>
           </div>
 
-          {/* Content */}
-          {tab === "overview" &&
-            (stats ? (
-              <div className="space-y-5">
-                <StatsCards stats={stats} />
-                <a
-                  href="/dashboard/equity"
-                  className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1.5 text-xs font-medium text-[var(--fg-2)] transition hover:bg-[var(--bg-surface)]"
-                >
-                  View account equity timeline
-                </a>
-              </div>
-            ) : (
-              <p className="text-sm text-[var(--fg-3)]">No data yet — sync your sheet.</p>
-            ))}
           {tab === "trades" && <TradeLog />}
-          {tab === "calendar" &&
-            (stats ? (
-              <CalendarView calendarData={stats.calendarData} />
-            ) : (
-              <p className="text-sm text-[var(--fg-3)]">No data yet.</p>
-            ))}
           {tab === "daily" && <DailyJournal />}
         </>
       )}
