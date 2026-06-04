@@ -67,6 +67,10 @@ class IBKRConfig:
     port: int
     client_id: int
     fill_lookback_days: int
+    # IBKR Flex Web Service (for full trade history — the socket API only serves
+    # the current day's executions). Set both in the [ibkr] config to use --flex.
+    flex_token: str | None = None
+    flex_query_id: str | None = None
 
 
 def _load_config_with_ibkr():
@@ -139,6 +143,8 @@ def _load_config_with_ibkr():
         port=int(ibkr_raw.get("port", 4002)),
         client_id=int(ibkr_raw.get("client_id", 10)),
         fill_lookback_days=fill_lookback,
+        flex_token=str(ibkr_raw["flex_token"]) if ibkr_raw.get("flex_token") else None,
+        flex_query_id=str(ibkr_raw["flex_query_id"]) if ibkr_raw.get("flex_query_id") else None,
     )
 
     # Re-create a Config-like object with the broker alias/type replaced.
@@ -362,6 +368,149 @@ def _fetch_backfill_fills(ib, months: int) -> list[dict[str, Any]]:
     return rows
 
 
+# ── Flex Query backfill (full trade history) ─────────────────────────────────
+
+def _flex_datetime(t) -> str:
+    """Best-effort ISO-8601 (UTC) timestamp from a Flex <Trade>'s date/time fields."""
+    raw = getattr(t, "dateTime", None) or getattr(t, "tradeDateTime", None)
+    date = getattr(t, "tradeDate", None) or getattr(t, "reportDate", None)
+    tm = getattr(t, "tradeTime", None)
+    s = None
+    if raw:
+        s = str(raw).replace(";", " ").replace("T", " ")
+    elif date:
+        s = str(date) + ((" " + str(tm)) if tm else "")
+    if s:
+        for fmt in ("%Y%m%d %H%M%S", "%Y%m%d %H:%M:%S", "%Y%m%d",
+                    "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H%M%S", "%Y-%m-%d"):
+            try:
+                d = datetime.datetime.strptime(s.strip(), fmt)
+                return d.replace(tzinfo=datetime.timezone.utc).isoformat()
+            except ValueError:
+                continue
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+
+def _flex_trade_to_fill(t):
+    """Map an IBKR Flex <Trade>/<TradeConfirm> record to the bridge fill shape."""
+    def g(*names):
+        for n in names:
+            v = getattr(t, n, None)
+            if v not in (None, ""):
+                return v
+        return None
+
+    symbol = g("symbol", "underlyingSymbol")
+    raw_side = str(g("buySell", "side") or "").upper()
+    side = "BUY" if raw_side.startswith("BUY") else "SELL" if raw_side.startswith("SELL") else None
+    if not symbol or side is None:
+        return None
+    try:
+        qty = abs(float(g("quantity", "shares") or 0))
+        price = float(g("tradePrice", "price") or 0)
+    except (TypeError, ValueError):
+        return None
+    if qty == 0:
+        return None
+    fees_raw = g("ibCommission", "commission")
+    try:
+        fees = abs(float(fees_raw)) if fees_raw is not None else None
+    except (TypeError, ValueError):
+        fees = None
+    fill_id = g("ibExecID", "tradeID", "transactionID", "ibOrderID")
+    return {
+        "brokerFillId": str(fill_id) if fill_id else None,
+        "ticker": str(symbol).upper(),
+        "side": side,
+        "qty": qty,
+        "price": price,
+        "executedAt": _flex_datetime(t),
+        "fees": fees,
+        "currency": str(g("currency") or "USD"),
+    }
+
+
+def _flex_backfill(cfg, ibkr_cfg: IBKRConfig, post: bool, out: str) -> None:
+    """Pull full trade history via the IBKR Flex Web Service and POST as fills.
+
+    The live socket API only returns the current day's executions, so Flex is
+    the only way to recover older trades. Needs flex_token + flex_query_id in
+    the [ibkr] config (create an Activity Flex Query with a Trades section in
+    IBKR Account Management + a Flex Web Service token). See docs/IBKR_SETUP.md.
+    """
+    if not ibkr_cfg.flex_token or not ibkr_cfg.flex_query_id:
+        sys.exit(
+            "Flex backfill needs flex_token + flex_query_id in the [ibkr] config.\n"
+            "See docs/IBKR_SETUP.md (Flex Query setup)."
+        )
+    try:
+        from ib_async import FlexReport
+    except ImportError:
+        try:
+            from ib_insync import FlexReport
+        except ImportError:
+            sys.exit("No IBKR client lib installed. Run: pip install ib_async")
+
+    log.info("Downloading IBKR Flex report (queryId=%s) ...", ibkr_cfg.flex_query_id)
+    try:
+        report = FlexReport(token=ibkr_cfg.flex_token, queryId=ibkr_cfg.flex_query_id)
+    except Exception as e:
+        log.exception("Flex download failed: %s", e)
+        sys.exit("Flex download failed — check the token, query ID, and that the query ran at least once.")
+
+    try:
+        topics = set(report.topics())
+    except Exception:
+        topics = set()
+    log.info("[flex] report topics: %s", ", ".join(sorted(topics)) or "(none)")
+
+    trades = []
+    for topic in ("Trade", "TradeConfirm"):
+        if topic in topics:
+            try:
+                recs = list(report.extract(topic, parseNumbers=True))
+            except Exception:
+                recs = []
+            if recs:
+                trades = recs
+                log.info("[flex] using topic '%s' (%d records)", topic, len(recs))
+                break
+    if not trades:
+        log.warning("[flex] no Trade records found. Add a 'Trades' section to the Flex Query "
+                    "and confirm its date range covers your trades.")
+
+    rows = [r for r in (_flex_trade_to_fill(t) for t in trades) if r]
+    buys = sum(1 for r in rows if r["side"] == "BUY")
+    log.info("[flex] parsed %d trade fills (buys=%d sells=%d); tickers: %s",
+             len(rows), buys, len(rows) - buys,
+             ", ".join(sorted({r["ticker"] for r in rows})) or "(none)")
+
+    if not post:
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(rows, f, indent=2, default=str)
+        log.info("[flex] wrote %d fills to %s (dry-run; add --post to send)", len(rows), out)
+        return
+
+    if not rows:
+        log.info("[flex] nothing to post.")
+        return
+
+    # Include current positions + equity so the server's position "full replace"
+    # doesn't wipe the live snapshot. Requires the gateway to be up.
+    from bridge.ibkr_adapter import IBKRSync
+    from bridge.client import DashboardClient
+    _attach_ibkr(cfg, ibkr_cfg)
+    try:
+        snap = IBKRSync(cfg).fetch()
+    except Exception as e:
+        log.exception("Flex --post needs IB Gateway running to preserve positions: %s", e)
+        sys.exit("Start IB Gateway (so positions aren't wiped), then retry --flex --post.")
+    result = DashboardClient(cfg).sync(snap.get("positions", []), rows, equity=snap.get("equity"))
+    log.info("[flex] Sync result: %s", result)
+    if not result.get("ok"):
+        sys.exit(1)
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _attach_ibkr(cfg, ibkr_cfg: IBKRConfig) -> None:
@@ -403,6 +552,12 @@ def main() -> None:
         help="Backfill historical fills (walks reqExecutions in 7-day chunks)",
     )
     ap.add_argument(
+        "--flex", action="store_true",
+        help="Backfill FULL trade history via the IBKR Flex Web Service "
+             "(needs flex_token + flex_query_id in [ibkr]). The only way to get "
+             "trades older than the current day.",
+    )
+    ap.add_argument(
         "--months", type=int, default=3,
         help="How many months back to backfill (default: 3)",
     )
@@ -413,6 +568,10 @@ def main() -> None:
     args = ap.parse_args()
 
     cfg, ibkr_cfg = _load_config_with_ibkr()
+
+    if args.flex:
+        _flex_backfill(cfg, ibkr_cfg, post=args.post, out=args.out)
+        return
 
     if args.backfill:
         _backfill(cfg, ibkr_cfg, months=args.months, post=args.post, out=args.out)

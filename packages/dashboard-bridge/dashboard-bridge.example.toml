@@ -76,3 +76,10 @@ broker_type = "IBKR"
 # How many days of fills to pull on each sync (same semantics as MooMoo).
 # The dashboard dedups on brokerFillId, so over-pulling is safe.
 fill_lookback_days = 1
+# ── Flex Web Service (for FULL trade history via `ibkr_bridge.py --flex`) ──────
+# The live socket API only returns the CURRENT day's executions, so older trades
+# (e.g. a sell from yesterday) need a Flex Query. Create an Activity Flex Query
+# with a "Trades" section in IBKR Account Management → note its Query ID, and
+# enable the Flex Web Service to get a token. Leave unset if you don't use --flex.
+# flex_token = "your-flex-web-service-token"
+# flex_query_id = "1234567"

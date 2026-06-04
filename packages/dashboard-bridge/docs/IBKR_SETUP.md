@@ -136,23 +136,42 @@ Then open `/dashboard/portfolio` — your IBKR positions should appear under the
 
 ---
 
-## Step 8 — Backfill historical fills (optional)
+## Step 8 — Backfill trade history via Flex Query (recommended)
 
-To import older fills (e.g. the last 3 months) into the dashboard's fill history
-for net-realised P&L calculations:
+**Important:** IBKR's live socket API (`reqExecutions` / `ib.fills()`) only returns
+the **current trading day's** executions. To import *older* trades (yesterday and
+back) you need a **Flex Query** — the only IBKR API that exposes historical trades.
 
+**One-time IBKR setup:**
+1. **Account Management → Performance & Reports → Flex Queries** → create an
+   **Activity Flex Query** with a **Trades** section (ensure Symbol, Buy/Sell,
+   Quantity, TradePrice, IBCommission, DateTime, Currency are included). Set the
+   period wide enough to cover your *opening* trades (e.g. *Last 365 Calendar Days*
+   or *Year to Date*). Save and note the **Query ID**.
+2. **Settings → Account Settings → Flex Web Service** → Enable → copy the **token**.
+3. Add both to the `[ibkr]` section of `~/.config/dashboard-bridge.toml`:
+   ```toml
+   flex_token = "your-token"
+   flex_query_id = "1234567"
+   ```
+
+**Run it:**
 ```powershell
-# Dry run first — writes ibkr_backfill.json
-.\.venv\Scripts\python.exe ibkr_bridge.py --backfill --months 3
+# Dry run — downloads the report, writes ibkr_backfill.json, prints tickers
+.\.venv\Scripts\python.exe ibkr_bridge.py --flex
 
-# Inspect the file, then POST to the dashboard
-.\.venv\Scripts\python.exe ibkr_bridge.py --backfill --months 3 --post
+# POST to the dashboard (bundles live positions + equity so they aren't wiped)
+.\.venv\Scripts\python.exe ibkr_bridge.py --flex --post
 ```
 
-> IBKR's `reqExecutions` API returns up to 7 days per call. The backfill walks
-> backwards in 7-day windows — expect it to take a few seconds per month of history.
-> The dashboard deduplicates on `brokerFillId` (= IBKR `execId`) so re-running
-> is safe.
+> `--flex --post` needs IB Gateway running (it re-sends the live position snapshot
+> alongside the historical fills). The dashboard dedups on `brokerFillId`
+> (= IBKR `execId`), so re-running is safe. **For accurate net-realised P&L, the
+> Flex Query date range must include the _opening_ trade of each position** — if
+> you only see a closing sell, widen the query's date range and re-run.
+>
+> The older `--backfill` mode (reqExecutions) only sees the current day and cannot
+> retrieve prior days — prefer `--flex`.
 
 ---
 
