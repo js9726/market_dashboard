@@ -12,6 +12,7 @@ import logging
 from typing import Any
 
 from moomoo import (
+    Currency,
     OpenSecTradeContext,
     SecurityFirm,
     TrdEnv,
@@ -171,11 +172,18 @@ class MoomooSync:
         fills are USD. Keep positions/fills in trade currency, but send account
         equity as MYR so the dashboard can convert exactly once.
         """
+        # Query account aggregates in the holdings' TRADE currency (USD for the
+        # US market) rather than the FUTUMY base currency (MYR). Otherwise the
+        # dashboard stores MYR and has to round-trip back through moomoo's own
+        # FX rate — which won't match the broker UI. See log.md 2026-06 equity fix.
+        market = self.cfg.opend.market.upper()
+        report_currency = Currency.HKD if market == "HK" else Currency.USD
         try:
             ret, data = ctx.accinfo_query(
                 trd_env=TrdEnv.REAL,
                 acc_id=self.cfg.opend.acc_id,
                 refresh_cache=True,
+                currency=report_currency,
             )
         except Exception as e:
             log.warning("accinfo_query exception (non-fatal): %s", e)
@@ -187,11 +195,9 @@ class MoomooSync:
             return None
 
         row = data.iloc[0]
-        firm_name = self.cfg.opend.security_firm.upper()
-        currency = (
-            "MYR" if firm_name == "FUTUMY"
-            else ("HKD" if self.cfg.opend.market.upper() == "HK" else "USD")
-        )
+        # currencyCode reflects what we queried accinfo in (above), so the
+        # dashboard stores true USD/HKD and never re-converts.
+        currency = "HKD" if report_currency == Currency.HKD else "USD"
 
         def _f(key: str) -> float | None:
             v = row.get(key)
@@ -207,9 +213,11 @@ class MoomooSync:
         # total_assets has been observed as a different aggregate/base-currency
         # number and must not drive the dashboard when it fails reconciliation.
         total_assets = _f("total_assets")
-        cash = _f("cash") if currency == "MYR" else (_f("us_cash") if currency == "USD" else _f("cash"))
+        # accinfo was queried in `currency`, so "cash"/"market_val" are already
+        # in that currency (total cash incl. any converted balance).
+        cash = _f("cash")
         if cash is None:
-            cash = _f("cash") or 0.0
+            cash = _f("us_cash") or 0.0
         market_val = _f("market_val")
         unrealized_pl = _f("unrealized_pl")  # may not exist; falls back to None
 
