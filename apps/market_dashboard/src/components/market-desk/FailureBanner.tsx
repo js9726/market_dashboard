@@ -4,15 +4,19 @@
  * FailureBanner — Phase 6.
  *
  * Top-of-dashboard alert when:
- *   1. Latest brief bucket is >12h old (CI may have failed)
- *   2. No broker-bridge heartbeat in >2h (daemon offline / PC off)
- *   3. Any provider tab returned an error on its last run
+ *   1. EVERY provider brief is stale (>12h) — the pre-open CI likely failed.
+ *   2. A SPECIFIC provider tab is stale (>24h) while others updated — that
+ *      provider's generation step is failing silently (e.g. the Claude tab
+ *      dying on the Claude subscription session limit in CI).
+ *   3. A provider tab returned an explicit error on its last run.
  *
- * Per Round 8 answer: PushNotification skipped, dashboard banner is the
- * only alert channel. The banner is dismissable (session-scoped) so the user
- * can acknowledge known issues.
+ * Reads from /api/morning-verdict. IMPORTANT: that endpoint returns each
+ * provider as `providers[name] = { generatedAt, error, stale, ... }` with the
+ * fields at the TOP LEVEL (there is no `.entry` wrapper). A previous version
+ * read `p.entry.generatedAt`, so it silently never fired.
  *
- * Reads from /api/morning-verdict and (optionally) /api/bridge/health.
+ * The dashboard banner is the only alert channel; it is dismissable
+ * (session-scoped) so the user can acknowledge a known issue.
  */
 
 import { useEffect, useState } from "react";
@@ -25,7 +29,35 @@ interface BannerMessage {
   body: string;
 }
 
+interface ProviderEntry {
+  generatedAt?: string | null;
+  error?: string | null;
+  stale?: boolean;
+}
+
+interface ProviderRow {
+  name: string;
+  label: string;
+  generatedAt: string | null;
+  error: string | null;
+  ageH: number | null;
+}
+
 const DISMISS_KEY = "failure-banner-dismissed";
+
+const PROVIDER_LABEL: Record<string, string> = {
+  deepseek: "DeepSeek",
+  gemini: "Gemini",
+  openai: "GPT-4o",
+  claude: "Claude",
+};
+
+const ALL_STALE_H = 12; // every tab older than this → CI likely failed
+const TAB_STALE_H = 24; // one tab this old while others fresh → that step is failing
+
+function ageHours(iso: string): number {
+  return (Date.now() - new Date(iso).getTime()) / 3_600_000;
+}
 
 export default function FailureBanner() {
   const [messages, setMessages] = useState<BannerMessage[]>([]);
@@ -42,24 +74,57 @@ export default function FailureBanner() {
     async function check() {
       const msgs: BannerMessage[] = [];
 
-      // Brief freshness check
       try {
         const r = await fetch("/api/morning-verdict", { cache: "no-store" });
         if (r.ok) {
           const j = await r.json();
-          const providers = j.providers ?? {};
-          const latest = Object.values(providers)
-            .filter((p): p is { entry?: { generatedAt?: string } } => p != null && typeof p === "object")
-            .map((p) => p.entry?.generatedAt)
-            .filter((s): s is string => !!s)
-            .sort((a, b) => b.localeCompare(a))[0];
-          if (latest) {
-            const ageH = (Date.now() - new Date(latest).getTime()) / 3_600_000;
-            if (ageH > 12) {
+          const providers: Record<string, ProviderEntry | null> = j.providers ?? {};
+
+          const rows: ProviderRow[] = Object.entries(providers)
+            .filter((pair): pair is [string, ProviderEntry] => pair[1] != null && typeof pair[1] === "object")
+            .map(([name, v]) => ({
+              name,
+              label: PROVIDER_LABEL[name] ?? name,
+              generatedAt: v.generatedAt ?? null,
+              error: v.error ?? null,
+              ageH: v.generatedAt ? ageHours(v.generatedAt) : null,
+            }));
+
+          const timed = rows.filter(
+            (row): row is ProviderRow & { generatedAt: string; ageH: number } =>
+              row.generatedAt != null && row.ageH != null,
+          );
+          const freshestAge = timed.length ? Math.min(...timed.map((row) => row.ageH)) : null;
+
+          if (freshestAge != null && freshestAge > ALL_STALE_H) {
+            // 1. Everything is stale — the whole pre-open CI run likely failed.
+            const newest = timed.reduce((a, b) => (a.ageH <= b.ageH ? a : b));
+            msgs.push({
+              severity: "warning",
+              title: `Brief stale ${Math.round(freshestAge)}h`,
+              body: `Newest tab (${newest.label}) generated ${new Date(newest.generatedAt).toLocaleString()}. The pre-open CI may have failed — check GitHub Actions.`,
+            });
+          } else if (freshestAge != null) {
+            // 2. Some tabs are fresh, but a specific tab lags far behind — that
+            //    provider's generation step is failing silently.
+            for (const row of timed) {
+              if (row.ageH > TAB_STALE_H) {
+                msgs.push({
+                  severity: "warning",
+                  title: `${row.label} tab stale ${Math.round(row.ageH)}h`,
+                  body: `Other tabs updated but ${row.label} hasn't refreshed since ${new Date(row.generatedAt).toLocaleString()} — its generation step is likely failing. Use "Refresh ${row.label}" or check GitHub Actions.`,
+                });
+              }
+            }
+          }
+
+          // 3. A provider stored an explicit error on its last run.
+          for (const row of rows) {
+            if (row.error) {
               msgs.push({
-                severity: "warning",
-                title: `Brief stale ${Math.round(ageH)}h`,
-                body: `Latest brief generated ${new Date(latest).toLocaleString()}. The pre-open CI may have failed — check GH Actions.`,
+                severity: "error",
+                title: `${row.label} tab failed`,
+                body: row.error.slice(0, 200),
               });
             }
           }

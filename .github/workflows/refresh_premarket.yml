@@ -114,6 +114,7 @@ jobs:
       # Claude tab now powered by the Node-based SDK runner below (Phase 3c).
       # OpenAI skipped per $5/day cost cap; on-demand only via dashboard button.
       - name: Generate morning brief (DeepSeek + Gemini)
+        id: brief_py
         if: success()
         continue-on-error: true
         run: |
@@ -135,6 +136,7 @@ jobs:
       # Anthropic API token. Generate the token once with `claude setup-token`
       # on a Max/Pro plan and store it as the CLAUDE_CODE_OAUTH_TOKEN secret.
       - name: Generate Claude tab brief (Agent SDK + skill, subscription auth)
+        id: brief_claude
         if: success()
         continue-on-error: true
         working-directory: packages/core-skills/morning-brief
@@ -210,3 +212,30 @@ jobs:
           done
           echo "Push failed after 5 attempts."
           exit 1
+
+      # ── Step 8: surface silent brief failures ────────────────────────────
+      # The brief steps above are continue-on-error so a single provider
+      # failure never blocks the data commit. That also meant a failing
+      # provider (e.g. the Claude tab dying on the Claude subscription session
+      # limit) left the workflow GREEN and nobody noticed. This gate inspects
+      # the real step outcomes AFTER the commit:
+      #   - ALL providers failed  → fail the job (red ⇒ GitHub notifies).
+      #   - Only Claude failed    → warning annotation (Gemini/DeepSeek carry
+      #                             the brief; the dashboard FailureBanner shows
+      #                             the stale Claude tab to the user).
+      - name: Verify provider briefs
+        if: always()
+        working-directory: .
+        run: |
+          py='${{ steps.brief_py.outcome }}'
+          cl='${{ steps.brief_claude.outcome }}'
+          echo "morning_brief.py (deepseek,gemini): ${py:-unknown}"
+          echo "claude tab (agent sdk):             ${cl:-unknown}"
+          if [ "$cl" != "success" ]; then
+            echo "::warning::Claude tab brief failed (likely the Claude subscription session limit). Gemini/DeepSeek carry the brief; the Claude tab will show STALE on the dashboard until the limit resets or it is refreshed on-demand."
+          fi
+          if [ "$py" != "success" ] && [ "$cl" != "success" ]; then
+            echo "::error::No provider brief succeeded this run — the dashboard brief will be stale. Inspect the brief steps above."
+            exit 1
+          fi
+          echo "At least one provider brief posted — OK."
