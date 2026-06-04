@@ -1,8 +1,8 @@
 {
-  "fetched_at": "2026-06-03T22:42:34.706706+00:00",
-  "scored": false,
-  "score_top": 0,
-  "deepseek_scored_at": null,
+  "fetched_at": "2026-06-04T00:18:59.269423+00:00",
+  "scored": true,
+  "score_top": 10,
+  "deepseek_scored_at": "2026-06-04T00:18:59.269396+00:00",
   "market_was_open": false,
   "screeners": [
     {
@@ -19,8 +19,8 @@
           "low": 875.001,
           "close": 957.03,
           "change": 9.309895833333332,
-          "volume": 1045923,
-          "relative_volume_10d_calc": 1.5980789249362517,
+          "volume": 1047538,
+          "relative_volume_10d_calc": 1.6005465037769238,
           "market_cap_basic": 29367378389.288406,
           "sector": "Industrial Services",
           "industry": "Engineering & Construction",
@@ -28,9 +28,9 @@
           "Perf.1M": 77.93622757274332,
           "premarket_change": -0.03312317251461573,
           "ATRP": 5.38031508476903,
-          "score": 42,
+          "score": 40,
           "verdict": "PASS",
-          "thesis": "PARABOLIC setup; algorithmic score only.",
+          "thesis": "Parabolic move with extreme momentum but high risk of reversal; wait for pullback to 21dma.",
           "stages": {
             "s1_trend": 10,
             "s2_pattern": 3,
@@ -38,7 +38,7 @@
             "s4_risk": 7
           },
           "pattern": "PARABOLIC",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "SNDK",
@@ -49,8 +49,8 @@
           "low": 1708.88,
           "close": 1831.5,
           "change": 6.708382856743348,
-          "volume": 11805482,
-          "relative_volume_10d_calc": 1.127613511324388,
+          "volume": 11884496,
+          "relative_volume_10d_calc": 1.1351606198612343,
           "market_cap_basic": 271226406781.39377,
           "sector": "Electronic Technology",
           "industry": "Computer Peripherals",
@@ -58,9 +58,9 @@
           "Perf.1M": 49.85517681519906,
           "premarket_change": 1.144282085343407,
           "ATRP": 5.996236663269362,
-          "score": 63,
+          "score": 60,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Momentum breakout with unclear pattern and high risk from 50% monthly gain and fade.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 10,
@@ -68,7 +68,7 @@
             "s4_risk": 10
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "NBIX",
@@ -79,8 +79,8 @@
           "low": 155.12,
           "close": 165.11,
           "change": 6.632653061224496,
-          "volume": 1941837,
-          "relative_volume_10d_calc": 1.721419401954232,
+          "volume": 1942029,
+          "relative_volume_10d_calc": 1.7215896080658548,
           "market_cap_basic": 16601808092.234695,
           "sector": "Health Technology",
           "industry": "Biotechnology",
@@ -88,9 +88,9 @@
           "Perf.1M": 25.292153589315536,
           "premarket_change": 2.7124773960216926,
           "ATRP": 2.890438252487606,
-          "score": 75,
+          "score": 78,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout with strong trend but high risk from 25% monthly gain and fade from premarket.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 20,
@@ -98,7 +98,7 @@
             "s4_risk": 12
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "EXEL",
@@ -109,8 +109,8 @@
           "low": 48.1036,
           "close": 51.6,
           "change": 6.304079110012366,
-          "volume": 2979283,
-          "relative_volume_10d_calc": 1.199488669391369,
+          "volume": 2979299,
+          "relative_volume_10d_calc": 1.1994951111489027,
           "market_cap_basic": 12969921960.889988,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -118,9 +118,9 @@
           "Perf.1M": 18.59342679843715,
           "premarket_change": null,
           "ATRP": 3.2896911375798235,
-          "score": 66,
+          "score": 68,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Strong trend and momentum breakout but pattern quality unclear; risk of false breakout without clear base.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 10,
@@ -128,7 +128,7 @@
             "s4_risk": 12
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "URI",
@@ -139,8 +139,8 @@
           "low": 995.87,
           "close": 1056.58,
           "change": 6.2081582597856775,
-          "volume": 859663,
-          "relative_volume_10d_calc": 1.956404684831647,
+          "volume": 860199,
+          "relative_volume_10d_calc": 1.9576245034245954,
           "market_cap_basic": 66191099528.82976,
           "sector": "Finance",
           "industry": "Finance/Rental/Leasing",
@@ -148,9 +148,9 @@
           "Perf.1M": 10.994621396756026,
           "premarket_change": 0.057296797410580434,
           "ATRP": 2.966583542076082,
-          "score": 76,
+          "score": 78,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout with strong trend but fade from premarket and low risk quality suggest caution.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 20,
@@ -158,7 +158,7 @@
             "s4_risk": 12
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "TTMI",
@@ -169,8 +169,8 @@
           "low": 176.0001,
           "close": 189.6,
           "change": 5.556174145418099,
-          "volume": 2562288,
-          "relative_volume_10d_calc": 0.8109440967848257,
+          "volume": 2567688,
+          "relative_volume_10d_calc": 0.8126531545186316,
           "market_cap_basic": 19689970747.72965,
           "sector": "Electronic Technology",
           "industry": "Electronic Components",
@@ -178,9 +178,9 @@
           "Perf.1M": 16.176470588235297,
           "premarket_change": 0.07237501391826937,
           "ATRP": 6.834390776797232,
-          "score": 60,
+          "score": 58,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Pullback to 21dma with strong trend but unclear pattern and low volume risk entry.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 6,
@@ -188,7 +188,7 @@
             "s4_risk": 10
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "WDC",
@@ -199,8 +199,8 @@
           "low": 571.25,
           "close": 594.11,
           "change": 5.507014739833065,
-          "volume": 7823501,
-          "relative_volume_10d_calc": 1.2989269621108195,
+          "volume": 7845960,
+          "relative_volume_10d_calc": 1.3026558043058991,
           "market_cap_basic": 204779090725.9615,
           "sector": "Electronic Technology",
           "industry": "Computer Peripherals",
@@ -208,9 +208,9 @@
           "Perf.1M": 37.93095442620667,
           "premarket_change": 1.4029479666133862,
           "ATRP": 4.983726906426257,
-          "score": 65,
+          "score": 68,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Strong trend and timing but unclear pattern and high risk from extended move; wait for pullback.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 10,
@@ -218,7 +218,7 @@
             "s4_risk": 12
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "ILMN",
@@ -229,8 +229,8 @@
           "low": 160.1,
           "close": 170.93,
           "change": 5.155336819440169,
-          "volume": 3140129,
-          "relative_volume_10d_calc": 1.746855150157172,
+          "volume": 3140511,
+          "relative_volume_10d_calc": 1.7470676569259576,
           "market_cap_basic": 25861710007.388123,
           "sector": "Health Technology",
           "industry": "Medical Specialties",
@@ -238,9 +238,9 @@
           "Perf.1M": 26.194167589516443,
           "premarket_change": 0.06151953245154987,
           "ATRP": 3.6359531324633947,
-          "score": 75,
+          "score": 78,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout from base with strong volume but risk/reward poor after 18% weekly surge.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 20,
@@ -248,7 +248,7 @@
             "s4_risk": 12
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "AXSM",
@@ -259,8 +259,8 @@
           "low": 217.151,
           "close": 233.49,
           "change": 5.0999279798343595,
-          "volume": 781975,
-          "relative_volume_10d_calc": 1.2477391982141761,
+          "volume": 783788,
+          "relative_volume_10d_calc": 1.2506320671247708,
           "market_cap_basic": 12015341051.776241,
           "sector": "Health Technology",
           "industry": "Biotechnology",
@@ -268,9 +268,9 @@
           "Perf.1M": 10.136792452830193,
           "premarket_change": 3.0293482175008957,
           "ATRP": 3.5921410797891054,
-          "score": 66,
+          "score": 68,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Strong trend and timing but unclear pattern and high risk; wait for clearer base or pullback entry.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 10,
@@ -278,7 +278,7 @@
             "s4_risk": 12
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "INTC",
@@ -289,8 +289,8 @@
           "low": 110.86,
           "close": 112.71,
           "change": 4.4287964421384105,
-          "volume": 118504965,
-          "relative_volume_10d_calc": 0.9617834110483452,
+          "volume": 118927649,
+          "relative_volume_10d_calc": 0.9652139041025016,
           "market_cap_basic": 566480461601.9376,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -298,9 +298,9 @@
           "Perf.1M": 13.641863278886857,
           "premarket_change": 7.8662095802835115,
           "ATRP": 7.324075856346609,
-          "score": 64,
+          "score": 62,
           "verdict": "WAIT",
-          "thesis": "PULLBACK setup; algorithmic score only.",
+          "thesis": "Pullback in strong uptrend but weak risk/reward due to wide intraday range and fading premarket momentum.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 14,
@@ -308,7 +308,7 @@
             "s4_risk": 10
           },
           "pattern": "PULLBACK",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "DKS",
@@ -319,8 +319,8 @@
           "low": 214.87,
           "close": 224.17,
           "change": 4.391356989848179,
-          "volume": 943009,
-          "relative_volume_10d_calc": 0.5547600606218125,
+          "volume": 943040,
+          "relative_volume_10d_calc": 0.554778297522923,
           "market_cap_basic": 20051842333.10808,
           "sector": "Retail Trade",
           "industry": "Specialty Stores",
@@ -349,8 +349,8 @@
           "low": 393.6001,
           "close": 409.67,
           "change": 4.342621364168919,
-          "volume": 3244376,
-          "relative_volume_10d_calc": 0.9743599153702509,
+          "volume": 3254589,
+          "relative_volume_10d_calc": 0.9774271115940167,
           "market_cap_basic": 64130625903.37823,
           "sector": "Electronic Technology",
           "industry": "Electronic Production Equipment",
@@ -379,8 +379,8 @@
           "low": 126.15,
           "close": 133.93,
           "change": 4.1122512437811105,
-          "volume": 10083526,
-          "relative_volume_10d_calc": 0.9202252504101807,
+          "volume": 10113392,
+          "relative_volume_10d_calc": 0.9229508294713891,
           "market_cap_basic": 52487595091.87804,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -409,8 +409,8 @@
           "low": 201.511,
           "close": 210.59,
           "change": 4.046442687747034,
-          "volume": 3169343,
-          "relative_volume_10d_calc": 1.6090953141351314,
+          "volume": 3174180,
+          "relative_volume_10d_calc": 1.611551089365036,
           "market_cap_basic": 59241771108.85598,
           "sector": "Energy Minerals",
           "industry": "Oil & Gas Production",
@@ -439,8 +439,8 @@
           "low": 524.3001,
           "close": 542.52,
           "change": 4.022701997929214,
-          "volume": 29222097,
-          "relative_volume_10d_calc": 0.9052509962692178,
+          "volume": 29408275,
+          "relative_volume_10d_calc": 0.9110184748996326,
           "market_cap_basic": 884633392612.6812,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -469,8 +469,8 @@
           "low": 1617.8316,
           "close": 1689.89,
           "change": 3.9938707315121995,
-          "volume": 441439,
-          "relative_volume_10d_calc": 0.6348969153121765,
+          "volume": 443656,
+          "relative_volume_10d_calc": 0.6380855018694293,
           "market_cap_basic": 83024297006.16301,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -499,8 +499,8 @@
           "low": 223.51,
           "close": 232.62,
           "change": 3.931730855151466,
-          "volume": 2993686,
-          "relative_volume_10d_calc": 0.72962801519511,
+          "volume": 2995171,
+          "relative_volume_10d_calc": 0.7299899427995965,
           "market_cap_basic": 74938108092.78679,
           "sector": "Retail Trade",
           "industry": "Apparel/Footwear Retail",
@@ -529,8 +529,8 @@
           "low": 2019.54,
           "close": 2125.11,
           "change": 3.90719734011344,
-          "volume": 1017346,
-          "relative_volume_10d_calc": 1.0716201304214281,
+          "volume": 1019986,
+          "relative_volume_10d_calc": 1.0744009711032734,
           "market_cap_basic": 277597837512.2044,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -559,8 +559,8 @@
           "low": 233.02,
           "close": 250.01,
           "change": 3.8075070586281297,
-          "volume": 19394176,
-          "relative_volume_10d_calc": 0.7977363348952464,
+          "volume": 19466567,
+          "relative_volume_10d_calc": 0.8007139778236906,
           "market_cap_basic": 263510535993.0302,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -568,16 +568,16 @@
           "Perf.1M": 41.07324229770906,
           "premarket_change": -2.437302773625645,
           "ATRP": 6.992567196922188,
-          "score": 50,
+          "score": 58,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "PULLBACK setup; algorithmic score only.",
           "stages": {
             "s1_trend": 18,
-            "s2_pattern": 6,
+            "s2_pattern": 14,
             "s3_timing": 18,
             "s4_risk": 8
           },
-          "pattern": "UNCLEAR",
+          "pattern": "PULLBACK",
           "score_source": "algorithmic"
         },
         {
@@ -619,8 +619,8 @@
           "low": 187.48,
           "close": 195.96,
           "change": 3.775883069427525,
-          "volume": 891513,
-          "relative_volume_10d_calc": 0.8436774184207063,
+          "volume": 891787,
+          "relative_volume_10d_calc": 0.8439367165045786,
           "market_cap_basic": 28930969429.563942,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -649,8 +649,8 @@
           "low": 294.0101,
           "close": 301.65,
           "change": 3.734653873929625,
-          "volume": 114098680,
-          "relative_volume_10d_calc": 2.6840371720819043,
+          "volume": 115539947,
+          "relative_volume_10d_calc": 2.7179412821285323,
           "market_cap_basic": 263883424071.58514,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -679,8 +679,8 @@
           "low": 141.89,
           "close": 146.96,
           "change": 3.500246496232128,
-          "volume": 5297969,
-          "relative_volume_10d_calc": 1.5526429637050336,
+          "volume": 5298636,
+          "relative_volume_10d_calc": 1.5528384372642017,
           "market_cap_basic": 89662592131.23347,
           "sector": "Producer Manufacturing",
           "industry": "Industrial Machinery",
@@ -709,8 +709,8 @@
           "low": 418.22,
           "close": 437.67,
           "change": 3.4191871455576623,
-          "volume": 5690640,
-          "relative_volume_10d_calc": 0.9721308116784231,
+          "volume": 5700504,
+          "relative_volume_10d_calc": 0.9738158766845376,
           "market_cap_basic": 213183389253.13278,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -739,8 +739,8 @@
           "low": 685.01,
           "close": 725,
           "change": 3.407453894538658,
-          "volume": 793108,
-          "relative_volume_10d_calc": 0.7680673157581884,
+          "volume": 794631,
+          "relative_volume_10d_calc": 0.7695422302993351,
           "market_cap_basic": 25976559954.67901,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -776,8 +776,8 @@
           "low": 29.7,
           "close": 30.84,
           "change": 19.257540603248263,
-          "volume": 112001765,
-          "relative_volume_10d_calc": 3.3714540951700136,
+          "volume": 112298691,
+          "relative_volume_10d_calc": 3.380392100554683,
           "market_cap_basic": 7207714187.605569,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -785,9 +785,9 @@
           "Perf.1M": 73.9424703891709,
           "premarket_change": 18.329466357308593,
           "ATRP": 10.477154110555118,
-          "score": 32,
+          "score": 30,
           "verdict": "PASS",
-          "thesis": "PARABOLIC setup; algorithmic score only.",
+          "thesis": "Parabolic gap-up with weak trend and pattern; risk of sharp reversal from extended move.",
           "stages": {
             "s1_trend": 10,
             "s2_pattern": 6,
@@ -795,7 +795,37 @@
             "s4_risk": 11
           },
           "pattern": "PARABOLIC",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
+        },
+        {
+          "ticker": "MRVL",
+          "exchange": "NASDAQ",
+          "name": "MRVL",
+          "open": 317.63,
+          "high": 324.2,
+          "low": 294.0101,
+          "close": 301.65,
+          "change": 3.734653873929625,
+          "volume": 115539947,
+          "relative_volume_10d_calc": 2.7179412821285323,
+          "market_cap_basic": 263883424071.58514,
+          "sector": "Electronic Technology",
+          "industry": "Semiconductors",
+          "Perf.W": 38.38425543627855,
+          "Perf.1M": 82.28788977519942,
+          "premarket_change": 9.360707039444263,
+          "ATRP": 6.23943606216352,
+          "score": 29,
+          "verdict": "PASS",
+          "thesis": "Parabolic gap-fade with massive RVOL; avoid chasing extreme momentum exhaustion.",
+          "stages": {
+            "s1_trend": 5,
+            "s2_pattern": 4,
+            "s3_timing": 18,
+            "s4_risk": 7
+          },
+          "pattern": "PARABOLIC",
+          "score_source": "deepseek"
         },
         {
           "ticker": "PHVS",
@@ -815,9 +845,9 @@
           "Perf.1M": 3.823630726834307,
           "premarket_change": -0.03450655624569207,
           "ATRP": 4.619727884679784,
-          "score": 57,
+          "score": 60,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Biotech momentum breakout with unclear pattern quality; risk of fading premarket gap and low volume confirmation.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 11,
@@ -825,7 +855,7 @@
             "s4_risk": 13
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "TGTX",
@@ -836,8 +866,8 @@
           "low": 37.96,
           "close": 40.11,
           "change": 9.470524017467245,
-          "volume": 3662609,
-          "relative_volume_10d_calc": 2.6998434690242266,
+          "volume": 3663659,
+          "relative_volume_10d_calc": 2.7006174625470063,
           "market_cap_basic": 6140181986.35071,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -845,9 +875,9 @@
           "Perf.1M": 18.73889875666074,
           "premarket_change": 5.840611353711791,
           "ATRP": 4.207319031293574,
-          "score": 78,
-          "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "score": 80,
+          "verdict": "GO",
+          "thesis": "Breakout on heavy volume with strong trend, but fade from premarket high adds intraday risk.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 21,
@@ -855,37 +885,7 @@
             "s4_risk": 13
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
-        },
-        {
-          "ticker": "MRVL",
-          "exchange": "NASDAQ",
-          "name": "MRVL",
-          "open": 317.63,
-          "high": 324.2,
-          "low": 294.0101,
-          "close": 301.65,
-          "change": 3.734653873929625,
-          "volume": 114098680,
-          "relative_volume_10d_calc": 2.6840371720819043,
-          "market_cap_basic": 263883424071.58514,
-          "sector": "Electronic Technology",
-          "industry": "Semiconductors",
-          "Perf.W": 38.38425543627855,
-          "Perf.1M": 82.28788977519942,
-          "premarket_change": 9.360707039444263,
-          "ATRP": 6.23943606216352,
-          "score": 34,
-          "verdict": "PASS",
-          "thesis": "PARABOLIC setup; algorithmic score only.",
-          "stages": {
-            "s1_trend": 5,
-            "s2_pattern": 4,
-            "s3_timing": 18,
-            "s4_risk": 7
-          },
-          "pattern": "PARABOLIC",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "QURE",
@@ -896,8 +896,8 @@
           "low": 26.9,
           "close": 29.88,
           "change": 11.659192825112097,
-          "volume": 2935133,
-          "relative_volume_10d_calc": 2.5116792069511917,
+          "volume": 2941320,
+          "relative_volume_10d_calc": 2.51697360391835,
           "market_cap_basic": 1868378712.0672643,
           "sector": "Health Technology",
           "industry": "Biotechnology",
@@ -905,9 +905,9 @@
           "Perf.1M": 54.02061855670104,
           "premarket_change": 0.9342301943198803,
           "ATRP": 7.004417348563336,
-          "score": 48,
-          "verdict": "PASS",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "score": 50,
+          "verdict": "WAIT",
+          "thesis": "Breakout with huge volume but weak pattern and risk; fade from premarket high warns of exhaustion.",
           "stages": {
             "s1_trend": 13,
             "s2_pattern": 11,
@@ -915,7 +915,7 @@
             "s4_risk": 8
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "SYRE",
@@ -926,8 +926,8 @@
           "low": 69.815,
           "close": 73.52,
           "change": 6.304222093695778,
-          "volume": 1679656,
-          "relative_volume_10d_calc": 2.0726926175682614,
+          "volume": 1679680,
+          "relative_volume_10d_calc": 2.0727222335270183,
           "market_cap_basic": 6384568858.393291,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -935,9 +935,9 @@
           "Perf.1M": 7.7058306475241585,
           "premarket_change": 3.3834586466165466,
           "ATRP": 5.585027167046129,
-          "score": 61,
+          "score": 63,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Strong volume breakout but unclear pattern and sector headwinds in pharma majors warrant caution.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 11,
@@ -945,7 +945,7 @@
             "s4_risk": 13
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "ADEA",
@@ -956,8 +956,8 @@
           "low": 29.37,
           "close": 32.05,
           "change": 4.533594259621647,
-          "volume": 3986257,
-          "relative_volume_10d_calc": 2.0564157220540764,
+          "volume": 4001917,
+          "relative_volume_10d_calc": 2.0644943457372373,
           "market_cap_basic": 3534914572.513046,
           "sector": "Technology Services",
           "industry": "Packaged Software",
@@ -965,9 +965,9 @@
           "Perf.1M": -3.5219747140276993,
           "premarket_change": 1.7938682322243988,
           "ATRP": 5.899640820955492,
-          "score": 50,
+          "score": 52,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Pullback to 21dma with volume, but unclear pattern and weak sector context limit conviction.",
           "stages": {
             "s1_trend": 8,
             "s2_pattern": 11,
@@ -975,7 +975,7 @@
             "s4_risk": 13
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "URI",
@@ -986,8 +986,8 @@
           "low": 995.87,
           "close": 1056.58,
           "change": 6.2081582597856775,
-          "volume": 859663,
-          "relative_volume_10d_calc": 1.956404684831647,
+          "volume": 860199,
+          "relative_volume_10d_calc": 1.9576245034245954,
           "market_cap_basic": 66191099528.82976,
           "sector": "Finance",
           "industry": "Finance/Rental/Leasing",
@@ -995,9 +995,9 @@
           "Perf.1M": 10.994621396756026,
           "premarket_change": 0.057296797410580434,
           "ATRP": 2.966583542076082,
-          "score": 76,
+          "score": 78,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout with strong trend but fade from premarket and low risk quality suggest caution.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 20,
@@ -1005,7 +1005,7 @@
             "s4_risk": 12
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "TRVG",
@@ -1016,8 +1016,8 @@
           "low": 3.66,
           "close": 4.11,
           "change": 5.927835051546403,
-          "volume": 122236,
-          "relative_volume_10d_calc": 1.9201020401751787,
+          "volume": 123236,
+          "relative_volume_10d_calc": 1.9358101952209523,
           "market_cap_basic": 1932543027,
           "sector": "Technology Services",
           "industry": "Internet Software/Services",
@@ -1027,7 +1027,7 @@
           "ATRP": 5.3370608364060335,
           "score": 68,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout with strong trend but poor risk/reward due to low S4 score; wait for pullback to better entry.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 20,
@@ -1035,7 +1035,7 @@
             "s4_risk": 5
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "CLMT",
@@ -1046,8 +1046,8 @@
           "low": 36.315,
           "close": 37.37,
           "change": 3.489338133481025,
-          "volume": 1443115,
-          "relative_volume_10d_calc": 1.8437571626749034,
+          "volume": 1443972,
+          "relative_volume_10d_calc": 1.8448520857326032,
           "market_cap_basic": 3256688980.4940457,
           "sector": "Energy Minerals",
           "industry": "Oil Refining/Marketing",
@@ -1055,9 +1055,9 @@
           "Perf.1M": 11.187146682534953,
           "premarket_change": 2.658543339795073,
           "ATRP": 3.8223545562409402,
-          "score": 70,
+          "score": 73,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout with strong trend but weak risk/reward due to wide intraday range and fade from premarket.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 20,
@@ -1065,7 +1065,7 @@
             "s4_risk": 10
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "ILMN",
@@ -1076,8 +1076,8 @@
           "low": 160.1,
           "close": 170.93,
           "change": 5.155336819440169,
-          "volume": 3140129,
-          "relative_volume_10d_calc": 1.746855150157172,
+          "volume": 3140511,
+          "relative_volume_10d_calc": 1.7470676569259576,
           "market_cap_basic": 25861710007.388123,
           "sector": "Health Technology",
           "industry": "Medical Specialties",
@@ -1106,8 +1106,8 @@
           "low": 155.12,
           "close": 165.11,
           "change": 6.632653061224496,
-          "volume": 1941837,
-          "relative_volume_10d_calc": 1.721419401954232,
+          "volume": 1942029,
+          "relative_volume_10d_calc": 1.7215896080658548,
           "market_cap_basic": 16601808092.234695,
           "sector": "Health Technology",
           "industry": "Biotechnology",
@@ -1136,8 +1136,8 @@
           "low": 43.52,
           "close": 46.03,
           "change": 4.780332346915551,
-          "volume": 5093043,
-          "relative_volume_10d_calc": 1.7129397531248525,
+          "volume": 5093097,
+          "relative_volume_10d_calc": 1.7129579149088132,
           "market_cap_basic": 6528007993.4919195,
           "sector": "Retail Trade",
           "industry": "Specialty Stores",
@@ -1226,8 +1226,8 @@
           "low": 92.6634,
           "close": 97.98,
           "change": 6.222896790980062,
-          "volume": 2269865,
-          "relative_volume_10d_calc": 1.6428327160281615,
+          "volume": 2270005,
+          "relative_volume_10d_calc": 1.6429340421335659,
           "market_cap_basic": 19574654629.98396,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -1256,8 +1256,8 @@
           "low": 72.76,
           "close": 76.82,
           "change": 4.021665538253215,
-          "volume": 6967839,
-          "relative_volume_10d_calc": 1.6240041469932054,
+          "volume": 6969363,
+          "relative_volume_10d_calc": 1.6243593478409888,
           "market_cap_basic": 16256688715.676914,
           "sector": "Producer Manufacturing",
           "industry": "Electrical Products",
@@ -1286,8 +1286,8 @@
           "low": 201.511,
           "close": 210.59,
           "change": 4.046442687747034,
-          "volume": 3169343,
-          "relative_volume_10d_calc": 1.6090953141351314,
+          "volume": 3174180,
+          "relative_volume_10d_calc": 1.611551089365036,
           "market_cap_basic": 59241771108.85598,
           "sector": "Energy Minerals",
           "industry": "Oil & Gas Production",
@@ -1316,8 +1316,8 @@
           "low": 875.001,
           "close": 957.03,
           "change": 9.309895833333332,
-          "volume": 1045923,
-          "relative_volume_10d_calc": 1.5980789249362517,
+          "volume": 1047538,
+          "relative_volume_10d_calc": 1.6005465037769238,
           "market_cap_basic": 29367378389.288406,
           "sector": "Industrial Services",
           "industry": "Engineering & Construction",
@@ -1346,8 +1346,8 @@
           "low": 12.6,
           "close": 13.63,
           "change": 6.11132736473336,
-          "volume": 6277441,
-          "relative_volume_10d_calc": 1.569548007180359,
+          "volume": 6289262,
+          "relative_volume_10d_calc": 1.5725036107444352,
           "market_cap_basic": 2465170110.365123,
           "sector": "Industrial Services",
           "industry": "Environmental Services",
@@ -1376,8 +1376,8 @@
           "low": 141.89,
           "close": 146.96,
           "change": 3.500246496232128,
-          "volume": 5297969,
-          "relative_volume_10d_calc": 1.5526429637050336,
+          "volume": 5298636,
+          "relative_volume_10d_calc": 1.5528384372642017,
           "market_cap_basic": 89662592131.23347,
           "sector": "Producer Manufacturing",
           "industry": "Industrial Machinery",
@@ -1436,8 +1436,8 @@
           "low": 1.37,
           "close": 1.46,
           "change": 4.28571428571429,
-          "volume": 4751859,
-          "relative_volume_10d_calc": 1.506131630491969,
+          "volume": 4752571,
+          "relative_volume_10d_calc": 1.5063573033751312,
           "market_cap_basic": 1102434628.6857142,
           "sector": "Health Services",
           "industry": "Medical/Nursing Services",
@@ -1466,8 +1466,8 @@
           "low": 56.56,
           "close": 62.7,
           "change": 9.404990403071018,
-          "volume": 4416317,
-          "relative_volume_10d_calc": 1.5057352598724103,
+          "volume": 4417109,
+          "relative_volume_10d_calc": 1.506005290833915,
           "market_cap_basic": 9544547337.639154,
           "sector": "Health Technology",
           "industry": "Medical Specialties",
@@ -1503,8 +1503,8 @@
           "low": 2.86,
           "close": 3.05,
           "change": 3.040540540540536,
-          "volume": 6099594,
-          "relative_volume_10d_calc": 3.5627104475435987,
+          "volume": 6152083,
+          "relative_volume_10d_calc": 3.5933687354035966,
           "market_cap_basic": 870837046.8918917,
           "sector": "Retail Trade",
           "industry": "Internet Retail",
@@ -1512,9 +1512,9 @@
           "Perf.1M": 5.902777777777776,
           "premarket_change": 0.9628378378378443,
           "ATRP": 4.868408701402091,
-          "score": 67,
+          "score": 70,
           "verdict": "WAIT",
-          "thesis": "PULLBACK setup; algorithmic score only.",
+          "thesis": "Pullback in high RVOL with strong close, but sector headwind and low price risk cap upside.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 21,
@@ -1522,7 +1522,7 @@
             "s4_risk": 13
           },
           "pattern": "PULLBACK",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "NVTS",
@@ -1533,8 +1533,8 @@
           "low": 29.7,
           "close": 30.84,
           "change": 19.257540603248263,
-          "volume": 112001765,
-          "relative_volume_10d_calc": 3.3714540951700136,
+          "volume": 112298691,
+          "relative_volume_10d_calc": 3.380392100554683,
           "market_cap_basic": 7207714187.605569,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -1542,9 +1542,9 @@
           "Perf.1M": 73.9424703891709,
           "premarket_change": 18.329466357308593,
           "ATRP": 10.477154110555118,
-          "score": 32,
+          "score": 30,
           "verdict": "PASS",
-          "thesis": "PARABOLIC setup; algorithmic score only.",
+          "thesis": "Parabolic gap-up with weak trend and pattern; avoid chasing extreme momentum fade risk.",
           "stages": {
             "s1_trend": 10,
             "s2_pattern": 6,
@@ -1552,7 +1552,7 @@
             "s4_risk": 11
           },
           "pattern": "PARABOLIC",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "DRTS",
@@ -1563,8 +1563,8 @@
           "low": 9.22,
           "close": 10.58,
           "change": 18.47704367301232,
-          "volume": 3228574,
-          "relative_volume_10d_calc": 3.094267919794887,
+          "volume": 3237535,
+          "relative_volume_10d_calc": 3.1028561494062514,
           "market_cap_basic": 931143028.8219485,
           "sector": "Health Technology",
           "industry": "Medical Specialties",
@@ -1572,9 +1572,9 @@
           "Perf.1M": 17.42508324084351,
           "premarket_change": 5.711086226203805,
           "ATRP": 9.102364578756495,
-          "score": 68,
+          "score": 70,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout with extreme volume but huge fade from premarket high; risk of failed breakout.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 23,
@@ -1582,7 +1582,7 @@
             "s4_risk": 13
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "RZLT",
@@ -1593,8 +1593,8 @@
           "low": 4.07,
           "close": 4.58,
           "change": 14.500000000000002,
-          "volume": 5233477,
-          "relative_volume_10d_calc": 3.0335620614980825,
+          "volume": 5236486,
+          "relative_volume_10d_calc": 3.03530621519228,
           "market_cap_basic": 441018862.24,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -1602,9 +1602,9 @@
           "Perf.1M": 38.36858006042296,
           "premarket_change": 10.204999999999998,
           "ATRP": 6.2302805534360015,
-          "score": 68,
+          "score": 70,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout with strong volume but high fade risk from premarket; wait for consolidation near $4.40.",
           "stages": {
             "s1_trend": 18,
             "s2_pattern": 23,
@@ -1612,37 +1612,7 @@
             "s4_risk": 11
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
-        },
-        {
-          "ticker": "TGTX",
-          "exchange": "NASDAQ",
-          "name": "TGTX",
-          "open": 38.57,
-          "high": 41.34,
-          "low": 37.96,
-          "close": 40.11,
-          "change": 9.470524017467245,
-          "volume": 3662609,
-          "relative_volume_10d_calc": 2.6998434690242266,
-          "market_cap_basic": 6140181986.35071,
-          "sector": "Health Technology",
-          "industry": "Pharmaceuticals: Major",
-          "Perf.W": -0.4220456802383359,
-          "Perf.1M": 18.73889875666074,
-          "premarket_change": 5.840611353711791,
-          "ATRP": 4.207319031293574,
-          "score": 78,
-          "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
-          "stages": {
-            "s1_trend": 22,
-            "s2_pattern": 21,
-            "s3_timing": 22,
-            "s4_risk": 13
-          },
-          "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "MRVL",
@@ -1653,8 +1623,8 @@
           "low": 294.0101,
           "close": 301.65,
           "change": 3.734653873929625,
-          "volume": 114098680,
-          "relative_volume_10d_calc": 2.6840371720819043,
+          "volume": 115539947,
+          "relative_volume_10d_calc": 2.7179412821285323,
           "market_cap_basic": 263883424071.58514,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -1662,9 +1632,9 @@
           "Perf.1M": 82.28788977519942,
           "premarket_change": 9.360707039444263,
           "ATRP": 6.23943606216352,
-          "score": 34,
+          "score": 29,
           "verdict": "PASS",
-          "thesis": "PARABOLIC setup; algorithmic score only.",
+          "thesis": "Parabolic gap-fade with massive RVOL; avoid chasing extreme exhaustion risk.",
           "stages": {
             "s1_trend": 5,
             "s2_pattern": 4,
@@ -1672,7 +1642,37 @@
             "s4_risk": 7
           },
           "pattern": "PARABOLIC",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
+        },
+        {
+          "ticker": "TGTX",
+          "exchange": "NASDAQ",
+          "name": "TGTX",
+          "open": 38.57,
+          "high": 41.34,
+          "low": 37.96,
+          "close": 40.11,
+          "change": 9.470524017467245,
+          "volume": 3663659,
+          "relative_volume_10d_calc": 2.7006174625470063,
+          "market_cap_basic": 6140181986.35071,
+          "sector": "Health Technology",
+          "industry": "Pharmaceuticals: Major",
+          "Perf.W": -0.4220456802383359,
+          "Perf.1M": 18.73889875666074,
+          "premarket_change": 5.840611353711791,
+          "ATRP": 4.207319031293574,
+          "score": 80,
+          "verdict": "GO",
+          "thesis": "Breakout on heavy volume with strong sector tailwind, risk is gap fill from premarket fade.",
+          "stages": {
+            "s1_trend": 22,
+            "s2_pattern": 21,
+            "s3_timing": 22,
+            "s4_risk": 13
+          },
+          "pattern": "BREAKOUT",
+          "score_source": "deepseek"
         },
         {
           "ticker": "QURE",
@@ -1683,8 +1683,8 @@
           "low": 26.9,
           "close": 29.88,
           "change": 11.659192825112097,
-          "volume": 2935133,
-          "relative_volume_10d_calc": 2.5116792069511917,
+          "volume": 2941320,
+          "relative_volume_10d_calc": 2.51697360391835,
           "market_cap_basic": 1868378712.0672643,
           "sector": "Health Technology",
           "industry": "Biotechnology",
@@ -1692,9 +1692,9 @@
           "Perf.1M": 54.02061855670104,
           "premarket_change": 0.9342301943198803,
           "ATRP": 7.004417348563336,
-          "score": 48,
-          "verdict": "PASS",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "score": 50,
+          "verdict": "WAIT",
+          "thesis": "Breakout with huge volume but fading from premarket high; risk of exhaustion after 54% monthly gain.",
           "stages": {
             "s1_trend": 13,
             "s2_pattern": 11,
@@ -1702,7 +1702,7 @@
             "s4_risk": 8
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "ALOY",
@@ -1713,8 +1713,8 @@
           "low": 10.38,
           "close": 13.8,
           "change": 18.556701030927837,
-          "volume": 4861192,
-          "relative_volume_10d_calc": 2.2635478652085106,
+          "volume": 4897176,
+          "relative_volume_10d_calc": 2.280303324853319,
           "market_cap_basic": 844746285.7731959,
           "sector": "Non-Energy Minerals",
           "industry": "Other Metals/Minerals",
@@ -1722,9 +1722,9 @@
           "Perf.1M": 40.1015228426396,
           "premarket_change": -0.6821305841924372,
           "ATRP": 8.893802090307828,
-          "score": 60,
+          "score": 55,
           "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "thesis": "Breakout with extreme volume but poor entry timing and risk quality; wait for pullback to 21dma.",
           "stages": {
             "s1_trend": 21,
             "s2_pattern": 21,
@@ -1732,7 +1732,7 @@
             "s4_risk": 8
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "MEI",
@@ -1743,8 +1743,8 @@
           "low": 12.3,
           "close": 13.2,
           "change": 5.599999999999994,
-          "volume": 1208658,
-          "relative_volume_10d_calc": 2.1221447627977046,
+          "volume": 1208844,
+          "relative_volume_10d_calc": 2.1224713389887198,
           "market_cap_basic": 467681593.63199997,
           "sector": "Electronic Technology",
           "industry": "Electronic Components",
@@ -1752,9 +1752,9 @@
           "Perf.1M": 53.13225058004641,
           "premarket_change": 0.1599999999999966,
           "ATRP": 7.185622755945668,
-          "score": 52,
+          "score": 55,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Strong momentum breakout with high RVOL but unclear pattern and poor risk/reward limit conviction.",
           "stages": {
             "s1_trend": 13,
             "s2_pattern": 11,
@@ -1762,7 +1762,7 @@
             "s4_risk": 6
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "SYRE",
@@ -1773,8 +1773,8 @@
           "low": 69.815,
           "close": 73.52,
           "change": 6.304222093695778,
-          "volume": 1679656,
-          "relative_volume_10d_calc": 2.0726926175682614,
+          "volume": 1679680,
+          "relative_volume_10d_calc": 2.0727222335270183,
           "market_cap_basic": 6384568858.393291,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -1782,9 +1782,9 @@
           "Perf.1M": 7.7058306475241585,
           "premarket_change": 3.3834586466165466,
           "ATRP": 5.585027167046129,
-          "score": 61,
+          "score": 63,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Strong volume breakout but unclear pattern and sector headwinds from biotech volatility warrant caution.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 11,
@@ -1792,7 +1792,7 @@
             "s4_risk": 13
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "ADEA",
@@ -1803,8 +1803,8 @@
           "low": 29.37,
           "close": 32.05,
           "change": 4.533594259621647,
-          "volume": 3986257,
-          "relative_volume_10d_calc": 2.0564157220540764,
+          "volume": 4001917,
+          "relative_volume_10d_calc": 2.0644943457372373,
           "market_cap_basic": 3534914572.513046,
           "sector": "Technology Services",
           "industry": "Packaged Software",
@@ -1833,8 +1833,8 @@
           "low": 15.96,
           "close": 16.5,
           "change": 4.828462515883099,
-          "volume": 2210369,
-          "relative_volume_10d_calc": 1.9868640770494115,
+          "volume": 2211459,
+          "relative_volume_10d_calc": 1.987843859992433,
           "market_cap_basic": 831638156.5120713,
           "sector": "Transportation",
           "industry": "Air Freight/Couriers",
@@ -1863,8 +1863,8 @@
           "low": 995.87,
           "close": 1056.58,
           "change": 6.2081582597856775,
-          "volume": 859663,
-          "relative_volume_10d_calc": 1.956404684831647,
+          "volume": 860199,
+          "relative_volume_10d_calc": 1.9576245034245954,
           "market_cap_basic": 66191099528.82976,
           "sector": "Finance",
           "industry": "Finance/Rental/Leasing",
@@ -1893,8 +1893,8 @@
           "low": 36.315,
           "close": 37.37,
           "change": 3.489338133481025,
-          "volume": 1443115,
-          "relative_volume_10d_calc": 1.8437571626749034,
+          "volume": 1443972,
+          "relative_volume_10d_calc": 1.8448520857326032,
           "market_cap_basic": 3256688980.4940457,
           "sector": "Energy Minerals",
           "industry": "Oil Refining/Marketing",
@@ -1923,8 +1923,8 @@
           "low": 1.2,
           "close": 1.33,
           "change": 7.258064516129038,
-          "volume": 2480103,
-          "relative_volume_10d_calc": 1.764508764441958,
+          "volume": 2481058,
+          "relative_volume_10d_calc": 1.7651882143962712,
           "market_cap_basic": 474472361.266129,
           "sector": "Technology Services",
           "industry": "Packaged Software",
@@ -1953,8 +1953,8 @@
           "low": 160.1,
           "close": 170.93,
           "change": 5.155336819440169,
-          "volume": 3140129,
-          "relative_volume_10d_calc": 1.746855150157172,
+          "volume": 3140511,
+          "relative_volume_10d_calc": 1.7470676569259576,
           "market_cap_basic": 25861710007.388123,
           "sector": "Health Technology",
           "industry": "Medical Specialties",
@@ -1983,8 +1983,8 @@
           "low": 155.12,
           "close": 165.11,
           "change": 6.632653061224496,
-          "volume": 1941837,
-          "relative_volume_10d_calc": 1.721419401954232,
+          "volume": 1942029,
+          "relative_volume_10d_calc": 1.7215896080658548,
           "market_cap_basic": 16601808092.234695,
           "sector": "Health Technology",
           "industry": "Biotechnology",
@@ -2013,8 +2013,8 @@
           "low": 43.52,
           "close": 46.03,
           "change": 4.780332346915551,
-          "volume": 5093043,
-          "relative_volume_10d_calc": 1.7129397531248525,
+          "volume": 5093097,
+          "relative_volume_10d_calc": 1.7129579149088132,
           "market_cap_basic": 6528007993.4919195,
           "sector": "Retail Trade",
           "industry": "Specialty Stores",
@@ -2043,8 +2043,8 @@
           "low": 92.6634,
           "close": 97.98,
           "change": 6.222896790980062,
-          "volume": 2269865,
-          "relative_volume_10d_calc": 1.6428327160281615,
+          "volume": 2270005,
+          "relative_volume_10d_calc": 1.6429340421335659,
           "market_cap_basic": 19574654629.98396,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -2073,8 +2073,8 @@
           "low": 72.76,
           "close": 76.82,
           "change": 4.021665538253215,
-          "volume": 6967839,
-          "relative_volume_10d_calc": 1.6240041469932054,
+          "volume": 6969363,
+          "relative_volume_10d_calc": 1.6243593478409888,
           "market_cap_basic": 16256688715.676914,
           "sector": "Producer Manufacturing",
           "industry": "Electrical Products",
@@ -2103,8 +2103,8 @@
           "low": 201.511,
           "close": 210.59,
           "change": 4.046442687747034,
-          "volume": 3169343,
-          "relative_volume_10d_calc": 1.6090953141351314,
+          "volume": 3174180,
+          "relative_volume_10d_calc": 1.611551089365036,
           "market_cap_basic": 59241771108.85598,
           "sector": "Energy Minerals",
           "industry": "Oil & Gas Production",
@@ -2133,8 +2133,8 @@
           "low": 875.001,
           "close": 957.03,
           "change": 9.309895833333332,
-          "volume": 1045923,
-          "relative_volume_10d_calc": 1.5980789249362517,
+          "volume": 1047538,
+          "relative_volume_10d_calc": 1.6005465037769238,
           "market_cap_basic": 29367378389.288406,
           "sector": "Industrial Services",
           "industry": "Engineering & Construction",
@@ -2163,8 +2163,8 @@
           "low": 12.6,
           "close": 13.63,
           "change": 6.11132736473336,
-          "volume": 6277441,
-          "relative_volume_10d_calc": 1.569548007180359,
+          "volume": 6289262,
+          "relative_volume_10d_calc": 1.5725036107444352,
           "market_cap_basic": 2465170110.365123,
           "sector": "Industrial Services",
           "industry": "Environmental Services",
@@ -2193,8 +2193,8 @@
           "low": 141.89,
           "close": 146.96,
           "change": 3.500246496232128,
-          "volume": 5297969,
-          "relative_volume_10d_calc": 1.5526429637050336,
+          "volume": 5298636,
+          "relative_volume_10d_calc": 1.5528384372642017,
           "market_cap_basic": 89662592131.23347,
           "sector": "Producer Manufacturing",
           "industry": "Industrial Machinery",
@@ -2260,8 +2260,8 @@
           "low": 29.7,
           "close": 30.84,
           "change": 19.257540603248263,
-          "volume": 112001765,
-          "relative_volume_10d_calc": 3.3714540951700136,
+          "volume": 112298691,
+          "relative_volume_10d_calc": 3.380392100554683,
           "market_cap_basic": 7207714187.605569,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -2269,9 +2269,9 @@
           "Perf.1M": 73.9424703891709,
           "premarket_change": 18.329466357308593,
           "ATRP": 10.477154110555118,
-          "score": 32,
+          "score": 30,
           "verdict": "PASS",
-          "thesis": "PARABOLIC setup; algorithmic score only.",
+          "thesis": "Parabolic gap-up with weak trend and pattern; high risk of reversal after 73% monthly gain.",
           "stages": {
             "s1_trend": 10,
             "s2_pattern": 6,
@@ -2279,7 +2279,7 @@
             "s4_risk": 11
           },
           "pattern": "PARABOLIC",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "NN",
@@ -2290,8 +2290,8 @@
           "low": 20.6,
           "close": 21.57,
           "change": 7.581047381546132,
-          "volume": 3718201,
-          "relative_volume_10d_calc": 1.4644952555951585,
+          "volume": 3718473,
+          "relative_volume_10d_calc": 1.4646023887785238,
           "market_cap_basic": 2942944584.9411473,
           "sector": "Technology Services",
           "industry": "Packaged Software",
@@ -2299,9 +2299,9 @@
           "Perf.1M": 11.300309597523226,
           "premarket_change": 14.613466334164588,
           "ATRP": 7.9055697171169665,
-          "score": 61,
+          "score": 58,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Gap-and-fade breakout with high RVOL but unclear pattern and weak close, risking failed breakout.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 10,
@@ -2309,7 +2309,7 @@
             "s4_risk": 10
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "LILKV",
@@ -2320,7 +2320,7 @@
           "low": 5.27,
           "close": 5.27,
           "change": -5.892857142857145,
-          "volume": 37488,
+          "volume": 37862,
           "relative_volume_10d_calc": null,
           "market_cap_basic": 1514333735.8500001,
           "sector": "Communications",
@@ -2329,9 +2329,9 @@
           "Perf.1M": 50.571428571428555,
           "premarket_change": 14.285714285714299,
           "ATRP": null,
-          "score": 36,
+          "score": 31,
           "verdict": "PASS",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "High RVOL fade from premarket and weak close suggest failed breakout; avoid until base forms.",
           "stages": {
             "s1_trend": 10,
             "s2_pattern": 6,
@@ -2339,7 +2339,7 @@
             "s4_risk": 3
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "ABVX",
@@ -2350,8 +2350,8 @@
           "low": 80.77,
           "close": 90.15,
           "change": 24.344827586206904,
-          "volume": 7153783,
-          "relative_volume_10d_calc": 2.0568389641175657,
+          "volume": 7165717,
+          "relative_volume_10d_calc": 2.0602701998983797,
           "market_cap_basic": 5853103295.64666,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Other",
@@ -2359,9 +2359,9 @@
           "Perf.1M": -23.801876426337582,
           "premarket_change": 12.331034482758618,
           "ATRP": 11.456781890939261,
-          "score": 26,
+          "score": 21,
           "verdict": "PASS",
-          "thesis": "STAGE4-BOUNCE setup; algorithmic score only.",
+          "thesis": "Stage4 bounce with extreme volatility and weak trend; avoid until structure forms.",
           "stages": {
             "s1_trend": 1,
             "s2_pattern": 6,
@@ -2369,7 +2369,7 @@
             "s4_risk": 13
           },
           "pattern": "STAGE4-BOUNCE",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "GME",
@@ -2380,8 +2380,8 @@
           "low": 22.12,
           "close": 22.18,
           "change": 6.022944550669206,
-          "volume": 17847621,
-          "relative_volume_10d_calc": 3.4480967156799576,
+          "volume": 17884670,
+          "relative_volume_10d_calc": 3.4552544503281344,
           "market_cap_basic": 9951971365.19885,
           "sector": "Retail Trade",
           "industry": "Electronics/Appliance Stores",
@@ -2389,9 +2389,9 @@
           "Perf.1M": -11.668657905217046,
           "premarket_change": 11.520076481835547,
           "ATRP": 4.027539640988128,
-          "score": 50,
-          "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "score": 48,
+          "verdict": "PASS",
+          "thesis": "Meme stock gap-up with fading intraday momentum; high RVOL but weak close and trend failure risk.",
           "stages": {
             "s1_trend": 4,
             "s2_pattern": 13,
@@ -2399,7 +2399,7 @@
             "s4_risk": 16
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "MRVL",
@@ -2410,8 +2410,8 @@
           "low": 294.0101,
           "close": 301.65,
           "change": 3.734653873929625,
-          "volume": 114098680,
-          "relative_volume_10d_calc": 2.6840371720819043,
+          "volume": 115539947,
+          "relative_volume_10d_calc": 2.7179412821285323,
           "market_cap_basic": 263883424071.58514,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -2419,9 +2419,9 @@
           "Perf.1M": 82.28788977519942,
           "premarket_change": 9.360707039444263,
           "ATRP": 6.23943606216352,
-          "score": 34,
+          "score": 29,
           "verdict": "PASS",
-          "thesis": "PARABOLIC setup; algorithmic score only.",
+          "thesis": "Parabolic gap-fade with massive volume; avoid chasing extreme momentum exhaustion.",
           "stages": {
             "s1_trend": 5,
             "s2_pattern": 4,
@@ -2429,7 +2429,7 @@
             "s4_risk": 7
           },
           "pattern": "PARABOLIC",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "WOLF",
@@ -2440,8 +2440,8 @@
           "low": 60.34,
           "close": 61.67,
           "change": 0.9990173599737954,
-          "volume": 7939307,
-          "relative_volume_10d_calc": 0.8221391829020086,
+          "volume": 8006645,
+          "relative_volume_10d_calc": 0.8291160998538218,
           "market_cap_basic": 2981071180.9608583,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -2449,9 +2449,9 @@
           "Perf.1M": 69.93662165885921,
           "premarket_change": 7.926629544710126,
           "ATRP": 14.567380835257545,
-          "score": 39,
+          "score": 44,
           "verdict": "PASS",
-          "thesis": "PULLBACK setup; algorithmic score only.",
+          "thesis": "Pullback in volatile semiconductor name with weak trend and poor risk/reward; avoid until structure improves.",
           "stages": {
             "s1_trend": 10,
             "s2_pattern": 14,
@@ -2459,7 +2459,7 @@
             "s4_risk": 3
           },
           "pattern": "PULLBACK",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "INTC",
@@ -2470,8 +2470,8 @@
           "low": 110.86,
           "close": 112.71,
           "change": 4.4287964421384105,
-          "volume": 118504965,
-          "relative_volume_10d_calc": 0.9617834110483452,
+          "volume": 118927649,
+          "relative_volume_10d_calc": 0.9652139041025016,
           "market_cap_basic": 566480461601.9376,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -2479,9 +2479,9 @@
           "Perf.1M": 13.641863278886857,
           "premarket_change": 7.8662095802835115,
           "ATRP": 7.324075856346609,
-          "score": 64,
+          "score": 62,
           "verdict": "WAIT",
-          "thesis": "PULLBACK setup; algorithmic score only.",
+          "thesis": "Pullback setup in weak semis sector; risk of failed bounce after premarket fade and wide intraday range.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 14,
@@ -2489,7 +2489,7 @@
             "s4_risk": 10
           },
           "pattern": "PULLBACK",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "MBC",
@@ -2511,7 +2511,7 @@
           "ATRP": 5.510321064385469,
           "score": 27,
           "verdict": "PASS",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Weak trend and pattern, high fade risk; avoid until clear base forms.",
           "stages": {
             "s1_trend": 4,
             "s2_pattern": 6,
@@ -2519,7 +2519,7 @@
             "s4_risk": 5
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "ACHC",
@@ -2530,8 +2530,8 @@
           "low": 25.29,
           "close": 25.73,
           "change": 5.364455364455359,
-          "volume": 3127605,
-          "relative_volume_10d_calc": 1.272405380969181,
+          "volume": 3127705,
+          "relative_volume_10d_calc": 1.2724460640279742,
           "market_cap_basic": 2366311580.117936,
           "sector": "Health Services",
           "industry": "Medical/Nursing Services",
@@ -2539,9 +2539,9 @@
           "Perf.1M": -12.43533895997822,
           "premarket_change": 6.470106470106463,
           "ATRP": 5.106511202532837,
-          "score": 46,
+          "score": 48,
           "verdict": "PASS",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "High RVOL gap-up but weak trend and unclear pattern; risk of failed breakout from low base.",
           "stages": {
             "s1_trend": 4,
             "s2_pattern": 10,
@@ -2549,7 +2549,7 @@
             "s4_risk": 10
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "TGTX",
@@ -2560,8 +2560,8 @@
           "low": 37.96,
           "close": 40.11,
           "change": 9.470524017467245,
-          "volume": 3662609,
-          "relative_volume_10d_calc": 2.6998434690242266,
+          "volume": 3663659,
+          "relative_volume_10d_calc": 2.7006174625470063,
           "market_cap_basic": 6140181986.35071,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -2590,8 +2590,8 @@
           "low": 9.22,
           "close": 10.58,
           "change": 18.47704367301232,
-          "volume": 3228574,
-          "relative_volume_10d_calc": 3.094267919794887,
+          "volume": 3237535,
+          "relative_volume_10d_calc": 3.1028561494062514,
           "market_cap_basic": 931143028.8219485,
           "sector": "Health Technology",
           "industry": "Medical Specialties",
@@ -2620,8 +2620,8 @@
           "low": 6.665,
           "close": 6.78,
           "change": 4.7913446676970715,
-          "volume": 2741088,
-          "relative_volume_10d_calc": 1.759672866709092,
+          "volume": 2741421,
+          "relative_volume_10d_calc": 1.759886639876759,
           "market_cap_basic": 1476380229.802164,
           "sector": "Health Services",
           "industry": "Medical/Nursing Services",
@@ -2650,8 +2650,8 @@
           "low": 18.05,
           "close": 18.22,
           "change": -1.8318965517241375,
-          "volume": 2751266,
-          "relative_volume_10d_calc": 1.6292063405588448,
+          "volume": 2755475,
+          "relative_volume_10d_calc": 1.6316987674951762,
           "market_cap_basic": 4204374487.8674564,
           "sector": "Electronic Technology",
           "industry": "Aerospace & Defense",
@@ -2680,8 +2680,8 @@
           "low": 3.43,
           "close": 3.58,
           "change": -2.7173913043478284,
-          "volume": 4637155,
-          "relative_volume_10d_calc": 1.4972059171138736,
+          "volume": 4646333,
+          "relative_volume_10d_calc": 1.5001692331788468,
           "market_cap_basic": 583736174.2717391,
           "sector": "Health Technology",
           "industry": "Biotechnology",
@@ -2710,8 +2710,8 @@
           "low": 24.5,
           "close": 25,
           "change": 1.1326860841423994,
-          "volume": 1468442,
-          "relative_volume_10d_calc": 0.7376506699072,
+          "volume": 1468646,
+          "relative_volume_10d_calc": 0.7377531463663731,
           "market_cap_basic": 2521181417.880259,
           "sector": "Industrial Services",
           "industry": "Oilfield Services/Equipment",
@@ -2740,8 +2740,8 @@
           "low": 27.54,
           "close": 27.71,
           "change": 4.645015105740183,
-          "volume": 2731831,
-          "relative_volume_10d_calc": 1.476935884258155,
+          "volume": 2731876,
+          "relative_volume_10d_calc": 1.4769602130379338,
           "market_cap_basic": 33748954903.093212,
           "sector": "Consumer Durables",
           "industry": "Motor Vehicles",
@@ -2770,8 +2770,8 @@
           "low": 13.65,
           "close": 13.74,
           "change": -1.575931232091695,
-          "volume": 2515372,
-          "relative_volume_10d_calc": 1.8963104537670987,
+          "volume": 2515412,
+          "relative_volume_10d_calc": 1.8963406093139326,
           "market_cap_basic": 722250945.3825215,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -2800,8 +2800,8 @@
           "low": 76.27,
           "close": 77.95,
           "change": 5.694915254237292,
-          "volume": 20263061,
-          "relative_volume_10d_calc": 1.7020853578243385,
+          "volume": 20289666,
+          "relative_volume_10d_calc": 1.7043201623755817,
           "market_cap_basic": 100078836511.0034,
           "sector": "Health Technology",
           "industry": "Medical Specialties",
@@ -2830,8 +2830,8 @@
           "low": 18.1796,
           "close": 20.07,
           "change": 10.700496414782137,
-          "volume": 416021,
-          "relative_volume_10d_calc": 10.909679754125015,
+          "volume": 416163,
+          "relative_volume_10d_calc": 10.913403543369034,
           "market_cap_basic": 643633790.2787082,
           "sector": "Finance",
           "industry": "Regional Banks",
@@ -2860,8 +2860,8 @@
           "low": 73.79,
           "close": 75.2,
           "change": 0.6154669521006262,
-          "volume": 4964904,
-          "relative_volume_10d_calc": 0.9383137229532926,
+          "volume": 4991476,
+          "relative_volume_10d_calc": 0.9433355465870054,
           "market_cap_basic": 18640012430.6342,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -2920,8 +2920,8 @@
           "low": 120.88,
           "close": 121.62,
           "change": -0.27877992784518635,
-          "volume": 1409266,
-          "relative_volume_10d_calc": 2.346632626656778,
+          "volume": 1409828,
+          "relative_volume_10d_calc": 2.347568438303537,
           "market_cap_basic": 5161992876.724665,
           "sector": "Electronic Technology",
           "industry": "Semiconductors",
@@ -2950,8 +2950,8 @@
           "low": 2.495,
           "close": 2.51,
           "change": 0.39999999999999153,
-          "volume": 450658,
-          "relative_volume_10d_calc": 1.161378940668029,
+          "volume": 450660,
+          "relative_volume_10d_calc": 1.1613840948157006,
           "market_cap_basic": 546642798,
           "sector": "Retail Trade",
           "industry": "Food Retail",
@@ -2980,8 +2980,8 @@
           "low": 41.67,
           "close": 42.82,
           "change": 6.09514370664024,
-          "volume": 367089,
-          "relative_volume_10d_calc": 1.5011728392032546,
+          "volume": 367323,
+          "relative_volume_10d_calc": 1.5021297582184623,
           "market_cap_basic": 555937940.8538157,
           "sector": "Electronic Technology",
           "industry": "Aerospace & Defense",
@@ -3017,8 +3017,8 @@
           "low": 50.98,
           "close": 51.31,
           "change": -2.5636156475503125,
-          "volume": 2654975,
-          "relative_volume_10d_calc": 10.762507529772497,
+          "volume": 2655030,
+          "relative_volume_10d_calc": 10.762730484005264,
           "market_cap_basic": 4435394245.968287,
           "sector": "Communications",
           "industry": "Wireless Telecommunications",
@@ -3026,9 +3026,9 @@
           "Perf.1M": 4.928425357873218,
           "premarket_change": 1.1583744777820102,
           "ATRP": 3.097486191546121,
-          "score": 64,
+          "score": 62,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "High RVOL breakdown from premarket fade, pattern unclear; risk of failed breakout continuation.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 13,
@@ -3036,7 +3036,7 @@
             "s4_risk": 18
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "MCHPP",
@@ -3058,7 +3058,7 @@
           "ATRP": 3.6477955691027337,
           "score": 53,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Unclear pattern with weak trend; wait for clearer base breakout or volume confirmation.",
           "stages": {
             "s1_trend": 8,
             "s2_pattern": 13,
@@ -3066,7 +3066,7 @@
             "s4_risk": 20
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "REXR/PB",
@@ -3086,9 +3086,9 @@
           "Perf.1M": 4.258241758241757,
           "premarket_change": null,
           "ATRP": 1.044028778497097,
-          "score": 62,
+          "score": 65,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "REXR/PB shows a 1M uptrend with high RVOL but unclear pattern; wait for clearer breakout or pullback entry.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 13,
@@ -3096,7 +3096,7 @@
             "s4_risk": 16
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "IX",
@@ -3116,9 +3116,9 @@
           "Perf.1M": 18.903362617388677,
           "premarket_change": 1.2367946405565493,
           "ATRP": 2.195651876458703,
-          "score": 79,
-          "verdict": "WAIT",
-          "thesis": "PULLBACK setup; algorithmic score only.",
+          "score": 82,
+          "verdict": "GO",
+          "thesis": "Pullback in strong uptrend with high RVOL, risk is gap fill below 38.90.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 21,
@@ -3126,7 +3126,7 @@
             "s4_risk": 18
           },
           "pattern": "PULLBACK",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "HGV",
@@ -3146,9 +3146,9 @@
           "Perf.1M": 8.66347409664781,
           "premarket_change": -2.3434498655397595,
           "ATRP": 3.854114591686547,
-          "score": 70,
+          "score": 68,
           "verdict": "WAIT",
-          "thesis": "PULLBACK setup; algorithmic score only.",
+          "thesis": "Pullback in real estate developer with heavy volume but weak close; risk of further downside if sector headwinds persist.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 21,
@@ -3156,7 +3156,7 @@
             "s4_risk": 16
           },
           "pattern": "PULLBACK",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "PVH",
@@ -3167,8 +3167,8 @@
           "low": 96.285,
           "close": 98,
           "change": 0.8126735932517295,
-          "volume": 3055700,
-          "relative_volume_10d_calc": 3.271010329742933,
+          "volume": 3064668,
+          "relative_volume_10d_calc": 3.2806102317742627,
           "market_cap_basic": 4515256571.854748,
           "sector": "Consumer Non-Durables",
           "industry": "Apparel/Footwear",
@@ -3176,9 +3176,9 @@
           "Perf.1M": 5.934493568262885,
           "premarket_change": 0.29832321777595544,
           "ATRP": 4.048136320805429,
-          "score": 64,
+          "score": 66,
           "verdict": "WAIT",
-          "thesis": "PULLBACK setup; algorithmic score only.",
+          "thesis": "Pullback in apparel stock with strong RVOL but weak trend leadership and entry timing needs confirmation.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 21,
@@ -3186,7 +3186,7 @@
             "s4_risk": 16
           },
           "pattern": "PULLBACK",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "FLG/PU",
@@ -3206,9 +3206,9 @@
           "Perf.1M": 1.4936336924583726,
           "premarket_change": null,
           "ATRP": 1.329638624717002,
-          "score": 49,
-          "verdict": "PASS",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "score": 52,
+          "verdict": "WAIT",
+          "thesis": "Low RVOL breakout attempt in Major Banks with unclear pattern; risk of false move without volume confirmation.",
           "stages": {
             "s1_trend": 8,
             "s2_pattern": 13,
@@ -3216,7 +3216,7 @@
             "s4_risk": 16
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "PHVS",
@@ -3236,9 +3236,9 @@
           "Perf.1M": 3.823630726834307,
           "premarket_change": -0.03450655624569207,
           "ATRP": 4.619727884679784,
-          "score": 57,
+          "score": 60,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Biotech momentum breakout with unclear pattern quality; risk of fading premarket gap and low volume confirmation.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 11,
@@ -3246,7 +3246,7 @@
             "s4_risk": 13
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "TGTX",
@@ -3257,8 +3257,8 @@
           "low": 37.96,
           "close": 40.11,
           "change": 9.470524017467245,
-          "volume": 3662609,
-          "relative_volume_10d_calc": 2.6998434690242266,
+          "volume": 3663659,
+          "relative_volume_10d_calc": 2.7006174625470063,
           "market_cap_basic": 6140181986.35071,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -3266,9 +3266,9 @@
           "Perf.1M": 18.73889875666074,
           "premarket_change": 5.840611353711791,
           "ATRP": 4.207319031293574,
-          "score": 78,
-          "verdict": "WAIT",
-          "thesis": "BREAKOUT setup; algorithmic score only.",
+          "score": 80,
+          "verdict": "GO",
+          "thesis": "Breakout with strong volume and trend, but fade from premarket high adds intraday risk.",
           "stages": {
             "s1_trend": 22,
             "s2_pattern": 21,
@@ -3276,7 +3276,7 @@
             "s4_risk": 13
           },
           "pattern": "BREAKOUT",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "BCE",
@@ -3298,7 +3298,7 @@
           "ATRP": 1.7980919881975521,
           "score": 53,
           "verdict": "WAIT",
-          "thesis": "UNCLEAR setup; algorithmic score only.",
+          "thesis": "Unclear pattern with low RVOL; wait for clearer base breakout or pullback to support.",
           "stages": {
             "s1_trend": 15,
             "s2_pattern": 11,
@@ -3306,7 +3306,7 @@
             "s4_risk": 15
           },
           "pattern": "UNCLEAR",
-          "score_source": "algorithmic"
+          "score_source": "deepseek"
         },
         {
           "ticker": "PCG",
@@ -3317,8 +3317,8 @@
           "low": 16.61,
           "close": 16.85,
           "change": 1.6898008449004291,
-          "volume": 35089514,
-          "relative_volume_10d_calc": 2.2200814354105276,
+          "volume": 35094153,
+          "relative_volume_10d_calc": 2.2203749406947235,
           "market_cap_basic": 37107488098.63307,
           "sector": "Utilities",
           "industry": "Electric Utilities",
@@ -3339,6 +3339,36 @@
           "score_source": "algorithmic"
         },
         {
+          "ticker": "AVGO",
+          "exchange": "NASDAQ",
+          "name": "AVGO",
+          "open": 494.775,
+          "high": 495,
+          "low": 472.64,
+          "close": 479.23,
+          "change": -0.4859106671927186,
+          "volume": 50121177,
+          "relative_volume_10d_calc": 2.1182198850787044,
+          "market_cap_basic": 2268994965173.6206,
+          "sector": "Electronic Technology",
+          "industry": "Semiconductors",
+          "Perf.W": 12.741430823158545,
+          "Perf.1M": 14.589385842210358,
+          "premarket_change": 2.741034532882029,
+          "ATRP": 3.6741166693188396,
+          "score": 68,
+          "verdict": "WAIT",
+          "thesis": "PULLBACK setup; algorithmic score only.",
+          "stages": {
+            "s1_trend": 22,
+            "s2_pattern": 19,
+            "s3_timing": 12,
+            "s4_risk": 15
+          },
+          "pattern": "PULLBACK",
+          "score_source": "algorithmic"
+        },
+        {
           "ticker": "M",
           "exchange": "NYSE",
           "name": "M",
@@ -3347,8 +3377,8 @@
           "low": 21.24,
           "close": 21.8,
           "change": 0.5999077065066866,
-          "volume": 14188622,
-          "relative_volume_10d_calc": 2.1010229051211478,
+          "volume": 14196544,
+          "relative_volume_10d_calc": 2.102195979113419,
           "market_cap_basic": 5749521162.371942,
           "sector": "Retail Trade",
           "industry": "Department Stores",
@@ -3394,36 +3424,6 @@
             "s2_pattern": 19,
             "s3_timing": 18,
             "s4_risk": 10
-          },
-          "pattern": "PULLBACK",
-          "score_source": "algorithmic"
-        },
-        {
-          "ticker": "AVGO",
-          "exchange": "NASDAQ",
-          "name": "AVGO",
-          "open": 494.775,
-          "high": 495,
-          "low": 472.64,
-          "close": 479.23,
-          "change": -0.4859106671927186,
-          "volume": 48599473,
-          "relative_volume_10d_calc": 2.053909670017238,
-          "market_cap_basic": 2268994965173.6206,
-          "sector": "Electronic Technology",
-          "industry": "Semiconductors",
-          "Perf.W": 12.741430823158545,
-          "Perf.1M": 14.589385842210358,
-          "premarket_change": 2.741034532882029,
-          "ATRP": 3.6741166693188396,
-          "score": 68,
-          "verdict": "WAIT",
-          "thesis": "PULLBACK setup; algorithmic score only.",
-          "stages": {
-            "s1_trend": 22,
-            "s2_pattern": 19,
-            "s3_timing": 12,
-            "s4_risk": 15
           },
           "pattern": "PULLBACK",
           "score_source": "algorithmic"
@@ -3497,8 +3497,8 @@
           "low": 30.57,
           "close": 31.18,
           "change": 2.63331138907176,
-          "volume": 6690501,
-          "relative_volume_10d_calc": 2.008550259530893,
+          "volume": 6691751,
+          "relative_volume_10d_calc": 2.0089255210881984,
           "market_cap_basic": 6673105011.927585,
           "sector": "Process Industries",
           "industry": "Industrial Specialties",
@@ -3527,8 +3527,8 @@
           "low": 995.87,
           "close": 1056.58,
           "change": 6.2081582597856775,
-          "volume": 859663,
-          "relative_volume_10d_calc": 1.956404684831647,
+          "volume": 860199,
+          "relative_volume_10d_calc": 1.9576245034245954,
           "market_cap_basic": 66191099528.82976,
           "sector": "Finance",
           "industry": "Finance/Rental/Leasing",
@@ -3587,8 +3587,8 @@
           "low": 21.83,
           "close": 22.42,
           "change": -1.6235190873189884,
-          "volume": 1646686,
-          "relative_volume_10d_calc": 1.9261289858851103,
+          "volume": 1646848,
+          "relative_volume_10d_calc": 1.9263184773216766,
           "market_cap_basic": 1758028299.1268103,
           "sector": "Producer Manufacturing",
           "industry": "Auto Parts: OEM",
@@ -3617,8 +3617,8 @@
           "low": 26.94,
           "close": 26.95,
           "change": 0.03711952487007428,
-          "volume": 6431873,
-          "relative_volume_10d_calc": 1.9081095396354542,
+          "volume": 6431885,
+          "relative_volume_10d_calc": 1.9081130996116036,
           "market_cap_basic": 1434841924.8775055,
           "sector": "Health Technology",
           "industry": "Pharmaceuticals: Major",
@@ -3647,8 +3647,8 @@
           "low": 108.23,
           "close": 111.59,
           "change": -1.1340480198458414,
-          "volume": 1257648,
-          "relative_volume_10d_calc": 1.9030175961882996,
+          "volume": 1257687,
+          "relative_volume_10d_calc": 1.9030766092716513,
           "market_cap_basic": 6700229951.7397,
           "sector": "Electronic Technology",
           "industry": "Aerospace & Defense",
@@ -3677,8 +3677,8 @@
           "low": 36.315,
           "close": 37.37,
           "change": 3.489338133481025,
-          "volume": 1443115,
-          "relative_volume_10d_calc": 1.8437571626749034,
+          "volume": 1443972,
+          "relative_volume_10d_calc": 1.8448520857326032,
           "market_cap_basic": 3256688980.4940457,
           "sector": "Energy Minerals",
           "industry": "Oil Refining/Marketing",
@@ -3707,8 +3707,8 @@
           "low": 160.1,
           "close": 170.93,
           "change": 5.155336819440169,
-          "volume": 3140129,
-          "relative_volume_10d_calc": 1.746855150157172,
+          "volume": 3140511,
+          "relative_volume_10d_calc": 1.7470676569259576,
           "market_cap_basic": 25861710007.388123,
           "sector": "Health Technology",
           "industry": "Medical Specialties",
@@ -3737,8 +3737,8 @@
           "low": 13.15,
           "close": 13.52,
           "change": 1.2734082397003739,
-          "volume": 8374979,
-          "relative_volume_10d_calc": 1.736817254388435,
+          "volume": 8375134,
+          "relative_volume_10d_calc": 1.7368493985495643,
           "market_cap_basic": 2722412042.367041,
           "sector": "Finance",
           "industry": "Real Estate Investment Trusts",
