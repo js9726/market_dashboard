@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
+import { getUsdMyrRate } from "@/lib/equity-currency";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -55,6 +56,8 @@ export async function GET() {
     select: { fixedFxRate: true },
   });
   const fixedRate = connection?.fixedFxRate != null ? Number(connection.fixedFxRate) : null;
+  const liveRate = await getUsdMyrRate();
+  const conversionRate = fixedRate ?? liveRate;
 
   const trades = await prisma.tradeRecord.findMany({
     where: {
@@ -72,21 +75,24 @@ export async function GET() {
     },
   });
 
-  const usd = (t: (typeof trades)[number]) =>
-    t.pnlUsd != null ? toNum(t.pnlUsd) : fixedRate != null && t.pnl != null ? toNum(t.pnl) / fixedRate : toNum(t.pnl);
-  const wins = trades.filter((t) => usd(t) > 0);
-  const losses = trades.filter((t) => usd(t) <= 0);
-  const avgWin = avg(wins.map(usd));
-  const avgLoss = avg(losses.map((t) => Math.abs(usd(t))));
-  const winRate = trades.length ? pct((wins.length / trades.length) * 100) : 0;
+  const usd = (t: (typeof trades)[number]): number | null =>
+    t.pnlUsd != null ? toNum(t.pnlUsd) : conversionRate != null && t.pnl != null ? toNum(t.pnl) / conversionRate : null;
+  const valuedTrades = trades
+    .map((t) => ({ trade: t, usd: usd(t) }))
+    .filter((row): row is { trade: (typeof trades)[number]; usd: number } => row.usd != null);
+  const wins = valuedTrades.filter((row) => row.usd > 0);
+  const losses = valuedTrades.filter((row) => row.usd <= 0);
+  const avgWin = avg(wins.map((row) => row.usd));
+  const avgLoss = avg(losses.map((row) => Math.abs(row.usd)));
+  const winRate = valuedTrades.length ? pct((wins.length / valuedTrades.length) * 100) : 0;
   const avgRR = avgLoss > 0 ? avgWin / avgLoss : 0;
   const breakevenWinRate = avgWin + avgLoss > 0 ? (avgLoss / (avgWin + avgLoss)) * 100 : 50;
   const targetWinRate = Math.min(65, Math.max(40, Math.ceil(breakevenWinRate + 8)));
   const targetRR = avgRR >= 1.8 ? 1.8 : 2.0;
 
-  const recentTrades = trades.filter((t) => t.tradeDate && t.tradeDate >= from30);
+  const recentTrades = valuedTrades.filter((row) => row.trade.tradeDate && row.trade.tradeDate >= from30);
   const recentWinRate = recentTrades.length
-    ? pct((recentTrades.filter((t) => usd(t) > 0).length / recentTrades.length) * 100)
+    ? pct((recentTrades.filter((row) => row.usd > 0).length / recentTrades.length) * 100)
     : null;
   const grades = trades.map((t) => gradeFromScore(t.verdictScore)).filter((g): g is "A" | "B" | "C" => !!g);
   const gradeCounts = {
@@ -164,7 +170,7 @@ export async function GET() {
     generatedAt: now.toISOString(),
     periodDays: 90,
     current: {
-      trades: trades.length,
+      trades: valuedTrades.length,
       winRate,
       recentWinRate,
       avgRR: Math.round(avgRR * 100) / 100,
@@ -178,7 +184,7 @@ export async function GET() {
     },
     improvement: {
       summary:
-        trades.length === 0
+        valuedTrades.length === 0
           ? "No closed trades in the last 90 days; coaching will sharpen once the journal has recent realized outcomes."
           : `Recent edge is ${winRate}% win rate with ${avgRR.toFixed(2)} average R:R. The next improvement is selection quality, not more activity.`,
       mistakes,

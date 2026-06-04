@@ -38,7 +38,7 @@ function fmt(n: number, prefix = "$") {
   return `${n >= 0 ? "+" : ""}${prefix}${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-export default function StatsCards({ stats }: { stats: Stats }) {
+export default function StatsCards({ stats, currencySymbol = "$" }: { stats: Stats; currencySymbol?: string }) {
   const streakLabel =
     stats.currentStreak > 0
       ? `${stats.currentStreak}W streak`
@@ -49,23 +49,23 @@ export default function StatsCards({ stats }: { stats: Stats }) {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        <Card label="Total P&L" value={fmt(stats.totalPnl)} positive={stats.totalPnl >= 0} />
+        <Card label="Total P&L" value={fmt(stats.totalPnl, currencySymbol)} positive={stats.totalPnl >= 0} />
         <Card label="Total Trades" value={`${stats.totalTrades} (${stats.openTrades} open)`} />
         <Card label="Win Rate" value={`${stats.winRate}%`} positive={stats.winRate >= 50} />
         <Card label="Profit Factor" value={stats.profitFactor.toFixed(2)} positive={stats.profitFactor >= 1} />
         <Card label="Avg R:R" value={stats.avgRR.toFixed(2)} positive={stats.avgRR >= 1} />
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <Card label="Max Drawdown" value={`-$${stats.maxDrawdown.toLocaleString("en-US", { minimumFractionDigits: 2 })}`} positive={false} />
+        <Card label="Max Drawdown" value={`-${currencySymbol}${stats.maxDrawdown.toLocaleString("en-US", { minimumFractionDigits: 2 })}`} positive={false} />
         <Card label="Sharpe Ratio" value={stats.sharpe.toFixed(2)} positive={stats.sharpe >= 1} />
-        <Card label="Expectancy" value={fmt(stats.expectancy)} positive={stats.expectancy >= 0} />
-        <Card label="Best Trade" value={fmt(stats.bestTrade)} positive={true} />
-        <Card label="Worst Trade" value={fmt(stats.worstTrade)} positive={false} />
+        <Card label="Expectancy" value={fmt(stats.expectancy, currencySymbol)} positive={stats.expectancy >= 0} />
+        <Card label="Best Trade" value={fmt(stats.bestTrade, currencySymbol)} positive={true} />
+        <Card label="Worst Trade" value={fmt(stats.worstTrade, currencySymbol)} positive={false} />
         <Card label="Streak" value={streakLabel} positive={stats.currentStreak > 0 ? true : stats.currentStreak < 0 ? false : null} />
       </div>
       <div className="grid max-w-xs grid-cols-2 gap-3">
-        <Card label="Avg Win" value={fmt(stats.avgWin)} positive={true} />
-        <Card label="Avg Loss" value={fmt(stats.avgLoss)} positive={false} />
+        <Card label="Avg Win" value={fmt(stats.avgWin, currencySymbol)} positive={true} />
+        <Card label="Avg Loss" value={fmt(stats.avgLoss, currencySymbol)} positive={false} />
       </div>
     </div>
   );

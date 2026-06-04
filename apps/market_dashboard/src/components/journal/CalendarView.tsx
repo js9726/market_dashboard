@@ -8,7 +8,7 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
 
-export default function CalendarView({ calendarData }: { calendarData: DayData[] }) {
+export default function CalendarView({ calendarData, currencySymbol = "$" }: { calendarData: DayData[]; currencySymbol?: string }) {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
@@ -59,7 +59,7 @@ export default function CalendarView({ calendarData }: { calendarData: DayData[]
         <div>
           <p className="text-[11px] text-[var(--fg-3)]">Month P&L</p>
           <p className={`font-mono font-semibold tabular-nums ${monthPnl >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]"}`}>
-            {monthPnl >= 0 ? "+" : ""}${monthPnl.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            {monthPnl >= 0 ? "+" : ""}{currencySymbol}{monthPnl.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
         </div>
         <div>
@@ -103,7 +103,7 @@ export default function CalendarView({ calendarData }: { calendarData: DayData[]
               {data && (
                 <>
                   <p className={`font-mono font-semibold tabular-nums ${data.pnl >= 0 ? "text-[var(--gain-cell-fg)]" : "text-[var(--loss-cell-fg)]"}`}>
-                    {data.pnl >= 0 ? "+" : ""}${Math.abs(data.pnl).toFixed(0)}
+                    {data.pnl >= 0 ? "+" : ""}{currencySymbol}{Math.abs(data.pnl).toFixed(0)}
                   </p>
                   <p className="text-[var(--fg-3)]">{data.trades}t</p>
                 </>

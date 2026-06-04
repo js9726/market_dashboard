@@ -166,8 +166,10 @@ class MoomooSync:
         equity snapshot dict. Returns None on error (sync still succeeds for
         positions+fills; equity is best-effort).
 
-        Reported in the account's local currency (USD for FUTUMY/US, HKD for
-        HK accounts). The dashboard normalises display via currencyCode.
+        Reported in the account's local cash-reporting currency. For FUTUMY
+        Malaysia, accinfo cash/market_val are MYR even when US securities and
+        fills are USD. Keep positions/fills in trade currency, but send account
+        equity as MYR so the dashboard can convert exactly once.
         """
         try:
             ret, data = ctx.accinfo_query(
@@ -185,8 +187,9 @@ class MoomooSync:
             return None
 
         row = data.iloc[0]
+        firm_name = self.cfg.opend.security_firm.upper()
         currency = (
-            "USD" if self.cfg.opend.market.upper() == "US"
+            "MYR" if firm_name == "FUTUMY"
             else ("HKD" if self.cfg.opend.market.upper() == "HK" else "USD")
         )
 
@@ -199,9 +202,12 @@ class MoomooSync:
 
         # moomoo accinfo_query returns: total_assets, cash, market_val,
         # frozen_cash, avl_withdrawal_cash, power, available_funds, etc.
-        # Field names vary by market; us_cash/hk_cash also available.
+        # Field names vary by market; us_cash/hk_cash also available. On FUTUMY
+        # US accounts, cash + market_val are the reliable MYR account values;
+        # total_assets has been observed as a different aggregate/base-currency
+        # number and must not drive the dashboard when it fails reconciliation.
         total_assets = _f("total_assets")
-        cash = _f("us_cash") if currency == "USD" else _f("cash")
+        cash = _f("cash") if currency == "MYR" else (_f("us_cash") if currency == "USD" else _f("cash"))
         if cash is None:
             cash = _f("cash") or 0.0
         market_val = _f("market_val")
@@ -221,12 +227,12 @@ class MoomooSync:
         if expected > 0 and abs(total_assets - expected) / expected > 0.5:
             log.warning(
                 "equity reconciliation FAILED: total_assets=%.2f vs cash+market_val=%.2f "
-                "(%.1fx). acc_id=%s may be the wrong account or a margin/aggregate view. "
-                "See docs/EQUITY-ACCID-FIX.md.",
+                "(%.1fx). Using cash+market_val for the dashboard snapshot. acc_id=%s",
                 total_assets, expected,
                 (total_assets / expected) if expected else 0.0,
                 self.cfg.opend.acc_id,
             )
+            total_assets = expected
 
         return {
             "snapshotDate": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),
