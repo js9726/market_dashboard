@@ -3,11 +3,10 @@
 /**
  * JournalShell — the Trades Hub "Journal" tab.
  *
- * Review-first IA: the auto-generated weekly digest is the hero (zero effort,
- * fed by broker fills + the HELD tracker), then the connected-sheet analytics
- * (Overview / Trades / Calendar / Daily). Auto-journal is primary — a Google
- * Sheet is an OPTIONAL import, not the empty-state centerpiece. Themed entirely
- * on the mode-aware design tokens so it follows the light/dark toggle.
+ * Connected-sheet analytics for Overview / Trades / Calendar / Daily.
+ * Auto-journal is primary - a Google Sheet is an optional import, not the
+ * empty-state centerpiece. Themed on mode-aware design tokens so it follows the
+ * light/dark toggle.
  */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,7 +16,6 @@ import TradeLog from "./TradeLog";
 import CalendarView from "./CalendarView";
 import AddTradeModal from "./AddTradeModal";
 import DailyJournal from "./DailyJournal";
-import JournalDigestCard from "./JournalDigestCard";
 
 type Tab = "overview" | "trades" | "calendar" | "daily";
 
@@ -81,9 +79,6 @@ export default function JournalShell() {
 
   return (
     <div className="space-y-5">
-      {/* Hero: auto, zero-effort weekly review (works from broker fills, no sheet needed) */}
-      <JournalDigestCard />
-
       {connection === undefined ? (
         <p className="py-10 text-center text-sm text-[var(--fg-3)]">Loading…</p>
       ) : !connection ? (
