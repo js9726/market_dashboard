@@ -158,18 +158,20 @@ def analyze(ticker: str, n: int = 100) -> dict | None:
     last_date = str(bars[-1].get("time_key", bars[-1].get("time", "")))
 
     a14 = atr(highs, lows, closes, 14)
+    e8 = ema(closes, 8)
     e21 = ema(closes, 21)
     e50 = ema(closes, 50)
     s200 = sma(closes, 200) if len(closes) >= 200 else [None] * len(closes)
     r14 = rsi(closes, 14)
     ml, ms, mh = macd_calc(closes)
 
-    atr_now, e21_now, e50_now = a14[-1], e21[-1], e50[-1]
+    atr_now, e8_now, e21_now, e50_now = a14[-1], e8[-1], e21[-1], e50[-1]
     ma200_now = s200[-1] if s200[-1] else None
     rsi_now = r14[-1]
     macd_now, sig_now, hist_now = ml[-1], ms[-1], mh[-1]
     hist_prev = mh[-2] if len(mh) > 1 else 0
 
+    dist_8_atr = (last_close - e8_now) / atr_now if (atr_now and e8_now) else None
     dist_21_atr = (last_close - e21_now) / atr_now if (atr_now and e21_now) else None
     dist_50_atr = (last_close - e50_now) / atr_now if (atr_now and e50_now) else None
     dist_200_atr = (last_close - ma200_now) / atr_now if (atr_now and ma200_now) else None
@@ -181,8 +183,10 @@ def analyze(ticker: str, n: int = 100) -> dict | None:
     return {
         "symbol": ticker, "close": round(last_close, 2), "date": last_date,
         "atr14": round(atr_now, 2), "atr_pct": round(atr_now / last_close * 100, 2),
+        "ema8": round(e8_now, 2) if e8_now else None,
         "ema21": round(e21_now, 2), "ema50": round(e50_now, 2),
         "ma200": round(ma200_now, 2) if ma200_now else None,
+        "dist_8_atr": round(dist_8_atr, 2) if dist_8_atr is not None else None,
         "dist_21_atr": round(dist_21_atr, 2), "dist_50_atr": round(dist_50_atr, 2),
         "dist_200_atr": round(dist_200_atr, 2) if dist_200_atr else None,
         "rsi14": round(rsi_now, 1),

@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { isOwner } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,11 @@ function normaliseOperator(raw: string | null): string {
   return OPERATOR_RE.test(trimmed) ? trimmed : "JS";
 }
 
+function operatorFromSheetTab(sheetTab: string | null | undefined): string | null {
+  const m = (sheetTab ?? "").match(/\[([A-Za-z0-9]{2,8})\]/);
+  return m?.[1]?.toUpperCase() ?? null;
+}
+
 export async function GET(req: Request, context: RouteContext) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -37,7 +43,23 @@ export async function GET(req: Request, context: RouteContext) {
   }
 
   const url = new URL(req.url);
-  const operatorLabel = normaliseOperator(url.searchParams.get("operator"));
+  const requestedOperator = url.searchParams.get("operator");
+  let operatorLabel = normaliseOperator(requestedOperator);
+  if (!isOwner(session)) {
+    const connection = await prisma.spreadsheetConnection.findUnique({
+      where: { userId: session.user.id },
+      select: { sheetTab: true },
+    });
+    const ownOperator = operatorFromSheetTab(connection?.sheetTab);
+    if (!ownOperator) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (!requestedOperator) {
+      operatorLabel = ownOperator;
+    } else if (operatorLabel !== ownOperator) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+  }
   const normalizedTicker = ticker.toUpperCase();
   try {
     const row = await prisma.wikiTradeVerdict.findUnique({

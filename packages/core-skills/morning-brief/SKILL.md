@@ -100,6 +100,36 @@ The brief's `technicals` field and `technicalsNarrative` MUST cite these numbers
 classify each index. If QQQ shows EXTREME-EXTENDED + RSI > 70 + MACD curving down,
 the brief's `posture` should reflect that — typically `WAIT` or `TRIM_TIGHTEN`, not `GO`.
 
+### Step 0.7 — Open Holdings Overnight Review — MANDATORY (operator-local)
+
+The watchlist/screener cover **new** opportunities; this step covers the **book you
+already hold** — the half the brief historically missed. Before researching new setups,
+sweep the live positions for any stop that broke overnight (incl. after-hours) and any
+extended winner to trim. Source of truth = **live broker positions**, not the sheet.
+
+```powershell
+cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
+# Pass journaled stops so R + stop-status are exact (read them from the T.Journal sheet
+# or the dashboard trades). OPEND_ACC_ID comes from env — never hardcode the account id.
+$env:OPEND_ACC_ID="<your live US acc id>"
+python holdings_review.py --stops '{"VRT":326.48,"HUT":93.91,"TENB":22.99}'
+```
+
+Output is urgency-sorted: `CUT` (regular-session stop broken) → `CUT-ON-OPEN`
+(after-hours below stop — decide on the open, don't chase the thin AH print) → `WARN`
+(within 0.3 ATR of stop, or below 8EMA) → `OK`. R is `(last−entry)/(entry−stop)`.
+
+- **Skip this step in CI / GitHub Actions / SaaS** — there is no broker there. It is for
+  manual operator runs only (OpenD on `127.0.0.1:11111`).
+- If any holding is `CUT` / `CUT-ON-OPEN` / `WARN`, or you want the full per-holding
+  **HOLD / TRIM / CUT** call with the overnight news catalyst and wiki citations, run the
+  **trade-analyser skill → Mode C (Open-Holdings Daily/Overnight Review)**, which adds the
+  day-by-day + news + verdict and refreshes each held trade on the dashboard.
+- Surface a one-line holdings line in the brief's narrative (e.g. "Book: VRT stop broken
+  AH on the Broadcom sell-the-news → cut/cut-on-open; HUT/TENB extended, trail") so viewers
+  see position risk alongside the market posture. Never place or modify orders — give the
+  levels; the operator executes.
+
 ### Step 1 — Read Jie's TV Watchlist via Chrome
 
 Navigate Chrome to the watchlist URL. The user must be logged in to TradingView in Chrome.
@@ -285,6 +315,8 @@ it through `ingest_to_dashboard.py` (which defaults to provider=claude).
 | `handler.py` | `build_prompt()` — renders the prompt |
 | `handler.ts` | TypeScript version — used by Next.js server routes |
 | `cli_run.py` | End-to-end CLI runner (generate + push) |
+| `compute_index_technicals.py` | Daily-bar EMA8/21/50 + ATR + extension + entry-risk (get_cur_kline; reused by holdings_review) |
+| `holdings_review.py` | **Step 0.7** — live broker holdings sweep: quotes + after-hours + stop-status + R per position (operator-local) |
 | `ingest_to_dashboard.py` | Standalone push — reads JSON file → POST to ingest API |
 | `_env_loader.py` | Auto-loads `.env.local` so no shell profile setup needed |
 | `schema.json` | JSON-schema for skill inputs |

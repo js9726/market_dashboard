@@ -1,19 +1,15 @@
 /**
  * GET /api/equity/timeline
  *
- * Currency-aware equity view. Two facts drive this:
- *   • Your sheet records realized P&L in MYR (verified: clean trades ≈ 4.7× the
- *     USD price move). So the `realized` curve is MYR, summed across ALL closed
- *     trades (the broker/market `currency` column is NOT the P&L currency).
- *   • Your live broker account (cash + US positions) is USD.
- * To put them on one curve, the UI toggles USD/MYR using a LIVE USD/MYR rate.
+ * Currency-aware equity view.
  *
- * Returns realized in MYR + the FX rate + USD net-value building blocks; the
- * client converts to the selected display currency. Broker net-value is still
- * gated by reconciliation (the wrong ~$103k total is never shown).
+ * Source-of-truth rule:
+ * - If the MooMoo bridge has account snapshots, EquitySnapshot.totalAssets is
+ *   the primary account-equity curve.
+ * - Cash + live-position value is a diagnostic cross-check and fallback only.
+ * - Realized P&L comes from broker TradeFill rows, net of fees, in USD.
  *
- * Phase 2 (needs bridge): replace the sheet realized with MooMoo deal-history
- * realized (native USD) where available — see EQUITY tasks.
+ * The client converts USD to MYR with a live USD/MYR rate when available.
  */
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
@@ -24,14 +20,10 @@ import { computeBrokerRealized } from "@/server/realized-pnl";
 
 export const dynamic = "force-dynamic";
 
-const RECONCILE_TOLERANCE = 0.5;
-
 function plainTicker(ticker: string): string {
   return ticker.replace(/^[A-Za-z]{2}\./, "").toUpperCase();
 }
 
-// Live USD/MYR with a warm-instance cache + fail-closed (null when unknown —
-// the UI then stays in MYR rather than guessing a rate).
 let _fx: { rate: number; at: number } | null = null;
 async function getUsdMyr(): Promise<number | null> {
   if (_fx && Date.now() - _fx.at < 3_600_000) return _fx.rate;
@@ -48,7 +40,7 @@ async function getUsdMyr(): Promise<number | null> {
       }
     }
   } catch {
-    /* fall through to last-known / null */
+    // Fail closed: return the last warm-instance value, or null if unavailable.
   }
   return _fx?.rate ?? null;
 }
@@ -70,6 +62,8 @@ export async function GET(req: Request) {
     ? new Date(`${qp.get("to")}T00:00:00.000Z`)
     : new Date(today.toISOString().slice(0, 10) + "T00:00:00.000Z");
   const accountId = qp.get("accountId");
+  const fromKey = from.toISOString().slice(0, 10);
+  const toKey = to.toISOString().slice(0, 10);
 
   const accounts = await prisma.userBrokerAccount.findMany({
     where: { userId: userScopeId, isActive: true },
@@ -77,10 +71,6 @@ export async function GET(req: Request) {
     orderBy: { createdAt: "asc" },
   });
 
-  // ── Realized P&L: broker-true, net of fees, from MooMoo TradeFills (USD) ────
-  // Symmetric matching + per-fill fees (backfill_deals.py pulls deal history +
-  // order_fee_query). Computed over ALL fills up to `to` so the cumulative is
-  // correct, then windowed to [from, to] for display.
   const fills = await prisma.tradeFill.findMany({
     where: {
       brokerAccount: { userId: userScopeId },
@@ -92,10 +82,16 @@ export async function GET(req: Request) {
     select: { ticker: true, side: true, qty: true, price: true, fees: true, executedAt: true },
   });
   const brokerRealized = computeBrokerRealized(fills);
-  const fromKey = from.toISOString().slice(0, 10);
-  const realized = brokerRealized.points.filter((p) => p.date >= fromKey);
+  const beforeWindow = [...brokerRealized.points].reverse().find((p) => p.date < fromKey);
+  const inWindow = brokerRealized.points.filter((p) => p.date >= fromKey);
+  const realized = [
+    ...(beforeWindow ? [{ date: fromKey, value: beforeWindow.value }] : []),
+    ...inWindow,
+  ];
+  if (realized.length === 1 && realized[0].date !== toKey) {
+    realized.push({ date: toKey, value: realized[0].value });
+  }
 
-  // ── Broker account value (USD) + reconciliation guard ──────────────────────
   const snapshots = await prisma.equitySnapshot.findMany({
     where: {
       userId: userScopeId,
@@ -104,17 +100,23 @@ export async function GET(req: Request) {
     },
     orderBy: { snapshotDate: "asc" },
   });
-  const byDate = new Map<string, { totalAssets: number; cash: number }>();
+  const byDate = new Map<string, { totalAssets: number; cash: number; marketVal: number }>();
   for (const s of snapshots) {
     const k = s.snapshotDate.toISOString().slice(0, 10);
-    const cur = byDate.get(k) ?? { totalAssets: 0, cash: 0 };
+    const cur = byDate.get(k) ?? { totalAssets: 0, cash: 0, marketVal: 0 };
     cur.totalAssets += Number(s.totalAssets);
     cur.cash += Number(s.cash);
+    cur.marketVal += Number(s.marketVal);
     byDate.set(k, cur);
   }
   const accountValue = Array.from(byDate.entries())
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, v]) => ({ date, totalAssets: Number(v.totalAssets.toFixed(2)), cash: Number(v.cash.toFixed(2)) }));
+    .map(([date, v]) => ({
+      date,
+      totalAssets: Number(v.totalAssets.toFixed(2)),
+      cash: Number(v.cash.toFixed(2)),
+      marketVal: Number(v.marketVal.toFixed(2)),
+    }));
 
   const positions = await prisma.position.findMany({
     where: { brokerAccount: { userId: userScopeId } },
@@ -164,21 +166,25 @@ export async function GET(req: Request) {
   const latest = accountValue.length ? accountValue[accountValue.length - 1] : null;
   const expectedNet = latest ? latest.cash + positionsValue : null;
   const brokerLatest = latest?.totalAssets ?? null;
-  const accountValueReliable =
-    brokerLatest != null && expectedNet != null && expectedNet > 0
-      ? Math.abs(brokerLatest - expectedNet) / expectedNet <= RECONCILE_TOLERANCE
-      : false;
+  const discrepancy =
+    brokerLatest != null && expectedNet != null
+      ? brokerLatest - expectedNet
+      : null;
+  const discrepancyPct =
+    discrepancy != null && expectedNet != null && expectedNet !== 0
+      ? (discrepancy / expectedNet) * 100
+      : null;
 
   const fxUsdMyr = await getUsdMyr();
 
   return NextResponse.json({
-    // realized is MYR (sheet); net building blocks are USD (broker). The client
-    // converts to the chosen display currency with fxUsdMyr.
     realized,
     realizedCurrency: "USD",
     realizedGrossUsd: brokerRealized.grossUsd,
     realizedFeesUsd: brokerRealized.feesUsd,
     realizedNetUsd: brokerRealized.netUsd,
+    accountValue,
+    accountValueSource: accountValue.length > 0 ? "moomoo-total-assets" : "fallback-cash-plus-positions",
     fxUsdMyr,
     positionsValue: Number(positionsValue.toFixed(2)),
     positionsPricing: {
@@ -191,9 +197,16 @@ export async function GET(req: Request) {
       excludedPositionCurrencies,
     },
     latestCash: latest?.cash ?? null,
-    accountValueReliable,
     reconciliation: expectedNet != null
-      ? { expectedNet: Number(expectedNet.toFixed(2)), brokerLatest, positionsValue: Number(positionsValue.toFixed(2)), latestCash: latest?.cash ?? null }
+      ? {
+          expectedNet: Number(expectedNet.toFixed(2)),
+          brokerLatest,
+          discrepancy: discrepancy == null ? null : Number(discrepancy.toFixed(2)),
+          discrepancyPct: discrepancyPct == null ? null : Number(discrepancyPct.toFixed(2)),
+          positionsValue: Number(positionsValue.toFixed(2)),
+          latestCash: latest?.cash ?? null,
+          latestMarketVal: latest?.marketVal ?? null,
+        }
       : null,
     accounts: accounts.map((a) => ({ id: a.id, alias: a.alias, currency: a.displayCurrency ?? a.preset.currency })),
   });

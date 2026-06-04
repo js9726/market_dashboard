@@ -41,6 +41,18 @@ type Trade = {
   broker?: string | null;
   hasPlan?: boolean;
   synthetic?: boolean;
+  wikiVerdict?: {
+    source: "WikiTradeVerdict";
+    operatorLabel: string;
+    intent: string;
+    qualityGrade: "A" | "B" | "C" | null;
+    auditGrade: "A" | "B" | "C" | null;
+    setup: string | null;
+    model: string | null;
+    ingestedAt: string;
+    day0Url: string | null;
+    day14Url: string | null;
+  };
 };
 
 type VerdictHistoryItem = {
@@ -82,6 +94,13 @@ function scoreBadgeBg(score: number): string {
   if (score >= 7) return "border-[var(--gain-fg)] bg-[var(--gain-bg)] text-[var(--gain-fg)]";
   if (score >= 5) return "border-[var(--warn-500)] text-[var(--warn-500)]";
   return "border-[var(--loss-fg)] bg-[var(--loss-bg)] text-[var(--loss-fg)]";
+}
+
+function gradeFromScore(score: number | null | undefined): "A" | "B" | "C" | null {
+  if (score == null) return null;
+  if (score >= 7) return "A";
+  if (score >= 5) return "B";
+  return "C";
 }
 
 function ProviderBar({
@@ -633,6 +652,14 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
               {isOpen ? "Open" : pnlNum! >= 0 ? "Win" : "Loss"}
             </span>
             {isFromCache && !selectedHistoryId && <span className="text-[10px] text-[var(--fg-3)] italic">cached</span>}
+            {trade.wikiVerdict && (
+              <span
+                className="rounded border border-[var(--accent)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--accent)]"
+                title={`Imported from ${trade.wikiVerdict.source} (${trade.wikiVerdict.operatorLabel})`}
+              >
+                wiki
+              </span>
+            )}
             {history.length > 0 && (
               <select
                 value={selectedHistoryId}
@@ -688,6 +715,38 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
                   <div className="font-medium text-[var(--fg-2)]">{value}</div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {trade.wikiVerdict && (
+            <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-2 text-xs text-[var(--fg-2)]">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-mono text-[var(--fg-3)]">{trade.wikiVerdict.operatorLabel}</span>
+                {trade.wikiVerdict.qualityGrade && (
+                  <span className={`rounded border px-1.5 py-0.5 font-semibold ${scoreBadgeBg(trade.verdictScore ?? 0)}`}>
+                    {trade.wikiVerdict.qualityGrade}-grade
+                  </span>
+                )}
+                {trade.wikiVerdict.auditGrade && (
+                  <span className="rounded border border-[var(--line)] px-1.5 py-0.5 text-[var(--fg-3)]">
+                    day-14 {trade.wikiVerdict.auditGrade}
+                  </span>
+                )}
+                {trade.wikiVerdict.setup && <span>{trade.wikiVerdict.setup}</span>}
+                {trade.wikiVerdict.model && <span className="text-[var(--fg-3)]">{trade.wikiVerdict.model}</span>}
+                <span className="ml-auto inline-flex gap-2">
+                  {trade.wikiVerdict.day0Url && (
+                    <a className="text-[var(--accent)] hover:underline" href={trade.wikiVerdict.day0Url} target="_blank" rel="noreferrer">
+                      day0
+                    </a>
+                  )}
+                  {trade.wikiVerdict.day14Url && (
+                    <a className="text-[var(--accent)] hover:underline" href={trade.wikiVerdict.day14Url} target="_blank" rel="noreferrer">
+                      day14
+                    </a>
+                  )}
+                </span>
+              </div>
             </div>
           )}
 
@@ -953,7 +1012,7 @@ export default function TradeLog() {
         <table className="w-full text-sm">
           <thead className="bg-[var(--bg-raised)] text-xs uppercase text-[var(--fg-3)]">
             <tr>
-              {["#", "Date", "Symbol", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "State", "Verdict", "Score"].map((h) => (
+              {["#", "Date", "Symbol", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "State", "Verdict", "Grade"].map((h) => (
                 <th key={h} className="whitespace-nowrap px-3 py-2 text-left">{h}</th>
               ))}
             </tr>
@@ -968,6 +1027,7 @@ export default function TradeLog() {
               const isOpen = t.pnl === null;
               const isLive = t.source === "LIVE";
               const liveU = t.liveUnrealizedPl;
+              const grade = t.wikiVerdict?.qualityGrade ?? gradeFromScore(t.verdictScore);
               const verdict = t.verdict as TradeReviewResult | null;
               const verdictSummary = verdict
                 ? `${verdict.overall_verdict}${verdict.best_match ? " · " + verdict.best_match : ""}`
@@ -1030,13 +1090,23 @@ export default function TradeLog() {
                   {/* Verdict column: shows summary if cached, else notes */}
                   <td className="max-w-xs px-3 py-2">
                     {verdictSummary && !t.synthetic ? (
-                      <button
-                        onClick={() => setReviewTrade(t)}
-                        className="block max-w-[200px] truncate text-left text-xs text-[var(--fg-2)] hover:text-[var(--fg-1)]"
-                        title={verdictSummary}
-                      >
-                        {verdictSummary}
-                      </button>
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <button
+                          onClick={() => setReviewTrade(t)}
+                          className="block max-w-[200px] truncate text-left text-xs text-[var(--fg-2)] hover:text-[var(--fg-1)]"
+                          title={verdictSummary}
+                        >
+                          {verdictSummary}
+                        </button>
+                        {t.wikiVerdict && (
+                          <span
+                            className="shrink-0 rounded border border-[var(--accent)] px-1 py-px text-[9px] font-semibold leading-none text-[var(--accent)]"
+                            title={`Imported from ${t.wikiVerdict.source}`}
+                          >
+                            wiki
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <span className="block max-w-[160px] truncate text-xs text-[var(--fg-3)]">{t.notes || "—"}</span>
                     )}
@@ -1049,9 +1119,12 @@ export default function TradeLog() {
                       <button
                         onClick={() => setReviewTrade(t)}
                         className={`rounded border px-2 py-0.5 text-xs font-semibold transition-opacity hover:opacity-80 ${scoreBadgeBg(t.verdictScore)}`}
-                        title="Click to view full review"
+                        title={t.wikiVerdict?.auditGrade ? `Click to view full review. Day-14 audit grade: ${t.wikiVerdict.auditGrade}` : "Click to view full review"}
                       >
-                        {t.verdictScore.toFixed(1)}
+                        {grade ? `${grade} ` : ""}{t.verdictScore.toFixed(1)}
+                        {t.wikiVerdict?.auditGrade ? (
+                          <span className="ml-1 text-[9px] opacity-75">14d {t.wikiVerdict.auditGrade}</span>
+                        ) : null}
                       </button>
                     ) : (
                       <button

@@ -4,6 +4,17 @@ Behavioral guidelines for AI-assisted development on this repo.
 
 **Bias:** caution over speed. For trivial tasks, use judgment.
 
+**AI output ingest contract:** an AI analysis is not complete when it only exists
+in chat. Morning briefs must land in `MorningBriefCache` via
+`/api/morning-verdict/ingest`; journaled/held-position reviews must land through
+`/api/trades/import` and/or `/api/journal/entries/ingest`; ad-hoc ticker
+analyses must land as `WikiTradeVerdict(intent="analysis")` via the
+trade-analyser `submit_verdict.py` / `sync:wiki -- --post` path. Provider API
+keys are `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, and
+`ANTHROPIC_API_KEY`; Claude subscription runs use the Claude SDK/CLI path and
+still post the same schema. If a provider returns chat text that cannot be
+persisted in one of those schemas, say it is not dashboard-ingested yet.
+
 **Freshness is a hard gate:** for market data, never fix only the UI. Verify the
 producer and the dashboard consumer. A daily routine is not done until
 `build_data.py` has refreshed VIX/indices/RVOL/theme/rotation data, screeners

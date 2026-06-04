@@ -26,6 +26,7 @@ const PUBLIC_DEST = path.join(APP_ROOT, "public", "wiki");
 const args = new Set(process.argv.slice(2));
 const post = args.has("--post");
 const dryRun = args.has("--dry-run");
+const DASHBOARD_ROOT = path.resolve(APP_ROOT, "..", "..");
 
 function argValue(name) {
   const prefix = `${name}=`;
@@ -34,8 +35,11 @@ function argValue(name) {
 }
 
 function loadEnv() {
-  for (const name of [".env.local", ".env"]) {
-    const p = path.join(APP_ROOT, name);
+  for (const p of [
+    path.join(APP_ROOT, ".env.local"),
+    path.join(APP_ROOT, ".env"),
+    path.join(DASHBOARD_ROOT, ".env"),
+  ]) {
     if (!fs.existsSync(p)) continue;
     const raw = fs.readFileSync(p, "utf8");
     for (const line of raw.split(/\r?\n/)) {

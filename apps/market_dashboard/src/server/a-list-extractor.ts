@@ -385,6 +385,7 @@ export function extractScreenerCandidates(file: ScoredScreenerFile | null | unde
       if ((verdict ?? "").toUpperCase() !== "GO") continue;
       if (rvol == null || rvol < MIN_RVOL) continue;
       const pattern = asStr(hit.pattern);
+      const close = asNum(hit.close);
       const cand: ExtractedCandidate = {
         ticker,
         day0Score: score,
@@ -393,7 +394,8 @@ export function extractScreenerCandidates(file: ScoredScreenerFile | null | unde
         setupClassification: pattern ? SCREENER_PATTERN_TO_SETUP[pattern.toUpperCase()] ?? pattern : null,
         screenSource: asStr(sc.id),
         sector: asStr(hit.sector),
-        day0Price: asNum(hit.close),
+        entryZone: close,
+        day0Price: close,
       };
       const existing = best.get(ticker);
       if (!existing || (cand.day0Score ?? 0) > (existing.day0Score ?? 0)) best.set(ticker, cand);

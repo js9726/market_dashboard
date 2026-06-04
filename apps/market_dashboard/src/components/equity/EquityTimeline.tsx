@@ -1,18 +1,18 @@
 "use client";
 
-/**
- * EquityTimeline (/dashboard/equity).
- *
- * Realized P&L comes from your sheet in MYR; the live account (cash + US
- * positions) is USD. A USD/MYR toggle converts both onto one curve using a
- * live USD/MYR rate. If the rate is unavailable we fail closed: show realized
- * in MYR and the account value in USD without guessing a conversion.
- */
-
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 
 interface RealizedPoint { date: string; value: number }
-interface Reconciliation { expectedNet: number; brokerLatest: number | null; positionsValue: number; latestCash: number | null }
+interface AccountValuePoint { date: string; totalAssets: number; cash: number; marketVal: number }
+interface Reconciliation {
+  expectedNet: number;
+  brokerLatest: number | null;
+  discrepancy: number | null;
+  discrepancyPct: number | null;
+  positionsValue: number;
+  latestCash: number | null;
+  latestMarketVal: number | null;
+}
 interface Account { id: string; alias: string; currency: string }
 interface PositionsPricing {
   source: "live-quote" | "position-cache" | "mixed";
@@ -29,17 +29,24 @@ interface Resp {
   realizedGrossUsd: number;
   realizedFeesUsd: number;
   realizedNetUsd: number;
+  accountValue: AccountValuePoint[];
+  accountValueSource: "moomoo-total-assets" | "fallback-cash-plus-positions";
   fxUsdMyr: number | null;
   positionsValue: number;
   positionsPricing: PositionsPricing;
   latestCash: number | null;
-  accountValueReliable: boolean;
   reconciliation: Reconciliation | null;
   accounts: Account[];
 }
 
 const CASH_KEY = "md-equity-cash-override";
 const CCY_KEY = "md-equity-ccy";
+const W = 800;
+const EQUITY_TOP = 14;
+const EQUITY_H = 160;
+const PNL_TOP = 212;
+const PNL_H = 58;
+
 type Ccy = "USD" | "MYR";
 
 export default function EquityTimeline() {
@@ -49,6 +56,7 @@ export default function EquityTimeline() {
   const [windowDays, setWindowDays] = useState(90);
   const [cashOverride, setCashOverride] = useState("");
   const [wantCcy, setWantCcy] = useState<Ccy>("USD");
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -60,6 +68,7 @@ export default function EquityTimeline() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setError(null);
     const to = new Date().toISOString().slice(0, 10);
     const fromD = new Date();
     fromD.setUTCDate(fromD.getUTCDate() - windowDays);
@@ -79,6 +88,7 @@ export default function EquityTimeline() {
       window.localStorage.setItem(CASH_KEY, v);
     }
   }
+
   function pickCcy(c: Ccy) {
     setWantCcy(c);
     if (typeof window !== "undefined") window.localStorage.setItem(CCY_KEY, c);
@@ -86,37 +96,57 @@ export default function EquityTimeline() {
 
   const fx = data?.fxUsdMyr ?? null;
   const canConvert = fx != null && fx > 0;
-  // Realized + net value are USD natively; only show MYR when we have a rate.
   const ccy: Ccy = canConvert ? wantCcy : "USD";
   const sym = ccy === "MYR" ? "RM" : "$";
 
-  // Realized series in the display currency (USD native → ×fx for MYR).
   const realized = useMemo(() => {
     const pts = data?.realized ?? [];
     return pts.map((p) => ({ date: p.date, v: ccy === "MYR" && fx ? p.value * fx : p.value }));
   }, [data, ccy, fx]);
 
-  const positionsValue = data?.positionsValue ?? 0;
+  const brokerEquity = useMemo(() => {
+    return (data?.accountValue ?? []).map((p) => ({ date: p.date, v: ccy === "MYR" && fx ? p.totalAssets * fx : p.totalAssets }));
+  }, [data, ccy, fx]);
+
   const parsedCash = cashOverride.trim() !== "" ? Number(cashOverride) : null;
   const cashNum =
     parsedCash != null
       ? (Number.isFinite(parsedCash) ? parsedCash : null)
       : (data?.latestCash ?? null);
-  const netUsd = cashNum != null ? cashNum + positionsValue : null; // USD
-  const netInCcy = netUsd == null ? null : ccy === "MYR" ? (fx ? netUsd * fx : null) : netUsd;
+  const fallbackNetUsd = cashNum != null ? cashNum + (data?.positionsValue ?? 0) : null;
+  const fallbackNet = fallbackNetUsd == null ? null : ccy === "MYR" && fx ? fallbackNetUsd * fx : fallbackNetUsd;
+  const fallbackEquity = useMemo(() => {
+    if (brokerEquity.length > 0 || fallbackNet == null) return [];
+    const first = realized[0]?.date ?? new Date().toISOString().slice(0, 10);
+    const last = realized[realized.length - 1]?.date ?? first;
+    return first === last
+      ? [{ date: first, v: fallbackNet }]
+      : [{ date: first, v: fallbackNet }, { date: last, v: fallbackNet }];
+  }, [brokerEquity, fallbackNet, realized]);
+  const equity = brokerEquity.length > 0 ? brokerEquity : fallbackEquity;
+  const usingBrokerTotal = brokerEquity.length > 0;
 
-  // Net-value line: project net (display ccy) back through the realized curve.
-  const netSeries = useMemo(() => {
-    if (netInCcy == null || realized.length === 0) return [];
-    const totalRealized = realized[realized.length - 1].v;
-    const start = netInCcy - totalRealized;
-    return realized.map((p) => ({ date: p.date, v: Number((start + p.v).toFixed(2)) }));
-  }, [netInCcy, realized]);
+  const chart = useMemo(() => buildChartData(equity, realized), [equity, realized]);
+  const equityDomain = useMemo(() => domain(equity.map((p) => p.v)), [equity]);
+  const realizedDomain = useMemo(() => domain([...realized.map((p) => p.v), 0]), [realized]);
+  const equityPath = useMemo(() => buildPath(chart.equity, equityDomain, EQUITY_TOP, EQUITY_H, chart.dates.length), [chart, equityDomain]);
+  const realizedPath = useMemo(() => buildPath(chart.realized, realizedDomain, PNL_TOP, PNL_H, chart.dates.length), [chart, realizedDomain]);
+  const equityStats = useMemo(() => computeStats(equity), [equity]);
+  const realizedStats = useMemo(() => computeStats(realized), [realized]);
+  const hover = hoverIndex == null ? null : chart.dates[hoverIndex] ? {
+    date: chart.dates[hoverIndex],
+    equity: valueAtOrBefore(equity, chart.dates[hoverIndex]),
+    realized: valueAtOrBefore(realized, chart.dates[hoverIndex]),
+    drawdown: drawdownAt(equity, chart.dates[hoverIndex]),
+  } : null;
 
-  const stats = useMemo(() => computeStats(realized), [realized]);
-  const allV = useMemo(() => [...realized.map((p) => p.v), ...netSeries.map((p) => p.v)], [realized, netSeries]);
-  const realizedPath = useMemo(() => buildSvgPath(realized, allV), [realized, allV]);
-  const netPath = useMemo(() => buildSvgPath(netSeries, allV), [netSeries, allV]);
+  function handleChartMove(e: MouseEvent<SVGSVGElement>) {
+    if (chart.dates.length === 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * W;
+    const idx = Math.max(0, Math.min(chart.dates.length - 1, Math.round((x / W) * (chart.dates.length - 1))));
+    setHoverIndex(idx);
+  }
 
   return (
     <div className="space-y-4 p-5">
@@ -124,11 +154,11 @@ export default function EquityTimeline() {
         <div>
           <p className="t-overline text-[var(--fg-3)]">Equity Timeline</p>
           <p className="t-caption">
-            Realized P&amp;L (broker-true from MooMoo deals, net of fees, USD) + net account value
-            (cash + live positions, USD), shown in {ccy}{canConvert ? ` at USD/MYR ${fx!.toFixed(3)}` : ""}.
+            MooMoo total assets are the primary account-equity curve. Broker realized P&amp;L is
+            net of fees; cash + live positions is shown as a diagnostic fallback.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="inline-flex gap-1 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-raised)] p-1">
             {(["USD", "MYR"] as Ccy[]).map((c) => (
               <button
@@ -142,14 +172,14 @@ export default function EquityTimeline() {
             ))}
           </div>
           <label className="t-caption flex items-center gap-1.5">
-            Cash $
+            Fallback cash $
             <input
               type="number"
               value={cashOverride}
               onChange={(e) => saveCash(e.target.value)}
               placeholder={data?.latestCash != null ? String(data.latestCash) : "cash"}
               className="w-24 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-2 py-1 text-xs text-[var(--fg-1)] focus:border-[var(--accent)] focus:outline-none"
-              title="Override USD cash to compute net account value (saved on this device)"
+              title="Used only when no MooMoo account snapshot is available"
             />
           </label>
           {[30, 90, 180, 365].map((d) => (
@@ -166,9 +196,34 @@ export default function EquityTimeline() {
           Showing everything in USD; switch to MYR once the rate is back.
         </div>
       )}
+      {data && !usingBrokerTotal && (
+        <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
+          <span className="font-semibold text-[var(--warn-500)]">MooMoo account snapshot unavailable.</span>{" "}
+          The chart is using cash + live-position value as a fallback until the bridge writes EquitySnapshot rows.
+        </div>
+      )}
+      {data && usingBrokerTotal && data.reconciliation && (
+        <div className="rounded-[var(--radius-md)] border border-[var(--accent-soft-border)] bg-[var(--accent-soft-bg)] p-3 text-xs text-[var(--fg-2)]">
+          <span className="font-semibold text-[var(--accent)]">MooMoo total assets plotted.</span>{" "}
+          Latest broker total{" "}
+          <span className="t-mono">{data.reconciliation.brokerLatest != null ? `$${fmt(data.reconciliation.brokerLatest)}` : "n/a"}</span>
+          {" "}vs cash + live positions{" "}
+          <span className="t-mono">${fmt(data.reconciliation.expectedNet)}</span>
+          {data.reconciliation.discrepancy != null ? (
+            <>
+              {" "}(diff{" "}
+              <span className="t-mono">
+                {data.reconciliation.discrepancy >= 0 ? "+" : "-"}${fmt(data.reconciliation.discrepancy)}
+                {data.reconciliation.discrepancyPct != null ? `, ${data.reconciliation.discrepancyPct >= 0 ? "+" : ""}${data.reconciliation.discrepancyPct.toFixed(1)}%` : ""}
+              </span>
+              ).
+            </>
+          ) : "."}
+        </div>
+      )}
       {data && (data.positionsPricing.usedAvgCost > 0 || data.positionsPricing.usedPositionCache > 0 || data.positionsPricing.staleQuotes > 0) && (
         <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
-          <span className="font-semibold text-[var(--warn-500)]">Position pricing fallback.</span>{" "}
+          <span className="font-semibold text-[var(--warn-500)]">Position cross-check fallback.</span>{" "}
           {data.positionsPricing.latestQuoteAt
             ? `Latest quote ${new Date(data.positionsPricing.latestQuoteAt).toLocaleString()}. `
             : "No live quote timestamp available. "}
@@ -183,53 +238,77 @@ export default function EquityTimeline() {
             : null}
         </div>
       )}
-      {data && !data.accountValueReliable && data.reconciliation && (
-        <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
-          <span className="font-semibold text-[var(--warn-500)]">Broker total ignored.</span>{" "}
-          The bridge reported{" "}
-          <span className="font-mono">{data.reconciliation.brokerLatest != null ? `$${fmt(data.reconciliation.brokerLatest)}` : "n/a"}</span>{" "}
-          (doesn&apos;t reconcile with cash + positions). Net value uses cash + live positions instead.
-        </div>
-      )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label={`Net account value (${netInCcy != null ? ccy : "USD"})`} value={netInCcy != null ? `${sym}${fmt(netInCcy)}` : netUsd != null ? `$${fmt(netUsd)}` : "—"} />
-        <Stat label={`Realized P&L (${ccy})`} value={signed(stats.current, sym)} color={stats.current >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
-        <Stat label={`${windowDays}d Realized`} value={signed(stats.change, sym)} color={stats.change >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
-        <Stat label="Max Drawdown" value={`-${sym}${fmt(stats.maxDd)}`} color="var(--loss-fg)" />
+        <Stat label={`${usingBrokerTotal ? "MooMoo total assets" : "Fallback net value"} (${ccy})`} value={equityStats.current != null ? `${sym}${fmt(equityStats.current)}` : "-"} />
+        <Stat label={`Broker realized (${ccy})`} value={signed(realizedStats.current ?? 0, sym)} color={(realizedStats.current ?? 0) >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
+        <Stat label={`${windowDays}d realized`} value={signed(realizedStats.change ?? 0, sym)} color={(realizedStats.change ?? 0) >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
+        <Stat label="Max equity drawdown" value={equityStats.maxDd != null ? `-${sym}${fmt(equityStats.maxDd)}` : "-"} color="var(--loss-fg)" />
       </div>
 
       {data && data.realizedCurrency === "USD" && (
         <p className="t-caption text-[var(--fg-3)]">
-          Broker realized (USD): gross ${fmt(data.realizedGrossUsd)} − fees ${fmt(data.realizedFeesUsd)} ={" "}
-          net {data.realizedNetUsd >= 0 ? "+" : "-"}${fmt(data.realizedNetUsd)} · MooMoo deal history (FIFO, net of fees).
+          Broker realized (USD): gross ${fmt(data.realizedGrossUsd)} - fees ${fmt(data.realizedFeesUsd)} ={" "}
+          net {data.realizedNetUsd >= 0 ? "+" : "-"}${fmt(data.realizedNetUsd)}. MooMoo deal history, FIFO, net of fees.
         </p>
       )}
 
       {loading ? (
-        <p className="t-caption t-mono">Loading equity timeline…</p>
+        <p className="t-caption t-mono">Loading equity timeline...</p>
       ) : error ? (
         <p className="t-caption t-mono">Error: {error}</p>
-      ) : realized.length === 0 ? (
+      ) : equity.length === 0 && realized.length === 0 ? (
         <div className="border-t border-[var(--line)] pt-4">
-          <p className="t-caption">No closed trades in this window yet — your realized-P&amp;L curve appears once trades close.</p>
+          <p className="t-caption">No equity snapshots or broker fills in this window yet.</p>
         </div>
       ) : (
         <div className="border-t border-[var(--line)] pt-4">
-          <svg viewBox="0 0 800 280" className="h-72 w-full">
-            <line x1={0} y1={zeroY(allV)} x2={800} y2={zeroY(allV)} stroke="var(--line)" strokeWidth={1} strokeDasharray="4 4" />
-            {netPath && <path d={netPath} stroke="var(--fg-2)" strokeWidth={1.5} fill="none" />}
-            <path d={realizedPath} stroke="var(--accent)" strokeWidth={2} fill="none" />
+          <svg
+            viewBox="0 0 800 280"
+            className="h-72 w-full cursor-crosshair"
+            onMouseMove={handleChartMove}
+            onMouseLeave={() => setHoverIndex(null)}
+            role="img"
+            aria-label="Equity timeline chart"
+          >
+            <rect x={0} y={0} width={800} height={280} fill="transparent" />
+            <text x={0} y={10} fill="var(--fg-3)" fontSize={10}>Account equity</text>
+            <line x1={0} y1={EQUITY_TOP + EQUITY_H} x2={800} y2={EQUITY_TOP + EQUITY_H} stroke="var(--line)" strokeWidth={1} />
+            {equityPath && <path d={equityPath} stroke="var(--fg-2)" strokeWidth={1.8} fill="none" />}
+            <text x={0} y={PNL_TOP - 8} fill="var(--fg-3)" fontSize={10}>Realized P&amp;L</text>
+            <line x1={0} y1={zeroY(realizedDomain, PNL_TOP, PNL_H)} x2={800} y2={zeroY(realizedDomain, PNL_TOP, PNL_H)} stroke="var(--line)" strokeWidth={1} strokeDasharray="4 4" />
+            {realizedPath && <path d={realizedPath} stroke="var(--accent)" strokeWidth={2} fill="none" />}
+            {hoverIndex != null && chart.dates[hoverIndex] && (
+              <g>
+                <line x1={xForIndex(hoverIndex, chart.dates.length)} y1={0} x2={xForIndex(hoverIndex, chart.dates.length)} y2={280} stroke="var(--accent)" strokeOpacity={0.45} strokeWidth={1} />
+                {hover?.equity != null && (
+                  <circle cx={xForIndex(hoverIndex, chart.dates.length)} cy={yFor(hover.equity, equityDomain, EQUITY_TOP, EQUITY_H)} r={3} fill="var(--fg-2)" />
+                )}
+                {hover?.realized != null && (
+                  <circle cx={xForIndex(hoverIndex, chart.dates.length)} cy={yFor(hover.realized, realizedDomain, PNL_TOP, PNL_H)} r={3} fill="var(--accent)" />
+                )}
+              </g>
+            )}
           </svg>
-          <div className="mt-2 flex items-center justify-between t-caption text-[var(--fg-3)]">
-            <span>{realized[0]?.date}</span>
-            <span className="flex items-center gap-3">
+          <div className="mt-2 flex items-center justify-between gap-3 t-caption text-[var(--fg-3)]">
+            <span>{chart.dates[0]}</span>
+            <span className="flex flex-wrap items-center justify-center gap-3">
+              <span className="inline-flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "var(--fg-2)" }} />{usingBrokerTotal ? "MooMoo total assets" : "Fallback net"}</span>
               <span className="inline-flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "var(--accent)" }} />Realized P&amp;L</span>
-              {netSeries.length > 0 && (
-                <span className="inline-flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "var(--fg-2)" }} />Net value</span>
-              )}
             </span>
-            <span>{realized[realized.length - 1]?.date}</span>
+            <span>{chart.dates[chart.dates.length - 1]}</span>
+          </div>
+          <div className="mt-2 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-2 t-caption">
+            {hover ? (
+              <span>
+                <span className="t-mono text-[var(--fg-1)]">{hover.date}</span>
+                {" "}Equity <span className="t-mono text-[var(--fg-1)]">{hover.equity != null ? `${sym}${fmt(hover.equity)}` : "-"}</span>
+                {" "}Realized <span className="t-mono" style={{ color: (hover.realized ?? 0) >= 0 ? "var(--gain-fg)" : "var(--loss-fg)" }}>{hover.realized != null ? signed(hover.realized, sym) : "-"}</span>
+                {" "}Drawdown <span className="t-mono text-[var(--loss-fg)]">{hover.drawdown != null ? `-${sym}${fmt(hover.drawdown)}` : "-"}</span>
+              </span>
+            ) : (
+              <span>Hover the chart for date, account equity, realized P&amp;L, and drawdown.</span>
+            )}
           </div>
         </div>
       )}
@@ -249,12 +328,92 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
 function fmt(n: number): string {
   return Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+
 function signed(n: number, sym: string): string {
   return `${n >= 0 ? "+" : "-"}${sym}${fmt(n)}`;
 }
 
+function domain(values: number[]): [number, number] {
+  if (values.length === 0) return [0, 1];
+  let min = Math.min(...values);
+  let max = Math.max(...values);
+  if (min === max) {
+    const pad = Math.max(1, Math.abs(min) * 0.01);
+    min -= pad;
+    max += pad;
+  } else {
+    const pad = (max - min) * 0.08;
+    min -= pad;
+    max += pad;
+  }
+  return [min, max];
+}
+
+function xForIndex(index: number, total: number): number {
+  return total <= 1 ? W / 2 : (index / (total - 1)) * W;
+}
+
+function yFor(v: number, [min, max]: [number, number], top: number, height: number): number {
+  const range = max - min || 1;
+  return top + height - ((v - min) / range) * height;
+}
+
+function zeroY(domainVals: [number, number], top: number, height: number): number {
+  return yFor(0, domainVals, top, height);
+}
+
+function buildPath(
+  points: { i: number; v: number }[],
+  domainVals: [number, number],
+  top: number,
+  height: number,
+  totalDates: number,
+): string {
+  if (points.length === 0) return "";
+  return points
+    .map((p, n) => {
+      const x = xForIndex(p.i, totalDates);
+      const y = yFor(p.v, domainVals, top, height);
+      return `${n === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join(" ");
+}
+
+function buildChartData(equity: { date: string; v: number }[], realized: { date: string; v: number }[]) {
+  const dates = Array.from(new Set([...equity.map((p) => p.date), ...realized.map((p) => p.date)])).sort();
+  return {
+    dates,
+    equity: dates
+      .map((date, i) => ({ i, v: valueAtOrBefore(equity, date) }))
+      .filter((p): p is { i: number; v: number } => p.v != null),
+    realized: dates
+      .map((date, i) => ({ i, v: valueAtOrBefore(realized, date) }))
+      .filter((p): p is { i: number; v: number } => p.v != null),
+  };
+}
+
+function valueAtOrBefore(points: { date: string; v: number }[], date: string): number | null {
+  let out: number | null = null;
+  for (const p of points) {
+    if (p.date > date) break;
+    out = p.v;
+  }
+  return out;
+}
+
+function drawdownAt(points: { date: string; v: number }[], date: string): number | null {
+  let peak: number | null = null;
+  let current: number | null = null;
+  for (const p of points) {
+    if (p.date > date) break;
+    peak = peak == null ? p.v : Math.max(peak, p.v);
+    current = p.v;
+  }
+  return peak == null || current == null ? null : Math.max(0, peak - current);
+}
+
 function computeStats(points: { date: string; v: number }[]) {
-  if (points.length === 0) return { current: 0, peak: 0, change: 0, maxDd: 0 };
+  if (points.length === 0) return { current: null as number | null, change: null as number | null, maxDd: null as number | null };
   const vals = points.map((p) => p.v);
   const current = vals[vals.length - 1];
   const first = vals[0];
@@ -265,29 +424,5 @@ function computeStats(points: { date: string; v: number }[]) {
     const dd = peak - v;
     if (dd > maxDd) maxDd = dd;
   }
-  return { current, peak, change: current - first, maxDd };
-}
-
-function zeroY(allV: number[]): number {
-  if (allV.length === 0) return 280;
-  const min = Math.min(...allV, 0);
-  const max = Math.max(...allV, 0);
-  const range = max - min || 1;
-  const H = 280, pad = 10;
-  return H - pad - ((0 - min) / range) * (H - 2 * pad);
-}
-
-function buildSvgPath(points: { date: string; v: number }[], allV: number[]): string {
-  if (points.length === 0 || allV.length === 0) return "";
-  const min = Math.min(...allV, 0);
-  const max = Math.max(...allV, 0);
-  const range = max - min || 1;
-  const W = 800, H = 280, pad = 10;
-  return points
-    .map((p, i) => {
-      const x = points.length === 1 ? W / 2 : (i / (points.length - 1)) * W;
-      const y = H - pad - ((p.v - min) / range) * (H - 2 * pad);
-      return `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
-    })
-    .join(" ");
+  return { current, change: current - first, maxDd };
 }

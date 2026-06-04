@@ -98,8 +98,8 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
             <tr
               key={r.id}
               onClick={() => onSelect(r.id)}
-              className={`cursor-pointer border-b border-[var(--line)] hover:bg-[var(--bg-2)] ${
-                selectedId === r.id ? "bg-[var(--bg-2)]" : ""
+              className={`cursor-pointer border-b border-[var(--line)] hover:bg-[var(--bg-raised)] ${
+                selectedId === r.id ? "bg-[var(--accent-soft-bg)]" : ""
               }`}
             >
               <Td><span className="t-mono">{r.pickDate}</span></Td>
@@ -181,7 +181,7 @@ function renderBadges(badges?: string[], onBook?: boolean | null) {
           key={b}
           className="rounded px-1.5 py-0.5 text-[10px] font-semibold"
           style={{
-            background: b === "HELD" ? "var(--gain-bg, #14321f)" : "var(--bg-2)",
+            background: b === "HELD" ? "var(--gain-bg, #14321f)" : "var(--bg-raised)",
             color: b === "HELD" ? "var(--gain-fg)" : "var(--fg-2)",
           }}
         >
@@ -235,10 +235,10 @@ function outcomeLabelColor(outcome: string): string {
 
 function statusColor(status: string): string {
   switch (status) {
-    case "ACTIVE": return "var(--accent-fg)";
+    case "ACTIVE": return "var(--accent)";
     case "HIT_TARGET": return "var(--gain-fg)";
     case "STOPPED_OUT": return "var(--loss-fg)";
-    case "CONVERTED": return "var(--accent-fg)";
+    case "CONVERTED": return "var(--accent)";
     case "EXPIRED": return "var(--fg-3)";
     case "MANUALLY_CLOSED": return "var(--fg-3)";
     default: return "var(--fg-2)";

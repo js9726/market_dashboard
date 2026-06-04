@@ -11,12 +11,18 @@
  */
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+import { isOwner } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 const OPERATOR_RE = /^[A-Z]{2,8}$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function operatorFromSheetTab(sheetTab: string | null | undefined): string | null {
+  const m = (sheetTab ?? "").match(/\[([A-Za-z0-9]{2,8})\]/);
+  return m?.[1]?.toUpperCase() ?? null;
+}
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -26,11 +32,27 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url);
   const operatorRaw = url.searchParams.get("operator");
-  const operatorLabel = operatorRaw && OPERATOR_RE.test(operatorRaw.toUpperCase())
+  let operatorLabel = operatorRaw && OPERATOR_RE.test(operatorRaw.toUpperCase())
     ? operatorRaw.toUpperCase()
     : undefined;
   const sinceRaw = url.searchParams.get("since");
   const since = sinceRaw && DATE_RE.test(sinceRaw) ? new Date(`${sinceRaw}T00:00:00Z`) : undefined;
+  const owner = isOwner(session);
+
+  if (!owner) {
+    const connection = await prisma.spreadsheetConnection.findUnique({
+      where: { userId: session.user.id },
+      select: { sheetTab: true },
+    });
+    const ownOperator = operatorFromSheetTab(connection?.sheetTab);
+    if (!ownOperator) {
+      return NextResponse.json({ operators: [], count: 0, analyses: [] });
+    }
+    if (operatorLabel && operatorLabel !== ownOperator) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    operatorLabel = ownOperator;
+  }
 
   try {
     const rows = await prisma.wikiTradeVerdict.findMany({
