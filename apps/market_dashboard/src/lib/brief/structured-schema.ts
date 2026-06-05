@@ -176,6 +176,18 @@ export const structuredBriefSchema = z.object({
         .optional(),
     })
     .nullable(),
+  news: z
+    .array(
+      z.object({
+        headline: z.string(),
+        impact: z.enum(["HIGH", "MED", "LOW"]).nullable(),
+        tickers: z.array(z.string()).nullable(),
+        source: nullableString,
+        time: nullableString,
+      }),
+    )
+    .nullable()
+    .optional(),
   alert: nullableString,
   citations: z.array(z.string()).nullable(),
 });

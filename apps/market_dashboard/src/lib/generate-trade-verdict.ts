@@ -10,8 +10,8 @@ import {
   buildPrompt as buildAgentModeratorPrompt,
   SYSTEM_PROMPT as agentModeratorSystemPrompt,
   type ModeratorPromptInput,
-  type SnapshotInput,
 } from "@/lib/agent-moderator/handler";
+import { buildTradeSnapshot } from "@/lib/trade-snapshot";
 import type { Prisma } from "@prisma/client";
 
 export type ReviewStyle = "trader-debate" | "agent-pipeline";
@@ -26,21 +26,10 @@ export type VerdictResult = {
 
 export { buildPrompt, parseNumeric, tradeReviewSystemPrompt, type TradePromptInput };
 
-function snapshotFromTrade(): SnapshotInput {
-  // v0: sparse snapshot — only what's directly on the Trade row.
-  // PR 2 (build_data.py extension) will enrich this with yfinance technicals.
-  return {
-    currentPrice: null,
-    rsi14: null,
-    macdSignal: null,
-    emaHierarchy: null,
-    adx: null,
-    volumeRatio: null,
-    atrPct: null,
-    earningsDays: null,
-    halts90d: null,
-  };
-}
+// snapshotFromTrade was a v0 all-null stub. Entry-date market context now comes
+// from buildTradeSnapshot() (src/lib/trade-snapshot.ts), keyed on the trade's
+// entry date so the rubric can score against the regime + theme at trade time.
+// Technical fields (RSI/MACD/EMA/ADX) remain null — a later PR populates them.
 
 export async function generateTradeVerdict(
   tradeId: string,
@@ -83,7 +72,11 @@ export async function generateTradeVerdict(
     const moderatorInput: ModeratorPromptInput = {
       mode: "trade",
       ticker: dbTrade.ticker,
-      snapshot: snapshotFromTrade(),
+      snapshot: await buildTradeSnapshot({
+        ticker: dbTrade.ticker,
+        tradeDate: dbTrade.tradeDate,
+        industry: dbTrade.industry,
+      }),
       trade: {
         tradeDate: dbTrade.tradeDate?.toISOString() ?? null,
         side: dbTrade.side,

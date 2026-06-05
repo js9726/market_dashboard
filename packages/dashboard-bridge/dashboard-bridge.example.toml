@@ -51,3 +51,35 @@ live_quote_extras = "SPY,QQQ,IWM,DIA,VIX,SMH,XLK,NVDA,CRDO,ARM,MRVL"
 breadth_post_close = true
 breadth_post_close_time = "16:33"
 breadth_timezone = "America/New_York"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IBKR (Interactive Brokers) adapter — ibkr_bridge.py
+# Only needed if you run the IBKR adapter alongside (or instead of) MooMoo.
+# The [dashboard], [sync] sections above are shared; only [ibkr] is IBKR-specific.
+# ─────────────────────────────────────────────────────────────────────────────
+[ibkr]
+# Where IB Gateway or TWS is listening:
+#   IB Gateway paper:  4002  (recommended for read-only bridges)
+#   IB Gateway live:   4001
+#   TWS paper:         7497
+#   TWS live:          7496
+port = 4002
+host = "127.0.0.1"
+# Any unused integer clientId (1–32 is conventional for automation).
+# Each simultaneous API connection must use a different clientId.
+client_id = 10
+# Must match a UserBrokerAccount.alias on your dashboard (case-sensitive).
+# Create it at /dashboard/settings/brokers → "+ Add account" → pick "IBKR".
+account_alias = "IBKR main"
+# Broker type string — shown in dashboard diagnostics. Keep as "IBKR".
+broker_type = "IBKR"
+# How many days of fills to pull on each sync (same semantics as MooMoo).
+# The dashboard dedups on brokerFillId, so over-pulling is safe.
+fill_lookback_days = 1
+# ── Flex Web Service (for FULL trade history via `ibkr_bridge.py --flex`) ──────
+# The live socket API only returns the CURRENT day's executions, so older trades
+# (e.g. a sell from yesterday) need a Flex Query. Create an Activity Flex Query
+# with a "Trades" section in IBKR Account Management → note its Query ID, and
+# enable the Flex Web Service to get a token. Leave unset if you don't use --flex.
+# flex_token = "your-flex-web-service-token"
+# flex_query_id = "1234567"

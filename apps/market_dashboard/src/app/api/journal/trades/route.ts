@@ -172,7 +172,8 @@ export async function GET(req: Request) {
       exitPrice: true, side: true, fees: true, pnl: true, notes: true,
       proposedEntry: true, proposedSL: true, proposedTP: true,
       rrr: true, riskPct: true, rewardPct: true, positionPct: true,
-      currency: true, platform: true, industry: true, strategy: true,
+      currency: true, currencyCode: true, pnlUsd: true, pnlSource: true,
+      platform: true, industry: true, strategy: true,
       state: true,
       verdict: true, verdictScore: true, verdictGeneratedAt: true,
     },
@@ -188,6 +189,9 @@ export async function GET(req: Request) {
         quantity: pos.qty,        // broker = truth
         buyPrice: pos.avgCost,    // broker avg cost
         pnl: null,
+        pnlUsd: null,             // open holding — realized USD is N/A; live unrealized below
+        currencyCode: "USD",
+        pnlSource: "broker",
         sheetPnl: t.pnl != null ? Number(t.pnl) : null,
         currentPrice: live.currentPrice,
         marketValue: live.marketValue,
@@ -236,6 +240,9 @@ export async function GET(req: Request) {
         rewardPct: null,
         positionPct: null,
         currency: null,
+        currencyCode: "USD",
+        pnlUsd: null,
+        pnlSource: "broker",
         platform: p.brokerAccount.alias,
         industry: null,
         strategy: null,

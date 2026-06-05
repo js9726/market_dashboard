@@ -114,6 +114,16 @@ export interface BriefRating {
   pt: number | null;
 }
 
+/** High-impact, market-moving news item (2026-06). Surfaced in the morning
+ *  brief and pulled into the daily-journal "news" widget. */
+export interface BriefNewsItem {
+  headline: string;
+  impact: "HIGH" | "MED" | "LOW" | null;
+  tickers: string[] | null;
+  source: string | null; // publisher or URL
+  time: string | null; // ISO or human ("pre-market", "08:30 ET")
+}
+
 export interface StructuredBrief {
   mood: BriefMood | null;
   breadth: BriefBreadth | null;
@@ -138,6 +148,9 @@ export interface StructuredBrief {
     upgrades?: BriefRating[] | null;
     downgrades?: BriefRating[] | null;
   } | null;
+  /** High-impact market-moving news (revised brief, 2026-06). Optional so
+   *  existing parsers/literals stay valid until WS4 wires the Zod schema + prompt. */
+  news?: BriefNewsItem[] | null;
   alert: string | null;
   citations: string[] | null;
 }

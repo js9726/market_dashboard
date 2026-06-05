@@ -12,6 +12,7 @@ import logging
 from typing import Any
 
 from moomoo import (
+    Currency,
     OpenSecTradeContext,
     SecurityFirm,
     TrdEnv,
@@ -166,14 +167,23 @@ class MoomooSync:
         equity snapshot dict. Returns None on error (sync still succeeds for
         positions+fills; equity is best-effort).
 
-        Reported in the account's local currency (USD for FUTUMY/US, HKD for
-        HK accounts). The dashboard normalises display via currencyCode.
+        Reported in the account's local cash-reporting currency. For FUTUMY
+        Malaysia, accinfo cash/market_val are MYR even when US securities and
+        fills are USD. Keep positions/fills in trade currency, but send account
+        equity as MYR so the dashboard can convert exactly once.
         """
+        # Query account aggregates in the holdings' TRADE currency (USD for the
+        # US market) rather than the FUTUMY base currency (MYR). Otherwise the
+        # dashboard stores MYR and has to round-trip back through moomoo's own
+        # FX rate — which won't match the broker UI. See log.md 2026-06 equity fix.
+        market = self.cfg.opend.market.upper()
+        report_currency = Currency.HKD if market == "HK" else Currency.USD
         try:
             ret, data = ctx.accinfo_query(
                 trd_env=TrdEnv.REAL,
                 acc_id=self.cfg.opend.acc_id,
                 refresh_cache=True,
+                currency=report_currency,
             )
         except Exception as e:
             log.warning("accinfo_query exception (non-fatal): %s", e)
@@ -185,10 +195,9 @@ class MoomooSync:
             return None
 
         row = data.iloc[0]
-        currency = (
-            "USD" if self.cfg.opend.market.upper() == "US"
-            else ("HKD" if self.cfg.opend.market.upper() == "HK" else "USD")
-        )
+        # currencyCode reflects what we queried accinfo in (above), so the
+        # dashboard stores true USD/HKD and never re-converts.
+        currency = "HKD" if report_currency == Currency.HKD else "USD"
 
         def _f(key: str) -> float | None:
             v = row.get(key)
@@ -199,11 +208,16 @@ class MoomooSync:
 
         # moomoo accinfo_query returns: total_assets, cash, market_val,
         # frozen_cash, avl_withdrawal_cash, power, available_funds, etc.
-        # Field names vary by market; us_cash/hk_cash also available.
+        # Field names vary by market; us_cash/hk_cash also available. On FUTUMY
+        # US accounts, cash + market_val are the reliable MYR account values;
+        # total_assets has been observed as a different aggregate/base-currency
+        # number and must not drive the dashboard when it fails reconciliation.
         total_assets = _f("total_assets")
-        cash = _f("us_cash") if currency == "USD" else _f("cash")
+        # accinfo was queried in `currency`, so "cash"/"market_val" are already
+        # in that currency (total cash incl. any converted balance).
+        cash = _f("cash")
         if cash is None:
-            cash = _f("cash") or 0.0
+            cash = _f("us_cash") or 0.0
         market_val = _f("market_val")
         unrealized_pl = _f("unrealized_pl")  # may not exist; falls back to None
 
@@ -221,12 +235,12 @@ class MoomooSync:
         if expected > 0 and abs(total_assets - expected) / expected > 0.5:
             log.warning(
                 "equity reconciliation FAILED: total_assets=%.2f vs cash+market_val=%.2f "
-                "(%.1fx). acc_id=%s may be the wrong account or a margin/aggregate view. "
-                "See docs/EQUITY-ACCID-FIX.md.",
+                "(%.1fx). Using cash+market_val for the dashboard snapshot. acc_id=%s",
                 total_assets, expected,
                 (total_assets / expected) if expected else 0.0,
                 self.cfg.opend.acc_id,
             )
+            total_assets = expected
 
         return {
             "snapshotDate": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),

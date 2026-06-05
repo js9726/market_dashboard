@@ -91,6 +91,13 @@ function hashToken(plaintext: string): string {
   return crypto.createHash("sha256").update(plaintext).digest("hex");
 }
 
+function brokerSource(value: string | undefined): string {
+  const v = value?.toLowerCase() ?? "";
+  if (v.includes("ibkr") || v.includes("interactive")) return "ibkr";
+  if (v.includes("moomoo") || v.includes("futu")) return "moomoo";
+  return v || "bridge";
+}
+
 export async function POST(req: Request) {
   // ── Auth: bearer token + timestamp ──────────────────────────────────────
   const authHeader = req.headers.get("authorization") ?? "";
@@ -268,7 +275,7 @@ export async function POST(req: Request) {
         realizedPlDay: e.realizedPlDay != null ? new Prisma.Decimal(e.realizedPlDay) : null,
         equityPctChange: e.equityPctChange != null ? new Prisma.Decimal(e.equityPctChange) : null,
         currencyCode: e.currencyCode ?? accountCurrency,
-        source: "moomoo",
+        source: brokerSource(body.brokerType),
       };
       await prisma.equitySnapshot.upsert({
         where: {

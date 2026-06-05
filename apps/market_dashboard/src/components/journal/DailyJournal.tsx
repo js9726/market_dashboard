@@ -30,6 +30,57 @@ interface JournalEntryDto {
   updatedAt: string;
 }
 
+interface WidgetPrefs {
+  morningBrief: boolean;
+  marketBrief: boolean;
+  highImpactNews: boolean;
+  tradeEntries: boolean;
+  reflection: boolean;
+}
+
+interface JournalPrefsDto {
+  dailyDocUrl: string | null;
+  widgetPrefs: WidgetPrefs;
+  defaultTemplate: string | null;
+  autoWrite: boolean;
+}
+
+interface ComposedSection {
+  key: string;
+  title: string;
+  markdown: string;
+}
+
+interface DailyComposeDto {
+  date: string;
+  markdown: string;
+  sections: ComposedSection[];
+  prefs: WidgetPrefs;
+  tradeCount: number;
+  hasBrief: boolean;
+}
+
+const DEFAULT_PREFS: JournalPrefsDto = {
+  dailyDocUrl: null,
+  widgetPrefs: {
+    morningBrief: true,
+    marketBrief: true,
+    highImpactNews: true,
+    tradeEntries: true,
+    reflection: true,
+  },
+  defaultTemplate: null,
+  autoWrite: false,
+};
+
+const WIDGET_TOGGLES: { key: keyof WidgetPrefs; label: string }[] = [
+  { key: "morningBrief", label: "Morning brief" },
+  { key: "marketBrief", label: "Market brief" },
+  { key: "highImpactNews", label: "High-impact news" },
+  { key: "tradeEntries", label: "Trade entries" },
+  { key: "reflection", label: "Reflection" },
+];
+
 function todayIsoDate(): string {
   const d = new Date();
   const y = d.getFullYear();
@@ -59,6 +110,18 @@ export default function DailyJournal() {
   const [attachments, setAttachments] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── WS4: config panel + composed preview + generate ──────────────────────
+  const [prefs, setPrefs] = useState<JournalPrefsDto>(DEFAULT_PREFS);
+  const [prefsSaving, setPrefsSaving] = useState(false);
+  const [prefsMsg, setPrefsMsg] = useState<string | null>(null);
+  const [configOpen, setConfigOpen] = useState(false);
+
+  const [preview, setPreview] = useState<DailyComposeDto | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [generateMsg, setGenerateMsg] = useState<string | null>(null);
 
   const loadEntry = useCallback(async (d: string) => {
     setLoading(true);
@@ -90,9 +153,114 @@ export default function DailyJournal() {
     }
   }, []);
 
+  const loadPrefs = useCallback(async () => {
+    try {
+      const r = await fetch("/api/journal/prefs", { cache: "no-store" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const p = (await r.json()) as JournalPrefsDto;
+      setPrefs({
+        dailyDocUrl: p.dailyDocUrl ?? null,
+        widgetPrefs: { ...DEFAULT_PREFS.widgetPrefs, ...(p.widgetPrefs ?? {}) },
+        defaultTemplate: p.defaultTemplate ?? null,
+        autoWrite: !!p.autoWrite,
+      });
+    } catch {
+      // Non-fatal: keep defaults so the panel still renders.
+    }
+  }, []);
+
+  const loadPreview = useCallback(async (d: string) => {
+    setPreviewLoading(true);
+    setPreviewError(null);
+    try {
+      const r = await fetch(`/api/journal/daily?date=${encodeURIComponent(d)}`, { cache: "no-store" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = (await r.json()) as DailyComposeDto;
+      setPreview(data);
+    } catch (e) {
+      setPreviewError(e instanceof Error ? e.message : "Failed to compose preview");
+      setPreview(null);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadEntry(date);
-  }, [date, loadEntry]);
+    loadPreview(date);
+  }, [date, loadEntry, loadPreview]);
+
+  useEffect(() => {
+    loadPrefs();
+  }, [loadPrefs]);
+
+  async function savePrefs() {
+    setPrefsSaving(true);
+    setPrefsMsg(null);
+    try {
+      const r = await fetch("/api/journal/prefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dailyDocUrl: prefs.dailyDocUrl ?? "",
+          widgetPrefs: prefs.widgetPrefs,
+          defaultTemplate: prefs.defaultTemplate ?? "",
+          autoWrite: prefs.autoWrite,
+        }),
+      });
+      const payload = (await r.json()) as JournalPrefsDto & { error?: string };
+      if (!r.ok) throw new Error(payload.error || `HTTP ${r.status}`);
+      setPrefs({
+        dailyDocUrl: payload.dailyDocUrl ?? null,
+        widgetPrefs: { ...DEFAULT_PREFS.widgetPrefs, ...(payload.widgetPrefs ?? {}) },
+        defaultTemplate: payload.defaultTemplate ?? null,
+        autoWrite: !!payload.autoWrite,
+      });
+      setPrefsMsg("Saved");
+      // Re-compose preview since toggles affect the output.
+      loadPreview(date);
+    } catch (e) {
+      setPrefsMsg(e instanceof Error ? e.message : "Failed to save preferences");
+    } finally {
+      setPrefsSaving(false);
+    }
+  }
+
+  async function generateToday() {
+    setGenerating(true);
+    setGenerateMsg(null);
+    try {
+      const r = await fetch("/api/journal/daily", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date }),
+      });
+      const payload = (await r.json()) as {
+        error?: string;
+        doc?: { ok: boolean; skipped?: boolean; reason?: string } | null;
+        tradeCount?: number;
+      };
+      if (!r.ok) throw new Error(payload.error || `HTTP ${r.status}`);
+      let msg = "Composed";
+      if (payload.doc) {
+        if (payload.doc.ok && payload.doc.skipped) msg = "Composed — doc already has today's section";
+        else if (payload.doc.ok) msg = "Composed and written to Google Doc";
+        else if (payload.doc.reason === "no_doc_url_configured") msg = "Composed (no Google Doc configured)";
+        else msg = `Composed — doc write failed: ${payload.doc.reason ?? "unknown"}`;
+      }
+      setGenerateMsg(msg);
+      loadPreview(date);
+      loadEntry(date);
+    } catch (e) {
+      setGenerateMsg(e instanceof Error ? e.message : "Generate failed");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function toggleWidget(key: keyof WidgetPrefs) {
+    setPrefs((p) => ({ ...p, widgetPrefs: { ...p.widgetPrefs, [key]: !p.widgetPrefs[key] } }));
+  }
 
   function addLink() {
     const trimmed = newLink.trim();
@@ -182,11 +350,19 @@ export default function DailyJournal() {
         <div>
           <p className="t-overline">Daily Journal</p>
           <p className="t-caption">
-            Mood, sleep, market conditions, reflection notes, and chart links — one entry per day.
-            Image upload coming soon (Feature 7.2).
+            Auto-composed from the morning brief, your trades&apos; AI briefings, and your reflection —
+            preview below, then push to your Google Doc. The manual reflection form is the last section.
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setConfigOpen((v) => !v)}
+            className="mds-button h-9 px-3 text-[12px]"
+            aria-expanded={configOpen}
+          >
+            {configOpen ? "Hide config" : "Configure"}
+          </button>
           <label className="t-caption" htmlFor="journal-date">Date</label>
           <input
             id="journal-date"
@@ -205,7 +381,148 @@ export default function DailyJournal() {
         <p className="mb-3 t-caption text-[var(--gain-fg)]">Saved at {savedAt}</p>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {/* ── WS4 Config panel ─────────────────────────────────────────────── */}
+      {configOpen ? (
+        <div className="mb-5 rounded-md border border-[var(--line)] bg-[var(--bg-raised)] p-4">
+          <div className="flex items-center justify-between">
+            <p className="t-overline">Daily Journal Settings</p>
+            {prefsMsg ? (
+              <span className="t-caption text-[var(--accent)]">{prefsMsg}</span>
+            ) : null}
+          </div>
+
+          <div className="mt-3">
+            <p className="t-caption">Include sections</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {WIDGET_TOGGLES.map(({ key, label }) => {
+                const on = prefs.widgetPrefs[key];
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => toggleWidget(key)}
+                    className={`rounded-full border px-3 py-1 text-[12px] transition ${
+                      on
+                        ? "border-[var(--accent-soft-border)] bg-[var(--accent-soft-bg)] text-[var(--accent)]"
+                        : "border-[var(--line)] bg-[var(--bg-surface)] text-[var(--fg-3)]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="t-caption" htmlFor="daily-doc-url">Google Doc URL</label>
+            <input
+              id="daily-doc-url"
+              type="url"
+              value={prefs.dailyDocUrl ?? ""}
+              onChange={(e) => setPrefs((p) => ({ ...p, dailyDocUrl: e.target.value || null }))}
+              placeholder="https://docs.google.com/document/d/…/edit"
+              className="mt-1 w-full rounded border border-[var(--line)] bg-[var(--bg-surface)] px-3 py-2 text-[13px] font-mono"
+            />
+            <p className="mt-1 t-caption">
+              Generated sections are appended here. Requires Google Docs access — if writes fail,
+              sign out and back in to grant the Docs permission.
+            </p>
+          </div>
+
+          <div className="mt-4">
+            <label className="t-caption" htmlFor="default-template">Default template</label>
+            <textarea
+              id="default-template"
+              rows={3}
+              value={prefs.defaultTemplate ?? ""}
+              onChange={(e) => setPrefs((p) => ({ ...p, defaultTemplate: e.target.value || null }))}
+              placeholder="Optional notes/structure prepended to your reflection (e.g. What worked? What to fix?)"
+              className="mt-1 w-full rounded border border-[var(--line)] bg-[var(--bg-surface)] px-3 py-2 text-[13px] leading-relaxed"
+            />
+          </div>
+
+          <div className="mt-4 flex items-center justify-between">
+            <label className="flex items-center gap-2 t-caption" htmlFor="auto-write">
+              <input
+                id="auto-write"
+                type="checkbox"
+                checked={prefs.autoWrite}
+                onChange={(e) => setPrefs((p) => ({ ...p, autoWrite: e.target.checked }))}
+                className="h-4 w-4 accent-[var(--accent)]"
+              />
+              Auto-write to Google Doc daily (via scheduled cron)
+            </label>
+            <button
+              type="button"
+              onClick={savePrefs}
+              disabled={prefsSaving}
+              className="mds-button mds-button--primary h-9 px-4 text-[12px]"
+            >
+              {prefsSaving ? "Saving…" : "Save settings"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── WS4 Composed preview ─────────────────────────────────────────── */}
+      <div className="mb-5 rounded-md border border-[var(--line)] bg-[var(--bg-raised)] p-4">
+        <div className="market-section-head">
+          <div>
+            <p className="t-overline">Composed Journal — Preview</p>
+            <p className="t-caption">
+              {previewLoading
+                ? "Composing…"
+                : preview
+                ? `${preview.sections.length} section(s) · ${preview.tradeCount} trade(s)${preview.hasBrief ? " · brief found" : " · no brief"}`
+                : "Nothing composed yet."}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {generateMsg ? <span className="t-caption text-[var(--accent)]">{generateMsg}</span> : null}
+            <button
+              type="button"
+              onClick={() => loadPreview(date)}
+              disabled={previewLoading || generating}
+              className="mds-button h-9 px-3 text-[12px]"
+            >
+              Refresh preview
+            </button>
+            <button
+              type="button"
+              onClick={generateToday}
+              disabled={generating || previewLoading}
+              className="mds-button mds-button--primary h-9 px-4 text-[12px]"
+            >
+              {generating ? "Generating…" : "Generate today"}
+            </button>
+          </div>
+        </div>
+
+        {previewError ? (
+          <p className="mt-2 t-caption text-[var(--loss-fg)]">{previewError}</p>
+        ) : null}
+
+        {preview && preview.sections.length > 0 ? (
+          <div className="mt-3 space-y-3">
+            {preview.sections.map((s) => (
+              <div key={s.key} className="rounded bg-[var(--bg-surface)] p-3">
+                <p className="t-overline">{s.title}</p>
+                <pre className="mt-1 whitespace-pre-wrap break-words font-sans text-[12px] leading-relaxed text-[var(--fg-2)]">
+                  {s.markdown}
+                </pre>
+              </div>
+            ))}
+          </div>
+        ) : !previewLoading && !previewError ? (
+          <p className="mt-2 t-caption">No sections — enable widgets in Configure, or add a brief / trades for this date.</p>
+        ) : null}
+      </div>
+
+      {/* ── Manual reflection form (existing) ────────────────────────────── */}
+      <p className="t-overline">Manual Reflection</p>
+      <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="rounded-md bg-[var(--bg-raised)] p-4">
           <p className="t-overline">Mood</p>
           <div className="mt-3">

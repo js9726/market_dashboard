@@ -1,3 +1,8 @@
 moomoo-api>=10.4.6408
 requests>=2.31.0
 tomli>=2.0.0; python_version < "3.11"
+# Optional: Interactive Brokers adapter (ibkr_bridge.py). Install only if you
+# use the IBKR adapter — MooMoo users don't need it. Prefer ib_async (the
+# maintained fork; works on Python 3.12+/3.14). The legacy ib_insync crashes on
+# import under modern Python (eventkit calls the removed asyncio.get_event_loop_policy).
+ib_async>=2.0.0

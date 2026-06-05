@@ -1,5 +1,5 @@
-import WipPlaceholder from "@/components/market-desk/WipPlaceholder";
+import SettingsHome from "@/components/settings/SettingsHome";
 
 export default function SettingsPage() {
-  return <WipPlaceholder icon="accounts" title="Settings" />;
+  return <SettingsHome />;
 }

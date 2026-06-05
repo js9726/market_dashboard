@@ -943,6 +943,8 @@ export default function TradeLog() {
   const [loading, setLoading] = useState(false);
   const [stockTicker, setStockTicker] = useState<string | null>(null);
   const [reviewTrade, setReviewTrade] = useState<Trade | null>(null);
+  const [bulkRunning, setBulkRunning] = useState<"filtered" | "all" | null>(null);
+  const [bulkMessage, setBulkMessage] = useState<string | null>(null);
 
   function loadTrades() {
     setLoading(true);
@@ -968,6 +970,42 @@ export default function TradeLog() {
   function handleVerdictSaved() {
     // Refresh the trade list so the score badge updates
     loadTrades();
+  }
+
+  function runBulkReviews(mode: "filtered" | "all") {
+    setBulkRunning(mode);
+    setBulkMessage(null);
+    fetch("/api/analysis/trade-review/bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mode,
+        force: true,
+        limit: 150,
+        filters: { symbol, side, result, state: stateFilter },
+      }),
+    })
+      .then((r) => r.json().then((data) => ({ ok: r.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok || data.error) throw new Error(data.error ?? "Bulk review failed");
+        const reviewed = Number(data.reviewed ?? 0);
+        const errors = Array.isArray(data.errors) ? data.errors.length : 0;
+        const quotaSkipped = Number(data.skippedForQuota ?? 0);
+        const limitSkipped = Number(data.skippedForLimit ?? 0);
+        setBulkMessage(
+          [
+            `DeepSeek reviewed ${reviewed} trade${reviewed === 1 ? "" : "s"}`,
+            errors ? `${errors} error${errors === 1 ? "" : "s"}` : null,
+            limitSkipped ? `${limitSkipped} left for next batch` : null,
+            quotaSkipped ? `${quotaSkipped} skipped by quota` : null,
+          ]
+            .filter(Boolean)
+            .join(" / "),
+        );
+        loadTrades();
+      })
+      .catch((e: Error) => setBulkMessage(e.message))
+      .finally(() => setBulkRunning(null));
   }
 
   return (
@@ -1004,8 +1042,34 @@ export default function TradeLog() {
             {f.opts.map(([val, label]) => <option key={val} value={val}>{label}</option>)}
           </select>
         ))}
-        <span className="ml-auto text-xs text-[var(--fg-3)]">{total} trade{total !== 1 ? "s" : ""}</span>
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => runBulkReviews("filtered")}
+            disabled={!!bulkRunning}
+            className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1.5 text-xs font-medium text-[var(--fg-2)] transition hover:border-[var(--accent)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+            title="Rerun DeepSeek on up to 150 trades matching the current filters"
+          >
+            {bulkRunning === "filtered" ? "Running..." : "Run filtered"}
+          </button>
+          <button
+            type="button"
+            onClick={() => runBulkReviews("all")}
+            disabled={!!bulkRunning}
+            className="rounded-[var(--radius-sm)] border border-[var(--accent-soft-border)] bg-[var(--accent-soft-bg)] px-3 py-1.5 text-xs font-medium text-[var(--accent)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            title="Rerun DeepSeek on up to 150 trades across the whole book"
+          >
+            {bulkRunning === "all" ? "Running..." : "Run all"}
+          </button>
+          <span className="text-xs text-[var(--fg-3)]">{total} trade{total !== 1 ? "s" : ""}</span>
+        </div>
       </div>
+
+      {bulkMessage && (
+        <div className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-2 text-xs text-[var(--fg-2)]">
+          {bulkMessage}
+        </div>
+      )}
 
       {/* Table */}
       <div className="overflow-x-auto rounded-[var(--radius-md)] border border-[var(--line)]">

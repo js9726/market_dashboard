@@ -30,12 +30,26 @@ interface Resp {
   realizedFeesUsd: number;
   realizedNetUsd: number;
   accountValue: AccountValuePoint[];
-  accountValueSource: "moomoo-total-assets" | "fallback-cash-plus-positions";
+  accountValueCurrency: "USD";
+  accountValueSource: "broker-total-assets" | "fallback-cash-plus-positions";
   fxUsdMyr: number | null;
   positionsValue: number;
   positionsPricing: PositionsPricing;
   latestCash: number | null;
   reconciliation: Reconciliation | null;
+  snapshotQuality: { repairedSnapshots: number; skippedSnapshots: number };
+  latestAccountBreakdown: {
+    id: string;
+    alias: string;
+    currency: string;
+    totalAssets: number;
+    totalAssetsUsd: number;
+    cash: number;
+    cashUsd: number;
+    marketVal: number;
+    marketValUsd: number;
+    repaired: boolean;
+  }[];
   accounts: Account[];
 }
 
@@ -154,7 +168,7 @@ export default function EquityTimeline() {
         <div>
           <p className="t-overline text-[var(--fg-3)]">Equity Timeline</p>
           <p className="t-caption">
-            MooMoo total assets are the primary account-equity curve. Broker realized P&amp;L is
+            Broker account snapshots are normalized to USD first, then converted for display. Broker realized P&amp;L is
             net of fees; cash + live positions is shown as a diagnostic fallback.
           </p>
         </div>
@@ -198,13 +212,13 @@ export default function EquityTimeline() {
       )}
       {data && !usingBrokerTotal && (
         <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
-          <span className="font-semibold text-[var(--warn-500)]">MooMoo account snapshot unavailable.</span>{" "}
+          <span className="font-semibold text-[var(--warn-500)]">Broker account snapshot unavailable.</span>{" "}
           The chart is using cash + live-position value as a fallback until the bridge writes EquitySnapshot rows.
         </div>
       )}
       {data && usingBrokerTotal && data.reconciliation && (
         <div className="rounded-[var(--radius-md)] border border-[var(--accent-soft-border)] bg-[var(--accent-soft-bg)] p-3 text-xs text-[var(--fg-2)]">
-          <span className="font-semibold text-[var(--accent)]">MooMoo total assets plotted.</span>{" "}
+          <span className="font-semibold text-[var(--accent)]">Broker total assets plotted.</span>{" "}
           Latest broker total{" "}
           <span className="t-mono">{data.reconciliation.brokerLatest != null ? `$${fmt(data.reconciliation.brokerLatest)}` : "n/a"}</span>
           {" "}vs cash + live positions{" "}
@@ -219,6 +233,31 @@ export default function EquityTimeline() {
               ).
             </>
           ) : "."}
+        </div>
+      )}
+      {data && data.snapshotQuality.repairedSnapshots > 0 && (
+        <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
+          <span className="font-semibold text-[var(--warn-500)]">Snapshot repair applied.</span>{" "}
+          {data.snapshotQuality.repairedSnapshots} MooMoo Malaysia snapshot{data.snapshotQuality.repairedSnapshots === 1 ? "" : "s"} used reconciled MYR cash + securities instead of the inconsistent broker total_assets field.
+        </div>
+      )}
+      {data && data.latestAccountBreakdown.length > 0 && (
+        <div className="grid gap-2 md:grid-cols-2">
+          {data.latestAccountBreakdown.map((acct) => {
+            const displayTotal = ccy === "MYR" && fx ? acct.totalAssetsUsd * fx : acct.totalAssetsUsd;
+            return (
+              <div key={acct.id} className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-raised)] p-3 text-xs text-[var(--fg-2)]">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-semibold text-[var(--fg-1)]">{acct.alias}</span>
+                  <span className="t-mono">{sym}{fmt(displayTotal)}</span>
+                </div>
+                <p className="mt-1 text-[var(--fg-3)]">
+                  Native {acct.currency}: {acct.currency === "MYR" ? "RM" : "$"}{fmt(acct.totalAssets)}
+                  {acct.repaired ? " from cash + securities" : ""}
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
       {data && (data.positionsPricing.usedAvgCost > 0 || data.positionsPricing.usedPositionCache > 0 || data.positionsPricing.staleQuotes > 0) && (
@@ -240,7 +279,7 @@ export default function EquityTimeline() {
       )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label={`${usingBrokerTotal ? "MooMoo total assets" : "Fallback net value"} (${ccy})`} value={equityStats.current != null ? `${sym}${fmt(equityStats.current)}` : "-"} />
+        <Stat label={`${usingBrokerTotal ? "Broker total assets" : "Fallback net value"} (${ccy})`} value={equityStats.current != null ? `${sym}${fmt(equityStats.current)}` : "-"} />
         <Stat label={`Broker realized (${ccy})`} value={signed(realizedStats.current ?? 0, sym)} color={(realizedStats.current ?? 0) >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
         <Stat label={`${windowDays}d realized`} value={signed(realizedStats.change ?? 0, sym)} color={(realizedStats.change ?? 0) >= 0 ? "var(--gain-fg)" : "var(--loss-fg)"} />
         <Stat label="Max equity drawdown" value={equityStats.maxDd != null ? `-${sym}${fmt(equityStats.maxDd)}` : "-"} color="var(--loss-fg)" />
@@ -293,7 +332,7 @@ export default function EquityTimeline() {
           <div className="mt-2 flex items-center justify-between gap-3 t-caption text-[var(--fg-3)]">
             <span>{chart.dates[0]}</span>
             <span className="flex flex-wrap items-center justify-center gap-3">
-              <span className="inline-flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "var(--fg-2)" }} />{usingBrokerTotal ? "MooMoo total assets" : "Fallback net"}</span>
+              <span className="inline-flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "var(--fg-2)" }} />{usingBrokerTotal ? "Broker total assets" : "Fallback net"}</span>
               <span className="inline-flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "var(--accent)" }} />Realized P&amp;L</span>
             </span>
             <span>{chart.dates[chart.dates.length - 1]}</span>

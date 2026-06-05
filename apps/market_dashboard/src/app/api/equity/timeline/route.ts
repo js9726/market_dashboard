@@ -14,6 +14,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
+import { convertEquitySnapshotToUsd, getUsdMyrRate, normalizeCurrencyCode } from "@/lib/equity-currency";
 import { liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { prisma } from "@/lib/prisma";
 import { computeBrokerRealized } from "@/server/realized-pnl";
@@ -22,27 +23,6 @@ export const dynamic = "force-dynamic";
 
 function plainTicker(ticker: string): string {
   return ticker.replace(/^[A-Za-z]{2}\./, "").toUpperCase();
-}
-
-let _fx: { rate: number; at: number } | null = null;
-async function getUsdMyr(): Promise<number | null> {
-  if (_fx && Date.now() - _fx.at < 3_600_000) return _fx.rate;
-  try {
-    const r = await fetch("https://api.frankfurter.app/latest?from=USD&to=MYR", {
-      signal: AbortSignal.timeout(5000),
-    });
-    if (r.ok) {
-      const j = await r.json();
-      const rate = Number(j?.rates?.MYR);
-      if (Number.isFinite(rate) && rate > 0) {
-        _fx = { rate, at: Date.now() };
-        return rate;
-      }
-    }
-  } catch {
-    // Fail closed: return the last warm-instance value, or null if unavailable.
-  }
-  return _fx?.rate ?? null;
 }
 
 export async function GET(req: Request) {
@@ -70,6 +50,8 @@ export async function GET(req: Request) {
     include: { preset: true },
     orderBy: { createdAt: "asc" },
   });
+  const accountById = new Map(accounts.map((a) => [a.id, a]));
+  const fxUsdMyr = await getUsdMyrRate();
 
   const fills = await prisma.tradeFill.findMany({
     where: {
@@ -101,13 +83,26 @@ export async function GET(req: Request) {
     orderBy: { snapshotDate: "asc" },
   });
   const byDate = new Map<string, { totalAssets: number; cash: number; marketVal: number }>();
+  const latestByAccount = new Map<string, AccountSnapshotUsd>();
+  let repairedSnapshots = 0;
+  let skippedSnapshots = 0;
   for (const s of snapshots) {
+    const converted = snapshotToUsd(s, accountById.get(s.brokerAccountId), fxUsdMyr);
+    if (!converted) {
+      skippedSnapshots += 1;
+      continue;
+    }
+    if (converted.repaired) repairedSnapshots += 1;
     const k = s.snapshotDate.toISOString().slice(0, 10);
     const cur = byDate.get(k) ?? { totalAssets: 0, cash: 0, marketVal: 0 };
-    cur.totalAssets += Number(s.totalAssets);
-    cur.cash += Number(s.cash);
-    cur.marketVal += Number(s.marketVal);
+    cur.totalAssets += converted.totalAssetsUsd;
+    cur.cash += converted.cashUsd;
+    cur.marketVal += converted.marketValUsd;
     byDate.set(k, cur);
+    const prior = latestByAccount.get(s.brokerAccountId);
+    if (!prior || s.snapshotDate > prior.snapshotDate || s.capturedAt > prior.capturedAt) {
+      latestByAccount.set(s.brokerAccountId, { ...converted, snapshotDate: s.snapshotDate, capturedAt: s.capturedAt });
+    }
   }
   const accountValue = Array.from(byDate.entries())
     .sort(([a], [b]) => a.localeCompare(b))
@@ -175,8 +170,6 @@ export async function GET(req: Request) {
       ? (discrepancy / expectedNet) * 100
       : null;
 
-  const fxUsdMyr = await getUsdMyr();
-
   return NextResponse.json({
     realized,
     realizedCurrency: "USD",
@@ -184,7 +177,8 @@ export async function GET(req: Request) {
     realizedFeesUsd: brokerRealized.feesUsd,
     realizedNetUsd: brokerRealized.netUsd,
     accountValue,
-    accountValueSource: accountValue.length > 0 ? "moomoo-total-assets" : "fallback-cash-plus-positions",
+    accountValueCurrency: "USD",
+    accountValueSource: accountValue.length > 0 ? "broker-total-assets" : "fallback-cash-plus-positions",
     fxUsdMyr,
     positionsValue: Number(positionsValue.toFixed(2)),
     positionsPricing: {
@@ -208,6 +202,107 @@ export async function GET(req: Request) {
           latestMarketVal: latest?.marketVal ?? null,
         }
       : null,
+    snapshotQuality: {
+      repairedSnapshots,
+      skippedSnapshots,
+    },
+    latestAccountBreakdown: Array.from(latestByAccount.entries()).map(([id, row]) => {
+      const account = accountById.get(id);
+      return {
+        id,
+        alias: account?.alias ?? "Broker account",
+        currency: row.nativeCurrency,
+        totalAssets: row.nativeTotalAssets,
+        totalAssetsUsd: row.totalAssetsUsd,
+        cash: row.nativeCash,
+        cashUsd: row.cashUsd,
+        marketVal: row.nativeMarketVal,
+        marketValUsd: row.marketValUsd,
+        repaired: row.repaired,
+      };
+    }),
     accounts: accounts.map((a) => ({ id: a.id, alias: a.alias, currency: a.displayCurrency ?? a.preset.currency })),
   });
+}
+
+type BrokerAccountForSnapshot = {
+  alias: string;
+  preset?: { name: string; currency: string } | null;
+};
+
+type AccountSnapshotUsd = {
+  totalAssetsUsd: number;
+  cashUsd: number;
+  marketValUsd: number;
+  nativeCurrency: string;
+  nativeTotalAssets: number;
+  nativeCash: number;
+  nativeMarketVal: number;
+  repaired: boolean;
+  snapshotDate: Date;
+  capturedAt: Date;
+};
+
+function isMoomooMalaysia(account: BrokerAccountForSnapshot | undefined, source: string): boolean {
+  const haystack = `${account?.alias ?? ""} ${account?.preset?.name ?? ""} ${source}`.toLowerCase();
+  return haystack.includes("moomoo") && (haystack.includes("malaysia") || haystack.includes("futumy"));
+}
+
+function snapshotToUsd(
+  s: {
+    totalAssets: unknown;
+    cash: unknown;
+    marketVal: unknown;
+    currencyCode: string | null;
+    source: string;
+  },
+  account: BrokerAccountForSnapshot | undefined,
+  fxUsdMyr: number | null,
+): Omit<AccountSnapshotUsd, "snapshotDate" | "capturedAt"> | null {
+  const rawTotal = Number(s.totalAssets);
+  const rawCash = Number(s.cash);
+  const rawMarket = Number(s.marketVal);
+  const storedCurrency = normalizeCurrencyCode(s.currencyCode);
+  if (![rawTotal, rawCash, rawMarket].every(Number.isFinite)) return null;
+
+  const expected = rawCash + rawMarket;
+  const badMoomooTotal =
+    isMoomooMalaysia(account, s.source) &&
+    storedCurrency === "USD" &&
+    expected > 0 &&
+    Math.abs(rawTotal - expected) / expected > 0.5;
+
+  if (badMoomooTotal) {
+    const converted = convertEquitySnapshotToUsd(
+      { totalAssets: expected, cash: rawCash, marketVal: rawMarket, currencyCode: "MYR" },
+      fxUsdMyr,
+    );
+    if (!converted) return null;
+    return {
+      ...converted,
+      nativeCurrency: "MYR",
+      nativeTotalAssets: round2(expected),
+      nativeCash: round2(rawCash),
+      nativeMarketVal: round2(rawMarket),
+      repaired: true,
+    };
+  }
+
+  const converted = convertEquitySnapshotToUsd(
+    { totalAssets: rawTotal, cash: rawCash, marketVal: rawMarket, currencyCode: storedCurrency },
+    fxUsdMyr,
+  );
+  if (!converted) return null;
+  return {
+    ...converted,
+    nativeCurrency: storedCurrency,
+    nativeTotalAssets: round2(rawTotal),
+    nativeCash: round2(rawCash),
+    nativeMarketVal: round2(rawMarket),
+    repaired: false,
+  };
+}
+
+function round2(n: number): number {
+  return Number(n.toFixed(2));
 }

@@ -11,8 +11,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
+          // NOTE: adding the Docs scope (WS4 daily-journal Google-Doc auto-write)
+          // means existing users must re-consent — their stored OAuth grant does
+          // not include `documents` until they sign in again (prompt:"consent"
+          // forces the re-consent screen on next login).
           scope:
-            "openid email profile https://www.googleapis.com/auth/spreadsheets",
+            "openid email profile https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/documents",
           access_type: "offline", // required for refresh_token
           prompt: "consent",      // forces refresh_token even on re-auth
         },
