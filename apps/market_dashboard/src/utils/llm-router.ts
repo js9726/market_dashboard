@@ -12,7 +12,7 @@ const TIER_MODELS = {
   deepseek:  { fast: "deepseek-chat",             standard: "deepseek-chat" },
   anthropic: { fast: "claude-haiku-4-5-20251001", standard: "claude-sonnet-4-6" },
   openai:    { fast: "gpt-4o-mini",               standard: "gpt-4o" },
-  gemini:    { fast: "gemini-2.0-flash",          standard: "gemini-2.5-pro" },
+  gemini:    { fast: "gemini-2.5-flash",          standard: "gemini-2.5-pro" },
 } as const;
 
 const PROVIDER_ORDER = ["deepseek", "anthropic", "openai", "gemini"] as const;
