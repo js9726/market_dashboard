@@ -33,6 +33,10 @@ htmlcov/
 .pytest_cache/
 .mypy_cache/
 .env.local
+venv_temp/
+apps/market_dashboard/venv_temp/
+.codex-next-*.err.log
+apps/market_dashboard/.codex-next-*.err.log
 
 # Local run scripts (may contain secrets)
 run_daily.bat
@@ -46,3 +50,10 @@ watch_quotes.py
 # Session learning logs (local scratch pad — promote lessons to CLAUDE.md manually)
 .learnings/
 site-screenshots/
+
+# Generated local broker / morning-brief scratch outputs
+packages/dashboard-bridge/ibkr_backfill.json
+packages/core-skills/morning-brief/_tmp_*.py
+packages/core-skills/morning-brief/brief_output_*.json
+packages/core-skills/morning-brief/holdings_review_*.json
+packages/core-skills/morning-brief/index_technicals_*.json
