@@ -12,6 +12,7 @@ describe("trade review scoring", () => {
 
   it("extracts trader-debate overall_score even when returned as a string", () => {
     expect(extractOverallScore({ overall_score: "5.8" }, "trader-debate")).toBe(5.8);
+    expect(extractOverallScore(null, "trader-debate")).toBeNull();
   });
 
   it("normalizes agent-pipeline confidence to the 0-10 badge scale", () => {

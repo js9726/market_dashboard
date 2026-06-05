@@ -35,9 +35,11 @@ export function coerceScore(value: unknown): number | null {
   return Number.isFinite(parsed) ? Math.round(parsed * 10) / 10 : null;
 }
 
-export function extractOverallScore(review: Record<string, unknown>, style: ReviewStyle): number | null {
-  if (style === "trader-debate") return coerceScore(review.overall_score);
-  const moderator = review.moderator as { confidence?: unknown } | undefined;
+export function extractOverallScore(review: unknown, style: ReviewStyle): number | null {
+  if (!review || typeof review !== "object") return null;
+  const payload = review as Record<string, unknown>;
+  if (style === "trader-debate") return coerceScore(payload.overall_score);
+  const moderator = payload.moderator as { confidence?: unknown } | undefined;
   const confidence = coerceScore(moderator?.confidence);
   if (confidence == null) return null;
   return confidence > 10 && confidence <= 100 ? Math.round(confidence) / 10 : confidence;
