@@ -25,6 +25,10 @@
       "schedule": "33 20 * * 1-5"
     },
     {
+      "path": "/api/cron/refresh-quotes",
+      "schedule": "*/5 13-21 * * 1-5"
+    },
+    {
       "path": "/api/cron/sync-held-alist",
       "schedule": "30 21 * * 1-5"
     },

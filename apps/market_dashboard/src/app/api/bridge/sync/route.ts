@@ -16,7 +16,7 @@
  *     brokerType:         string,         // for diagnostics (e.g. "MOOMOO_FUTUMY")
  *     syncedAt:           string (ISO),
  *     positions: [
- *       { ticker, qty, avgCost, currency }
+ *       { ticker, qty, avgCost, currency, currentPrice?, marketValue?, unrealizedPl?, unrealizedPlPct? }
  *     ],
  *     fills: [
  *       { brokerFillId, ticker, side, qty, price, executedAt, fees?, currency? }
@@ -60,6 +60,10 @@ type IncomingPosition = {
   qty: number;
   avgCost: number;
   currency: string;
+  currentPrice?: number | null;
+  marketValue?: number | null;
+  unrealizedPl?: number | null;
+  unrealizedPlPct?: number | null;
 };
 
 type IncomingEquity = {
@@ -96,6 +100,17 @@ function brokerSource(value: string | undefined): string {
   if (v.includes("ibkr") || v.includes("interactive")) return "ibkr";
   if (v.includes("moomoo") || v.includes("futu")) return "moomoo";
   return v || "bridge";
+}
+
+function decimalOrNull(value: unknown): Prisma.Decimal | null {
+  if (value == null) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? new Prisma.Decimal(n) : null;
+}
+
+function liveQuoteSymbol(ticker: string): string {
+  const [prefix, symbol] = ticker.split(".", 2);
+  return prefix && symbol ? symbol : ticker;
 }
 
 export async function POST(req: Request) {
@@ -208,11 +223,16 @@ export async function POST(req: Request) {
   const incomingTickers = new Set<string>();
   let positionsUpserted = 0;
   const now = new Date();
+  const positionQuoteSource = brokerSource(body.brokerType);
 
   for (const p of body.positions) {
     if (!p.ticker || p.qty == null || p.avgCost == null) continue;
     const ticker = p.ticker.toUpperCase();
     incomingTickers.add(ticker);
+    const currentPrice = decimalOrNull(p.currentPrice);
+    const marketValue = decimalOrNull(p.marketValue);
+    const unrealizedPl = decimalOrNull(p.unrealizedPl);
+    const unrealizedPlPct = decimalOrNull(p.unrealizedPlPct);
 
     try {
       await prisma.position.upsert({
@@ -228,6 +248,10 @@ export async function POST(req: Request) {
           qty: new Prisma.Decimal(p.qty),
           avgCost: new Prisma.Decimal(p.avgCost),
           currency: p.currency ?? accountCurrency,
+          currentPrice,
+          marketValue,
+          unrealizedPl,
+          unrealizedPlPct,
           openedAt: now,
           lastFillAt: now,
           asOf: now,
@@ -236,9 +260,31 @@ export async function POST(req: Request) {
           qty: new Prisma.Decimal(p.qty),
           avgCost: new Prisma.Decimal(p.avgCost),
           currency: p.currency ?? accountCurrency,
+          currentPrice,
+          marketValue,
+          unrealizedPl,
+          unrealizedPlPct,
           asOf: now,
         },
       });
+      if (currentPrice) {
+        await prisma.liveQuote.upsert({
+          where: { symbol: liveQuoteSymbol(ticker) },
+          create: {
+            symbol: liveQuoteSymbol(ticker),
+            price: currentPrice,
+            changePct: null,
+            volume: null,
+            source: positionQuoteSource,
+            observedAt: now,
+          },
+          update: {
+            price: currentPrice,
+            source: positionQuoteSource,
+            observedAt: now,
+          },
+        });
+      }
       positionsUpserted++;
     } catch (e) {
       console.error("[bridge/sync] position upsert failed:", e);

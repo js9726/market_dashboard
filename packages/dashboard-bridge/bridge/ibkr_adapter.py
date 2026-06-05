@@ -56,6 +56,17 @@ def _normalize_ticker(contract) -> str:
     return local or symbol
 
 
+def _safe_float(value: Any) -> float | None:
+    """IBKR sometimes returns unset sentinels/NaN for portfolio fields."""
+    try:
+        n = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not (n == n) or abs(n) > 1e100:
+        return None
+    return n
+
+
 class IBKRSync:
     """
     One-shot connector: connects, fetches data, disconnects.
@@ -127,12 +138,37 @@ class IBKRSync:
                 continue
             contract = item.contract
             currency = (getattr(contract, "currency", None) or "USD").upper()
-            rows.append({
+            avg_cost = float(item.averageCost)
+            current_price = _safe_float(getattr(item, "marketPrice", None))
+            market_value = _safe_float(getattr(item, "marketValue", None))
+            unrealized_pl = (
+                _safe_float(getattr(item, "unrealizedPNL", None))
+                if hasattr(item, "unrealizedPNL")
+                else _safe_float(getattr(item, "unrealizedPnl", None))
+            )
+            if market_value is None and current_price is not None:
+                market_value = qty * current_price
+            cost = qty * avg_cost
+            unrealized_pl_pct = (
+                (unrealized_pl / abs(cost)) * 100
+                if unrealized_pl is not None and cost
+                else None
+            )
+            row = {
                 "ticker": _normalize_ticker(contract),
                 "qty": qty,
-                "avgCost": float(item.averageCost),
+                "avgCost": avg_cost,
                 "currency": currency,
-            })
+            }
+            if current_price is not None and current_price > 0:
+                row["currentPrice"] = current_price
+            if market_value is not None:
+                row["marketValue"] = market_value
+            if unrealized_pl is not None:
+                row["unrealizedPl"] = unrealized_pl
+            if unrealized_pl_pct is not None:
+                row["unrealizedPlPct"] = unrealized_pl_pct
+            rows.append(row)
         log.debug("IBKR positions: %d rows", len(rows))
         return rows
 

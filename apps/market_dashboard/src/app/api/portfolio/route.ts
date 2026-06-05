@@ -95,7 +95,19 @@ export async function GET() {
       const market = marketQuoteMap.get(ticker);
       if (!live) return market ? { ...market, symbol: ticker } : null;
       if (!market) return { ...live, symbol: ticker };
-      return live.observedAt >= market.observedAt ? { ...live, symbol: ticker } : market;
+      if (live.observedAt >= market.observedAt) {
+        return {
+          ...live,
+          symbol: ticker,
+          changePct: live.changePct ?? market.changePct,
+        };
+      }
+      return {
+        ...market,
+        symbol: ticker,
+        price: market.price ?? live.price,
+        changePct: market.changePct ?? live.changePct,
+      };
     })
     .filter((q): q is NonNullable<typeof q> => q != null);
 
@@ -149,13 +161,28 @@ export async function GET() {
       const cost = qty * avgCost;
 
       const quote = quoteMap.get(p.ticker);
-      const currentPrice = quote ? toNum(quote.price) : null;
-      const marketValue = currentPrice != null ? qty * currentPrice : null;
-      const unrealizedPl = marketValue != null ? marketValue - cost : null;
+      const brokerPrice = p.currentPrice != null ? toNum(p.currentPrice) : null;
+      const currentPrice = quote ? toNum(quote.price) : brokerPrice;
+      const marketValue =
+        currentPrice != null
+          ? qty * currentPrice
+          : p.marketValue != null
+            ? toNum(p.marketValue)
+            : null;
+      const unrealizedPl =
+        marketValue != null
+          ? marketValue - cost
+          : p.unrealizedPl != null
+            ? toNum(p.unrealizedPl)
+            : null;
       const unrealizedPlPct =
-        unrealizedPl != null && cost !== 0 ? (unrealizedPl / Math.abs(cost)) * 100 : null;
+        unrealizedPl != null && cost !== 0
+          ? (unrealizedPl / Math.abs(cost)) * 100
+          : p.unrealizedPlPct != null
+            ? toNum(p.unrealizedPlPct)
+            : null;
 
-      const priceObservedAt = quote?.observedAt ?? null;
+      const priceObservedAt = quote?.observedAt ?? (brokerPrice != null ? p.asOf : null);
       const stale =
         priceObservedAt == null ||
         now - priceObservedAt.getTime() > STALE_THRESHOLD_MS;
@@ -182,11 +209,11 @@ export async function GET() {
         marketValue,
         unrealizedPl,
         unrealizedPlPct,
-        changePct: quote?.changePct ? toNum(quote.changePct) : null,
+        changePct: quote?.changePct != null ? toNum(quote.changePct) : null,
         openedAt: p.openedAt,
         lastFillAt: p.lastFillAt,
         priceObservedAt,
-        priceSource: quote?.source ?? null,
+        priceSource: quote?.source ?? (brokerPrice != null ? "broker-cache" : null),
         stale,
         latestTradeRecordId,
       };
