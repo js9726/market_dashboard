@@ -2,6 +2,14 @@ import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { prisma } from "@/lib/prisma";
+import {
+  activeTradePriority,
+  brokerKey,
+  isOpenishTrade,
+  materializeOpenPositionTradeRecords,
+  OPEN_TRADE_STATES,
+  plainTicker,
+} from "@/lib/trades/position-trade-records";
 import type { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -18,22 +26,6 @@ import { NextResponse } from "next/server";
  * ("Moo Moo" / "moomoo Malaysia" -> moomoo; "IBKR" -> ibkr).
  */
 
-/** Map any broker label to a canonical key. */
-function brokerKey(s: string | null | undefined): string {
-  const n = (s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (n.includes("moomoo") || n.includes("futu")) return "moomoo";
-  if (n.includes("ibkr") || n.includes("interactivebrokers")) return "ibkr";
-  if (n.includes("tiger")) return "tiger";
-  return n || "unknown";
-}
-/** Strip the "US." / "HK." market prefix from a broker ticker. */
-function plainTicker(t: string): string {
-  return t.replace(/^[A-Za-z]{2}\./, "").toUpperCase();
-}
-const OPEN_STATES = ["OPEN", "SEMI-OPEN", "PLANNING"];
-function isOpenish(state: string | null, pnl: unknown): boolean {
-  return (state != null && OPEN_STATES.includes(state.toUpperCase())) || (state == null && pnl == null);
-}
 function toNum(value: unknown): number | null {
   if (value == null) return null;
   const n = Number(value);
@@ -84,6 +76,7 @@ export async function GET(req: Request) {
   const side = searchParams.get("side") ?? "";
   const result = searchParams.get("result") ?? "";
   const stateFilter = searchParams.get("state") ?? "";
+  await materializeOpenPositionTradeRecords(userScopeId, { symbol });
   const liveQuoteStaleMs = liveQuoteThresholdsForNow().staleSec * 1000;
   const connection = await prisma.spreadsheetConnection.findUnique({
     where: { userId: userScopeId },
@@ -145,7 +138,7 @@ export async function GET(req: Request) {
   // Positions already represented by an OPEN sheet row anywhere (so we don't
   // also synthesize a broker-only row for them).
   const openSheet = await prisma.tradeRecord.findMany({
-    where: { userId: userScopeId, OR: [{ state: { in: OPEN_STATES } }, { state: null, pnl: null }] },
+    where: { userId: userScopeId, OR: [{ state: { in: [...OPEN_TRADE_STATES] } }, { state: null, pnl: null }] },
     select: { ticker: true, platform: true },
   });
   const openSheetKeys = new Set(openSheet.map((t) => `${plainTicker(t.ticker)}|${brokerKey(t.platform)}`));
@@ -156,11 +149,11 @@ export async function GET(req: Request) {
     ...(side ? { side } : {}),
     ...(stateFilter ? { state: stateFilter } : {}),
     ...(result === "win"
-      ? { pnl: { gt: 0 }, NOT: { state: { in: OPEN_STATES } } }
+      ? { pnl: { gt: 0 }, NOT: { state: { in: [...OPEN_TRADE_STATES] } } }
       : result === "loss"
-      ? { pnl: { lte: 0 }, NOT: { state: { in: OPEN_STATES } } }
+      ? { pnl: { lte: 0 }, NOT: { state: { in: [...OPEN_TRADE_STATES] } } }
       : result === "open"
-      ? { OR: [{ state: { in: OPEN_STATES } }, { state: null, pnl: null }] }
+      ? { OR: [{ state: { in: [...OPEN_TRADE_STATES] } }, { state: null, pnl: null }] }
       : {}),
   };
 
@@ -182,7 +175,7 @@ export async function GET(req: Request) {
   // Enrich: overlay live broker truth onto matching open sheet rows.
   const enriched = trades.map((t) => {
     const pos = posByKey.get(`${plainTicker(t.ticker)}|${brokerKey(t.platform)}`);
-    if (pos && isOpenish(t.state, t.pnl)) {
+    if (pos && isOpenishTrade(t.state, t.pnl)) {
       const live = liveFieldsForPosition(pos);
       return {
         ...t,
@@ -266,6 +259,8 @@ export async function GET(req: Request) {
     .filter(syntheticMatchesFilters);
 
   const combined = [...brokerOnly, ...enriched].sort((a, b) => {
+    const priority = activeTradePriority(a) - activeTradePriority(b);
+    if (priority !== 0) return priority;
     const at = a.tradeDate ? new Date(a.tradeDate).getTime() : 0;
     const bt = b.tradeDate ? new Date(b.tradeDate).getTime() : 0;
     return bt - at;

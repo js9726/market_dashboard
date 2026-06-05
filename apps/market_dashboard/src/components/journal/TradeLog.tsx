@@ -981,7 +981,7 @@ export default function TradeLog() {
       body: JSON.stringify({
         mode,
         force: true,
-        limit: 150,
+        limit: 300,
         filters: { symbol, side, result, state: stateFilter },
       }),
     })
@@ -990,12 +990,15 @@ export default function TradeLog() {
         if (!ok || data.error) throw new Error(data.error ?? "Bulk review failed");
         const reviewed = Number(data.reviewed ?? 0);
         const errors = Array.isArray(data.errors) ? data.errors.length : 0;
+        const firstError = Array.isArray(data.errors) && data.errors[0]?.error
+          ? String(data.errors[0].error)
+          : null;
         const quotaSkipped = Number(data.skippedForQuota ?? 0);
         const limitSkipped = Number(data.skippedForLimit ?? 0);
         setBulkMessage(
           [
-            `DeepSeek reviewed ${reviewed} trade${reviewed === 1 ? "" : "s"}`,
-            errors ? `${errors} error${errors === 1 ? "" : "s"}` : null,
+            `AI reviewed ${reviewed} trade${reviewed === 1 ? "" : "s"}`,
+            errors ? `${errors} error${errors === 1 ? "" : "s"}${firstError ? ` (${firstError})` : ""}` : null,
             limitSkipped ? `${limitSkipped} left for next batch` : null,
             quotaSkipped ? `${quotaSkipped} skipped by quota` : null,
           ]
@@ -1048,7 +1051,7 @@ export default function TradeLog() {
             onClick={() => runBulkReviews("filtered")}
             disabled={!!bulkRunning}
             className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1.5 text-xs font-medium text-[var(--fg-2)] transition hover:border-[var(--accent)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
-            title="Rerun DeepSeek on up to 150 trades matching the current filters"
+            title="Rerun AI trade review on up to 300 trades matching the current filters"
           >
             {bulkRunning === "filtered" ? "Running..." : "Run filtered"}
           </button>
@@ -1057,7 +1060,7 @@ export default function TradeLog() {
             onClick={() => runBulkReviews("all")}
             disabled={!!bulkRunning}
             className="rounded-[var(--radius-sm)] border border-[var(--accent-soft-border)] bg-[var(--accent-soft-bg)] px-3 py-1.5 text-xs font-medium text-[var(--accent)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            title="Rerun DeepSeek on up to 150 trades across the whole book"
+            title="Rerun AI trade review on up to 300 trades across the whole book"
           >
             {bulkRunning === "all" ? "Running..." : "Run all"}
           </button>
@@ -1177,9 +1180,7 @@ export default function TradeLog() {
                   </td>
                   {/* Score column: badge if scored, else Analyse button */}
                   <td className="px-3 py-2">
-                    {t.synthetic ? (
-                      <span className="text-xs text-[var(--fg-4)]">—</span>
-                    ) : t.verdictScore != null ? (
+                    {t.verdictScore != null ? (
                       <button
                         onClick={() => setReviewTrade(t)}
                         className={`rounded border px-2 py-0.5 text-xs font-semibold transition-opacity hover:opacity-80 ${scoreBadgeBg(t.verdictScore)}`}
