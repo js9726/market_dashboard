@@ -2,403 +2,471 @@
   "mood": {
     "label": "CAUTIOUSLY-RISK-OFF",
     "posture": "WAIT",
-    "summary": "Nasdaq futures are pointing lower, dragged down by a disappointing AI chip revenue forecast from Broadcom, which is weighing on the semiconductor sector. Traders are cautious ahead of jobless claims data."
+    "summary": "US futures are pointing to a lower open, particularly in tech, following a stronger-than-expected jobs report which is pushing yields higher and tempering rate cut expectations."
   },
   "breadth": {
-    "up": null,
-    "down": null
+    "up": 958,
+    "down": 2803
   },
   "fearGreed": {
-    "score": null,
-    "label": null
+    "score": 54,
+    "label": "Neutral"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": 752.71,
-      "changePct": -0.2,
+      "level": 752.11,
+      "changePct": -0.66,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
-      "level": 736.77,
-      "changePct": -1.0,
+      "level": 729.62,
+      "changePct": -1.48,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
-      "level": 513.23,
-      "changePct": 0.98,
+      "level": 516.94,
+      "changePct": 0.05,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
-      "level": 288.41,
-      "changePct": 0.26,
+      "level": 289.31,
+      "changePct": -0.92,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "^VIX",
       "name": "Volatility",
-      "level": 16.62,
-      "changePct": 3.49,
+      "level": 15.79,
+      "changePct": 2.53,
       "note": "live",
-      "citation": "Source: Cboe Global Markets"
+      "citation": null
     },
     {
       "symbol": "^TNX",
       "name": "10Y Yield",
-      "level": 4.46,
-      "changePct": -0.89,
+      "level": 4.55,
+      "changePct": 1.34,
       "note": "live",
-      "citation": "Source: Trading Economics"
+      "citation": null
     },
     {
       "symbol": "CL=F",
       "name": "Crude Oil",
-      "level": 94.31,
-      "changePct": -1.98,
+      "level": 93.03,
+      "changePct": 0,
       "note": "futures",
-      "citation": "Source: TradingKey"
+      "citation": null
     }
   ],
-  "indicesNarrative": "Futures are mixed, with a clear divergence between the Dow and the tech-heavy Nasdaq. The Nasdaq is under pressure due to weakness in semiconductor stocks following Broadcom's AI revenue forecast. A rising VIX suggests increasing caution among investors.",
+  "indicesNarrative": "The previous session showed a clear rotation from tech to value, with the Dow gaining while the Nasdaq fell. Pre-market futures indicate a continuation of this trend, as a hot jobs report sends yields higher, pressuring growth-oriented tech stocks. The VIX is ticking up, suggesting a slight increase in investor anxiety.",
   "technicals": {
-    "SPY": null,
-    "QQQ": {
-      "close": 744.21,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": 655.91,
-      "ma200": 617.65,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": 78.44,
-      "macd": 21.76,
+    "SPY": {
+      "close": 756.1,
+      "atr14": 1.7945,
+      "atr_pct": 0.24,
+      "ema21": 756.4,
+      "ema50": 754.11,
+      "ma200": 735,
+      "dist_21_atr": -0.17,
+      "dist_50_atr": 1.11,
+      "dist_200_atr": 11.76,
+      "rsi14": 54.828,
+      "macd": 0.39,
       "macd_signal": null,
       "macd_hist": null,
       "macd_dir": "RISING",
       "curving_down": false,
       "bear_cross_imminent": false,
-      "overbought": true,
+      "overbought": false,
       "oversold": false,
-      "entry_risk": "EXTREME-EXTENDED"
+      "entry_risk": "FAIR"
     },
-    "DIA": null
+    "QQQ": {
+      "close": 738.5,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "UNKNOWN"
+    },
+    "DIA": {
+      "close": 516.69,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "UNKNOWN"
+    }
   },
-  "technicalsNarrative": "QQQ is technically overbought with an RSI of 78.44, suggesting it is extended and prone to a pullback. The entry risk is currently extreme. Other index technical data was not available.",
-  "sectorsThemes": [],
-  "sectorsNarrative": "Semiconductors and AI-related stocks are expected to be weak today following Broadcom's commentary, potentially leading to rotation into more defensive sectors.",
-  "industryNarrative": "The semiconductor industry is facing headwinds after Broadcom's AI chip revenue forecast failed to impress investors, which could create a drag on the broader technology sector.",
+  "technicalsNarrative": "SPY's technical posture is relatively neutral, with an RSI of 54.8 and trading close to its short-term moving averages, suggesting a 'FAIR' entry risk. Momentum is positive but not overextended. Data for QQQ and DIA is less clear, but the price action suggests tech (QQQ) is weaker and more vulnerable to a pullback than the broader market.",
+  "sectorsThemes": [
+    {
+      "symbol": "XLK",
+      "name": "Technology",
+      "changePct": -1.56,
+      "rs": null,
+      "note": "Lagging on higher yields and profit-taking in semis."
+    },
+    {
+      "symbol": "XLF",
+      "name": "Financials",
+      "changePct": -0.6,
+      "rs": null,
+      "note": "Declined in the previous session."
+    },
+    {
+      "symbol": "XLU",
+      "name": "Utilities",
+      "changePct": 0.53,
+      "rs": null,
+      "note": "Showing defensive strength."
+    },
+    {
+      "symbol": "SMH",
+      "name": "Semiconductors",
+      "changePct": null,
+      "rs": null,
+      "note": "Under pressure after Broadcom's cautious guidance."
+    }
+  ],
+  "sectorsNarrative": "A clear defensive rotation was visible yesterday, with Utilities gaining while Technology and specifically Semiconductors sold off. This is driven by concerns over stretched valuations in AI names and a broader shift to value amid changing interest rate expectations.",
+  "industryNarrative": "Semiconductors are the weakest link, pulling the tech sector down after Broadcom's guidance sparked profit-taking across the group. In contrast, more defensive and value-oriented sectors like Industrials and Utilities are showing relative strength.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "STI",
+      "ticker": "COO",
       "side": "LONG",
-      "changePct": 377.78,
-      "why": "Specific catalyst not immediately available.",
+      "changePct": 5.61,
+      "why": "Positive earnings report.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "CXAI",
+      "ticker": "APP",
       "side": "LONG",
-      "changePct": 91.08,
-      "why": "Specific catalyst not immediately available.",
-      "traderLens": "Qullamaggie"
+      "changePct": 3.36,
+      "why": "Positive momentum in pre-market.",
+      "traderLens": "Momentum"
     },
     {
-      "ticker": "FOXX",
+      "ticker": "CMG",
       "side": "LONG",
-      "changePct": 77.27,
-      "why": "Specific catalyst not immediately available.",
-      "traderLens": "Qullamaggie"
+      "changePct": 3.23,
+      "why": "Upgraded by JPMorgan.",
+      "traderLens": "Catalyst"
     },
     {
-      "ticker": "TWAV",
-      "side": "LONG",
-      "changePct": 59.1,
-      "why": "Specific catalyst not immediately available.",
-      "traderLens": "Qullamaggie"
-    },
-    {
-      "ticker": "SBEV",
-      "side": "LONG",
-      "changePct": 58.43,
-      "why": "Stock surges after submitting an NYSE compliance plan.",
-      "traderLens": "Episodic Pivot"
-    },
-    {
-      "ticker": "HUBC",
+      "ticker": "AMD",
       "side": "SHORT",
-      "changePct": -63.3,
-      "why": "Specific catalyst not immediately available.",
-      "traderLens": "Reversion to mean"
+      "changePct": -2.89,
+      "why": "Broad profit-taking in semiconductor stocks.",
+      "traderLens": "Sector Weakness"
     },
     {
-      "ticker": "ADCT",
+      "ticker": "GWRE",
       "side": "SHORT",
-      "changePct": -55.2,
-      "why": "Specific catalyst not immediately available.",
-      "traderLens": "Reversion to mean"
+      "changePct": null,
+      "why": "Negative reaction to earnings.",
+      "traderLens": "Earnings Fade"
     },
     {
-      "ticker": "VIVK",
+      "ticker": "LULU",
       "side": "SHORT",
-      "changePct": -37.6,
-      "why": "Specific catalyst not immediately available.",
-      "traderLens": "Reversion to mean"
+      "changePct": null,
+      "why": "Negative reaction to earnings.",
+      "traderLens": "Earnings Fade"
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": 212.83,
-      "changePct": -0.78,
+      "level": null,
+      "changePct": null,
       "abc": "B",
-      "note": "Pulling back in pre-market with other chip stocks; watching support around $209."
+      "note": "Key leader in the weak semiconductor space; watch for support."
     },
     {
       "ticker": "TSLA",
-      "level": 423.7,
-      "changePct": -0.96,
-      "abc": "B",
-      "note": "Declining in pre-market, influenced by broader tech sell-off."
+      "level": null,
+      "changePct": null,
+      "abc": "C",
+      "note": "Continues to show relative weakness compared to other megacaps."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Received a Buy rating upgrade based on its AI monetization strategy."
+      "abc": "B",
+      "note": "Consolidating; needs to hold key moving averages."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "General market weakness in tech may affect the stock."
+      "abc": "B",
+      "note": "Holding up better than some tech peers, but vulnerable to sector weakness."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "General market sentiment will be a key driver."
+      "abc": "B",
+      "note": "Showing relative strength, but watching broader market direction."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "General market sentiment will be a key driver."
+      "note": "Lagging; needs to reclaim key levels to attract interest."
     },
     {
       "ticker": "GOOGL",
-      "level": 358.54,
-      "changePct": -0.13,
-      "abc": "C",
-      "note": "Slightly down in pre-market trading."
+      "level": null,
+      "changePct": null,
+      "abc": "A",
+      "note": "Showed strong performance yesterday, a pocket of strength in tech."
     },
     {
       "ticker": "AMD",
-      "level": 521.82,
-      "changePct": -3.82,
-      "abc": "B",
-      "note": "Trading lower in sympathy with Broadcom's AI chip outlook."
+      "level": 508.1,
+      "changePct": -2.89,
+      "abc": "C",
+      "note": "Down hard in pre-market, reflecting broad semi weakness. RSI near overbought."
     },
     {
       "ticker": "SMCI",
-      "level": null,
+      "level": 46.9,
       "changePct": null,
       "abc": "C",
-      "note": "Likely to be affected by the negative sentiment in the AI hardware space."
+      "note": "Volatile name in the AI space, caught in the semiconductor downdraft."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "General market sentiment will be a key driver."
+      "note": "High-beta name likely to be weak in a risk-off tape."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Pre-market decline noted due to increased expenses."
+      "abc": "B",
+      "note": "Cybersecurity name, downgraded by Berenberg."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "Price action will be tied to Bitcoin's movement."
+      "note": "High correlation to Bitcoin, which is seeing weakness."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is showing signs of weakness, particularly in the leading tech sector. Not an ideal environment to be aggressive on new long positions."
+      "view": "Market is showing signs of weakness and rotation. Not an ideal environment for new long positions. Focus on protecting capital."
     },
     {
       "name": "Ted Zhang",
-      "view": "Potential rotation out of technology and semiconductors. Money may flow to more defensive or value-oriented sectors."
+      "view": "Clear rotation out of tech/semis and into defensive/value sectors. Follow the institutional flow away from growth."
     },
     {
       "name": "Clement Ang",
-      "view": "The market context is deteriorating with Nasdaq weakness. It's time to be highly selective and wait for A-grade setups to emerge from the chop."
+      "view": "Market context is deteriorating. Futures are down, yields are up. This is a time for patience, not forcing trades. A-grade setups only."
     },
     {
       "name": "SRxTrades",
-      "view": "Choppy price action is likely. Wait for clean pivots and volume confirmation before entering any new trades. Avoid chasing weakness."
+      "view": "Volume was high on yesterday's divergence. Wait for a clean pivot and volume confirmation before entering new positions. Avoid chasing weakness."
     },
     {
       "name": "Jeff",
-      "view": "Adhere to stop-losses strictly, especially in a volatile market. The current environment is not forgiving."
+      "view": "Respect stops, especially on any remaining tech longs. The character of the market is changing."
     },
     {
       "name": "Qullamaggie",
-      "view": "Momentum in leadership stocks is stalling. Be cautious with breakouts as they are more likely to fail in this environment."
+      "view": "Momentum in leadership stocks is stalling. Not the time to be aggressive on breakouts. Wait for the tape to firm up."
     },
     {
       "name": "Composite",
-      "view": "Adopt a defensive posture today. The weakness in the semiconductor space could have a ripple effect. It's a day to observe, protect capital, and wait for clarity. Raise the bar for new entries."
+      "view": "The key driver today is the stronger-than-expected jobs report, pushing yields up and pressuring tech. The posture is defensive (WAIT). Avoid new longs in growth sectors and watch for potential short setups in weak names if the market continues to sell off."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "CIEN",
-        "consensus": "EPS $1.45 / Rev $1.5B"
+        "ticker": "ABM",
+        "consensus": "EPS $0.88"
       }
     ],
-    "amc": [
+    "amc": [],
+    "yesterdayReactions": [
       {
-        "ticker": "LULU",
-        "consensus": "EPS $1.69 / Rev $2.4B"
+        "ticker": "AVGO",
+        "result": "Guidance disappointed",
+        "movePct": -13
       },
       {
-        "ticker": "DOCU",
-        "consensus": "EPS $1.00 / Rev $823.3M"
+        "ticker": "LULU",
+        "result": "Negative reaction to report",
+        "movePct": null
+      },
+      {
+        "ticker": "FIVE",
+        "result": "Beat estimates but sold off",
+        "movePct": -10
       }
-    ],
-    "yesterdayReactions": []
+    ]
   },
   "calendar": [
     {
       "time": "08:30 ET",
-      "name": "Initial Jobless Claims",
-      "consensus": null
+      "name": "Nonfarm Payrolls (May)",
+      "consensus": "+85K"
     },
     {
       "time": "08:30 ET",
-      "name": "Continuing Jobless Claims",
-      "consensus": "1,777.00K"
+      "name": "Unemployment Rate (May)",
+      "consensus": "4.3%"
+    },
+    {
+      "time": "08:30 ET",
+      "name": "Average Hourly Earnings MoM (May)",
+      "consensus": "0.3%"
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "UNH",
-        "firm": "Bank of America",
-        "rating": "Buy",
-        "pt": 450
-      },
-      {
-        "ticker": "MUR",
-        "firm": "KeyBanc",
+        "ticker": "CMG",
+        "firm": "JPMorgan",
         "rating": "Overweight",
-        "pt": 48
+        "pt": null
       },
       {
-        "ticker": "RTX",
-        "firm": "Jefferies",
-        "rating": "Buy",
-        "pt": 220
+        "ticker": "AMD",
+        "firm": "Barclays",
+        "rating": "Overweight",
+        "pt": 665
       }
     ],
     "downgrades": [
       {
-        "ticker": "AVGO",
-        "firm": "Macquarie",
-        "rating": "Neutral",
-        "pt": 437
-      },
-      {
-        "ticker": "CMS",
-        "firm": "Jefferies",
+        "ticker": "CRWD",
+        "firm": "Berenberg",
         "rating": "Hold",
-        "pt": 74
+        "pt": null
       },
       {
-        "ticker": "OLLI",
-        "firm": "Gordon Haskett",
-        "rating": "Accumulate",
-        "pt": 90
+        "ticker": "AMD",
+        "firm": "Zacks Research",
+        "rating": "Hold",
+        "pt": null
       }
     ]
   },
-  "alert": "Nasdaq futures under pressure from weakness in semiconductor stocks.",
+  "alert": "US Nonfarm Payrolls came in much hotter than expected (+172K vs +85K consensus), pushing yields higher.",
+  "news": [
+    {
+      "headline": "US jobs report comes in stronger than expected, with 172K jobs added in May vs. 85K forecast",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "DIA",
+        "^TNX"
+      ],
+      "source": "Reuters - https://www.stonex.com/news/financial-markets-morning-commentary/",
+      "time": "08:30 ET"
+    },
+    {
+      "headline": "US futures point to a lower open, with Nasdaq futures down over 1% as yields rise on jobs data",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "DIA"
+      ],
+      "source": "investing.com - https://www.investing.com/news/stock-market-news/stock-market-today-futures-edge-lower-with-key-jobs-report-in-focus-3472159",
+      "time": "pre-market"
+    },
+    {
+      "headline": "European markets are mixed as investors digest US jobs data and monitor geopolitical tensions",
+      "impact": "MED",
+      "tickers": null,
+      "source": "CaixaBank Research - https://www.caixabankresearch.com/en/financial-markets/daily-report/financial-markets-daily-report-05-june-2026",
+      "time": "morning"
+    },
+    {
+      "headline": "Semiconductor stocks continue to face pressure after Broadcom's disappointing AI-chip guidance",
+      "impact": "MED",
+      "tickers": [
+        "SMH",
+        "AVGO",
+        "NVDA",
+        "AMD"
+      ],
+      "source": "The Motley Fool - https://www.fool.com/investing/2026/06/04/stock-market-today-broadcom-drags-on-nasdaq-at-mi/",
+      "time": "overnight"
+    }
+  ],
   "screenerScores": {},
   "citations": [
-    "Trading Economics, June 4 2026",
-    "Benzinga, June 4 2026",
-    "Benzinga, June 4 2026",
-    "24/7 Wall St., June 4 2026",
-    "Public.com, June 4 2026",
-    "Reddit r/DeepFuckingValue, June 4 2026",
-    "Investing.com, June 4 2026",
-    "Digrin, June 4 2026",
-    "Investing.com, June 4 2026",
-    "GuruFocus, June 4 2026",
-    "Fidelity, June 4 2026",
-    "Seeking Alpha, June 4 2026",
-    "Leverage Shares, June 4 2026",
-    "Markets Insider, June 4 2026",
-    "Cboe Global Markets, June 4 2026",
-    "Google Finance, June 4 2026",
-    "Benzinga, June 4 2026",
-    "Stock Consultant, June 4 2026",
-    "Tickeron.com, June 4 2026",
-    "MacroMicro, June 4 2026",
-    "Investing.com, June 4 2026",
-    "Benzinga, June 4 2026",
-    "TipRanks.com, June 4 2026",
-    "Kavout, June 4 2026",
-    "Earnings Whispers, June 4 2026",
-    "Macrotrends, June 4 2026",
-    "Investing.com, June 4 2026",
-    "Robinhood, June 4 2026",
-    "TipRanks.com, June 4 2026",
-    "Trading Economics, June 4 2026",
-    "Stock Analysis, June 4 2026",
-    "TradingKey, June 4 2026",
-    "Investing.com, June 4 2026",
-    "GuruFocus, June 4 2026",
-    "MarketBeat, June 4 2026",
-    "FRED, June 4 2026",
-    "MarketBeat, June 4 2026",
-    "TradingKey, June 4 2026",
-    "TradingKey, June 4 2026",
-    "YouTube, Wicked Stocks, June 4 2026",
-    "Robinhood, June 4 2026",
-    "Robinhood, June 4 2026",
-    "MarketBeat, June 4 2026",
-    "Investing.com, June 4 2026",
-    "Investing.com, June 4 2026",
-    "YouTube, June 4 2026",
-    "TradingView, June 4 2026",
-    "Phemex, June 4 2026"
+    "Trading Economics - https://tradingeconomics.com/united-states/10-year-treasury-yield",
+    "Benzinga - https://www.benzinga.com/markets/equities/26/06/39185999/whats-going-on-with-amd-stock-friday",
+    "Zacks Investment Research - https://www.zacks.com/stock/news/2282249/stock-market-news-for-jun-4-2026",
+    "Investing.com - https://www.investing.com/pre-market/",
+    "Digrin - https://www.digrin.com/earnings/2026-06-05",
+    "Cboe - https://www.cboe.com/tradable_products/vix/",
+    "Investtech - https://www.investtech.com/us/market.php?product=getstockreport&paper=SPY.US",
+    "investing.com - https://www.investing.com/news/stock-market-news/live-european-markets-wrap-a-mixed-mood-waiting-on-nfp-usiran-developments-432SI-3472146",
+    "YouTube - https://www.youtube.com/watch?v=gT8LpBvSgUo",
+    "FinHacker.cz - https://finhacker.cz/fear-and-greed-index-historical-data-chart/",
+    "MacroMicro - https://en.macromicro.me/collections/43/us-market-sentiment/243/us-cnn-fear-and-greed-index",
+    "Kiplinger - https://www.kiplinger.com/investing/stocks/earnings-calendar-and-analysis-for-this-week",
+    "24/7 Wall St. - https://247wallst.com/investing/2026/06/04/stock-market-live-june-4-2026-s-p-500-spy-fall-as-broadcom-sinks/",
+    "CaixaBank Research - https://www.caixabankresearch.com/en/financial-markets/daily-report/financial-markets-daily-report-05-june-2026",
+    "The Motley Fool - https://www.fool.com/investing/2026/06/04/stock-market-today-broadcom-drags-on-nasdaq-at-mi/",
+    "MarketBeat - https://www.marketbeat.com/instant-alerts/nasdaq-amd-a-buy-or-sell-right-now-2026-06-2/",
+    "StoneX - https://www.stonex.com/news/financial-markets-morning-commentary/"
   ]
 }
