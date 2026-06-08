@@ -304,6 +304,7 @@ export default function EquityTimeline() {
         <div className="border-t border-[var(--line)] pt-4">
           <svg
             viewBox="0 0 800 280"
+            preserveAspectRatio="none"
             className="h-72 w-full cursor-crosshair"
             onMouseMove={handleChartMove}
             onMouseLeave={() => setHoverIndex(null)}
@@ -312,14 +313,14 @@ export default function EquityTimeline() {
           >
             <rect x={0} y={0} width={800} height={280} fill="transparent" />
             <text x={0} y={10} fill="var(--fg-3)" fontSize={10}>Account equity</text>
-            <line x1={0} y1={EQUITY_TOP + EQUITY_H} x2={800} y2={EQUITY_TOP + EQUITY_H} stroke="var(--line)" strokeWidth={1} />
-            {equityPath && <path d={equityPath} stroke="var(--fg-2)" strokeWidth={1.8} fill="none" />}
+            <line x1={0} y1={EQUITY_TOP + EQUITY_H} x2={800} y2={EQUITY_TOP + EQUITY_H} stroke="var(--line)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+            {equityPath && <path d={equityPath} stroke="var(--fg-2)" strokeWidth={1.8} fill="none" vectorEffect="non-scaling-stroke" />}
             <text x={0} y={PNL_TOP - 8} fill="var(--fg-3)" fontSize={10}>Realized P&amp;L</text>
-            <line x1={0} y1={zeroY(realizedDomain, PNL_TOP, PNL_H)} x2={800} y2={zeroY(realizedDomain, PNL_TOP, PNL_H)} stroke="var(--line)" strokeWidth={1} strokeDasharray="4 4" />
-            {realizedPath && <path d={realizedPath} stroke="var(--accent)" strokeWidth={2} fill="none" />}
+            <line x1={0} y1={zeroY(realizedDomain, PNL_TOP, PNL_H)} x2={800} y2={zeroY(realizedDomain, PNL_TOP, PNL_H)} stroke="var(--line)" strokeWidth={1} strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />
+            {realizedPath && <path d={realizedPath} stroke="var(--accent)" strokeWidth={2} fill="none" vectorEffect="non-scaling-stroke" />}
             {hoverIndex != null && chart.dates[hoverIndex] && (
               <g>
-                <line x1={xForIndex(hoverIndex, chart.dates.length)} y1={0} x2={xForIndex(hoverIndex, chart.dates.length)} y2={280} stroke="var(--accent)" strokeOpacity={0.45} strokeWidth={1} />
+                <line x1={xForIndex(hoverIndex, chart.dates.length)} y1={0} x2={xForIndex(hoverIndex, chart.dates.length)} y2={280} stroke="var(--accent)" strokeOpacity={0.45} strokeWidth={1} vectorEffect="non-scaling-stroke" />
                 {hover?.equity != null && (
                   <circle cx={xForIndex(hoverIndex, chart.dates.length)} cy={yFor(hover.equity, equityDomain, EQUITY_TOP, EQUITY_H)} r={3} fill="var(--fg-2)" />
                 )}
