@@ -20,6 +20,7 @@ import { prisma } from "@/lib/prisma";
 import { getOwnerUserId } from "@/server/a-list-extractor";
 import { emaSeries, atrSeries, lowestLow, type Candle } from "@/server/indicators";
 import { atrFloorStop, rUnit, realizedVsFullR, softVsHard } from "@/server/alist-metrics";
+import { reconcileClosedHeld } from "@/server/alist-close";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -236,10 +237,22 @@ export async function GET(req: Request) {
     }
   }
 
+  // Auto-close: held candidates whose broker position is gone (operator exited
+  // / stopped out). Flips ACTIVE → STOPPED_OUT|CLOSED with realized R so manual
+  // broker exits register without hand-entry. Best-effort; never fails the cron.
+  let autoClosed: string[] = [];
+  try {
+    const rc = await reconcileClosedHeld(prisma, userId);
+    autoClosed = rc.closed.map((c) => `${c.ticker}(${c.realizedR ?? "?"}R ${c.outcome})`);
+  } catch (e) {
+    errors.push(`reconcile: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
   return NextResponse.json({
     ok: true,
     candidates: candidates.length,
     processed,
+    autoClosed,
     errors: errors.length ? errors.slice(0, 10) : undefined,
   });
 }

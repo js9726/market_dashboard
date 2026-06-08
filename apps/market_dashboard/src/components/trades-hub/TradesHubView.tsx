@@ -4,12 +4,14 @@ import { useMemo, useState } from "react";
 import AListView from "@/components/a-list/AListView";
 import JournalShell from "@/components/journal/JournalShell";
 import AnalyticsView from "@/components/audits/AnalyticsView";
+import AnalysesView from "@/components/audits/AnalysesView";
 import Icon from "@/components/market-desk/Icon";
 
-type TabKey = "a-list" | "journal" | "analytics";
+type TabKey = "a-list" | "screened" | "journal" | "analytics";
 
 const TABS: { id: TabKey; label: string; icon: string }[] = [
   { id: "a-list", label: "A-List", icon: "review" },
+  { id: "screened", label: "Screened", icon: "search" },
   { id: "journal", label: "Journal", icon: "journal" },
   { id: "analytics", label: "Analytics", icon: "analytics" },
 ];
@@ -18,6 +20,8 @@ export default function TradesHubView() {
   const [tab, setTab] = useState<TabKey>("a-list");
   const content = useMemo(() => {
     switch (tab) {
+      case "screened":
+        return <AnalysesView />;
       case "journal":
         return <JournalShell />;
       case "analytics":
