@@ -57,7 +57,7 @@ Step "CLAUDE.md has exactly 8 numbered sections (1..8)" {
 Step "Core Python scripts import without error" {
     Push-Location (Join-Path $be "scripts")
     try {
-        python -c "import importlib; [importlib.import_module(m) for m in ['build_data','breadth_scan','morning_brief','trader_verdict','tv_screener_fetch','live_quote_daemon']]; print('imports OK')"
+        python -c "import importlib; [importlib.import_module(m) for m in ['build_data','breadth_scan','morning_brief','trader_verdict','tv_screener_fetch']]; print('imports OK')"
     } finally { Pop-Location }
 }
 

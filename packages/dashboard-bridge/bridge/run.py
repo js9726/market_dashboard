@@ -93,6 +93,19 @@ def _sync_once(dry: bool = False) -> bool:
 def _run_scheduled_refreshes(cfg) -> None:
     """Run calendar-gated refresh tasks that should survive broker errors."""
     try:
+        from .portfolio_quotes import maybe_refresh_portfolio_quotes
+
+        result = maybe_refresh_portfolio_quotes(cfg)
+        if result.get("skipped"):
+            log.debug("Portfolio quote refresh skipped: %s", result.get("skipped"))
+        elif result.get("ok"):
+            log.info("Portfolio quote refresh result: %s", result)
+        else:
+            log.warning("Portfolio quote refresh failed: %s", result)
+    except Exception as e:
+        log.warning("Portfolio quote refresh check failed (non-fatal): %s", e)
+
+    try:
         from .breadth import maybe_refresh_breadth
 
         result = maybe_refresh_breadth(cfg)

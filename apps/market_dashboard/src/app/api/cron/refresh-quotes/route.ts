@@ -48,10 +48,13 @@ type YahooChartMeta = {
 function authorized(req: Request): boolean {
   const cronSecret = process.env.CRON_SECRET;
   const ingestKey = process.env.BRIEF_INGEST_KEY;
+  const liveQuoteKey = process.env.LIVE_QUOTE_INGEST_KEY;
   const authHeader = req.headers.get("authorization") ?? "";
   const urlSecret = new URL(req.url).searchParams.get("secret");
   if (cronSecret && authHeader === `Bearer ${cronSecret}`) return true;
   if (ingestKey && urlSecret === ingestKey) return true;
+  if (liveQuoteKey && authHeader === `Bearer ${liveQuoteKey}`) return true;
+  if (liveQuoteKey && urlSecret === liveQuoteKey) return true;
   // Vercel cron also sets `x-vercel-cron-signature` — accept any non-empty value
   // since the cron path is privately scheduled and not user-discoverable.
   if (req.headers.get("x-vercel-cron-signature")) return true;

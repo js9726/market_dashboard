@@ -1,14 +1,20 @@
 # Dashboard Bridge
 
-Local Python daemon that syncs your moomoo OpenD positions and trade fills to the Market Dashboard cloud.
+Local Python daemons that sync your MooMoo OpenD and IBKR positions, trade
+fills, quotes, and equity to the Market Dashboard cloud.
 
 ## What it does
 
-```
-┌────────────────────┐         ┌──────────────────────┐         ┌───────────────────┐
-│  moomoo OpenD      │ ◄─SDK── │  dashboard-bridge    │ ──HTTPS► │  /api/bridge/sync │
-│  127.0.0.1:11111   │         │  (this package)      │         │  (Vercel)         │
-└────────────────────┘         └──────────────────────┘         └───────────────────┘
+```text
+MooMoo OpenD / IB Gateway
+        |
+        | broker SDK / API
+        v
+packages/dashboard-bridge
+        |
+        | HTTPS
+        v
+Vercel dashboard APIs
 ```
 
 Every 60 seconds (default), the bridge:
@@ -16,7 +22,8 @@ Every 60 seconds (default), the bridge:
 2. Pulls trade fills since last sync
 3. Posts both to your dashboard via authenticated HTTPS
 4. Pushes live quotes for held tickers + configured watch tickers when `live_quote_key` is set
-5. Triggers market breadth once per US trading day after the close when `brief_ingest_key` is set
+5. Nudges the dashboard portfolio quote refresh endpoint every five minutes when `live_quote_key` is set
+6. Triggers market breadth once per US trading day after the close when `brief_ingest_key` is set
 
 The dashboard then surfaces live P&L in `/dashboard/portfolio`.
 

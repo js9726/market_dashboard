@@ -234,7 +234,7 @@ across routes without a map. Add a "which route uses which secret" sub-table.
 ### P-5 — Type hints across Python scripts
 
 `build_data.py`, `breadth_scan.py`, `morning_brief.py`, `trader_verdict.py`,
-`tv_screener_fetch.py`, `live_quote_daemon.py`, `yahoo_quote_push.py` —
+`tv_screener_fetch.py`, and the `packages/dashboard-bridge/bridge/` modules -
 add return-type annotations on public functions. Low-risk but ~150 line-touches;
 best done alongside P-1.
 
@@ -255,7 +255,7 @@ These were flagged by the initial audit but verified as non-issues:
 - **B4** — `breadth_scan.py:132,144` — `datetime.timezone.utc` works correctly. `import datetime` at [line 44](../../market_dashboard_backend/scripts/breadth_scan.py#L44) makes the full `datetime.timezone.utc` path available; not "by accident".
 - **B6** — `morning_brief.py` OpenAI/Claude blocks don't need `resp.raise_for_status()`. They use SDK clients (`openai.OpenAI.responses.create`, `anthropic.Anthropic.beta.messages.create`) which raise on HTTP errors automatically — only Gemini uses raw `requests.post` and it already has the check.
 - **B10** — `trader_verdict.py:466,473` — `_source` field is not dead; it's read at [line 481](../../market_dashboard_backend/scripts/trader_verdict.py#L481) to print provenance.
-- **B12** — `live_quote_daemon.py:59` — `_load_env()` is already called at module top, not inside `main()`. No race.
+- **B12** - The old `live_quote_daemon.py` env-loader concern is obsolete; live quotes now flow through `packages/dashboard-bridge`.
 - **LRN-005** — `journal/sync/route.ts` no longer has a cookie-race; current code captures `userId` + `connectionId` synchronously at [lines 98-99](../../src/app/api/journal/sync/route.ts#L98) before `after()`.
 
 ---

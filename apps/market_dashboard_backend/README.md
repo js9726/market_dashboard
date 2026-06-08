@@ -44,12 +44,12 @@ logged in and API access is enabled.
 The Python scripts in `scripts/` are still useful for market data builds,
 screeners, breadth, and morning brief generation.
 
-`scripts\live_quote_daemon.py` is legacy quote-only code. Prefer
-`start_moomoo_bridge.bat`, because the bridge is the complete path that also
-syncs broker positions, fills, and equity into the dashboard database.
+The old standalone quote-only daemon was removed. Use `start_moomoo_bridge.bat`,
+because the bridge is the complete path that syncs broker positions, fills,
+equity, held-position quotes, and market breadth into the dashboard database.
 
-`scripts\start_live_quote_daemon.bat` is kept only as a backward-compatible
-shortcut. It now forwards to `start_moomoo_bridge.bat`.
+`scripts\start_live_quote_daemon.bat` is kept as a backward-compatible shortcut.
+It forwards to `start_moomoo_bridge.bat`.
 
 ## Local Config
 

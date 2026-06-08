@@ -166,7 +166,7 @@ Define success criteria. Loop until verified.
 | `DEEPSEEK_API_KEY` | Yes (Phase 5) | AI stock analysis tab + intraday morning verdict regen |
 | `BRIEF_INGEST_KEY` | Yes (Phase 5) | Shared secret for `POST /api/morning-verdict/ingest` (cron writes brief rows) |
 | `LIVE_QUOTE_INGEST_KEY` | Yes (Phase 5) | Shared secret for `POST /api/live-quotes/ingest` (moomoo daemon + Yahoo fallback) |
-| `MOOMOO_OPEND_HOST` | Optional (local-only) | moomoo OpenD host for `live_quote_daemon.py` (default `127.0.0.1`) |
+| `MOOMOO_OPEND_HOST` | Optional (local-only) | moomoo OpenD host for local bridge scripts (default `127.0.0.1`) |
 | `MOOMOO_OPEND_PORT` | Optional (local-only) | moomoo OpenD port (default `11111`) |
 | `BLOB_READ_WRITE_TOKEN` | Optional (Feature 7.2) | Vercel Blob token for journal-entry image attachments. Get via `vercel env pull` or Vercel dashboard. Without it, `/api/journal/entry/attachments` returns 503 cleanly. |
 

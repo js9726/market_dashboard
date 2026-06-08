@@ -196,6 +196,18 @@ def _sync_once(cfg, ibkr_cfg, dry: bool = False) -> bool:
     client = DashboardClient(cfg)
     result = client.sync(positions, fills, equity=equity)
     log.info("Sync result: %s", result)
+    try:
+        from bridge.portfolio_quotes import maybe_refresh_portfolio_quotes
+
+        quote_result = maybe_refresh_portfolio_quotes(cfg)
+        if quote_result.get("skipped"):
+            log.debug("Portfolio quote refresh skipped: %s", quote_result.get("skipped"))
+        elif quote_result.get("ok"):
+            log.info("Portfolio quote refresh result: %s", quote_result)
+        else:
+            log.warning("Portfolio quote refresh failed: %s", quote_result)
+    except Exception as e:
+        log.warning("Portfolio quote refresh failed (non-fatal): %s", e)
     return bool(result.get("ok"))
 
 
