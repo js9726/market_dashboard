@@ -22,6 +22,9 @@ type Trade = {
   rewardPct: Decimal | null;
   positionPct: Decimal | null;
   currency: string | null;
+  currencyCode?: string | null;
+  pnlUsd?: number | null;
+  pnlSource?: string | null;
   platform: string | null;
   industry: string | null;
   strategy: string | null;
@@ -920,12 +923,41 @@ function fmtNum(v: Decimal | null | undefined): string {
   return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function fmtPnl(v: Decimal | null | undefined): { text: string; color: string } {
-  if (v === null || v === undefined) return { text: "Open", color: "text-[var(--fg-3)]" };
-  const n = parseFloat(v.toString());
+function ccSymbol(cc: string | null | undefined): string {
+  const c = (cc ?? "").toUpperCase();
+  if (c === "MYR") return "RM ";
+  if (c === "" || c === "USD") return "$";
+  return `${c} `;
+}
+
+function fmtMoney(n: number, symbol: string): string {
+  return `${n >= 0 ? "+" : "-"}${symbol}${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/**
+ * Currency-aware P&L. Prefers the USD-normalized `pnlUsd` (broker-true or
+ * fixed-rate converted) and surfaces the original sheet currency (e.g. RM) on
+ * hover. When not yet converted, shows the native currency honestly instead of
+ * mislabeling MYR as USD.
+ */
+function fmtPnlRow(t: Trade): { text: string; color: string; title?: string } {
+  const raw = t.pnl == null ? null : parseFloat(t.pnl.toString());
+  const usd = t.pnlUsd ?? null;
+  const cc = t.currencyCode ?? t.currency ?? null;
+  const isNonUsd = cc != null && cc.toUpperCase() !== "USD";
+
+  if (usd != null) {
+    const title = raw != null && isNonUsd
+      ? `Sheet original: ${ccSymbol(cc)}${Math.abs(raw).toLocaleString("en-US", { minimumFractionDigits: 2 })}` +
+        (t.pnlSource ? ` (${t.pnlSource})` : "")
+      : undefined;
+    return { text: fmtMoney(usd, "$"), color: usd >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]", title };
+  }
+  if (raw == null) return { text: "Open", color: "text-[var(--fg-3)]" };
   return {
-    text: `${n >= 0 ? "+" : ""}$${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
-    color: n >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]",
+    text: fmtMoney(raw, ccSymbol(cc)),
+    color: raw >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]",
+    title: isNonUsd ? "Original sheet currency — not yet converted to USD (set the fixed FX rate in Settings)" : undefined,
   };
 }
 
@@ -1090,7 +1122,7 @@ export default function TradeLog() {
             ) : trades.length === 0 ? (
               <tr><td colSpan={12} className="px-3 py-6 text-center text-[var(--fg-3)]">No trades found</td></tr>
             ) : trades.map((t, i) => {
-              const { text: pnlText, color: pnlColor } = fmtPnl(t.pnl);
+              const { text: pnlText, color: pnlColor, title: pnlTitle } = fmtPnlRow(t);
               const isOpen = t.pnl === null;
               const isLive = t.source === "LIVE";
               const liveU = t.liveUnrealizedPl;
@@ -1148,7 +1180,7 @@ export default function TradeLog() {
                         Live quote pending
                       </span>
                     ) : t.pnl != null ? (
-                      <span className={pnlColor}>{pnlText}</span>
+                      <span className={pnlColor} title={pnlTitle}>{pnlText}</span>
                     ) : (
                       <span className="text-[var(--fg-3)]">Open</span>
                     )}
