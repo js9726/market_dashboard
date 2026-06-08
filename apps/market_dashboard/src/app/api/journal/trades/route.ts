@@ -11,6 +11,7 @@ import {
   plainTicker,
 } from "@/lib/trades/position-trade-records";
 import type { Prisma } from "@prisma/client";
+import { getUsdMyrRate, moneyToUsd } from "@/lib/equity-currency";
 import { NextResponse } from "next/server";
 
 /**
@@ -83,6 +84,9 @@ export async function GET(req: Request) {
     select: { sheetTab: true },
   });
   const operatorLabel = operatorFromSheetTab(connection?.sheetTab);
+  // Live USD/MYR rate (Frankfurter, cached) to convert non-broker MYR sheet
+  // P&L to USD at display time — broker-true pnlUsd (set on the row) wins.
+  const fxUsdMyr = await getUsdMyrRate();
 
   // ── Live broker positions: truth for currently-open holdings ──────────────
   const positions = await prisma.position.findMany({
@@ -198,6 +202,16 @@ export async function GET(req: Request) {
         broker: pos.brokerAccount.alias,
         hasPlan: t.proposedEntry != null || t.proposedSL != null || t.proposedTP != null,
       };
+    }
+    // Non-broker sheet row: if the P&L is in a non-USD sheet currency (MYR) and
+    // no broker-true pnlUsd is stored, convert at the LIVE FX rate so the table
+    // shows USD (original currency stays on the row for the RM-on-hover label).
+    const cc = t.currencyCode ?? t.currency;
+    if (t.pnlUsd == null && t.pnl != null && cc != null && cc.toUpperCase() !== "USD") {
+      const usd = moneyToUsd(toNum(t.pnl), cc, fxUsdMyr);
+      if (usd != null) {
+        return { ...t, pnlUsd: usd, pnlSource: "live-fx", source: "SHEET" as const };
+      }
     }
     return { ...t, source: "SHEET" as const };
   });
