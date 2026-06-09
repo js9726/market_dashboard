@@ -2,40 +2,40 @@
   "mood": {
     "label": "CAUTIOUSLY-RISK-ON",
     "posture": "WAIT",
-    "summary": "US futures are pointing to a higher open, led by a rebound in technology and semiconductor stocks after last week's sell-off. However, rising oil prices due to Middle East tensions are keeping inflation concerns in focus."
+    "summary": "Markets are attempting a rebound after last week's sharp, rate-driven selloff in tech. Europe is positive and US futures are pointing to a higher open, but caution is warranted as yields remain elevated."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": 54,
-    "label": "Neutral"
+    "score": 42,
+    "label": "Fear"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": 0.83,
+      "changePct": 0.5,
       "note": "futures",
-      "citation": null
+      "citation": "Source: FinancialJuice 04:00 ET"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 1.49,
+      "changePct": 0.8,
       "note": "futures",
-      "citation": null
+      "citation": "Source: FinancialJuice 04:00 ET"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": 0.36,
+      "changePct": 0.31,
       "note": "futures",
-      "citation": null
+      "citation": "Source: 24/7 Wall St. 06:00 ET"
     },
     {
       "symbol": "IWM",
@@ -47,54 +47,33 @@
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility",
-      "level": 18.46,
-      "changePct": -14.18,
+      "name": "Volatility Index",
+      "level": 21.51,
+      "changePct": null,
       "note": "live",
-      "citation": null
+      "citation": "Source: Zacks 19:45 ET"
     },
     {
       "symbol": "^TNX",
-      "name": "10Y Yield",
-      "level": 4.57,
-      "changePct": null,
+      "name": "10-Yr Treasury",
+      "level": 4.55,
+      "changePct": -0.44,
       "note": "live",
-      "citation": null
+      "citation": "Source: Trading Economics 05:15 ET"
     },
     {
       "symbol": "CL=F",
       "name": "Crude Oil",
-      "level": 95.64,
-      "changePct": 4.21,
+      "level": 92.1,
+      "changePct": 1.72,
       "note": "live",
-      "citation": null
+      "citation": "Source: 24/7 Wall St. 06:00 ET"
     }
   ],
-  "indicesNarrative": "Futures indicate a gap up this morning, with the Nasdaq leading the charge as chip stocks rebound from Friday's sharp sell-off. The Dow is showing more modest gains. A falling VIX suggests decreasing fear, but elevated oil prices and Treasury yields could cap upside potential as inflation remains a key concern for the market.",
+  "indicesNarrative": "US index futures are pointing to a green open, attempting to recover from a sharp selloff on Friday driven by strong jobs data that pushed yields higher. Technology and AI-related names that were hit hardest are leading the rebound in pre-market. European markets are also trading higher, supported by easing geopolitical tensions in the Middle East.",
   "technicals": {
     "SPY": {
-      "close": 757.18,
-      "atr14": 3.92,
-      "atr_pct": 0.00517,
-      "ema21": 745.99,
-      "ema50": 711.9,
-      "ma200": 681.05,
-      "dist_21_atr": 2.85,
-      "dist_50_atr": 11.55,
-      "dist_200_atr": 19.42,
-      "rsi14": 69.74,
-      "macd": 11.98,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": "RISING",
-      "curving_down": false,
-      "bear_cross_imminent": false,
-      "overbought": false,
-      "oversold": false,
-      "entry_risk": "EXTENDED"
-    },
-    "QQQ": {
-      "close": null,
+      "close": 7383.74,
       "atr14": null,
       "atr_pct": null,
       "ema21": null,
@@ -108,314 +87,296 @@
       "macd_signal": null,
       "macd_hist": null,
       "macd_dir": null,
-      "curving_down": false,
-      "bear_cross_imminent": false,
-      "overbought": false,
-      "oversold": false,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
       "entry_risk": "UNKNOWN"
     },
-    "DIA": {
-      "close": 514.05,
+    "QQQ": {
+      "close": 25709.43,
       "atr14": null,
       "atr_pct": null,
-      "ema21": 499.23,
-      "ema50": 485.44,
-      "ma200": 475.03,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
       "dist_21_atr": null,
       "dist_50_atr": null,
       "dist_200_atr": null,
-      "rsi14": 69.07,
-      "macd": 5.49,
+      "rsi14": null,
+      "macd": null,
       "macd_signal": null,
       "macd_hist": null,
-      "macd_dir": "RISING",
-      "curving_down": false,
-      "bear_cross_imminent": false,
-      "overbought": false,
-      "oversold": false,
-      "entry_risk": "EXTENDED"
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
     }
   },
-  "technicalsNarrative": "Both SPY and DIA are technically extended, with RSI readings near 70, suggesting they are approaching overbought conditions. Chasing entries here is risky. The MACD for both is rising, indicating positive momentum for now, but the risk/reward for new long positions is becoming less favorable.",
-  "sectorsThemes": [],
-  "sectorsNarrative": "Semiconductors and technology are expected to lead at the open, attempting to recover from last week's losses. Energy sector will also be in focus due to the significant jump in crude oil prices.",
-  "industryNarrative": "Semiconductor and crypto-related stocks are showing significant strength in the pre-market, indicating a potential leadership role for these groups today. The broader market rebound seems to be fueled by a 'buy the dip' mentality in these high-beta areas.",
-  "industryMovers": [],
-  "movers": [
+  "technicalsNarrative": "Detailed daily technical data is not available at this time. However, the sharp sell-off on Friday suggests momentum has cooled significantly, and indices may be in a short-term oversold condition, prompting this morning's bounce. Chasing the open is risky until price can reclaim key moving averages.",
+  "sectorsThemes": [
     {
-      "ticker": "MRVL",
-      "side": "LONG",
-      "changePct": 9,
-      "why": "Marvell Technology is set to be added to the S&P 500 index.",
-      "traderLens": "Qullamaggie"
+      "symbol": "XLK",
+      "name": "Technology",
+      "changePct": -1.6,
+      "rs": null,
+      "note": "Led declines on Friday but is indicating a rebound in pre-market."
     },
     {
-      "ticker": "MSTR",
-      "side": "LONG",
-      "changePct": 7.16,
-      "why": "Riding the positive sentiment in the cryptocurrency sector and a broader tech rebound.",
-      "traderLens": "Qullamaggie"
+      "symbol": "XLV",
+      "name": "Health Care",
+      "changePct": 3.1,
+      "rs": null,
+      "note": "Showed strong relative strength during the selloff."
     },
     {
-      "ticker": "SMCI",
-      "side": "LONG",
-      "changePct": 7,
-      "why": "Rebounding from a sharp sell-off last Friday, as part of a broader recovery in semiconductor stocks.",
-      "traderLens": "Minervini"
+      "symbol": "XLF",
+      "name": "Financials",
+      "changePct": 2.6,
+      "rs": null,
+      "note": "Also performed well defensively on Friday."
     },
     {
-      "ticker": "MU",
-      "side": "LONG",
-      "changePct": 6,
-      "why": "Participating in the broad rebound of semiconductor stocks in pre-market trading.",
-      "traderLens": "Ted Zhang"
-    },
-    {
-      "ticker": "COIN",
-      "side": "LONG",
-      "changePct": 3.84,
-      "why": "Gaining along with other crypto-related stocks amid renewed positive sentiment in the sector.",
-      "traderLens": "Qullamaggie"
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": null,
+      "rs": null,
+      "note": "Supported by oil prices holding firm."
     }
   ],
+  "sectorsNarrative": "On Friday, there was a clear rotation out of Technology and into defensive sectors like Health Care and Financials. Today's pre-market action suggests a potential rotation back into tech, but it's too early to tell if it will hold.",
+  "industryNarrative": null,
+  "industryMovers": [],
+  "movers": [],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": null,
-      "changePct": 2,
+      "level": 208.64,
+      "changePct": 1.73,
       "abc": "A",
-      "note": "Bouncing with the semiconductor sector pre-market. Key leader to watch."
+      "note": "Leading the semi rebound pre-market."
     },
     {
       "ticker": "TSLA",
-      "level": null,
-      "changePct": null,
+      "level": 408.9,
+      "changePct": 4.58,
       "abc": "B",
-      "note": "Watching for relative strength as the tech market rebounds."
+      "note": "Strong pre-market move, catalyst unclear."
     },
     {
       "ticker": "AAPL",
-      "level": null,
-      "changePct": null,
-      "abc": "B",
-      "note": "WWDC 2026 kicks off today, which could be a catalyst for the stock."
+      "level": 299.73,
+      "changePct": -0.59,
+      "abc": "C",
+      "note": "Lagging pre-market after weakness tied to 'Siri AI' debut concerns."
     },
     {
       "ticker": "MSFT",
-      "level": 416.67,
-      "changePct": -2.66,
+      "level": 411.24,
+      "changePct": -0.12,
       "abc": "B",
-      "note": "Closed weak on Friday. Needs to reclaim key moving averages."
+      "note": "Slightly down pre-market on news of a hack on its open-source tools."
     },
     {
       "ticker": "AMZN",
-      "level": null,
-      "changePct": null,
-      "abc": "C",
-      "note": "Lagging other mega-cap tech names. Needs to show signs of strength."
+      "level": 246.58,
+      "changePct": 0.55,
+      "abc": "B",
+      "note": "Positive pre-market action."
     },
     {
       "ticker": "META",
-      "level": null,
-      "changePct": null,
+      "level": 588.63,
+      "changePct": 0.56,
       "abc": "B",
-      "note": "Consolidating and could be a potential breakout candidate if market strength continues."
+      "note": "Slightly up pre-market."
     },
     {
       "ticker": "GOOGL",
-      "level": null,
-      "changePct": null,
+      "level": 366.02,
+      "changePct": 0.75,
       "abc": "B",
-      "note": "Holding up relatively well. Watching for a move above recent highs."
+      "note": "Modest gains in pre-market."
     },
     {
       "ticker": "AMD",
       "level": null,
-      "changePct": 3,
-      "abc": "A",
-      "note": "Strong pre-market bounce along with other chip stocks."
+      "changePct": null,
+      "abc": null,
+      "note": "Likely to move with the semiconductor sector."
     },
     {
       "ticker": "SMCI",
-      "level": 41.63,
-      "changePct": 7,
-      "abc": "A",
-      "note": "Showing significant pre-market strength after a deep pullback. High volatility."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "A high-beta name that will be sensitive to market direction."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Needs to clear overhead resistance to regain momentum."
+      "abc": null,
+      "note": "Watch for relative strength in the software space."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Cybersecurity sector has been strong. Watching for continuation."
+      "abc": null,
+      "note": "Cybersecurity theme, watch for sector rotation."
     },
     {
       "ticker": "MSTR",
-      "level": 127.69,
-      "changePct": 7.16,
-      "abc": "A",
-      "note": "Strong pre-market move, highly correlated with the crypto market."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "High correlation to Bitcoin price movements."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is attempting a rebound, but caution is warranted as indices are extended. Focus on A-grade setups with tight risk control."
+      "view": "Market is in a correction after Friday's distribution. Not an ideal environment for new long positions. Focus on preserving capital."
     },
     {
       "name": "Ted Zhang",
-      "view": "Rotation back into technology and semiconductors is the play today. Energy is also a key sector to watch due to oil price movements."
+      "view": "A rotation out of tech into defensives was clear on Friday. Today's bounce in tech needs to be watched to see if it's a dead cat bounce or a resumption of the uptrend."
     },
     {
       "name": "Clement Ang",
-      "view": "The market is in a choppy environment. It's better to wait for a confirmed uptrend before deploying significant capital. Raise the bar for new entries."
+      "view": "The market context is choppy and uncertain. Entry grade is low. Better to wait for confirmation of a new uptrend before deploying significant capital."
     },
     {
       "name": "SRxTrades",
-      "view": "Look for clean pivots and volume confirmation on any long entries. Avoid chasing extended names at the open."
+      "view": "Wait for clean pivot entries with volume confirmation. Chasing this morning's gap up is not a high-probability setup."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your trading plan. Respect stops and don't get caught up in the FOMO of a gap-up open."
+      "view": "Respect hard stops. The market showed its ability to turn quickly. Discipline is key in this environment."
     },
     {
       "name": "Qullamaggie",
-      "view": "The pre-market movers in tech and crypto offer potential breakout opportunities. Be ready to act if momentum and volume confirm."
+      "view": "Looking for stocks that held up well during the selloff and are now breaking out with volume. The pre-market rebound could offer some opportunities if momentum confirms after the open."
     },
     {
       "name": "Composite",
-      "view": "Wait for the market to settle after the open. The rebound in tech is positive, but inflationary pressures from oil could create volatility. Be selective and manage risk tightly."
+      "view": "Posture is WAIT. The market is attempting a bounce after a sharp sell-off. It's prudent to see if this rebound has legs before committing to new long positions. Watch for leadership to emerge and for indices to reclaim key levels."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "CPB",
-        "consensus": null
+        "ticker": "SJM",
+        "consensus": "EPS $2.64 / Rev $2.26B"
       },
       {
-        "ticker": "GHM",
-        "consensus": "EPS $0.30 / Rev $60.12M"
+        "ticker": "UNFI",
+        "consensus": "EPS $0.78 / Rev $7.82B"
       },
       {
-        "ticker": "FCEL",
-        "consensus": null
+        "ticker": "ASO",
+        "consensus": "EPS $0.93 / Rev $1.44B"
       }
     ],
     "amc": [
       {
-        "ticker": "BYDDY",
-        "consensus": "Rev $21.7B"
+        "ticker": "LMNR",
+        "consensus": "EPS -$0.23 / Rev $21.74M"
+      },
+      {
+        "ticker": "BARK",
+        "consensus": "EPS -$0.32 / Rev $96.30M"
       }
     ],
     "yesterdayReactions": []
   },
-  "calendar": [
-    {
-      "time": "All Day",
-      "name": "Apple WWDC 2026 Begins",
-      "consensus": null
-    },
-    {
-      "time": "June 10, 08:30 ET",
-      "name": "US CPI Data",
-      "consensus": null
-    }
-  ],
+  "calendar": [],
   "ratings": {
-    "upgrades": [],
-    "downgrades": []
+    "upgrades": [
+      {
+        "ticker": "SNDK",
+        "firm": "Bank of America",
+        "rating": "Buy",
+        "pt": 2100
+      }
+    ],
+    "downgrades": [
+      {
+        "ticker": "META",
+        "firm": "Guggenheim",
+        "rating": "Buy",
+        "pt": 800
+      }
+    ]
   },
-  "alert": "Apple's WWDC 2026 kicks off today; watch for potential volatility in AAPL and related tech stocks.",
+  "alert": null,
   "news": [
     {
-      "headline": "Chip Stocks Lead Rebound in US Futures",
+      "headline": "US stocks poised for rebound after sharp sell-off",
       "impact": "HIGH",
       "tickers": [
-        "QQQ",
-        "SMH",
-        "NVDA",
-        "AMD"
-      ],
-      "source": "TradingKey - https://www.tradingkey.com/us-pre-market-chip-stocks-rebound-leads-nasdaq-futures-marvell-surges-nearly-9-pre-market-to-be-added-to-sp-500",
-      "time": "June 08 2026"
-    },
-    {
-      "headline": "Oil Prices Jump as Middle East Tensions Escalate",
-      "impact": "HIGH",
-      "tickers": [
-        "CL=F",
-        "XLE",
-        "SPY"
-      ],
-      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-6-8-26-futures-wobble-as-u-s-iran-ceasefire-falters-oil-jumps-4",
-      "time": "June 08 2026"
-    },
-    {
-      "headline": "Apple's WWDC 2026 Begins Today",
-      "impact": "MED",
-      "tickers": [
-        "AAPL",
+        "SPY",
         "QQQ"
       ],
-      "source": "TradingKey - https://www.tradingkey.com/us-pre-market-chip-stocks-rebound-leads-nasdaq-futures-marvell-surges-nearly-9-pre-market-to-be-added-to-sp-500",
-      "time": "June 08 2026"
+      "source": "24/7 Wall St. - https://247wallst.com/investing/2026/06/08/stock-market-live-june-8-2026-sp-500-spy-rebounds-with-chip-stocks/",
+      "time": "06:00 ET"
     },
     {
-      "headline": "Marvell Technology to Join S&P 500",
+      "headline": "European markets gain as geopolitical concerns ease",
       "impact": "MED",
-      "tickers": [
-        "MRVL"
-      ],
-      "source": "Futu - https://www.futunn.com/en/community/feed/107983458423812?src=3",
-      "time": "June 08 2026"
+      "tickers": [],
+      "source": "Kalkine Media - https://kalkinemedia.com/uk/stocks/stock-market-updates/ftse-market-watch-what-is-driving-europes-renewed-momentum",
+      "time": "03:00 ET"
     },
     {
-      "headline": "Crypto-Related Stocks Rally in Pre-Market",
+      "headline": "10-Year Treasury Yield eases slightly after recent spike",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "TLT"
+      ],
+      "source": "Trading Economics - https://tradingeconomics.com/united-states/10-year-treasury-yield",
+      "time": "05:15 ET"
+    },
+    {
+      "headline": "Bank Indonesia surprises with an off-schedule rate hike",
+      "impact": "LOW",
+      "tickers": [],
+      "source": "WSJ - https://www.wsj.com",
+      "time": "Overnight"
+    },
+    {
+      "headline": "Microsoft open source tools hacked to steal passwords of AI developers",
       "impact": "MED",
       "tickers": [
-        "MSTR",
-        "COIN",
-        "MARA",
-        "RIOT"
+        "MSFT"
       ],
-      "source": "KuCoin - https://www.kucoin.com/news/en-us-crypto-related-stocks-rise-in-pre-market-trading-on-june-8",
-      "time": "June 08 2026"
+      "source": "Techcrunch - https://techcrunch.com",
+      "time": "Overnight"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TradingKey",
-    "GuruFocus",
-    "TipRanks.com",
-    "MarketScreener",
-    "SoFi",
-    "富途资讯",
-    "Cheddar Flow",
-    "FinMasters",
-    "EarningsCall",
-    "MacroMicro",
-    "Investing.com",
-    "Barchart.com",
-    "Robinhood",
-    "Digrin",
-    "Bitget",
-    "Intellectia AI",
-    "Investtech",
-    "Fidelity Investments",
-    "Tickeron.com",
-    "Financhill",
-    "Stock Analysis",
-    "MarketBeat",
-    "MEXC News",
-    "TradingView"
+    "Reddit - https://www.reddit.com/r/DeepFuckingValue/comments/19x5g0z/premarket_news_report_june_9_2026/",
+    "Earnings Whispers - https://www.earningswhispers.com/calendar/2026/06/09",
+    "Trading Economics - https://tradingeconomics.com/united-states/10-year-treasury-yield",
+    "FinHacker.cz - https://finhacker.cz/fear-and-greed-index-historical-data-chart/",
+    "Kalkine Media - https://kalkinemedia.com/uk/stocks/stock-market-updates/ftse-market-watch-what-is-driving-europes-renewed-momentum",
+    "Zacks - https://www.zacks.com/stock/news/2283537/stock-market-news-for-jun-8-2026",
+    "Digrin - https://digrin.com/calendar/earnings/2026/06/09",
+    "Tickmill - https://www.tickmill.com/blog/daily-market-outlook-june-9-2026",
+    "Public.com - https://public.com/learn/what-is-pre-market-trading",
+    "SWBC - https://www.swbc.com/insights/market-commentary-week-of-june-8-2026",
+    "24/7 Wall St. - https://247wallst.com/investing/2026/06/08/stock-market-live-june-8-2026-sp-500-spy-rebounds-with-chip-stocks/",
+    "Benzinga - https://www.benzinga.com/earnings/scheduled-earnings-for-june-9-2026",
+    "XTB - https://www.xtb.com/en/market-analysis/market-wrap/market-wrap-the-bulls-are-back-on-the-european-trading-floor",
+    "FinancialJuice - https://www.financialjuice.com/home/top-news/article/as-day-two-of-the-ai-led-rebound-begins-stocks-rise-europe-market-wrap",
+    "MarketBeat - https://www.marketbeat.com/stocks/NASDAQ/META/price-target/",
+    "Market Chameleon - https://marketchameleon.com/Overview/AAPL/Vwap/Premarket/"
   ]
 }
