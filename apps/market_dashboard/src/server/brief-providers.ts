@@ -5,7 +5,7 @@
  * object that is rendered into Conviction Desk placeholders. HTML is retained
  * only as a legacy compatibility field.
  */
-import { generateObject } from "ai";
+import { generateObject, NoObjectGeneratedError } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createAnthropic } from "@ai-sdk/anthropic";
@@ -14,6 +14,7 @@ import type { BriefProvider } from "@/lib/brief/bucket";
 import type { ComposedSnapshot } from "@/lib/brief/snapshot";
 import { structuredBriefSchema } from "@/lib/brief/structured-schema";
 import { buildTraderLensBlock } from "@/lib/brief/trader-profiles";
+import { salvageJsonObject } from "@/lib/brief/salvage";
 
 export interface ProviderResult {
   htmlBody: string;
@@ -131,16 +132,33 @@ export async function runProvider(
     day: "numeric",
   });
 
-  const { object, usage } = await generateObject({
-    model: modelFor(provider),
-    schema: structuredBriefSchema,
-    schemaName: "StructuredBrief",
-    schemaDescription: "JSON fields rendered directly into the Conviction Desk UI.",
-    mode: "json",
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userPromptFor(snapshot, dateStr, watchlist) }],
-    maxTokens: 5000,
-  });
+  let object: unknown;
+  let usage: { promptTokens?: number; completionTokens?: number } | undefined;
+  try {
+    const res = await generateObject({
+      model: modelFor(provider),
+      schema: structuredBriefSchema,
+      schemaName: "StructuredBrief",
+      schemaDescription: "JSON fields rendered directly into the Conviction Desk UI.",
+      mode: "json",
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userPromptFor(snapshot, dateStr, watchlist) }],
+      // 5000 truncated DeepSeek's verbose JSON mid-object ("No object generated:
+      // could not parse the response", 2026-06-09). Headroom is cheap.
+      maxTokens: 8000,
+    });
+    object = res.object;
+    usage = res.usage;
+  } catch (err) {
+    // Salvage path: the raw text often contains one valid JSON object wrapped
+    // in fences/prose. Recover it instead of discarding the whole run.
+    if (!NoObjectGeneratedError.isInstance(err)) throw err;
+    const salvaged = salvageJsonObject(err.text ?? "");
+    const parsed = salvaged ? structuredBriefSchema.safeParse(salvaged) : null;
+    if (!parsed?.success) throw err;
+    object = parsed.data;
+    usage = err.usage;
+  }
 
   return {
     htmlBody: "",

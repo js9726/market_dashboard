@@ -35,6 +35,26 @@
     {
       "path": "/api/cron/refresh-breadth",
       "schedule": "33 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/refresh-brief",
+      "schedule": "25 13 * * 1-5"
+    },
+    {
+      "path": "/api/cron/refresh-brief",
+      "schedule": "25 14 * * 1-5"
+    },
+    {
+      "path": "/api/cron/reset-quotas",
+      "schedule": "5 4 * * *"
+    },
+    {
+      "path": "/api/cron/reset-quotas",
+      "schedule": "5 5 * * *"
+    },
+    {
+      "path": "/api/cron/reconcile-trades",
+      "schedule": "50 21 * * 1-5"
     }
   ]
 }
