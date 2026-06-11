@@ -68,7 +68,7 @@ type Providers = { deepseek: boolean; gemini: boolean; openai: boolean; anthropi
 const PROVIDER_LABELS: Record<string, string> = {
   deepseek: "DeepSeek",
   gemini: "Gemini 2.5 Pro",
-  openai: "GPT-4o",
+  openai: "Codex",
   anthropic: "Claude Sonnet",
 };
 
@@ -1076,16 +1076,16 @@ export default function TradeLog() {
         <table className="w-full text-sm">
           <thead className="bg-[var(--bg-raised)] text-xs uppercase text-[var(--fg-3)]">
             <tr>
-              {["#", "Date", "Symbol", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "State", "Verdict", "Grade"].map((h) => (
+              {["#", "Date", "Symbol", "Broker", "Side", "Qty", "Entry", "Exit", "Fees", "P&L", "State", "Verdict", "Grade"].map((h) => (
                 <th key={h} className="whitespace-nowrap px-3 py-2 text-left">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={12} className="px-3 py-6 text-center text-[var(--fg-3)]">Loading…</td></tr>
+              <tr><td colSpan={13} className="px-3 py-6 text-center text-[var(--fg-3)]">Loading…</td></tr>
             ) : trades.length === 0 ? (
-              <tr><td colSpan={12} className="px-3 py-6 text-center text-[var(--fg-3)]">No trades found</td></tr>
+              <tr><td colSpan={13} className="px-3 py-6 text-center text-[var(--fg-3)]">No trades found</td></tr>
             ) : trades.map((t, i) => {
               const { text: pnlText, color: pnlColor } = fmtPnl(t.pnl);
               const isOpen = t.pnl === null;
@@ -1122,6 +1122,9 @@ export default function TradeLog() {
                         </span>
                       )}
                     </span>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 text-xs text-[var(--fg-3)]">
+                    {t.broker ?? t.platform ?? "—"}
                   </td>
                   <td className="px-3 py-2">
                     {t.side ? (

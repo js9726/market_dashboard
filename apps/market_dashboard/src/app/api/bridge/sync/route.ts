@@ -38,6 +38,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import crypto from "crypto";
+import { reconcileBrokerTrades } from "@/server/trade-reconciler";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -303,6 +304,23 @@ export async function POST(req: Request) {
     }
   }
 
+  // ── Reconcile fills → journal rows (close exited positions) ─────────────
+  // Runs whenever this batch inserted fills or removed positions — both are
+  // the signals that an episode may have closed. Non-fatal: a reconciler
+  // error must never fail the bridge push.
+  let reconciled: { recordsClosed: number; duplicatesDeleted: number } | null = null;
+  if (fillsInserted > 0 || removed.count > 0) {
+    try {
+      const report = await reconcileBrokerTrades({ brokerAccountId: account.id });
+      reconciled = {
+        recordsClosed: report.recordsClosed,
+        duplicatesDeleted: report.duplicatesDeleted,
+      };
+    } catch (e) {
+      console.error("[bridge/sync] reconcile failed (non-fatal):", e);
+    }
+  }
+
   // ── Heartbeat ──────────────────────────────────────────────────────────
   await prisma.brokerBridgeToken.update({
     where: { id: tokenRow.id },
@@ -317,5 +335,6 @@ export async function POST(req: Request) {
     positionsUpserted,
     positionsRemoved: removed.count,
     equityUpserted,
+    reconciled,
   });
 }

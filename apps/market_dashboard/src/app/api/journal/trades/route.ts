@@ -97,12 +97,19 @@ export async function GET(req: Request) {
     select: {
       ticker: true, qty: true, avgCost: true, currentPrice: true,
       unrealizedPl: true, unrealizedPlPct: true, openedAt: true,
+      brokerAccountId: true,
       brokerAccount: { select: { alias: true } },
     },
   });
+  // Two match indexes: exact brokerAccountId (reconciled rows) first, then the
+  // legacy alias/platform text key (sheet rows that predate broker linking).
+  // Text-only matching let alias variants slip through and produced duplicate
+  // synthetic rows (MDB, 2026-06-10).
   const posByKey = new Map<string, (typeof positions)[number]>();
+  const posByAccount = new Map<string, (typeof positions)[number]>();
   for (const p of positions) {
     posByKey.set(`${plainTicker(p.ticker)}|${brokerKey(p.brokerAccount.alias)}`, p);
+    posByAccount.set(`${plainTicker(p.ticker)}|${p.brokerAccountId}`, p);
   }
   const positionSymbols = Array.from(new Set(positions.map((p) => plainTicker(p.ticker))));
   const liveQuotes = positionSymbols.length
@@ -143,12 +150,17 @@ export async function GET(req: Request) {
   }
 
   // Positions already represented by an OPEN sheet row anywhere (so we don't
-  // also synthesize a broker-only row for them).
+  // also synthesize a broker-only row for them). Keyed both by accountId and
+  // by alias text so either match form suppresses the synthetic row.
   const openSheet = await prisma.tradeRecord.findMany({
     where: { userId: userScopeId, OR: [{ state: { in: OPEN_STATES } }, { state: null, pnl: null }] },
-    select: { ticker: true, platform: true },
+    select: { ticker: true, platform: true, brokerAccountId: true },
   });
-  const openSheetKeys = new Set(openSheet.map((t) => `${plainTicker(t.ticker)}|${brokerKey(t.platform)}`));
+  const openSheetKeys = new Set<string>();
+  for (const t of openSheet) {
+    openSheetKeys.add(`${plainTicker(t.ticker)}|${brokerKey(t.platform)}`);
+    if (t.brokerAccountId) openSheetKeys.add(`${plainTicker(t.ticker)}|acct:${t.brokerAccountId}`);
+  }
 
   const where: Prisma.TradeRecordWhereInput = {
     userId: userScopeId,
@@ -173,15 +185,19 @@ export async function GET(req: Request) {
       proposedEntry: true, proposedSL: true, proposedTP: true,
       rrr: true, riskPct: true, rewardPct: true, positionPct: true,
       currency: true, currencyCode: true, pnlUsd: true, pnlSource: true,
-      platform: true, industry: true, strategy: true,
+      platform: true, industry: true, strategy: true, brokerAccountId: true,
       state: true,
       verdict: true, verdictScore: true, verdictGeneratedAt: true,
     },
   });
 
   // Enrich: overlay live broker truth onto matching open sheet rows.
+  // Exact brokerAccountId match wins; alias text match is the legacy fallback.
   const enriched = trades.map((t) => {
-    const pos = posByKey.get(`${plainTicker(t.ticker)}|${brokerKey(t.platform)}`);
+    const pos =
+      (t.brokerAccountId
+        ? posByAccount.get(`${plainTicker(t.ticker)}|${t.brokerAccountId}`)
+        : undefined) ?? posByKey.get(`${plainTicker(t.ticker)}|${brokerKey(t.platform)}`);
     if (pos && isOpenish(t.state, t.pnl)) {
       const live = liveFieldsForPosition(pos);
       return {
@@ -206,7 +222,7 @@ export async function GET(req: Request) {
         hasPlan: t.proposedEntry != null || t.proposedSL != null || t.proposedTP != null,
       };
     }
-    return { ...t, source: "SHEET" as const };
+    return { ...t, source: "SHEET" as const, broker: t.platform };
   });
 
   function syntheticMatchesFilters(row: { ticker: string; side: string; state: string }) {
@@ -217,7 +233,11 @@ export async function GET(req: Request) {
     return true;
   }
   const brokerOnly = positions
-    .filter((p) => !openSheetKeys.has(`${plainTicker(p.ticker)}|${brokerKey(p.brokerAccount.alias)}`))
+    .filter(
+      (p) =>
+        !openSheetKeys.has(`${plainTicker(p.ticker)}|${brokerKey(p.brokerAccount.alias)}`) &&
+        !openSheetKeys.has(`${plainTicker(p.ticker)}|acct:${p.brokerAccountId}`),
+    )
     .map((p) => {
       const ticker = plainTicker(p.ticker);
       const live = liveFieldsForPosition(p);
