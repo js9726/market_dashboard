@@ -1,577 +1,390 @@
 {
   "mood": {
-    "label": "RISK-OFF",
+    "label": "CAUTIOUSLY-RISK-ON",
     "posture": "WAIT",
-    "summary": "Geopolitical tensions between the US and Iran are weighing on sentiment, sparking a flight to safety. This is compounded by a continued tech and semiconductor sell-off, with all eyes on today's crucial CPI inflation data."
+    "summary": "Futures are pointing to a green open, led by a rebound in tech and chip stocks. However, with key inflation data (PPI) due this morning and escalating Middle East tensions, volatility could pick up."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": 42,
+    "score": 28,
     "label": "Fear"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": 733.07,
-      "changePct": -0.54,
+      "level": null,
+      "changePct": 0.76,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
-      "level": 701.49,
-      "changePct": -0.9,
+      "level": null,
+      "changePct": 1.22,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
-      "level": 507.09,
-      "changePct": -0.46,
+      "level": null,
+      "changePct": 0.83,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
-      "level": 284.44,
-      "changePct": -0.2,
+      "level": null,
+      "changePct": 1.41,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 21.49,
-      "changePct": 8.15,
+      "level": 22.31,
+      "changePct": 0.41,
       "note": "live",
-      "citation": "Source: Google Finance"
+      "citation": null
     },
     {
       "symbol": "^TNX",
-      "name": "10-Yr Treasury Yield",
-      "level": 4.52,
-      "changePct": -0.66,
+      "name": "10-Yr Treasury",
+      "level": 4.53,
+      "changePct": null,
       "note": "live",
-      "citation": "Source: Barchart"
+      "citation": null
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil (WTI)",
-      "level": 88.24,
-      "changePct": 0.05,
-      "note": "futures",
-      "citation": "Source: Barchart"
+      "name": "Crude Oil",
+      "level": 89.2,
+      "changePct": -2.91,
+      "note": "live",
+      "citation": null
     }
   ],
-  "indicesNarrative": "Futures are pointing to a sharply lower open, extending yesterday's tech-led selloff. Geopolitical risk is driving a spike in the VIX, while the Nasdaq continues to show notable relative weakness. The market saw a significant intraday reversal on Tuesday, with early gains evaporating, signaling seller strength.",
+  "indicesNarrative": "U.S. equity futures are indicating a higher open, attempting to rebound from Wednesday's sharp sell-off. The Nasdaq is leading the way, suggesting a risk-on sentiment in the technology sector. The VIX remains elevated, signaling that traders are still pricing in significant near-term volatility.",
   "technicals": {
-    "SPY": {
-      "close": 7386.65,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": 750.03,
-      "ma200": 740.21,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": 43.187,
-      "macd": -4.71,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": "FALLING",
-      "curving_down": true,
-      "bear_cross_imminent": true,
-      "overbought": false,
-      "oversold": false,
-      "entry_risk": "FAIR"
-    },
-    "QQQ": {
-      "close": 25678.82,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": null,
-      "ma200": null,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": false,
-      "bear_cross_imminent": false,
-      "overbought": false,
-      "oversold": false,
-      "entry_risk": "UNKNOWN"
-    },
-    "DIA": {
-      "close": 50872.11,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": 487.92,
-      "ma200": null,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": 71.52,
-      "macd": 5.99,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": "RISING",
-      "curving_down": false,
-      "bear_cross_imminent": false,
-      "overbought": true,
-      "oversold": false,
-      "entry_risk": "EXTENDED"
-    },
-    "IWM": {
-      "close": 2867.02,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": 287.54,
-      "ma200": 283.54,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": 48.746,
-      "macd": -1.05,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": "FALLING",
-      "curving_down": true,
-      "bear_cross_imminent": true,
-      "overbought": false,
-      "oversold": false,
-      "entry_risk": "FAIR"
-    }
+    "SPY": null,
+    "QQQ": null,
+    "DIA": null
   },
-  "technicalsNarrative": "The technical picture is deteriorating. DIA is the most extended and overbought with an RSI above 70, making it dangerous to chase. SPY and IWM have pulled back to a more neutral RSI reading but show MACD momentum weakening, suggesting caution is warranted. The recent violent reversals in tech-heavy indices highlight increasing distribution and risk.",
-  "sectorsThemes": [
-    {
-      "symbol": "XLK",
-      "name": "Technology",
-      "changePct": -1.85,
-      "rs": null,
-      "note": "Leading the market lower in pre-market, extending yesterday's weakness."
-    },
-    {
-      "symbol": "SMH",
-      "name": "Semiconductors",
-      "changePct": null,
-      "rs": null,
-      "note": "Semis remain the epicenter of the sell-off amid valuation concerns."
-    },
-    {
-      "symbol": "XLE",
-      "name": "Energy",
-      "changePct": -0.45,
-      "rs": null,
-      "note": "Watching oil prices closely amid Middle East tensions."
-    },
-    {
-      "symbol": "XLF",
-      "name": "Financials",
-      "changePct": 0.17,
-      "rs": null,
-      "note": "Holding up relatively better but sensitive to rate moves post-CPI."
-    }
-  ],
-  "sectorsNarrative": "A clear rotation out of technology and semiconductors is accelerating, driven by profit-taking in AI leaders. There is no clear leadership emerging, with most sectors poised to open lower, indicating broad-based risk aversion.",
-  "industryNarrative": "Semiconductors are the weakest group, with broad-based selling across major names like NVDA and AMD. The selling pressure is spilling over into broader software and tech hardware.",
-  "industryMovers": [
-    {
-      "industry": "Semiconductors",
-      "sector": "Technology",
-      "changePct": null,
-      "perf1W": null,
-      "perf1M": null,
-      "breadthPct": null,
-      "deltaWow": null,
-      "leaders": [
-        {
-          "ticker": "NVDA",
-          "changePct": -2.4,
-          "rvol": null,
-          "source": "Financial Post"
-        }
-      ],
-      "note": "The AI-darling group is facing its most significant profit-taking wave of the year as valuation concerns mount."
-    }
-  ],
+  "technicalsNarrative": "Technical data is unavailable at this time. Awaiting market open to populate key moving averages and momentum indicators.",
+  "sectorsThemes": [],
+  "sectorsNarrative": "Semiconductor and AI-related stocks are showing strength in the pre-market, driven by positive catalysts from Oracle's spending plans. This suggests a potential rotation back into growth and technology themes today.",
+  "industryNarrative": "Semiconductor equipment stocks are seeing broad-based gains in the pre-market, with names like Lam Research and Applied Materials up over 3%. This follows a period of weakness and could signal a sentiment shift in the chip sector.",
+  "industryMovers": [],
   "movers": [
     {
-      "ticker": "CBRL",
+      "ticker": "GLXG",
       "side": "LONG",
-      "changePct": 9.0,
-      "why": "Boosted its full-year revenue guidance, beating analyst estimates.",
-      "traderLens": "Episodic pivot (Qullamaggie)"
+      "changePct": 235,
+      "why": "Recent IPO, high volatility.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "CHWY",
+      "ticker": "FGL",
       "side": "LONG",
-      "changePct": 7.0,
-      "why": "Reported strong first-quarter results.",
-      "traderLens": "Earnings gap up"
+      "changePct": 102.16,
+      "why": "Low float stock with high pre-market volume.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "CASY",
+      "ticker": "QH",
       "side": "LONG",
-      "changePct": 2.0,
-      "why": "Fourth-quarter revenue beat analyst estimates.",
-      "traderLens": "Positive earnings reaction"
+      "changePct": 93.1,
+      "why": "High pre-market volume, potential short squeeze.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "HNGE",
+      "ticker": "INTC",
       "side": "LONG",
-      "changePct": 3.0,
-      "why": "Raised its full-year revenue forecast.",
-      "traderLens": "Guidance raise"
+      "changePct": 5,
+      "why": "Bank of America double upgrade to Buy from Sell, citing rising demand for CPUs.",
+      "traderLens": "Minervini"
     },
     {
-      "ticker": "DVN",
+      "ticker": "AMAT",
       "side": "LONG",
-      "changePct": 1.0,
-      "why": "Boosted its full-year production forecast.",
-      "traderLens": "Positive corporate update"
+      "changePct": 4,
+      "why": "Broad strength in semiconductor equipment stocks.",
+      "traderLens": "Ted Zhang"
     },
     {
-      "ticker": "DNTH",
+      "ticker": "ORCL",
       "side": "SHORT",
-      "changePct": -19.0,
-      "why": "Peer Sanofi halted a late-stage trial for a similar therapy, citing efficacy concerns.",
-      "traderLens": "Negative sector news"
+      "changePct": -9,
+      "why": "Investors spooked by the company's plan to raise $40 billion through equity and debt financing to fund its AI expansion, despite better-than-expected results.",
+      "traderLens": "Jeff"
     },
     {
-      "ticker": "ODFL",
+      "ticker": "HXHX",
       "side": "SHORT",
-      "changePct": -7.0,
-      "why": "Falling with other trucking stocks after Amazon expanded its freight offering.",
-      "traderLens": "Competitive threat"
+      "changePct": -29.6,
+      "why": "High pre-market volume on the downside.",
+      "traderLens": "Jeff"
     },
     {
-      "ticker": "NVDA",
+      "ticker": "FRGT",
       "side": "SHORT",
-      "changePct": -2.4,
-      "why": "Leading decliners among megacaps as the tech sell-off continues.",
-      "traderLens": "Profit taking/momentum reversal"
+      "changePct": -23.38,
+      "why": "Continued downside momentum.",
+      "traderLens": "Jeff"
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
       "level": null,
-      "changePct": -2.4,
-      "abc": "C",
-      "note": "Breaking below short-term support in pre-market. Watch for signs of a deeper pullback."
+      "changePct": null,
+      "abc": "A",
+      "note": "Leading AI chipmaker, showing strength on Oracle's positive spending news."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": -1.7,
-      "abc": "C",
-      "note": "Weakening with the broader tech sell-off."
+      "changePct": null,
+      "abc": "B",
+      "note": "Watching for a reaction to the broader market rebound."
     },
     {
       "ticker": "AAPL",
-      "level": null,
-      "changePct": -0.1,
-      "abc": "B",
-      "note": "Holding up relatively well compared to other tech giants."
+      "level": 292.95,
+      "changePct": 0.47,
+      "abc": "A",
+      "note": "Trading higher in pre-market, looking to reclaim recent highs."
     },
     {
       "ticker": "MSFT",
       "level": null,
-      "changePct": -1.5,
-      "abc": "C",
-      "note": "Under pressure as tech sentiment sours."
+      "changePct": null,
+      "abc": "A",
+      "note": "Key mega-cap name, will likely follow the Nasdaq's direction."
     },
     {
       "ticker": "AMZN",
       "level": null,
-      "changePct": -0.6,
+      "changePct": null,
       "abc": "B",
-      "note": "Watching key support levels."
+      "note": "Awaiting a clear directional signal."
     },
     {
       "ticker": "META",
       "level": null,
-      "changePct": -0.9,
+      "changePct": null,
       "abc": "B",
-      "note": "Testing recent support."
+      "note": "Watching for a potential bounce with other tech stocks."
     },
     {
       "ticker": "GOOGL",
-      "level": null,
-      "changePct": -1.3,
-      "abc": "C",
-      "note": "Following the tech sector lower."
+      "level": 357.11,
+      "changePct": 0.2,
+      "abc": "A",
+      "note": "Slightly up in pre-market, a key name in the AI space."
     },
     {
       "ticker": "AMD",
       "level": null,
-      "changePct": null,
-      "abc": "C",
-      "note": "Also caught in the semiconductor downdraft."
+      "changePct": 2.5,
+      "abc": "A",
+      "note": "Gaining in pre-market along with other chip stocks."
     },
     {
       "ticker": "SMCI",
-      "level": null,
+      "level": 28.73,
       "changePct": null,
       "abc": "C",
-      "note": "High-beta name, vulnerable to further tech weakness."
+      "note": "Priced a $7 billion financing package to support its order backlog."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Growth stock likely to be sold in a risk-off tape."
+      "abc": "B",
+      "note": "A key name in the data analytics and AI space."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Cybersecurity name, watch for relative strength."
+      "abc": "A",
+      "note": "Leading cybersecurity name, watching for relative strength."
     },
     {
       "ticker": "MSTR",
-      "level": null,
+      "level": 118.85,
       "changePct": null,
       "abc": "C",
-      "note": "High correlation to Bitcoin, which is also showing weakness."
+      "note": "Bitcoin proxy, will be sensitive to crypto market movements."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a correction. Not an ideal time to be buying breakouts. Cash is a valid position."
+      "view": "Market is attempting a rebound, but caution is warranted. Focus on A-grade setups with strong relative strength."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear institutional rotation out of tech and semis. No clear sector is catching a strong bid yet."
+      "view": "Potential rotation back into technology and semiconductors. Watch for confirmation of institutional buying."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is poor. A-grade setups are non-existent. Best to sit on the sidelines and wait for conditions to improve."
+      "view": "Market context is choppy. It's better to wait for a confirmed uptrend before deploying significant capital."
     },
     {
       "name": "SRxTrades",
-      "view": "Volume on the down days is starting to increase. This is not the time to be a hero and buy dips."
+      "view": "Wait for clean pivot entries with volume confirmation. Avoid chasing pre-market gaps."
     },
     {
       "name": "Jeff",
-      "view": "Respect your stops. The market is showing signs of weakness; don't fight it."
+      "view": "Stick to your trading plan and risk management rules. The market can be volatile."
     },
     {
       "name": "Qullamaggie",
-      "view": "No clean breakouts to chase. The momentum has shifted to the downside for now. Wait for the storm to pass."
+      "view": "Some low-float stocks are showing explosive pre-market moves, but these are high-risk plays. Focus on quality breakouts."
     },
     {
       "name": "Composite",
-      "view": "Wait. With futures indicating a sharp drop, geopolitical risk flaring, and a key inflation report due, there is no edge in being aggressive. Let the market react to CPI and look for signs of stabilization before deploying capital."
+      "view": "Wait for the market to open and digest the PPI data. The pre-market rebound is encouraging, but confirmation is needed. Keep a close eye on the VIX and market breadth."
     }
   ],
-  "standout": {
-    "ticker": null,
-    "side": null,
-    "score": null,
-    "sector": null,
-    "rs": null,
-    "grade": null,
-    "thesis": "No high-conviction setups in a risk-off environment ahead of CPI. The best trade is patience.",
-    "entry": null,
-    "stop": null,
-    "target": null,
-    "rrr": null,
-    "tags": [
-      "#patience",
-      "#riskmanagement"
-    ]
-  },
+  "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "CHWY",
-        "consensus": "EPS $0.39 / Rev $3.35B"
+        "ticker": "TRZ.TO",
+        "consensus": "Rev $773.8M"
       },
       {
-        "ticker": "JILL",
-        "consensus": "EPS $0.42 / Rev $144.21M"
+        "ticker": "HOFT",
+        "consensus": "EPS -$0.07 / Rev $66.31M"
       },
       {
-        "ticker": "CNM",
-        "consensus": "EPS $0.59 / Rev $1.90B"
+        "ticker": "ACB",
+        "consensus": "EPS -$0.14 / Rev $75.20M"
       }
     ],
     "amc": [
       {
-        "ticker": "ORCL",
-        "consensus": "EPS $1.96 / Rev $19.1B"
+        "ticker": "ADBE",
+        "consensus": "EPS $5.83 / Rev $6.5B"
+      },
+      {
+        "ticker": "RH",
+        "consensus": "EPS -$2.09 / Rev $792.5M"
+      },
+      {
+        "ticker": "LEN",
+        "consensus": "EPS $1.24 / Rev $8.07B"
       }
     ],
-    "yesterdayReactions": [
-      {
-        "ticker": "SJM",
-        "result": "beat",
-        "movePct": 10.4
-      },
-      {
-        "ticker": "UEC",
-        "result": "miss",
-        "movePct": -15.5
-      },
-      {
-        "ticker": "MTN",
-        "result": "miss",
-        "movePct": -4.3
-      },
-      {
-        "ticker": "UNFI",
-        "result": "miss",
-        "movePct": -10.3
-      }
-    ]
+    "yesterdayReactions": []
   },
   "calendar": [
     {
-      "time": "08:30 ET",
-      "name": "Consumer Price Index (CPI) YoY",
-      "consensus": "4.2%"
+      "time": "07:30 ET",
+      "name": "Producer Price Index (PPI)",
+      "consensus": "0.7%"
     },
     {
-      "time": "10:30 ET",
-      "name": "EIA Weekly Petroleum Status Report",
-      "consensus": null
+      "time": "07:30 ET",
+      "name": "Initial Jobless Claims",
+      "consensus": "220K"
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "ETR",
-        "firm": "Evercore ISI Group",
-        "rating": "Outperform",
-        "pt": 121
-      },
-      {
-        "ticker": "CECO",
-        "firm": "Needham",
+        "ticker": "INTC",
+        "firm": "Bank of America",
         "rating": "Buy",
-        "pt": 110
-      },
-      {
-        "ticker": "JAZZ",
-        "firm": "B of A Securities",
-        "rating": "Buy",
-        "pt": 307
+        "pt": null
       }
     ],
     "downgrades": [
       {
-        "ticker": "BILL",
-        "firm": "Truist",
-        "rating": "Hold",
-        "pt": 35
-      },
-      {
-        "ticker": "HESM",
-        "firm": "Morgan Stanley",
-        "rating": "Underweight",
-        "pt": 38
-      },
-      {
-        "ticker": "NKE",
-        "firm": "RBC Capital",
-        "rating": "Sector Perform",
-        "pt": 50
+        "ticker": "MSTR",
+        "firm": "Canaccord Genuity",
+        "rating": "Buy",
+        "pt": 163
       }
     ]
   },
-  "alert": "RISK-OFF: Geopolitical tensions and tech sell-off accelerate ahead of CPI data at 8:30 ET.",
+  "alert": "Key PPI inflation data is due at 7:30 AM ET, which could significantly impact market direction.",
   "news": [
     {
-      "headline": "Asian shares fall after a tech sell-off on Wall Street, oil prices volatile on US-Iran tensions",
+      "headline": "U.S. stock futures rise as chip stocks rebound",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
-        "SMH"
+        "NVDA",
+        "AMD",
+        "INTC"
       ],
-      "source": "WRAL - https://www.wral.com/story/asian-shares-fall-after-a-tech-sell-off-on-wall-street-while-oil-prices-stabilize/21473859/",
-      "time": "06:58 ET"
+      "source": "TipRanks.com - https://www.tipranks.com/news/stock-futures-rise-as-chip-stocks-rebound-traders-assess-middle-east-updates",
+      "time": "05:29 AM ET"
     },
     {
-      "headline": "S&P 500 futures fall as tech weakness continues and US, Iran exchange strikes",
-      "impact": "HIGH",
-      "tickers": [
-        "SPY",
-        "QQQ",
-        "DIA"
-      ],
-      "source": "Financial Post - https://financialpost.com/investing/us-premarket-movers-for-june-10-2026",
-      "time": "07:45 ET"
-    },
-    {
-      "headline": "US Consumer Price Index (CPI) data due at 8:30 AM ET, a key test for inflation trends",
-      "impact": "HIGH",
-      "tickers": [
-        "SPY",
-        "QQQ",
-        "TLT",
-        "^TNX"
-      ],
-      "source": "Yelza - https://www.yelza.com/economic-calendar-june-8-12-2026/",
-      "time": "Pre-Market"
-    },
-    {
-      "headline": "Cracker Barrel (CBRL) jumps 9% pre-market after boosting revenue guidance",
+      "headline": "Oracle drops 9% pre-market despite earnings beat, as investors focus on $40B financing plan for AI expansion",
       "impact": "MED",
       "tickers": [
-        "CBRL"
+        "ORCL"
       ],
-      "source": "Financial Post - https://financialpost.com/investing/us-premarket-movers-for-june-10-2026",
-      "time": "Pre-Market"
+      "source": "TipRanks.com - https://www.tipranks.com/news/stock-futures-rise-as-chip-stocks-rebound-traders-assess-middle-east-updates",
+      "time": "pre-market"
     },
     {
-      "headline": "Dianthus Therapeutics (DNTH) slumps 19% after peer Sanofi halts trial for similar therapy",
+      "headline": "Intel stock gains more than 5% after Bank of America double upgrade",
       "impact": "MED",
       "tickers": [
-        "DNTH"
+        "INTC"
       ],
-      "source": "Financial Post - https://financialpost.com/investing/us-premarket-movers-for-june-10-2026",
-      "time": "Pre-Market"
+      "source": "TipRanks.com - https://www.tipranks.com/news/stock-futures-rise-as-chip-stocks-rebound-traders-assess-middle-east-updates",
+      "time": "pre-market"
+    },
+    {
+      "headline": "Middle East tensions escalate with U.S. and Iran trading direct military strikes",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
+        "CL=F"
+      ],
+      "source": "Benzinga - https://www.benzinga.com/markets/26/06/39286432/stock-market-today-dow-jones-s-p-500-futures-gain-despite-trumps-threats-to-iran-amid-stalled-pe",
+      "time": "overnight"
+    },
+    {
+      "headline": "Producer Price Index (PPI) and jobless claims data due at 7:30 AM ET",
+      "impact": "HIGH",
+      "tickers": null,
+      "source": "Investing.com - https://www.investing.com/news/economy/ppi-and-jobless-claims-highlight-thursdays-economic-calendar-3465432",
+      "time": "07:30 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Benzinga - https://www.benzinga.com/general/entertainment/24/06/39243029/earnings-scheduled-for-june-10-2026",
-    "Reddit - https://www.reddit.com/r/EconReports/comments/1da991h/us_economic_calendar_june_10th_2026_cpi_day/",
-    "24/7 Wall St. - https://247wallst.com/investing/2024/06/09/here-are-wednesdays-top-wall-street-analyst-research-calls-bill-holdings-cava-group-entergy-globalfoundries-hess-midstream-nike-pfizer-sharkninja-stmicroelectronics-and-more/",
-    "Investing.com - https://www.investing.com/indices/us-spx-vix-futures",
-    "Barchart - https://www.barchart.com/stocks/quotes/$TNX",
-    "WRAL - https://www.wral.com/story/asian-shares-fall-after-a-tech-sell-off-on-wall-street-while-oil-prices-stabilize/21473859/",
-    "Financial Post - https://financialpost.com/investing/us-premarket-movers-for-june-10-2026",
-    "Zacks Investment Research - https://www.zacks.com/commentary/2284386/company-news-for-jun-10-2026",
-    "Investing.com - https://www.investing.com/etfs/spdr-s-p-500-technical",
-    "Financhill - https://financhill.com/stock-chart/dia-state-street-spdr-dow-jones-indust-avg-etf-trust/technical-analysis",
-    "Investing.com - https://www.investing.com/etfs/ishares-russell-2000-index-technical",
-    "Google Finance - https://www.google.com/finance/quote/VIX:INDEXCBOE",
-    "Yelza - https://www.yelza.com/economic-calendar-june-8-12-2026/",
-    "Benzinga - https://www.benzinga.com/markets/etfs/24/06/39234857/leading-and-lagging-sectors-for-june-9-2026",
-    "WDRB - https://www.wdrb.com/news/national/how-major-us-stock-indexes-fared-tuesday-6-9-2026/article_b3f95f4e-26d9-11ef-8fde-9f22312d1b9e.html",
-    "Benzinga - https://www.benzinga.com/news/24/06/39251846/micron-technology-to-900-here-are-10-top-analyst-forecasts-for-wednesday",
-    "Digrin - https://digrin.com/calendar/earnings/2026-06-10"
+    "CNN Business - https://www.cnn.com/markets/fear-and-greed",
+    "TradingKey - https://www.tradingkey.com/news/us-pre-market-three-major-indexes-rise-oracle-plunges-8-semiconductor-equipment-stocks-gain-ai-chip-capital-expenditure-cycle-continues-to-heat-up-202606110900",
+    "Public.com - https://public.com/stocks/googl/pre-market",
+    "Public.com - https://public.com/stocks/aapl/pre-market",
+    "Cboe - https://www.cboe.com/tradable_products/vix/",
+    "Digrin - https://digrin.com/earnings/2026-06-11",
+    "Investing.com - https://www.investing.com/economic-calendar/",
+    "Benzinga - https://www.benzinga.com/pre-market-movers",
+    "MarketScreener - https://www.marketscreener.com/quote/stock/S-P-500-4985/news/US-Equity-Futures-Rise-Pre-Bell-After-US-Says-Strikes-Completed-Against-Iran-46938361/",
+    "BeInCrypto - https://beincrypto.com/microstrategy-stock-bullish-bets-crash/",
+    "TipRanks - https://www.tipranks.com/news/stock-futures-rise-as-chip-stocks-rebound-traders-assess-middle-east-updates",
+    "TheStreet - https://www.thestreet.com/markets/stock-market-today-live-updates-06-11-26",
+    "TipRanks - https://www.tipranks.com/news/nvda-amd-dell-smci-why-ai-hardware-and-chip-stocks-are-rising-today-june-11-2026",
+    "Robinhood - https://robinhood.com/stocks/MSTR/",
+    "MarketBeat - https://www.marketbeat.com/stocks/NASDAQ/GOOGL/price-target/",
+    "Stocktwits - https://stocktwits.com/news/smci-stock-back-in-the-spotlight-after-super-micro-prices-equity-offering-a-look-at-some-key-figures"
   ]
 }
