@@ -1,15 +1,15 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-ON",
+    "label": "CAUTIOUSLY-RISK-OFF",
     "posture": "WAIT",
-    "summary": "Futures are pointing to a green open, led by a rebound in tech and chip stocks. However, with key inflation data (PPI) due this morning and escalating Middle East tensions, volatility could pick up."
+    "summary": "Geopolitical tensions are rising with US strikes in Iran, while tech sentiment is weighed down by a significant post-earnings drop in Oracle. A double-upgrade for Intel is providing some support for semis, but the broader tape is cautious."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": 28,
+    "score": 42,
     "label": "Fear"
   },
   "indices": [
@@ -17,126 +17,172 @@
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": 0.76,
-      "note": "futures",
+      "changePct": -1.6,
+      "note": "yesterday's close",
       "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 1.22,
-      "note": "futures",
+      "changePct": -2.0,
+      "note": "yesterday's close",
       "citation": null
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": 0.83,
-      "note": "futures",
+      "changePct": -1.9,
+      "note": "yesterday's close",
       "citation": null
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
       "level": null,
-      "changePct": 1.41,
-      "note": "futures",
+      "changePct": null,
+      "note": "futures or live",
       "citation": null
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 22.31,
-      "changePct": 0.41,
+      "level": 22,
+      "changePct": null,
       "note": "live",
-      "citation": null
+      "citation": "[11]"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Yr Treasury",
-      "level": 4.53,
+      "name": "10-Yr Treasury Yield",
+      "level": 4.552,
       "changePct": null,
       "note": "live",
-      "citation": null
+      "citation": "[6]"
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil",
-      "level": 89.2,
-      "changePct": -2.91,
+      "name": "Crude Oil (WTI)",
+      "level": 91.87,
+      "changePct": 2.04,
       "note": "live",
-      "citation": null
+      "citation": "[6]"
     }
   ],
-  "indicesNarrative": "U.S. equity futures are indicating a higher open, attempting to rebound from Wednesday's sharp sell-off. The Nasdaq is leading the way, suggesting a risk-on sentiment in the technology sector. The VIX remains elevated, signaling that traders are still pricing in significant near-term volatility.",
+  "indicesNarrative": "US markets closed lower overnight amid escalating geopolitical tensions in the Middle East, with tech leading the decline after Oracle's disappointing guidance. [25] Asian markets were mixed, with Japan and South Korea recovering from early lows while Hong Kong fell. [6, 14] Oil is spiking on the Iran news, and the VIX is elevated, signaling increased investor anxiety.",
   "technicals": {
-    "SPY": null,
-    "QQQ": null,
-    "DIA": null
+    "SPY": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    },
+    "QQQ": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    },
+    "DIA": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    },
+    "IWM": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    }
   },
-  "technicalsNarrative": "Technical data is unavailable at this time. Awaiting market open to populate key moving averages and momentum indicators.",
+  "technicalsNarrative": "Specific daily technical indicator data (ATR, RSI, MACD) for major indices was not consistently available from web sources at the time of this brief. A detailed technical assessment of entry risk is therefore not possible. Traders should exercise caution and rely on their own charting analysis.",
   "sectorsThemes": [],
-  "sectorsNarrative": "Semiconductor and AI-related stocks are showing strength in the pre-market, driven by positive catalysts from Oracle's spending plans. This suggests a potential rotation back into growth and technology themes today.",
-  "industryNarrative": "Semiconductor equipment stocks are seeing broad-based gains in the pre-market, with names like Lam Research and Applied Materials up over 3%. This follows a period of weakness and could signal a sentiment shift in the chip sector.",
+  "sectorsNarrative": "Technology and software are under pressure following Oracle's weak guidance and heavy spending plans, which has soured sentiment on the sector. [17] Conversely, semiconductor stocks are showing relative strength, buoyed by a significant analyst upgrade for Intel. [4]",
+  "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "GLXG",
-      "side": "LONG",
-      "changePct": 235,
-      "why": "Recent IPO, high volatility.",
-      "traderLens": "Qullamaggie"
-    },
-    {
-      "ticker": "FGL",
-      "side": "LONG",
-      "changePct": 102.16,
-      "why": "Low float stock with high pre-market volume.",
-      "traderLens": "Qullamaggie"
-    },
-    {
-      "ticker": "QH",
-      "side": "LONG",
-      "changePct": 93.1,
-      "why": "High pre-market volume, potential short squeeze.",
-      "traderLens": "Qullamaggie"
-    },
-    {
       "ticker": "INTC",
       "side": "LONG",
-      "changePct": 5,
-      "why": "Bank of America double upgrade to Buy from Sell, citing rising demand for CPUs.",
-      "traderLens": "Minervini"
+      "changePct": 5.0,
+      "why": "Bank of America double-upgraded the stock to Buy from Underperform and raised its price target, citing confidence in its server CPU and foundry business. [4]",
+      "traderLens": "Episodic pivot (Qullamaggie)"
     },
     {
-      "ticker": "AMAT",
+      "ticker": "AMD",
       "side": "LONG",
-      "changePct": 4,
-      "why": "Broad strength in semiconductor equipment stocks.",
-      "traderLens": "Ted Zhang"
+      "changePct": 2.2,
+      "why": "Bank of America reiterated a Buy rating and raised its price target to $560, citing strong CPU and GPU demand for AI workloads. [1]",
+      "traderLens": "Momentum (Minervini)"
     },
     {
       "ticker": "ORCL",
       "side": "SHORT",
-      "changePct": -9,
-      "why": "Investors spooked by the company's plan to raise $40 billion through equity and debt financing to fund its AI expansion, despite better-than-expected results.",
-      "traderLens": "Jeff"
-    },
-    {
-      "ticker": "HXHX",
-      "side": "SHORT",
-      "changePct": -29.6,
-      "why": "High pre-market volume on the downside.",
-      "traderLens": "Jeff"
-    },
-    {
-      "ticker": "FRGT",
-      "side": "SHORT",
-      "changePct": -23.38,
-      "why": "Continued downside momentum.",
-      "traderLens": "Jeff"
+      "changePct": -11.78,
+      "why": "Despite an earnings beat, shares plunged on concerns over future gross margin pressure and plans for significant capital expenditure and fundraising to support its AI buildout. [5, 13]",
+      "traderLens": "Post-earnings drift (Qullamaggie)"
     }
   ],
   "watchlist": [
@@ -144,159 +190,134 @@
       "ticker": "NVDA",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Leading AI chipmaker, showing strength on Oracle's positive spending news."
+      "abc": null,
+      "note": "Watching for reaction to INTC/AMD strength."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for a reaction to the broader market rebound."
+      "abc": null,
+      "note": "Monitoring for signs of relative strength or weakness."
     },
     {
       "ticker": "AAPL",
-      "level": 292.95,
-      "changePct": 0.47,
-      "abc": "A",
-      "note": "Trading higher in pre-market, looking to reclaim recent highs."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Consolidating, needs to see market stability."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Key mega-cap name, will likely follow the Nasdaq's direction."
+      "abc": null,
+      "note": "Could see pressure from ORCL's software sentiment."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Awaiting a clear directional signal."
+      "abc": null,
+      "note": "Watching for broader market direction."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for a potential bounce with other tech stocks."
+      "abc": null,
+      "note": "Monitoring for changes in ad-tech sentiment."
     },
     {
       "ticker": "GOOGL",
-      "level": 357.11,
-      "changePct": 0.2,
-      "abc": "A",
-      "note": "Slightly up in pre-market, a key name in the AI space."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Key player in AI, watching for sector leadership."
     },
     {
       "ticker": "AMD",
-      "level": null,
-      "changePct": 2.5,
+      "level": 462.36,
+      "changePct": 2.2,
       "abc": "A",
-      "note": "Gaining in pre-market along with other chip stocks."
+      "note": "Strong pre-market on analyst PT raise, showing relative strength. [1]"
     },
     {
       "ticker": "SMCI",
-      "level": 28.73,
+      "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Priced a $7 billion financing package to support its order backlog."
+      "abc": null,
+      "note": "High-beta name, sensitive to semi news."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "A key name in the data analytics and AI space."
+      "abc": null,
+      "note": "Watching for a bounce off recent lows."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Leading cybersecurity name, watching for relative strength."
+      "abc": null,
+      "note": "Cybersecurity name, sensitive to enterprise spending outlook."
     },
     {
       "ticker": "MSTR",
       "level": 118.85,
       "changePct": null,
       "abc": "C",
-      "note": "Bitcoin proxy, will be sensitive to crypto market movements."
+      "note": "Bitcoin proxy, volatile. Pre-market trading reached $118.85. [9]"
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is attempting a rebound, but caution is warranted. Focus on A-grade setups with strong relative strength."
+      "view": "Market is in a correction or chop zone. Not an ideal environment for Stage 2 breakouts. Be highly selective."
     },
     {
       "name": "Ted Zhang",
-      "view": "Potential rotation back into technology and semiconductors. Watch for confirmation of institutional buying."
+      "view": "Rotation is visible. Money flowing out of software/cloud (ORCL) and into specific semi names (INTC, AMD)."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is choppy. It's better to wait for a confirmed uptrend before deploying significant capital."
+      "view": "Market context is poor. Geopolitical risk is high, VIX is elevated. Not a time for A-grade setups. Cash is a valid position."
     },
     {
       "name": "SRxTrades",
-      "view": "Wait for clean pivot entries with volume confirmation. Avoid chasing pre-market gaps."
+      "view": "Wait for clean pivots and volume confirmation. Chasing pre-market gaps in this environment is high-risk."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your trading plan and risk management rules. The market can be volatile."
+      "view": "Respect hard stops. Volatility is elevated, so position sizes should be smaller to manage risk."
     },
     {
       "name": "Qullamaggie",
-      "view": "Some low-float stocks are showing explosive pre-market moves, but these are high-risk plays. Focus on quality breakouts."
+      "view": "Look for episodic pivots on news like the INTC upgrade. Otherwise, the broad market lacks clear breakout momentum."
     },
     {
       "name": "Composite",
-      "view": "Wait for the market to open and digest the PPI data. The pre-market rebound is encouraging, but confirmation is needed. Keep a close eye on the VIX and market breadth."
+      "view": "Stay defensive. Focus on relative strength in semis if you must trade, but the overall market is risk-off. Raise the bar for new entries and consider tightening stops on existing positions."
     }
   ],
   "standout": null,
   "earnings": {
-    "bmo": [
+    "bmo": [],
+    "amc": [],
+    "yesterdayReactions": [
       {
-        "ticker": "TRZ.TO",
-        "consensus": "Rev $773.8M"
-      },
-      {
-        "ticker": "HOFT",
-        "consensus": "EPS -$0.07 / Rev $66.31M"
-      },
-      {
-        "ticker": "ACB",
-        "consensus": "EPS -$0.14 / Rev $75.20M"
+        "ticker": "ORCL",
+        "result": "beat EPS & Rev",
+        "movePct": -11.78
       }
-    ],
-    "amc": [
-      {
-        "ticker": "ADBE",
-        "consensus": "EPS $5.83 / Rev $6.5B"
-      },
-      {
-        "ticker": "RH",
-        "consensus": "EPS -$2.09 / Rev $792.5M"
-      },
-      {
-        "ticker": "LEN",
-        "consensus": "EPS $1.24 / Rev $8.07B"
-      }
-    ],
-    "yesterdayReactions": []
+    ]
   },
   "calendar": [
     {
-      "time": "07:30 ET",
-      "name": "Producer Price Index (PPI)",
-      "consensus": "0.7%"
-    },
-    {
-      "time": "07:30 ET",
-      "name": "Initial Jobless Claims",
-      "consensus": "220K"
+      "time": "08:30 ET",
+      "name": "Continuing Jobless Claims",
+      "consensus": "1.78M"
     }
   ],
   "ratings": {
@@ -305,86 +326,137 @@
         "ticker": "INTC",
         "firm": "Bank of America",
         "rating": "Buy",
-        "pt": null
+        "pt": 135
+      },
+      {
+        "ticker": "GD",
+        "firm": "Jefferies",
+        "rating": "Buy",
+        "pt": 400
+      },
+      {
+        "ticker": "CME",
+        "firm": "Rothschild & Co Redburn",
+        "rating": "Buy",
+        "pt": 323
       }
     ],
     "downgrades": [
       {
-        "ticker": "MSTR",
-        "firm": "Canaccord Genuity",
-        "rating": "Buy",
-        "pt": 163
+        "ticker": "CHWY",
+        "firm": "MoffettNathanson",
+        "rating": "Neutral",
+        "pt": null
+      },
+      {
+        "ticker": "MKTX",
+        "firm": "Rothschild & Co Redburn",
+        "rating": "Neutral",
+        "pt": 134
+      },
+      {
+        "ticker": "JILL",
+        "firm": "William Blair",
+        "rating": "Market Perform",
+        "pt": null
       }
     ]
   },
-  "alert": "Key PPI inflation data is due at 7:30 AM ET, which could significantly impact market direction.",
+  "alert": "Geopolitical tensions rising as US strikes Iran; Oil prices surge.",
   "news": [
     {
-      "headline": "U.S. stock futures rise as chip stocks rebound",
+      "headline": "Intel shares climb 5% premarket after Bank of America double-upgrades stock to Buy",
       "impact": "HIGH",
       "tickers": [
-        "SPY",
-        "QQQ",
-        "NVDA",
+        "INTC",
+        "SMH",
         "AMD",
-        "INTC"
+        "NVDA"
       ],
-      "source": "TipRanks.com - https://www.tipranks.com/news/stock-futures-rise-as-chip-stocks-rebound-traders-assess-middle-east-updates",
-      "time": "05:29 AM ET"
-    },
-    {
-      "headline": "Oracle drops 9% pre-market despite earnings beat, as investors focus on $40B financing plan for AI expansion",
-      "impact": "MED",
-      "tickers": [
-        "ORCL"
-      ],
-      "source": "TipRanks.com - https://www.tipranks.com/news/stock-futures-rise-as-chip-stocks-rebound-traders-assess-middle-east-updates",
+      "source": "Investing.com",
       "time": "pre-market"
     },
     {
-      "headline": "Intel stock gains more than 5% after Bank of America double upgrade",
-      "impact": "MED",
-      "tickers": [
-        "INTC"
-      ],
-      "source": "TipRanks.com - https://www.tipranks.com/news/stock-futures-rise-as-chip-stocks-rebound-traders-assess-middle-east-updates",
-      "time": "pre-market"
-    },
-    {
-      "headline": "Middle East tensions escalate with U.S. and Iran trading direct military strikes",
+      "headline": "Oracle stock plunges over 11% despite earnings beat on concerns over heavy AI spending and margin pressure",
       "impact": "HIGH",
       "tickers": [
-        "SPY",
-        "CL=F"
+        "ORCL",
+        "XLK",
+        "IGV"
       ],
-      "source": "Benzinga - https://www.benzinga.com/markets/26/06/39286432/stock-market-today-dow-jones-s-p-500-futures-gain-despite-trumps-threats-to-iran-amid-stalled-pe",
+      "source": "Stock Titan",
       "time": "overnight"
     },
     {
-      "headline": "Producer Price Index (PPI) and jobless claims data due at 7:30 AM ET",
+      "headline": "Asian markets trade mostly lower amid escalated geopolitical tensions after US strikes on Iran",
       "impact": "HIGH",
-      "tickers": null,
-      "source": "Investing.com - https://www.investing.com/news/economy/ppi-and-jobless-claims-highlight-thursdays-economic-calendar-3465432",
-      "time": "07:30 ET"
+      "tickers": [
+        "SPY",
+        "QQQ"
+      ],
+      "source": "HDFCSky",
+      "time": "overnight"
+    },
+    {
+      "headline": "Bank of America reiterates Buy on AMD, raises price target to $560",
+      "impact": "MED",
+      "tickers": [
+        "AMD"
+      ],
+      "source": "Benzinga",
+      "time": "pre-market"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "CNN Business - https://www.cnn.com/markets/fear-and-greed",
-    "TradingKey - https://www.tradingkey.com/news/us-pre-market-three-major-indexes-rise-oracle-plunges-8-semiconductor-equipment-stocks-gain-ai-chip-capital-expenditure-cycle-continues-to-heat-up-202606110900",
-    "Public.com - https://public.com/stocks/googl/pre-market",
-    "Public.com - https://public.com/stocks/aapl/pre-market",
-    "Cboe - https://www.cboe.com/tradable_products/vix/",
-    "Digrin - https://digrin.com/earnings/2026-06-11",
-    "Investing.com - https://www.investing.com/economic-calendar/",
-    "Benzinga - https://www.benzinga.com/pre-market-movers",
-    "MarketScreener - https://www.marketscreener.com/quote/stock/S-P-500-4985/news/US-Equity-Futures-Rise-Pre-Bell-After-US-Says-Strikes-Completed-Against-Iran-46938361/",
-    "BeInCrypto - https://beincrypto.com/microstrategy-stock-bullish-bets-crash/",
-    "TipRanks - https://www.tipranks.com/news/stock-futures-rise-as-chip-stocks-rebound-traders-assess-middle-east-updates",
-    "TheStreet - https://www.thestreet.com/markets/stock-market-today-live-updates-06-11-26",
-    "TipRanks - https://www.tipranks.com/news/nvda-amd-dell-smci-why-ai-hardware-and-chip-stocks-are-rising-today-june-11-2026",
-    "Robinhood - https://robinhood.com/stocks/MSTR/",
-    "MarketBeat - https://www.marketbeat.com/stocks/NASDAQ/GOOGL/price-target/",
-    "Stocktwits - https://stocktwits.com/news/smci-stock-back-in-the-spotlight-after-super-micro-prices-equity-offering-a-look-at-some-key-figures"
+    "[1] What's Going On With AMD Stock Thursday? - Advanced Micro Devices (NASDAQ:AMD)",
+    "[2] Here Are Thursday's Best Wall Street Analyst Research Calls: Callaway Golf, Chewy, CME Group, Danaher, General Dynamics, Intel, SpaceX, Rocket Lab, Toast, and More",
+    "[3] Upgrades and Downgrades for Thursday, 6/11 | Daily Trade Alert",
+    "[4] Intel rallies as BofA double-upgrades stock on increased CPU, foundry visibility",
+    "[5] Oracle Announces Record Q4 and FY 2026 Results Driven by Cloud Infrastructure & Cloud Applications - Stock Titan",
+    "[6] Thursday 11th June 2026: Stock Futures Fall as U.S. Strikes Iran, Oil Prices Surge",
+    "[7] Earnings call transcript: Oracle Q4 2026 earnings beat expectations despite stock dip",
+    "[8] Why Is Intel Stock Gaining Tuesday? - Intel (NASDAQ:INTC) - Benzinga",
+    "[9] MicroStrategy Stock Sees $6 Million in Bullish Bets Despite the 40% Crash - BeInCrypto",
+    "[10] Fear and Greed Index: Historical Data & Chart (2011–2026) - FinHacker.cz",
+    "[11] Market Quick Take - 11 June 2026 - Saxo Bank",
+    "[12] Oracle slumps after Q4; analysts mull gross margin pressure, capital raise plans",
+    "[13] ORCL: Oracle Stock Sinks Over 10% After Mixed Earnings, Heavy Equity Raise",
+    "[14] Japan, South Korea Stocks V-Shaped Reversal: SK Hynix Closes Up 2.59%, Kioxia Rises Over 7% - TradingKey",
+    "[15] Analyst Upgrades and Downgrades for Thursday, 6/11 - Trades Of The Day",
+    "[16] US - CNN Fear and Greed Index | MacroMicro",
+    "[17] Oracle's stock is seeing its worst run in a quarter-century as this key AI debate rages on",
+    "[18] Intel Shares Surge After BofA Upgrades Stock to Buy on CPU and Foundry Growth Prospects (INTC) - InvestorsHub",
+    "[19] Intel Corporation Stock Price: Quote, Forecast, Splits & News (INTC) - Perplexity",
+    "[20] Strategy Inc.: MSTR Stock Price Quote & News - Robinhood",
+    "[21] Best Indicators for Day Trading SPY: A Comprehensive Guide | by Ajay sonere | Medium",
+    "[22] QQQ Technical Analysis, RSI and Moving Averages - Investing.com",
+    "[23] United States Continuing Jobless Claims - Trading Economics",
+    "[24] Intel Stock Soars As AI Foundry Deals Ignite Trader Momentum",
+    "[25] Stock Market Pre-open June 11, 2026: Nifty, Sensex Falling at the Start as Middle East Mauls Sentiment - HDFCSky",
+    "[26] Bank of America Issues Positive Forecast for Advanced Micro Devices (NASDAQ:AMD) Stock Price - MarketBeat",
+    "[27] Invesco QQQ (QQQ) Technical Analysis Statistics 2026 - AltIndex",
+    "[28] US - CNN Fear and Greed Index | US Stock Market | Collection - MacroMicro",
+    "[29] US - CNN Fear and Greed Index | US Stock Market | Collection - MacroMicro",
+    "[30] AMD Stock Price History - Investing.com",
+    "[31] AMD Stock Price Quote & News | Robinhood",
+    "[32] Weekly initial jobless claims jump more than consensus; continuing claims decline",
+    "[33] United States Continuing Jobless Claims came in at 1.795M, above expectations (1.78M) in May 29 | FXStreet",
+    "[34] Stock Market News (11th June 2026): Nifty down by 0.48% and Sensex by 0.50% - Dhan",
+    "[35] QQQ Technical Analysis (Invesco QQQ Trust, Series 1) | AI Technical Ratings, Indicators & Swing Trading Signals | Kavout",
+    "[36] QQQ Technical Analysis for Invesco QQQ Trust Series 1 ETF - Barchart.com",
+    "[37] Invesco QQQ (QQQ) Stock Technical Analysis - TipRanks.com",
+    "[38] US jobless claims top forecasts, fuelling doubts over labour resilience and complicating Fed rate outlook - VT Markets",
+    "[39] SPY Technical Analysis & ETF Price Forecast - Intellectia AI",
+    "[40] CNN Fear and Greed Index: Historical Data & How It Works (2026) - LBank",
+    "[41] SPDR S&P 500 ETF (SPY) Technical Analysis Statistics 2026 - AltIndex",
+    "[42] Strategy (MSTR) Stock Chart and Price History 2026 - MarketBeat",
+    "[43] Stock Analyst Ratings: Upgrades and Downgrades - Investing.com",
+    "[44] Continuing Claims Hit a New Cycle High | NISA Investment Advisors, LLC.",
+    "[45] SPDR S&P 500 ETF Technical Analysis - Investing.com",
+    "[46] SPY Trader's Cheat Sheet for SPDR S&P 500 Trust ETF - Barchart.com",
+    "[47] Advanced Micro Devices Inc (AMD) Stock Price & News - Google Finance",
+    "[48] SA analyst upgrades/downgrades: AMD, MU, HSY, ON | Seeking Alpha",
+    "[49] Strategy Inc ( MSTR) - Price History - Digrin"
   ]
 }
