@@ -19,7 +19,7 @@ interface BriefMeta {
 
 const PROVIDER_DISPLAY: Record<Provider, { name: string; icon: string }> = {
   gemini: { name: "Gemini 2.5 Pro", icon: "✦" },
-  openai: { name: "GPT-4o", icon: "⬡" },
+  openai: { name: "Codex", icon: "⬡" },
   claude: { name: "Claude", icon: "◆" },
 };
 

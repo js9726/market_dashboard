@@ -48,7 +48,7 @@ const DISMISS_KEY = "failure-banner-dismissed";
 const PROVIDER_LABEL: Record<string, string> = {
   deepseek: "DeepSeek",
   gemini: "Gemini",
-  openai: "GPT-4o",
+  openai: "Codex",
   claude: "Claude",
 };
 

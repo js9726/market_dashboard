@@ -21,7 +21,7 @@ const INDICES = [
 const PROVIDER_LABEL: Record<BriefProviderName, string> = {
   deepseek: "DeepSeek",
   gemini: "Gemini 2.5",
-  openai: "GPT-4o",
+  openai: "Codex",
   claude: "Claude",
 };
 
