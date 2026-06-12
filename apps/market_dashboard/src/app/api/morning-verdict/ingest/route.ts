@@ -93,7 +93,7 @@ export async function POST(req: Request) {
   //     Runs after every successful brief ingest, regardless of provider.
   //     Idempotent — re-runs (same brief, different provider) upsert by (date, ticker).
   //     Failures are non-fatal: brief ingest still succeeds even if A-list update fails.
-  let aListSummary: { inserted: number; updated: number; total: number; userId?: string } | null = null;
+  let aListSummary: { inserted: number; updated: number; refreshed?: number; total: number; userId?: string } | null = null;
   try {
     if (structuredJson) {
       const candidates = extractCandidates(structuredJson as Record<string, unknown>);
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
         const userId = await getOwnerUserId();
         if (!userId) {
           console.warn("[a-list-extractor] no owner-role user found — skipping A-list ingest");
-          aListSummary = { inserted: 0, updated: 0, total: candidates.length };
+          aListSummary = { inserted: 0, updated: 0, refreshed: 0, total: candidates.length };
         } else {
           // pickDate = UTC date of the bucket (briefs are bucketed in 15-min windows
           // around US pre-market 9:00 ET; using bucket UTC date is consistent across
@@ -119,13 +119,28 @@ export async function POST(req: Request) {
           aListSummary = { ...result, total: candidates.length, userId };
         }
       } else {
-        aListSummary = { inserted: 0, updated: 0, total: 0 };
+        aListSummary = { inserted: 0, updated: 0, refreshed: 0, total: 0 };
       }
     }
   } catch (err) {
     console.error("[a-list-extractor] failed (non-fatal):", err);
     aListSummary = null;
   }
+
+  // ── Ingest-contract gate (AGENTS.md): an A-list claim that exists only in
+  //    chat/brief text but not in AListCandidate is a FAILED ingest, not a
+  //    success with a caveat (the ONTO case, 2026-06-11). CI validators and
+  //    the morning-brief skill must treat anything except OK as a red run.
+  const persisted =
+    (aListSummary?.inserted ?? 0) + (aListSummary?.updated ?? 0) + (aListSummary?.refreshed ?? 0);
+  const aListGate =
+    structuredJson == null
+      ? "NO_BRIEF"
+      : aListSummary == null
+        ? "FAILED"
+        : persisted >= aListSummary.total
+          ? "OK"
+          : "PARTIAL";
 
   return NextResponse.json({
     ok: true,
@@ -135,5 +150,6 @@ export async function POST(req: Request) {
     generatedBy,
     hasStructuredJson: structuredJson != null,
     aList: aListSummary,
+    aListGate,
   });
 }

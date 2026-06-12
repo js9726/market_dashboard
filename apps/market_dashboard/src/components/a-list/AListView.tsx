@@ -154,8 +154,15 @@ function defaultToDate(): string {
 function computeSummary(rows: AListRow[]) {
   const total = rows.length;
   const active = rows.filter((r) => r.status === "ACTIVE").length;
-  const hitTarget = rows.filter((r) => r.day14?.outcome === "HIT_TARGET").length;
-  const stoppedOut = rows.filter((r) => r.day14?.outcome === "STOPPED_OUT").length;
+  // Status flips live (track-positions) while day14.outcome lands at day 14 —
+  // counting only the latter showed "0 stopped" over a table full of stops.
+  // A row counts once, whichever field resolved first.
+  const hitTarget = rows.filter(
+    (r) => r.status === "HIT_TARGET" || r.day14?.outcome === "HIT_TARGET",
+  ).length;
+  const stoppedOut = rows.filter(
+    (r) => r.status === "STOPPED_OUT" || r.day14?.outcome === "STOPPED_OUT",
+  ).length;
   const finished = hitTarget + stoppedOut;
   const hitRatePct = finished > 0 ? Math.round((hitTarget / finished) * 100) : 0;
   const scoredRows = rows.filter((r) => r.day14?.score != null);

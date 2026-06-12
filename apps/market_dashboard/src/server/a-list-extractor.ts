@@ -18,6 +18,7 @@
  * Idempotent: re-running the same brief upserts by (pickDate, ticker).
  */
 import { Prisma, PrismaClient } from "@prisma/client";
+import { computeAutoLevels } from "@/server/alist-levels";
 
 const prisma = new PrismaClient();
 
@@ -258,11 +259,57 @@ export async function upsertCandidates(
   briefBucketAt: Date,
   briefProvider: string,
   operatorLabel: string = "JS",
-): Promise<{ inserted: number; updated: number }> {
+): Promise<{ inserted: number; updated: number; refreshed: number }> {
   let inserted = 0;
   let updated = 0;
+  let refreshed = 0;
 
-  for (const c of candidates) {
+  for (const rawCandidate of candidates) {
+    const c = await withAutoLevels(rawCandidate);
+
+    // ── Cross-day dedupe ────────────────────────────────────────────────────
+    // A ticker that passes the bar again while an ACTIVE REC row exists within
+    // the tracking window is the SAME candidate re-qualifying, not a new pick.
+    // Creating a second row split the day-0→14 path and double-counted the
+    // stats (SJM/ASH/CBRL/TREX duplicated on consecutive days, 2026-06).
+    const windowStart = new Date(pickDate.getTime() - 14 * 86400e3);
+    const recent = await prisma.aListCandidate.findFirst({
+      where: {
+        userId,
+        ticker: c.ticker,
+        isHeld: false,
+        status: "ACTIVE",
+        pickDate: { lt: pickDate, gte: windowStart },
+      },
+      orderBy: { pickDate: "desc" },
+    });
+    if (recent) {
+      const requalTag = `requalified:${pickDate.toISOString().slice(0, 10)}`;
+      const existingTags = Array.isArray(recent.tags)
+        ? recent.tags.filter((t): t is string => typeof t === "string")
+        : [];
+      await prisma.aListCandidate.update({
+        where: { id: recent.id },
+        data: {
+          // Day-0 truth stays frozen; only refresh live-quality fields and
+          // fill gaps the original sighting lacked.
+          day0Score: Math.max(recent.day0Score ?? 0, c.day0Score ?? 0) || recent.day0Score,
+          day0Rvol: dec(c.day0Rvol) ?? recent.day0Rvol,
+          day0Verdict: recent.day0Verdict ?? c.day0Verdict ?? null,
+          setupClassification: recent.setupClassification ?? c.setupClassification ?? null,
+          sector: recent.sector ?? c.sector ?? null,
+          entryZone: recent.entryZone ?? dec(c.entryZone),
+          stop: recent.stop ?? dec(c.stop),
+          target: recent.target ?? dec(c.target),
+          rrr: recent.rrr ?? dec(c.rrr),
+          day0Thesis: recent.day0Thesis ?? c.day0Thesis ?? null,
+          tags: existingTags.includes(requalTag) ? existingTags : [...existingTags, requalTag],
+        },
+      });
+      refreshed++;
+      continue;
+    }
+
     const existing = await prisma.aListCandidate.findUnique({
       where: {
         userId_pickDate_ticker: { userId, pickDate, ticker: c.ticker },
@@ -313,6 +360,7 @@ export async function upsertCandidates(
       inserted++;
     }
 
+
     await prisma.wikiScreenerPick.upsert({
       where: {
         operatorLabel_pickDate_ticker_screenSource: {
@@ -339,7 +387,27 @@ export async function upsertCandidates(
     });
   }
 
-  return { inserted, updated };
+  return { inserted, updated, refreshed };
+}
+
+/**
+ * Fill missing entry/stop/target with deterministic ATR-floor levels (tagged
+ * AUTO-LEVELS). Without a stop the row has no 1R and can never be graded —
+ * exactly the "outcome never finalises" failure. Fail-soft: fetch errors
+ * leave levels null and the UI shows NEEDS-LEVELS.
+ */
+async function withAutoLevels(c: ExtractedCandidate): Promise<ExtractedCandidate> {
+  if (c.stop != null) return c;
+  const levels = await computeAutoLevels(c.ticker, c.entryZone ?? c.day0Price ?? null);
+  if (!levels) return c;
+  return {
+    ...c,
+    entryZone: c.entryZone ?? levels.entryZone,
+    stop: levels.stop,
+    target: c.target ?? levels.target,
+    rrr: c.rrr ?? levels.rrr,
+    tags: Array.from(new Set([...(c.tags ?? []), "AUTO-LEVELS"])),
+  };
 }
 
 /**

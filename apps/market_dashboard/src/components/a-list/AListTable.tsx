@@ -9,6 +9,8 @@
  * Soft-tranche-vs-Hard) once the daily tracker has run.
  */
 
+import { sessionsBetween, validUntil } from "@/lib/alist-validity";
+
 export interface AListRow {
   id: string;
   pickDate: string;
@@ -69,6 +71,24 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
+/** Day-N-of-14 counter with the entry-validity window on hover. */
+function renderDayIndex(r: AListRow) {
+  const pick = new Date(`${r.pickDate}T00:00:00.000Z`);
+  if (Number.isNaN(pick.getTime())) return <span>-</span>;
+  const n = sessionsBetween(pick, new Date());
+  const label = n > 14 ? "d14+" : `d${n}/14`;
+  const valid = validUntil(pick, r.setup).toISOString().slice(0, 10);
+  const title =
+    r.status === "ACTIVE" && !r.isHeld
+      ? `Entry valid through ${valid}; outcome tracked to day 14`
+      : `Day ${n} of the 14-session tracking window`;
+  return (
+    <span className="t-mono text-[var(--fg-3)]" title={title}>
+      {label}
+    </span>
+  );
+}
+
 export default function AListTable({ rows, selectedId, onSelect }: Props) {
   return (
     <div className="overflow-x-auto">
@@ -76,6 +96,7 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
         <thead className="border-b border-[var(--line)] text-[var(--fg-3)]">
           <tr>
             <Th>Date</Th>
+            <Th>Day</Th>
             <Th>Ticker</Th>
             <Th>Badges</Th>
             <Th>Setup</Th>
@@ -103,6 +124,7 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
               }`}
             >
               <Td><span className="t-mono">{r.pickDate}</span></Td>
+              <Td>{renderDayIndex(r)}</Td>
               <Td><strong>{r.ticker}</strong></Td>
               <Td>{renderBadges(r.badges, r.onBook)}</Td>
               <Td>{r.setup ?? "-"}</Td>

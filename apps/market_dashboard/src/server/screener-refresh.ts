@@ -1,7 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { fetchScreeners, type ScreenerFile } from "@/server/screener-scanner";
-import { ingestScreenerRec } from "@/server/a-list-extractor";
+import { getOwnerUserId, ingestScreenerRec } from "@/server/a-list-extractor";
+import { expireStaleRecCandidates } from "@/server/alist-maintenance";
 
 const DEFAULT_FRESH_WINDOW_MS = 15 * 60 * 1000;
 
@@ -77,6 +78,18 @@ async function refreshNow(source: string): Promise<ScreenerRefreshResult> {
     recCandidates = (await ingestScreenerRec(file)).count;
   } catch (e) {
     console.error("[screener-refresh] REC ingest failed (non-fatal):", e);
+  }
+
+  // Entry-validity sweep: flip stale ACTIVE REC picks to EXPIRED so a
+  // pre-open pick that never set up stops counting as actionable.
+  try {
+    const ownerId = await getOwnerUserId();
+    if (ownerId) {
+      const { expired, tickers } = await expireStaleRecCandidates(ownerId);
+      if (expired > 0) console.log(`[screener-refresh] expired ${expired} stale REC picks: ${tickers.join(", ")}`);
+    }
+  } catch (e) {
+    console.error("[screener-refresh] expiry sweep failed (non-fatal):", e);
   }
 
   return { row, file, totalHits, recCandidates };
