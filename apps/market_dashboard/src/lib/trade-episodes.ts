@@ -126,9 +126,15 @@ export function qtyMatches(r: CanonicalCandidate, ep: Episode): boolean {
   return r.quantity != null && Math.abs(r.quantity - ep.buyQty) < QTY_EPS + 1e-9;
 }
 
-/** Auto-created bridge stopgap rows ("position:<ticker>") with no user content. */
+/**
+ * Auto-created bridge stopgap rows ("position:<ticker>") with no user content.
+ * materializeOpenPositionTradeRecords stamps its rows with a fixed auto-note —
+ * that note is machine content, not user content.
+ */
+const AUTO_NOTE_PREFIX = "Auto-created from live broker position";
 export function isStopgap(r: CanonicalCandidate): boolean {
-  return r.source === "BRIDGE" && (r.brokerOrderId?.startsWith("position:") ?? false) && !r.notes;
+  if (r.source !== "BRIDGE" || !(r.brokerOrderId?.startsWith("position:") ?? false)) return false;
+  return !r.notes || r.notes.startsWith(AUTO_NOTE_PREFIX);
 }
 
 /**

@@ -186,6 +186,13 @@ export async function reconcileBrokerTrades(opts: {
                 ...closeData,
                 tradeDate: canonical.tradeDate ?? ep.openedAt,
                 platform: canonical.platform ?? account.alias,
+                // Free the (account, "position:<ticker>") unique slot: the
+                // materializer upserts on it for every LIVE position, so a
+                // re-entry would otherwise resurrect this closed row and wipe
+                // its exit/P&L. Rename to the immutable episode key.
+                ...(canonical.brokerOrderId?.startsWith("position:")
+                  ? { brokerOrderId: `episode:${ticker}:${ep.fillIds[0]}` }
+                  : {}),
                 // Non-sheet rows have no MYR sheet P&L to preserve.
                 ...(canonical.source !== "SHEET" && ep.usdSafe && ep.realized != null
                   ? { pnl: new Prisma.Decimal(ep.realized.toFixed(2)) }
@@ -253,7 +260,12 @@ export async function reconcileBrokerTrades(opts: {
               `both ${dup.id} (stopgap) and ${canonicalId} have a JournalEntry — stopgap kept, marked CLOSE`,
             );
             if (!dryRun) {
-              await prisma.tradeRecord.update({ where: { id: dup.id }, data: closeData });
+              await prisma.tradeRecord.update({
+                where: { id: dup.id },
+                // Also vacate the position:* slot so the materializer can't
+                // resurrect this kept duplicate on a future re-entry.
+                data: { ...closeData, brokerOrderId: `episode:${ticker}:${ep.fillIds[0]}:dup` },
+              });
             }
             continue;
           }
