@@ -232,6 +232,28 @@ export async function GET(req: Request) {
     return { ...t, source: "SHEET" as const, broker: t.platform };
   });
 
+  // One LIVE row per held position. A materialized bridge row AND a sheet/import
+  // row can both be open for the same holding (MDB, 2026-06-10) — they're the
+  // same position, not two trades. Keep the richer row (verdict > plan > first).
+  const liveRichness = (r: { verdict?: unknown; hasPlan?: boolean }) =>
+    (r.verdict != null ? 2 : 0) + (r.hasPlan ? 1 : 0);
+  const liveIndexByKey = new Map<string, number>();
+  const enrichedDeduped: typeof enriched = [];
+  for (const row of enriched) {
+    if (row.source !== "LIVE") {
+      enrichedDeduped.push(row);
+      continue;
+    }
+    const key = `${plainTicker(row.ticker)}|${("broker" in row ? row.broker : null) ?? ""}`;
+    const prevIdx = liveIndexByKey.get(key);
+    if (prevIdx == null) {
+      liveIndexByKey.set(key, enrichedDeduped.length);
+      enrichedDeduped.push(row);
+    } else if (liveRichness(row) > liveRichness(enrichedDeduped[prevIdx])) {
+      enrichedDeduped[prevIdx] = row;
+    }
+  }
+
   function syntheticMatchesFilters(row: { ticker: string; side: string; state: string }) {
     if (symbol && !row.ticker.includes(symbol)) return false;
     if (side && row.side !== side) return false;
@@ -292,7 +314,7 @@ export async function GET(req: Request) {
     })
     .filter(syntheticMatchesFilters);
 
-  const combined = [...brokerOnly, ...enriched].sort((a, b) => {
+  const combined = [...brokerOnly, ...enrichedDeduped].sort((a, b) => {
     const priority = activeTradePriority(a) - activeTradePriority(b);
     if (priority !== 0) return priority;
     const at = a.tradeDate ? new Date(a.tradeDate).getTime() : 0;
