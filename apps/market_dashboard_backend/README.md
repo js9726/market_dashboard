@@ -1,46 +1,70 @@
-# Market Dashboard
+# Market Dashboard Backend Scripts
 
-Static stock dashboard with daily auto-refresh via GitHub Actions (Yahoo Finance), hosted on GitHub Pages.
+This folder is the operator-facing script area: things you can double-click or
+run from PowerShell while the dashboard is deployed on Vercel.
 
-## Build data locally
+The live broker sync implementation lives in `packages/dashboard-bridge`.
+These backend BAT files are wrappers so you do not need to remember that package
+path.
 
-```bash
-cd market-dashboard
-pip install -r requirements.txt
-python scripts/build_data.py --out-dir data
+## What To Run
+
+MooMoo / OpenD continuous sync:
+
+```powershell
+apps\market_dashboard_backend\scripts\start_moomoo_bridge.bat
 ```
 
-This generates: `data/snapshot.json`, `data/events.json`, `data/meta.json`, and `data/charts/*.png`.
+This calls:
 
-To preview locally: open `index.html` in a browser, or serve the project root with a static server (e.g. `python -m http.server 8000`) and visit `http://localhost:8000`.
-
-## Deploy to GitHub Pages
-
-1. Create a new GitHub repository and push this directory’s contents to it (or push as the repo root).
-2. **Before first deploy** you need initial data. Either:
-   - **Recommended:** In the repo go to **Actions** → “Refresh dashboard data” → **Run workflow**. When it finishes, it will commit `data/` to the repo.
-   - Or run locally: `python scripts/build_data.py --out-dir data`, then `git add data/`, commit and push.
-3. In the repo **Settings → Pages**:
-   - Set Source to **GitHub Actions** (or “Deploy from a branch”).
-   - If using a branch: choose branch `main` and folder `/ (root)`.
-4. The workflow runs daily at 16:30 US Eastern to refresh data; you can also run it manually from **Actions**.
-
-Site URL: `https://<your-username>.github.io/<repo-name>/`
-
-## Project structure
-
-```
-market-dashboard/
-├── .github/workflows/refresh_data.yml   # Daily data refresh
-├── scripts/build_data.py                # Fetches data, outputs JSON + charts
-├── data/                                # Generated (commit for Pages)
-│   ├── snapshot.json
-│   ├── events.json
-│   ├── meta.json
-│   └── charts/*.png
-├── index.html                            # Static frontend
-├── requirements.txt
-└── README.md
+```powershell
+packages\dashboard-bridge\.venv\Scripts\python.exe -m bridge run
 ```
 
-Data: Yahoo Finance (yfinance), economic calendar (investpy). Charts: TradingView embed.
+It syncs MooMoo positions, fills, account equity, and live quotes when
+`~\.config\dashboard-bridge.toml` has `live_quote_key`.
+
+IBKR continuous sync:
+
+```powershell
+apps\market_dashboard_backend\scripts\start_ibkr_bridge.bat
+```
+
+This calls:
+
+```powershell
+packages\dashboard-bridge\.venv\Scripts\python.exe ibkr_bridge.py --run
+```
+
+It syncs IBKR positions, fills, and account equity while IB Gateway or TWS is
+logged in and API access is enabled.
+
+## Legacy Scripts
+
+The Python scripts in `scripts/` are still useful for market data builds,
+screeners, breadth, and morning brief generation.
+
+`scripts\live_quote_daemon.py` is legacy quote-only code. Prefer
+`start_moomoo_bridge.bat`, because the bridge is the complete path that also
+syncs broker positions, fills, and equity into the dashboard database.
+
+`scripts\start_live_quote_daemon.bat` is kept only as a backward-compatible
+shortcut. It now forwards to `start_moomoo_bridge.bat`.
+
+## Local Config
+
+The bridge reads:
+
+```text
+%USERPROFILE%\.config\dashboard-bridge.toml
+```
+
+That file is local-only and contains secrets. Do not commit it.
+
+Useful logs:
+
+```text
+%USERPROFILE%\.dashboard-bridge.log
+%USERPROFILE%\.ibkr-bridge.log
+%USERPROFILE%\.opend-watchdog.log
+```

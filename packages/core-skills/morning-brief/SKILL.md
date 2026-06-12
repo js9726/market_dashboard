@@ -29,7 +29,7 @@ PATH A: Claude CLI itself generates the brief (populates the "Claude" tab)
    Step 4  Pipe the JSON through ingest_to_dashboard.py
            → lands on the Claude tab (provider="claude")
 
-PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/GPT-4o tabs)
+PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/Codex tabs)
    Reads watchlist from dashboard DB + screener json
    Calls the chosen provider's API (DeepSeek / Gemini / OpenAI / Anthropic)
    Pushes to dashboard as that provider
@@ -221,11 +221,11 @@ python ingest_to_dashboard.py brief_output.json
 
 Dashboard viewers see the updated **Claude** chip within ~60 seconds (the poll interval).
 
-If you only need to refresh DeepSeek/Gemini/GPT-4o instead, jump to PATH B.
+If you only need to refresh DeepSeek/Gemini/Codex instead, jump to PATH B.
 
 ---
 
-## PATH B — `cli_run.py` (refreshes DeepSeek / Gemini / GPT-4o tabs)
+## PATH B — `cli_run.py` (refreshes DeepSeek / Gemini / Codex tabs)
 
 Use this for the **non-Claude** provider tabs. Each invocation calls one provider's
 API and pushes the result tagged as that provider. The Claude tab is NOT refreshed
@@ -240,7 +240,7 @@ python cli_run.py --provider deepseek --post
 # Gemini — pre-market run, Search Grounding gives richer citations
 python cli_run.py --provider gemini --post --tv-watchlist "NVDA,TSLA,AAPL,..."
 
-# OpenAI GPT-4o — pre-market, web_search_preview tool
+# Codex tab (stored as provider=openai) — pre-market, web_search_preview tool
 python cli_run.py --provider openai --post
 
 # Override watchlist with specific tickers
@@ -258,7 +258,7 @@ Watchlist resolution order:
 
 ## PATH C — Dashboard "Refresh" button (no terminal needed)
 
-Log in as owner → Conviction Desk → click **"Refresh DeepSeek"** (or Gemini/GPT/Claude).
+Log in as owner → Conviction Desk → click **"Refresh DeepSeek"** (or Gemini/Codex/Claude).
 
 The server reads your watchlist from the DB and regenerates. Same result as Path B but
 triggered from the browser. Other viewers see the update within 60 seconds.
@@ -295,7 +295,7 @@ npm run sync:market
 cd ../../packages/core-skills/morning-brief
 python cli_run.py --provider gemini --post
 python cli_run.py --provider deepseek --post
-python cli_run.py --provider openai --post   # optional, requires OPENAI_API_KEY
+python cli_run.py --provider openai --post   # Codex tab; optional, requires OPENAI_API_KEY
 ```
 
 Then run Claude CLI to refresh the **Claude** tab via PATH A:

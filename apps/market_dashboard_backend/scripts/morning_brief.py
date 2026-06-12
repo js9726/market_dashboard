@@ -18,7 +18,7 @@ picks it up immediately (no commit needed).
 
 Required env vars (at least one):
   GEMINI_API_KEY    — Google Gemini 2.5 Pro with Search Grounding
-  OPENAI_API_KEY    — OpenAI GPT-4o with web_search_preview
+  OPENAI_API_KEY    — Codex tab (stored as provider=openai) with web_search_preview
   ANTHROPIC_API_KEY — Anthropic Claude claude-sonnet-4-6 with web search beta
 """
 from __future__ import print_function
@@ -140,7 +140,7 @@ def generate_gemini(prompt: str, out_dir: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# OpenAI (GPT-4o via Responses API with web_search_preview)
+# Codex tab (OpenAI provider via Responses API with web_search_preview)
 # ---------------------------------------------------------------------------
 
 def generate_openai(prompt: str, out_dir: str) -> bool:
@@ -155,7 +155,7 @@ def generate_openai(prompt: str, out_dir: str) -> bool:
         print("[OpenAI] openai package not installed — run: pip install openai")
         return False
 
-    print("[OpenAI] Calling GPT-4o with web_search_preview...")
+    print("[OpenAI] Calling Codex tab provider with web_search_preview...")
     client = openai.OpenAI(api_key=api_key)
 
     for attempt in range(3):
@@ -293,7 +293,7 @@ def write_meta(out_dir: str, results: dict):
             "openai": {
                 "available": bool(os.environ.get("OPENAI_API_KEY")),
                 "generated": results.get("openai", False),
-                "label": "GPT-4o",
+                "label": "Codex",
             },
             "claude": {
                 "available": bool(os.environ.get("ANTHROPIC_API_KEY")),
