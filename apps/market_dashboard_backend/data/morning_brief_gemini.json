@@ -2,7 +2,7 @@
   "mood": {
     "label": "RISK-ON",
     "posture": "GO",
-    "summary": "Global markets are rallying strongly on hopes of a U.S.-Iran peace deal, which has sent oil prices lower and boosted risk appetite. The highly anticipated SpaceX IPO today is adding to the bullish sentiment."
+    "summary": "Global markets are rallying on hopes of a U.S.-Iran peace deal, which is pushing oil prices down and boosting risk appetite. The highly anticipated SpaceX IPO is also fueling positive sentiment, particularly in the tech sector."
   },
   "breadth": {
     "up": null,
@@ -16,145 +16,123 @@
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": 7411,
-      "changePct": 0.22,
+      "level": null,
+      "changePct": 0.66,
       "note": "futures",
-      "citation": "Source: Trading Economics"
+      "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 0.12,
+      "changePct": 0.47,
       "note": "futures",
-      "citation": "Source: Benzinga"
+      "citation": null
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": 0.55,
+      "changePct": 0.86,
       "note": "futures",
-      "citation": "Source: Benzinga"
+      "citation": null
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
       "level": null,
-      "changePct": 0.5,
+      "changePct": 0.36,
       "note": "futures",
-      "citation": "Source: Benzinga"
+      "citation": null
     },
     {
       "symbol": "^VIX",
       "name": "Volatility",
-      "level": 18.78,
-      "changePct": -15.48,
+      "level": 18.96,
+      "changePct": -1.3,
       "note": "live",
-      "citation": "Source: Google Finance"
+      "citation": null
     },
     {
       "symbol": "^TNX",
       "name": "10Y Yield",
-      "level": 4.45,
-      "changePct": -0.45,
+      "level": 4.47,
+      "changePct": null,
       "note": "live",
-      "citation": "Source: Trading Economics"
+      "citation": null
     },
     {
       "symbol": "CL=F",
       "name": "Crude Oil",
-      "level": 85.91,
-      "changePct": -2.0,
-      "note": "futures",
-      "citation": "Source: Morningstar"
+      "level": 84.43,
+      "changePct": -2.55,
+      "note": "live",
+      "citation": null
     }
   ],
-  "indicesNarrative": "U.S. index futures are pointing to a higher open, following a strong overnight session in Asia and Europe. The rally is driven by optimism about a potential U.S.-Iran peace deal, which has caused a sharp drop in oil prices and a corresponding fall in bond yields, creating a tailwind for equities.",
-  "technicals": {
-    "SPY": {
-      "close": null,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": null,
-      "ma200": null,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": null,
-      "bear_cross_imminent": null,
-      "overbought": null,
-      "oversold": null,
-      "entry_risk": "UNKNOWN"
-    }
-  },
-  "technicalsNarrative": "Technical data is currently unavailable. Traders should rely on price action and volume analysis for entry and risk management until full technical pictures are restored.",
+  "indicesNarrative": "U.S. futures are pointing to a higher open, following a strong overnight session in Asia and Europe. The rally is primarily driven by optimism surrounding a potential peace agreement between the U.S. and Iran, which has caused a significant drop in oil prices. The VIX has fallen below 20, indicating reduced fear in the market as risk-on sentiment prevails ahead of the SpaceX IPO.",
+  "technicals": null,
+  "technicalsNarrative": null,
   "sectorsThemes": [],
-  "sectorsNarrative": "Travel and leisure stocks are leading gains in Europe on the back of lower oil prices. Chip-related shares saw significant gains in Asian trading, suggesting a risk-on rotation back into technology and growth sectors.",
-  "industryNarrative": "Semiconductors and airlines are showing notable strength. The potential for lower fuel costs is a direct tailwind for airlines, while the broader risk-on mood and AI narrative are reigniting interest in chipmakers.",
+  "sectorsNarrative": "No sector data was available at the time of this brief.",
+  "industryNarrative": "Semiconductor and other technology-related stocks are showing strength, buoyed by the positive market sentiment and the upcoming SpaceX IPO. Conversely, oil majors are under pressure due to the sharp decline in crude prices.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "BYAH",
+      "ticker": "RKLB",
       "side": "LONG",
-      "changePct": 193.33,
-      "why": "Specific catalyst not identified in pre-market news.",
+      "changePct": 4.5,
+      "why": "Company will be added to the Nasdaq-100 index.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "VSME",
+      "ticker": "PSA",
       "side": "LONG",
-      "changePct": 117.57,
-      "why": "Specific catalyst not identified in pre-market news.",
+      "changePct": 7.13,
+      "why": "Recently hit a 52-week high, showing strong momentum.",
+      "traderLens": "Minervini"
+    },
+    {
+      "ticker": "PLTK",
+      "side": "LONG",
+      "changePct": 5.43,
+      "why": "Positive pre-market momentum.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "ADTX",
+      "ticker": "SNDK",
       "side": "LONG",
-      "changePct": 66.92,
-      "why": "Specific catalyst not identified in pre-market news.",
-      "traderLens": "Qullamaggie"
+      "changePct": 14.5,
+      "why": "Multiple analysts raised price targets citing AI-driven memory demand.",
+      "traderLens": "Ted Zhang"
     },
     {
-      "ticker": "EDHL",
+      "ticker": "CPNG",
       "side": "LONG",
-      "changePct": 45.99,
-      "why": "Specific catalyst not identified in pre-market news.",
-      "traderLens": "Qullamaggie"
+      "changePct": 14.09,
+      "why": "Morgan Stanley noted a record data breach fine was below market expectations.",
+      "traderLens": "Composite"
     },
     {
-      "ticker": "GMM",
-      "side": "LONG",
-      "changePct": 22.22,
-      "why": "Specific catalyst not identified in pre-market news.",
-      "traderLens": "Qullamaggie"
-    },
-    {
-      "ticker": "GELS",
+      "ticker": "ADBE",
       "side": "SHORT",
-      "changePct": -37.58,
-      "why": "Specific catalyst not identified in pre-market news.",
-      "traderLens": "Jeff"
+      "changePct": -7,
+      "why": "CFO's departure to Marvell Technology overshadowed a positive earnings report, leading to multiple analyst downgrades.",
+      "traderLens": "Composite"
     },
     {
-      "ticker": "ZNB",
+      "ticker": "SPCE",
       "side": "SHORT",
-      "changePct": -28.11,
-      "why": "Specific catalyst not identified in pre-market news.",
-      "traderLens": "Jeff"
+      "changePct": -10,
+      "why": "Giving back some of the previous session's strong gains.",
+      "traderLens": "Composite"
     },
     {
-      "ticker": "NTCL",
+      "ticker": "ORCL",
       "side": "SHORT",
-      "changePct": -24.13,
-      "why": "Specific catalyst not identified in pre-market news.",
-      "traderLens": "Jeff"
+      "changePct": -8.53,
+      "why": "Mixed Q4 results and guidance triggered recalibrated analyst targets.",
+      "traderLens": "Composite"
     }
   ],
   "watchlist": [
@@ -162,235 +140,234 @@
       "ticker": "NVDA",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Leading semiconductor name, likely to benefit from renewed AI enthusiasm."
+      "abc": null,
+      "note": "Watching for continuation on AI theme strength."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "High-beta name, could see significant movement in a risk-on environment."
+      "abc": null,
+      "note": "Monitoring for reaction to SpaceX IPO."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Market bellwether, strength would confirm broad market rally."
+      "abc": null,
+      "note": "General market bellwether."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Key player in AI space, watching for relative strength."
+      "abc": null,
+      "note": "General market bellwether."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Consumer discretionary and tech play, sensitive to broad sentiment."
+      "abc": null,
+      "note": "General market bellwether."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Ad-sensitive name, could benefit from positive economic outlook."
+      "abc": null,
+      "note": "General market bellwether."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "AI and search giant, watching for follow-through on tech rally."
+      "abc": null,
+      "note": "General market bellwether."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Another key semiconductor name, watching for leadership."
+      "abc": null,
+      "note": "Watching for continuation on AI theme strength."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "High-momentum AI-related name, could see explosive move."
+      "abc": null,
+      "note": "High-beta name in the AI space."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Software name with government ties, sensitive to geopolitical news."
+      "abc": null,
+      "note": "Watching for momentum in software/AI."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Cybersecurity leader, a defensive growth area."
+      "abc": null,
+      "note": "Cybersecurity name, watching for relative strength."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Bitcoin proxy, will move with crypto sentiment."
+      "abc": null,
+      "note": "Bitcoin proxy, watching crypto sentiment."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is showing signs of a potential Stage 2 continuation. Look for VCP setups in leading stocks."
+      "view": "Market is showing signs of a potential follow-through day. Look for Stage 2 breakouts with high relative strength."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear rotation into risk-on assets. Technology, especially semiconductors, and travel sectors are showing institutional interest."
+      "view": "Rotation into risk-on assets is clear. Technology and growth sectors are likely to lead."
     },
     {
       "name": "Clement Ang",
-      "view": "The market context has improved significantly overnight. This is an environment to look for A-grade setups."
+      "view": "Market context is improving. A-grade setups can be considered, but manage risk around the headline-driven nature of the rally."
     },
     {
       "name": "SRxTrades",
-      "view": "Wait for clean pivots and volume confirmation. Don't chase the gap-up open."
+      "view": "Look for clean pivots and volume confirmation on any entries today. Avoid chasing extended names."
     },
     {
       "name": "Jeff",
-      "view": "The overnight news is a catalyst, but stick to your rules. Manage risk and honor stops."
+      "view": "Stick to the plan. Honor stops. The geopolitical situation can change quickly."
     },
     {
       "name": "Qullamaggie",
-      "view": "Strong momentum coming into the market. Look for explosive breakouts on high volume."
+      "view": "Strong momentum is present. Look for explosive breakouts on high volume, especially in leading sectors."
     },
     {
       "name": "Composite",
-      "view": "The tape is bullish. Focus on leading sectors like tech (semis) and be ready to act on high-quality setups, but be mindful of potential volatility around the open."
+      "view": "The posture is 'GO' given the broad market strength and risk-on sentiment. Focus on leading stocks in strong sectors like tech and semis. The peace deal headlines are the main driver, so be aware of any reversal on that news."
     }
   ],
-  "standout": {
-    "ticker": null,
-    "side": null,
-    "score": null,
-    "sector": null,
-    "rs": null,
-    "grade": null,
-    "thesis": null,
-    "entry": null,
-    "stop": null,
-    "target": null,
-    "rrr": null,
-    "tags": []
-  },
+  "standout": null,
   "earnings": {
-    "bmo": [
-      {
-        "ticker": "BTM",
-        "consensus": "No consensus available"
-      },
-      {
-        "ticker": "REPL",
-        "consensus": "No consensus available"
-      },
-      {
-        "ticker": "CURR",
-        "consensus": "No consensus available"
-      },
-      {
-        "ticker": "JFIN",
-        "consensus": "No consensus available"
-      }
-    ],
-    "amc": [
-      {
-        "ticker": "PLCE",
-        "consensus": "No consensus available"
-      },
-      {
-        "ticker": "FTHM",
-        "consensus": "No consensus available"
-      }
-    ],
+    "bmo": [],
+    "amc": [],
     "yesterdayReactions": [
       {
         "ticker": "ADBE",
         "result": "beat",
-        "movePct": -4.91
+        "movePct": -7
       }
     ]
   },
   "calendar": [
     {
       "time": "10:00 ET",
-      "name": "University of Michigan Sentiment (Jun)",
-      "consensus": "No consensus available"
+      "name": "University of Michigan Consumer Sentiment (June, preliminary)",
+      "consensus": "46"
     }
   ],
   "ratings": {
-    "upgrades": [],
-    "downgrades": []
+    "upgrades": [
+      {
+        "ticker": "RR.L",
+        "firm": "Berenberg",
+        "rating": "Buy",
+        "pt": 1430
+      }
+    ],
+    "downgrades": [
+      {
+        "ticker": "ADBE",
+        "firm": "Stifel",
+        "rating": "Hold",
+        "pt": 200
+      },
+      {
+        "ticker": "ADBE",
+        "firm": "Wolfe Research",
+        "rating": "Peer Perform",
+        "pt": null
+      },
+      {
+        "ticker": "ADBE",
+        "firm": "Evercore ISI",
+        "rating": "Hold",
+        "pt": 225
+      }
+    ]
   },
-  "alert": "Major geopolitical catalyst overnight: U.S. President signals potential peace deal with Iran, easing tensions.",
+  "alert": "Major risk-on sentiment fueled by U.S.-Iran peace talks and SpaceX IPO.",
   "news": [
     {
-      "headline": "Asian stocks gain on easing US-Iran tensions, SpaceX debut awaited",
+      "headline": "World shares surge and oil prices slip over 4% after Trump claims a breakthrough in Iran war talks",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
-        "CL=F"
+        "CL=F",
+        "XLE"
       ],
-      "source": "Mitrade - https://www.mitrade.com/news/forex-news/asian-stocks-gain-on-easing-us-iran-tensions-spacex-debut-awaited-202606120242-26302-en",
-      "time": "June 12 2026"
+      "source": "WRAL - https://www.wral.com/story/world-shares-surge-and-oil-prices-slip-over-4-after-trump-claims-a-breakthrough-in-iran-war-talks/21477589/",
+      "time": "June 12 2026, 4:33 AM"
     },
     {
-      "headline": "European stocks jump to two-week highs as Iran-U.S. peace hopes lift sentiment",
+      "headline": "SpaceX set for historic market debut after record $75 billion IPO",
       "impact": "HIGH",
       "tickers": [
-        "SPY",
-        "QQQ"
-      ],
-      "source": "Investing.com - https://www.investing.com/news/stock-market-news/european-stocks-jump-to-twoweek-highs-as-iranus-peace-hopes-lift-sentiment-3463321",
-      "time": "June 12 2026"
-    },
-    {
-      "headline": "U.S. futures rise after Trump calls off Iran strikes",
-      "impact": "HIGH",
-      "tickers": [
-        "SPY",
         "QQQ",
-        "DIA"
+        "XLK"
       ],
-      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/2026061228/oil-falls-us-futures-rise-after-trump-calls-off-iran-strikes",
+      "source": "Benzinga - https://www.benzinga.com/news/26/06/42129135/spacex-set-for-historic-market-debut-after-record-75-billion-ipo",
       "time": "June 12 2026"
     },
     {
-      "headline": "SpaceX set for largest IPO in history",
+      "headline": "Asian markets rally, following Wall Street's lead on peace optimism",
+      "impact": "MED",
+      "tickers": null,
+      "source": "TradingKey - https://www.tradingkey.com/en/news/japan-south-korea-close-kioxia-becomes-japan-s-most-valuable-company-wall-street-tightening-leverage-weighs-on-south-korean-stock-gains-24513",
+      "time": "June 12 2026"
+    },
+    {
+      "headline": "European stocks jump amid US-Iran deal hopes",
+      "impact": "MED",
+      "tickers": null,
+      "source": "AJ Bell - https://www.ajbell.co.uk/news/early-market-roundup-european-stocks-jump-amid-us-iran-deal-hopes",
+      "time": "June 12 2026"
+    },
+    {
+      "headline": "Adobe shares fall despite earnings beat as CFO departs for Marvell",
       "impact": "MED",
       "tickers": [
-        "QQQ"
+        "ADBE",
+        "MRVL"
       ],
-      "source": "XTB - https://www.xtb.com/en/market-analysis/articles/macro-calendar-wrapping-up-an-intense-week-12-06-2026",
+      "source": "24/7 Wall St. - https://247wallst.com/investing/2026/06/12/stock-market-live-june-12-2026-s-p-500-spy-green-on-end-of-war-hopes/",
       "time": "June 12 2026"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Trading Economics - https://tradingeconomics.com/united-states/stock-market",
-    "Benzinga - https://www.benzinga.com/markets/futures/26/06/39308309/stock-market-today-s-p-500-dow-futures-gain-ahead-of-spacexs-debut-adobe-lennar-coreweave-in-focu",
-    "Google Finance - https://www.google.com/finance/quote/VIX:INDEXCBOE",
-    "Morningstar - https://www.morningstar.com/news/dow-jones/2026061228/oil-falls-us-futures-rise-after-trump-calls-off-iran-strikes",
-    "FinHacker.cz - https://finhacker.cz/fear-and-greed-index-cnn-historical-data-chart",
-    "Investing.com - https://www.investing.com/economic-calendar/earnings-calendar",
-    "Mitrade - https://www.mitrade.com/news/forex-news/asian-stocks-gain-on-easing-us-iran-tensions-spacex-debut-awaited-202606120242-26302-en",
-    "Investing.com - https://www.investing.com/news/stock-market-news/european-stocks-jump-to-twoweek-highs-as-iranus-peace-hopes-lift-sentiment-3463321",
-    "XTB - https://www.xtb.com/en/market-analysis/articles/macro-calendar-wrapping-up-an-intense-week-12-06-2026",
-    "Today's Premarket Stock Movers - https://www.benzinga.com/premarket",
-    "Investing.com Canada - https://ca.investing.com/news/stock-market-news/european-stocks-rally-as-oil-falls-on-hopes-for-usiran-deal-93CH-4613220"
+    "24/7 Wall St. - Stock Market Live June 12, 2026: S&P 500 (SPY) Green on End of War Hopes",
+    "AJ Bell - Early market roundup: European stocks jump amid US-Iran deal hopes",
+    "BNN Bloomberg - U.S. stocks rise as oil falls and Wall Street waits for SpaceX's debut",
+    "FinHacker.cz - Fear and Greed Index: Historical Data & Chart (2011–2026)",
+    "FT.com - US 10 year Treasury Bond, chart, prices",
+    "FT.com - WTI Crude Oil price information",
+    "Google Finance - VIX Price, Real-time Quote & News",
+    "Investing.com - Crude Oil Futures Price Today (WTI)",
+    "MarketScreener - European Markets Surge; MIB Hits Record Highs",
+    "Saxo Bank - Market Quick Take - 12 June 2026",
+    "Simply Wall St - US Stock Market Today: S&P 500 Futures Rise As Energy Inflation Tests Fed Patience",
+    "StoneX - Perspective: Morning Commentary for June 12",
+    "TipRanks - Stock Market News Today, 6/12/26 – Futures Climb on U.S.-Iran Peace Optimism, SpaceX IPO Looms",
+    "Trading Economics - US 10 Year Treasury Note Yield - Quote - Chart - Historical Data",
+    "TradingKey - Japan, South Korea Close: Kioxia Becomes Japan's Most Valuable Company",
+    "TradingView - VIX Index Chart — Volatility S&P 500 Index",
+    "WRAL - World shares surge and oil prices slip over 4% after Trump claims a breakthrough in Iran war talks",
+    "Yahoo Finance - Stock Market News for Jun 12, 2026"
   ]
 }
