@@ -27,6 +27,7 @@ Thumbs.db
 # Build / caches
 dist/
 build/
+.next/
 *.egg-info/
 .coverage
 htmlcov/
@@ -35,6 +36,8 @@ htmlcov/
 .env.local
 venv_temp/
 apps/market_dashboard/venv_temp/
+apps/market_dashboard/dev-server*.log
+apps/market_dashboard/console.log*
 .codex-next-*.err.log
 apps/market_dashboard/.codex-next-*.err.log
 

@@ -26,6 +26,25 @@ export type VerdictResult = {
 
 export { buildPrompt, parseNumeric, tradeReviewSystemPrompt, type TradePromptInput };
 
+export function coerceScore(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return Math.round(value * 10) / 10;
+  if (typeof value !== "string") return null;
+  const match = value.match(/-?\d+(?:\.\d+)?/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? Math.round(parsed * 10) / 10 : null;
+}
+
+export function extractOverallScore(review: unknown, style: ReviewStyle): number | null {
+  if (!review || typeof review !== "object") return null;
+  const payload = review as Record<string, unknown>;
+  if (style === "trader-debate") return coerceScore(payload.overall_score);
+  const moderator = payload.moderator as { confidence?: unknown } | undefined;
+  const confidence = coerceScore(moderator?.confidence);
+  if (confidence == null) return null;
+  return confidence > 10 && confidence <= 100 ? Math.round(confidence) / 10 : confidence;
+}
+
 // snapshotFromTrade was a v0 all-null stub. Entry-date market context now comes
 // from buildTradeSnapshot() (src/lib/trade-snapshot.ts), keyed on the trade's
 // entry date so the rubric can score against the regime + theme at trade time.
@@ -107,14 +126,11 @@ export async function generateTradeVerdict(
     .trim();
   const review = JSON.parse(cleaned) as Record<string, unknown>;
 
-  // Score field differs by style: trader-debate uses overall_score,
-  // agent-pipeline uses moderator.confidence.
-  let overallScore: number | null = null;
-  if (style === "trader-debate") {
-    overallScore = typeof review.overall_score === "number" ? review.overall_score : null;
-  } else {
-    const moderator = review.moderator as { confidence?: number } | undefined;
-    overallScore = typeof moderator?.confidence === "number" ? moderator.confidence : null;
+  // DeepSeek sometimes follows the example schema literally and returns
+  // numeric scores as strings. Coerce them before writing the visible grade.
+  const overallScore = extractOverallScore(review, style);
+  if (overallScore != null && style === "trader-debate") {
+    review.overall_score = overallScore;
   }
 
   const providerUsed = out.providerUsed ?? "unknown";

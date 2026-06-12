@@ -22,6 +22,9 @@ type Trade = {
   rewardPct: Decimal | null;
   positionPct: Decimal | null;
   currency: string | null;
+  currencyCode?: string | null;
+  pnlUsd?: number | null;
+  pnlSource?: string | null;
   platform: string | null;
   industry: string | null;
   strategy: string | null;
@@ -920,12 +923,41 @@ function fmtNum(v: Decimal | null | undefined): string {
   return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function fmtPnl(v: Decimal | null | undefined): { text: string; color: string } {
-  if (v === null || v === undefined) return { text: "Open", color: "text-[var(--fg-3)]" };
-  const n = parseFloat(v.toString());
+function ccSymbol(cc: string | null | undefined): string {
+  const c = (cc ?? "").toUpperCase();
+  if (c === "MYR") return "RM ";
+  if (c === "" || c === "USD") return "$";
+  return `${c} `;
+}
+
+function fmtMoney(n: number, symbol: string): string {
+  return `${n >= 0 ? "+" : "-"}${symbol}${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/**
+ * Currency-aware P&L. Prefers the USD-normalized `pnlUsd` (broker-true or
+ * fixed-rate converted) and surfaces the original sheet currency (e.g. RM) on
+ * hover. When not yet converted, shows the native currency honestly instead of
+ * mislabeling MYR as USD.
+ */
+function fmtPnlRow(t: Trade): { text: string; color: string; title?: string } {
+  const raw = t.pnl == null ? null : parseFloat(t.pnl.toString());
+  const usd = t.pnlUsd ?? null;
+  const cc = t.currencyCode ?? t.currency ?? null;
+  const isNonUsd = cc != null && cc.toUpperCase() !== "USD";
+
+  if (usd != null) {
+    const title = raw != null && isNonUsd
+      ? `Sheet original: ${ccSymbol(cc)}${Math.abs(raw).toLocaleString("en-US", { minimumFractionDigits: 2 })}` +
+        (t.pnlSource ? ` (${t.pnlSource})` : "")
+      : undefined;
+    return { text: fmtMoney(usd, "$"), color: usd >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]", title };
+  }
+  if (raw == null) return { text: "Open", color: "text-[var(--fg-3)]" };
   return {
-    text: `${n >= 0 ? "+" : ""}$${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
-    color: n >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]",
+    text: fmtMoney(raw, ccSymbol(cc)),
+    color: raw >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]",
+    title: isNonUsd ? "Original sheet currency — not yet converted to USD (set the fixed FX rate in Settings)" : undefined,
   };
 }
 
@@ -981,7 +1013,7 @@ export default function TradeLog() {
       body: JSON.stringify({
         mode,
         force: true,
-        limit: 150,
+        limit: 300,
         filters: { symbol, side, result, state: stateFilter },
       }),
     })
@@ -990,12 +1022,15 @@ export default function TradeLog() {
         if (!ok || data.error) throw new Error(data.error ?? "Bulk review failed");
         const reviewed = Number(data.reviewed ?? 0);
         const errors = Array.isArray(data.errors) ? data.errors.length : 0;
+        const firstError = Array.isArray(data.errors) && data.errors[0]?.error
+          ? String(data.errors[0].error)
+          : null;
         const quotaSkipped = Number(data.skippedForQuota ?? 0);
         const limitSkipped = Number(data.skippedForLimit ?? 0);
         setBulkMessage(
           [
-            `DeepSeek reviewed ${reviewed} trade${reviewed === 1 ? "" : "s"}`,
-            errors ? `${errors} error${errors === 1 ? "" : "s"}` : null,
+            `AI reviewed ${reviewed} trade${reviewed === 1 ? "" : "s"}`,
+            errors ? `${errors} error${errors === 1 ? "" : "s"}${firstError ? ` (${firstError})` : ""}` : null,
             limitSkipped ? `${limitSkipped} left for next batch` : null,
             quotaSkipped ? `${quotaSkipped} skipped by quota` : null,
           ]
@@ -1048,7 +1083,7 @@ export default function TradeLog() {
             onClick={() => runBulkReviews("filtered")}
             disabled={!!bulkRunning}
             className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-3 py-1.5 text-xs font-medium text-[var(--fg-2)] transition hover:border-[var(--accent)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
-            title="Rerun DeepSeek on up to 150 trades matching the current filters"
+            title="Rerun AI trade review on up to 300 trades matching the current filters"
           >
             {bulkRunning === "filtered" ? "Running..." : "Run filtered"}
           </button>
@@ -1057,7 +1092,7 @@ export default function TradeLog() {
             onClick={() => runBulkReviews("all")}
             disabled={!!bulkRunning}
             className="rounded-[var(--radius-sm)] border border-[var(--accent-soft-border)] bg-[var(--accent-soft-bg)] px-3 py-1.5 text-xs font-medium text-[var(--accent)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            title="Rerun DeepSeek on up to 150 trades across the whole book"
+            title="Rerun AI trade review on up to 300 trades across the whole book"
           >
             {bulkRunning === "all" ? "Running..." : "Run all"}
           </button>
@@ -1087,7 +1122,7 @@ export default function TradeLog() {
             ) : trades.length === 0 ? (
               <tr><td colSpan={13} className="px-3 py-6 text-center text-[var(--fg-3)]">No trades found</td></tr>
             ) : trades.map((t, i) => {
-              const { text: pnlText, color: pnlColor } = fmtPnl(t.pnl);
+              const { text: pnlText, color: pnlColor, title: pnlTitle } = fmtPnlRow(t);
               const isOpen = t.pnl === null;
               const isLive = t.source === "LIVE";
               const liveU = t.liveUnrealizedPl;
@@ -1148,7 +1183,7 @@ export default function TradeLog() {
                         Live quote pending
                       </span>
                     ) : t.pnl != null ? (
-                      <span className={pnlColor}>{pnlText}</span>
+                      <span className={pnlColor} title={pnlTitle}>{pnlText}</span>
                     ) : (
                       <span className="text-[var(--fg-3)]">Open</span>
                     )}
@@ -1180,9 +1215,7 @@ export default function TradeLog() {
                   </td>
                   {/* Score column: badge if scored, else Analyse button */}
                   <td className="px-3 py-2">
-                    {t.synthetic ? (
-                      <span className="text-xs text-[var(--fg-4)]">—</span>
-                    ) : t.verdictScore != null ? (
+                    {t.verdictScore != null ? (
                       <button
                         onClick={() => setReviewTrade(t)}
                         className={`rounded border px-2 py-0.5 text-xs font-semibold transition-opacity hover:opacity-80 ${scoreBadgeBg(t.verdictScore)}`}

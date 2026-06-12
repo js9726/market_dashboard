@@ -28,12 +28,13 @@ export async function requireUserIdAndQuota(): Promise<AuthorizedRequest | Unaut
 
   const user = await prisma.user.findUnique({
     where: { id: auth.userId },
-    select: { dailyScansUsed: true, dailyScansLimit: true },
+    select: { dailyScansUsed: true, dailyScansLimit: true, role: true },
   });
 
   if (!user) {
     return { error: NextResponse.json({ error: "User not found" }, { status: 404 }) };
   }
+  if (user.role === "owner") return { userId: auth.userId };
   if (user.dailyScansUsed >= user.dailyScansLimit) {
     return {
       error: NextResponse.json(

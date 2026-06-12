@@ -8,6 +8,19 @@ import {
   generateTradeVerdict,
   type TradePromptInput,
 } from "@/lib/generate-trade-verdict";
+import {
+  materializeOpenPositionTradeRecords,
+  OPEN_TRADE_STATES,
+  plainTicker,
+} from "@/lib/trades/position-trade-records";
+
+function tickerFromSyntheticPositionId(tradeId: string): string | null {
+  if (!tradeId.startsWith("pos-")) return null;
+  const rest = tradeId.slice(4);
+  const lastDash = rest.lastIndexOf("-");
+  const ticker = lastDash > 0 ? rest.slice(0, lastDash) : rest;
+  return ticker ? plainTicker(ticker) : null;
+}
 
 export async function POST(request: Request) {
   try {
@@ -24,8 +37,24 @@ export async function POST(request: Request) {
 
     // tradeId path: fetch from DB, check cache, generate and save verdict
     if (tradeId) {
+      let resolvedTradeId = tradeId;
+      const syntheticTicker = tickerFromSyntheticPositionId(tradeId);
+      if (syntheticTicker) {
+        await materializeOpenPositionTradeRecords(userId, { symbol: syntheticTicker });
+        const materialized = await prisma.tradeRecord.findFirst({
+          where: {
+            userId,
+            ticker: syntheticTicker,
+            OR: [{ state: { in: [...OPEN_TRADE_STATES] } }, { state: null, pnl: null }],
+          },
+          select: { id: true },
+          orderBy: { tradeDate: "desc" },
+        });
+        if (materialized) resolvedTradeId = materialized.id;
+      }
+
       const dbTrade = await prisma.tradeRecord.findUnique({
-        where: { id: tradeId, userId },
+        where: { id: resolvedTradeId, userId },
       });
       if (!dbTrade) {
         return NextResponse.json({ error: "Trade not found" }, { status: 404 });
@@ -39,7 +68,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ ...(dbTrade.verdict as Record<string, unknown>), _meta: { style: "trader-debate" } });
       }
 
-      const result = await generateTradeVerdict(tradeId, userId, { provider, style });
+      const result = await generateTradeVerdict(resolvedTradeId, userId, { provider, style });
       // Successful LLM run + DB write: charge the quota
       await incrementScanCount(userId);
       return NextResponse.json({

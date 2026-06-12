@@ -12,7 +12,7 @@ const TIER_MODELS = {
   deepseek:  { fast: "deepseek-chat",             standard: "deepseek-chat" },
   anthropic: { fast: "claude-haiku-4-5-20251001", standard: "claude-sonnet-4-6" },
   openai:    { fast: "gpt-4o-mini",               standard: "gpt-4o" },
-  gemini:    { fast: "gemini-2.0-flash",          standard: "gemini-2.5-pro" },
+  gemini:    { fast: "gemini-2.5-flash",          standard: "gemini-2.5-pro" },
 } as const;
 
 const PROVIDER_ORDER = ["deepseek", "anthropic", "openai", "gemini"] as const;
@@ -69,6 +69,7 @@ export async function callLLM(
 ): Promise<string> {
   const { maxTokens = 2048, provider, tier = "standard" } = opts;
   const queue = buildQueue(provider);
+  const failures: string[] = [];
 
   if (queue.length === 0) {
     throw new Error(
@@ -88,13 +89,15 @@ export async function callLLM(
       if (out) {
         out.providerUsed = p;
         out.modelUsed = TIER_MODELS[p][tier];
-        if (i > 0) out.note = `${queue[0]} unavailable — used ${p} instead`;
+        if (i > 0) out.note = `${queue[0]} unavailable - used ${p} instead`;
       }
       return text;
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      failures.push(`${p}: ${message}`);
       // Try next provider
     }
   }
 
-  throw new Error("All AI providers failed. Check your API keys and credit balances.");
+  throw new Error(`All AI providers failed. ${failures.join(" / ")}`);
 }

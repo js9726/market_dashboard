@@ -214,8 +214,8 @@ brief_snapshots: id, bucket_at, provider, structured_json, generated_by
 
 **Task Scheduler tasks:**
 1. **OpenD watchdog** — every 5 min, ensure `moomoo_OpenD.exe` alive + port 11111 responds. Relaunch if dead.
-2. **Live quote daemon** — launches `live_quote_daemon.py` at 21:30 MYT, stops 05:00 MYT (covers US market hours).
-3. **Push-to-cloud daemon** — every 10 min, pull moomoo fills + positions, POST to Vercel.
+2. **Dashboard bridge** - launches the MooMoo bridge at 21:30 MYT, stops 05:00 MYT, and keeps positions, fills, equity, held-position quotes, and breadth synced to Vercel.
+3. **IBKR bridge** - run while IB Gateway/TWS is logged in to sync IBKR positions, fills, equity, and quote refresh nudges.
 
 **New scripts:**
 - `scripts/local_broker_sync.py`

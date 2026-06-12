@@ -87,10 +87,10 @@ function schemaExample(ticker: string, isOpen: boolean): string {
     trader_reviews: [
       {
         handle: "@markminervini",
-        entry_score: "<0-4>",
-        risk_score: "<0-3>",
-        setup_score: "<0-3>",
-        total_score: "<0-10>",
+        entry_score: 3,
+        risk_score: 2,
+        setup_score: 2,
+        total_score: 7,
         verdict: "<GREAT ENTRY | GOOD ENTRY | ACCEPTABLE | POOR ENTRY | MISTAKE>",
         note: "<2-3 sentences from this trader's perspective>",
       },
@@ -112,7 +112,7 @@ function schemaExample(ticker: string, isOpen: boolean): string {
         { tranche: "25%", at: "<price/condition>" },
       ],
     },
-    overall_score: "<0-10 weighted average>",
+    overall_score: 6.5,
     overall_verdict: "<GREAT ENTRY | GOOD ENTRY | ACCEPTABLE | POOR ENTRY | MISTAKE>",
     lesson: "<1-2 sentence key takeaway>",
   };
