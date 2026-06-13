@@ -25,6 +25,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { ALL_PROVIDERS, isIntradayWindow, type BriefProvider } from "@/lib/brief/bucket";
 import { readCurrentBucketWithLazyRegen, readLatestRow } from "@/server/brief-cache";
+import { fetchFearGreed, overlayFearGreed } from "@/lib/fear-greed";
 
 export const dynamic = "force-dynamic";
 
@@ -37,14 +38,19 @@ export async function GET() {
   const { bucket, rows } = await readCurrentBucketWithLazyRegen();
   const byProvider = new Map(rows.map((r) => [r.provider as BriefProvider, r]));
 
+  // Authoritative Fear & Greed, fetched once and overlaid onto every provider's
+  // brief so the metric is consistent across tabs and fresh at read time
+  // (instead of each LLM guessing it — only Gemini's grounded run filled it).
+  const fearGreed = await fetchFearGreed();
+
   const providers: Record<string, unknown> = {};
   for (const p of ALL_PROVIDERS) {
     const row = byProvider.get(p);
     if (row) {
       providers[p] = {
         html: row.htmlBody,
-        structured: row.structuredJson,
-        verdict: row.verdictJson,
+        structured: overlayFearGreed(row.structuredJson, fearGreed),
+        verdict: overlayFearGreed(row.verdictJson, fearGreed),
         generatedAt: row.generatedAt.toISOString(),
         generatedBy: row.generatedBy,
         tokensIn: row.tokensIn,
@@ -59,8 +65,8 @@ export async function GET() {
       providers[p] = latest
         ? {
             html: latest.htmlBody,
-            structured: latest.structuredJson,
-            verdict: latest.verdictJson,
+            structured: overlayFearGreed(latest.structuredJson, fearGreed),
+            verdict: overlayFearGreed(latest.verdictJson, fearGreed),
             generatedAt: latest.generatedAt.toISOString(),
             generatedBy: latest.generatedBy,
             tokensIn: latest.tokensIn,
