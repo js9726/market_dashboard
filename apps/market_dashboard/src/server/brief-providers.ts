@@ -132,6 +132,12 @@ export async function runProvider(
     day: "numeric",
   });
 
+  // The Anthropic AI-SDK provider does NOT support json-mode structured output
+  // ("'json-mode object generation' functionality not supported") — it routes
+  // structured output through a tool call. DeepSeek/Gemini/OpenAI use json-mode.
+  // Forcing mode:"json" for all four bricked the on-demand Claude refresh.
+  const mode = provider === "claude" ? "tool" : "json";
+
   let object: unknown;
   let usage: { promptTokens?: number; completionTokens?: number } | undefined;
   try {
@@ -140,7 +146,7 @@ export async function runProvider(
       schema: structuredBriefSchema,
       schemaName: "StructuredBrief",
       schemaDescription: "JSON fields rendered directly into the Conviction Desk UI.",
-      mode: "json",
+      mode,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPromptFor(snapshot, dateStr, watchlist) }],
       // 5000 truncated DeepSeek's verbose JSON mid-object ("No object generated:
