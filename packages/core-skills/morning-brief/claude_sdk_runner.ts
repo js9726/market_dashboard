@@ -73,7 +73,15 @@ function buildDirective(): string {
     `- Emit a single valid StructuredBrief JSON object (the schema is in prompt.md).`,
     `- ${pushClause}`,
     ``,
-    `Be efficient: this is an automated cron run, not an interactive session. Do not ask questions.`,
+    `SESSION BUDGET — this runs on a metered subscription session window; staying inside it is REQUIRED:`,
+    `- Run web searches SEQUENTIALLY, one at a time. Do NOT fire many parallel WebSearch calls in a single turn, and do NOT spawn parallel sub-agents.`,
+    `- Make AT MOST 4 web searches total, each a CONSOLIDATED query covering several sections:`,
+    `    1. Overnight Asia + Europe markets, US index futures, VIX, 10Y yield, oil.`,
+    `    2. Top pre-market movers and their specific catalysts.`,
+    `    3. Today's earnings (BMO/AMC) + high-importance economic calendar.`,
+    `    4. The most market-moving overnight/pre-market headlines + notable analyst rating changes.`,
+    `- The wiki trader-style rubric and screener scoring need NO web search — apply them from the skill + pre-fetched data. Do NOT degrade or skip them.`,
+    `- This is an automated cron run, not an interactive session. Do not ask questions.`,
   ].join("\n");
 }
 
@@ -100,8 +108,11 @@ async function run(): Promise<number> {
         // Headless cron run — no interactive permission prompts.
         permissionMode: "bypassPermissions",
         ...(MODEL ? { model: MODEL } : {}),
-        // Bound the agent loop so a stuck run can't spin forever in CI.
-        maxTurns: 40,
+        // Bound the agent loop so a stuck run can't spin forever in CI. Lowered
+        // 40→28: with searches consolidated to ≤4 sequential queries (see the
+        // SESSION BUDGET directive), the brief needs far fewer turns, and a
+        // tighter cap keeps a runaway from burning the subscription session.
+        maxTurns: 28,
         stderr: (d: string) => {
           // Surface only the meaningful lines (skip raw token noise).
           const t = d.trim();

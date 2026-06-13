@@ -165,6 +165,8 @@ For each: apply the 7-trader composite lens (same framework as `traderLens`). Em
 with `score` as a 0–100 integer (composite × 10), a `verdict` label, and a 1-sentence `note`.
 Use the screener data already provided in `{live_data_block}` — no extra web search needed for these.
 
+WEB-SEARCH BUDGET (session-bounded run): make AT MOST 4 web searches, run SEQUENTIALLY — never many parallel WebSearch calls at once. Batch related lookups: (a) overnight Asia/Europe + index futures + VIX + 10Y yield + oil; (b) top pre-market movers + their catalysts; (c) today's earnings (BMO/AMC) + high-importance economic calendar; (d) the most market-moving overnight/pre-market headlines + notable analyst rating changes. The wiki trader-style rubric (below) and screener scoring need NO web search — apply them from this skill + the pre-fetched data; do not degrade them.
+
 SECTIONS — use pre-fetched data where provided; web-search only what is missing:
 0. Index technicals: use the INDEX TECHNICALS block from {live_data_block} verbatim — copy each field into `technicals.<symbol>`. Write `technicalsNarrative` interpreting:
    - Which index has the WORST entry-risk (EXTREME-EXTENDED) — DO NOT chase that one
