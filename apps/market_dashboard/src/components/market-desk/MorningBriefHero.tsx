@@ -124,15 +124,19 @@ export default function MorningBriefHero({ isOwner = false }: MorningBriefHeroPr
   async function handleRerun(provider: BriefProviderName) {
     setRerunMessage(`Re-running ${PROVIDER_LABEL[provider]}...`);
     const res = await verdict.rerunProvider(provider);
+    let dismissMs = 6000;
     if (res.ok) {
-      setRerunMessage(`${PROVIDER_LABEL[provider]} refreshed.`);
+      // Dispatched (Claude/Codex) runs in CI and lands in a few minutes — show
+      // the queued message longer so it isn't missed.
+      setRerunMessage(res.message ?? `${PROVIDER_LABEL[provider]} refreshed.`);
       setSelected(null);
+      if (res.dispatched) dismissMs = 12000;
     } else if (res.retryInSec) {
       setRerunMessage(`Rate limited. Try again in ${res.retryInSec}s.`);
     } else {
       setRerunMessage(`Re-run failed: ${res.error ?? "unknown"}`);
     }
-    setTimeout(() => setRerunMessage(null), 6000);
+    setTimeout(() => setRerunMessage(null), dismissMs);
   }
 
   const dateLabel = new Date().toLocaleDateString("en-MY", {

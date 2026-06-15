@@ -1,0 +1,109 @@
+name: Refresh Brief (single provider, on-demand)
+
+# On-demand single-provider brief refresh, dispatched by the dashboard
+# "Refresh <provider>" buttons via /api/morning-verdict/rerun (GH_DISPATCH_TOKEN)
+# OR triggered manually from the Actions tab.
+#
+# Why this exists: the dashboard Refresh buttons used a SERVERLESS metered-API
+# path with a condensed inline prompt (no wiki). This workflow runs the SAME
+# wiki-grounded brief as the daily pre-open job, one provider at a time:
+#   - claude  → claude_sdk_runner (Claude Code SUBSCRIPTION, loads the wiki skill)
+#   - deepseek/gemini/openai → morning_brief.py (provider API)
+#
+# It refreshes the underlying data first so an on-demand refresh isn't computed
+# off a stale snapshot. Each provider step pushes to /api/morning-verdict/ingest.
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "Provider to refresh"
+        required: true
+        type: choice
+        options: [claude, openai, deepseek, gemini]
+
+concurrency:
+  group: refresh-brief-${{ github.event.inputs.provider }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: apps/market_dashboard_backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load wiki deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.WIKI_SSH_KEY }}
+
+      - name: Fetch wiki submodule
+        continue-on-error: true
+        run: |
+          git submodule set-url packages/core-skills/wiki-source git@github.com:js9726/trade-analyser_skill.git 2>/dev/null || true
+          if git submodule update --init --recursive; then
+            echo "wiki-source submodule pulled OK"
+          else
+            echo "::warning::wiki submodule clone failed — brief runs without wiki context."
+            mkdir -p packages/core-skills/wiki-source/wiki
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── Refresh underlying data so the brief isn't off a stale snapshot ──────
+      - name: Build market data
+        run: python scripts/build_data.py --out-dir data
+
+      - name: Fetch TV screeners
+        continue-on-error: true
+        run: python scripts/tv_screener_fetch.py --out-dir data --score --score-top 10
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          TV_SESSION_ID:    ${{ secrets.TV_SESSION_ID }}
+
+      # ── Claude tab — Agent SDK on the SUBSCRIPTION (loads the wiki skill) ────
+      - name: Generate Claude brief (subscription)
+        if: ${{ github.event.inputs.provider == 'claude' }}
+        working-directory: packages/core-skills/morning-brief
+        run: npm install --no-audit --no-fund && npm run brief
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+          BRIEF_GENERATED_BY: manual-dispatch:claude-sdk
+          BRIEF_DATA_DIR: ${{ github.workspace }}/apps/market_dashboard_backend/data
+          WIKI_DIR:       ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
+
+      # ── DeepSeek / Gemini / OpenAI(Codex) — provider API via morning_brief.py ─
+      - name: Generate brief (deepseek / gemini / openai)
+        if: ${{ github.event.inputs.provider != 'claude' }}
+        run: |
+          python scripts/morning_brief.py --out-dir data \
+            --providers "${{ github.event.inputs.provider }}" \
+            --post-to "${VERCEL_INGEST_URL%/}/api/morning-verdict/ingest" \
+            --post-key "$BRIEF_INGEST_KEY" \
+            --generated-by "manual-dispatch:${{ github.event.inputs.provider }}"
+        env:
+          DEEPSEEK_API_KEY:  ${{ secrets.DEEPSEEK_API_KEY }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY:    ${{ secrets.OPENAI_API_KEY }}
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}

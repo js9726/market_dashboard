@@ -78,7 +78,9 @@ export function useMorningVerdict(intervalMs = 60_000) {
   }, [intervalMs, fetchOnce]);
 
   const rerunProvider = useCallback(
-    async (provider: BriefProviderName): Promise<{ ok: boolean; error?: string; retryInSec?: number }> => {
+    async (
+      provider: BriefProviderName,
+    ): Promise<{ ok: boolean; error?: string; retryInSec?: number; message?: string; dispatched?: boolean }> => {
       setRerunning(provider);
       try {
         const r = await fetch(`/api/morning-verdict/rerun?provider=${provider}`, { method: "POST" });
@@ -90,8 +92,10 @@ export function useMorningVerdict(intervalMs = 60_000) {
           const j = (await r.json().catch(() => ({}))) as { error?: string };
           return { ok: false, error: j.error ?? `HTTP ${r.status}` };
         }
-        await fetchOnce();
-        return { ok: true };
+        const j = (await r.json().catch(() => ({}))) as { dispatched?: boolean; message?: string };
+        // Dispatched runs are async (CI) — there's no new row to refetch yet.
+        if (!j.dispatched) await fetchOnce();
+        return { ok: true, dispatched: j.dispatched, message: j.message };
       } catch (e) {
         return { ok: false, error: (e as Error).message };
       } finally {

@@ -12,11 +12,23 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { ALL_PROVIDERS, bucketOf, type BriefProvider } from "@/lib/brief/bucket";
 import { regenAndStore, readBucket } from "@/server/brief-cache";
+import { dispatchBriefRefresh, isDispatchConfigured } from "@/lib/github-dispatch";
 
 export const dynamic = "force-dynamic";
 
 const FIVE_MIN_MS = 5 * 60 * 1000;
 const lastRerunAt = new Map<BriefProvider, number>();
+
+// Providers whose on-demand refresh runs the wiki-grounded CI workflow instead
+// of the serverless condensed-prompt API call: Claude on the subscription,
+// Codex/OpenAI via the wiki morning_brief.py. DeepSeek/Gemini stay instant.
+const DISPATCH_PROVIDERS = new Set<BriefProvider>(["claude", "openai"]);
+const PROVIDER_LABEL: Record<BriefProvider, string> = {
+  deepseek: "DeepSeek",
+  gemini: "Gemini",
+  openai: "Codex",
+  claude: "Claude",
+};
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -44,6 +56,26 @@ export async function POST(req: Request) {
     );
   }
   lastRerunAt.set(p, now);
+
+  // Subscription/wiki providers → dispatch the CI workflow (async; lands in a
+  // few minutes). Falls through to the serverless path if the dispatch token
+  // isn't configured, so the buttons still work without GH_DISPATCH_TOKEN.
+  if (DISPATCH_PROVIDERS.has(p) && isDispatchConfigured()) {
+    const dispatched = await dispatchBriefRefresh(p);
+    if (!dispatched.ok) {
+      lastRerunAt.delete(p); // dispatch failed — let the user retry immediately
+      return NextResponse.json(
+        { error: `Dispatch failed: ${dispatched.error}` },
+        { status: 502 },
+      );
+    }
+    return NextResponse.json({
+      ok: true,
+      dispatched: true,
+      provider: p,
+      message: `${PROVIDER_LABEL[p]} refresh queued — the wiki brief runs in CI and lands in a few minutes.`,
+    });
+  }
 
   const bucket = bucketOf();
   await regenAndStore({
