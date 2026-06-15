@@ -31,12 +31,12 @@ export interface TvScreenerHit {
   thesis?: string | null;
   /** Setup pattern classified by the scoring engine. */
   pattern?: "EP" | "BREAKOUT" | "PULLBACK" | "PARABOLIC" | "STAGE4-BOUNCE" | "UNCLEAR" | null;
-  /** 4-stage sub-scores (each 0-25). */
+  /** Conviction sub-scores (Setup/40 + Entry/30 + Theme/20 + Sentiment/10). */
   stages?: {
-    s1_trend:   number;  // Trend Leadership / RS
-    s2_pattern: number;  // Pattern Quality
-    s3_timing:  number;  // Entry Timing
-    s4_risk:    number;  // Risk Quality
+    setup:     number;  // Setup quality (/40)
+    entry:     number;  // Entry readiness (/30)
+    theme:     number;  // Theme + leadership (/20)
+    sentiment: number;  // Market sentiment (/10)
   } | null;
   /**
    * Score confidence source:

@@ -320,9 +320,9 @@ function buildScoreTooltip(hit: TvScreenerHit, fallbackNote?: string | null): st
   if (hit.thesis) lines.push(hit.thesis);
   else if (fallbackNote) lines.push(fallbackNote);
   if (hit.stages) {
-    const { s1_trend, s2_pattern, s3_timing, s4_risk } = hit.stages;
+    const { setup, entry, theme, sentiment } = hit.stages;
     lines.push(
-      `S1 Trend/RS ${s1_trend}/25  S2 Pattern ${s2_pattern}/25  S3 Timing ${s3_timing}/25  S4 Risk ${s4_risk}/25`
+      `Setup ${setup}/40  Entry ${entry}/30  Theme ${theme}/20  Sentiment ${sentiment}/10`
     );
   }
   return lines.join("\n") || "No thesis available";

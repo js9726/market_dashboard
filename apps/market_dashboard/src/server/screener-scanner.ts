@@ -64,100 +64,92 @@ async function fetchOne(cfg: ScreenerCfg): Promise<Record<string, unknown>[]> {
   }
 }
 
-/** Faithful TS port of tv_screener_fetch.py _algo_score (4-stage, deterministic). */
+/** Faithful TS port of tv_screener_fetch.py _compute_stages (Conviction model). */
 function algoScore(h: Record<string, unknown>): {
   score: number; verdict: string; pattern: string;
-  stages: { s1_trend: number; s2_pattern: number; s3_timing: number; s4_risk: number };
+  stages: { setup: number; entry: number; theme: number; sentiment: number };
 } {
   const num = (k: string): number => {
     const v = h[k];
     return typeof v === "number" && Number.isFinite(v) ? v : 0;
   };
   const perf_1m = num("Perf.1M");
-  const perf_1w = num("Perf.W");
   const chg_day = num("change");
   const rvol = num("relative_volume_10d_calc");
   const mcap = num("market_cap_basic");
   const premarket_chg = num("premarket_change");
   const high_d = num("high"), low_d = num("low"), close_d = num("close");
+  const A = Math.abs(chg_day);
 
-  // ── S1: trend / RS ──
-  let s1: number;
-  if (perf_1m > 80) s1 = 5;
-  else if (perf_1m > 50) s1 = 10;
-  else if (perf_1m > 25) s1 = 18;
-  else if (perf_1m > 10) s1 = 22;
-  else if (perf_1m > 2) s1 = 15;
-  else if (perf_1m > -5) s1 = 8;
-  else if (perf_1m > -20) s1 = 4;
-  else s1 = 1;
-  const prior_1m_trend = perf_1m - perf_1w;
-  if (perf_1w > 5 && perf_1m > 5 && perf_1m < 60 && prior_1m_trend > 3) s1 = Math.min(25, s1 + 3);
-
-  // ── S2: pattern ──
   const is_ep = chg_day > 8 && perf_1m < 15 && rvol > 2.5;
   const is_breakout = chg_day > 3 && chg_day < 20 && perf_1m > 8 && perf_1m < 50 && rvol > 1.5;
-  const is_pullback = Math.abs(chg_day) < 5 && perf_1m > 5 && rvol >= 0.8;
+  const is_pullback = A < 5 && perf_1m > 5 && rvol >= 0.8;
   const is_parabolic = perf_1m > 70 || (chg_day > 25 && perf_1m > 30);
   const is_stage4 = perf_1m < -15;
-  let s2: number;
-  if (is_parabolic) s2 = 3;
-  else if (is_stage4) s2 = 5;
-  else if (is_ep) s2 = 22;
-  else if (is_breakout) s2 = 20;
-  else if (is_pullback) s2 = 18;
-  else s2 = 10;
-  if (rvol >= 3) s2 = Math.min(25, s2 + 3);
-  else if (rvol >= 2) s2 = Math.min(25, s2 + 1);
-  else if (rvol < 1) s2 = Math.max(0, s2 - 4);
 
-  // ── S3: timing ──
-  let s3: number;
-  if (Math.abs(chg_day) > 30) s3 = 2;
-  else if (Math.abs(chg_day) > 20) s3 = 6;
-  else if (Math.abs(chg_day) > 15) s3 = 10;
-  else if (Math.abs(chg_day) > 10) s3 = 16;
-  else if (Math.abs(chg_day) > 5) s3 = 22;
-  else if (Math.abs(chg_day) > 1) s3 = 18;
-  else s3 = 12;
-  if (is_ep && rvol >= 3 && Math.abs(chg_day) >= 10 && Math.abs(chg_day) <= 25) s3 = Math.max(s3, 20);
+  // Setup /40
+  let setup: number;
+  if (is_parabolic) setup = 6;
+  else if (is_stage4) setup = 8;
+  else if (is_ep) setup = 32;
+  else if (is_breakout) setup = 30;
+  else if (is_pullback) setup = 26;
+  else setup = 14;
+  if (rvol >= 3) setup += 6; else if (rvol >= 2) setup += 3; else if (rvol < 1) setup -= 6;
+  if (perf_1m > 80) setup -= 8; else if (perf_1m > 60) setup -= 4;
+  setup = Math.max(0, Math.min(40, setup));
+
+  // Entry /30
+  let entry: number;
+  if (A > 30) entry = 3;
+  else if (A > 20) entry = 7;
+  else if (A > 15) entry = 12;
+  else if (A > 10) entry = 18;
+  else if (A > 5) entry = 27;
+  else if (A > 1) entry = 22;
+  else entry = 13;
+  if (is_ep && rvol >= 3 && A >= 10 && A <= 25) entry = Math.max(entry, 24);
   if (premarket_chg > 5 && chg_day >= 0) {
     const fade = premarket_chg - chg_day;
-    if (fade > 25) s3 = Math.max(0, s3 - 8);
-    else if (fade > 15) s3 = Math.max(0, s3 - 6);
+    if (fade > 25) entry -= 8; else if (fade > 15) entry -= 6;
   }
-  if (high_d > low_d && low_d > 0 && close_d > 0 && Math.abs(chg_day) > 5) {
-    const range_pct = (high_d - low_d) / close_d;
-    if (range_pct > 0.02) {
+  if (high_d > low_d && low_d > 0 && close_d > 0 && A > 5) {
+    if ((high_d - low_d) / close_d > 0.02) {
       const cs = (close_d - low_d) / (high_d - low_d);
-      if (cs < 0.35) s3 = Math.max(0, s3 - 5);
-      else if (cs < 0.5) s3 = Math.max(0, s3 - 3);
+      if (cs < 0.35) entry -= 6; else if (cs < 0.5) entry -= 3;
     }
   }
+  entry = Math.max(0, Math.min(30, entry));
 
-  // ── S4: risk ──
-  let s4 = 0;
-  if (mcap >= 10e9) s4 += 10;
-  else if (mcap >= 2e9) s4 += 8;
-  else if (mcap >= 500e6) s4 += 5;
-  else if (mcap >= 300e6) s4 += 3;
-  if (rvol >= 4) s4 += 10;
-  else if (rvol >= 3) s4 += 8;
-  else if (rvol >= 2) s4 += 5;
-  else if (rvol >= 1) s4 += 2;
-  if (perf_1m > 80) s4 = Math.max(0, s4 - 8);
-  else if (perf_1m > 60) s4 = Math.max(0, s4 - 5);
-  else if (perf_1m > 40) s4 = Math.max(0, s4 - 2);
-  s4 = Math.min(25, s4);
+  // Theme /20
+  let rs_part: number;
+  if (perf_1m > 80) rs_part = 5;
+  else if (perf_1m > 50) rs_part = 9;
+  else if (perf_1m > 25) rs_part = 14;
+  else if (perf_1m > 10) rs_part = 12;
+  else if (perf_1m > 2) rs_part = 8;
+  else if (perf_1m > -5) rs_part = 5;
+  else if (perf_1m > -20) rs_part = 3;
+  else rs_part = 1;
+  let mcap_part: number;
+  if (mcap >= 10e9) mcap_part = 6;
+  else if (mcap >= 2e9) mcap_part = 5;
+  else if (mcap >= 500e6) mcap_part = 3;
+  else if (mcap >= 300e6) mcap_part = 2;
+  else mcap_part = 0;
+  const theme = Math.min(20, rs_part + mcap_part);
 
-  const raw = Math.round(s1 + s2 + s3 + s4);
+  // Sentiment /10 (neutral default; LLM layer overlays real regime/event gate)
+  const sentiment = 6;
+
+  const raw = Math.round(setup + entry + theme + sentiment);
   const pattern = is_parabolic ? "PARABOLIC" : is_ep ? "EP" : is_breakout ? "BREAKOUT"
     : is_pullback ? "PULLBACK" : is_stage4 ? "STAGE4-BOUNCE" : "UNCLEAR";
-  // Verdict thresholds match prompt.md: GO >=80, WAIT 50-79, PASS <50.
-  const verdict = raw >= 80 ? "GO" : raw >= 50 ? "WAIT" : "PASS";
+  // Conviction bands (wiki/trader-styles.md): GO >=75, WAIT 50-74, PASS <50.
+  const verdict = raw >= 75 ? "GO" : raw >= 50 ? "WAIT" : "PASS";
   return {
     score: raw, verdict, pattern,
-    stages: { s1_trend: Math.round(s1), s2_pattern: Math.round(s2), s3_timing: Math.round(s3), s4_risk: Math.round(s4) },
+    stages: { setup: Math.round(setup), entry: Math.round(entry), theme: Math.round(theme), sentiment: Math.round(sentiment) },
   };
 }
 
