@@ -79,6 +79,14 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TV_SESSION_ID:    ${{ secrets.TV_SESSION_ID }}
 
+      # Pre-compute index technicals so the Claude agent doesn't spend session
+      # turns pulling yfinance + computing ATR/RSI/MACD itself (observed burning
+      # the subscription window before it even reached the web searches).
+      - name: Pre-compute index technicals
+        continue-on-error: true
+        working-directory: packages/core-skills/morning-brief
+        run: python compute_index_technicals.py --tickers SPY,QQQ,DIA,IWM --out "${{ github.workspace }}/apps/market_dashboard_backend/data/index_technicals.json"
+
       # ── Claude tab — Agent SDK on the SUBSCRIPTION (loads the wiki skill) ────
       - name: Generate Claude brief (subscription)
         if: ${{ github.event.inputs.provider == 'claude' }}
