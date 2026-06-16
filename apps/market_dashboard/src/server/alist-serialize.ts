@@ -45,6 +45,10 @@ export function serializeCandidate(r: AListCandidate) {
       sentiment: r.sentimentScore,
     },
     championPersona: r.championPersona,
+    // Entry-trigger lifecycle (R3.2): the "should I take it" signal.
+    trigger: r.triggerState
+      ? { state: r.triggerState, at: r.triggerStateAt?.toISOString() ?? null, reason: r.triggerReason }
+      : null,
     briefProvider: r.day0BriefProvider,
     briefBucketAt: r.day0BriefBucketAt?.toISOString() ?? null,
     day0Price: num(r.day0Price),

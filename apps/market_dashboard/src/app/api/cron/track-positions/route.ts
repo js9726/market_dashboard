@@ -21,6 +21,7 @@ import { getOwnerUserId } from "@/server/a-list-extractor";
 import { emaSeries, atrSeries, lowestLow, type Candle } from "@/server/indicators";
 import { atrFloorStop, rUnit, realizedVsFullR, softVsHard } from "@/server/alist-metrics";
 import { reconcileClosedHeld } from "@/server/alist-close";
+import { evaluateTrigger } from "@/lib/alist-triggers";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -49,7 +50,7 @@ async function fetchDailyCandles(yahooSymbol: string): Promise<Candle[]> {
     chart?: {
       result?: Array<{
         timestamp?: number[];
-        indicators?: { quote?: Array<{ open?: (number | null)[]; high?: (number | null)[]; low?: (number | null)[]; close?: (number | null)[] }> };
+        indicators?: { quote?: Array<{ open?: (number | null)[]; high?: (number | null)[]; low?: (number | null)[]; close?: (number | null)[]; volume?: (number | null)[] }> };
       }>;
       error?: unknown;
     };
@@ -65,9 +66,21 @@ async function fetchDailyCandles(yahooSymbol: string): Promise<Candle[]> {
     const l = q.low?.[i];
     const c = q.close?.[i];
     if (o == null || h == null || l == null || c == null) continue;
-    out.push({ date: new Date(ts[i] * 1000).toISOString().slice(0, 10), open: o, high: h, low: l, close: c });
+    out.push({ date: new Date(ts[i] * 1000).toISOString().slice(0, 10), open: o, high: h, low: l, close: c, volume: q.volume?.[i] ?? null });
   }
   return out;
+}
+
+/** Relative volume per bar vs the trailing 50-day average volume. */
+function rvolSeries(candles: Candle[]): (number | null)[] {
+  return candles.map((_, i) => {
+    const start = Math.max(0, i - 50);
+    const window = candles.slice(start, i).filter((b) => b.volume != null && b.volume > 0);
+    if (window.length < 10) return null;
+    const avg = window.reduce((a, b) => a + (b.volume ?? 0), 0) / window.length;
+    const v = candles[i].volume;
+    return avg > 0 && v != null ? v / avg : null;
+  });
 }
 
 function dec(v: number | null | undefined): Prisma.Decimal | null {
@@ -106,6 +119,8 @@ export async function GET(req: Request) {
       const loggedStop = cand.stop?.toNumber() ?? null;
       const target = cand.target?.toNumber() ?? null;
 
+      let triggerUpdate: { triggerState?: string; triggerStateAt?: Date | null; triggerReason?: string } = {};
+
       const candles = await fetchDailyCandles(cand.ticker);
       if (candles.length === 0) continue;
 
@@ -113,6 +128,7 @@ export async function GET(req: Request) {
       const ema8 = emaSeries(closes, 8);
       const ema21 = emaSeries(closes, 21);
       const atr14 = atrSeries(candles, 14);
+      const rvol = rvolSeries(candles);
 
       const entryIdx = candles.findIndex((c) => c.date >= entryDateStr);
       if (entryIdx < 0) continue;
@@ -155,27 +171,41 @@ export async function GET(req: Request) {
         const runMfeR = rBase ? (maxClose - entry) / rBase : null;
         const runMaeR = rBase ? (minClose - entry) / rBase : null;
 
+        const vol = c.volume != null && Number.isFinite(c.volume) ? BigInt(Math.round(c.volume)) : null;
+        const trackData = {
+          dayIndex: i - entryIdx,
+          open: dec(c.open), high: dec(c.high), low: dec(c.low), close: dec(c.close),
+          volume: vol, rvol: dec(rvol[i]),
+          ema8: dec(e8), ema21: dec(e21), atr14: dec(atr14[i]),
+          closeBelow8ema: closeBelow8, closeBelow21ema: closeBelow21,
+          hardStopHitLogged: hardLogged, hardStopHitAtr: hardAtr,
+          runMfeR: dec(runMfeR), runMaeR: dec(runMaeR),
+        };
         await prisma.positionDailyTrack.upsert({
           where: { candidateId_sessionDate: { candidateId: cand.id, sessionDate: new Date(`${c.date}T00:00:00.000Z`) } },
-          create: {
-            candidateId: cand.id,
-            dayIndex: i - entryIdx,
-            sessionDate: new Date(`${c.date}T00:00:00.000Z`),
-            open: dec(c.open), high: dec(c.high), low: dec(c.low), close: dec(c.close),
-            ema8: dec(e8), ema21: dec(e21), atr14: dec(atr14[i]),
-            closeBelow8ema: closeBelow8, closeBelow21ema: closeBelow21,
-            hardStopHitLogged: hardLogged, hardStopHitAtr: hardAtr,
-            runMfeR: dec(runMfeR), runMaeR: dec(runMaeR),
-          },
-          update: {
-            dayIndex: i - entryIdx,
-            open: dec(c.open), high: dec(c.high), low: dec(c.low), close: dec(c.close),
-            ema8: dec(e8), ema21: dec(e21), atr14: dec(atr14[i]),
-            closeBelow8ema: closeBelow8, closeBelow21ema: closeBelow21,
-            hardStopHitLogged: hardLogged, hardStopHitAtr: hardAtr,
-            runMfeR: dec(runMfeR), runMaeR: dec(runMaeR),
-          },
+          create: { candidateId: cand.id, sessionDate: new Date(`${c.date}T00:00:00.000Z`), ...trackData },
+          update: trackData,
         });
+      }
+
+      // ── Entry-trigger lifecycle (REC picks only — HELD is already entered) ──
+      if (!cand.isHeld) {
+        const triggerPath = candles.slice(entryIdx, lastIdx + 1).map((c, k) => ({
+          date: c.date, open: c.open, high: c.high, low: c.low, close: c.close,
+          ema8: ema8[entryIdx + k], ema21: ema21[entryIdx + k], rvol: rvol[entryIdx + k],
+        }));
+        const trig = evaluateTrigger(cand.setupClassification, triggerPath, cand.entryZone?.toNumber() ?? null);
+        // Only advance / record changes — never regress a fired trigger to ARMED.
+        const prev = cand.triggerState;
+        const terminalNow = trig.state === "TRIGGERED" || trig.state === "INVALIDATED";
+        const prevTerminal = prev === "TRIGGERED" || prev === "INVALIDATED";
+        if (!prevTerminal || terminalNow) {
+          triggerUpdate = {
+            triggerState: trig.state,
+            triggerStateAt: trig.date ? new Date(`${trig.date}T00:00:00.000Z`) : (prev !== trig.state ? new Date() : cand.triggerStateAt),
+            triggerReason: trig.reason,
+          };
+        }
       }
 
       // ── Savings metrics (provisional until the position closes) ──────────
@@ -229,6 +259,7 @@ export async function GET(req: Request) {
           day14Outcome: outcome,
           day14ComputedAt: windowComplete ? new Date() : cand.day14ComputedAt,
           status,
+          ...triggerUpdate,
         },
       });
       processed++;
