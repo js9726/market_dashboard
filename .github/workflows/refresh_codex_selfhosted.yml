@@ -1,0 +1,77 @@
+name: Refresh Codex Brief (self-hosted, subscription)
+
+# Generates the Codex tab on the operator's ChatGPT/Codex SUBSCRIPTION (not the
+# metered OpenAI API). Runs on a SELF-HOSTED runner on Jie's PC, where the Codex
+# CLI is logged in (~/.codex/auth.json, auto-refreshing) — the only place the
+# live subscription auth exists (rotating OAuth + desktop binary can't run on a
+# GitHub-hosted Linux runner).
+#
+# Setup: install a self-hosted runner on the PC with the label `codex`
+#   (Repo → Settings → Actions → Runners → New self-hosted runner).
+#   Codex must be logged in there (`codex login`) and have workspace credits.
+#
+# Trigger: manual (workflow_dispatch) or the pre-open schedule (only runs when
+# the PC + runner are online; otherwise the queued run is skipped/cancelled).
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '5 13 * * 1-5'   # ~09:05 ET, when the operator PC is typically on
+
+concurrency:
+  group: refresh-codex-selfhosted
+  cancel-in-progress: false
+
+jobs:
+  codex:
+    # Requires a self-hosted runner labelled `codex` on the operator PC.
+    runs-on: [self-hosted, codex]
+    defaults:
+      run:
+        shell: bash
+        working-directory: apps/market_dashboard_backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load wiki deploy key
+        continue-on-error: true
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.WIKI_SSH_KEY }}
+
+      - name: Fetch wiki submodule
+        continue-on-error: true
+        working-directory: .
+        run: |
+          git submodule set-url packages/core-skills/wiki-source git@github.com:js9726/trade-analyser_skill.git 2>/dev/null || true
+          git submodule update --init --recursive || { echo "::warning::wiki submodule clone failed"; mkdir -p packages/core-skills/wiki-source/wiki; }
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # ── Refresh underlying data so the brief isn't off a stale snapshot ──────
+      - name: Build market data
+        run: python scripts/build_data.py --out-dir data
+
+      - name: Fetch TV screeners
+        continue-on-error: true
+        run: python scripts/tv_screener_fetch.py --out-dir data --score --score-top 10
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          TV_SESSION_ID:    ${{ secrets.TV_SESSION_ID }}
+
+      - name: Pre-compute index technicals
+        continue-on-error: true
+        working-directory: packages/core-skills/morning-brief
+        run: python compute_index_technicals.py --tickers SPY,QQQ,DIA,IWM --out "$GITHUB_WORKSPACE/apps/market_dashboard_backend/data/index_technicals.json"
+
+      # ── Codex tab on the SUBSCRIPTION (codex exec via local auth) ───────────
+      - name: Generate Codex brief (subscription)
+        working-directory: packages/core-skills/morning-brief
+        run: npm install --no-audit --no-fund && npm run brief:codex
+        env:
+          VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
+          BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+          BRIEF_DATA_DIR: ${{ github.workspace }}/apps/market_dashboard_backend/data
+          WIKI_DIR:       ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
+          CODEX_REASONING: medium

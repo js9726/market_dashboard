@@ -7,6 +7,8 @@
   "scripts": {
     "brief": "tsx claude_sdk_runner.ts",
     "brief:dry": "tsx claude_sdk_runner.ts --dry-run",
+    "brief:codex": "node codex_brief_runner.mjs",
+    "brief:codex:dry": "node codex_brief_runner.mjs --dry-run",
     "journal": "tsx journal_close_runner.ts",
     "journal:dry": "tsx journal_close_runner.ts --dry-run"
   },
