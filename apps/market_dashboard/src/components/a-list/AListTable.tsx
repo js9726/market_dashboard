@@ -31,6 +31,10 @@ export interface AListRow {
   day0Price: number | null;
   status: string;
   convertedTradeId: string | null;
+  // Conviction breakdown + champion persona (R3.1) and entry trigger (R3.2).
+  conviction?: { setup: number | null; entry: number | null; theme: number | null; sentiment: number | null } | null;
+  championPersona?: string | null;
+  trigger?: { state: string; at: string | null; reason: string | null } | null;
   day14: {
     mfe: number | null;
     mae: number | null;
@@ -71,6 +75,29 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
+/** Entry-trigger badge — the "should I take it" signal (R3.2). */
+const TRIGGER_STYLE: Record<string, { bg: string; label: string }> = {
+  TRIGGERED: { bg: "var(--gain-fg)", label: "TRIGGERED" },
+  ARMED: { bg: "var(--accent)", label: "ARMED" },
+  INVALIDATED: { bg: "var(--loss-fg)", label: "INVALID" },
+  EXPIRED: { bg: "var(--fg-4)", label: "EXPIRED" },
+};
+function renderTrigger(r: AListRow) {
+  if (r.isHeld) return <span className="text-[var(--fg-4)]">—</span>;
+  const t = r.trigger;
+  if (!t) return <span className="text-[var(--fg-4)]">—</span>;
+  const s = TRIGGER_STYLE[t.state] ?? { bg: "var(--fg-4)", label: t.state };
+  return (
+    <span
+      className="rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white"
+      style={{ backgroundColor: s.bg }}
+      title={t.reason ?? t.state}
+    >
+      {s.label}
+    </span>
+  );
+}
+
 /** Day-N-of-14 counter with the entry-validity window on hover. */
 function renderDayIndex(r: AListRow) {
   const pick = new Date(`${r.pickDate}T00:00:00.000Z`);
@@ -100,6 +127,7 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
             <Th>Ticker</Th>
             <Th>Badges</Th>
             <Th>Setup</Th>
+            <Th>Trigger</Th>
             <Th align="right">Entry</Th>
             <Th align="right">Stop</Th>
             <Th align="right">Score</Th>
@@ -128,6 +156,7 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
               <Td><strong>{r.ticker}</strong></Td>
               <Td>{renderBadges(r.badges, r.onBook)}</Td>
               <Td>{r.setup ?? "-"}</Td>
+              <Td>{renderTrigger(r)}</Td>
               <Td align="right">{fmt(r.entry, 2)}</Td>
               <Td align="right">{fmt(r.stop, 2)}</Td>
               <Td align="right">

@@ -104,6 +104,24 @@ export default function AListDetailPanel({ row, onClose }: Props) {
           </Section>
         )}
 
+        {!row.isHeld && row.trigger && (
+          <Section title="Entry Trigger">
+            <Row label="State" value={row.trigger.state} />
+            <Row label="Reason" value={row.trigger.reason ?? "-"} />
+            {row.trigger.at && <Row label="Since" value={new Date(row.trigger.at).toLocaleString()} />}
+          </Section>
+        )}
+
+        {row.conviction && (row.conviction.setup != null || row.conviction.entry != null) && (
+          <Section title="Conviction Breakdown">
+            <ConvictionBar label="Setup" value={row.conviction.setup} max={40} />
+            <ConvictionBar label="Entry" value={row.conviction.entry} max={30} />
+            <ConvictionBar label="Theme" value={row.conviction.theme} max={20} />
+            <ConvictionBar label="Sentiment" value={row.conviction.sentiment} max={10} />
+            {row.championPersona && <Row label="Champion" value={row.championPersona} />}
+          </Section>
+        )}
+
         <Section title="Setup">
           <Row label="Classification" value={row.setup ?? "-"} />
           <Row label="Trader Lens" value={row.traderLens ?? "-"} />
@@ -254,6 +272,21 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
     <div className="mb-4 border-t border-[var(--line)] pt-3">
       <p className="t-overline mb-2 text-[var(--fg-3)]">{title}</p>
       <div className="space-y-1">{children}</div>
+    </div>
+  );
+}
+
+/** Conviction sub-score as a labelled progress bar (value / max). */
+function ConvictionBar({ label, value, max }: { label: string; value: number | null | undefined; max: number }) {
+  const v = value ?? 0;
+  const pct = Math.max(0, Math.min(100, (v / max) * 100));
+  return (
+    <div className="grid grid-cols-[minmax(70px,auto)_1fr_auto] items-center gap-2 t-caption">
+      <span className="text-[var(--fg-3)]">{label}</span>
+      <span className="h-1.5 overflow-hidden rounded bg-[var(--bg-raised)]">
+        <span className="block h-full rounded bg-[var(--accent)]" style={{ width: `${pct}%` }} />
+      </span>
+      <span className="t-mono text-[var(--fg-2)]">{value != null ? `${v}/${max}` : `–/${max}`}</span>
     </div>
   );
 }
