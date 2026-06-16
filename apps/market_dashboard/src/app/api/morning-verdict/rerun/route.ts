@@ -12,7 +12,12 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { ALL_PROVIDERS, bucketOf, type BriefProvider } from "@/lib/brief/bucket";
 import { regenAndStore, readBucket } from "@/server/brief-cache";
-import { dispatchBriefRefresh, isDispatchConfigured } from "@/lib/github-dispatch";
+import {
+  dispatchBriefRefresh,
+  dispatchCodexSelfHosted,
+  isCodexRunnerOnline,
+  isDispatchConfigured,
+} from "@/lib/github-dispatch";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +28,6 @@ const lastRerunAt = new Map<BriefProvider, number>();
 // of the serverless condensed-prompt API call: Claude on the subscription,
 // Codex/OpenAI via the wiki morning_brief.py. DeepSeek/Gemini stay instant.
 const DISPATCH_PROVIDERS = new Set<BriefProvider>(["claude", "openai"]);
-const PROVIDER_LABEL: Record<BriefProvider, string> = {
-  deepseek: "DeepSeek",
-  gemini: "Gemini",
-  openai: "Codex",
-  claude: "Claude",
-};
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -61,7 +60,12 @@ export async function POST(req: Request) {
   // few minutes). Falls through to the serverless path if the dispatch token
   // isn't configured, so the buttons still work without GH_DISPATCH_TOKEN.
   if (DISPATCH_PROVIDERS.has(p) && isDispatchConfigured()) {
-    const dispatched = await dispatchBriefRefresh(p);
+    // Codex prefers the self-hosted SUBSCRIPTION runner when the operator PC is
+    // online; otherwise it falls back to the cloud OpenAI-API workflow.
+    const useSelfHostedCodex = p === "openai" && (await isCodexRunnerOnline());
+    const dispatched = useSelfHostedCodex
+      ? await dispatchCodexSelfHosted()
+      : await dispatchBriefRefresh(p);
     if (!dispatched.ok) {
       lastRerunAt.delete(p); // dispatch failed — let the user retry immediately
       return NextResponse.json(
@@ -69,11 +73,13 @@ export async function POST(req: Request) {
         { status: 502 },
       );
     }
+    const lane =
+      p === "openai" ? (useSelfHostedCodex ? "Codex (subscription)" : "Codex (OpenAI API)") : "Claude";
     return NextResponse.json({
       ok: true,
       dispatched: true,
       provider: p,
-      message: `${PROVIDER_LABEL[p]} refresh queued — the wiki brief runs in CI and lands in a few minutes.`,
+      message: `${lane} refresh queued — the wiki brief runs in CI and lands in a few minutes.`,
     });
   }
 
