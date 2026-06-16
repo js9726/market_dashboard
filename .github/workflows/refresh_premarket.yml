@@ -110,6 +110,16 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TV_SESSION_ID:    ${{ secrets.TV_SESSION_ID }}
 
+      # ── Step 3: pre-compute index technicals ─────────────────────────────
+      # Compute ATR/RSI/MACD here so the Claude SDK runner (Step 4b) doesn't
+      # spend subscription-session turns pulling yfinance itself — observed
+      # blowing the session window during data prep before the web searches.
+      - name: Pre-compute index technicals
+        if: success()
+        continue-on-error: true
+        working-directory: packages/core-skills/morning-brief
+        run: python compute_index_technicals.py --tickers SPY,QQQ,DIA,IWM --out "${{ github.workspace }}/apps/market_dashboard_backend/data/index_technicals.json"
+
       # ── Step 4a: Python morning brief (DeepSeek + Gemini only) ──────────
       # Claude tab now powered by the Node-based SDK runner below (Phase 3c).
       # OpenAI skipped per $5/day cost cap; on-demand only via dashboard button.
