@@ -22,9 +22,23 @@ import { computeAutoLevels } from "@/server/alist-levels";
 
 const prisma = new PrismaClient();
 
-const MIN_SCORE = 80;
+// Conviction GO band (wiki/trader-styles.md): GO >= 75. The A-list REC gate was
+// previously hardcoded to 80, silently dropping GO picks scoring 75-79.
+const MIN_SCORE = 75;
 const MIN_RVOL = 1.5;
 const ACCEPTABLE_VERDICTS = new Set(["GO"]);
+
+/** Best-match persona for a setup pattern — deterministic heuristic at pick
+ *  time (wiki setup→persona affinity). The R4 multi-agent refines this on
+ *  triggered picks. */
+function championForSetup(setup: string | null | undefined): string | null {
+  const s = (setup ?? "").toUpperCase();
+  if (s.startsWith("EP")) return "@Qullamaggie";
+  if (s.startsWith("BO")) return "@markminervini";
+  if (s.startsWith("PB") || s.includes("PULLBACK") || s.includes("MA-")) return "@PrimeTrading_";
+  if (s.includes("POST-GAP")) return "@Qullamaggie";
+  return null;
+}
 
 type BriefAnyShape = Record<string, unknown>;
 
@@ -44,6 +58,11 @@ interface ExtractedCandidate {
   day0Thesis?: string | null;
   day0TraderLens?: string | null;
   day0Price?: number | null;
+  setupScore?: number | null;
+  entryScore?: number | null;
+  themeScore?: number | null;
+  sentimentScore?: number | null;
+  championPersona?: string | null;
   tags?: string[];
 }
 
@@ -303,6 +322,12 @@ export async function upsertCandidates(
           target: recent.target ?? dec(c.target),
           rrr: recent.rrr ?? dec(c.rrr),
           day0Thesis: recent.day0Thesis ?? c.day0Thesis ?? null,
+          // Gap-fill the Conviction breakdown if the frozen row predates it.
+          setupScore: recent.setupScore ?? c.setupScore ?? null,
+          entryScore: recent.entryScore ?? c.entryScore ?? null,
+          themeScore: recent.themeScore ?? c.themeScore ?? null,
+          sentimentScore: recent.sentimentScore ?? c.sentimentScore ?? null,
+          championPersona: recent.championPersona ?? c.championPersona ?? championForSetup(c.setupClassification),
           tags: existingTags.includes(requalTag) ? existingTags : [...existingTags, requalTag],
         },
       });
@@ -349,6 +374,11 @@ export async function upsertCandidates(
       day0BriefBucketAt: briefBucketAt,
       day0BriefProvider: briefProvider,
       day0Price: dec(c.day0Price),
+      setupScore: c.setupScore ?? null,
+      entryScore: c.entryScore ?? null,
+      themeScore: c.themeScore ?? null,
+      sentimentScore: c.sentimentScore ?? null,
+      championPersona: c.championPersona ?? championForSetup(c.setupClassification),
       tags: (c.tags as Prisma.InputJsonValue | undefined) ?? Prisma.JsonNull,
     };
 
@@ -454,16 +484,24 @@ export function extractScreenerCandidates(file: ScoredScreenerFile | null | unde
       if (rvol == null || rvol < MIN_RVOL) continue;
       const pattern = asStr(hit.pattern);
       const close = asNum(hit.close);
+      const setupClass = pattern ? SCREENER_PATTERN_TO_SETUP[pattern.toUpperCase()] ?? pattern : null;
+      // Conviction sub-scores from the algo scorer (screener-scanner algoScore).
+      const stages = (hit.stages ?? {}) as Record<string, unknown>;
       const cand: ExtractedCandidate = {
         ticker,
         day0Score: score,
         day0Verdict: "GO",
         day0Rvol: rvol,
-        setupClassification: pattern ? SCREENER_PATTERN_TO_SETUP[pattern.toUpperCase()] ?? pattern : null,
+        setupClassification: setupClass,
         screenSource: asStr(sc.id),
         sector: asStr(hit.sector),
         entryZone: close,
         day0Price: close,
+        setupScore: asNum(stages.setup),
+        entryScore: asNum(stages.entry),
+        themeScore: asNum(stages.theme),
+        sentimentScore: asNum(stages.sentiment),
+        championPersona: championForSetup(setupClass),
       };
       const existing = best.get(ticker);
       if (!existing || (cand.day0Score ?? 0) > (existing.day0Score ?? 0)) best.set(ticker, cand);

@@ -436,14 +436,23 @@ model AListCandidate {
   stop              Decimal?  @db.Decimal(12, 4)
   target            Decimal?  @db.Decimal(12, 4)
   rrr               Decimal?  @db.Decimal(6, 2)
-  /// 0-100 DeepSeek/Claude composite at pick day.
+  /// 0-100 Conviction composite at pick day (Setup/40+Entry/30+Theme/20+Sentiment/10).
   day0Score         Int?
-  /// "GO" | "WAIT" | "PASS"
+  /// "GO" | "WAIT" | "PASS" (GO >= 75).
   day0Verdict       String?
   day0Rvol          Decimal?  @db.Decimal(6, 2)
   day0Thesis        String?   @db.Text
   /// Trader-style lens that fits best (e.g. "@Qullamaggie", "@markminervini").
   day0TraderLens    String?
+  /// Conviction sub-scores at pick day (wiki/trader-styles.md). Null for
+  /// brief-sourced picks that don't carry the deterministic breakdown.
+  setupScore        Int?
+  entryScore        Int?
+  themeScore        Int?
+  sentimentScore    Int?
+  /// Best-match persona for the setup (deterministic heuristic at pick time;
+  /// the R4 multi-agent refines it on triggered picks).
+  championPersona   String?
   /// Link to the brief that promoted this candidate (frozen reference).
   day0BriefBucketAt DateTime?
   day0BriefProvider String?

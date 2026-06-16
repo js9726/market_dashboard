@@ -37,6 +37,14 @@ export function serializeCandidate(r: AListCandidate) {
     rvol: num(r.day0Rvol),
     thesis: r.day0Thesis,
     traderLens: r.day0TraderLens,
+    // Conviction breakdown (wiki/trader-styles.md) + best-match persona.
+    conviction: {
+      setup: r.setupScore,
+      entry: r.entryScore,
+      theme: r.themeScore,
+      sentiment: r.sentimentScore,
+    },
+    championPersona: r.championPersona,
     briefProvider: r.day0BriefProvider,
     briefBucketAt: r.day0BriefBucketAt?.toISOString() ?? null,
     day0Price: num(r.day0Price),
