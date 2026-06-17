@@ -49,6 +49,10 @@ export function serializeCandidate(r: AListCandidate) {
     trigger: r.triggerState
       ? { state: r.triggerState, at: r.triggerStateAt?.toISOString() ?? null, reason: r.triggerReason }
       : null,
+    // Multi-agent Conviction verdict (R4): ENTER/WAIT/PASS + breakdown+reasoning.
+    agent: r.agentVerdict
+      ? { verdict: r.agentVerdict, at: r.agentConvictionAt?.toISOString() ?? null, analysis: r.agentConviction }
+      : null,
     briefProvider: r.day0BriefProvider,
     briefBucketAt: r.day0BriefBucketAt?.toISOString() ?? null,
     day0Price: num(r.day0Price),

@@ -22,6 +22,11 @@ import { emaSeries, atrSeries, lowestLow, type Candle } from "@/server/indicator
 import { atrFloorStop, rUnit, realizedVsFullR, softVsHard } from "@/server/alist-metrics";
 import { reconcileClosedHeld } from "@/server/alist-close";
 import { evaluateTrigger } from "@/lib/alist-triggers";
+import { runConvictionAnalysis, type ConvictionInput } from "@/server/conviction-analysis";
+
+// Cap LLM Conviction analyses per cron run so a day with many triggers can't
+// blow the function budget; the rest get picked up next run.
+const MAX_ANALYSES_PER_RUN = 5;
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -107,6 +112,8 @@ export async function GET(req: Request) {
 
   let processed = 0;
   const errors: string[] = [];
+  // Picks that flipped to TRIGGERED this run → queue the LLM Conviction verdict.
+  const newlyTriggered: { candId: string; input: ConvictionInput }[] = [];
 
   for (const cand of candidates) {
     try {
@@ -206,6 +213,27 @@ export async function GET(req: Request) {
             triggerReason: trig.reason,
           };
         }
+        // Queue the LLM Conviction verdict once, on the ARMED→TRIGGERED flip.
+        if (trig.state === "TRIGGERED" && prev !== "TRIGGERED" && cand.agentConvictionAt == null) {
+          newlyTriggered.push({
+            candId: cand.id,
+            input: {
+              ticker: cand.ticker,
+              setup: cand.setupClassification,
+              sector: cand.sector,
+              triggerState: trig.state,
+              triggerReason: trig.reason,
+              entryZone: cand.entryZone?.toNumber() ?? null,
+              stop: cand.stop?.toNumber() ?? aStop ?? null,
+              target: cand.target?.toNumber() ?? null,
+              rvol: cand.day0Rvol?.toNumber() ?? rvol[lastIdx] ?? null,
+              rsRating: null,
+              day0Thesis: cand.day0Thesis,
+              algo: { setup: cand.setupScore, entry: cand.entryScore, theme: cand.themeScore, sentiment: cand.sentimentScore },
+              recentPath: triggerPath.slice(-6).map((b) => ({ date: b.date, close: b.close, ema8: b.ema8, ema21: b.ema21, rvol: b.rvol })),
+            },
+          });
+        }
       }
 
       // ── Savings metrics (provisional until the position closes) ──────────
@@ -268,6 +296,29 @@ export async function GET(req: Request) {
     }
   }
 
+  // ── Multi-agent Conviction verdict on freshly-TRIGGERED picks (R4) ────────
+  // Runs only on the trigger flip, bounded per run, never fails the cron.
+  let analyzed = 0;
+  if (process.env.LLM_DISABLED !== "1") {
+    for (const item of newlyTriggered.slice(0, MAX_ANALYSES_PER_RUN)) {
+      try {
+        const verdict = await runConvictionAnalysis(item.input);
+        if (!verdict) continue;
+        await prisma.aListCandidate.update({
+          where: { id: item.candId },
+          data: {
+            agentConviction: verdict as unknown as Prisma.InputJsonValue,
+            agentVerdict: verdict.moderator,
+            agentConvictionAt: new Date(),
+          },
+        });
+        analyzed++;
+      } catch (e) {
+        errors.push(`analyze ${item.input.ticker}: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+  }
+
   // Auto-close: held candidates whose broker position is gone (operator exited
   // / stopped out). Flips ACTIVE → STOPPED_OUT|CLOSED with realized R so manual
   // broker exits register without hand-entry. Best-effort; never fails the cron.
@@ -283,6 +334,8 @@ export async function GET(req: Request) {
     ok: true,
     candidates: candidates.length,
     processed,
+    triggered: newlyTriggered.length,
+    analyzed,
     autoClosed,
     errors: errors.length ? errors.slice(0, 10) : undefined,
   });

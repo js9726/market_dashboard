@@ -541,6 +541,13 @@ model AListCandidate {
   triggerStateAt   DateTime?
   triggerReason    String?
 
+  // ── Multi-agent Conviction verdict (R4; runs once on TRIGGERED) ────────────
+  /// LLM Conviction breakdown + per-component reasoning (ConvictionAnalysis).
+  agentConviction   Json?
+  /// Moderator decision: "ENTER" | "WAIT" | "PASS".
+  agentVerdict      String?
+  agentConvictionAt DateTime?
+
   // ── Free-form ───────────────────────────────────────────────────────────
   notes String? @db.Text
   tags  Json? // e.g. ["earnings", "AI-infra", "post-gap-VCP"]

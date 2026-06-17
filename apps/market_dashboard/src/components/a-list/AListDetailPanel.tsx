@@ -112,6 +112,23 @@ export default function AListDetailPanel({ row, onClose }: Props) {
           </Section>
         )}
 
+        {row.agent && row.agent.analysis && (
+          <Section title={`Multi-Agent Verdict · ${row.agent.verdict}`}>
+            <ConvictionBar label="Setup" value={row.agent.analysis.setup ?? null} max={40} />
+            <ConvictionBar label="Entry" value={row.agent.analysis.entry ?? null} max={30} />
+            <ConvictionBar label="Theme" value={row.agent.analysis.theme ?? null} max={20} />
+            <ConvictionBar label="Sentiment" value={row.agent.analysis.sentiment ?? null} max={10} />
+            <Row label="Conviction" value={row.agent.analysis.conviction != null ? `${row.agent.analysis.conviction}/100 (${row.agent.analysis.verdict ?? "-"})` : "-"} />
+            {row.agent.analysis.champion && <Row label="Champion" value={row.agent.analysis.champion} />}
+            {row.agent.analysis.reasoning?.moderator && (
+              <p className="t-caption mt-1 text-[var(--fg-2)]">{row.agent.analysis.reasoning.moderator}</p>
+            )}
+            {row.agent.analysis.reasoning?.entry && (
+              <p className="t-caption mt-1 text-[var(--fg-3)]"><strong>Entry:</strong> {row.agent.analysis.reasoning.entry}</p>
+            )}
+          </Section>
+        )}
+
         {row.conviction && (row.conviction.setup != null || row.conviction.entry != null) && (
           <Section title="Conviction Breakdown">
             <ConvictionBar label="Setup" value={row.conviction.setup} max={40} />

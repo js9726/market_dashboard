@@ -35,6 +35,16 @@ export interface AListRow {
   conviction?: { setup: number | null; entry: number | null; theme: number | null; sentiment: number | null } | null;
   championPersona?: string | null;
   trigger?: { state: string; at: string | null; reason: string | null } | null;
+  // Multi-agent Conviction verdict (R4) — ENTER/WAIT/PASS + LLM breakdown.
+  agent?: {
+    verdict: string;
+    at: string | null;
+    analysis: {
+      setup?: number; entry?: number; theme?: number; sentiment?: number; conviction?: number;
+      verdict?: string; champion?: string | null;
+      reasoning?: { setup?: string; entry?: string; theme?: string; sentiment?: string; moderator?: string };
+    } | null;
+  } | null;
   day14: {
     mfe: number | null;
     mae: number | null;
@@ -82,18 +92,34 @@ const TRIGGER_STYLE: Record<string, { bg: string; label: string }> = {
   INVALIDATED: { bg: "var(--loss-fg)", label: "INVALID" },
   EXPIRED: { bg: "var(--fg-4)", label: "EXPIRED" },
 };
+const AGENT_COLOR: Record<string, string> = {
+  ENTER: "var(--gain-fg)",
+  WAIT: "var(--accent)",
+  PASS: "var(--loss-fg)",
+};
 function renderTrigger(r: AListRow) {
   if (r.isHeld) return <span className="text-[var(--fg-4)]">—</span>;
   const t = r.trigger;
   if (!t) return <span className="text-[var(--fg-4)]">—</span>;
   const s = TRIGGER_STYLE[t.state] ?? { bg: "var(--fg-4)", label: t.state };
   return (
-    <span
-      className="rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white"
-      style={{ backgroundColor: s.bg }}
-      title={t.reason ?? t.state}
-    >
-      {s.label}
+    <span className="inline-flex flex-col items-start gap-0.5">
+      <span
+        className="rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white"
+        style={{ backgroundColor: s.bg }}
+        title={t.reason ?? t.state}
+      >
+        {s.label}
+      </span>
+      {r.agent?.verdict && (
+        <span
+          className="text-[10px] font-semibold leading-none"
+          style={{ color: AGENT_COLOR[r.agent.verdict] ?? "var(--fg-3)" }}
+          title={r.agent.analysis?.reasoning?.moderator ?? "Multi-agent Conviction verdict"}
+        >
+          ▸ {r.agent.verdict}
+        </span>
+      )}
     </span>
   );
 }
