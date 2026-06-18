@@ -1,7 +1,11 @@
 # Plan — Conviction Decision-Grade A-List (R3–R5)
 
 **Owner:** Jie Sheng
-**Status:** APPROVED 2026-06-16 — R3 in progress (backtest checkpoint first)
+**Status:** R3–R5 SHIPPED 2026-06-16/17. R3 (gate→GO≥75 + Conviction breakdown
++ trigger lifecycle + UI), R4 (multi-agent Conviction verdict on triggered
+picks), R5 (coaching digest) all live on main + migrations applied. R3.0
+backtest → ship-and-forward-validate (data walled; the trigger engine is the
+forward-validation instrument). Remaining: beta-readiness parallel track.
 **Supersedes the A-list/scoring portions of:** `PLAN-pre-open-ci-and-journal-revamp.md` (Rev 3)
 
 Re-planned after the 2026-06-15 wiki + screener overhaul to the **Conviction
