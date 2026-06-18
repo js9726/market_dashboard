@@ -2,384 +2,435 @@
   "mood": {
     "label": "CAUTIOUSLY-RISK-ON",
     "posture": "WAIT",
-    "summary": "Markets are in a holding pattern ahead of the Federal Reserve's first interest rate decision under new Chair Kevin Warsh. A tentative U.S.-Iran deal has sent oil prices lower, easing some inflation fears, but all eyes are on the Fed's tone and economic projections."
+    "summary": "Futures are pointing to a strong rebound after yesterday's Fed-induced selloff, but the tape remains reactive. Easing geopolitical tensions and falling oil prices are supportive, but leadership is narrow."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": null,
-    "label": null
+    "score": 39,
+    "label": "Fear"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": null,
-      "changePct": 0.13,
-      "note": "futures",
+      "level": 7420.1,
+      "changePct": -1.21,
+      "note": "Futures indicate a +0.88% open.",
       "citation": "Source: Investing.com"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
-      "level": null,
-      "changePct": 0.56,
-      "note": "futures",
+      "level": 26021.66,
+      "changePct": -1.34,
+      "note": "Futures indicate a +2.03% open.",
       "citation": "Source: Investing.com"
     },
     {
       "symbol": "DIA",
-      "name": "Dow Jones Industrial Average",
-      "level": null,
-      "changePct": 0.02,
-      "note": "futures",
-      "citation": "Source: Investing.com"
-    },
-    {
-      "symbol": "IWM",
-      "name": "Russell 2000",
-      "level": null,
-      "changePct": 0.13,
-      "note": "futures",
+      "name": "Dow Jones",
+      "level": 51492.55,
+      "changePct": -0.98,
+      "note": "Futures indicate a +0.37% open.",
       "citation": "Source: Investing.com"
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 16.41,
-      "changePct": 1.3,
-      "note": "live",
-      "citation": "Source: Zacks Investment Research"
+      "level": 18.44,
+      "changePct": null,
+      "note": "Remains elevated after yesterday's pop.",
+      "citation": "Source: Saxo Bank"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Year Treasury Yield",
-      "level": 4.43,
+      "name": "10-Yr Treasury Yield",
+      "level": 4.45,
       "changePct": null,
-      "note": "live",
+      "note": "Yields remain firm after hawkish Fed comments.",
       "citation": "Source: StoneX"
     },
     {
       "symbol": "CL=F",
       "name": "Crude Oil (WTI)",
-      "level": 76.27,
-      "changePct": 0.29,
-      "note": "futures",
-      "citation": "Source: TheStreet"
+      "level": 74.43,
+      "changePct": -2.1,
+      "note": "Prices falling on US-Iran deal and reopening of Strait of Hormuz.",
+      "citation": "Source: The Journal"
     }
   ],
-  "indicesNarrative": "US equity futures are pointing to a slightly higher open, with the Nasdaq showing relative strength. The Dow hit a record high yesterday, but the S&P 500 and Nasdaq pulled back. The main focus for today is the Federal Reserve's policy announcement and press conference.",
-  "technicals": null,
-  "technicalsNarrative": null,
-  "sectorsThemes": [],
-  "sectorsNarrative": "Technology stocks are looking to rebound after a recent selloff. The drop in oil prices is weighing on the energy sector.",
-  "industryNarrative": null,
+  "indicesNarrative": "U.S. indices sold off sharply yesterday after the Fed adopted a more hawkish tone, with nearly half of policymakers seeing a rate hike in 2026. However, futures are indicating a strong rebound this morning, fueled by an easing of geopolitical tensions after a U.S.-Iran peace deal was signed, which is also pushing oil prices lower. The Nasdaq is set to lead the bounce.",
+  "technicals": {
+    "SPY": {
+      "close": 7420.1,
+      "atr14": 2.6915,
+      "atr_pct": 0.036,
+      "ema21": null,
+      "ema50": 746.71,
+      "ma200": 738.24,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": 35.856,
+      "macd": 1.26,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "FAIR"
+    },
+    "QQQ": {
+      "close": 26021.66,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "UNKNOWN"
+    },
+    "DIA": {
+      "close": 51492.55,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "UNKNOWN"
+    }
+  },
+  "technicalsNarrative": "Based on yesterday's close, SPY's technicals look weak, with an RSI of 35.8 and most moving averages flashing 'Sell' signals after the sharp drop. This suggests the index was approaching oversold territory, setting up for today's pre-market bounce. With futures pointing to a strong open, the key will be whether indices can reclaim key moving averages and hold the gains.",
+  "sectorsThemes": [
+    {
+      "symbol": "XLK",
+      "name": "Technology",
+      "changePct": null,
+      "rs": null,
+      "note": "Remains the clear market leader, driven by AI enthusiasm."
+    },
+    {
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": null,
+      "rs": null,
+      "note": "Under pressure as crude oil prices fall on geopolitical developments."
+    },
+    {
+      "symbol": "XLU",
+      "name": "Utilities",
+      "changePct": null,
+      "rs": null,
+      "note": "Defensive sector that has been lagging in the recent risk-on environment."
+    }
+  ],
+  "sectorsNarrative": "Market leadership remains extremely narrow, with Technology as the dominant outperformer. Defensive sectors like Utilities and Energy have been the primary laggards, a trend likely to continue with falling oil prices.",
+  "industryNarrative": "Semiconductors and AI-related stocks continue to be the strongest industry groups, driving the gains in the Technology sector. Conversely, interest-rate sensitive groups and commodity-related industries have been underperforming.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "JBL",
+      "ticker": "ADTX",
       "side": "LONG",
-      "changePct": 4.09,
-      "why": "Jabil Inc. is expected to report its quarterly earnings today.",
-      "traderLens": "Qullamaggie"
+      "changePct": 175.0,
+      "why": "Reacting to news of a major shareholder stock sale.",
+      "traderLens": "Episodic pivot, high-risk momentum play (Qullamaggie)."
     },
     {
-      "ticker": "KEYS",
+      "ticker": "ENPH",
       "side": "LONG",
-      "changePct": 3.92,
-      "why": "Keysight Technologies is showing strong pre-market gains.",
-      "traderLens": "Momentum"
+      "changePct": 4.1,
+      "why": "Upgraded to equal-weight from underweight by Barclays.",
+      "traderLens": "Catalyst-driven setup (Minervini)."
     },
     {
-      "ticker": "MTCH",
+      "ticker": "ALB",
       "side": "LONG",
-      "changePct": 3.64,
-      "why": "Match Group Inc. is among the top pre-market gainers.",
-      "traderLens": "Momentum"
+      "changePct": 1.8,
+      "why": "Upgraded to buy from neutral at Citi on lithium price expectations.",
+      "traderLens": "Analyst-driven momentum."
     },
     {
-      "ticker": "ASTS",
-      "side": "LONG",
-      "changePct": 5.1,
-      "why": "AST SpaceMobile is gaining ahead of its planned satellite launch.",
-      "traderLens": "Episodic Pivot"
-    },
-    {
-      "ticker": "WOLF",
-      "side": "LONG",
-      "changePct": 4.2,
-      "why": "Wolfspeed is seeing positive momentum in pre-market trading.",
-      "traderLens": "Momentum"
-    },
-    {
-      "ticker": "NVST",
+      "ticker": "ACN",
       "side": "SHORT",
-      "changePct": -7.1,
-      "why": "Envista Holdings is one of the top pre-market losers.",
-      "traderLens": "Breakdown"
+      "changePct": -11.0,
+      "why": "Issued a disappointing Q4 revenue forecast below Wall Street expectations.",
+      "traderLens": "Earnings-driven breakdown."
     },
     {
-      "ticker": "LION",
+      "ticker": "SNBR",
       "side": "SHORT",
-      "changePct": -6.2,
-      "why": "Lionsgate Studios is seeing significant pre-market selling pressure.",
-      "traderLens": "Breakdown"
-    },
-    {
-      "ticker": "AS",
-      "side": "SHORT",
-      "changePct": -3.9,
-      "why": "Amer Sports is declining in pre-market trading.",
-      "traderLens": "Breakdown"
+      "changePct": -45.9,
+      "why": "Significant pre-market decline on high volume, catalyst pending.",
+      "traderLens": "Breakdown, avoid catching a falling knife (Jeff)."
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Presenting at the VivaTech 2026 Conference this week."
+      "changePct": 1.0,
+      "abc": "A",
+      "note": "Leading the tech rebound pre-market."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Monitoring for reaction to general market sentiment."
+      "changePct": 0.3,
+      "abc": "B",
+      "note": "Watching for follow-through with the market bounce."
     },
     {
       "ticker": "AAPL",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Watching for movement in the tech sector."
+      "changePct": 0.6,
+      "abc": "B",
+      "note": "Up pre-market after CEO comments on raising prices."
     },
     {
       "ticker": "MSFT",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Reports that Microsoft walked away from a major Oracle cloud lease."
+      "changePct": -0.2,
+      "abc": "B",
+      "note": "Slightly down pre-market, watching for direction at the open."
     },
     {
       "ticker": "AMZN",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Monitoring as SpaceX valuation surpasses Amazon's market cap."
+      "changePct": 0.2,
+      "abc": "B",
+      "note": "In-line with broad market futures."
     },
     {
       "ticker": "META",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Watching for movement in the tech sector."
+      "changePct": 0.5,
+      "abc": "B",
+      "note": "Participating in the pre-market tech rally."
     },
     {
       "ticker": "GOOGL",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Watching for movement in the tech sector."
+      "changePct": -0.5,
+      "abc": "C",
+      "note": "Lagging other megacaps in pre-market."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Chip stocks are rebounding after a recent selloff."
+      "abc": "A",
+      "note": "Watching relative strength vs NVDA."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring the semiconductor space."
+      "abc": "A",
+      "note": "Key name in the server/AI space."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching for movement in growth and tech stocks."
+      "abc": "C",
+      "note": "Needs to prove itself against overhead resistance."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring the cybersecurity sector."
+      "abc": "B",
+      "note": "Cybersecurity leader, watching for sector rotation."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching for movement in relation to cryptocurrency markets."
+      "abc": "C",
+      "note": "High beta crypto play, moves with Bitcoin sentiment."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a holding pattern. Awaiting confirmation of a clear uptrend before committing heavily."
+      "view": "Market is attempting a rebound after a pullback. Look for leaders to emerge, but don't chase extended names."
     },
     {
       "name": "Ted Zhang",
-      "view": "Rotation out of energy and into tech may continue if oil prices remain subdued."
+      "view": "Rotation remains focused on Tech and AI. Money flows out of Energy and defensives."
     },
     {
       "name": "Clement Ang",
-      "view": "A-grade setups are scarce before the Fed announcement. Best to wait for clarity."
+      "view": "Market context is choppy (Whipsaw Wednesday). Wait for confirmation of the bounce before deploying significant capital. Grade is B-."
     },
     {
       "name": "SRxTrades",
-      "view": "Volume is light ahead of the FOMC. Wait for volume confirmation on any breakouts."
+      "view": "Wait for clean pivots and volume confirmation on any long entries today. Avoid chasing the gap up open."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your trading plan. Don't let FOMC speculation lead to impulsive decisions."
+      "view": "Respect stops. Yesterday's reversal shows how quickly the tape can turn. Don't get caught on the wrong side."
     },
     {
       "name": "Qullamaggie",
-      "view": "Some episodic pivots may be setting up, but the overall market needs to be supportive for breakouts to follow through."
+      "view": "Looking for high-momentum names that gap up and hold their gains, providing an opportunity for an entry."
     },
     {
       "name": "Composite",
-      "view": "Patience is key today. Observe the market's reaction to the Fed's announcement before taking on new risk. Focus on managing existing positions."
+      "view": "Be patient at the open. The gap up is significant, especially in tech. The best trades may come from letting the market settle and finding names with relative strength that set up clean intraday pivots. Do not chase."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "JBL",
-        "consensus": "EPS $3.09 / Rev $8.63B"
+        "ticker": "ACN",
+        "consensus": "EPS $3.71 / Rev $18.75B"
       },
       {
-        "ticker": "KMX",
-        "consensus": "EPS $0.94 / Rev $7.46B"
+        "ticker": "KR",
+        "consensus": "EPS $1.59 / Rev $45.39B"
       }
     ],
-    "amc": [
+    "amc": [],
+    "yesterdayReactions": [
       {
-        "ticker": "SWBI",
-        "consensus": "EPS $0.23 / Rev $155.27M"
+        "ticker": "LZB",
+        "result": "beat by 53%",
+        "movePct": 14.8
       }
-    ],
-    "yesterdayReactions": []
+    ]
   },
   "calendar": [
     {
       "time": "08:30 ET",
-      "name": "Retail Sales",
+      "name": "Jobless Claims",
       "consensus": null
     },
     {
-      "time": "10:00 ET",
-      "name": "Business Inventories",
-      "consensus": null
-    },
-    {
-      "time": "10:00 ET",
-      "name": "Pending Home Sales",
-      "consensus": null
-    },
-    {
-      "time": "14:00 ET",
-      "name": "FOMC Statement",
-      "consensus": null
-    },
-    {
-      "time": "14:30 ET",
-      "name": "FOMC Press Conference",
+      "time": "08:30 ET",
+      "name": "Philadelphia Fed Manufacturing Index",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "MFA",
-        "firm": "BTIG",
+        "ticker": "ALB",
+        "firm": "Citi",
         "rating": "Buy",
-        "pt": 10.5
-      },
-      {
-        "ticker": "MITT",
-        "firm": "BTIG",
-        "rating": "Buy",
-        "pt": 9
-      },
-      {
-        "ticker": "GTLB",
-        "firm": "Zacks Investment Research",
-        "rating": "Strong Buy",
         "pt": null
+      },
+      {
+        "ticker": "ENPH",
+        "firm": "Barclays",
+        "rating": "Equal-weight",
+        "pt": null
+      },
+      {
+        "ticker": "SLB",
+        "firm": "Stifel",
+        "rating": "Buy",
+        "pt": 64
       }
     ],
     "downgrades": [
       {
-        "ticker": "EFC",
-        "firm": "BTIG",
-        "rating": "Neutral",
+        "ticker": "ZI",
+        "firm": "S&P Global Ratings",
+        "rating": "BB-",
+        "pt": null
+      },
+      {
+        "ticker": "PAYO",
+        "firm": "Benchmark",
+        "rating": "Hold",
         "pt": null
       }
     ]
   },
-  "alert": "FOMC rate decision and press conference at 2:00 PM and 2:30 PM ET.",
+  "alert": null,
   "news": [
     {
-      "headline": "U.S. Stock Futures Rise Ahead of First Fed Decision Under Chair Kevin Warsh",
+      "headline": "US stocks eye rebound after Fed's hawkish tone sparked selloff",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
         "DIA"
       ],
-      "source": "Bloomberg",
-      "time": "05:00 ET"
+      "source": "Financial Post — https://financialpost.com/investing/us-premarket-movers-for-june-18-2026",
+      "time": "07:45 ET"
     },
     {
-      "headline": "Oil Prices Stabilize After U.S.-Iran Deal Sparks Selloff",
+      "headline": "US and Iran sign interim peace deal, easing Mideast tensions and oil prices",
       "impact": "HIGH",
       "tickers": [
         "CL=F",
         "XLE"
       ],
-      "source": "TheStreet",
-      "time": "06:00 ET"
+      "source": "Michael West Media — https://michaelwest.com.au/asian-stocks-steady-as-us-and-iran-sign-peace-deal/",
+      "time": "Overnight"
     },
     {
-      "headline": "SpaceX valuation soars past Amazon after announcing $60 billion acquisition of AI startup Cursor",
+      "headline": "Accenture tumbles 11% in premarket after weak Q4 revenue forecast",
       "impact": "MED",
       "tickers": [
-        "AMZN"
+        "ACN"
       ],
-      "source": "TheStreet",
-      "time": "04:30 ET"
+      "source": "Financial Post — https://financialpost.com/investing/us-premarket-movers-for-june-18-2026",
+      "time": "Premarket"
     },
     {
-      "headline": "Chip Stocks Rebound Premarket After Tuesday's Selloff",
+      "headline": "Kroger reports Q1 EPS beat, maintains 2026 guidance",
       "impact": "MED",
       "tickers": [
-        "SMH",
-        "NVDA",
-        "AMD",
-        "INTC"
+        "KR"
       ],
-      "source": "Stocktwits",
-      "time": "05:30 ET"
+      "source": "PR Newswire — https://www.prnewswire.com/news-releases/kroger-reports-first-quarter-2026-results-302175895.html",
+      "time": "07:00 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Investing.com",
-    "Zacks Investment Research",
-    "TheStreet",
-    "StoneX",
-    "Stocktwits",
-    "Bloomberg"
+    "Saxo Bank — https://www.home.saxo/content/articles/market-quick-take/market-quick-take-18062026",
+    "StoneX — https://www.stonex.com/perspective/morning-commentary-for-june-18/",
+    "The Journal — https://www.thejournal.ie/world-shares-mixed-us-iran-deal-6381243-Jun2026/",
+    "Investing.com — https://www.investing.com/etfs/spdr-s-p-500-technical",
+    "Financial Post — https://financialpost.com/investing/us-premarket-movers-for-june-18-2026",
+    "Benzinga — https://www.benzinga.com/news/earnings/26/06/39371896/earnings-scheduled-for-june-18-2026",
+    "Zacks Investment Research — https://www.zacks.com/stock/news/2288151/company-news-for-jun-18-2026",
+    "Econoday — https://www.econoday.com/investor/getcalendar.aspx?target=2026",
+    "Michael West Media — https://michaelwest.com.au/asian-stocks-steady-as-us-and-iran-sign-peace-deal/",
+    "CommunityAmerica Credit Union — https://www.communityamerica.com/investments/market-insights/june-2026",
+    "GuruFocus — https://www.gurufocus.com/news/2583002/payo-downgraded-by-benchmark--rating-changed-to-hold"
   ]
 }
