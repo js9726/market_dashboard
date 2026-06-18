@@ -117,6 +117,8 @@ export default function AnalyticsView() {
         ) : null}
       </div>
 
+      <CoachingDigestCard />
+
       {error ? <p className="mb-3 t-caption text-[var(--loss-fg)]">{error}</p> : null}
 
       {!data ? (
@@ -312,6 +314,81 @@ export default function AnalyticsView() {
         </div>
       )}
     </section>
+  );
+}
+
+interface EdgeRow {
+  setup: string; champion: string; n: number; triggered: number; taken: number;
+  winRate: number | null; avgMfeR: number | null;
+}
+interface CoachingDigestData {
+  totalPicks: number;
+  edge: EdgeRow[];
+  execution: { triggeredTaken: number; triggeredMissed: number; chasedOffBook: number; onBookEntries: number };
+  mfeCapture: number | null;
+  topLeak: string;
+}
+
+/** R5 coaching digest — edge per lane + execution behaviour + the #1 leak. */
+function CoachingDigestCard() {
+  const [d, setD] = useState<CoachingDigestData | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  useEffect(() => {
+    fetch("/api/analytics/coaching", { cache: "no-store" })
+      .then(async (r) => {
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error ?? `HTTP ${r.status}`);
+        setD(j);
+      })
+      .catch((e) => setErr(e instanceof Error ? e.message : "load failed"));
+  }, []);
+  if (err) return null;
+  if (!d) return null;
+  const ex = d.execution;
+  return (
+    <div className="mb-6 rounded-md border border-[var(--accent)] bg-[var(--bg-raised)] p-4">
+      <h3 className="mb-1 text-[13px] font-bold uppercase tracking-[0.1em]">Coaching Digest</h3>
+      <p className="mb-3 t-caption text-[var(--fg-3)]">
+        Edge per lane + how you executed the triggers, over your last {d.totalPicks} A-list picks.
+      </p>
+      <div className="mb-3 rounded border-l-2 border-[var(--accent)] bg-[var(--bg-surface)] p-3 t-body-small">
+        <strong>Do this differently:</strong> {d.topLeak}
+      </div>
+      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <Stat label="Triggered · taken" value={String(ex.triggeredTaken)} tone="gain" />
+        <Stat label="Triggered · missed" value={String(ex.triggeredMissed)} tone={ex.triggeredMissed > ex.triggeredTaken ? "loss" : "neutral"} />
+        <Stat label="Chased off-book" value={String(ex.chasedOffBook)} tone={ex.chasedOffBook > ex.onBookEntries ? "loss" : "neutral"} />
+        <Stat label="MFE capture" value={d.mfeCapture != null ? `${Math.round(d.mfeCapture * 100)}%` : "—"} tone={d.mfeCapture != null && d.mfeCapture < 0.4 ? "loss" : "neutral"} />
+      </div>
+      {d.edge.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-[var(--line)] text-[var(--fg-3)]">
+              <tr>
+                {["Setup", "Champion", "N", "Triggered", "Taken", "Win%", "Avg MFE"].map((h) => (
+                  <th key={h} className="px-2 py-1 text-left font-normal text-xs uppercase tracking-wider">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {d.edge.map((e) => (
+                <tr key={`${e.setup}|${e.champion}`} className="border-b border-[var(--line)]">
+                  <td className="px-2 py-1">{e.setup}</td>
+                  <td className="px-2 py-1 text-[var(--fg-3)]">{e.champion}</td>
+                  <td className="px-2 py-1">{e.n}</td>
+                  <td className="px-2 py-1">{e.triggered}</td>
+                  <td className="px-2 py-1">{e.taken}</td>
+                  <td className="px-2 py-1">{e.winRate != null ? `${e.winRate}%` : "—"}</td>
+                  <td className="px-2 py-1" style={{ color: e.avgMfeR != null ? (e.avgMfeR >= 0 ? "var(--gain-fg)" : "var(--loss-fg)") : undefined }}>
+                    {e.avgMfeR != null ? `${e.avgMfeR >= 0 ? "+" : ""}${e.avgMfeR}R` : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 }
 
