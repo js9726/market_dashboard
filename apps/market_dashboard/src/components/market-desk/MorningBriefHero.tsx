@@ -9,6 +9,7 @@ import MarketBreadthPanels from "./MarketBreadthPanels";
 import FreshnessBadge from "./FreshnessBadge";
 import { BRIEF_THRESHOLDS, liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { selectBriefProvider } from "@/lib/brief/provider-selection";
+import { asText } from "@/lib/brief/as-text";
 
 const INDICES = [
   { symbol: "SPX", fallbackSymbol: "SPY" },
@@ -331,8 +332,8 @@ function TradersCard({ verdict }: { verdict: BriefView }) {
       <ul className="space-y-2 mt-2">
         {traders.slice(0, 5).map((trader) => (
           <li key={trader.name} className="t-body-small">
-            <b>{trader.name}:</b>{" "}
-            <span className="text-[var(--fg-2)]">{trader.view}</span>
+            <b>{asText(trader.name)}:</b>{" "}
+            <span className="text-[var(--fg-2)]">{asText(trader.view)}</span>
           </li>
         ))}
       </ul>
@@ -369,7 +370,7 @@ function StandoutCard({ verdict }: { verdict: BriefView }) {
           </span>
         ) : null}
       </div>
-      {standout.thesis ? <p className="t-body-small mt-3">{standout.thesis}</p> : null}
+      {standout.thesis ? <p className="t-body-small mt-3">{asText(standout.thesis)}</p> : null}
     </div>
   );
 }
@@ -385,11 +386,11 @@ function BriefDetails({ brief }: { brief: StructuredBrief }) {
   return (
     <div className="brief-placeholder-grid">
       <BriefPanel title="Index read" span="wide">
-        <p className="t-body-small">{brief.indicesNarrative ?? "No index narrative yet."}</p>
+        <p className="t-body-small">{asText(brief.indicesNarrative) || "No index narrative yet."}</p>
       </BriefPanel>
 
       <BriefPanel title="Rotation">
-        <p className="t-body-small">{brief.sectorsNarrative ?? "No sector read yet."}</p>
+        <p className="t-body-small">{asText(brief.sectorsNarrative) || "No sector read yet."}</p>
         {sectors.length ? (
           <ul className="brief-chip-list mt-3">
             {sectors.map((sector) => (
@@ -404,7 +405,7 @@ function BriefDetails({ brief }: { brief: StructuredBrief }) {
       </BriefPanel>
 
       <BriefPanel title="Industry movers">
-        <p className="t-body-small">{brief.industryNarrative ?? "No industry read yet."}</p>
+        <p className="t-body-small">{asText(brief.industryNarrative) || "No industry read yet."}</p>
         <IndustryMoverRows rows={industryMovers} />
       </BriefPanel>
 
@@ -447,12 +448,12 @@ function BriefDetails({ brief }: { brief: StructuredBrief }) {
       </BriefPanel>
 
       <BriefPanel title="Sources" span="wide">
-        {brief.alert ? <p className="t-body-small mb-3 text-[var(--accent)]">{brief.alert}</p> : null}
+        {asText(brief.alert) ? <p className="t-body-small mb-3 text-[var(--accent)]">{asText(brief.alert)}</p> : null}
         <ul className="space-y-1">
           {citations.length ? (
             citations.map((citation, index) => (
               <li key={index} className="t-caption text-[var(--fg-3)]">
-                {citation}
+                {asText(citation)}
               </li>
             ))
           ) : (
@@ -536,9 +537,9 @@ function StructuredRows({
     <ul className="brief-rows">
       {rows.map((row) => (
         <li key={row.key}>
-          <span className="t-ticker">{row.main}</span>
-          <span className={row.metricClass ?? "text-[var(--fg-2)]"}>{row.metric}</span>
-          <span>{row.note}</span>
+          <span className="t-ticker">{asText(row.main)}</span>
+          <span className={row.metricClass ?? "text-[var(--fg-2)]"}>{asText(row.metric)}</span>
+          <span>{asText(row.note)}</span>
         </li>
       ))}
     </ul>
