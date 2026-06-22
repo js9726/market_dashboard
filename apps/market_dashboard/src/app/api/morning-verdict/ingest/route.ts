@@ -26,8 +26,23 @@ import { ALL_PROVIDERS, bucketOf, type BriefProvider } from "@/lib/brief/bucket"
 import { ingestRow } from "@/server/brief-cache";
 import { normalizeBriefProvider } from "@/lib/brief/provider-selection";
 import { extractCandidates, upsertCandidates, getOwnerUserId } from "@/server/a-list-extractor";
+import { asText } from "@/lib/brief/as-text";
 
 export const dynamic = "force-dynamic";
+
+/**
+ * Coerce freeform string fields that a provider sometimes emits as an object
+ * (observed: Codex/OpenAI emitting `alert` as `{ level, message }`). Persisting
+ * the object shape blanks the client desk with React error #31. Flatten to text
+ * at the ingest boundary so the cache only ever holds renderable strings.
+ * Mutates and returns the same reference.
+ */
+function sanitizeBriefStringFields(json: unknown): unknown {
+  if (!json || typeof json !== "object" || Array.isArray(json)) return json;
+  const o = json as Record<string, unknown>;
+  if (o.alert != null && typeof o.alert !== "string") o.alert = asText(o.alert);
+  return o;
+}
 
 function authorized(req: Request): boolean {
   const expected = process.env.BRIEF_INGEST_KEY;
@@ -74,13 +89,14 @@ export async function POST(req: Request) {
 
   // structuredJson is the new primary payload. Fall back to verdictJson when
   // a legacy producer only sends the old shape.
-  const structuredJson = body.structuredJson ?? body.verdictJson ?? null;
+  const structuredJson = sanitizeBriefStringFields(body.structuredJson ?? body.verdictJson ?? null);
+  const verdictJson = sanitizeBriefStringFields(body.verdictJson ?? structuredJson);
 
   const row = await ingestRow({
     bucket,
     provider: provider as BriefProvider,
     htmlBody,
-    verdictJson: body.verdictJson ?? structuredJson,
+    verdictJson,
     structuredJson,
     generatedBy,
     inputHash,

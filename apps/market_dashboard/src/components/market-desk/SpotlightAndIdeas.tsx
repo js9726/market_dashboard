@@ -6,6 +6,7 @@ import type { StructuredBrief, BriefMover, BriefTraderView } from "@/types/struc
 import FreshnessBadge from "./FreshnessBadge";
 import { BRIEF_THRESHOLDS } from "@/lib/freshness";
 import { selectFreshestBriefWithContent } from "@/lib/brief/provider-selection";
+import { asText } from "@/lib/brief/as-text";
 
 type FilterKey = "All" | "Longs" | "Shorts" | "High conviction";
 const FILTERS: FilterKey[] = ["All", "Longs", "Shorts", "High conviction"];
@@ -134,7 +135,7 @@ export default function SpotlightAndIdeas() {
           {standout?.grade ? ` - ${standout.grade}` : ""}
         </p>
         <p className="t-body-small mt-4 border-t border-[var(--line)] pt-4">
-          {standout?.thesis ?? "Awaiting structured verdict..."}
+          {asText(standout?.thesis) || "Awaiting structured verdict..."}
         </p>
         {standout?.entry != null || standout?.stop != null || standout?.target != null ? (
           <p className="t-caption t-mono mt-2">
@@ -167,8 +168,8 @@ export default function SpotlightAndIdeas() {
             <ul className="mt-2 space-y-2">
               {traderViews.map((trader) => (
                 <li key={trader.name} className="t-body-small">
-                  <span className="t-overline text-[var(--fg-2)]">{trader.name}:</span>{" "}
-                  <span className="text-[var(--fg-2)]">{trader.view}</span>
+                  <span className="t-overline text-[var(--fg-2)]">{asText(trader.name)}:</span>{" "}
+                  <span className="text-[var(--fg-2)]">{asText(trader.view)}</span>
                 </li>
               ))}
             </ul>
@@ -210,10 +211,10 @@ function IdeaRow({ mover, isStandout }: { mover: BriefMover; isStandout: boolean
             </span>
           ) : null}
         </div>
-        {mover.why ? <p className="t-body-small mt-1">{mover.why}</p> : null}
-        {mover.traderLens ? (
+        {asText(mover.why) ? <p className="t-body-small mt-1">{asText(mover.why)}</p> : null}
+        {asText(mover.traderLens) ? (
           <p className="t-caption mt-1 text-[var(--fg-3)]">
-            <span className="t-overline">Lens:</span> {mover.traderLens}
+            <span className="t-overline">Lens:</span> {asText(mover.traderLens)}
           </p>
         ) : null}
       </div>
