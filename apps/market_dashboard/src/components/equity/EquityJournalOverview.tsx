@@ -21,7 +21,7 @@ type Stats = {
   currentStreak: number;
   unconvertedCount?: number;
   fxUsdMyr: number | null;
-  calendarData: { date: string; pnl: number; trades: number }[];
+  calendarData: { date: string; pnl: number | null; trades: number }[];
 };
 
 type Ccy = "USD" | "MYR";
@@ -111,7 +111,7 @@ function convertStats(stats: Stats, ccy: Ccy, fx: number | null): Stats {
   ];
   const out: Stats = {
     ...stats,
-    calendarData: stats.calendarData.map((d) => ({ ...d, pnl: round2(d.pnl * fx) })),
+    calendarData: stats.calendarData.map((d) => ({ ...d, pnl: d.pnl == null ? null : round2(d.pnl * fx) })),
   };
   for (const key of moneyKeys) out[key] = round2(out[key] * fx);
   return out;

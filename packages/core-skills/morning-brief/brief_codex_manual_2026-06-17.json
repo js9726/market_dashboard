@@ -1,0 +1,713 @@
+{
+  "mood": {
+    "label": "CAUTIOUSLY-RISK-ON",
+    "posture": "WAIT",
+    "summary": "Breadth is positive and semiconductors are leading, but the Fed decision/press conference is the dominant tape risk. Treat new entries as conditional triggers only; do not chase extended high-RVOL names after the opening move."
+  },
+  "breadth": {
+    "up": 3671,
+    "down": 2728
+  },
+  "fearGreed": {
+    "score": 39,
+    "label": "Fear"
+  },
+  "indices": [
+    {
+      "symbol": "SPY",
+      "name": "S&P 500",
+      "level": 751.1452,
+      "changePct": 0.11,
+      "note": "Live dashboard snapshot as of 2026-06-17 14:47 UTC",
+      "citation": "Market Dashboard /api/market-snapshot 2026-06-17T14:47:54Z"
+    },
+    {
+      "symbol": "QQQ",
+      "name": "Nasdaq 100 ETF",
+      "level": 733.47,
+      "changePct": 0.49,
+      "note": "Live dashboard snapshot as of 2026-06-17 14:47 UTC",
+      "citation": "Market Dashboard /api/market-snapshot 2026-06-17T14:47:54Z"
+    },
+    {
+      "symbol": "DIA",
+      "name": "Dow Industrials ETF",
+      "level": 523.425,
+      "changePct": 0.38,
+      "note": "Live dashboard snapshot as of 2026-06-17 14:47 UTC",
+      "citation": "Market Dashboard /api/market-snapshot 2026-06-17T14:47:54Z"
+    },
+    {
+      "symbol": "IWM",
+      "name": "Russell 2000 ETF",
+      "level": 293.98,
+      "changePct": 0.65,
+      "note": "Live dashboard snapshot as of 2026-06-17 14:47 UTC",
+      "citation": "Market Dashboard /api/market-snapshot 2026-06-17T14:47:54Z"
+    },
+    {
+      "symbol": "^VIX",
+      "name": "CBOE Volatility Index",
+      "level": null,
+      "changePct": null,
+      "note": "VIX data not available in the fresh local bundle; keep volatility risk open into FOMC.",
+      "citation": "Cboe/Barron's VIX pages checked; no fresh level ingested"
+    },
+    {
+      "symbol": "^TNX",
+      "name": "US 10Y yield",
+      "level": 4.44,
+      "changePct": null,
+      "note": "10Y around 4.44% ahead of FOMC.",
+      "citation": "Trading Economics / WSJ, 2026-06-17"
+    },
+    {
+      "symbol": "CL=F",
+      "name": "WTI crude",
+      "level": 75.04,
+      "changePct": -0.31,
+      "note": "WTI below $80; energy remains a weak pocket.",
+      "citation": "CME Group delayed quote, 2026-06-17"
+    }
+  ],
+  "indicesNarrative": "SPY/QQQ/IWM are green-to-flat with fair ATR entry risk, while DIA is already extended at +2.09 ATR from the 21EMA. Breadth is supportive, but the 14:00 ET FOMC decision and 14:30 ET Warsh press conference argue for waiting for post-event confirmation.",
+  "technicals": {
+    "SPY": {
+      "symbol": "SPY",
+      "close": 750.38,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 9.69,
+      "atr_pct": 1.29,
+      "ema8": 746.38,
+      "ema21": 743.24,
+      "ema50": 729.23,
+      "ma200": null,
+      "dist_8_atr": 0.41,
+      "dist_21_atr": 0.74,
+      "dist_50_atr": 2.18,
+      "dist_200_atr": null,
+      "rsi14": 57.1,
+      "macd": 4.796,
+      "macd_signal": 6.089,
+      "macd_hist": -1.2925,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "FAIR"
+    },
+    "QQQ": {
+      "symbol": "QQQ",
+      "close": 733.24,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 16.27,
+      "atr_pct": 2.22,
+      "ema8": 726.66,
+      "ema21": 719.69,
+      "ema50": 694.07,
+      "ma200": null,
+      "dist_8_atr": 0.4,
+      "dist_21_atr": 0.83,
+      "dist_50_atr": 2.41,
+      "dist_200_atr": null,
+      "rsi14": 57.4,
+      "macd": 9.661,
+      "macd_signal": 11.681,
+      "macd_hist": -2.02,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "FAIR"
+    },
+    "DIA": {
+      "symbol": "DIA",
+      "close": 523.06,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 6.44,
+      "atr_pct": 1.23,
+      "ema8": 515.6,
+      "ema21": 509.59,
+      "ema50": 501.17,
+      "ma200": null,
+      "dist_8_atr": 1.16,
+      "dist_21_atr": 2.09,
+      "dist_50_atr": 3.4,
+      "dist_200_atr": null,
+      "rsi14": 66.1,
+      "macd": 5.772,
+      "macd_signal": 5.076,
+      "macd_hist": 0.6959,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "EXTENDED"
+    },
+    "IWM": {
+      "symbol": "IWM",
+      "close": 293.72,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 5.99,
+      "atr_pct": 2.04,
+      "ema8": 290.52,
+      "ema21": 287.05,
+      "ema50": 280.2,
+      "ma200": null,
+      "dist_8_atr": 0.53,
+      "dist_21_atr": 1.11,
+      "dist_50_atr": 2.26,
+      "dist_200_atr": null,
+      "rsi14": 59.9,
+      "macd": 3.573,
+      "macd_signal": 3.369,
+      "macd_hist": 0.2041,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": true,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "FAIR"
+    },
+    "SMH": {
+      "symbol": "SMH",
+      "close": 635.22,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 30.17,
+      "atr_pct": 4.75,
+      "ema8": 617.82,
+      "ema21": 597.66,
+      "ema50": 550.53,
+      "ma200": null,
+      "dist_8_atr": 0.58,
+      "dist_21_atr": 1.25,
+      "dist_50_atr": 2.81,
+      "dist_200_atr": null,
+      "rsi14": 60.2,
+      "macd": 22.864,
+      "macd_signal": 23.942,
+      "macd_hist": -1.0786,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "FAIR"
+    }
+  },
+  "technicalsNarrative": "SPY, QQQ, IWM, and SMH are all FAIR by the ATR/21EMA model; DIA is the worst chase risk at EXTENDED. IWM has a bear-cross-imminent flag despite a fair distance reading, so small-cap longs still need tight triggers rather than market buys.",
+  "sectorsThemes": [
+    {
+      "symbol": "XLK",
+      "name": "Technology",
+      "changePct": 1.33,
+      "rs": 60,
+      "note": "Technology green, helped by semiconductor equipment rebound; entries still need pullback discipline."
+    },
+    {
+      "symbol": "SMH",
+      "name": "Semiconductors",
+      "changePct": 2.94,
+      "rs": 65,
+      "note": "Semiconductors are the leadership pocket today, but many equipment names are extended intraday."
+    },
+    {
+      "symbol": "XLI",
+      "name": "Industrials",
+      "changePct": 0.76,
+      "rs": 100,
+      "note": "Industrials strong with high RS and broad participation."
+    },
+    {
+      "symbol": "XLF",
+      "name": "Financials",
+      "changePct": 0.78,
+      "rs": 100,
+      "note": "Financials firm; breadth support but not the main momentum theme."
+    },
+    {
+      "symbol": "XLC",
+      "name": "Communication Services",
+      "changePct": -1.3,
+      "rs": 20,
+      "note": "Communication services lagging intraday; avoid forcing longs here."
+    },
+    {
+      "symbol": "XLY",
+      "name": "Consumer Discretionary",
+      "changePct": -0.58,
+      "rs": 75,
+      "note": "Consumer discretionary mixed despite strong retail-sales headline."
+    },
+    {
+      "symbol": "XLV",
+      "name": "Healthcare",
+      "changePct": -0.75,
+      "rs": 75,
+      "note": "Healthcare lagging at ETF level, though breadth under Health Services is better beneath the surface."
+    },
+    {
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": -0.65,
+      "rs": 10,
+      "note": "Energy weak as crude stays below $80."
+    },
+    {
+      "symbol": "XLP",
+      "name": "Consumer Staples",
+      "changePct": -0.99,
+      "rs": 60,
+      "note": "Watch for relative strength confirmation before new entries."
+    },
+    {
+      "symbol": "XLU",
+      "name": "Utilities",
+      "changePct": -0.24,
+      "rs": 70,
+      "note": "Watch for relative strength confirmation before new entries."
+    },
+    {
+      "symbol": "XLB",
+      "name": "Materials",
+      "changePct": 0.5,
+      "rs": 70,
+      "note": "Watch for relative strength confirmation before new entries."
+    },
+    {
+      "symbol": "XLRE",
+      "name": "Real Estate",
+      "changePct": -0.53,
+      "rs": 50,
+      "note": "Watch for relative strength confirmation before new entries."
+    },
+    {
+      "symbol": "CIBR",
+      "name": "Cybersecurity",
+      "changePct": 0.29,
+      "rs": 50,
+      "note": "Watch for relative strength confirmation before new entries."
+    },
+    {
+      "symbol": "IGV",
+      "name": "Software",
+      "changePct": 0.31,
+      "rs": 40,
+      "note": "Watch for relative strength confirmation before new entries."
+    },
+    {
+      "symbol": "IBB",
+      "name": "Biotech",
+      "changePct": 1.29,
+      "rs": 30,
+      "note": "Watch for relative strength confirmation before new entries."
+    }
+  ],
+  "sectorsNarrative": "Leadership is concentrated in semiconductors/equipment and selected industrials/financials. Communication services, energy, staples, and healthcare ETFs are lagging, so the tape is constructive but not one-way risk-on.",
+  "industryNarrative": "Electronic Technology and Producer Manufacturing have the strongest breadth/read-through via SMH, AMAT, LRCX, ASML and JBL. Energy Minerals and Communications are the weakest breadth groups, so avoid broad sympathy longs there.",
+  "industryMovers": [
+    {
+      "industry": "Semiconductor Equipment",
+      "sector": "Technology / Producer Manufacturing",
+      "changePct": 2.94,
+      "perf1W": null,
+      "perf1M": null,
+      "breadthPct": 61.4,
+      "deltaWow": null,
+      "leaders": [
+        {
+          "ticker": "AMAT",
+          "changePct": 8.790454569452498,
+          "rvol": 0.25257406649638653,
+          "source": "TradingView top-gainer"
+        },
+        {
+          "ticker": "LRCX",
+          "changePct": 6.384361293117465,
+          "rvol": 0.17063251010166897,
+          "source": "TradingView top-gainer"
+        },
+        {
+          "ticker": "ASML",
+          "changePct": 5.890048728026653,
+          "rvol": 0.297148190964162,
+          "source": "TradingView premarket-movers"
+        }
+      ],
+      "note": "Strongest visible theme, but most leaders show low intraday RVOL versus 10-day average after the opening push."
+    },
+    {
+      "industry": "Construction Materials",
+      "sector": "Non-Energy Minerals",
+      "changePct": 11.819887429643524,
+      "perf1W": 14.50528338136407,
+      "perf1M": 12.825366777094185,
+      "breadthPct": 43.8,
+      "deltaWow": null,
+      "leaders": [
+        {
+          "ticker": "CPAC",
+          "changePct": 11.819887429643524,
+          "rvol": 37.50394989815925,
+          "source": "TradingView premarket-movers"
+        }
+      ],
+      "note": "CPAC is the only scored GO/EP, but catalyst confirmation is thin; treat as tactical only."
+    },
+    {
+      "industry": "Data Processing Services",
+      "sector": "Technology Services",
+      "changePct": 15.884194053208125,
+      "perf1W": 45.69601574028528,
+      "perf1M": 47.9766860949209,
+      "breadthPct": 54.9,
+      "deltaWow": null,
+      "leaders": [
+        {
+          "ticker": "SHAZ",
+          "changePct": 15.884194053208125,
+          "rvol": 2.116477282190827,
+          "source": "TradingView best-winners"
+        }
+      ],
+      "note": "High momentum but extended; better as pullback/watch than fresh chase."
+    }
+  ],
+  "movers": [
+    {
+      "ticker": "CPAC",
+      "side": "LONG",
+      "changePct": 11.819887429643524,
+      "why": "TradingView scored EP/GO with RVOL above 40x; no clean catalyst surfaced in web search, so trigger must be conditional.",
+      "traderLens": "Qullamaggie EP only if ORH/high-volume support holds; Jeff would reject a chase without a tight LoD stop."
+    },
+    {
+      "ticker": "SHAZ",
+      "side": "LONG",
+      "changePct": 15.884194053208125,
+      "why": "Breakout-style momentum with RVOL >2x, but score remains WAIT because entry is extended.",
+      "traderLens": "Minervini/Qullamaggie watchlist, not chase."
+    },
+    {
+      "ticker": "JBL",
+      "side": "LONG",
+      "changePct": 4.652339484967119,
+      "why": "Earnings day mover; pullback pattern score 66 WAIT.",
+      "traderLens": "SRx/Alex would wait for post-earnings range to tighten."
+    },
+    {
+      "ticker": "AMAT",
+      "side": "LONG",
+      "changePct": 8.790454569452498,
+      "why": "Semiconductor equipment leader today, but low RVOL and unclear pattern keep it WAIT.",
+      "traderLens": "Ted Zhang theme yes; SRx says no fresh entry without volume-confirmed pivot."
+    },
+    {
+      "ticker": "QURE",
+      "side": "LONG",
+      "changePct": 77.12115598369768,
+      "why": "Premarket/news momentum was large but local scorer marks PASS; likely too extended for swing entry.",
+      "traderLens": "Qullamaggie would require fresh EP structure and LoD risk."
+    },
+    {
+      "ticker": "SENEB",
+      "side": "SHORT",
+      "changePct": -4.8297469851028545,
+      "why": "VCP screener pullback but red on the day; WAIT until it reclaims structure.",
+      "traderLens": "Composite: no long until reclaim."
+    }
+  ],
+  "watchlist": [
+    {
+      "ticker": "CPAC",
+      "level": 11.92,
+      "changePct": 11.819887429643524,
+      "abc": null,
+      "note": "REC GO, but conditional only above 12.27 with stop near 11.30; no chase if it loses VWAP/opening range."
+    },
+    {
+      "ticker": "SHAZ",
+      "level": 88.86,
+      "changePct": 15.884194053208125,
+      "abc": null,
+      "note": "B-list WATCH: strong breakout/RVOL, but extended; wait for tight shelf or first pullback."
+    },
+    {
+      "ticker": "JBL",
+      "level": 392.98,
+      "changePct": 4.652339484967119,
+      "abc": null,
+      "note": "WATCH: earnings-related pullback; let the earnings range settle before entry."
+    },
+    {
+      "ticker": "AMAT",
+      "level": 618.18,
+      "changePct": 8.790454569452498,
+      "abc": null,
+      "note": "Theme leader but low RVOL; better wait for 10/21EMA pullback or tight continuation shelf."
+    },
+    {
+      "ticker": "ONTO",
+      "level": 329.53,
+      "changePct": 4.232168274553217,
+      "abc": null,
+      "note": "HELD/semicap: green but low RVOL; do not add unless it builds a tight reclaim setup."
+    },
+    {
+      "ticker": "MTLS",
+      "level": 6.7,
+      "changePct": 0.6,
+      "abc": null,
+      "note": "HELD via OpenD: last 6.70, RVOL 1.48, above 8/21/50 EMA, OK but no stop supplied; define stop before adding."
+    },
+    {
+      "ticker": "LZB",
+      "level": 41.91,
+      "changePct": 19.537934968625194,
+      "abc": null,
+      "note": "WATCH only: earnings/catalyst move already stretched; wait for post-gap base."
+    }
+  ],
+  "traderLens": [
+    {
+      "name": "Minervini",
+      "view": "Market is constructive enough for Stage 2 leaders, but many semiconductor names are extended rather than in clean VCP pivots."
+    },
+    {
+      "name": "Ted Zhang",
+      "view": "Institutional rotation is concentrated in semicap/equipment and industrials; avoid weak energy/communication pockets."
+    },
+    {
+      "name": "Clement Ang",
+      "view": "A-grade entries are scarce; several names have momentum but poor entry location."
+    },
+    {
+      "name": "SRxTrades",
+      "view": "Require volume-confirmed pivot or reclaim; low RVOL on AMAT/LRCX/NBIS after the open is not a clean add signal."
+    },
+    {
+      "name": "Jeff",
+      "view": "Do not chase extended day-one moves; LoD distance and event risk into FOMC matter more than headline RVOL."
+    },
+    {
+      "name": "Qullamaggie",
+      "view": "CPAC is the only EP-style GO from the screener, but it needs ORH/high-volume support confirmation and a hard LoD-style stop."
+    },
+    {
+      "name": "Composite",
+      "view": "Best action is WAIT-FOR-TRIGGER: CPAC conditional, SHAZ/JBL/LZB watch, semis for pullback; protect held MTLS/ONTO rather than adding."
+    }
+  ],
+  "standout": {
+    "ticker": "CPAC",
+    "side": "LONG",
+    "score": 83,
+    "sector": "Construction Materials",
+    "rs": null,
+    "grade": "B",
+    "thesis": "Only production screener GO: EP pattern, +11.8% intraday, RVOL 41.7x, and score 83. Because same-day catalyst is not cleanly verified, entry is conditional above the intraday high/ORH rather than a market buy.",
+    "entry": 12.27,
+    "stop": 11.3,
+    "target": 14.21,
+    "rrr": 2.0,
+    "tags": [
+      "#EP",
+      "#RVOL",
+      "#conditional"
+    ]
+  },
+  "earnings": {
+    "bmo": [
+      {
+        "ticker": "JBL",
+        "consensus": "Q3 FY2026 expected around EPS $3.09 / revenue $8.53B per Zacks preview"
+      }
+    ],
+    "amc": [
+      {
+        "ticker": "LZB",
+        "consensus": "Fiscal Q4/FY2026 report/call scheduled June 17; consensus not verified in live source"
+      }
+    ],
+    "yesterdayReactions": []
+  },
+  "calendar": [
+    {
+      "time": "08:30 ET",
+      "name": "Retail sales May",
+      "consensus": "Actual +0.9%; consensus about +0.5%"
+    },
+    {
+      "time": "10:00 ET",
+      "name": "Pending home sales / business inventories",
+      "consensus": null
+    },
+    {
+      "time": "14:00 ET",
+      "name": "FOMC rate decision",
+      "consensus": "Hold expected"
+    },
+    {
+      "time": "14:30 ET",
+      "name": "Fed Chair Warsh press conference",
+      "consensus": "Guidance/SEP risk event"
+    }
+  ],
+  "ratings": {
+    "upgrades": [
+      {
+        "ticker": "CRI",
+        "firm": "Wells Fargo",
+        "rating": "Underweight to Equal Weight",
+        "pt": 42
+      },
+      {
+        "ticker": "CRL",
+        "firm": "Morgan Stanley",
+        "rating": "Equal Weight to Overweight",
+        "pt": 220
+      },
+      {
+        "ticker": "LYFT",
+        "firm": "Rothschild & Co Redburn",
+        "rating": "Neutral to Buy",
+        "pt": 22
+      }
+    ],
+    "downgrades": [
+      {
+        "ticker": "CTSH",
+        "firm": "Berenberg",
+        "rating": "Buy to Hold",
+        "pt": 59
+      },
+      {
+        "ticker": "IQV",
+        "firm": "Morgan Stanley",
+        "rating": "Overweight to Equal Weight",
+        "pt": 200
+      },
+      {
+        "ticker": "RMD",
+        "firm": "Morgan Stanley",
+        "rating": "Overweight to Equal Weight",
+        "pt": 230
+      }
+    ]
+  },
+  "alert": "Fed day: positive breadth, but wait for post-14:00 ET reaction before fresh swing risk. CPAC is conditional; semicap leaders are mostly extended/low-RVOL after the open.",
+  "news": [
+    {
+      "headline": "US stocks trade modestly higher while investors wait for FOMC decision and Warsh press conference",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
+        "QQQ",
+        "DIA",
+        "IWM"
+      ],
+      "source": "IBD/Barron's market coverage, June 17 2026",
+      "time": "morning ET"
+    },
+    {
+      "headline": "May retail sales rose 0.9%, stronger than expected, supporting the consumer-demand read",
+      "impact": "HIGH",
+      "tickers": [
+        "XLY",
+        "SPY"
+      ],
+      "source": "AP / WSJ retail sales coverage, June 17 2026",
+      "time": "08:30 ET"
+    },
+    {
+      "headline": "10-year Treasury yield around 4.44% ahead of Fed; rates remain a key growth-stock input",
+      "impact": "HIGH",
+      "tickers": [
+        "QQQ",
+        "TLT"
+      ],
+      "source": "WSJ / Trading Economics, June 17 2026",
+      "time": "morning ET"
+    },
+    {
+      "headline": "Crude oil below $80 / WTI near $75, keeping energy weaker and inflation pressure less acute intraday",
+      "impact": "MED",
+      "tickers": [
+        "XLE",
+        "CL=F"
+      ],
+      "source": "CME Group / Economic Times, June 17 2026",
+      "time": "morning ET"
+    },
+    {
+      "headline": "Semiconductor equipment names AMAT, LRCX, ASML lead Nasdaq movers; theme is strong but entries are extended",
+      "impact": "MED",
+      "tickers": [
+        "AMAT",
+        "LRCX",
+        "ASML",
+        "SMH"
+      ],
+      "source": "IBD live market coverage + TradingView screener payload",
+      "time": "regular session"
+    }
+  ],
+  "screenerScores": {
+    "CPAC": {
+      "score": 83,
+      "verdict": "GO",
+      "note": "83 GO: EP + RVOL 41.7x, but requires ORH/high-volume support; catalyst not independently verified."
+    },
+    "SHAZ": {
+      "score": 65,
+      "verdict": "WAIT",
+      "note": "71 WAIT: strong breakout/RVOL, but extended and entry risk not tight enough."
+    },
+    "SENEB": {
+      "score": 69,
+      "verdict": "WAIT",
+      "note": "69 WAIT: pullback/VCP candidate but red and thin; wait for reclaim."
+    },
+    "JBL": {
+      "score": 54,
+      "verdict": "WAIT",
+      "note": "66 WAIT: earnings-related pullback; wait for post-earnings range confirmation."
+    },
+    "AMAT": {
+      "score": 63,
+      "verdict": "WAIT",
+      "note": "61 WAIT: strong theme but low RVOL and unclear structure after large gap."
+    },
+    "LZB": {
+      "score": 57,
+      "verdict": "WAIT",
+      "note": "60 WAIT: post-earnings/announcement move is stretched; needs base."
+    },
+    "ONTO": {
+      "score": 54,
+      "verdict": "WAIT",
+      "note": "54 WAIT: held semicap exposure, green but low RVOL; no add."
+    },
+    "MTLS": {
+      "score": null,
+      "verdict": "WAIT",
+      "note": "HELD: OpenD live last 6.70, RVOL 1.48, above 8/21/50 EMA; define stop before any add."
+    }
+  },
+  "citations": [
+    "Market Dashboard /api/market-snapshot built_at 2026-06-17T14:47:54Z",
+    "Market Dashboard /api/breadth as_of 2026-06-17T14:44Z and local breadth_fast as_of 2026-06-17T14:47Z",
+    "Market Dashboard /api/screeners fetched 2026-06-17T14:39Z",
+    "OpenD holdings_review MTLS as_of 2026-06-17 10:48:19 ET",
+    "IBD live market coverage: https://www.investors.com/market-trend/stock-market-today/dow-jones-sp500-nasdaq-fed-decision-warsh-spacex-stock-spcx/",
+    "MarketWatch economic calendar: https://www.marketwatch.com/livecoverage/stock-market-today-s-p-500-nasdaq-dow-federal-reserve-meeting-interest-rate-decision-14-point-plan/card/wednesday-s-economic-calendar-nCUBdmAfaGk0OnMVb16m",
+    "AP retail sales report: https://apnews.com/article/090206f028b12e15038265806355d75f",
+    "Briefing.com upgrades/downgrades: https://www.briefing.com/calendars/updown?Filter=All",
+    "StockAnalysis premarket movers: https://stockanalysis.com/markets/premarket/",
+    "CME WTI crude quote: https://www.cmegroup.com/markets/energy/crude-oil/light-sweet-crude.html",
+    "Trading Economics 10Y yield: https://tradingeconomics.com/united-states/government-bond-yield"
+  ]
+}

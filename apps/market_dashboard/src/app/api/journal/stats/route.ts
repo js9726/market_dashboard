@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { getUsdMyrRate } from "@/lib/equity-currency";
 import { prisma } from "@/lib/prisma";
+import { brokerKey, isOpenishTrade, plainTicker } from "@/lib/trades/position-trade-records";
 import { NextResponse } from "next/server";
 import { Decimal } from "@prisma/client/runtime/library";
 
@@ -16,6 +17,10 @@ function stdDev(arr: number[]): number {
   return Math.sqrt(variance);
 }
 
+function dateKey(value: Date | null | undefined): string | null {
+  return value ? value.toISOString().slice(0, 10) : null;
+}
+
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -28,6 +33,15 @@ export async function GET() {
   const trades = await prisma.tradeRecord.findMany({
     where: { userId },
     orderBy: { tradeDate: "asc" },
+  });
+  const positions = await prisma.position.findMany({
+    where: { brokerAccount: { userId } },
+    select: {
+      ticker: true,
+      openedAt: true,
+      brokerAccountId: true,
+      brokerAccount: { select: { alias: true } },
+    },
   });
 
   // Report all money in USD. Prefer persisted pnlUsd; else reverse the sheet's
@@ -50,6 +64,7 @@ export async function GET() {
   // Use state as primary source; fall back to pnl for trades without state
   const isClosed = (t: typeof trades[0]) =>
     t.state ? t.state.toUpperCase() === "CLOSE" : t.pnl !== null;
+  const isOpenTrade = (t: typeof trades[0]) => isOpenishTrade(t.state, t.pnl);
   const closed = trades.filter(isClosed);
   const valued = closed
     .map((t) => ({ trade: t, usd: usdVal(t) }))
@@ -88,7 +103,7 @@ export async function GET() {
   // Sharpe ratio (annualised, daily P&L)
   const dailyMap: Record<string, number> = {};
   for (const { trade, usd } of valued) {
-    const d = trade.tradeDate ? trade.tradeDate.toISOString().slice(0, 10) : "unknown";
+    const d = dateKey(trade.tradeDate) ?? "unknown";
     dailyMap[d] = (dailyMap[d] ?? 0) + usd;
   }
   const dailyPnls = Object.values(dailyMap);
@@ -111,7 +126,7 @@ export async function GET() {
   // Monthly summary
   const monthlyMap: Record<string, { pnl: number; trades: number; wins: number }> = {};
   for (const { trade, usd } of valued) {
-    const m = trade.tradeDate ? trade.tradeDate.toISOString().slice(0, 7) : "unknown";
+    const m = dateKey(trade.tradeDate)?.slice(0, 7) ?? "unknown";
     if (!monthlyMap[m]) monthlyMap[m] = { pnl: 0, trades: 0, wins: 0 };
     monthlyMap[m].pnl += usd;
     monthlyMap[m].trades += 1;
@@ -121,19 +136,50 @@ export async function GET() {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([month, v]) => ({ month, ...v, pnl: Math.round(v.pnl * 100) / 100 }));
 
-  // Calendar data
-  const calendarData = Object.entries(dailyMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, pnl]) => ({
+  // Calendar trade counts should reflect execution entries, including open
+  // broker positions. P&L remains closed/valued only.
+  const tradeCountByDay: Record<string, number> = {};
+  for (const trade of trades) {
+    const d = dateKey(trade.tradeDate);
+    if (!d) continue;
+    tradeCountByDay[d] = (tradeCountByDay[d] ?? 0) + 1;
+  }
+
+  const representedOpenPositions = new Set<string>();
+  for (const trade of trades.filter(isOpenTrade)) {
+    const ticker = plainTicker(trade.ticker);
+    representedOpenPositions.add(`${ticker}|${brokerKey(trade.platform)}`);
+    if (trade.brokerAccountId) representedOpenPositions.add(`${ticker}|acct:${trade.brokerAccountId}`);
+  }
+  let syntheticOpenPositions = 0;
+  for (const position of positions) {
+    const ticker = plainTicker(position.ticker);
+    if (
+      representedOpenPositions.has(`${ticker}|${brokerKey(position.brokerAccount.alias)}`) ||
+      representedOpenPositions.has(`${ticker}|acct:${position.brokerAccountId}`)
+    ) {
+      continue;
+    }
+    const d = dateKey(position.openedAt);
+    if (!d) continue;
+    tradeCountByDay[d] = (tradeCountByDay[d] ?? 0) + 1;
+    syntheticOpenPositions++;
+  }
+
+  const calendarDates = Array.from(new Set([...Object.keys(dailyMap), ...Object.keys(tradeCountByDay)]));
+  const calendarData = calendarDates
+    .sort((a, b) => a.localeCompare(b))
+    .map((date) => ({
       date,
-      pnl: Math.round(pnl * 100) / 100,
-      trades: valued.filter(({ trade }) => trade.tradeDate?.toISOString().slice(0, 10) === date).length,
+      pnl: dailyMap[date] == null ? null : Math.round(dailyMap[date] * 100) / 100,
+      trades: tradeCountByDay[date] ?? 0,
     }));
+  const totalTradeEntries = trades.length + syntheticOpenPositions;
 
   return NextResponse.json({
     totalPnl: Math.round(totalPnl * 100) / 100,
-    totalTrades: closed.length,
-    openTrades: trades.length - closed.length,
+    totalTrades: totalTradeEntries,
+    openTrades: trades.filter((t) => !isClosed(t)).length + syntheticOpenPositions,
     winRate: Math.round(winRate * 1000) / 10,
     avgWin: Math.round(avgWin * 100) / 100,
     avgLoss: Math.round(avgLoss * 100) / 100,

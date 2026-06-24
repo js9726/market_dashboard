@@ -1,0 +1,669 @@
+{
+  "mood": {
+    "label": "RISK-OFF-BUT-SELECTIVE",
+    "posture": "WAIT-FOR-TRIGGER",
+    "summary": "Premarket dailies are fresh, but breadth is negative, Fear & Greed is in Fear, and the market is digesting the Fed/Warsh selloff with jobless claims, Philly Fed and LEI due. Treat GO rows as conditional ORH/reclaim trades only; avoid chasing high-RVOL names already extended above the 10EMA."
+  },
+  "breadth": {
+    "up": 2315,
+    "down": 4114
+  },
+  "fearGreed": {
+    "score": 32,
+    "label": "Fear"
+  },
+  "indices": [
+    {
+      "symbol": "SPY",
+      "name": "S&P 500 ETF",
+      "level": 739.06,
+      "changePct": -1.25,
+      "note": "Premarket bundle uses last regular-session data; technicals from OpenD daily bars dated 2026-06-17 00:00:00.",
+      "citation": "Local Market Dashboard snapshot.json + OpenD index_technicals.json, 2026-06-18 premarket"
+    },
+    {
+      "symbol": "QQQ",
+      "name": "Nasdaq 100 ETF",
+      "level": 722.51,
+      "changePct": -1.01,
+      "note": "Premarket bundle uses last regular-session data; technicals from OpenD daily bars dated 2026-06-17 00:00:00.",
+      "citation": "Local Market Dashboard snapshot.json + OpenD index_technicals.json, 2026-06-18 premarket"
+    },
+    {
+      "symbol": "DIA",
+      "name": "Dow Industrials ETF",
+      "level": 514.89,
+      "changePct": -0.99,
+      "note": "Premarket bundle uses last regular-session data; technicals from OpenD daily bars dated 2026-06-17 00:00:00.",
+      "citation": "Local Market Dashboard snapshot.json + OpenD index_technicals.json, 2026-06-18 premarket"
+    },
+    {
+      "symbol": "IWM",
+      "name": "Russell 2000 ETF",
+      "level": 289.88,
+      "changePct": -0.75,
+      "note": "Premarket bundle uses last regular-session data; technicals from OpenD daily bars dated 2026-06-17 00:00:00.",
+      "citation": "Local Market Dashboard snapshot.json + OpenD index_technicals.json, 2026-06-18 premarket"
+    }
+  ],
+  "indicesNarrative": "The index location is healthier than yesterday: SPY, QQQ and IWM are AT-MA by the OpenD ATR/21EMA model, while DIA and SMH are FAIR. That argues for selective entries if the open confirms, but the prior-session selloff and negative breadth mean no blind premarket chase.",
+  "technicals": {
+    "SPY": {
+      "symbol": "SPY",
+      "close": 739.06,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 10.99,
+      "atr_pct": 1.49,
+      "ema8": 742.38,
+      "ema21": 740.48,
+      "ema50": 726.99,
+      "ma200": null,
+      "dist_8_atr": -0.3,
+      "dist_21_atr": -0.13,
+      "dist_50_atr": 1.1,
+      "dist_200_atr": null,
+      "rsi14": 50.7,
+      "macd": 4.035,
+      "macd_signal": 5.923,
+      "macd_hist": -1.8885,
+      "macd_dir": "FALLING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "AT-MA"
+    },
+    "QQQ": {
+      "symbol": "QQQ",
+      "close": 722.51,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 17.47,
+      "atr_pct": 2.42,
+      "ema8": 724.28,
+      "ema21": 718.72,
+      "ema50": 693.65,
+      "ma200": null,
+      "dist_8_atr": -0.1,
+      "dist_21_atr": 0.22,
+      "dist_50_atr": 1.65,
+      "dist_200_atr": null,
+      "rsi14": 53.4,
+      "macd": 8.805,
+      "macd_signal": 11.51,
+      "macd_hist": -2.7045,
+      "macd_dir": "FALLING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "AT-MA"
+    },
+    "DIA": {
+      "symbol": "DIA",
+      "close": 514.89,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 7.19,
+      "atr_pct": 1.4,
+      "ema8": 512.69,
+      "ema21": 507.59,
+      "ema50": 499.55,
+      "ma200": null,
+      "dist_8_atr": 0.31,
+      "dist_21_atr": 1.01,
+      "dist_50_atr": 2.13,
+      "dist_200_atr": null,
+      "rsi14": 59.1,
+      "macd": 5.219,
+      "macd_signal": 4.955,
+      "macd_hist": 0.2638,
+      "macd_dir": "FALLING",
+      "curving_down": true,
+      "bear_cross_imminent": true,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "FAIR"
+    },
+    "IWM": {
+      "symbol": "IWM",
+      "close": 289.88,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 6.52,
+      "atr_pct": 2.25,
+      "ema8": 289.67,
+      "ema21": 286.71,
+      "ema50": 280.04,
+      "ma200": null,
+      "dist_8_atr": 0.03,
+      "dist_21_atr": 0.49,
+      "dist_50_atr": 1.51,
+      "dist_200_atr": null,
+      "rsi14": 55.6,
+      "macd": 3.267,
+      "macd_signal": 3.308,
+      "macd_hist": -0.041,
+      "macd_dir": "FALLING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "AT-MA"
+    },
+    "SMH": {
+      "symbol": "SMH",
+      "close": 623.97,
+      "date": "2026-06-17 00:00:00",
+      "atr14": 30.99,
+      "atr_pct": 4.97,
+      "ema8": 615.32,
+      "ema21": 596.63,
+      "ema50": 550.09,
+      "ma200": null,
+      "dist_8_atr": 0.28,
+      "dist_21_atr": 0.88,
+      "dist_50_atr": 2.38,
+      "dist_200_atr": null,
+      "rsi14": 58.4,
+      "macd": 21.966,
+      "macd_signal": 23.763,
+      "macd_hist": -1.7965,
+      "macd_dir": "RISING",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "FAIR"
+    }
+  },
+  "technicalsNarrative": "OpenD-backed technicals: SPY -0.13 ATR from the 21EMA, QQQ +0.22, IWM +0.49, DIA +1.01, SMH +0.88. This is pullback/reclaim territory, not an index-extension problem; execution risk is breadth and macro calendar.",
+  "sectorsThemes": [
+    {
+      "symbol": "XLF",
+      "name": "Financials / brokerage",
+      "changePct": null,
+      "note": "HOOD is the clean liquid momentum leader after layoffs/analyst target hikes and record trading-volume commentary."
+    },
+    {
+      "symbol": "IBB",
+      "name": "Biotech",
+      "changePct": null,
+      "note": "QURE and TRVI show biotech momentum, but QURE is a +78% regulatory EP and must be treated as news-risk, not a casual swing chase."
+    },
+    {
+      "symbol": "SMH",
+      "name": "Semis / AI infrastructure",
+      "changePct": null,
+      "note": "GFS/NBIS/SIMO are the strongest AI-infrastructure tape names, but several are extended premarket."
+    },
+    {
+      "symbol": "PAVE",
+      "name": "Infrastructure / construction materials",
+      "changePct": null,
+      "note": "CPAC remains a high-RVOL construction-materials EP, helped by Q1 margin expansion, but liquidity and gap extension require a trigger."
+    }
+  ],
+  "sectorsNarrative": "Strength is narrow and stock-specific: brokerage/fintech, biotech catalysts, AI infrastructure, and isolated construction-materials momentum. Broad market breadth is not confirming a full risk-on open yet.",
+  "industryNarrative": "Biotech has the loudest catalyst via QURE, but the best swing-trade profile is still a liquid breakout/reclaim rather than a huge gap chase. Finance is cleaner through HOOD; construction materials through CPAC is tradable only above the prior high with a defined stop.",
+  "industryMovers": [
+    {
+      "industry": "Investment Banks/Brokers",
+      "tickers": [
+        "HOOD"
+      ],
+      "read": "liquid breakout with real catalyst and premarket follow-through"
+    },
+    {
+      "industry": "Biotechnology",
+      "tickers": [
+        "QURE",
+        "TRVI",
+        "KRYS",
+        "DYN"
+      ],
+      "read": "active momentum, but binary/catalyst risk is high"
+    },
+    {
+      "industry": "AI infrastructure / semis",
+      "tickers": [
+        "NBIS",
+        "GFS",
+        "SIMO",
+        "AMAT"
+      ],
+      "read": "relative strength remains, entries need pullback/reclaim discipline"
+    },
+    {
+      "industry": "Construction Materials",
+      "tickers": [
+        "CPAC",
+        "TTAM"
+      ],
+      "read": "CPAC is high-RVOL but thin and extended"
+    }
+  ],
+  "movers": [
+    {
+      "symbol": "QURE",
+      "name": "uniQure",
+      "level": 48.3842,
+      "changePct": 78.44,
+      "reason": "FDA said 3-year AMT-130 data can support a BLA basis; company plans Q3 2026 submission. Huge EP, but +78% from prior close means no chase without tight intraday structure.",
+      "citation": "https://www.globenewswire.com/news-release/2026/06/17/3313322/0/en/uniqure-announces-plan-for-bla-submission-for-amt-130-in-huntington-s-disease.html"
+    },
+    {
+      "symbol": "HOOD",
+      "name": "Robinhood",
+      "level": 107.45,
+      "changePct": 2.138,
+      "reason": "Layoffs/restructuring plus analyst target hikes and record June activity commentary; live premarket +2.1% after +8.8% close.",
+      "citation": "https://www.investors.com/news/robinhood-stock-hood-stock-soars-above-key-level/"
+    },
+    {
+      "symbol": "CPAC",
+      "name": "Cementos Pacasmayo",
+      "level": 11.87,
+      "changePct": 11.35,
+      "reason": "Q1 results showed sales volume +11.7%, revenue +11.3%, EBITDA +32.1%; price at 52-week high with RVOL near 100x.",
+      "citation": "https://www.businesswire.com/news/home/20260424165897/en/Cementos-Pacasmayo-S.A.A.-Announces-Consolidated-Results-for-First-Quarter-2026"
+    },
+    {
+      "symbol": "BRAI",
+      "name": "Braiin",
+      "level": 8.88,
+      "changePct": -5.128,
+      "reason": "AI/agtech platform momentum but very volatile: -5.1% premarket after +25% regular move; not an A-list entry.",
+      "citation": "https://braiin.com/"
+    },
+    {
+      "symbol": "NBIS",
+      "name": "Nebius",
+      "level": 295.14,
+      "changePct": 5.065,
+      "reason": "Nasdaq-100 inclusion/AI-infrastructure demand keeps momentum alive; premarket +5.1% is extended, so use pullback/reclaim only.",
+      "citation": "https://www.investopedia.com/these-nvidia-backed-firms-are-set-to-join-the-nasdaq-100-soon-their-stocks-are-surging-11996844"
+    },
+    {
+      "symbol": "GFS",
+      "name": "GlobalFoundries",
+      "level": 83.8413,
+      "changePct": 3.969,
+      "reason": "Held position: premarket bid is constructive, above EMA8/21/50 with MACD rising; no stop in system, define one.",
+      "citation": "OpenD holdings_review_2026-06-18_premarket.json"
+    }
+  ],
+  "watchlist": [
+    {
+      "symbol": "HOOD",
+      "grade": "A-LIST CONDITIONAL",
+      "setup": "BREAKOUT / ORH reclaim",
+      "level": 107.45,
+      "changePct": 2.138,
+      "entry": "Buy stop only above 107.50 after open/reclaim; no premarket market buy",
+      "stop": "103.80 or first 5/15m ORL, whichever is tighter after confirmation",
+      "target": "110.70 first, then 115-118 if volume persists",
+      "note": "Best liquid candidate: score 86 GO, RVOL 2.19x in screener, OpenD RVOL 1.9x, clear catalyst."
+    },
+    {
+      "symbol": "CPAC",
+      "grade": "A-/B+ CONDITIONAL",
+      "setup": "EP / 52-week high",
+      "level": 11.87,
+      "changePct": 11.35,
+      "entry": "Only above 12.27 prior high with volume; pass if it opens below and fades",
+      "stop": "11.30 structure low",
+      "target": "14.20 area / 2R if it holds high-volume range",
+      "note": "Score 85 GO, but thin liquidity and stale catalyst make this trigger-only."
+    },
+    {
+      "symbol": "PTRN",
+      "grade": "B WATCH / SUPPLY RISK",
+      "setup": "BREAKOUT near highs",
+      "level": null,
+      "changePct": null,
+      "entry": "Only above 21.20 with tight opening shelf",
+      "stop": "19.14 low; risk too wide unless ORL tightens",
+      "target": "23-24 if supply clears",
+      "note": "Raw score 86, but 8M-share secondary priced at $19 creates overhead/supply risk."
+    },
+    {
+      "symbol": "TRVI",
+      "grade": "B WATCH",
+      "setup": "Biotech breakout",
+      "level": null,
+      "changePct": null,
+      "entry": "Needs ORH and biotech group confirmation",
+      "stop": "Under opening range or 15.60 area if range tightens",
+      "target": "18.00-19.00",
+      "note": "Score 83 GO, but catalyst is event schedule, not decisive data; April offering overhang remains."
+    },
+    {
+      "symbol": "NBIS",
+      "grade": "B WATCH",
+      "setup": "AI-infrastructure continuation",
+      "level": 295.14,
+      "changePct": 5.065,
+      "entry": "Avoid gap chase; wait for pullback toward 285-290 then reclaim, or ORH after base",
+      "stop": "Under ORL / 280 area after confirmation",
+      "target": "300-315",
+      "note": "Score 80 GO and Nasdaq-100 catalyst, but premarket +5% after a big run needs patience."
+    },
+    {
+      "symbol": "GFS",
+      "grade": "HELD OK",
+      "setup": "Held MA continuation",
+      "level": 83.8413,
+      "changePct": 3.969,
+      "entry": "No add unless it holds above 83.80 after open or forms a tight shelf",
+      "stop": "Use 80.30/EMA8 as soft-stop; hard stop should be defined from your plan",
+      "target": "88-92 if semis continue",
+      "note": "Held 11 shares avg 81.78; OpenD premarket +3.97%, urgency OK."
+    },
+    {
+      "symbol": "MTLS",
+      "grade": "HELD WARN",
+      "setup": "Held below 8EMA soft trail",
+      "level": 6.61,
+      "changePct": -0.75,
+      "entry": "No add",
+      "stop": "Soft stop/trail issue below EMA8 6.62; define hard stop around 6.42 21EMA or planned level",
+      "target": "Recover 6.80 first",
+      "note": "Held 600 shares avg 6.723; below 8EMA with MACD falling and no stop stored."
+    }
+  ],
+  "traderLens": [
+    {
+      "trader": "@markminervini",
+      "read": "Market is not full risk-on because breadth is negative; take only Stage 2 names clearing pivots with fresh demand."
+    },
+    {
+      "trader": "@Qullamaggie",
+      "read": "QURE is the textbook news EP but too extended for a casual swing chase; HOOD/CPAC need ORH or tight intraday shelf."
+    },
+    {
+      "trader": "@jfsrev",
+      "read": "Require RVOL and tight opening range. If OR is wide, no trade."
+    },
+    {
+      "trader": "@SRxTrades",
+      "read": "Use buy stops after reclaim/ORH; stops must sit under ORL or prior structure, not arbitrary percentages."
+    },
+    {
+      "trader": "@PrimeTrading_",
+      "read": "Do not buy extended names above the 10EMA just because RVOL is high; wait for pullback/reclaim."
+    }
+  ],
+  "standout": {
+    "symbol": "HOOD",
+    "side": "LONG",
+    "verdict": "GO-CONDITIONAL",
+    "score": 86,
+    "summary": "HOOD is today's cleanest liquid premarket candidate: score 86 GO, live OpenD premarket 107.45 (+2.14%), screener RVOL 2.19x, and catalyst from restructuring/analyst upgrades. Entry is conditional above 107.50 after the open/reclaim; stop below 103.80 or the first tight ORL. No market buy if it gaps and fades."
+  },
+  "earnings": [],
+  "calendar": [
+    {
+      "time": "08:30 ET",
+      "event": "Initial jobless claims and continuing claims",
+      "expectation": "Initial claims forecast around 225K vs 229K previous",
+      "importance": "High for rates/risk appetite",
+      "citation": "https://www.marketwatch.com/economy-politics/calendar?eafs_enabled=false"
+    },
+    {
+      "time": "08:30 ET",
+      "event": "Philadelphia Fed manufacturing survey",
+      "expectation": "June survey due premarket",
+      "importance": "Medium/high for cyclicals and rates",
+      "citation": "https://www.marketwatch.com/economy-politics/calendar?eafs_enabled=false"
+    },
+    {
+      "time": "10:00 ET",
+      "event": "Conference Board Leading Economic Index",
+      "expectation": "June 18 release scheduled",
+      "importance": "Medium",
+      "citation": "https://www.conference-board.org/topics/us-leading-indicators/"
+    }
+  ],
+  "ratings": [
+    {
+      "symbol": "HOOD",
+      "note": "Argus and Deutsche Bank target hikes reported after restructuring announcement.",
+      "citation": "https://www.investors.com/news/robinhood-stock-hood-stock-soars-above-key-level/"
+    },
+    {
+      "symbol": "PTRN",
+      "note": "Secondary offering priced at $19; watch supply.",
+      "citation": "https://www.investing.com/news/company-news/knox-lane-to-sell-8m-pattern-shares-at-19-each-93CH-4746477"
+    }
+  ],
+  "alert": {
+    "level": "YELLOW",
+    "message": "OpenD is now live after self-heal, but OpenAI API generation failed with insufficient_quota; this Codex tab was manually structured from fresh dashboard/OpenD data plus web-grounded sources. Keep entries conditional until the 08:30 ET data and opening range confirm."
+  },
+  "news": [
+    {
+      "title": "Fed/Warsh selloff leaves breadth negative into premarket",
+      "summary": "Prior session sold off after the Fed held rates and emphasized price stability; today's tape starts with negative breadth and a macro data gauntlet.",
+      "citation": "https://www.investors.com/market-trend/stock-market-today/dow-jones-sp500-nasdaq-fed-decision-warsh-spacex-stock-spcx/"
+    },
+    {
+      "title": "QURE regulatory EP",
+      "summary": "FDA Type B meeting outcome supports near-term AMT-130 BLA basis; company targets Q3 2026 BLA submission.",
+      "citation": "https://www.globenewswire.com/news-release/2026/06/17/3313322/0/en/uniqure-announces-plan-for-bla-submission-for-amt-130-in-huntington-s-disease.html"
+    },
+    {
+      "title": "HOOD restructuring + analyst target hikes",
+      "summary": "Robinhood rose after workforce reduction, record activity comments, and target hikes; premarket remains constructive.",
+      "citation": "https://www.investors.com/news/robinhood-stock-hood-stock-soars-above-key-level/"
+    }
+  ],
+  "screenerScores": [
+    {
+      "ticker": "HOOD",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "PTRN",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "CPAC",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "TRVI",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "FRMI",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "PRCH",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "NBIS",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "DYN",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "SHAZ",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "SIMO",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "AMAT",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    },
+    {
+      "ticker": "LZB",
+      "score": null,
+      "verdict": null,
+      "pattern": null,
+      "screener": null,
+      "price": null,
+      "changePct": null,
+      "rvol": null,
+      "sector": null,
+      "industry": null,
+      "premarketChange": null,
+      "thesis": null
+    }
+  ],
+  "citations": [
+    {
+      "title": "Market Dashboard snapshot, breadth and screeners",
+      "url": "local://apps/market_dashboard_backend/data",
+      "note": "snapshot 2026-06-18T09:26:48.420540Z; breadth 2026-06-18T09:27:39.228777+00:00; TV screeners 2026-06-18T09:29:18.099161+00:00"
+    },
+    {
+      "title": "OpenD live candidate quotes",
+      "url": "local://packages/core-skills/morning-brief/opend_live_2026-06-18_premarket.json",
+      "note": "Live moomoo OpenD prices/RVOL/premarket fields as of about 05:33 ET"
+    },
+    {
+      "title": "OpenD holdings review",
+      "url": "local://packages/core-skills/morning-brief/holdings_review_2026-06-18_premarket.json",
+      "note": "Live broker positions: MTLS and GFS"
+    },
+    {
+      "title": "uniQure AMT-130 BLA update",
+      "url": "https://www.globenewswire.com/news-release/2026/06/17/3313322/0/en/uniqure-announces-plan-for-bla-submission-for-amt-130-in-huntington-s-disease.html"
+    },
+    {
+      "title": "Robinhood stock catalyst",
+      "url": "https://www.investors.com/news/robinhood-stock-hood-stock-soars-above-key-level/"
+    },
+    {
+      "title": "Cementos Pacasmayo Q1 2026 results",
+      "url": "https://www.businesswire.com/news/home/20260424165897/en/Cementos-Pacasmayo-S.A.A.-Announces-Consolidated-Results-for-First-Quarter-2026"
+    },
+    {
+      "title": "Nasdaq-100 inclusion catalyst for NBIS",
+      "url": "https://www.investopedia.com/these-nvidia-backed-firms-are-set-to-join-the-nasdaq-100-soon-their-stocks-are-surging-11996844"
+    },
+    {
+      "title": "US economic calendar",
+      "url": "https://www.marketwatch.com/economy-politics/calendar?eafs_enabled=false"
+    },
+    {
+      "title": "Braiin company description",
+      "url": "https://braiin.com/"
+    }
+  ]
+}

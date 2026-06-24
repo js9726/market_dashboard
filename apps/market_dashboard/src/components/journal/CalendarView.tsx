@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type DayData = { date: string; pnl: number; trades: number };
+type DayData = { date: string; pnl: number | null; trades: number };
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -19,10 +19,11 @@ export default function CalendarView({ calendarData, currencySymbol = "$" }: { c
   // Monthly stats
   const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
   const monthDays = calendarData.filter((d) => d.date.startsWith(monthKey));
-  const monthPnl = monthDays.reduce((s, d) => s + d.pnl, 0);
+  const monthValuedDays = monthDays.filter((d) => d.pnl != null);
+  const monthPnl = monthDays.reduce((s, d) => s + (d.pnl ?? 0), 0);
   const monthTrades = monthDays.reduce((s, d) => s + d.trades, 0);
-  const monthWins = monthDays.filter((d) => d.pnl > 0).length;
-  const monthWr = monthDays.length ? Math.round((monthWins / monthDays.length) * 100) : 0;
+  const monthWins = monthValuedDays.filter((d) => d.pnl != null && d.pnl > 0).length;
+  const monthWr = monthValuedDays.length ? Math.round((monthWins / monthValuedDays.length) * 100) : 0;
 
   // Build calendar grid
   const firstDay = new Date(year, month, 1).getDay();
@@ -88,11 +89,14 @@ export default function CalendarView({ calendarData, currencySymbol = "$" }: { c
           const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const data = dayMap[dateStr];
           const isToday = dateStr === new Date().toISOString().slice(0, 10);
-          const cellBg = data
-            ? data.pnl >= 0
-              ? "border-[var(--gain-cell-bg)] bg-[var(--gain-cell-bg)]"
-              : "border-[var(--loss-cell-bg)] bg-[var(--loss-cell-bg)]"
-            : "border-[var(--line)] bg-[var(--bg-raised)]";
+          const hasPnl = data?.pnl != null;
+          const cellBg = !data
+            ? "border-[var(--line)] bg-[var(--bg-raised)]"
+            : !hasPnl
+              ? "border-[var(--line)] bg-[var(--bg-raised)]"
+              : data.pnl! >= 0
+                ? "border-[var(--gain-cell-bg)] bg-[var(--gain-cell-bg)]"
+                : "border-[var(--loss-cell-bg)] bg-[var(--loss-cell-bg)]";
 
           return (
             <div
@@ -102,9 +106,13 @@ export default function CalendarView({ calendarData, currencySymbol = "$" }: { c
               <p className={`mb-0.5 font-medium ${isToday ? "text-[var(--accent)]" : "text-[var(--fg-2)]"}`}>{day}</p>
               {data && (
                 <>
-                  <p className={`font-mono font-semibold tabular-nums ${data.pnl >= 0 ? "text-[var(--gain-cell-fg)]" : "text-[var(--loss-cell-fg)]"}`}>
-                    {data.pnl >= 0 ? "+" : ""}{currencySymbol}{Math.abs(data.pnl).toFixed(0)}
-                  </p>
+                  {hasPnl ? (
+                    <p className={`font-mono font-semibold tabular-nums ${data.pnl! >= 0 ? "text-[var(--gain-cell-fg)]" : "text-[var(--loss-cell-fg)]"}`}>
+                      {data.pnl! >= 0 ? "+" : ""}{currencySymbol}{Math.abs(data.pnl!).toFixed(0)}
+                    </p>
+                  ) : (
+                    <p className="font-mono font-semibold text-[var(--fg-3)]">open</p>
+                  )}
                   <p className="text-[var(--fg-3)]">{data.trades}t</p>
                 </>
               )}
