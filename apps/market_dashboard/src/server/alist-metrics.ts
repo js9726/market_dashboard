@@ -71,26 +71,37 @@ export interface EntryGradeInput {
   score: number | null;
   verdict: string | null; // "GO" | "WAIT" | "PASS"
   rvol: number | null;
+  setup?: string | null; // setup class — RVOL is judged conditionally on it
 }
 export interface EntryGrade {
-  grade: "A" | "B" | "C";
-  passedBar: boolean; // cleared the A-list REC bar (>=80 / GO / >=1.5x)
+  grade: "A" | "B" | "C" | null; // null = off-book / ungraded (no REC at entry)
+  passedBar: boolean; // cleared the A-list REC bar (GO>=75 / GO / setup-conditional RVOL)
   reasons: string[];
 }
 
 /**
- * Grade a (held) entry against the A-list REC bar: score>=80 AND verdict GO AND
- * rvol>=1.5x. A = cleared the bar; B = near-miss with real merit; C = off-spec.
- * Used as the learning overlay on HELD rows (was this an A-entry or a freelance?).
+ * Grade a (held) entry against the A-list REC bar (wiki/a-list-gate-and-screener.md):
+ * Conviction >=75 AND verdict GO AND a setup-conditional RVOL (breakout/EP need a
+ * >=1.5x surge; a pullback does not). A = cleared the bar; B = near-miss with real
+ * merit; C = off-spec. An OFF-BOOK entry (no REC pick existed at your entry) is
+ * NOT graded — returning a failing "C" for the mere absence of a pick mislabels a
+ * good discretionary call (e.g. ONTO +1.88R) as a failure. It stays ungraded and
+ * is judged by its outcome (MFE/MAE) + the "off-book" tag instead.
  */
 export function gradeEntryVsBar(i: EntryGradeInput): EntryGrade {
+  if (i.score == null && i.verdict == null && i.rvol == null) {
+    return { grade: null, passedBar: false, reasons: ["off-book — no REC pick at entry"] };
+  }
   const reasons: string[] = [];
-  const scoreOk = i.score != null && i.score >= 80;
+  const scoreOk = i.score != null && i.score >= 75;
   const verdictOk = (i.verdict ?? "").toUpperCase() === "GO";
-  const rvolOk = i.rvol != null && i.rvol >= 1.5;
-  if (!scoreOk) reasons.push(`score ${i.score ?? "?"} < 80`);
+  // A pullback's volume expansion comes at the trigger, not at entry, so it is
+  // not gated on the surge here (consistent with the screener/extractor gate).
+  const isPullback = /(^PB|PULLBACK|MA-|POST-GAP)/.test((i.setup ?? "").toUpperCase());
+  const rvolOk = isPullback || (i.rvol != null && i.rvol >= 1.5);
+  if (!scoreOk) reasons.push(`score ${i.score ?? "?"} < 75`);
   if (!verdictOk) reasons.push(`verdict ${i.verdict ?? "?"} != GO`);
-  if (!rvolOk) reasons.push(`rvol ${i.rvol ?? "?"} < 1.5x`);
+  if (!rvolOk) reasons.push(`rvol ${i.rvol ?? "?"} < 1.5x (breakout/EP surge)`);
   const passedBar = scoreOk && verdictOk && rvolOk;
   let grade: "A" | "B" | "C";
   if (passedBar) grade = "A";

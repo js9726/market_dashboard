@@ -61,6 +61,7 @@ export async function syncHeldPositions(userId: string): Promise<HeldSyncResult>
       score: rec?.day0Score ?? null,
       verdict: rec?.day0Verdict ?? null,
       rvol: rec?.day0Rvol != null ? Number(rec.day0Rvol) : null,
+      setup: rec?.setupClassification ?? null,
     });
     const entryGradeJson: Prisma.InputJsonValue = {
       score: rec?.day0Score ?? null,
@@ -69,7 +70,7 @@ export async function syncHeldPositions(userId: string): Promise<HeldSyncResult>
       setup: rec?.setupClassification ?? null,
       passedBar: grade.passedBar,
       reasons: grade.reasons,
-      source: rec ? "REC" : "PENDING",
+      source: rec ? "REC" : "OFF-BOOK",
     };
 
     const heldData = {
