@@ -300,7 +300,14 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
     const windowComplete = lastIdx >= entryIdx + WINDOW;
     let outcome: string | null = null;
     let status = cand.status;
-    if (hitTarget) {
+    if (cand.isHeld) {
+      // HELD: the broker is the source of truth for open/closed — reconcileClosedHeld
+      // flips it once the position is gone. The price path must NOT retire a
+      // position you may still be holding; it only stamps a rule-based outcome
+      // label after the window completes. The hard-stop *breach* is still captured
+      // via hardStopHitAt/Basis above as a learning flag, not a terminal status.
+      if (windowComplete) outcome = markClose >= entry ? "DRIFT" : "FADE";
+    } else if (hitTarget) {
       outcome = "HIT_TARGET";
       status = "HIT_TARGET";
     } else if (hardHitAt) {

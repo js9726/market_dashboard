@@ -53,7 +53,8 @@ export interface AListRow {
     score: number | null;
     outcome: string | null;
     verdict: string | null;
-    computedAt: string;
+    computedAt: string | null;
+    final?: boolean; // true once the 14-session window is locked; else "so far"
   } | null;
   tags: unknown;
   notes: string | null;
@@ -67,6 +68,8 @@ export interface AListRow {
   rUnitLogged?: number | null;
   rUnitAtr?: number | null;
   atrFloorStop?: number | null;
+  effectiveStop?: number | null;
+  stopSource?: string | null; // "logged" | "atr" | null
   entryGradeJson?: unknown;
   savings?: {
     realizedR: number | null;
@@ -183,8 +186,8 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
               <Td>{renderBadges(r.badges, r.onBook)}</Td>
               <Td>{r.setup ?? "-"}</Td>
               <Td>{renderTrigger(r)}</Td>
-              <Td align="right">{fmt(r.entry, 2)}</Td>
-              <Td align="right">{fmt(r.stop, 2)}</Td>
+              <Td align="right">{fmt(r.entry ?? (r.held?.entryAvgCost ?? null), 2)}</Td>
+              <Td align="right">{renderStop(r)}</Td>
               <Td align="right">
                 <strong style={{ color: scoreColor(r.score) }}>{r.score ?? "-"}</strong>
               </Td>
@@ -193,26 +196,8 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
               <Td>{r.sector ?? "-"}</Td>
               <Td align="right">{renderSaveR(r.savings?.saveRealizedR, r.savings?.saveRealizedUsd)}</Td>
               <Td align="right">{renderSaveR(r.savings?.saveSoftVsHardR, r.savings?.saveSoftVsHardUsd)}</Td>
-              <Td align="right">
-                {r.day14?.mfe != null ? (
-                  <span>
-                    {fmt(r.day14.mfe, 2)}
-                    {r.day14.mfeR != null && (
-                      <span className="text-[var(--fg-3)]"> ({r.day14.mfeR.toFixed(1)}R)</span>
-                    )}
-                  </span>
-                ) : "-"}
-              </Td>
-              <Td align="right">
-                {r.day14?.mae != null ? (
-                  <span>
-                    {fmt(r.day14.mae, 2)}
-                    {r.day14.maeR != null && (
-                      <span className="text-[var(--fg-3)]"> ({r.day14.maeR.toFixed(1)}R)</span>
-                    )}
-                  </span>
-                ) : "-"}
-              </Td>
+              <Td align="right">{renderExcursion(r.day14?.mfeR, r.day14?.mfe, r.day14?.final, "mfe")}</Td>
+              <Td align="right">{renderExcursion(r.day14?.maeR, r.day14?.mae, r.day14?.final, "mae")}</Td>
               <Td>
                 {r.day14?.outcome ? (
                   <span className="t-mono" style={{ color: outcomeLabelColor(r.day14.outcome) }}>
@@ -278,6 +263,41 @@ function renderGrade(grade?: string | null) {
   if (!grade) return <span className="text-[var(--fg-3)]">-</span>;
   const color = grade === "A" ? "var(--gain-fg)" : grade === "B" ? "var(--warn-fg)" : "var(--loss-fg)";
   return <strong style={{ color }}>{grade}</strong>;
+}
+
+/** Always show a risk level: the logged stop, or the wiki ATR-floor stop as a
+ *  fallback (flagged "atr") so a pick never shows a blank stop. */
+function renderStop(r: AListRow) {
+  const s = r.effectiveStop ?? r.stop ?? null;
+  if (s == null) return <span className="text-[var(--fg-3)]">-</span>;
+  const isAtr = r.stopSource === "atr" || (r.stop == null && r.effectiveStop != null);
+  return (
+    <span title={isAtr ? "Wiki ATR-floor stop (no logged stop on this pick)" : "Logged stop"}>
+      {s.toFixed(2)}
+      {isAtr ? <span className="ml-1 text-[9px] text-[var(--fg-3)]">atr</span> : null}
+    </span>
+  );
+}
+
+/** MFE/MAE shown R-first (the comparable unit), with the $ level dimmed and a
+ *  "·now" marker while the 14-session window is still open (running value). */
+function renderExcursion(
+  r: number | null | undefined,
+  abs: number | null | undefined,
+  final: boolean | undefined,
+  kind: "mfe" | "mae",
+) {
+  if (r == null && abs == null) return <span className="text-[var(--fg-3)]">-</span>;
+  const color = kind === "mfe" ? "var(--gain-fg)" : "var(--loss-fg)";
+  return (
+    <span title={final ? "Locked day-14 value" : "Running value so far — 14-session window still open"}>
+      {r != null ? (
+        <span style={{ color }}>{r >= 0 ? "+" : ""}{r.toFixed(2)}R</span>
+      ) : null}
+      {abs != null ? <span className="text-[var(--fg-3)]"> {abs.toFixed(2)}</span> : null}
+      {final === false ? <span className="ml-1 text-[9px] text-[var(--fg-3)]">·now</span> : null}
+    </span>
+  );
 }
 
 function renderSaveR(saveR?: number | null, saveUsd?: number | null) {

@@ -76,6 +76,10 @@ export function serializeCandidate(r: AListCandidate) {
     rUnitLogged: num(r.rUnitLogged),
     rUnitAtr: num(r.rUnitAtr),
     atrFloorStop: num(r.atrFloorStop),
+    // Always show a stop: the logged one, or the wiki ATR-floor stop as fallback
+    // (so a pick — even an off-book hold — never shows a blank risk level).
+    effectiveStop: num(r.stop) ?? num(r.atrFloorStop),
+    stopSource: r.stop != null ? "logged" : r.atrFloorStop != null ? "atr" : null,
     savings: {
       realizedR: num(r.realizedRLogged),
       saveRealizedR: num(r.saveRealizedR),
@@ -88,7 +92,10 @@ export function serializeCandidate(r: AListCandidate) {
       hardStopHitBasis: r.hardStopHitBasis,
     },
 
-    day14: r.day14ComputedAt
+    // Surface MFE/MAE as soon as the tracker has walked any sessions — NOT only
+    // at day-14. `final` distinguishes the locked day-14 result from the
+    // still-running "so far" value of an in-window pick.
+    day14: r.day14Mfe != null || r.day14ComputedAt
       ? {
           mfe: num(r.day14Mfe),
           mae: num(r.day14Mae),
@@ -97,7 +104,8 @@ export function serializeCandidate(r: AListCandidate) {
           score: num(r.day14Score),
           outcome: r.day14Outcome,
           verdict: r.day14Verdict,
-          computedAt: r.day14ComputedAt.toISOString(),
+          computedAt: r.day14ComputedAt?.toISOString() ?? null,
+          final: r.day14ComputedAt != null,
         }
       : null,
     tags: r.tags,

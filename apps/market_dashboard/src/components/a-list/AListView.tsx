@@ -3,32 +3,38 @@
 /**
  * AListView — top-level component for the /dashboard/a-list page.
  *
- * Phase 2 of the pre-open CI + journal revamp plan
- * (see apps/market_dashboard/docs/PLAN-pre-open-ci-and-journal-revamp.md).
+ * Reads GET /api/a-list/history (filtered) and splits the result into two
+ * boards: ACTIVE (still in the tracking window / still held) and CLOSED/REVIEW
+ * (resolved — stopped, target, expired, or broker-exited). A performance
+ * scoreboard sits on top so the past GO-list outcomes are actually visualised.
  *
- * Reads from:
- *   GET /api/a-list/today      (default view — today's candidates)
- *   GET /api/a-list/history    (filtered history view)
- *
- * Filters: date range, ticker, sector, setup, status, outcome, minScore.
- * Sort: date (default), score, outcome.
- *
- * Each row drills into a detail panel showing the day-0 thesis, the frozen
- * brief reference, day-14 outcome (when computed), and notes.
+ * Each row drills into a detail panel (day-0 thesis, frozen brief, day-14
+ * outcome, notes).
  */
 
 import { useEffect, useMemo, useState } from "react";
 import AListTable, { type AListRow } from "./AListTable";
 import AListFilters, { type AListFilterState } from "./AListFilters";
 import AListDetailPanel from "./AListDetailPanel";
+import AListScoreboard from "./AListScoreboard";
 
 const TODAY_LIMIT = 200;
+type Board = "active" | "closed";
+
+const CLOSED_STATUSES = new Set(["STOPPED_OUT", "CLOSED", "HIT_TARGET", "EXPIRED", "MANUALLY_CLOSED", "CONVERTED"]);
+/** A pick is "finished" when its status is terminal or its day-14 window locked.
+ *  HELD positions stay ACTIVE until the broker exit reconciles (broker-truth),
+ *  so they never fall into Closed just because a rule-stop was tagged. */
+function isClosed(r: AListRow): boolean {
+  return CLOSED_STATUSES.has(r.status) || r.day14?.final === true;
+}
 
 export default function AListView() {
   const [rows, setRows] = useState<AListRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [board, setBoard] = useState<Board>("active");
   const [filters, setFilters] = useState<AListFilterState>({
     from: defaultFromDate(),
     to: defaultToDate(),
@@ -78,11 +84,12 @@ export default function AListView() {
     };
   }, [filters]);
 
-  // Selected row for detail panel
-  const selected = useMemo(
-    () => rows.find((r) => r.id === selectedId) ?? null,
-    [rows, selectedId],
-  );
+  const activeRows = useMemo(() => rows.filter((r) => !isClosed(r)), [rows]);
+  const closedRows = useMemo(() => rows.filter(isClosed), [rows]);
+  const shown = board === "active" ? activeRows : closedRows;
+
+  // Selected row for detail panel (search across both boards)
+  const selected = useMemo(() => rows.find((r) => r.id === selectedId) ?? null, [rows, selectedId]);
 
   // Summary stats for the header
   const summary = useMemo(() => computeSummary(rows), [rows]);
@@ -94,50 +101,63 @@ export default function AListView() {
           <div>
             <p className="t-overline text-[var(--fg-3)]">A-List Candidates</p>
             <p className="t-caption">
-              Strict-quality picks (score &ge; 80, GO, RVOL &ge; 1.5x). Tracked day-0 to day-14.
+              GO &ge; 75 Conviction (Setup/40 + Entry/30 + Theme/20 + Sentiment/10), RVOL &ge; 1.5x.
+              Tracked day-0 to day-14; held positions tracked to broker exit.
             </p>
           </div>
           <div className="flex flex-wrap items-baseline gap-4 t-caption">
-            <span>
-              <strong className="t-mono">{summary.total}</strong> total
-            </span>
-            <span>
-              <strong className="t-mono">{summary.active}</strong> active
-            </span>
-            <span>
-              <strong className="t-mono">{summary.hitTarget}</strong> hit target
-            </span>
-            <span>
-              <strong className="t-mono">{summary.stoppedOut}</strong> stopped
-            </span>
-            <span>
-              hit rate <strong className="t-mono">{summary.hitRatePct}%</strong>
-            </span>
-            <span>
-              avg day-14 score <strong className="t-mono">{summary.avgDay14Score}</strong>
-            </span>
+            <span><strong className="t-mono">{summary.total}</strong> total</span>
+            <span><strong className="t-mono">{summary.active}</strong> active</span>
+            <span><strong className="t-mono">{summary.hitTarget}</strong> hit target</span>
+            <span><strong className="t-mono">{summary.stoppedOut}</strong> stopped</span>
+            <span>hit rate <strong className="t-mono">{summary.hitRatePct}%</strong></span>
+            <span>avg day-14 score <strong className="t-mono">{summary.avgDay14Score}</strong></span>
           </div>
         </div>
       </div>
 
+      <AListScoreboard rows={rows} />
+
       <AListFilters filters={filters} onChange={setFilters} />
+
+      {/* Active vs Closed/Review boards */}
+      <div className="flex gap-1 border-b border-[var(--line)] px-1">
+        <BoardTab label="Active" count={activeRows.length} active={board === "active"} onClick={() => setBoard("active")} />
+        <BoardTab label="Closed / Review" count={closedRows.length} active={board === "closed"} onClick={() => setBoard("closed")} />
+      </div>
 
       {loading ? (
         <p className="p-5 t-caption t-mono">Loading...</p>
       ) : error ? (
         <p className="p-5 t-caption t-mono">Error: {error}</p>
-      ) : rows.length === 0 ? (
+      ) : shown.length === 0 ? (
         <p className="p-5 t-caption">
-          No candidates match these filters. Try widening the date range or clearing filters.
+          {board === "active"
+            ? "No active picks in range. Switch to Closed / Review, or widen the date range."
+            : "No closed picks in range yet — resolved picks (stop / target / day-14 / broker exit) land here."}
         </p>
       ) : (
-        <AListTable rows={rows} selectedId={selectedId} onSelect={setSelectedId} />
+        <AListTable rows={shown} selectedId={selectedId} onSelect={setSelectedId} />
       )}
 
-      {selected && (
-        <AListDetailPanel row={selected} onClose={() => setSelectedId(null)} />
-      )}
+      {selected && <AListDetailPanel row={selected} onClose={() => setSelectedId(null)} />}
     </div>
+  );
+}
+
+function BoardTab({ label, count, active, onClick }: { label: string; count: number; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-t px-4 py-2 text-[13px] font-semibold transition ${
+        active
+          ? "bg-[var(--bg-surface)] text-[var(--fg-1)] border-b-2 border-[var(--accent)]"
+          : "text-[var(--fg-3)] hover:text-[var(--fg-1)]"
+      }`}
+    >
+      {label} <span className="ml-1 text-[11px] text-[var(--fg-3)]">{count}</span>
+    </button>
   );
 }
 

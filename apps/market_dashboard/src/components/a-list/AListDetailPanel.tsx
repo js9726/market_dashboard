@@ -205,7 +205,12 @@ export default function AListDetailPanel({ row, onClose }: Props) {
               <Row label="MFE (R)" value={row.day14.mfeR != null ? `${row.day14.mfeR.toFixed(1)}R` : "-"} />
               <Row label="MAE (R)" value={row.day14.maeR != null ? `${row.day14.maeR.toFixed(1)}R` : "-"} />
               <Row label="Day-14 Score" value={row.day14.score != null ? row.day14.score.toFixed(1) : "-"} />
-              <Row label="Computed" value={new Date(row.day14.computedAt).toLocaleString()} />
+              <Row
+                label="Computed"
+                value={row.day14.final && row.day14.computedAt
+                  ? new Date(row.day14.computedAt).toLocaleString()
+                  : "running — 14-session window still open"}
+              />
               {row.day14.verdict && (
                 <div className="mt-3">
                   <p className="t-overline text-[var(--fg-3)]">Verdict</p>
