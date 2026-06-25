@@ -83,7 +83,10 @@ function algoScore(h: Record<string, unknown>): {
 
   const is_ep = chg_day > 8 && perf_1m < 15 && rvol > 2.5;
   const is_breakout = chg_day > 3 && chg_day < 20 && perf_1m > 8 && perf_1m < 50 && rvol > 1.5;
-  const is_pullback = A < 5 && perf_1m > 5 && rvol >= 0.8;
+  // Pullback = a small move in an uptrend on NON-surging volume. Contraction is
+  // the signal (wiki/a-list-gate-and-screener.md), so there is no low-RVOL floor —
+  // the quietest pullbacks are the best ones; a surge would make it a breakout/EP.
+  const is_pullback = A < 5 && perf_1m > 5 && rvol < 1.5;
   const is_parabolic = perf_1m > 70 || (chg_day > 25 && perf_1m > 30);
   const is_stage4 = perf_1m < -15;
 
@@ -95,7 +98,16 @@ function algoScore(h: Record<string, unknown>): {
   else if (is_breakout) setup = 30;
   else if (is_pullback) setup = 26;
   else setup = 14;
-  if (rvol >= 3) setup += 6; else if (rvol >= 2) setup += 3; else if (rvol < 1) setup -= 6;
+  // RVOL is read by setup class (wiki/a-list-gate-and-screener.md). Breakout/EP
+  // want a surge; a pullback wants CONTRACTION — low volume on a pullback is the
+  // setup forming, not weakness, so reward the dry-up and only fault a HIGH-volume
+  // (potential distribution) pullback. Penalising pullback contraction was the bug
+  // that dropped names like GFS/NTAP to a poor score.
+  if (is_pullback) {
+    if (rvol <= 0.7) setup += 4; else if (rvol <= 1.0) setup += 2; else if (rvol > 2) setup -= 4;
+  } else {
+    if (rvol >= 3) setup += 6; else if (rvol >= 2) setup += 3; else if (rvol < 1) setup -= 6;
+  }
   if (perf_1m > 80) setup -= 8; else if (perf_1m > 60) setup -= 4;
   setup = Math.max(0, Math.min(40, setup));
 

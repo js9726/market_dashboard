@@ -25,8 +25,30 @@ const prisma = new PrismaClient();
 // Conviction GO band (wiki/trader-styles.md): GO >= 75. The A-list REC gate was
 // previously hardcoded to 80, silently dropping GO picks scoring 75-79.
 const MIN_SCORE = 75;
-const MIN_RVOL = 1.5;
+// RVOL is NOT a universal admission floor (wiki/a-list-gate-and-screener.md). It is
+// the SURGE threshold for breakout/EP setups only; pullbacks want contraction and
+// must not be gated on it (the surge is required at the trigger). See rvolPasses().
+const MIN_RVOL_SURGE = 1.5;
+// Pullback candidates enter the A-list as WATCH/armed at the WATCH band — the GO
+// comes on the reclaim trigger — so they admit below GO>=75.
+const PULLBACK_MIN_SCORE = 65;
 const ACCEPTABLE_VERDICTS = new Set(["GO"]);
+
+type SetupLane = "breakout" | "pullback" | "unknown";
+function setupLane(setup: string | null | undefined): SetupLane {
+  const s = (setup ?? "").toUpperCase();
+  if (!s) return "unknown";
+  if (s.startsWith("PB") || s.includes("PULLBACK") || s.includes("MA-") || s.includes("POST-GAP")) return "pullback";
+  if (s.startsWith("BO") || s.startsWith("EP") || s.includes("BREAKOUT") || s === "PARABOLIC") return "breakout";
+  return "unknown";
+}
+/** Setup-conditional RVOL test: a pullback doesn't need a surge (contraction is
+ *  the signal; the surge is required at the trigger), so it always passes here.
+ *  Breakout / EP / unknown require RVOL >= the surge floor. */
+function rvolPasses(setup: string | null | undefined, rvol: number | null): boolean {
+  if (setupLane(setup) === "pullback") return true;
+  return rvol != null && rvol >= MIN_RVOL_SURGE;
+}
 
 /** Best-match persona for a setup pattern — deterministic heuristic at pick
  *  time (wiki setup→persona affinity). The R4 multi-agent refines this on
@@ -105,11 +127,18 @@ export function extractCandidates(brief: BriefAnyShape | null): ExtractedCandida
     }
   };
 
-  const meetsFilter = (score: number | null, verdict: string | null, rvol: number | null): boolean => {
-    if (score == null || score < MIN_SCORE) return false;
-    if (verdict == null || !ACCEPTABLE_VERDICTS.has(verdict.toUpperCase())) return false;
-    if (rvol == null || rvol < MIN_RVOL) return false;
-    return true;
+  const meetsFilter = (score: number | null, verdict: string | null, rvol: number | null, setup?: string | null): boolean => {
+    const lane = setupLane(setup);
+    // Pullbacks admit at the WATCH band (armed); breakout/EP/unknown require GO>=75.
+    const minScore = lane === "pullback" ? PULLBACK_MIN_SCORE : MIN_SCORE;
+    if (score == null || score < minScore) return false;
+    const v = (verdict ?? "").toUpperCase();
+    if (lane === "pullback") {
+      if (v !== "GO" && v !== "WAIT" && v !== "WATCH") return false;
+    } else if (!ACCEPTABLE_VERDICTS.has(v)) {
+      return false;
+    }
+    return rvolPasses(setup, rvol);
   };
 
   // ── Standout (highest-conviction) ──────────────────────────────────────
@@ -219,7 +248,7 @@ export function extractCandidates(brief: BriefAnyShape | null): ExtractedCandida
   // (RVOL may have been filled in late from industryMovers / screener)
   const final: ExtractedCandidate[] = [];
   for (const c of Array.from(found.values())) {
-    if (meetsFilter(c.day0Score ?? null, c.day0Verdict ?? null, c.day0Rvol ?? null)) {
+    if (meetsFilter(c.day0Score ?? null, c.day0Verdict ?? null, c.day0Rvol ?? null, c.setupClassification)) {
       final.push(c);
     }
   }
@@ -477,20 +506,31 @@ export function extractScreenerCandidates(file: ScoredScreenerFile | null | unde
     for (const hit of sc.hits ?? []) {
       const ticker = asStr(hit.ticker)?.toUpperCase() ?? null;
       const score = asNum(hit.score);
-      const verdict = asStr(hit.verdict);
+      const verdict = (asStr(hit.verdict) ?? "").toUpperCase();
       const rvol = asNum(hit.relative_volume_10d_calc);
-      if (!ticker || score == null || score < MIN_SCORE) continue;
-      if ((verdict ?? "").toUpperCase() !== "GO") continue;
-      if (rvol == null || rvol < MIN_RVOL) continue;
       const pattern = asStr(hit.pattern);
       const close = asNum(hit.close);
       const setupClass = pattern ? SCREENER_PATTERN_TO_SETUP[pattern.toUpperCase()] ?? pattern : null;
+      const lane = setupLane(setupClass);
+      if (!ticker || score == null) continue;
+      if (lane === "pullback") {
+        // Pullback lane (wiki/a-list-gate-and-screener.md): admit as WATCH/armed at
+        // the WATCH band; the GO + volume surge are required at the TRIGGER, not at
+        // admission, so do NOT gate on the surge here.
+        if (score < PULLBACK_MIN_SCORE) continue;
+        if (verdict !== "GO" && verdict !== "WAIT") continue;
+      } else {
+        // Breakout / EP / unknown: require GO + a volume surge.
+        if (score < MIN_SCORE) continue;
+        if (verdict !== "GO") continue;
+        if (rvol == null || rvol < MIN_RVOL_SURGE) continue;
+      }
       // Conviction sub-scores from the algo scorer (screener-scanner algoScore).
       const stages = (hit.stages ?? {}) as Record<string, unknown>;
       const cand: ExtractedCandidate = {
         ticker,
         day0Score: score,
-        day0Verdict: "GO",
+        day0Verdict: verdict === "GO" ? "GO" : "WAIT",
         day0Rvol: rvol,
         setupClassification: setupClass,
         screenSource: asStr(sc.id),

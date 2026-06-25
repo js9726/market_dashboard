@@ -84,3 +84,18 @@ Conviction-component agents: **Setup /40** (persona rubric), **Entry /30** (4 ea
 ## Sequence & parallel track
 
 R3 → R4 → R5, each multi-tenant. Beta-readiness (observability, member-book, legal/disclaimer, OAuth full verification at scale) stays a **parallel track** to schedule at onboarding — OAuth is already Published/In-production (100-user cap, fine for the 5–10 beta).
+
+---
+
+## P1–P5 re-plan (2026-06-25, post A-list-usefulness audit + wiki gate-doctrine)
+
+Driven by the operator audit ("page uninformative; MFE/MAE never update; closed not filtered; no stops; GO list isn't what the pros buy"). New phases on top of R3–R5:
+
+- **P1 — tracker fix (SHIPPED).** `track-positions` timed out at 60s on ~88 candidates → 0 rows. Now bounded-parallel + per-fetch timeout + Yahoo→Stooq fallback + maxDuration 300. MFE/MAE/stops populate.
+- **P3 — A-list redesign (SHIPPED).** Active vs Closed/Review boards; performance scoreboard (win-rate, avg MFE/MAE R, MFE-capture by setup); serializer surfaces running MFE/MAE + `effectiveStop` (logged or ATR-floor); HELD = broker-truth (price-path stop no longer retires a held position).
+- **P3.5 — setup-conditional RVOL gate + pullback lane (this change).** Root cause of "GO list ≠ pro buys": a **universal `RVOL ≥ 1.5×`** gate + a `setup -= 6` low-RVOL penalty excluded/penalised the pullback lane the pros trade — contradicting `wiki/a-list-gate-and-screener.md` (RVOL is setup-conditional: breakout/EP ≥150% surge, pullback ≤100% contraction). Fix: `screener-scanner` rewards pullback contraction (no universal penalty) + widens `is_pullback`; `a-list-extractor` gates RVOL by setup class and admits pullbacks at the WATCH band (armed → GO on the trigger). **Remaining in P3.5:** split "off-book" from the A/B/C entry grade (so ONTO +1.88R isn't mislabelled C); `skills:sync` to propagate the doctrine to LLM-scorer knowledge.
+- **P4 — market context** at entry + exit (SPY/QQQ % + breadth + Fear&Greed) so "was it the pick or the tape" is answerable.
+- **P5 — auto-calibrating scoring** (lesson digest → wiki edits + `skills:sync`); calibrates *within* the corrected P3.5 gate.
+- **P2 — OpenD/IBKR bridge push** as the authoritative daily-bar feed (cloud Yahoo/Stooq fallback already carries it unattended).
+
+**Amended order: P3.5 → P4 → P5 → P2.** Anti-reversion: P3.5/P5 scoring/gate doctrine lands in `llm_traders_wiki` first (done for the gate), then runtime + `skills:sync`.
