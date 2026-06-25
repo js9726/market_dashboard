@@ -108,10 +108,8 @@ export default function AListView() {
           <div className="flex flex-wrap items-baseline gap-4 t-caption">
             <span><strong className="t-mono">{summary.total}</strong> total</span>
             <span><strong className="t-mono">{summary.active}</strong> active</span>
-            <span><strong className="t-mono">{summary.hitTarget}</strong> hit target</span>
             <span><strong className="t-mono">{summary.stoppedOut}</strong> stopped</span>
-            <span>hit rate <strong className="t-mono">{summary.hitRatePct}%</strong></span>
-            <span>avg day-14 score <strong className="t-mono">{summary.avgDay14Score}</strong></span>
+            <span className="text-[var(--fg-3)]">win-rate &amp; R in the Performance panel below</span>
           </div>
         </div>
       </div>

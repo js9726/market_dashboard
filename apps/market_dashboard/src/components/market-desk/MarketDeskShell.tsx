@@ -53,7 +53,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
   "/dashboard/a-list": {
     title: "A-List",
-    subtitle: "Strict-quality picks - day-0 to day-14 outcome",
+    subtitle: "GO≥75 picks · Active vs Closed · tracked day-0 to day-14, held to broker exit",
   },
   "/dashboard/trades": {
     title: "Trades Hub",

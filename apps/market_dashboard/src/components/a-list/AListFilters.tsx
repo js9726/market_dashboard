@@ -101,7 +101,7 @@ export default function AListFilters({ filters, onChange }: Props) {
           type="number"
           value={filters.minScore}
           onChange={(e) => update("minScore", e.target.value)}
-          placeholder="80"
+          placeholder="75"
           min={0}
           max={100}
           className="mds-input"
