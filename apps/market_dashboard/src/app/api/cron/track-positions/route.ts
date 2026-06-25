@@ -11,6 +11,14 @@
  *
  * Idempotent (upserts by (candidateId, sessionDate)). Safe to re-run.
  *
+ * Resilience (2026-06): the previous version processed every ACTIVE candidate
+ * SEQUENTIALLY with a single Yahoo fetch each — at ~88 candidates that blew the
+ * 60s serverless budget (FUNCTION_INVOCATION_TIMEOUT) and wrote ZERO rows, so
+ * MFE/MAE never populated. Now it (a) runs candidates in bounded parallel
+ * batches, (b) puts a hard per-request timeout on each price fetch, and
+ * (c) falls back Yahoo -> Stooq so one rate-limited feed can't stall the run.
+ * A future local OpenD/IBKR bridge push supersedes these cloud feeds.
+ *
  * Auth: Vercel cron Bearer <CRON_SECRET>, ?secret=<BRIEF_INGEST_KEY>, or any
  * x-vercel-cron-signature.
  */
@@ -27,9 +35,14 @@ import { runConvictionAnalysis, type ConvictionInput } from "@/server/conviction
 // Cap LLM Conviction analyses per cron run so a day with many triggers can't
 // blow the function budget; the rest get picked up next run.
 const MAX_ANALYSES_PER_RUN = 5;
+// How many candidates to price-fetch concurrently. Keeps the whole run inside
+// the function budget while bounding parallel pressure on the price feeds.
+const FETCH_CONCURRENCY = 8;
+// Hard ceiling per price fetch so a single hung request can't eat the budget.
+const FETCH_TIMEOUT_MS = 9000;
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const WINDOW = 14; // trading sessions tracked after entry
 const YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart";
@@ -45,10 +58,11 @@ function authorized(req: Request): boolean {
   return false;
 }
 
-async function fetchDailyCandles(yahooSymbol: string): Promise<Candle[]> {
+async function fetchYahooCandles(yahooSymbol: string): Promise<Candle[]> {
   const url = `${YAHOO_CHART_URL}/${encodeURIComponent(yahooSymbol)}?interval=1d&range=3mo`;
   const res = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0 (compatible; MarketDashboardBot/1.0)" },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`Yahoo chart ${yahooSymbol} HTTP ${res.status}`);
   const json = (await res.json()) as {
@@ -76,6 +90,51 @@ async function fetchDailyCandles(yahooSymbol: string): Promise<Candle[]> {
   return out;
 }
 
+/** Stooq daily CSV fallback (keyless, separate infra from Yahoo — the two rarely
+ *  rate-limit at the same time). Format: Date,Open,High,Low,Close,Volume. */
+async function fetchStooqCandles(symbol: string): Promise<Candle[]> {
+  const stooqSymbol = `${symbol.toLowerCase()}.us`;
+  const url = `https://stooq.com/q/d/l/?s=${encodeURIComponent(stooqSymbol)}&i=d`;
+  const res = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; MarketDashboardBot/1.0)" },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
+  if (!res.ok) throw new Error(`Stooq ${symbol} HTTP ${res.status}`);
+  const text = await res.text();
+  const lines = text.trim().split("\n");
+  if (lines.length < 2 || !/^date,/i.test(lines[0])) return [];
+  const out: Candle[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    if (cols.length < 5) continue;
+    const [date, o, h, l, c, v] = cols;
+    const O = parseFloat(o), H = parseFloat(h), L = parseFloat(l), C = parseFloat(c);
+    if (![O, H, L, C].every(Number.isFinite)) continue;
+    const vol = v != null && Number.isFinite(parseFloat(v)) ? parseFloat(v) : null;
+    out.push({ date, open: O, high: H, low: L, close: C, volume: vol });
+  }
+  return out.slice(-90); // match Yahoo's ~3mo window
+}
+
+/** Resilient daily candles: Yahoo first, Stooq fallback. Either feed can
+ *  rate-limit serverless IPs; trying both keeps the tracker alive. Returns []
+ *  only when BOTH are unavailable for this symbol. */
+async function fetchDailyCandles(symbol: string): Promise<Candle[]> {
+  try {
+    const y = await fetchYahooCandles(symbol);
+    if (y.length) return y;
+  } catch {
+    /* fall through to Stooq */
+  }
+  try {
+    const s = await fetchStooqCandles(symbol);
+    if (s.length) return s;
+  } catch {
+    /* no source available */
+  }
+  return [];
+}
+
 /** Relative volume per bar vs the trailing 50-day average volume. */
 function rvolSeries(candles: Candle[]): (number | null)[] {
   return candles.map((_, i) => {
@@ -90,6 +149,199 @@ function rvolSeries(candles: Candle[]): (number | null)[] {
 
 function dec(v: number | null | undefined): Prisma.Decimal | null {
   return v == null || !Number.isFinite(v) ? null : new Prisma.Decimal(Number(v.toFixed(4)));
+}
+
+type CandidateRow = Awaited<ReturnType<typeof prisma.aListCandidate.findMany>>[number];
+interface CandResult {
+  ticker: string;
+  processed: boolean;
+  error?: string;
+  triggered?: { candId: string; input: ConvictionInput };
+}
+
+/** Process one candidate: fetch the path, append daily tracks, derive savings +
+ *  day-14 MFE/MAE/outcome, and (REC only) advance the entry trigger. Pure of
+ *  shared state so candidates can run concurrently. */
+async function processCandidate(cand: CandidateRow): Promise<CandResult> {
+  try {
+    const entry = cand.entryAvgCost?.toNumber() ?? cand.entryZone?.toNumber() ?? cand.day0Price?.toNumber() ?? null;
+    if (entry == null || entry <= 0) return { ticker: cand.ticker, processed: false };
+
+    const entryRef = cand.entryFillAt ?? cand.pickDate;
+    const entryDateStr = new Date(entryRef).toISOString().slice(0, 10);
+    const qty = cand.heldQty?.toNumber() ?? 1;
+    const loggedStop = cand.stop?.toNumber() ?? null;
+    const target = cand.target?.toNumber() ?? null;
+
+    let triggerUpdate: { triggerState?: string; triggerStateAt?: Date | null; triggerReason?: string } = {};
+    let triggered: CandResult["triggered"];
+
+    const candles = await fetchDailyCandles(cand.ticker);
+    if (candles.length === 0) return { ticker: cand.ticker, processed: false, error: "no price feed (Yahoo + Stooq both unavailable)" };
+
+    const closes = candles.map((c) => c.close);
+    const ema8 = emaSeries(closes, 8);
+    const ema21 = emaSeries(closes, 21);
+    const atr14 = atrSeries(candles, 14);
+    const rvol = rvolSeries(candles);
+
+    const entryIdx = candles.findIndex((c) => c.date >= entryDateStr);
+    if (entryIdx < 0) return { ticker: cand.ticker, processed: false };
+
+    // ── 1R bases (both) ──────────────────────────────────────────────────
+    const atrAtEntry = atr14[entryIdx];
+    const fiveDayLow = lowestLow(candles, entryIdx, 5);
+    const aStop = atrFloorStop({ entry, atr14: atrAtEntry, fiveDayLow, setup: cand.setupClassification });
+    const rLogged = rUnit(entry, loggedStop);
+    const rAtr = rUnit(entry, aStop);
+    const rBase = rLogged ?? rAtr; // prefer the logged stop for R-denominated stats
+
+    // ── Walk the window, append daily tracks, collect signals ────────────
+    let maxClose = -Infinity;
+    let minClose = Infinity;
+    let exit8: number | null = null;
+    let exit21: number | null = null;
+    let hardHitLoggedAt: string | null = null;
+    let hardHitAtrAt: string | null = null;
+    let hitTarget = false;
+    const lastIdx = Math.min(entryIdx + WINDOW, candles.length - 1);
+
+    for (let i = entryIdx; i <= lastIdx; i++) {
+      const c = candles[i];
+      const e8 = ema8[i];
+      const e21 = ema21[i];
+      const closeBelow8 = e8 != null && c.close < e8;
+      const closeBelow21 = e21 != null && c.close < e21;
+      const hardLogged = loggedStop != null && c.low <= loggedStop;
+      const hardAtr = aStop != null && c.low <= aStop;
+
+      if (closeBelow8 && exit8 == null) exit8 = c.close;
+      if (closeBelow21 && exit21 == null) exit21 = c.close;
+      if (hardLogged && hardHitLoggedAt == null) hardHitLoggedAt = c.date;
+      if (hardAtr && hardHitAtrAt == null) hardHitAtrAt = c.date;
+      if (target != null && c.high >= target) hitTarget = true;
+      maxClose = Math.max(maxClose, c.close);
+      minClose = Math.min(minClose, c.close);
+
+      const runMfeR = rBase ? (maxClose - entry) / rBase : null;
+      const runMaeR = rBase ? (minClose - entry) / rBase : null;
+
+      const vol = c.volume != null && Number.isFinite(c.volume) ? BigInt(Math.round(c.volume)) : null;
+      const trackData = {
+        dayIndex: i - entryIdx,
+        open: dec(c.open), high: dec(c.high), low: dec(c.low), close: dec(c.close),
+        volume: vol, rvol: dec(rvol[i]),
+        ema8: dec(e8), ema21: dec(e21), atr14: dec(atr14[i]),
+        closeBelow8ema: closeBelow8, closeBelow21ema: closeBelow21,
+        hardStopHitLogged: hardLogged, hardStopHitAtr: hardAtr,
+        runMfeR: dec(runMfeR), runMaeR: dec(runMaeR),
+      };
+      await prisma.positionDailyTrack.upsert({
+        where: { candidateId_sessionDate: { candidateId: cand.id, sessionDate: new Date(`${c.date}T00:00:00.000Z`) } },
+        create: { candidateId: cand.id, sessionDate: new Date(`${c.date}T00:00:00.000Z`), ...trackData },
+        update: trackData,
+      });
+    }
+
+    // ── Entry-trigger lifecycle (REC picks only — HELD is already entered) ──
+    if (!cand.isHeld) {
+      const triggerPath = candles.slice(entryIdx, lastIdx + 1).map((c, k) => ({
+        date: c.date, open: c.open, high: c.high, low: c.low, close: c.close,
+        ema8: ema8[entryIdx + k], ema21: ema21[entryIdx + k], rvol: rvol[entryIdx + k],
+      }));
+      const trig = evaluateTrigger(cand.setupClassification, triggerPath, cand.entryZone?.toNumber() ?? null);
+      // Only advance / record changes — never regress a fired trigger to ARMED.
+      const prev = cand.triggerState;
+      const terminalNow = trig.state === "TRIGGERED" || trig.state === "INVALIDATED";
+      const prevTerminal = prev === "TRIGGERED" || prev === "INVALIDATED";
+      if (!prevTerminal || terminalNow) {
+        triggerUpdate = {
+          triggerState: trig.state,
+          triggerStateAt: trig.date ? new Date(`${trig.date}T00:00:00.000Z`) : (prev !== trig.state ? new Date() : cand.triggerStateAt),
+          triggerReason: trig.reason,
+        };
+      }
+      // Queue the LLM Conviction verdict once, on the ARMED→TRIGGERED flip.
+      if (trig.state === "TRIGGERED" && prev !== "TRIGGERED" && cand.agentConvictionAt == null) {
+        triggered = {
+          candId: cand.id,
+          input: {
+            ticker: cand.ticker,
+            setup: cand.setupClassification,
+            sector: cand.sector,
+            triggerState: trig.state,
+            triggerReason: trig.reason,
+            entryZone: cand.entryZone?.toNumber() ?? null,
+            stop: cand.stop?.toNumber() ?? aStop ?? null,
+            target: cand.target?.toNumber() ?? null,
+            rvol: cand.day0Rvol?.toNumber() ?? rvol[lastIdx] ?? null,
+            rsRating: null,
+            day0Thesis: cand.day0Thesis,
+            algo: { setup: cand.setupScore, entry: cand.entryScore, theme: cand.themeScore, sentiment: cand.sentimentScore },
+            recentPath: triggerPath.slice(-6).map((b) => ({ date: b.date, close: b.close, ema8: b.ema8, ema21: b.ema21, rvol: b.rvol })),
+          },
+        };
+      }
+    }
+
+    // ── Savings metrics (provisional until the position closes) ──────────
+    const markClose = candles[lastIdx].close;
+    const realizedPnlUsd = (markClose - entry) * qty;
+    const real = rBase ? realizedVsFullR({ qty, rUnitPerShare: rBase, realizedPnlUsd }) : null;
+    const soft = rBase ? softVsHard({ entry, qty, rUnitPerShare: rBase, exit8emaClose: exit8, exit21emaClose: exit21 }) : null;
+
+    const hardHitAt = hardHitLoggedAt ?? hardHitAtrAt;
+    const hardBasis = hardHitLoggedAt && hardHitAtrAt ? "BOTH" : hardHitLoggedAt ? "LOGGED" : hardHitAtrAt ? "ATR" : null;
+
+    // Truly complete only after 14 full sessions have elapsed since entry —
+    // NOT merely because we've reached the latest candle (that happens every
+    // day for an in-progress position, which would prematurely stamp a day-14
+    // outcome like DRIFT on a position still being held).
+    const windowComplete = lastIdx >= entryIdx + WINDOW;
+    let outcome: string | null = null;
+    let status = cand.status;
+    if (hitTarget) {
+      outcome = "HIT_TARGET";
+      status = "HIT_TARGET";
+    } else if (hardHitAt) {
+      outcome = "STOPPED_OUT";
+      status = "STOPPED_OUT";
+    } else if (windowComplete) {
+      outcome = markClose >= entry ? "DRIFT" : "FADE";
+    }
+
+    const mfeR = rBase ? (maxClose - entry) / rBase : null;
+    const maeR = rBase ? (minClose - entry) / rBase : null;
+
+    await prisma.aListCandidate.update({
+      where: { id: cand.id },
+      data: {
+        rUnitLogged: dec(rLogged),
+        rUnitAtr: dec(rAtr),
+        atrFloorStop: dec(aStop),
+        realizedRLogged: real ? dec(real.realizedR) : null,
+        saveRealizedUsd: real ? dec(real.saveUsd) : null,
+        saveRealizedR: real ? dec(real.saveR) : null,
+        soft8emaExit: dec(exit8),
+        soft21emaExit: dec(exit21),
+        saveSoftVsHardUsd: soft ? dec(soft.saveUsd) : null,
+        saveSoftVsHardR: soft ? dec(soft.saveR) : null,
+        hardStopHitAt: hardHitAt ? new Date(`${hardHitAt}T00:00:00.000Z`) : null,
+        hardStopHitBasis: hardBasis,
+        day14Mfe: dec(maxClose),
+        day14Mae: dec(minClose),
+        day14MfeR: dec(mfeR),
+        day14MaeR: dec(maeR),
+        day14Outcome: outcome,
+        day14ComputedAt: windowComplete ? new Date() : cand.day14ComputedAt,
+        status,
+        ...triggerUpdate,
+      },
+    });
+    return { ticker: cand.ticker, processed: true, triggered };
+  } catch (e) {
+    return { ticker: cand.ticker, processed: false, error: e instanceof Error ? e.message : String(e) };
+  }
 }
 
 export async function GET(req: Request) {
@@ -110,191 +362,21 @@ export async function GET(req: Request) {
     orderBy: { pickDate: "asc" },
   });
 
-  let processed = 0;
-  const errors: string[] = [];
-  // Picks that flipped to TRIGGERED this run → queue the LLM Conviction verdict.
-  const newlyTriggered: { candId: string; input: ConvictionInput }[] = [];
-
-  for (const cand of candidates) {
-    try {
-      const entry = cand.entryAvgCost?.toNumber() ?? cand.entryZone?.toNumber() ?? cand.day0Price?.toNumber() ?? null;
-      if (entry == null || entry <= 0) continue;
-
-      const entryRef = cand.entryFillAt ?? cand.pickDate;
-      const entryDateStr = new Date(entryRef).toISOString().slice(0, 10);
-      const qty = cand.heldQty?.toNumber() ?? 1;
-      const loggedStop = cand.stop?.toNumber() ?? null;
-      const target = cand.target?.toNumber() ?? null;
-
-      let triggerUpdate: { triggerState?: string; triggerStateAt?: Date | null; triggerReason?: string } = {};
-
-      const candles = await fetchDailyCandles(cand.ticker);
-      if (candles.length === 0) continue;
-
-      const closes = candles.map((c) => c.close);
-      const ema8 = emaSeries(closes, 8);
-      const ema21 = emaSeries(closes, 21);
-      const atr14 = atrSeries(candles, 14);
-      const rvol = rvolSeries(candles);
-
-      const entryIdx = candles.findIndex((c) => c.date >= entryDateStr);
-      if (entryIdx < 0) continue;
-
-      // ── 1R bases (both) ──────────────────────────────────────────────────
-      const atrAtEntry = atr14[entryIdx];
-      const fiveDayLow = lowestLow(candles, entryIdx, 5);
-      const aStop = atrFloorStop({ entry, atr14: atrAtEntry, fiveDayLow, setup: cand.setupClassification });
-      const rLogged = rUnit(entry, loggedStop);
-      const rAtr = rUnit(entry, aStop);
-      const rBase = rLogged ?? rAtr; // prefer the logged stop for R-denominated stats
-
-      // ── Walk the window, append daily tracks, collect signals ────────────
-      let maxClose = -Infinity;
-      let minClose = Infinity;
-      let exit8: number | null = null;
-      let exit21: number | null = null;
-      let hardHitLoggedAt: string | null = null;
-      let hardHitAtrAt: string | null = null;
-      let hitTarget = false;
-      const lastIdx = Math.min(entryIdx + WINDOW, candles.length - 1);
-
-      for (let i = entryIdx; i <= lastIdx; i++) {
-        const c = candles[i];
-        const e8 = ema8[i];
-        const e21 = ema21[i];
-        const closeBelow8 = e8 != null && c.close < e8;
-        const closeBelow21 = e21 != null && c.close < e21;
-        const hardLogged = loggedStop != null && c.low <= loggedStop;
-        const hardAtr = aStop != null && c.low <= aStop;
-
-        if (closeBelow8 && exit8 == null) exit8 = c.close;
-        if (closeBelow21 && exit21 == null) exit21 = c.close;
-        if (hardLogged && hardHitLoggedAt == null) hardHitLoggedAt = c.date;
-        if (hardAtr && hardHitAtrAt == null) hardHitAtrAt = c.date;
-        if (target != null && c.high >= target) hitTarget = true;
-        maxClose = Math.max(maxClose, c.close);
-        minClose = Math.min(minClose, c.close);
-
-        const runMfeR = rBase ? (maxClose - entry) / rBase : null;
-        const runMaeR = rBase ? (minClose - entry) / rBase : null;
-
-        const vol = c.volume != null && Number.isFinite(c.volume) ? BigInt(Math.round(c.volume)) : null;
-        const trackData = {
-          dayIndex: i - entryIdx,
-          open: dec(c.open), high: dec(c.high), low: dec(c.low), close: dec(c.close),
-          volume: vol, rvol: dec(rvol[i]),
-          ema8: dec(e8), ema21: dec(e21), atr14: dec(atr14[i]),
-          closeBelow8ema: closeBelow8, closeBelow21ema: closeBelow21,
-          hardStopHitLogged: hardLogged, hardStopHitAtr: hardAtr,
-          runMfeR: dec(runMfeR), runMaeR: dec(runMaeR),
-        };
-        await prisma.positionDailyTrack.upsert({
-          where: { candidateId_sessionDate: { candidateId: cand.id, sessionDate: new Date(`${c.date}T00:00:00.000Z`) } },
-          create: { candidateId: cand.id, sessionDate: new Date(`${c.date}T00:00:00.000Z`), ...trackData },
-          update: trackData,
-        });
-      }
-
-      // ── Entry-trigger lifecycle (REC picks only — HELD is already entered) ──
-      if (!cand.isHeld) {
-        const triggerPath = candles.slice(entryIdx, lastIdx + 1).map((c, k) => ({
-          date: c.date, open: c.open, high: c.high, low: c.low, close: c.close,
-          ema8: ema8[entryIdx + k], ema21: ema21[entryIdx + k], rvol: rvol[entryIdx + k],
-        }));
-        const trig = evaluateTrigger(cand.setupClassification, triggerPath, cand.entryZone?.toNumber() ?? null);
-        // Only advance / record changes — never regress a fired trigger to ARMED.
-        const prev = cand.triggerState;
-        const terminalNow = trig.state === "TRIGGERED" || trig.state === "INVALIDATED";
-        const prevTerminal = prev === "TRIGGERED" || prev === "INVALIDATED";
-        if (!prevTerminal || terminalNow) {
-          triggerUpdate = {
-            triggerState: trig.state,
-            triggerStateAt: trig.date ? new Date(`${trig.date}T00:00:00.000Z`) : (prev !== trig.state ? new Date() : cand.triggerStateAt),
-            triggerReason: trig.reason,
-          };
-        }
-        // Queue the LLM Conviction verdict once, on the ARMED→TRIGGERED flip.
-        if (trig.state === "TRIGGERED" && prev !== "TRIGGERED" && cand.agentConvictionAt == null) {
-          newlyTriggered.push({
-            candId: cand.id,
-            input: {
-              ticker: cand.ticker,
-              setup: cand.setupClassification,
-              sector: cand.sector,
-              triggerState: trig.state,
-              triggerReason: trig.reason,
-              entryZone: cand.entryZone?.toNumber() ?? null,
-              stop: cand.stop?.toNumber() ?? aStop ?? null,
-              target: cand.target?.toNumber() ?? null,
-              rvol: cand.day0Rvol?.toNumber() ?? rvol[lastIdx] ?? null,
-              rsRating: null,
-              day0Thesis: cand.day0Thesis,
-              algo: { setup: cand.setupScore, entry: cand.entryScore, theme: cand.themeScore, sentiment: cand.sentimentScore },
-              recentPath: triggerPath.slice(-6).map((b) => ({ date: b.date, close: b.close, ema8: b.ema8, ema21: b.ema21, rvol: b.rvol })),
-            },
-          });
-        }
-      }
-
-      // ── Savings metrics (provisional until the position closes) ──────────
-      const markClose = candles[lastIdx].close;
-      const realizedPnlUsd = (markClose - entry) * qty;
-      const real = rBase ? realizedVsFullR({ qty, rUnitPerShare: rBase, realizedPnlUsd }) : null;
-      const soft = rBase ? softVsHard({ entry, qty, rUnitPerShare: rBase, exit8emaClose: exit8, exit21emaClose: exit21 }) : null;
-
-      const hardHitAt = hardHitLoggedAt ?? hardHitAtrAt;
-      const hardBasis = hardHitLoggedAt && hardHitAtrAt ? "BOTH" : hardHitLoggedAt ? "LOGGED" : hardHitAtrAt ? "ATR" : null;
-
-      // Truly complete only after 14 full sessions have elapsed since entry —
-      // NOT merely because we've reached the latest candle (that happens every
-      // day for an in-progress position, which would prematurely stamp a day-14
-      // outcome like DRIFT on a position still being held).
-      const windowComplete = lastIdx >= entryIdx + WINDOW;
-      let outcome: string | null = null;
-      let status = cand.status;
-      if (hitTarget) {
-        outcome = "HIT_TARGET";
-        status = "HIT_TARGET";
-      } else if (hardHitAt) {
-        outcome = "STOPPED_OUT";
-        status = "STOPPED_OUT";
-      } else if (windowComplete) {
-        outcome = markClose >= entry ? "DRIFT" : "FADE";
-      }
-
-      const mfeR = rBase ? (maxClose - entry) / rBase : null;
-      const maeR = rBase ? (minClose - entry) / rBase : null;
-
-      await prisma.aListCandidate.update({
-        where: { id: cand.id },
-        data: {
-          rUnitLogged: dec(rLogged),
-          rUnitAtr: dec(rAtr),
-          atrFloorStop: dec(aStop),
-          realizedRLogged: real ? dec(real.realizedR) : null,
-          saveRealizedUsd: real ? dec(real.saveUsd) : null,
-          saveRealizedR: real ? dec(real.saveR) : null,
-          soft8emaExit: dec(exit8),
-          soft21emaExit: dec(exit21),
-          saveSoftVsHardUsd: soft ? dec(soft.saveUsd) : null,
-          saveSoftVsHardR: soft ? dec(soft.saveR) : null,
-          hardStopHitAt: hardHitAt ? new Date(`${hardHitAt}T00:00:00.000Z`) : null,
-          hardStopHitBasis: hardBasis,
-          day14Mfe: dec(maxClose),
-          day14Mae: dec(minClose),
-          day14MfeR: dec(mfeR),
-          day14MaeR: dec(maeR),
-          day14Outcome: outcome,
-          day14ComputedAt: windowComplete ? new Date() : cand.day14ComputedAt,
-          status,
-          ...triggerUpdate,
-        },
-      });
-      processed++;
-    } catch (e) {
-      errors.push(`${cand.ticker}: ${e instanceof Error ? e.message : String(e)}`);
+  // ── Process in bounded-parallel batches so the whole run fits the budget ──
+  const results: CandResult[] = [];
+  for (let i = 0; i < candidates.length; i += FETCH_CONCURRENCY) {
+    const slice = candidates.slice(i, i + FETCH_CONCURRENCY);
+    const settled = await Promise.allSettled(slice.map((c) => processCandidate(c)));
+    for (let k = 0; k < settled.length; k++) {
+      const s = settled[k];
+      if (s.status === "fulfilled") results.push(s.value);
+      else results.push({ ticker: slice[k].ticker, processed: false, error: String(s.reason) });
     }
   }
+
+  const processed = results.filter((r) => r.processed).length;
+  const errors = results.filter((r) => r.error).map((r) => `${r.ticker}: ${r.error}`);
+  const newlyTriggered = results.flatMap((r) => (r.triggered ? [r.triggered] : []));
 
   // ── Multi-agent Conviction verdict on freshly-TRIGGERED picks (R4) ────────
   // Runs only on the trigger flip, bounded per run, never fails the cron.
