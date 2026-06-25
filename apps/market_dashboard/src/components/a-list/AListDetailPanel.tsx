@@ -225,6 +225,16 @@ export default function AListDetailPanel({ row, onClose }: Props) {
           )}
         </Section>
 
+        {(row.day0Market || row.exitMarket) && (
+          <Section title="Market Backdrop — pick vs tape">
+            <Row label="SPY" value={mktPair(fmtPctM(row.day0Market?.spyChg), fmtPctM(row.exitMarket?.spyChg))} />
+            <Row label="QQQ" value={mktPair(fmtPctM(row.day0Market?.qqqChg), fmtPctM(row.exitMarket?.qqqChg))} />
+            <Row label="Breadth A/D" value={mktPair(advDecM(row.day0Market), advDecM(row.exitMarket))} />
+            <Row label="Fear & Greed" value={mktPair(fgM(row.day0Market), fgM(row.exitMarket))} />
+            <p className="t-caption mt-2 text-[var(--fg-3)]">Entry → Exit — separates the pick from the tape.</p>
+          </Section>
+        )}
+
         <Section title="Status">
           <Row label="Current" value={row.status} />
           {row.convertedTradeId && <Row label="Trade Record" value={row.convertedTradeId} />}
@@ -238,6 +248,22 @@ export default function AListDetailPanel({ row, onClose }: Props) {
       </div>
     </>
   );
+}
+
+function fmtPctM(v: number | null | undefined): string {
+  if (v == null) return "-";
+  return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
+}
+function advDecM(m?: { breadthAdvance: number | null; breadthDecline: number | null } | null): string {
+  if (!m || (m.breadthAdvance == null && m.breadthDecline == null)) return "-";
+  return `${m.breadthAdvance ?? "?"}/${m.breadthDecline ?? "?"}`;
+}
+function fgM(m?: { fearGreed: number | null; fearGreedLabel: string | null } | null): string {
+  if (!m || m.fearGreed == null) return "-";
+  return `${m.fearGreed}${m.fearGreedLabel ? ` (${m.fearGreedLabel})` : ""}`;
+}
+function mktPair(entry: string, exit: string): string {
+  return exit && exit !== "-" ? `${entry} → ${exit}` : entry;
 }
 
 function PathTable({ rows }: { rows: TrackRow[] }) {

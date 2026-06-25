@@ -11,6 +11,16 @@
 
 import { sessionsBetween, validUntil } from "@/lib/alist-validity";
 
+export interface MarketCtx {
+  spyChg: number | null;
+  qqqChg: number | null;
+  breadthAdvance: number | null;
+  breadthDecline: number | null;
+  fearGreed: number | null;
+  fearGreedLabel: string | null;
+  asOf?: string;
+}
+
 export interface AListRow {
   id: string;
   pickDate: string;
@@ -80,6 +90,9 @@ export interface AListRow {
     hardStopHitBasis: string | null;
     hardStopHitAt: string | null;
   };
+  // Market backdrop at entry vs exit (P4).
+  day0Market?: MarketCtx | null;
+  exitMarket?: MarketCtx | null;
 }
 
 interface Props {

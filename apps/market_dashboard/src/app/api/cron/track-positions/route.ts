@@ -31,6 +31,7 @@ import { atrFloorStop, rUnit, realizedVsFullR, softVsHard } from "@/server/alist
 import { reconcileClosedHeld } from "@/server/alist-close";
 import { evaluateTrigger } from "@/lib/alist-triggers";
 import { runConvictionAnalysis, type ConvictionInput } from "@/server/conviction-analysis";
+import { marketContextNow } from "@/lib/market-context";
 
 // Cap LLM Conviction analyses per cron run so a day with many triggers can't
 // blow the function budget; the rest get picked up next run.
@@ -320,6 +321,11 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
     const mfeR = rBase ? (maxClose - entry) / rBase : null;
     const maeR = rBase ? (minClose - entry) / rBase : null;
 
+    // Exit-day market backdrop for a REC pick that just resolved (P4). HELD exits
+    // are captured by reconcileClosedHeld instead (broker-truth).
+    const captureExit = !cand.isHeld && (outcome === "HIT_TARGET" || outcome === "STOPPED_OUT") && cand.exitMarket == null;
+    const exitMkt = captureExit ? await marketContextNow() : null;
+
     await prisma.aListCandidate.update({
       where: { id: cand.id },
       data: {
@@ -342,6 +348,7 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
         day14Outcome: outcome,
         day14ComputedAt: windowComplete ? new Date() : cand.day14ComputedAt,
         status,
+        ...(exitMkt ? { exitMarket: exitMkt as unknown as Prisma.InputJsonValue } : {}),
         ...triggerUpdate,
       },
     });

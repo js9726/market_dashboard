@@ -15,6 +15,7 @@
  * tracker run reconciles the candidate.
  */
 import { Prisma, type PrismaClient } from "@prisma/client";
+import { marketContextNow } from "@/lib/market-context";
 
 /** Strip a broker prefix ("US.POWL" → "POWL"); bare tickers pass through. */
 function plain(ticker: string): string {
@@ -67,6 +68,10 @@ export async function reconcileClosedHeld(
     const outcome = isLoss ? "STOPPED_OUT" : "DRIFT";
     const status = isLoss ? "STOPPED_OUT" : "CLOSED";
 
+    // Capture the market backdrop at exit (P4) — cached, so the first close in a
+    // run fetches and the rest reuse.
+    const exitMkt = await marketContextNow();
+
     await prisma.aListCandidate.update({
       where: { id: c.id },
       data: {
@@ -76,6 +81,7 @@ export async function reconcileClosedHeld(
           realizedR != null ? new Prisma.Decimal(realizedR) : c.realizedRLogged,
         hardStopHitAt: c.hardStopHitAt ?? new Date(),
         day14ComputedAt: new Date(),
+        exitMarket: exitMkt as unknown as Prisma.InputJsonValue,
       },
     });
     closed.push({ ticker: plain(c.ticker), realizedR, outcome });

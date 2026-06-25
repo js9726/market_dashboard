@@ -19,6 +19,7 @@
  */
 import { Prisma, PrismaClient } from "@prisma/client";
 import { computeAutoLevels } from "@/server/alist-levels";
+import { marketContextNow } from "@/lib/market-context";
 
 const prisma = new PrismaClient();
 
@@ -312,6 +313,10 @@ export async function upsertCandidates(
   let updated = 0;
   let refreshed = 0;
 
+  // Entry-day market backdrop, captured once (cached) and frozen onto each NEW
+  // candidate so the page can read "the pick vs the tape" (P4).
+  const mkt = await marketContextNow();
+
   for (const rawCandidate of candidates) {
     const c = await withAutoLevels(rawCandidate);
 
@@ -415,7 +420,9 @@ export async function upsertCandidates(
       await prisma.aListCandidate.update({ where: { id: existing.id }, data });
       updated++;
     } else {
-      await prisma.aListCandidate.create({ data });
+      await prisma.aListCandidate.create({
+        data: { ...data, day0Market: mkt as unknown as Prisma.InputJsonValue },
+      });
       inserted++;
     }
 

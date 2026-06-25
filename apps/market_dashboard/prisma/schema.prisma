@@ -458,6 +458,10 @@ model AListCandidate {
   day0BriefProvider String?
   /// Price at pick close (or pre-mkt if pick happened pre-mkt).
   day0Price         Decimal?  @db.Decimal(12, 4)
+  /// Market backdrop at entry day (lib/market-context.ts): { spyChg, qqqChg,
+  /// breadthAdvance, breadthDecline, fearGreed, fearGreedLabel, asOf }. Lets the
+  /// page separate "the pick" from "the tape" (entry vs exit).
+  day0Market        Json?
 
   // ── Day-14 outcome (computed on day 14 via cron) ───────────────────────
   /// Highest close above entry over 14 sessions.
@@ -526,6 +530,9 @@ model AListCandidate {
   /// When/whether the hard stop was breached in-window.
   hardStopHitAt     DateTime?
   hardStopHitBasis  String?   // "LOGGED" | "ATR" | "BOTH"
+  /// Market backdrop captured at exit (broker exit / day-14 terminal). Same shape
+  /// as day0Market — pair them to read "was it the pick or the tape?".
+  exitMarket        Json?
 
   // ── Status lifecycle ────────────────────────────────────────────────────
   /// "ACTIVE" | "EXPIRED" | "HIT_TARGET" | "STOPPED_OUT" | "MANUALLY_CLOSED" | "CONVERTED"

@@ -108,6 +108,9 @@ export function serializeCandidate(r: AListCandidate) {
           final: r.day14ComputedAt != null,
         }
       : null,
+    // Market backdrop at entry vs exit (P4) — "was it the pick or the tape?".
+    day0Market: r.day0Market ?? null,
+    exitMarket: r.exitMarket ?? null,
     tags: r.tags,
     notes: r.notes,
     createdAt: r.createdAt.toISOString(),
