@@ -94,6 +94,29 @@
         "sort":   {"sortBy": "relative_volume_10d_calc", "sortOrder": "desc"},
         "range":  [0, 25]
       }
+    },
+    {
+      "id": "liquid-pullback",
+      "name": "Liquid Leaders Pullback",
+      "tv_url": "",
+      "_filter_notes": "Lane 2 (wiki/a-list-gate-and-screener.md): the pullback lane the breakout screeners miss. Rising-structure leaders (SMA20>SMA50, close>SMA50, Perf.1M>5) on a quiet/down small-change day (-5..4%) with CONTRACTING volume (RVOL<=1.2) — i.e. a healthy pullback, not a breakout. Scored on pullback criteria + admitted as WATCH/armed; the GO comes on the trigger.",
+      "query": {
+        "filter": [
+          {"left": "close",                    "operation": "egreater", "right": "SMA50"},
+          {"left": "SMA20",                    "operation": "greater",  "right": "SMA50"},
+          {"left": "Perf.1M",                  "operation": "egreater", "right": 5},
+          {"left": "change",                   "operation": "in_range", "right": [-5, 4]},
+          {"left": "relative_volume_10d_calc", "operation": "in_range", "right": [0, 1.2]},
+          {"left": "ATRP",                     "operation": "in_range", "right": [2, 12]},
+          {"left": "market_cap_basic",         "operation": "egreater", "right": 1000000000},
+          {"left": "close",                    "operation": "egreater", "right": 5},
+          {"left": "exchange",                 "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
+        ],
+        "options": {"lang": "en"},
+        "markets": ["america"],
+        "sort":   {"sortBy": "Perf.1M", "sortOrder": "desc"},
+        "range":  [0, 25]
+      }
     }
   ],
   "columns_to_fetch": [
