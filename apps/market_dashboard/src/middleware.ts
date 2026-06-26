@@ -36,6 +36,9 @@ export default auth((req) => {
     // entries/ingest (cron writes AI-scored JournalEntry via bearer).
     pathname.startsWith("/api/journal/closed-today") ||
     pathname.startsWith("/api/journal/entries/ingest") ||
+    // A-list daily-bar ingest (P2): the local OpenD/IBKR bridge pushes bars via
+    // BRIEF_INGEST_KEY. Key/bearer auth inside the handler — must bypass session.
+    pathname.startsWith("/api/a-list/bars-ingest") ||
     // Bridge daemon uses bearer-token auth (BrokerBridgeToken.tokenHash) plus
     // X-Timestamp replay protection. Token endpoint stays session-authed
     // because only logged-in users generate/revoke their own tokens.
