@@ -117,10 +117,41 @@ async function fetchStooqCandles(symbol: string): Promise<Candle[]> {
   return out.slice(-90); // match Yahoo's ~3mo window
 }
 
-/** Resilient daily candles: Yahoo first, Stooq fallback. Either feed can
- *  rate-limit serverless IPs; trying both keeps the tracker alive. Returns []
- *  only when BOTH are unavailable for this symbol. */
+/** Authoritative OpenD/IBKR bars pushed by the local bridge (P2). Preferred over
+ *  the cloud feeds when fresh (latest bar within ~4 days) and deep enough for the
+ *  EMA/ATR windows — so MFE/MAE use the broker's own price basis. */
+async function fetchBrokerBars(symbol: string): Promise<Candle[]> {
+  const ticker = symbol.includes(".") ? symbol.slice(symbol.lastIndexOf(".") + 1).toUpperCase() : symbol.toUpperCase();
+  const since = new Date();
+  since.setUTCDate(since.getUTCDate() - 120);
+  const rows = await prisma.brokerDailyBar.findMany({
+    where: { ticker, date: { gte: since } },
+    orderBy: { date: "asc" },
+  });
+  if (rows.length < 20) return [];
+  const latest = rows[rows.length - 1].date;
+  if (Date.now() - latest.getTime() > 4 * 86_400_000) return []; // stale → use cloud
+  return rows
+    .map((r) => ({
+      date: r.date.toISOString().slice(0, 10),
+      open: r.open?.toNumber() ?? 0,
+      high: r.high?.toNumber() ?? 0,
+      low: r.low?.toNumber() ?? 0,
+      close: r.close?.toNumber() ?? 0,
+      volume: r.volume != null ? Number(r.volume) : null,
+    }))
+    .filter((c) => c.close > 0);
+}
+
+/** Resilient daily candles: broker bridge (OpenD/IBKR) first, then Yahoo, then
+ *  Stooq. Returns [] only when every source is unavailable for this symbol. */
 async function fetchDailyCandles(symbol: string): Promise<Candle[]> {
+  try {
+    const b = await fetchBrokerBars(symbol);
+    if (b.length) return b;
+  } catch {
+    /* fall through to cloud feeds */
+  }
   try {
     const y = await fetchYahooCandles(symbol);
     if (y.length) return y;

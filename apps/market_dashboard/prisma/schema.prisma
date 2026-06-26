@@ -288,6 +288,26 @@ model MarketBreadthSnapshot {
   @@index([refreshedAt(sort: Desc)])
 }
 
+/// Authoritative daily OHLCV bars pushed from the local moomoo OpenD / IBKR
+/// bridge (P2). The track-positions cron prefers these over the cloud Yahoo/Stooq
+/// fallback when they are fresh, so MFE/MAE/stops are computed from the same
+/// price basis the broker fills are in. One row per (ticker, date).
+model BrokerDailyBar {
+  id        String   @id @default(cuid())
+  ticker    String // plain uppercase ticker, e.g. "MU"
+  date      DateTime @db.Date
+  open      Decimal? @db.Decimal(14, 4)
+  high      Decimal? @db.Decimal(14, 4)
+  low       Decimal? @db.Decimal(14, 4)
+  close     Decimal? @db.Decimal(14, 4)
+  volume    BigInt?
+  source    String   @default("opend")
+  fetchedAt DateTime @default(now())
+
+  @@unique([ticker, date])
+  @@index([ticker, date(sort: Desc)])
+}
+
 /// Daily TV screener snapshot — DB-backed (push) so it refreshes reliably via
 /// Vercel cron hitting /api/screeners/refresh (TradingView scanner, proven to
 /// work from Vercel), instead of GitHub Actions cron which skipped intraday and
