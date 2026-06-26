@@ -81,7 +81,12 @@ function algoScore(h: Record<string, unknown>): {
   const high_d = num("high"), low_d = num("low"), close_d = num("close");
   const A = Math.abs(chg_day);
 
-  const is_ep = chg_day > 8 && perf_1m < 15 && rvol > 2.5;
+  // P5 calibration (2026-06-26, wiki/a-list-gate-and-screener.md "Calibration log"):
+  // EP-FRESH ran 28% win / +0.11R avg MFE over n=18 — the detector was catching
+  // WEAK episodic pivots. Tightened to match the wiki's own EP definition
+  // (Qullamaggie: "10%+ gap, huge volume"): chg>10 + rvol>3 (was >8 / >2.5).
+  // Small, reversible, data + wiki justified.
+  const is_ep = chg_day > 10 && perf_1m < 15 && rvol > 3;
   const is_breakout = chg_day > 3 && chg_day < 20 && perf_1m > 8 && perf_1m < 50 && rvol > 1.5;
   // Pullback = a small move in an uptrend on NON-surging volume. Contraction is
   // the signal (wiki/a-list-gate-and-screener.md), so there is no low-RVOL floor —
