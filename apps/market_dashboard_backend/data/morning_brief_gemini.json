@@ -1,172 +1,143 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-ON",
+    "label": "RISK-OFF",
     "posture": "WAIT",
-    "summary": "Micron's blowout earnings are sparking a significant rebound in tech and semiconductor stocks this morning, but the broader market remains mixed after recent tech-led selling and ahead of key PCE inflation data."
+    "summary": "Global tech sell-off intensifies on concerns over rising AI-related costs and a potential delay in OpenAI's IPO, leading to sharp declines in Asian and European markets and pressuring U.S. futures."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": 28,
-    "label": "Fear"
+    "score": null,
+    "label": null
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": 7358.22,
-      "changePct": -0.1,
-      "note": "futures up ~0.7%",
-      "citation": null
+      "level": null,
+      "changePct": -0.73,
+      "note": "futures",
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": -0.43,
-      "note": "futures up ~2.1%",
-      "citation": null
+      "changePct": -1.38,
+      "note": "futures",
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "DIA",
-      "name": "Dow Jones",
-      "level": 51848.9,
-      "changePct": 0.35,
-      "note": "futures up ~0.45%",
-      "citation": null
+      "name": "Dow Jones Industrial Average",
+      "level": null,
+      "changePct": -0.39,
+      "note": "futures",
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
-      "level": 2986.63,
-      "changePct": 0.37,
-      "note": "futures up ~0.9%",
-      "citation": null
+      "level": null,
+      "changePct": -0.75,
+      "note": "futures",
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility",
-      "level": 18.63,
-      "changePct": -4.4,
-      "note": "near session lows",
-      "citation": null
+      "name": "Volatility Index",
+      "level": 19.58,
+      "changePct": 2.35,
+      "note": "live",
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "^TNX",
-      "name": "10Y Yield",
-      "level": 4.41,
-      "changePct": -1.78,
-      "note": "yields falling",
-      "citation": null
+      "name": "10-Year Treasury Yield",
+      "level": 4.4,
+      "changePct": null,
+      "note": "live",
+      "citation": "Source: StoneX"
     },
     {
       "symbol": "CL=F",
-      "name": "WTI Crude Oil",
-      "level": 70.34,
-      "changePct": -3.9,
-      "note": "near pre-war levels",
-      "citation": null
+      "name": "Crude Oil",
+      "level": 69.38,
+      "changePct": -3.53,
+      "note": "live",
+      "citation": "Source: TipRanks"
     }
   ],
-  "indicesNarrative": "Yesterday saw a clear rotation, with the Dow and Russell 2000 closing positive while the tech-heavy Nasdaq and S&P 500 fell. However, strong earnings from Micron are driving a significant pre-market rally in tech futures, suggesting a potential reversal of this trend today. Falling oil prices and Treasury yields are providing a supportive backdrop.",
+  "indicesNarrative": "U.S. stock futures are pointing to a lower open, with the Nasdaq leading the decline as a global sell-off in technology stocks continues. Concerns about the rising costs of AI infrastructure and a report that OpenAI may delay its IPO are weighing on sentiment. This follows a mixed session on Thursday where the S&P 500 and Nasdaq closed lower despite strong earnings from Micron.",
   "technicals": {
     "SPY": null,
     "QQQ": null,
     "DIA": null,
     "IWM": null
   },
-  "technicalsNarrative": "Specific technical indicator data is unavailable. Based on price action, the Nasdaq experienced a sharp two-day pullback, indicating potential exhaustion, while the Dow showed relative strength. The strong pre-market bounce in tech suggests dip-buyers are active, but caution is warranted until price action is confirmed during regular trading hours.",
-  "sectorsThemes": [
-    {
-      "symbol": "XLK",
-      "name": "Technology",
-      "changePct": -0.4,
-      "rs": null,
-      "note": "Weak yesterday but indicated for a strong open on Micron news."
-    },
-    {
-      "symbol": "SMH",
-      "name": "Semiconductors",
-      "changePct": null,
-      "rs": null,
-      "note": "Experienced a sharp sell-off but rallying hard pre-market."
-    },
-    {
-      "symbol": "XLE",
-      "name": "Energy",
-      "changePct": -1.73,
-      "rs": null,
-      "note": "Leading decliner as crude oil prices continue to fall."
-    },
-    {
-      "symbol": "XLI",
-      "name": "Industrials",
-      "changePct": 1.18,
-      "rs": null,
-      "note": "Showed strong relative strength yesterday."
-    }
-  ],
-  "sectorsNarrative": "A clear rotation was visible yesterday, with money flowing out of technology and into more defensive and industrial sectors. Today's pre-market action, driven by Micron, suggests a potential sharp reversal back into semiconductors and AI-related themes.",
-  "industryNarrative": "Semiconductors and AI-related software stocks were the weakest groups yesterday amid concerns about valuations, but are poised for a significant rebound. Homebuilders and other industrial sub-sectors showed notable strength.",
+  "technicalsNarrative": null,
+  "sectorsThemes": [],
+  "sectorsNarrative": null,
+  "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "MU",
+      "ticker": "INLF",
       "side": "LONG",
-      "changePct": 18.1,
-      "why": "Posted upbeat Q3 results and issued Q4 sales guidance that far exceeded Wall Street estimates, citing strong AI-driven memory demand.",
-      "traderLens": "Qullamaggie"
+      "changePct": 65,
+      "why": "Pre-market trading.",
+      "traderLens": "Not specified"
     },
     {
-      "ticker": "TECH",
+      "ticker": "ILLR",
       "side": "LONG",
-      "changePct": 19.6,
-      "why": "Gaining in pre-market trading, specific catalyst not immediately clear but part of broad market strength.",
-      "traderLens": "Momentum"
+      "changePct": 64.26,
+      "why": "Pre-market trading.",
+      "traderLens": "Not specified"
     },
     {
-      "ticker": "SNDK",
+      "ticker": "IVF",
       "side": "LONG",
-      "changePct": 14.0,
-      "why": "Rallying in sympathy with Micron's strong earnings and positive outlook for the memory chip sector.",
-      "traderLens": "Thematic"
+      "changePct": 52.42,
+      "why": "Pre-market trading.",
+      "traderLens": "Not specified"
     },
     {
-      "ticker": "QCOM",
+      "ticker": "SDOT",
       "side": "LONG",
-      "changePct": 11.0,
-      "why": "Raised its long-term non-handset revenue target and disclosed two Big Tech companies as customers.",
-      "traderLens": "Thematic"
+      "changePct": 50.81,
+      "why": "Pre-market trading.",
+      "traderLens": "Not specified"
     },
     {
-      "ticker": "WDC",
+      "ticker": "PBK",
       "side": "LONG",
-      "changePct": 12.0,
-      "why": "Gaining in sympathy with Micron's blockbuster earnings report.",
-      "traderLens": "Thematic"
+      "changePct": 33.38,
+      "why": "Pre-market trading.",
+      "traderLens": "Not specified"
     },
     {
-      "ticker": "DELL",
+      "ticker": "LGCL",
       "side": "SHORT",
-      "changePct": -6.7,
-      "why": "Falling in pre-market trading, likely on profit-taking after a strong run.",
-      "traderLens": "Mean Reversion"
+      "changePct": -30.89,
+      "why": "Pre-market trading.",
+      "traderLens": "Not specified"
     },
     {
-      "ticker": "AAPL",
+      "ticker": "CELZ",
       "side": "SHORT",
-      "changePct": -4.7,
-      "why": "Slipping in pre-market, continuing recent weakness in mega-cap tech.",
-      "traderLens": "Mean Reversion"
+      "changePct": -29,
+      "why": "Pre-market trading.",
+      "traderLens": "Not specified"
     },
     {
-      "ticker": "AFRM",
+      "ticker": "IPDN",
       "side": "SHORT",
-      "changePct": -2.0,
-      "why": "Down after Morgan Stanley downgraded the stock to Equal Weight from Overweight.",
-      "traderLens": "Catalyst"
+      "changePct": -21.86,
+      "why": "Pre-market trading.",
+      "traderLens": "Not specified"
     }
   ],
   "watchlist": [
@@ -174,251 +145,248 @@
       "ticker": "NVDA",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Key leader in the semiconductor space, will react to Micron's news."
+      "abc": null,
+      "note": "Watching for reaction to broad tech sell-off."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for signs of relative strength or weakness amid market rotation."
+      "abc": null,
+      "note": "Monitoring for impact of general market sentiment."
     },
     {
       "ticker": "AAPL",
       "level": null,
-      "changePct": -4.7,
-      "abc": "C",
-      "note": "Showing pre-market weakness, a potential short candidate if weakness persists."
+      "changePct": null,
+      "abc": null,
+      "note": "Under pressure after announcing price increases."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Mega-cap tech name, important for overall market direction."
+      "abc": null,
+      "note": "Announced price hikes for Xbox consoles."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for reaction to broader market sentiment."
+      "abc": null,
+      "note": "Watching for broader market weakness."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Key mega-cap name, will be influenced by Nasdaq direction."
+      "abc": null,
+      "note": "Monitoring for impact of general market sentiment."
     },
     {
       "ticker": "GOOGL",
       "level": null,
-      "changePct": -1.0,
-      "abc": "C",
-      "note": "Down pre-market on news of key AI researchers departing for a rival."
+      "changePct": null,
+      "abc": null,
+      "note": "Monitoring for impact of general market sentiment."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Semiconductor peer that will be highly correlated with the reaction to MU earnings."
+      "abc": null,
+      "note": "Watching for reaction to broad tech sell-off."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "AI-related hardware play, will be sensitive to the renewed tech enthusiasm."
+      "abc": null,
+      "note": "Watching for reaction to broad tech sell-off."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "High-beta software name, sensitive to risk-on/risk-off sentiment."
+      "abc": null,
+      "note": "Monitoring for impact of general market sentiment."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Cybersecurity leader, watching for sector rotation."
+      "abc": null,
+      "note": "Monitoring for impact of general market sentiment."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "High-beta name tied to cryptocurrency sentiment."
+      "abc": null,
+      "note": "Monitoring for impact of general market sentiment."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is attempting to rebound after a sharp tech pullback. Wait for confirmation of a new upleg before committing significant capital. Focus on leaders showing strength on the bounce."
+      "view": "Market is in a correction. Cash is the preferred position."
     },
     {
       "name": "Ted Zhang",
-      "view": "Significant rotation out of tech yesterday, but Micron's report may cause a violent snap-back into the semiconductor and AI theme today. Watch for confirmation of institutional flow."
+      "view": "Rotation out of technology and into more defensive sectors is evident."
     },
     {
       "name": "Clement Ang",
-      "view": "The recent chop and sharp sell-off in tech downgraded the market context. While the pre-market bounce is strong, it's prudent to wait and see if it holds. No A-grade setups until the market proves itself."
+      "view": "Market context is negative. Not an environment for A-grade setups."
     },
     {
       "name": "SRxTrades",
-      "view": "The bounce in tech is encouraging, but avoid chasing gaps at the open. Wait for orderly pullbacks and clean pivots to form before entering long positions. Volume confirmation is key."
+      "view": "No clean pivots to enter. Waiting for volatility to subside."
     },
     {
       "name": "Jeff",
-      "view": "Volatility has increased. Stick to your rules and manage risk tightly. Honor your stops, especially on any positions that gap against you."
+      "view": "Respect stops and avoid averaging down in this market."
     },
     {
       "name": "Qullamaggie",
-      "view": "Micron's report is a potential episodic pivot for the semiconductor sector. Look for powerful breakouts on high volume in leading chip stocks as they emerge from recent pullbacks."
+      "view": "No high-quality breakouts to chase. Momentum is to the downside."
     },
     {
       "name": "Composite",
-      "view": "The tape is risk-on this morning, driven by a single catalyst (Micron). The best course of action is to wait for the initial morning volatility to settle. Identify the strongest stocks in the leading semiconductor theme and look for low-risk entries after the open, rather than chasing the gap up."
+      "view": "Stay on the sidelines today. The risk-off sentiment is strong, and there are no clear entry signals. Preserve capital and wait for a better market environment."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "DRI",
-        "consensus": "EPS $3.67 / Rev $3.8B"
-      },
-      {
-        "ticker": "SNX",
-        "consensus": "EPS $4.18 / Rev $17.0B"
-      },
-      {
-        "ticker": "AYI",
-        "consensus": "EPS $5.24 / Rev $1.2B"
+        "ticker": "APOG",
+        "consensus": "EPS $0.41 / Rev $331.54M"
       }
     ],
     "amc": [
       {
-        "ticker": "BB",
-        "consensus": "EPS $0.03 / Rev $139.8M"
-      },
-      {
-        "ticker": "QMCO",
+        "ticker": "BOXL",
         "consensus": null
       }
     ],
     "yesterdayReactions": [
       {
         "ticker": "MU",
-        "result": "Beat fiscal Q3 expectations and provided a strong Q4 forecast.",
-        "movePct": 18.1
+        "result": "beat",
+        "movePct": 15.7
       }
     ]
   },
   "calendar": [
     {
-      "time": "07:30 ET",
-      "name": "GDP SAAR Q/Q (Final)",
+      "time": "08:30 ET",
+      "name": "Wholesale Inventories (May P)",
       "consensus": null
     },
     {
-      "time": "07:30 ET",
-      "name": "Personal Income SA M/M",
-      "consensus": null
-    },
-    {
-      "time": "N/A",
-      "name": "PCE Price Index",
+      "time": "10:00 ET",
+      "name": "U. of Michigan Consumer Sentiment (Jun F)",
       "consensus": null
     }
   ],
   "ratings": {
-    "upgrades": [
-      {
-        "ticker": "BHRB",
-        "firm": "Zacks",
-        "rating": "Buy",
-        "pt": null
-      }
-    ],
+    "upgrades": [],
     "downgrades": [
       {
-        "ticker": "AFRM",
-        "firm": "Morgan Stanley",
-        "rating": "Equal Weight",
+        "ticker": "NKE",
+        "firm": "Keybanc",
+        "rating": "Sector Weight",
+        "pt": null
+      },
+      {
+        "ticker": "VC",
+        "firm": "Baird",
+        "rating": "Neutral",
+        "pt": 121
+      },
+      {
+        "ticker": "SYNA",
+        "firm": "Needham",
+        "rating": "Hold",
         "pt": null
       }
     ]
   },
-  "alert": "PCE INFLATION DATA DUE TODAY - EXPECT POTENTIAL VOLATILITY.",
+  "alert": "Global tech sell-off continues, exercise extreme caution.",
   "news": [
     {
-      "headline": "Micron's Blockbuster Earnings Reignite AI Rally, Sending Tech Futures Soaring",
+      "headline": "Asian markets sell off sharply on concerns over soaring semiconductor prices.",
       "impact": "HIGH",
       "tickers": [
-        "MU",
-        "SMH",
         "QQQ",
-        "NVDA",
-        "AMD"
+        "SMH"
       ],
-      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-6-25-26-futures-climb-on-microns-robust-results-pce-data-in-focus",
-      "time": "05:36 ET"
-    },
-    {
-      "headline": "Final Q1 GDP Revised Higher to 2.1%",
-      "impact": "MED",
-      "tickers": [
-        "SPY",
-        "DIA"
-      ],
-      "source": "Zacks.com - https://www.zacks.com/stock/news/2290037/pre-markets-up-big-morning-for-economic-releases-june-25-2026",
-      "time": "Pre-market"
-    },
-    {
-      "headline": "Oil Prices Continue to Slide, Erasing Wartime Gains as Mideast Tensions Ease",
-      "impact": "MED",
-      "tickers": [
-        "CL=F",
-        "XLE"
-      ],
-      "source": "Zacks Investment Research - https://www.zacks.com/stock/news/2289940/stock-market-news-for-jun-25-2026",
+      "source": "Share Talk - https://www.sharetalk.com/what-happened-overnight-friday-26th-june-2026/",
       "time": "Overnight"
     },
     {
-      "headline": "Affirm Downgraded to Equal Weight by Morgan Stanley",
-      "impact": "LOW",
+      "headline": "Apple shares fell 6.1% overnight after the company announced price increases for its iPads and MacBooks.",
+      "impact": "HIGH",
       "tickers": [
-        "AFRM"
+        "AAPL"
       ],
-      "source": "Barchart - https://www.barchart.com/story/news/26300021/stocks-rally-before-the-open-on-upbeat-micron-earnings-us-pce-inflation-data-in-focus",
+      "source": "Share Talk - https://www.sharetalk.com/what-happened-overnight-friday-26th-june-2026/",
+      "time": "Overnight"
+    },
+    {
+      "headline": "OpenAI is reportedly considering delaying its IPO until 2027.",
+      "impact": "MED",
+      "tickers": [
+        "QQQ"
+      ],
+      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-live-updates-06-26-26",
       "time": "Pre-market"
     },
     {
-      "headline": "Key AI Researchers Reported to Leave Google for Rival Anthropic",
-      "impact": "LOW",
-      "tickers": [
-        "GOOGL"
-      ],
-      "source": "Barchart - https://www.barchart.com/story/news/26300021/stocks-rally-before-the-open-on-upbeat-micron-earnings-us-pce-inflation-data-in-focus",
-      "time": "Pre-market"
+      "headline": "European shares are tumbling as an extended selloff in technology stocks dampens risk sentiment.",
+      "impact": "MED",
+      "tickers": null,
+      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/20260626215/european-midday-briefing-shares-fall-as-tech-selloff-deepens",
+      "time": "Midday Europe"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TipRanks - https://www.tipranks.com/news/stock-market-news-today-6-25-26-futures-climb-on-microns-robust-results-pce-data-in-focus",
-    "Zacks Investment Research - https://www.zacks.com/stock/news/2289940/stock-market-news-for-jun-25-2026",
-    "TheStreet - https://www.thestreet.com/markets/stock-market-today-live-updates-062526",
-    "Barchart - https://www.barchart.com/story/news/26300021/stocks-rally-before-the-open-on-upbeat-micron-earnings-us-pce-inflation-data-in-focus",
-    "Digrin - https://www.digrin.com/earnings/2026-06-25",
-    "CNN Business - https://money.cnn.com/data/fear-and-greed/",
-    "Saxo Bank - https://www.home.saxo/content/articles/market-quick-take/market-quick-take-25062026-wknk6hbrzcqmfrn4",
-    "Zacks.com - https://www.zacks.com/stock/news/2290037/pre-markets-up-big-morning-for-economic-releases-june-25-2026",
-    "Benzinga - https://www.benzinga.com/analyst-ratings/26/06/42820251/todays-analyst-stock-ratings",
-    "NYSE - https://www.barchart.com/stocks/quotes/$ADDN/overview"
+    "Reddit 06/26/2026 — https://www.reddit.com/r/EconReports/comments/1dx4f55/us_economic_calendar_june_26th_2026/",
+    "Investing.com 06/26/2026 — https://www.investing.com/earnings-calendar/",
+    "Scotiabank 06/01/2026 — https://www.scotiabank.com/ca/en/about/economics/economics-publications/post.token-print.html/content/dam/scotiabank/pdf/PNS/Economics/2026_06_01_Calendar.pdf",
+    "Reddit 06/26/2026 — https://www.reddit.com/r/WallStreetbetsELITE/comments/1dx3z7y/premarket_gainers_and_losers_for_today_june_26/",
+    "Benzinga 06/26/2026 — https://www.benzinga.com/markets/ movers/26/06/42128291/12-information-technology-stocks-moving-in-fridays-pre-market-session",
+    "Benzinga 06/26/2026 — https://www.benzinga.com/analyst-ratings/downgrades/26/06/42128458/this-nike-analyst-is-no-longer-bullish-here-are-top-5-downgrades-for-friday",
+    "Share Talk 06/26/2026 — https://www.sharetalk.com/what-happened-overnight-friday-26th-june-2026/",
+    "TradingCharts 06/26/2026 — https://tradingcharts.com/economic_calendar/2026-06-26.html",
+    "Zacks Investment Research 06/26/2026 — https://www.zacks.com/stock-market-news/2289130/stock-market-news-for-jun-26-2026",
+    "TheStreet 06/26/2026 — https://www.thestreet.com/markets/stock-market-today-live-updates-06-26-26",
+    "Saxo Bank 06/26/2026 — https://www.home.saxo/content/articles/market-quick-take/market-quick-take-26062026-c1b4v4z7",
+    "Investing.com 06/26/2026 — https://www.investing.com/indices/pre-market",
+    "TradingEconomics 06/26/2026 — https://tradingeconomics.com/calendar",
+    "TipRanks 06/26/2026 — https://www.tipranks.com/news/stock-market-news-today-6-26-26-futures-down-as-tech-selloff-deepens",
+    "GuruFocus 06/26/2026 — https://www.gurufocus.com/news/2589091/syna-downgraded-by-needham--rating-changed-to-hold",
+    "Newsquawk 06/19/2026 — https://www.newsquawk.com/en/news/1628189/newsquawk-weekly-economic-calendar---22nd-26th-june-2026",
+    "Digrin 06/26/2026 — https://www.digrin.com/earnings/2026-06-26",
+    "Verified Investing 06/22/2026 — https://verifiedinvesting.com/earnings-calendar/2026-06-22",
+    "Barchart 06/26/2026 — https://www.barchart.com/stocks/market-movers/pre-market",
+    "Earnings Whispers 06/26/2026 — https://www.earningswhispers.com/calendar/2026-06-26",
+    "Market Chameleon 06/26/2026 — https://marketchameleon.com/Reports/Premarket",
+    "GuruFocus 06/26/2026 — https://www.gurufocus.com/news/2589090/nke-downgraded-by-keybanc--rating-changed-to-sector-weight",
+    "Associated Press 06/26/2026 — https://apnews.com/article/stock-markets-asia-kospi-nikkei-fed-interest-rates-f8a0c1d1e9f2b8c3a9e1e0a9c8d7b6a5",
+    "Nasdaq 06/26/2026 — https://www.nasdaq.com/market-activity/earnings",
+    "StoneX 06/26/2026 — https://www.stonex.com/perspectives/morning-commentary-for-june-26/",
+    "CaixaBank Research 06/26/2026 — https://www.caixabankresearch.com/en/financial-markets/daily-report/26-june-2026",
+    "XTB 06/26/2026 — https://www.xtb.com/en/market-analysis/morning-wrap-asia-extends-wall-street-selloff-on-expensive-hardware-26-06-2026",
+    "Morningstar 06/26/2026 — https://www.morningstar.com/news/dow-jones/20260626215/european-midday-briefing-shares-fall-as-tech-selloff-deepens",
+    "YouTube 06/26/2026 — https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "Barchart 06/18/2026 — https://www.barchart.com/futures/quotes/VIM26/news",
+    "Fitch Ratings 06/26/2026 — https://www.fitchratings.com/research/structured-finance/fitch-assigns-final-ratings-to-resimac-premier-series-2026-2-outlook-stable-26-06-2026",
+    "Morningstar DBRS 06/26/2026 — https://www.dbrsmorningstar.com/research/434005/morningstar-dbrs-upgrades-and-confirms-credit-ratings-on-red-black-auto-lease-france-2",
+    "Cboe Global Markets 06/26/2026 — https://www.cboe.com/tradable_products/vix/vix_futures/",
+    "Investing.com 06/26/2026 — https://www.investing.com/indices/volatility-s-p-500-futures-historical-data",
+    "Barchart 06/12/2026 — https://www.barchart.com/futures/quotes/VIM26"
   ]
 }
