@@ -67,22 +67,23 @@ export async function POST(req: Request) {
   for (const [rawTicker, bars] of Object.entries(barsByTicker)) {
     if (!Array.isArray(bars)) continue;
     const ticker = plain(rawTicker);
-    const ops = bars.map((b) => {
-      const dateStr = typeof b.date === "string" ? b.date.slice(0, 10) : null;
-      if (!dateStr) return null;
-      const date = new Date(`${dateStr}T00:00:00.000Z`);
-      if (Number.isNaN(date.getTime())) return null;
-      const data = { open: dec(b.open), high: dec(b.high), low: dec(b.low), close: dec(b.close), volume: bigint(b.volume), source };
-      return prisma.brokerDailyBar.upsert({
-        where: { ticker_date: { ticker, date } },
-        create: { ticker, date, ...data },
-        update: { ...data, fetchedAt: new Date() },
-      });
-    });
-    const valid = ops.filter((o): o is NonNullable<typeof o> => o != null);
-    await Promise.all(valid);
-    upserted += valid.length;
-    if (valid.length) tickers.push(ticker);
+    const rows = bars
+      .map((b) => {
+        const dateStr = typeof b.date === "string" ? b.date.slice(0, 10) : null;
+        if (!dateStr) return null;
+        const date = new Date(`${dateStr}T00:00:00.000Z`);
+        if (Number.isNaN(date.getTime())) return null;
+        return { ticker, date, open: dec(b.open), high: dec(b.high), low: dec(b.low), close: dec(b.close), volume: bigint(b.volume), source };
+      })
+      .filter((r): r is NonNullable<typeof r> => r != null);
+    if (!rows.length) continue;
+    // Bulk replace (delete + createMany) — far faster than per-row upsert, which
+    // gateway-timed out at ~25 tickers x 80 bars. Bars are daily/immutable, so a
+    // re-push just refreshes the window.
+    await prisma.brokerDailyBar.deleteMany({ where: { ticker, date: { in: rows.map((r) => r.date) } } });
+    await prisma.brokerDailyBar.createMany({ data: rows });
+    upserted += rows.length;
+    tickers.push(ticker);
   }
   return NextResponse.json({ ok: true, upserted, tickers: tickers.length });
 }
