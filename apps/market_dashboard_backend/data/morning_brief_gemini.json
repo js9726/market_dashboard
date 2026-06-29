@@ -1,8 +1,8 @@
 {
   "mood": {
-    "label": "RISK-OFF",
+    "label": "CAUTIOUSLY-RISK-ON",
     "posture": "WAIT",
-    "summary": "Global tech sell-off intensifies on concerns over rising AI-related costs and a potential delay in OpenAI's IPO, leading to sharp declines in Asian and European markets and pressuring U.S. futures."
+    "summary": "US futures are pointing to a strong open, led by a rebound in tech, as a fragile ceasefire between the U.S. and Iran eases geopolitical tensions. However, with persistent inflation and a key jobs report later in this holiday-shortened week, the rally is on tentative footing."
   },
   "breadth": {
     "up": null,
@@ -17,127 +17,114 @@
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.73,
+      "changePct": 0.69,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: TipRanks 05:21 ET"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": -1.38,
+      "changePct": 0.97,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: TipRanks 05:21 ET"
     },
     {
       "symbol": "DIA",
-      "name": "Dow Jones Industrial Average",
+      "name": "Dow Jones",
       "level": null,
-      "changePct": -0.39,
+      "changePct": 0.36,
       "note": "futures",
-      "citation": "Source: Investing.com"
-    },
-    {
-      "symbol": "IWM",
-      "name": "Russell 2000",
-      "level": null,
-      "changePct": -0.75,
-      "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: TipRanks 05:21 ET"
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 19.58,
-      "changePct": 2.35,
+      "level": 18.36,
+      "changePct": -0.33,
       "note": "live",
-      "citation": "Source: Investing.com"
+      "citation": "Source: Charles Schwab 09:15 ET"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Year Treasury Yield",
-      "level": 4.4,
+      "name": "10-Yr Treasury Yield",
+      "level": 4.38,
       "changePct": null,
       "note": "live",
       "citation": "Source: StoneX"
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil",
-      "level": 69.38,
-      "changePct": -3.53,
-      "note": "live",
-      "citation": "Source: TipRanks"
+      "name": "WTI Crude Oil",
+      "level": 70.13,
+      "changePct": 1.27,
+      "note": "futures",
+      "citation": "Source: Charles Schwab 09:15 ET"
     }
   ],
-  "indicesNarrative": "U.S. stock futures are pointing to a lower open, with the Nasdaq leading the decline as a global sell-off in technology stocks continues. Concerns about the rising costs of AI infrastructure and a report that OpenAI may delay its IPO are weighing on sentiment. This follows a mixed session on Thursday where the S&P 500 and Nasdaq closed lower despite strong earnings from Micron.",
-  "technicals": {
-    "SPY": null,
-    "QQQ": null,
-    "DIA": null,
-    "IWM": null
-  },
+  "indicesNarrative": "Equity futures are showing strength this morning, with the tech-heavy Nasdaq leading the way after a significant pullback last week. The rebound is supported by an uneasy ceasefire in the Middle East, which has helped stabilize oil prices. Asian markets were mixed, while European bourses are muted as traders await fresh catalysts.",
+  "technicals": null,
   "technicalsNarrative": null,
   "sectorsThemes": [],
-  "sectorsNarrative": null,
+  "sectorsNarrative": "Last week saw a clear rotation out of technology and into more defensive sectors like healthcare and real estate. Today's pre-market action suggests a potential reversal of that trend, with tech names showing strong bids.",
   "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "INLF",
+      "ticker": "CMCSA",
       "side": "LONG",
-      "changePct": 65,
-      "why": "Pre-market trading.",
-      "traderLens": "Not specified"
+      "changePct": 22.0,
+      "why": "Announced plan to spin off NBCUniversal and Sky into a separate publicly traded company.",
+      "traderLens": "Episodic Pivot (Qullamaggie)"
     },
     {
-      "ticker": "ILLR",
+      "ticker": "CHTR",
       "side": "LONG",
-      "changePct": 64.26,
-      "why": "Pre-market trading.",
-      "traderLens": "Not specified"
+      "changePct": 20.0,
+      "why": "Rallying on news of Comcast's restructuring and reports of talks with SpaceX.",
+      "traderLens": "Sympathy Play"
     },
     {
-      "ticker": "IVF",
+      "ticker": "IRDM",
       "side": "LONG",
-      "changePct": 52.42,
-      "why": "Pre-market trading.",
-      "traderLens": "Not specified"
+      "changePct": 22.0,
+      "why": "To be acquired by Rocket Lab (RKLB) in an $8 billion deal.",
+      "traderLens": "M&A Arbitrage"
     },
     {
-      "ticker": "SDOT",
+      "ticker": "RKLB",
       "side": "LONG",
-      "changePct": 50.81,
-      "why": "Pre-market trading.",
-      "traderLens": "Not specified"
+      "changePct": 11.0,
+      "why": "Announced acquisition of Iridium (IRDM) for $8 billion.",
+      "traderLens": "Catalyst"
     },
     {
-      "ticker": "PBK",
+      "ticker": "VSAT",
       "side": "LONG",
-      "changePct": 33.38,
-      "why": "Pre-market trading.",
-      "traderLens": "Not specified"
+      "changePct": 14.2,
+      "why": "Investor enthusiasm following recent defense contract wins with the U.S. Space Force.",
+      "traderLens": "Catalyst"
     },
     {
-      "ticker": "LGCL",
+      "ticker": "ADBE",
       "side": "SHORT",
-      "changePct": -30.89,
-      "why": "Pre-market trading.",
-      "traderLens": "Not specified"
+      "changePct": null,
+      "why": "Downgraded to Neutral from Buy at Phillip Securities with a significant price target cut.",
+      "traderLens": "Fading Strength"
     },
     {
-      "ticker": "CELZ",
+      "ticker": "CRWD",
       "side": "SHORT",
-      "changePct": -29,
-      "why": "Pre-market trading.",
-      "traderLens": "Not specified"
+      "changePct": null,
+      "why": "Downgraded to Neutral from Buy at Arete.",
+      "traderLens": "Fading Strength"
     },
     {
-      "ticker": "IPDN",
+      "ticker": "CRM",
       "side": "SHORT",
-      "changePct": -21.86,
-      "why": "Pre-market trading.",
-      "traderLens": "Not specified"
+      "changePct": null,
+      "why": "Downgraded to Neutral from Buy at Phillip Securities with a price target cut.",
+      "traderLens": "Fading Strength"
     }
   ],
   "watchlist": [
@@ -145,148 +132,147 @@
       "ticker": "NVDA",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching for reaction to broad tech sell-off."
+      "abc": "C",
+      "note": "Watching for signs of stabilization after last week's sharp sell-off."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring for impact of general market sentiment."
+      "abc": "C",
+      "note": "Attempting to rebound with the broader tech sector."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Under pressure after announcing price increases."
+      "abc": "C",
+      "note": "Fell over 5% Friday on price hike news; watching for follow-through weakness or a bounce."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Announced price hikes for Xbox consoles."
+      "abc": "B",
+      "note": "Held up better than some megacaps last week; a key leader to watch."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching for broader market weakness."
+      "abc": "B",
+      "note": "Showing relative strength, will monitor for leadership."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring for impact of general market sentiment."
+      "abc": "C",
+      "note": "In the news for internal AI project delays; could be a laggard."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring for impact of general market sentiment."
+      "abc": "B",
+      "note": "Bouncing with other megacaps in the pre-market."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching for reaction to broad tech sell-off."
+      "abc": "C",
+      "note": "Semis were hit hard; needs to reclaim key levels to repair damage."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching for reaction to broad tech sell-off."
+      "abc": "C",
+      "note": "High-beta name in the AI space, watching for bounce sustainability."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring for impact of general market sentiment."
+      "abc": "C",
+      "note": "Needs to see a strong bid to reverse the recent downtrend."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring for impact of general market sentiment."
+      "abc": "C",
+      "note": "Facing a pre-market headwind from a downgrade to Neutral at Arete."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring for impact of general market sentiment."
+      "abc": "C",
+      "note": "Correlated to Bitcoin, which has been weak. Watching for a potential bounce."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a correction. Cash is the preferred position."
+      "view": "Market remains in a correction. Not an ideal time to be aggressive with new long positions until the major indices prove themselves."
     },
     {
       "name": "Ted Zhang",
-      "view": "Rotation out of technology and into more defensive sectors is evident."
+      "view": "A sharp bounce in tech this morning suggests the rotation out of the sector may have been short-lived profit-taking. Watch for confirmation."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is negative. Not an environment for A-grade setups."
+      "view": "The market context is choppy and headline-driven. This is a time for patience and waiting for A-grade setups, not forcing trades on a rebound."
     },
     {
       "name": "SRxTrades",
-      "view": "No clean pivots to enter. Waiting for volatility to subside."
+      "view": "Volume on this morning's gap up will be critical. A low-volume rally could easily fade. Wait for clean pivots to form."
     },
     {
       "name": "Jeff",
-      "view": "Respect stops and avoid averaging down in this market."
+      "view": "Respect stops. A headline could reverse this rally quickly. Do not get caught on the wrong side of a failed bounce."
     },
     {
       "name": "Qullamaggie",
-      "view": "No high-quality breakouts to chase. Momentum is to the downside."
+      "view": "The main catalyst today is the Comcast spin-off, creating an episodic pivot. Otherwise, the broader market is not yet conducive for aggressive breakout trading."
     },
     {
       "name": "Composite",
-      "view": "Stay on the sidelines today. The risk-off sentiment is strong, and there are no clear entry signals. Preserve capital and wait for a better market environment."
+      "view": "Wait for the market to prove itself. The bounce is encouraging, but it's happening after a sharp sell-off. Let the market open and establish a trend. Focus on relative strength and avoid chasing extended names."
     }
   ],
   "standout": null,
   "earnings": {
-    "bmo": [
-      {
-        "ticker": "APOG",
-        "consensus": "EPS $0.41 / Rev $331.54M"
-      }
-    ],
+    "bmo": [],
     "amc": [
       {
-        "ticker": "BOXL",
+        "ticker": "AVAV",
+        "consensus": null
+      },
+      {
+        "ticker": "CNXC",
         "consensus": null
       }
     ],
     "yesterdayReactions": [
       {
-        "ticker": "MU",
-        "result": "beat",
-        "movePct": 15.7
+        "ticker": "AAPL",
+        "result": "Announced price hikes on MacBooks/iPads",
+        "movePct": -5.0
+      },
+      {
+        "ticker": "GLW",
+        "result": "Announced multi-billion dollar deal with Amazon",
+        "movePct": 9.0
       }
     ]
   },
   "calendar": [
     {
-      "time": "08:30 ET",
-      "name": "Wholesale Inventories (May P)",
-      "consensus": null
-    },
-    {
-      "time": "10:00 ET",
-      "name": "U. of Michigan Consumer Sentiment (Jun F)",
+      "time": "10:30 ET",
+      "name": "Dallas Fed Manufacturing Business Index (Jun)",
       "consensus": null
     }
   ],
@@ -294,99 +280,80 @@
     "upgrades": [],
     "downgrades": [
       {
-        "ticker": "NKE",
-        "firm": "Keybanc",
-        "rating": "Sector Weight",
-        "pt": null
-      },
-      {
-        "ticker": "VC",
-        "firm": "Baird",
+        "ticker": "ADBE",
+        "firm": "Phillip Securities",
         "rating": "Neutral",
-        "pt": 121
+        "pt": 203
       },
       {
-        "ticker": "SYNA",
-        "firm": "Needham",
-        "rating": "Hold",
-        "pt": null
+        "ticker": "CRWD",
+        "firm": "Arete",
+        "rating": "Neutral",
+        "pt": 730
+      },
+      {
+        "ticker": "CRM",
+        "firm": "Phillip Securities",
+        "rating": "Neutral",
+        "pt": 166
       }
     ]
   },
-  "alert": "Global tech sell-off continues, exercise extreme caution.",
+  "alert": null,
   "news": [
     {
-      "headline": "Asian markets sell off sharply on concerns over soaring semiconductor prices.",
+      "headline": "Comcast to spin off NBCUniversal and Sky businesses, stock soars over 20%",
       "impact": "HIGH",
       "tickers": [
+        "CMCSA",
+        "CHTR"
+      ],
+      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-live-updates-06-29-26",
+      "time": "pre-market"
+    },
+    {
+      "headline": "U.S. stock futures rise as fragile U.S.-Iran ceasefire eases tensions",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
         "QQQ",
-        "SMH"
+        "CL=F"
       ],
-      "source": "Share Talk - https://www.sharetalk.com/what-happened-overnight-friday-26th-june-2026/",
-      "time": "Overnight"
+      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-6-29-26-futures-edge-higher-on-u-s-iran-ceasefire-jobs-data-in-focus",
+      "time": "overnight"
     },
     {
-      "headline": "Apple shares fell 6.1% overnight after the company announced price increases for its iPads and MacBooks.",
-      "impact": "HIGH",
-      "tickers": [
-        "AAPL"
-      ],
-      "source": "Share Talk - https://www.sharetalk.com/what-happened-overnight-friday-26th-june-2026/",
-      "time": "Overnight"
-    },
-    {
-      "headline": "OpenAI is reportedly considering delaying its IPO until 2027.",
+      "headline": "Rocket Lab to acquire Iridium Communications in an $8 billion deal",
       "impact": "MED",
       "tickers": [
-        "QQQ"
+        "RKLB",
+        "IRDM"
       ],
-      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-live-updates-06-26-26",
-      "time": "Pre-market"
+      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-live-updates-06-29-26",
+      "time": "pre-market"
     },
     {
-      "headline": "European shares are tumbling as an extended selloff in technology stocks dampens risk sentiment.",
+      "headline": "Fitch Ratings highlights that US PCE inflation has remained above 2% for 63 consecutive months",
       "impact": "MED",
-      "tickers": null,
-      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/20260626215/european-midday-briefing-shares-fall-as-tech-selloff-deepens",
-      "time": "Midday Europe"
+      "tickers": [
+        "SPY",
+        "TLT"
+      ],
+      "source": "Fitch Ratings - https://www.fitchratings.com/research/sovereigns/rising-us-inflation-brings-persistent-overshoot-into-focus-29-06-2026",
+      "time": "06/29/2026"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Reddit 06/26/2026 — https://www.reddit.com/r/EconReports/comments/1dx4f55/us_economic_calendar_june_26th_2026/",
-    "Investing.com 06/26/2026 — https://www.investing.com/earnings-calendar/",
-    "Scotiabank 06/01/2026 — https://www.scotiabank.com/ca/en/about/economics/economics-publications/post.token-print.html/content/dam/scotiabank/pdf/PNS/Economics/2026_06_01_Calendar.pdf",
-    "Reddit 06/26/2026 — https://www.reddit.com/r/WallStreetbetsELITE/comments/1dx3z7y/premarket_gainers_and_losers_for_today_june_26/",
-    "Benzinga 06/26/2026 — https://www.benzinga.com/markets/ movers/26/06/42128291/12-information-technology-stocks-moving-in-fridays-pre-market-session",
-    "Benzinga 06/26/2026 — https://www.benzinga.com/analyst-ratings/downgrades/26/06/42128458/this-nike-analyst-is-no-longer-bullish-here-are-top-5-downgrades-for-friday",
-    "Share Talk 06/26/2026 — https://www.sharetalk.com/what-happened-overnight-friday-26th-june-2026/",
-    "TradingCharts 06/26/2026 — https://tradingcharts.com/economic_calendar/2026-06-26.html",
-    "Zacks Investment Research 06/26/2026 — https://www.zacks.com/stock-market-news/2289130/stock-market-news-for-jun-26-2026",
-    "TheStreet 06/26/2026 — https://www.thestreet.com/markets/stock-market-today-live-updates-06-26-26",
-    "Saxo Bank 06/26/2026 — https://www.home.saxo/content/articles/market-quick-take/market-quick-take-26062026-c1b4v4z7",
-    "Investing.com 06/26/2026 — https://www.investing.com/indices/pre-market",
-    "TradingEconomics 06/26/2026 — https://tradingeconomics.com/calendar",
-    "TipRanks 06/26/2026 — https://www.tipranks.com/news/stock-market-news-today-6-26-26-futures-down-as-tech-selloff-deepens",
-    "GuruFocus 06/26/2026 — https://www.gurufocus.com/news/2589091/syna-downgraded-by-needham--rating-changed-to-hold",
-    "Newsquawk 06/19/2026 — https://www.newsquawk.com/en/news/1628189/newsquawk-weekly-economic-calendar---22nd-26th-june-2026",
-    "Digrin 06/26/2026 — https://www.digrin.com/earnings/2026-06-26",
-    "Verified Investing 06/22/2026 — https://verifiedinvesting.com/earnings-calendar/2026-06-22",
-    "Barchart 06/26/2026 — https://www.barchart.com/stocks/market-movers/pre-market",
-    "Earnings Whispers 06/26/2026 — https://www.earningswhispers.com/calendar/2026-06-26",
-    "Market Chameleon 06/26/2026 — https://marketchameleon.com/Reports/Premarket",
-    "GuruFocus 06/26/2026 — https://www.gurufocus.com/news/2589090/nke-downgraded-by-keybanc--rating-changed-to-sector-weight",
-    "Associated Press 06/26/2026 — https://apnews.com/article/stock-markets-asia-kospi-nikkei-fed-interest-rates-f8a0c1d1e9f2b8c3a9e1e0a9c8d7b6a5",
-    "Nasdaq 06/26/2026 — https://www.nasdaq.com/market-activity/earnings",
-    "StoneX 06/26/2026 — https://www.stonex.com/perspectives/morning-commentary-for-june-26/",
-    "CaixaBank Research 06/26/2026 — https://www.caixabankresearch.com/en/financial-markets/daily-report/26-june-2026",
-    "XTB 06/26/2026 — https://www.xtb.com/en/market-analysis/morning-wrap-asia-extends-wall-street-selloff-on-expensive-hardware-26-06-2026",
-    "Morningstar 06/26/2026 — https://www.morningstar.com/news/dow-jones/20260626215/european-midday-briefing-shares-fall-as-tech-selloff-deepens",
-    "YouTube 06/26/2026 — https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    "Barchart 06/18/2026 — https://www.barchart.com/futures/quotes/VIM26/news",
-    "Fitch Ratings 06/26/2026 — https://www.fitchratings.com/research/structured-finance/fitch-assigns-final-ratings-to-resimac-premier-series-2026-2-outlook-stable-26-06-2026",
-    "Morningstar DBRS 06/26/2026 — https://www.dbrsmorningstar.com/research/434005/morningstar-dbrs-upgrades-and-confirms-credit-ratings-on-red-black-auto-lease-france-2",
-    "Cboe Global Markets 06/26/2026 — https://www.cboe.com/tradable_products/vix/vix_futures/",
-    "Investing.com 06/26/2026 — https://www.investing.com/indices/volatility-s-p-500-futures-historical-data",
-    "Barchart 06/12/2026 — https://www.barchart.com/futures/quotes/VIM26"
+    "STL.News - https://www.stl.news/global-market-snapshot-geopolitical-flares-and-bargain-hunting-dominate-overnight-action/",
+    "StoneX - https://www.stonex.com/perspectives/morning-commentary-for-june-29/",
+    "Charles Schwab - https://www.schwab.com/learn/story/schwab-market-update",
+    "TheStreet - https://www.thestreet.com/markets/stock-market-today-live-updates-06-29-26",
+    "Investing.com - https://www.investing.com/news/pre-market-movers",
+    "XTB.com - https://www.xtb.com/en/market-analysis/news-and-research/economic-calendar-what-may-drive-markets-this-week-29062026",
+    "24/7 Wall St. - https://247wallst.com/investing/2026/06/29/here-are-mondays-best-wall-street-analyst-research-calls-adobe-applovin-caseys-general-stores-crowdstrike-honeywell-aerospace-salesforce-synaptics-terawulf-and-more/",
+    "TipRanks - https://www.tipranks.com/news/stock-market-news-today-6-29-26-futures-edge-higher-on-u-s-iran-ceasefire-jobs-data-in-focus",
+    "Fitch Ratings - https://www.fitchratings.com/research/sovereigns/rising-us-inflation-brings-persistent-overshoot-into-focus-29-06-2026",
+    "OpenArc Corporate Advisory - https://www.openarc.net/market-recap-6-26-2026/"
   ]
 }
