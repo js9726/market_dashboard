@@ -188,6 +188,39 @@ type StockEntryPlan = {
   batches: string;
 };
 
+type CatalystEvent = {
+  date: string | null;
+  type: string;
+  summary?: string;
+  source?: string | null;
+  major_mover?: boolean;
+};
+
+type InsiderInstitutionalActivity = {
+  date: string | null;
+  party: string;
+  action: string;
+  detail: string;
+};
+
+type PeerSectorTrend = {
+  stock_trend_1m?: string;
+  sector_trend_1m?: string;
+  peers?: { ticker: string; trend_1m?: string; note?: string }[];
+};
+
+type UpcomingCatalyst = {
+  date: string | null;
+  type: string;
+  description: string;
+};
+
+type AnalystTargetChange = {
+  date: string | null;
+  firm: string | null;
+  change: string;
+};
+
 type StockAnalysisResult = {
   name: string;
   sector: string;
@@ -206,6 +239,18 @@ type StockAnalysisResult = {
   trailing_eps: number | null;
   forward_eps: number | null;
   dividend_yield_pct: number | null;
+  eli12?: string[];
+  professional_summary?: string;
+  hot_theme?: string | null;
+  catalysts?: string[];
+  significant_fundamentals?: string[];
+  recent_events?: CatalystEvent[];
+  insider_institutional_activity?: InsiderInstitutionalActivity[];
+  peer_sector_trend?: PeerSectorTrend;
+  upcoming_catalysts?: UpcomingCatalyst[];
+  analyst_target_changes?: AnalystTargetChange[];
+  big_move_reasons?: string[];
+  unverified_flags?: string[];
   trader_analysis: TraderAnalysis[];
   entry_plan: StockEntryPlan;
   bulls: string[];
@@ -215,6 +260,26 @@ type StockAnalysisResult = {
   composite_note: string;
   best_match_trader: string;
 };
+
+function SectionTitle({ children }: { children: string }) {
+  return <div className="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--fg-2)]">{children}</div>;
+}
+
+function BulletList({ items, empty = "No visible source data." }: { items?: string[]; empty?: string }) {
+  const rows = (items ?? []).filter(Boolean);
+  if (!rows.length) return <p className="text-xs text-[var(--fg-3)]">{empty}</p>;
+  return (
+    <ul className="space-y-1 text-xs leading-relaxed text-[var(--fg-2)]">
+      {rows.map((item, i) => <li key={i}>{item}</li>)}
+    </ul>
+  );
+}
+
+function TrendText({ value }: { value?: string | null }) {
+  const v = (value ?? "unknown").toLowerCase();
+  const cls = v === "up" ? "gain" : v === "down" ? "loss" : "text-[var(--fg-2)]";
+  return <span className={`font-mono uppercase ${cls}`}>{v}</span>;
+}
 
 function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () => void }) {
   const [providers, setProviders] = useState<Providers | null>(null);
@@ -258,7 +323,7 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--bg-surface)] shadow-2xl"
+        className="relative z-10 w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--bg-surface)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--line)] bg-[var(--bg-surface)] px-5 py-3 backdrop-blur">
@@ -311,6 +376,142 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                   </div>
                 ))}
               </div>
+
+              <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <SectionTitle>Big Move Reasons</SectionTitle>
+                    <BulletList items={result.big_move_reasons} empty="No major move driver returned by the fetched sources." />
+                  </div>
+                  <div className="shrink-0 rounded border border-[var(--line)] bg-[var(--bg-surface)] px-3 py-2 text-xs text-[var(--fg-2)]">
+                    <div>Stock 1M: <TrendText value={result.peer_sector_trend?.stock_trend_1m} /></div>
+                    <div>Sector 1M: <TrendText value={result.peer_sector_trend?.sector_trend_1m} /></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-3 lg:grid-cols-3">
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>What It Does</SectionTitle>
+                  <BulletList items={result.eli12} />
+                </div>
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Theme / Narrative</SectionTitle>
+                  <p className="text-xs leading-relaxed text-[var(--fg-2)]">{result.hot_theme || "No hot theme returned by the fetched sources."}</p>
+                </div>
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Catalysts</SectionTitle>
+                  <BulletList items={result.catalysts} />
+                </div>
+              </div>
+
+              {result.professional_summary ? (
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Professional Summary</SectionTitle>
+                  <p className="text-xs leading-relaxed text-[var(--fg-2)]">{result.professional_summary}</p>
+                </div>
+              ) : null}
+
+              <div className="grid gap-3 lg:grid-cols-2">
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Significant Fundamentals</SectionTitle>
+                  <BulletList items={result.significant_fundamentals} />
+                </div>
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Upcoming 30-Day Catalysts</SectionTitle>
+                  {(result.upcoming_catalysts ?? []).length ? (
+                    <div className="space-y-2">
+                      {(result.upcoming_catalysts ?? []).map((c, i) => (
+                        <div key={i} className="text-xs leading-relaxed text-[var(--fg-2)]">
+                          <span className="font-mono text-[var(--fg-1)]">{c.date ?? "undated"}</span>
+                          <span className="mx-2 text-[var(--fg-3)]">|</span>
+                          <span className="font-semibold text-[var(--accent)]">{c.type}</span>
+                          <span className="mx-2 text-[var(--fg-3)]">|</span>
+                          {c.description}
+                        </div>
+                      ))}
+                    </div>
+                  ) : <p className="text-xs text-[var(--fg-3)]">No upcoming catalysts returned by the fetched source.</p>}
+                </div>
+              </div>
+
+              {(result.recent_events ?? []).length ? (
+                <div>
+                  <SectionTitle>Last 3 Months News / Events</SectionTitle>
+                  <div className="overflow-x-auto rounded-lg border border-[var(--line)]">
+                    <table className="w-full min-w-[720px] text-left text-xs">
+                      <thead className="bg-[var(--bg-raised)] text-[10px] uppercase tracking-wide text-[var(--fg-3)]">
+                        <tr>
+                          <th className="px-3 py-2">Date</th>
+                          <th className="px-3 py-2">Type</th>
+                          <th className="px-3 py-2">Summary</th>
+                          <th className="px-3 py-2">Source</th>
+                          <th className="px-3 py-2 text-right">Mover</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(result.recent_events ?? []).map((event, i) => (
+                          <tr key={i} className="border-t border-[var(--line)]">
+                            <td className="px-3 py-2 font-mono text-[var(--fg-2)]">{event.date ?? "undated"}</td>
+                            <td className="px-3 py-2 text-[var(--accent)]">{event.type}</td>
+                            <td className="px-3 py-2 text-[var(--fg-2)]">{event.summary}</td>
+                            <td className="px-3 py-2">
+                              {event.source ? <a className="text-[var(--accent)] hover:underline" href={event.source} target="_blank" rel="noreferrer">source</a> : <span className="text-[var(--fg-3)]">none</span>}
+                            </td>
+                            <td className="px-3 py-2 text-right font-mono">{event.major_mover ? "Y" : "N"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="grid gap-3 lg:grid-cols-3">
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Insider / Institutional</SectionTitle>
+                  {(result.insider_institutional_activity ?? []).length ? (
+                    <div className="space-y-2">
+                      {(result.insider_institutional_activity ?? []).slice(0, 5).map((row, i) => (
+                        <p key={i} className="text-xs leading-relaxed text-[var(--fg-2)]">
+                          <span className="font-mono text-[var(--fg-1)]">{row.date ?? "undated"}</span> {row.party}: {row.action} - {row.detail}
+                        </p>
+                      ))}
+                    </div>
+                  ) : <p className="text-xs text-[var(--fg-3)]">No insider or institutional activity returned.</p>}
+                </div>
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Analyst Changes</SectionTitle>
+                  {(result.analyst_target_changes ?? []).length ? (
+                    <div className="space-y-2">
+                      {(result.analyst_target_changes ?? []).slice(0, 5).map((row, i) => (
+                        <p key={i} className="text-xs leading-relaxed text-[var(--fg-2)]">
+                          <span className="font-mono text-[var(--fg-1)]">{row.date ?? "undated"}</span> {row.firm ?? "Unknown"}: {row.change}
+                        </p>
+                      ))}
+                    </div>
+                  ) : <p className="text-xs text-[var(--fg-3)]">No analyst changes returned.</p>}
+                </div>
+                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Peer Trend</SectionTitle>
+                  {(result.peer_sector_trend?.peers ?? []).length ? (
+                    <div className="space-y-1">
+                      {(result.peer_sector_trend?.peers ?? []).slice(0, 6).map((peer) => (
+                        <p key={peer.ticker} className="text-xs text-[var(--fg-2)]">
+                          <span className="font-mono text-[var(--fg-1)]">{peer.ticker}</span> <TrendText value={peer.trend_1m} /> {peer.note ? `- ${peer.note}` : ""}
+                        </p>
+                      ))}
+                    </div>
+                  ) : <p className="text-xs text-[var(--fg-3)]">Peer movement not verified.</p>}
+                </div>
+              </div>
+
+              {(result.unverified_flags ?? []).length ? (
+                <div className="rounded-lg border border-[var(--warn-500)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Source Gaps</SectionTitle>
+                  <BulletList items={result.unverified_flags} />
+                </div>
+              ) : null}
 
               <div>
                 <div className="text-xs font-medium text-[var(--fg-2)] uppercase tracking-wide mb-2">Trader Analysis</div>

@@ -52,6 +52,83 @@
       "trailing_eps": { "type": ["number", "null"] },
       "forward_eps": { "type": ["number", "null"] },
       "dividend_yield_pct": { "type": ["number", "null"] },
+      "eli12": { "type": "array", "items": { "type": "string" }, "minItems": 0, "maxItems": 3 },
+      "professional_summary": { "type": "string" },
+      "hot_theme": { "type": ["string", "null"] },
+      "catalysts": { "type": "array", "items": { "type": "string" } },
+      "significant_fundamentals": { "type": "array", "items": { "type": "string" } },
+      "recent_events": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "date": { "type": ["string", "null"] },
+            "type": { "type": "string" },
+            "summary": { "type": "string" },
+            "source": { "type": ["string", "null"] },
+            "major_mover": { "type": "boolean" }
+          },
+          "required": ["date", "type", "summary", "source", "major_mover"]
+        }
+      },
+      "insider_institutional_activity": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "date": { "type": ["string", "null"] },
+            "party": { "type": "string" },
+            "action": { "type": "string" },
+            "detail": { "type": "string" }
+          },
+          "required": ["date", "party", "action", "detail"]
+        }
+      },
+      "peer_sector_trend": {
+        "type": "object",
+        "properties": {
+          "stock_trend_1m": { "type": "string", "enum": ["up", "down", "flat", "unknown"] },
+          "sector_trend_1m": { "type": "string", "enum": ["up", "down", "flat", "unknown"] },
+          "peers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ticker": { "type": "string" },
+                "trend_1m": { "type": "string", "enum": ["up", "down", "flat", "unknown"] },
+                "note": { "type": "string" }
+              },
+              "required": ["ticker", "trend_1m", "note"]
+            }
+          }
+        }
+      },
+      "upcoming_catalysts": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "date": { "type": ["string", "null"] },
+            "type": { "type": "string" },
+            "description": { "type": "string" }
+          },
+          "required": ["date", "type", "description"]
+        }
+      },
+      "analyst_target_changes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "date": { "type": ["string", "null"] },
+            "firm": { "type": ["string", "null"] },
+            "change": { "type": "string" }
+          },
+          "required": ["date", "firm", "change"]
+        }
+      },
+      "big_move_reasons": { "type": "array", "items": { "type": "string" } },
+      "unverified_flags": { "type": "array", "items": { "type": "string" } },
       "trader_analysis": {
         "type": "array",
         "items": {

@@ -86,6 +86,11 @@ export async function GET(req: Request) {
           predictedOutcome: (d0.predicted_outcome as string | undefined) ?? null,
           predictedExit: (d0.predicted_exit_price as number | undefined) ?? null,
           predictedStop: (d0.predicted_stop_price as number | undefined) ?? null,
+          hotTheme: (d0.hot_theme as string | undefined) ?? null,
+          catalysts: Array.isArray(d0.catalysts) ? d0.catalysts : [],
+          upcomingCatalysts: Array.isArray(d0.upcoming_catalysts) ? d0.upcoming_catalysts : [],
+          bigMoveReasons: Array.isArray(d0.big_move_reasons) ? d0.big_move_reasons : [],
+          unverifiedFlags: Array.isArray(d0.unverified_flags) ? d0.unverified_flags : [],
           verdictUrl: `/api/wiki/trades/${date}/${r.ticker}/day0?operator=${op}`,
           ingestedAt: r.ingestedAt.toISOString(),
         };

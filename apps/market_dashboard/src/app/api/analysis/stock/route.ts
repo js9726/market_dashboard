@@ -9,6 +9,10 @@ import {
   SYSTEM_PROMPT as stockAnalystSystem,
   type StockDisplayFields,
 } from "@/lib/trader-scorer-stock/handler";
+import {
+  fetchDeepDiveData,
+  type DeepDiveGrounding,
+} from "../../../../../agents/fundamental/tools/deep-dive-data";
 
 const FULL_MODULES   = ["price", "financialData", "summaryDetail", "defaultKeyStatistics", "assetProfile", "calendarEvents"] as const;
 const CORE_MODULES   = ["price", "financialData", "summaryDetail", "defaultKeyStatistics", "assetProfile"] as const;
@@ -83,6 +87,67 @@ function renderNews(label: string, rows: NewsItem[]): string {
     const publisher = n.publisher ? ` (${n.publisher})` : "";
     return `- ${date}: ${n.title}${publisher}`;
   }).join("\n")}`;
+}
+
+function renderDeepDiveGrounding(g: DeepDiveGrounding): string {
+  const lines: string[] = [];
+  lines.push("");
+  lines.push("CATALYST / FILINGS GROUNDING (use only these facts for dated rows; do not invent missing data):");
+  lines.push(`- Fetched at: ${g.fetchedAt}`);
+  lines.push(`- Availability: ${Object.entries(g.availability).map(([k, v]) => `${k}=${v ? "yes" : "no"}`).join(", ")}`);
+  if (g.profile?.longBusinessSummary) {
+    lines.push(`- Business summary: ${g.profile.longBusinessSummary}`);
+  }
+  if (g.fundamentals) {
+    lines.push(`- Fundamentals: revenue=${fmtBig(g.fundamentals.totalRevenue)} revenueGrowth=${g.fundamentals.revenueGrowth != null ? fmt(g.fundamentals.revenueGrowth * 100) + "%" : "N/A"} earningsGrowth=${g.fundamentals.earningsGrowth != null ? fmt(g.fundamentals.earningsGrowth * 100) + "%" : "N/A"} grossMargin=${g.fundamentals.grossMargins != null ? fmt(g.fundamentals.grossMargins * 100) + "%" : "N/A"} profitMargin=${g.fundamentals.profitMargins != null ? fmt(g.fundamentals.profitMargins * 100) + "%" : "N/A"} ROE=${g.fundamentals.returnOnEquity != null ? fmt(g.fundamentals.returnOnEquity * 100) + "%" : "N/A"} FCF=${fmtBig(g.fundamentals.freeCashflow)}`);
+  }
+  if (g.insiderTransactions.length) {
+    lines.push("INSIDER TRANSACTIONS:");
+    for (const t of g.insiderTransactions.slice(0, 12)) {
+      lines.push(`- ${t.date?.slice(0, 10) ?? "undated"} | ${t.filer ?? "unknown"} (${t.relation ?? "unknown"}) | ${t.transaction ?? "unknown"} | shares=${t.shares ?? "N/A"} value=${t.value ?? "N/A"}`);
+    }
+  } else {
+    lines.push("INSIDER TRANSACTIONS: none returned by fetched source.");
+  }
+  if (g.institutional) {
+    lines.push(`INSTITUTIONAL OWNERSHIP: heldByInstitutions=${g.institutional.heldPercentInstitutions != null ? fmt(g.institutional.heldPercentInstitutions * 100) + "%" : "N/A"} heldByInsiders=${g.institutional.heldPercentInsiders != null ? fmt(g.institutional.heldPercentInsiders * 100) + "%" : "N/A"}`);
+    for (const h of g.institutional.topHolders.slice(0, 6)) {
+      lines.push(`- ${h.organization ?? "unknown"} | pctHeld=${h.pctHeld != null ? fmt(h.pctHeld * 100) + "%" : "N/A"} | value=${h.value ?? "N/A"} | reportDate=${h.reportDate?.slice(0, 10) ?? "N/A"}`);
+    }
+  } else {
+    lines.push("INSTITUTIONAL OWNERSHIP: none returned by fetched source.");
+  }
+  if (g.recommendationTrend.length) {
+    lines.push("ANALYST RECOMMENDATION TREND:");
+    for (const r of g.recommendationTrend) {
+      lines.push(`- ${r.period ?? "unknown"}: strongBuy=${r.strongBuy ?? "N/A"} buy=${r.buy ?? "N/A"} hold=${r.hold ?? "N/A"} sell=${r.sell ?? "N/A"} strongSell=${r.strongSell ?? "N/A"}`);
+    }
+  }
+  if (g.upgradeDowngradeHistory.length) {
+    lines.push("ANALYST UPGRADE / DOWNGRADE HISTORY:");
+    for (const u of g.upgradeDowngradeHistory.slice(0, 15)) {
+      lines.push(`- ${u.date?.slice(0, 10) ?? "undated"} | ${u.firm ?? "unknown"} | ${u.fromGrade ?? "?"} -> ${u.toGrade ?? "?"} | action=${u.action ?? "unknown"}`);
+    }
+  } else {
+    lines.push("ANALYST UPGRADE / DOWNGRADE HISTORY: none returned by fetched source.");
+  }
+  if (g.calendar) {
+    lines.push(`UPCOMING CALENDAR: earnings=${g.calendar.earningsDates.map((d) => d.slice(0, 10)).join(", ") || "N/A"} exDividend=${g.calendar.exDividendDate?.slice(0, 10) ?? "N/A"} dividend=${g.calendar.dividendDate?.slice(0, 10) ?? "N/A"}`);
+  } else {
+    lines.push("UPCOMING CALENDAR: none returned by fetched source.");
+  }
+  if (g.news.length) {
+    lines.push("RECENT NEWS HEADLINES:");
+    for (const n of g.news.slice(0, 15)) {
+      lines.push(`- ${n.publishedAt?.slice(0, 10) ?? "undated"} | ${n.publisher ?? "unknown"} | ${n.title} | ${n.link ?? "no-link"}`);
+    }
+  } else {
+    lines.push("RECENT NEWS HEADLINES: none returned by fetched source.");
+  }
+  if (g.errors.length) {
+    lines.push(`FETCH ERRORS: ${g.errors.join("; ")}`);
+  }
+  return lines.join("\n");
 }
 
 /** Screener hit data optionally passed by the dashboard Score button. */
@@ -187,9 +252,10 @@ export async function POST(request: Request) {
     const debtToEquity = (fd?.debtToEquity as number) ?? null;
     const currentRatio = (fd?.currentRatio as number) ?? null;
     const freeCashflow = (fd?.freeCashflow as number) ?? null;
-    const [tickerNews, sectorNews] = await Promise.all([
+    const [tickerNews, sectorNews, deepDiveGrounding] = await Promise.all([
       fetchYahooNews(`${ticker} stock`, 6),
       sector ? fetchYahooNews(`${sector} stocks`, 4) : Promise.resolve([]),
+      fetchDeepDiveData(ticker),
     ]);
 
     const earningsDays = earningsDate
@@ -239,7 +305,8 @@ FUNDAMENTALS:
 - Dividend Yield: ${dividendYield != null ? fmt(dividendYield * 100) + "%" : "None"}
 ${screenerExtra}
 ${renderNews("LATEST TICKER NEWS", tickerNews)}
-${renderNews("LATEST SECTOR NEWS", sectorNews)}`;
+${renderNews("LATEST SECTOR NEWS", sectorNews)}
+${renderDeepDiveGrounding(deepDiveGrounding)}`;
 
     const display: StockDisplayFields = {
       name,
@@ -266,7 +333,7 @@ ${renderNews("LATEST SECTOR NEWS", sectorNews)}`;
     //   deepseek-chat  → primary (fast + cheap)
     //   gemini-2.0-flash → fallback (2-4 s vs 10-20 s for 2.5-pro)
     const llmMeta: { providerUsed?: string; modelUsed?: string; note?: string } = {};
-    const raw = await callLLM(prompt, stockAnalystSystem, { maxTokens: 1024, provider, tier: "fast" }, llmMeta);
+    const raw = await callLLM(prompt, stockAnalystSystem, { maxTokens: 3800, provider, tier: "fast" }, llmMeta);
 
     let analysis: Record<string, unknown>;
     try {
@@ -319,8 +386,22 @@ ${renderNews("LATEST SECTOR NEWS", sectorNews)}`;
         model: llmMeta.modelUsed ?? provider ?? "unknown",
         provider: llmMeta.providerUsed ?? provider ?? null,
         verdict_timestamp: new Date().toISOString(),
+        eli12: analysis.eli12 ?? [],
+        professional_summary: text(analysis.professional_summary),
+        hot_theme: text(analysis.hot_theme),
+        catalysts: Array.isArray(analysis.catalysts) ? analysis.catalysts : [],
+        significant_fundamentals: Array.isArray(analysis.significant_fundamentals) ? analysis.significant_fundamentals : [],
+        recent_events: Array.isArray(analysis.recent_events) ? analysis.recent_events : [],
+        insider_institutional_activity: Array.isArray(analysis.insider_institutional_activity) ? analysis.insider_institutional_activity : [],
+        peer_sector_trend: analysis.peer_sector_trend ?? null,
+        upcoming_catalysts: Array.isArray(analysis.upcoming_catalysts) ? analysis.upcoming_catalysts : [],
+        analyst_target_changes: Array.isArray(analysis.analyst_target_changes) ? analysis.analyst_target_changes : [],
+        big_move_reasons: Array.isArray(analysis.big_move_reasons) ? analysis.big_move_reasons : [],
+        unverified_flags: Array.isArray(analysis.unverified_flags) ? analysis.unverified_flags : [],
         ticker_news: tickerNews,
         sector_news: sectorNews,
+        grounding_availability: deepDiveGrounding.availability,
+        grounding_errors: deepDiveGrounding.errors,
         raw_stock_analysis: analysis,
       })) as Prisma.InputJsonObject;
 

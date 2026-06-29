@@ -9,10 +9,9 @@ interface AnalysisRow {
   setupClassification: string | null;
   compositeScore: number | null;
   bestStyleMatch: string | null;
-  weakestDimension: string | null;
-  predictedOutcome: string | null;
-  predictedExit: number | null;
-  predictedStop: number | null;
+  hotTheme: string | null;
+  catalysts: string[];
+  upcomingCatalysts: { date: string | null; type: string; description: string }[];
   verdictUrl: string;
   ingestedAt: string;
 }
@@ -35,9 +34,14 @@ function fmtScore(value: number | null): string {
   return value.toFixed(1);
 }
 
-function fmtPrice(value: number | null): string {
-  if (value == null || Number.isNaN(value)) return "—";
-  return `$${value.toFixed(2)}`;
+function firstText(rows: string[] | null | undefined): string {
+  return rows?.find(Boolean) ?? "-";
+}
+
+function upcomingText(rows: AnalysisRow["upcomingCatalysts"]): string {
+  const first = rows?.[0];
+  if (!first) return "-";
+  return `${first.date ?? "undated"} ${first.type}: ${first.description}`;
 }
 
 export default function AnalysesView() {
@@ -106,17 +110,17 @@ export default function AnalysesView() {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] text-left text-[12px]">
+          <table className="w-full min-w-[1120px] text-left text-[12px]">
             <thead className="text-[10px] uppercase tracking-[0.12em] text-[var(--fg-3)]">
               <tr className="border-b border-[var(--line)]">
                 <th className="py-2 pr-3 font-bold">Ticker</th>
                 <th className="px-3 py-2 font-bold">Date</th>
                 <th className="px-3 py-2 font-bold">Setup</th>
+                <th className="px-3 py-2 font-bold">Theme</th>
+                <th className="px-3 py-2 font-bold">Catalyst</th>
+                <th className="px-3 py-2 font-bold">Next event</th>
                 <th className="px-3 py-2 text-right font-bold">Score</th>
                 <th className="px-3 py-2 font-bold">Best style</th>
-                <th className="px-3 py-2 font-bold">Weakest</th>
-                <th className="px-3 py-2 text-right font-bold">Pred. exit</th>
-                <th className="px-3 py-2 text-right font-bold">Pred. stop</th>
                 <th className="py-2 pl-3 font-bold">JSON</th>
               </tr>
             </thead>
@@ -136,13 +140,19 @@ export default function AnalysesView() {
                   <td className="px-3 py-2 font-mono text-[11px] text-[var(--accent)]">
                     {r.setupClassification ?? "—"}
                   </td>
+                  <td className="max-w-[190px] px-3 py-2 text-[var(--fg-2)]">
+                    <span title={r.hotTheme ?? undefined} className="line-clamp-2">{r.hotTheme ?? "-"}</span>
+                  </td>
+                  <td className="max-w-[220px] px-3 py-2 text-[var(--fg-2)]">
+                    <span title={firstText(r.catalysts)} className="line-clamp-2">{firstText(r.catalysts)}</span>
+                  </td>
+                  <td className="max-w-[240px] px-3 py-2 text-[var(--fg-2)]">
+                    <span title={upcomingText(r.upcomingCatalysts)} className="line-clamp-2">{upcomingText(r.upcomingCatalysts)}</span>
+                  </td>
                   <td className={`px-3 py-2 text-right font-mono ${scoreClass(r.compositeScore)}`}>
                     {fmtScore(r.compositeScore)}
                   </td>
                   <td className="px-3 py-2 text-[var(--fg-1)]">{r.bestStyleMatch ?? "—"}</td>
-                  <td className="px-3 py-2 text-[var(--fg-2)]">{r.weakestDimension ?? "—"}</td>
-                  <td className="px-3 py-2 text-right font-mono text-[var(--fg-2)]">{fmtPrice(r.predictedExit)}</td>
-                  <td className="px-3 py-2 text-right font-mono text-[var(--fg-2)]">{fmtPrice(r.predictedStop)}</td>
                   <td className="py-2 pl-3">
                     <a className="text-[var(--accent)] hover:underline" href={r.verdictUrl} target="_blank" rel="noreferrer">day0</a>
                   </td>

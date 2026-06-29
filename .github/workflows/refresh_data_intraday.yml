@@ -23,6 +23,8 @@ on:
   schedule:
     - cron: '33 13 * * 1-5'          # 3 min after open (09:33 ET EDT)
     - cron: '3 14 * * 1-5'           # 33 min after open (10:03 ET EDT)
+    - cron: '33 14 * * 1-5'          # 63 min after open (10:33 ET EDT)
+    - cron: '3 15 * * 1-5'           # 93 min after open (11:03 ET EDT)
     - cron: '33 20 * * 1-5'          # 33 min post-market (16:33 ET EDT)
   workflow_dispatch: {}
 
@@ -54,8 +56,13 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
+      - name: Skip if not a US trading day
+        id: trading_day
+        run: python scripts/check_trading_day.py
+
       # ── Step 1: market data (snapshot, events, charts) — required ─────────
       - name: Build market data
+        if: success()
         run: python scripts/build_data.py --out-dir data
 
       # ── Step 2: TradingView screener hits — required ──────────────────────
@@ -63,6 +70,7 @@ jobs:
       # If TradingView blocks this IP (common in CI), the script exits non-zero
       # but does NOT overwrite the output — last good data is preserved.
       - name: Fetch TV screeners (no scoring)
+        if: success()
         continue-on-error: true
         run: python scripts/tv_screener_fetch.py --out-dir data
         env:
@@ -72,6 +80,7 @@ jobs:
 
       # ── Step 3: sync to Next.js public folder ─────────────────────────────
       - name: Sync data into Next.js public folder
+        if: success()
         working-directory: apps/market_dashboard
         run: |
           mkdir -p public/market-dashboard/charts
@@ -83,6 +92,7 @@ jobs:
 
       # ── Step 4: sanitize JSON (replace NaN/Infinity with null) ────────────
       - name: Sanitize JSON
+        if: success()
         working-directory: apps/market_dashboard
         run: |
           python3 -c "
@@ -98,6 +108,7 @@ jobs:
 
       # ── Step 5: commit and push ───────────────────────────────────────────
       - name: Commit updated data
+        if: success()
         working-directory: .
         run: |
           git config user.name  "github-actions[bot]"

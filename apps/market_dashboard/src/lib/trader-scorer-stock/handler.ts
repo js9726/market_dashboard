@@ -10,13 +10,18 @@
 import { TRADER_PROFILES, type TraderProfile } from "@/lib/brief/trader-profiles";
 
 const PROMPT_TEMPLATE =
-  "Analyze this stock through 7 trader style lenses and return a JSON object.\n\n" +
+  "Analyze this stock through 7 trader style lenses and return a catalyst-first JSON object.\n\n" +
   "{stock_context}\n\n" +
   "## Trader profiles\n{trader_profiles_block}\n\n" +
+  "## Catalyst-first requirements\n" +
+  "Lead with the reasons this stock can make a large future move: earnings, sales, guidance, product launches, analyst upgrades/downgrades, insider buying from executives, partnerships, regulatory events, and sector/news catalysts.\n\n" +
+  "Use only the fetched stock context for dated news, links, insider activity, institutional activity, analyst actions, and upcoming dates. If a field is not visible in the fetched source, return an empty array or an explanatory unverified flag. Do not invent URLs or dates.\n\n" +
   "Return ONLY this JSON structure (no markdown, no explanation):\n{schema_example}\n";
 
 export const SYSTEM_PROMPT =
   "You are an expert stock market analyst. Analyze the provided stock data through the lens of 7 specific trader styles and return ONLY valid JSON, no markdown fences.\n\n" +
+  "## Catalyst-first priority\n" +
+  "Big stock moves usually come from catalysts and themes. Start by identifying the business, hot narrative, recent events, upcoming catalysts, insider/institutional activity, peer/sector trend, analyst changes, and the strongest reasons the stock could move. Never invent news, links, dates, insider transactions, institutional filings, or analyst actions. Use unverified_flags for source gaps.\n\n" +
   "## Verdict ladder\n" +
   "- `STRONG BUY` (score >= 9) - high-conviction long\n" +
   "- `BUY` (7-8) - long with caveats\n" +
@@ -80,6 +85,30 @@ function schemaExample(d: StockDisplayFields): string {
     `  "trailing_eps": ${d.trailingEps ?? "null"},`,
     `  "forward_eps": ${d.forwardEps ?? "null"},`,
     `  "dividend_yield_pct": ${d.dividendYieldPct != null ? +d.dividendYieldPct.toFixed(2) : "null"},`,
+    `  "eli12": ["<short bullet 1>", "<short bullet 2>", "<short bullet 3>"],`,
+    `  "professional_summary": "<max 10 sentences: industry, products/services, competitors by ticker, metrics, moat, uniqueness, biotech commercial/clinical stage if relevant>",`,
+    `  "hot_theme": "<current theme/narrative or null>",`,
+    `  "catalysts": ["<earnings/news/macro/product/regulatory catalyst>", "<next catalyst>"],`,
+    `  "significant_fundamentals": ["<growth/moat/product/management/patent/balance sheet point>"],`,
+    `  "recent_events": [`,
+    `    { "date": "YYYY-MM-DD", "type": "Earnings | Product Launch | Analyst Upgrade/Downgrade | Regulatory | Macro | Other", "summary": "<1-2 sentences>", "source": "<direct URL or null>", "major_mover": false }`,
+    `  ],`,
+    `  "insider_institutional_activity": [`,
+    `    { "date": "YYYY-MM-DD", "party": "<executive/institution>", "action": "Buy | Sell | New Position | Increase | Decrease | Other", "detail": "<shares/value/% or source limitation>" }`,
+    `  ],`,
+    `  "peer_sector_trend": {`,
+    `    "stock_trend_1m": "up | down | flat | unknown",`,
+    `    "sector_trend_1m": "up | down | flat | unknown",`,
+    `    "peers": [{ "ticker": "<peer ticker>", "trend_1m": "up | down | flat | unknown", "note": "<short comparison>" }]`,
+    `  },`,
+    `  "upcoming_catalysts": [`,
+    `    { "date": "YYYY-MM-DD", "type": "Earnings | Product | Regulatory | Conference | Other", "description": "<what and why it matters>" }`,
+    `  ],`,
+    `  "analyst_target_changes": [`,
+    `    { "date": "YYYY-MM-DD", "firm": "<firm or null>", "change": "<rating/target change>" }`,
+    `  ],`,
+    `  "big_move_reasons": ["<highest-signal reason the stock can move>"],`,
+    `  "unverified_flags": ["<source gap or qualitative claim not grounded in fetched data>"],`,
     `  "trader_analysis": [`,
     `    {`,
     `      "handle": "@markminervini",`,
