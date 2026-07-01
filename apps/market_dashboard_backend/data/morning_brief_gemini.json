@@ -1,386 +1,436 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-ON",
+    "label": "CAUTIOUSLY-RISK-OFF",
     "posture": "WAIT",
-    "summary": "US markets rebounded sharply yesterday, led by a tech recovery after a five-day slide. Futures are flat as traders assess whether the bounce has legs amid quarter-end positioning and a busy economic calendar today."
+    "summary": "US futures are pointing to a lower open, with tech and semiconductor sectors showing weakness. Key focus is on upcoming ADP jobs data and a speech by Fed Chair Warsh, creating uncertainty to start the new quarter."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": null,
-    "label": null
+    "score": 31,
+    "label": "Fear"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": 7440.43,
-      "changePct": 1.18,
-      "note": "futures flat",
-      "citation": "Source: TheStreet 09:53 ET"
+      "level": null,
+      "changePct": -0.28,
+      "note": "futures",
+      "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
-      "level": 25820.14,
-      "changePct": 2.49,
-      "note": "futures flat",
-      "citation": "Source: Saxo Bank 06/30/2026"
+      "level": null,
+      "changePct": -0.54,
+      "note": "futures",
+      "citation": null
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
-      "level": 52182.74,
-      "changePct": 0.59,
-      "note": "futures flat",
-      "citation": "Source: TheStreet 09:53 ET"
+      "level": null,
+      "changePct": -0.22,
+      "note": "futures",
+      "citation": null
     },
     {
       "symbol": "^VIX",
       "name": "Volatility",
-      "level": 17.57,
-      "changePct": -4.57,
+      "level": 16.46,
+      "changePct": -6.8,
       "note": "live",
-      "citation": "Source: Reddit r/FluentInFinance"
+      "citation": null
     },
     {
       "symbol": "^TNX",
       "name": "10-Yr Yield",
-      "level": 4.37,
-      "changePct": -0.46,
+      "level": 4.5,
+      "changePct": 0.03,
       "note": "live",
-      "citation": "Source: Yahoo Finance"
+      "citation": null
     },
     {
       "symbol": "CL=F",
       "name": "Crude Oil",
-      "level": 70.55,
-      "changePct": 1.91,
-      "note": "live",
-      "citation": "Source: Reddit r/FluentInFinance"
+      "level": 68.88,
+      "changePct": -2.29,
+      "note": "futures",
+      "citation": null
     }
   ],
-  "indicesNarrative": "Major indices snapped a five-day losing streak with a strong tech-led rebound. The Dow closed above 52,000 for the first time, boosted by Alphabet's inclusion. Futures are muted this morning, suggesting some consolidation after yesterday's sharp rally as traders await key economic data.",
+  "indicesNarrative": "Futures are broadly lower to kick off the second half, with the Nasdaq leading the way down due to weakness in semiconductors. Rising treasury yields and cautious sentiment ahead of Fed Chair Warsh's speech are weighing on the tape, suggesting a risk-off start to the session.",
   "technicals": null,
   "technicalsNarrative": null,
-  "sectorsThemes": [],
-  "sectorsNarrative": "Technology and Communication Services led yesterday's rebound, while defensive sectors likely lagged. The key question is whether this is quarter-end window dressing or the start of a new leg up for growth stocks.",
+  "sectorsThemes": [
+    {
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": -0.4,
+      "rs": null,
+      "note": "Falling premarket with crude oil prices."
+    },
+    {
+      "symbol": "XLV",
+      "name": "Health Care",
+      "changePct": 0.3,
+      "rs": null,
+      "note": "Showing modest strength in a weak premarket."
+    },
+    {
+      "symbol": "SMH",
+      "name": "Semiconductors",
+      "changePct": null,
+      "rs": null,
+      "note": "Sector is reported to be the main drag on the broader market in pre-market."
+    }
+  ],
+  "sectorsNarrative": "Rotation appears defensive, with Healthcare showing modest gains while cyclicals like Energy and growth-heavy Technology are under pressure. Semiconductors are notably weak, acting as a drag on the Nasdaq.",
   "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
+      "ticker": "MSTR",
+      "side": "LONG",
+      "changePct": 7.05,
+      "why": "Announced a new capital framework including a $1B buyback and received a reiterated Buy rating from Citi.",
+      "traderLens": "Qullamaggie style Episodic Pivot on news."
+    },
+    {
       "ticker": "AVAV",
       "side": "LONG",
-      "changePct": 20.0,
-      "why": "AeroVironment surged after a strong earnings report, beating both revenue and profit estimates.",
-      "traderLens": "Qullamaggie-style episodic pivot on earnings surprise."
+      "changePct": 18.8,
+      "why": "Reported Q4 earnings and revenue that beat consensus estimates.",
+      "traderLens": "Qullamaggie style earnings-driven gap up."
     },
     {
-      "ticker": "AVEX",
+      "ticker": "PLTR",
       "side": "LONG",
-      "changePct": 11.0,
-      "why": "AEVEX gained after announcing a $50 million contract win with the U.S. Air Force.",
-      "traderLens": "Episodic pivot based on a significant contract catalyst."
+      "changePct": 2.0,
+      "why": "Bank of America reiterated its Buy rating on the stock.",
+      "traderLens": "Minervini style setup with a catalyst."
     },
     {
-      "ticker": "APD",
+      "ticker": "STZ",
       "side": "LONG",
-      "changePct": 9.0,
-      "why": "Air Products and Chemicals saw significant pre-market gains, though the specific catalyst is not immediately clear.",
-      "traderLens": "Momentum burst, requires further investigation for a fundamental thesis."
+      "changePct": 1.5,
+      "why": "Earnings and revenue surpassed estimates for the quarter.",
+      "traderLens": "Earnings reaction play."
     },
     {
-      "ticker": "RUN",
+      "ticker": "SOC",
       "side": "LONG",
-      "changePct": 5.0,
-      "why": "Sunrun climbed amid broader strength in solar and renewable energy names.",
-      "traderLens": "Thematic momentum play on sector strength."
+      "changePct": 23.0,
+      "why": "Priced a combined equity and debt offering to raise new capital.",
+      "traderLens": "High-risk catalyst play."
     },
     {
-      "ticker": "GOOGL",
-      "side": "LONG",
-      "changePct": 4.8,
-      "why": "Alphabet gained on its first day of trading as a component of the Dow Jones Industrial Average.",
-      "traderLens": "Institutional flow catalyst from index inclusion."
+      "ticker": "NBIS",
+      "side": "SHORT",
+      "changePct": -12.0,
+      "why": "Stock falling on reports that Meta is planning a major expansion into the AI cloud market.",
+      "traderLens": "Fundamental threat, potential for continued weakness."
     },
     {
       "ticker": "CNXC",
       "side": "SHORT",
-      "changePct": -19.0,
-      "why": "Concentrix tumbled after lowering its annual revenue and adjusted profit forecasts.",
-      "traderLens": "Fundamental breakdown on negative guidance."
+      "changePct": -11.2,
+      "why": "Reported Q2 earnings that missed the Zacks Consensus Estimate.",
+      "traderLens": "Post-earnings weakness."
     },
     {
-      "ticker": "SMCI",
+      "ticker": "AMD",
       "side": "SHORT",
-      "changePct": -8.1,
-      "why": "Super Micro Computer fell after authorities in Taiwan raided its offices over alleged smuggling of Nvidia chips to China.",
-      "traderLens": "Negative headline catalyst creating an episodic pivot to the downside."
-    },
-    {
-      "ticker": "MSTR",
-      "side": "SHORT",
-      "changePct": -7.2,
-      "why": "MicroStrategy declined in pre-market trading, giving back some of its recent gains.",
-      "traderLens": "Mean reversion setup after a strong prior session."
+      "changePct": -4.08,
+      "why": "Profit-taking and cooling risk appetite for high-multiple tech names after a strong Q2.",
+      "traderLens": "Mean reversion or pullback trade."
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": 210.69,
-      "changePct": 2.95,
-      "abc": null,
-      "note": "Rebounding with the semiconductor sector."
+      "level": null,
+      "changePct": -0.8,
+      "abc": "B",
+      "note": "Pulling back with semi sector weakness; watch for support."
     },
     {
       "ticker": "TSLA",
-      "level": 400.49,
-      "changePct": 8.06,
-      "abc": null,
-      "note": "Leading the 'Magnificent Seven' rebound."
+      "level": null,
+      "changePct": -0.7,
+      "abc": "B",
+      "note": "Consolidating, sensitive to broad market direction."
     },
     {
       "ticker": "AAPL",
-      "level": 298.01,
-      "changePct": 0.7,
-      "abc": null,
-      "note": "Participating in the broad tech recovery."
+      "level": null,
+      "changePct": 0.0,
+      "abc": "C",
+      "note": "Flat pre-market, lagging other megacaps."
     },
     {
       "ticker": "MSFT",
-      "level": 379.40,
-      "changePct": 0.13,
-      "abc": null,
-      "note": "Lagging the tech rebound slightly."
+      "level": null,
+      "changePct": 0.6,
+      "abc": "A",
+      "note": "Showing relative strength against the tech tape."
     },
     {
       "ticker": "AMZN",
-      "level": 244.39,
-      "changePct": 2.9,
-      "abc": null,
-      "note": "Showing strong relative strength during the bounce."
+      "level": null,
+      "changePct": 0.0,
+      "abc": "B",
+      "note": "Quiet pre-market, watching for direction."
     },
     {
       "ticker": "META",
-      "level": 542.87,
-      "changePct": -2.65,
-      "abc": null,
-      "note": "Watching to see if it can reclaim key moving averages."
+      "level": null,
+      "changePct": 0.0,
+      "abc": "B",
+      "note": "Flat, digesting recent gains."
     },
     {
       "ticker": "GOOGL",
-      "level": 343.71,
-      "changePct": 4.62,
-      "abc": null,
-      "note": "Strong momentum following its inclusion in the Dow."
+      "level": null,
+      "changePct": -0.5,
+      "abc": "C",
+      "note": "Slight weakness pre-market."
     },
     {
       "ticker": "AMD",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Watching for follow-through with other chip stocks."
+      "level": 557.2,
+      "changePct": -4.08,
+      "abc": "B",
+      "note": "Significant pre-market pullback after strong run; potential for mean reversion."
     },
     {
       "ticker": "SMCI",
-      "level": null,
-      "changePct": -8.1,
-      "abc": null,
-      "note": "Under pressure from negative news catalyst."
+      "level": 29.33,
+      "changePct": 4.19,
+      "abc": "C",
+      "note": "Attempting to bounce but in a longer-term downtrend."
     },
     {
       "ticker": "PLTR",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Consolidating, needs a catalyst."
+      "changePct": 2.0,
+      "abc": "A",
+      "note": "Gapping up on positive analyst commentary."
     },
     {
       "ticker": "CRWD",
-      "level": null,
+      "level": 732.71,
       "changePct": null,
-      "abc": null,
-      "note": "Cybersecurity sector is one to watch for rotation."
+      "abc": "B",
+      "note": "In a strong uptrend, but may be subject to tech pullback."
     },
     {
       "ticker": "MSTR",
-      "level": null,
-      "changePct": -7.2,
-      "abc": null,
-      "note": "Volatile price action, reacting to Bitcoin's movement."
+      "level": 93.05,
+      "changePct": 7.05,
+      "abc": "A",
+      "note": "Major episodic pivot on buyback news; high volatility."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is attempting a rally after a pullback. Need to see confirmation and follow-through days before committing significant capital. Focus on leaders showing high relative strength."
+      "view": "Market is showing weakness, not an ideal environment to be aggressive. Focus on protecting capital and only A+ setups."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear rotation back into Technology and Growth yesterday. Watch to see if this flow is sustained or if it's just quarter-end rebalancing."
+      "view": "Rotation seems defensive with money flowing out of tech/semis. Healthcare showing some relative strength."
     },
     {
       "name": "Clement Ang",
-      "view": "The market context improved with yesterday's rally, but it's still just one day. The posture should be to wait for more evidence of a confirmed uptrend before deploying fresh capital into A-grade setups."
+      "view": "Market context is weak with futures down. Not a 'Go' day; sit on hands or be extremely selective. Grade C environment."
     },
     {
       "name": "SRxTrades",
-      "view": "Yesterday's bounce had decent volume, but chasing extended names this morning is risky. Wait for low-risk entries like pullbacks to key moving averages or clean base breakouts."
+      "view": "Choppy action likely. Wait for clear signals and volume confirmation before entering any new positions. Avoid chasing gaps."
     },
     {
       "name": "Jeff",
-      "view": "Respect your stops. Yesterday's rally doesn't guarantee today's direction. Manage risk on any new positions."
+      "view": "Respect hard stops, especially in a volatile open. The market can move quickly on Fed comments."
     },
     {
       "name": "Qullamaggie",
-      "view": "The bounce provides potential for breakout setups. Look for stocks with strong episodic pivots and volume confirmation that are breaking out of tight consolidations."
+      "view": "Some episodic pivots like MSTR are in play, but the broad market weakness is a headwind. Be cautious with size on breakouts."
     },
     {
       "name": "Composite",
-      "view": "The market showed strength yesterday, but conviction is medium. Be patient this morning. Don't chase gaps. Observe the price action in the first hour and see if the leadership from yesterday continues. Focus on A-grade setups and manage risk tightly."
+      "view": "Wait for the market to digest the morning's economic data and Fed commentary. The tape is risk-off; raising the bar for new long entries is prudent. Focus on managing existing positions."
     }
   ],
   "standout": null,
   "earnings": {
-    "bmo": [],
-    "amc": [
+    "bmo": [
       {
-        "ticker": "NKE",
-        "consensus": "EPS $0.12 / Rev $10.85B"
+        "ticker": "GIS",
+        "consensus": "EPS $0.806 / Rev $4.58B"
       },
       {
-        "ticker": "STZ",
-        "consensus": "EPS $3.27 / Rev $2.4B"
+        "ticker": "MSM",
+        "consensus": null
       },
       {
-        "ticker": "PRGS",
-        "consensus": "EPS $1.52 / Rev $247.6M"
+        "ticker": "UNF",
+        "consensus": null
       }
     ],
-    "yesterdayReactions": []
+    "amc": [
+      {
+        "ticker": "CULP",
+        "consensus": null
+      },
+      {
+        "ticker": "BSET",
+        "consensus": null
+      },
+      {
+        "ticker": "GBX",
+        "consensus": null
+      }
+    ],
+    "yesterdayReactions": [
+      {
+        "ticker": "AVAV",
+        "result": "beat",
+        "movePct": 18.8
+      },
+      {
+        "ticker": "CNXC",
+        "result": "miss",
+        "movePct": -11.2
+      }
+    ]
   },
   "calendar": [
     {
+      "time": "08:15 ET",
+      "name": "ADP Employment Change (Jun)",
+      "consensus": null
+    },
+    {
       "time": "09:00 ET",
-      "name": "S&P/Case-Shiller Home Price Index",
+      "name": "Fed Chair Warsh Speaks",
+      "consensus": null
+    },
+    {
+      "time": "09:45 ET",
+      "name": "S&P Global Manufacturing PMI (Jun F)",
       "consensus": null
     },
     {
       "time": "10:00 ET",
-      "name": "JOLTS Job Openings",
+      "name": "ISM Manufacturing PMI (Jun)",
       "consensus": null
     },
     {
       "time": "10:00 ET",
-      "name": "Consumer Confidence",
+      "name": "Construction Spending (May)",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "OC",
-        "firm": "Evercore ISI Group",
+        "ticker": "NVDA",
+        "firm": "Evercore ISI",
         "rating": "Outperform",
-        "pt": 188
+        "pt": null
       },
       {
-        "ticker": "TW",
-        "firm": "Goldman Sachs",
+        "ticker": "ARMK",
+        "firm": "Zacks",
         "rating": "Buy",
-        "pt": 146
+        "pt": null
       },
       {
-        "ticker": "CMCSA",
-        "firm": "Deutsche Bank",
+        "ticker": "PLTR",
+        "firm": "Bank of America",
         "rating": "Buy",
-        "pt": 32
+        "pt": 255
       }
     ],
     "downgrades": [
       {
-        "ticker": "BAC",
-        "firm": "Oppenheimer",
-        "rating": "Perform",
-        "pt": null
-      },
-      {
-        "ticker": "C",
-        "firm": "Oppenheimer",
-        "rating": "Perform",
+        "ticker": "CFR",
+        "firm": "Raymond James",
+        "rating": "Market Perform",
         "pt": null
       }
     ]
   },
-  "alert": null,
+  "alert": "Fed Chair Warsh speaks at 9:00 AM ET; expect potential market volatility.",
   "news": [
     {
-      "headline": "Dow closes above 52,000 for the first time as tech rebounds",
+      "headline": "US Stock Futures Slip to Start Q3 as Investors Await Fed Chair Warsh's Comments and Key Economic Data",
       "impact": "HIGH",
       "tickers": [
-        "DIA",
         "SPY",
-        "QQQ"
-      ],
-      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-june-30-2026-dow-edges-higher-after-record-close",
-      "time": "06/30/2026"
-    },
-    {
-      "headline": "U.S. and Iran agree to halt hostilities, easing geopolitical tensions",
-      "impact": "HIGH",
-      "tickers": [
-        "CL=F",
-        "SPY"
-      ],
-      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-june-30-2026-dow-edges-higher-after-record-close",
-      "time": "06/30/2026"
-    },
-    {
-      "headline": "Alphabet gains nearly 5% on its first day as a Dow component",
-      "impact": "MED",
-      "tickers": [
-        "GOOGL",
+        "QQQ",
         "DIA"
       ],
-      "source": "Saxo Bank - https://www.home.saxo/content/articles/market-quick-take/market-quick-take-30062026",
-      "time": "06/30/2026"
+      "source": "24/7 Wall St. - https://247wallst.com/investing/2026/07/01/stock-market-live-july-1-2026-sp-500-spy-lower-as-investors-wait-on-the-fed-and-fresh-economic-data/",
+      "time": "06:30 ET"
     },
     {
-      "headline": "Super Micro Computer shares fall after Taiwan office raided over alleged Nvidia chip smuggling",
+      "headline": "Semiconductor and Memory Chip Sectors Weaken, Dragging on Tech Futures",
       "impact": "MED",
       "tickers": [
-        "SMCI",
-        "NVDA"
+        "SMH",
+        "QQQ",
+        "NVDA",
+        "AMD"
       ],
-      "source": "Saxo Bank - https://www.home.saxo/content/articles/market-quick-take/market-quick-take-30062026",
-      "time": "06/30/2026"
+      "source": "TradingKey - https://www.tradingkey.com/news/us-pre-market-three-major-futures-decline-across-the-board-memory-chip-and-optical-communication-sectors-weaken-adp-and-warsh-speeches-debut-together-701",
+      "time": "05:19 ET"
     },
     {
-      "headline": "AeroVironment (AVAV) surges 20% on strong earnings beat",
+      "headline": "MicroStrategy Jumps Premarket After Announcing New Capital Framework, $1B Share Buyback",
       "impact": "MED",
       "tickers": [
-        "AVAV"
+        "MSTR"
       ],
-      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-june-30-2026-dow-edges-higher-after-record-close",
-      "time": "06/30/2026"
+      "source": "Stocks.News - https://stocks.news/mstr-stock-pops-as-new-capital-framework-targets-buybacks-and-btc-liquidity/",
+      "time": "07:01 ET"
+    },
+    {
+      "headline": "Crude Oil Prices Fall as Middle East Tensions Ease",
+      "impact": "LOW",
+      "tickers": [
+        "CL=F",
+        "XLE"
+      ],
+      "source": "Fidelity - https://www.fidelity.com/news/article/top-news/202607010927/sector-update-energy-stocks-fall-premarket-wednesday.html",
+      "time": "09:27 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TipRanks 06/30/2026 - https://www.tipranks.com/news/options-volatility-and-implied-earnings-moves-today-june-30-2026",
-    "TheStreet 06/30/2026 - https://www.thestreet.com/markets/stock-market-today-june-30-2026-dow-edges-higher-after-record-close",
-    "Saxo Bank 06/30/2026 - https://www.home.saxo/content/articles/market-quick-take/market-quick-take-30062026",
-    "Digrin Earnings Calendar - https://digrin.com/earnings/calendar/2026-06-30",
-    "Benzinga Analyst Ratings - https://www.benzinga.com/analyst-ratings/upgrades/26/06/4212345/this-owens-corning-analyst-turns-bullish-here-are-top-3-upgrades-for-tuesday",
-    "Econoday Calendar - https://www.econoday.com/calendar.aspx",
-    "Reddit r/FluentInFinance - https://www.reddit.com/r/FluentInFinance/comments/1dt4x3p/stock_market_recap_for_monday_june_29_2026/",
-    "Yahoo Finance - https://finance.yahoo.com/quote/MSFT,NVDA,GOOGL,META,AAPL,TSLA,AMZN/.",
-    "FinanceCharts - https://financecharts.com/stocks/AAPL/versus/AMZN,MSFT,NVDA,TSLA/price",
-    "Investing.com Movers - https://www.investing.com/equities/pre-market",
-    "GuruFocus Ratings - https://www.gurufocus.com/news/3034980/bac-downgraded-by-oppenheimer--rating-changed-to-perform",
-    "Nasdaq - https://www.nasdaq.com/market-activity/stocks/most-advanced"
+    "Benzinga - https://www.benzinga.com/premarket",
+    "Zacks Investment Research - https://www.zacks.com/commentary/2293856/company-news-for-jul-1-2026",
+    "GuruFocus - https://www.gurufocus.com/news/3175142/cfr-downgraded-by-raymond-james--rating-changed-to-market-perform",
+    "Saxo Bank - https://www.home.saxo/content/articles/market-quick-take/market-quick-take-01072026",
+    "Fidelity - https://www.fidelity.com/news/article/top-news/202607010927/sector-update-energy-stocks-fall-premarket-wednesday.html",
+    "Fidelity - https://www.fidelity.com/news/article/market-news/202607010920/sector-update-healthcare-stocks-edge-higher-premarket-wednesday.html",
+    "24/7 Wall St. - https://247wallst.com/investing/2026/07/01/stock-market-live-july-1-2026-sp-500-spy-lower-as-investors-wait-on-the-fed-and-fresh-economic-data/",
+    "Benzinga - https://www.benzinga.com/markets/amd-dips-4-as-investors-lock-in-profits-after-a-blockbuster-ai-rotation-surge-advanced-micro-devices-shares-were-down-408-at-55720-at-the-time-of-publication-on-wednesday-according-to-benzinga-pro-data-2026-07-01",
+    "TradingKey - https://www.tradingkey.com/news/us-pre-market-three-major-futures-decline-across-the-board-memory-chip-and-optical-communication-sectors-weaken-adp-and-warsh-speeches-debut-together-701",
+    "Stocks.News - https://stocks.news/mstr-stock-pops-as-new-capital-framework-targets-buybacks-and-btc-liquidity/",
+    "Wall Street Horizon - https://www.wallstreethorizon.com/earnings-calendar",
+    "Investing.com - https://www.investing.com/earnings-calendar/",
+    "BMO Capital Markets - https://economics.bmo.com/en/publications/misc/20260701/north-american-economic-calendar-july-2026/",
+    "Market Chameleon - https://marketchameleon.com/Home/ReleaseDates",
+    "Public.com - https://public.com/stocks/SMCI/pre-market",
+    "MarketBeat - https://www.marketbeat.com/stocks/NASDAQ/CRWD/chart/",
+    "Robinhood - https://robinhood.com/stocks/MSTR/",
+    "TradingView - https://www.tradingview.com/symbols/NASDAQ-SMCI/",
+    "Market Chameleon - https://marketchameleon.com/Overview/CRWD/Stock-Price-Action/Premarket-VWAP",
+    "Finnhub.io - Real-Time Stock Prices"
   ]
 }
