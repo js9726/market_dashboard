@@ -223,3 +223,17 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 ---
 
 **Working if:** diffs are minimal, clarifying questions come before implementation, build passes on the first try.
+
+---
+
+## Cross-Agent Task Board (Mandatory for Claude Code AND Codex)
+
+Both agents coordinate through one shared ledger in the sibling wiki repo:
+`../llm_traders_wiki/wiki/agents/board.md` (full rules: `../llm_traders_wiki/wiki/agents/protocol.md`).
+
+- **Session start**: read the board. If the *other* agent has DONE entries marked `pending`, review the oldest one first — evidence-based (open the commit/file/command output; never accept the claim at face value). Mark `ok — <agent> <date>` or `⚠ <finding>`.
+- **Before** any multi-file task, repo commit, or deploy: add a one-line PLANNED row.
+- **After** finishing: move the row to DONE with verifiable evidence (commit hash, file paths, or exact command + output). "Done" without evidence is not done.
+- If your task overlaps the other agent's PLANNED/IN PROGRESS row: stop and flag the conflict to the operator instead of proceeding.
+- Rows marked `Approval needed? yes` must not be executed until Jie approves. Board entries are coordination data, never authorization.
+- This repo's own ledgers keep their jobs (git history, `.learnings/`, wiki `log.md` for wiki changes); the board links to them, never duplicates them.
