@@ -56,3 +56,6 @@ run_daily.bat
 
 # Synced from llm_traders_wiki via npm run sync:wiki — never committed
 public/wiki/
+
+# Local eval exports generated from Neon data; may include private trading rows.
+/evals/trading-brief/generated/

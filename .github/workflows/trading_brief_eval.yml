@@ -1,0 +1,35 @@
+name: Trading Brief Eval Gate
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/trading_brief_eval.yml"
+      - "apps/market_dashboard/evals/trading-brief/**"
+      - "apps/market_dashboard/scripts/eval-trading-brief.mjs"
+      - "apps/market_dashboard/package.json"
+      - "apps/market_dashboard/src/lib/**"
+      - "packages/core-skills/**"
+  workflow_dispatch: {}
+
+concurrency:
+  group: trading-brief-eval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: apps/market_dashboard
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run trading brief eval
+        run: npm run eval:trading-brief -- --min-score 0.8

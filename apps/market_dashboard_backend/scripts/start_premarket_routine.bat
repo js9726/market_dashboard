@@ -24,7 +24,9 @@ REM ============================================================================
 set REPO_ROOT=C:\Users\jiesh\AI codes hub\market_dashboard
 set BACKEND=%REPO_ROOT%\apps\market_dashboard_backend
 set FRONTEND=%REPO_ROOT%\apps\market_dashboard
-set WIKI=C:\Users\jiesh\AI codes hub\llm_traders_wiki
+set WIKI=%JIE_WIKI_ROOT%
+if "%WIKI%"=="" set WIKI=%LLM_TRADERS_WIKI_ROOT%
+if "%WIKI%"=="" set WIKI=C:\Users\jiesh\AI codes hub\jie_wiki
 set LOG=%BACKEND%\data\_premarket_routine.log
 
 echo. >> "%LOG%"

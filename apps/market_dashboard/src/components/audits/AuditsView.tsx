@@ -135,7 +135,7 @@ export default function AuditsView() {
           <p className="t-overline">Trade Audits</p>
           <p className="t-caption">
             Monthly grade-A/B/C breakdown of past trades vs the wiki rubric. Sourced from{" "}
-            <code>llm_traders_wiki/verdicts/{"{operator}"}/_audit_YYYY-MM.md</code> via{" "}
+            <code>jie_wiki/verdicts/{"{operator}"}/_audit_YYYY-MM.md</code> via{" "}
             <code>npm run sync:wiki -- --post</code>. Paper-only rows (no actual buy price in the
             journal) are flagged <span className="font-mono text-[var(--fg-3)]">PAPER</span>.
           </p>

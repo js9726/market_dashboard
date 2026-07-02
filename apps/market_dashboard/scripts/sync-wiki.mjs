@@ -20,7 +20,11 @@ import { fileURLToPath } from "node:url";
 
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REPO_ROOT = path.resolve(APP_ROOT, "..", "..", "..");
-const VERDICTS_ROOT = path.join(REPO_ROOT, "jie_wiki", "verdicts");
+const WIKI_ROOT =
+  process.env.JIE_WIKI_ROOT ||
+  process.env.LLM_TRADERS_WIKI_ROOT ||
+  path.join(REPO_ROOT, "jie_wiki");
+const VERDICTS_ROOT = path.join(WIKI_ROOT, "verdicts");
 const PUBLIC_DEST = path.join(APP_ROOT, "public", "wiki");
 
 const args = new Set(process.argv.slice(2));
@@ -78,7 +82,7 @@ function readJsonFile(p) {
 
 if (!fs.existsSync(VERDICTS_ROOT)) {
   console.error(`[sync:wiki] source missing: ${VERDICTS_ROOT}`);
-  console.error("[sync:wiki] expected ../jie_wiki next to market_dashboard.");
+  console.error("[sync:wiki] expected JIE_WIKI_ROOT or ../jie_wiki next to market_dashboard.");
   process.exit(2);
 }
 

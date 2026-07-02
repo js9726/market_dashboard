@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "model": "handwritten-baseline",
+  "generatedAt": "2026-06-30",
+  "results": [
+    {
+      "id": "textbook-vcp-breakout-go",
+      "verdict": "GO",
+      "convictionScore": 86,
+      "setupTags": ["BO-VCP", "tight base", "volume expansion"],
+      "riskFlags": [],
+      "brief": "GO because the base is tight, the pivot is clear, and volume expansion confirms the breakout. The stop should use the base low or the 1.5 ATR floor."
+    },
+    {
+      "id": "quiet-21ema-pullback-watch",
+      "verdict": "WATCH",
+      "convictionScore": 63,
+      "setupTags": ["PB-21EMA", "volume contraction"],
+      "riskFlags": ["needs trigger"],
+      "brief": "WATCH because a 21EMA pullback wants volume contraction, not breakout RVOL. Wait for a reversal trigger or tight-area break before sizing."
+    },
+    {
+      "id": "parabolic-chase-pass",
+      "verdict": "PASS",
+      "convictionScore": 22,
+      "setupTags": ["PARABOLIC"],
+      "riskFlags": ["extended", "chase", "wide stop"],
+      "brief": "PASS because the move is extended and late with no fresh setup. Any entry would be a chase and the required wide stop breaks the risk gate."
+    },
+    {
+      "id": "catalyst-no-setup-watch",
+      "verdict": "WATCH",
+      "convictionScore": 48,
+      "setupTags": ["NEWS-NO-TRIGGER"],
+      "riskFlags": ["no trigger", "undefined risk point"],
+      "brief": "WATCH because the catalyst is real but there is no actionable trigger and no defined risk point. Let price form a pivot or tight base first."
+    },
+    {
+      "id": "intraday-trigger-no-daily-setup-pass",
+      "verdict": "PASS",
+      "convictionScore": 28,
+      "setupTags": ["ORB-NO-SETUP"],
+      "riskFlags": ["loose range", "low rvol", "no daily setup"],
+      "brief": "PASS because an intraday ORB trigger is not enough when the daily chart is a loose range with low RVOL and no daily setup. Wait for the range to tighten or reclaim a real pivot with defined risk."
+    }
+  ]
+}

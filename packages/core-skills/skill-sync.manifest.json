@@ -7,9 +7,12 @@
     "wiki": {
       "description": "Authoring source for trading knowledge.",
       "candidates": [
+        "${JIE_WIKI_ROOT}",
         "${LLM_TRADERS_WIKI_ROOT}",
         "../jie_wiki",
-        "C:/Users/jiesh/AI codes hub/jie_wiki"
+        "../llm_traders_wiki",
+        "C:/Users/jiesh/AI codes hub/jie_wiki",
+        "C:/Users/jiesh/AI codes hub/llm_traders_wiki"
       ]
     },
     "globalSkills": {

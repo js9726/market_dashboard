@@ -5,8 +5,8 @@
   "target": "agent-moderator/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-02T04:00:04.607Z",
-  "renderHash": "5553440b784ad2881fcdb1310517b37bef4934e14b97274f6cdd6ffc6a5b48f6",
+  "generatedAt": "2026-07-02T14:44:27.276Z",
+  "renderHash": "4f386d188a975d88e5d5e887d987e78441663413cb3408e1791e0405007362f8",
   "sources": [
     {
       "root": "wiki",
@@ -31,12 +31,12 @@
     {
       "root": "wiki",
       "path": "wiki/traderlion-early-entry-techniques.md",
-      "sha256": "0027117abe53ed5a0781e5ead8904ded55c2ac6d225993738085390a86b657ba"
+      "sha256": "d5825c16fcaf4ea75f448b1ef342df773ef8ab4c1b70243bfd80f856056a6a8d"
     },
     {
       "root": "wiki",
       "path": "wiki/entry-methods.md",
-      "sha256": "4334c4546957182c46a999585a4a6b565e0c6d3ff32309dc1ac78a6f3bdaf403"
+      "sha256": "c62cde02ae42f57d26a020929270f725fec358717bfce4258ff8b3023f6b8ea2"
     },
     {
       "root": "wiki",
@@ -77,8 +77,8 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trader-style-profiles.md sha256:86b243e654ed
 - wiki:wiki/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
-- wiki:wiki/traderlion-early-entry-techniques.md sha256:0027117abe53
-- wiki:wiki/entry-methods.md sha256:4334c4546957
+- wiki:wiki/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
+- wiki:wiki/entry-methods.md sha256:c62cde02ae42
 - wiki:wiki/risk-management.md sha256:67607fb8a123
 - wiki:wiki/position-sizing.md sha256:23dc116bc8f1
 - wiki:wiki/relative-strength.md sha256:588b842eccce
@@ -608,11 +608,11 @@ Score risk lower when:
 
 # TraderLion Early Entry Techniques
 
-**Summary**: Ameet Rai / TraderLion outlines four early-entry techniques: alternative early entry pivots, Power of 3, Launch Pad, and High Volume Close. The common theme is finding earlier, tighter risk points before or shortly after obvious base pivots.
+**Summary**: Ameet Rai / TraderLion early-entry techniques: alternative early entry pivots, Power of 3, Launch Pad, High Volume Close, and Shakeout +3 — plus Richard Moglen's range-entry doctrine (four tactics incl. undercut & rally, ORB as an intraday trigger only). The common theme is finding earlier, tighter risk points on setups that are already qualified on the daily/weekly chart.
 
-**Sources**: 3 Early Entry Techniques To Improve Win Rate.md, trader-style-research-2026-06-11.md
+**Sources**: 3 Early Entry Techniques To Improve Win Rate.md, trader-style-research-2026-06-11.md; live scrape 2026-07-02: https://traderlion.com/trading-strategies/3-early-entry-techniques-to-improve-win-rate/ (content verified against this page — matches), https://traderlion.com/technical-analysis/chart-patterns/shakeout-plus-3-early-entry/, https://traderlion.com/profile/richard-moglen/trade-opportunity-case-study-of-the-week-tem-opening-range-breakout-feb-8-2025/, https://traderlion.com/profile/richard-moglen/trade-opportunity-case-study-of-the-week-w-range-breakout-sep-6-2025/, https://traderlion.com/quick-reads/the-oops-reversal-entry-setup-tactic-traders-handbook-educational-article/
 
-**Last updated**: 2026-06-11
+**Last updated**: 2026-07-02
 
 ---
 
@@ -624,7 +624,7 @@ Entry is a tight multi-day period before the general base pivot. Exit is below t
 
 ## Power Of 3
 
-Power of 3 occurs when a stock moves from below its 10, 21, and 50-day moving averages to above them in a single session. The source prefers horizontal moving averages, decreasing volume while consolidating below the MAs, and increasing volume as price moves through them. (source: 3 Early Entry Techniques To Improve Win Rate.md)
+Power of 3 occurs when a stock moves from below its 10, 21, and 50-day **simple** moving averages to above them in a single session (live article specifies SMAs; downtrending MAs decrease the setup's probability). The source prefers horizontal moving averages, decreasing volume while consolidating below the MAs, and increasing volume as price moves through them. (source: 3 Early Entry Techniques To Improve Win Rate.md)
 
 The entry is a break above the consolidation highs when the bunched moving averages sit near that same point. Risk is generally below the consolidation lows or on repeated closes back below the moving averages. (source: 3 Early Entry Techniques To Improve Win Rate.md)
 
@@ -632,13 +632,64 @@ The entry is a break above the consolidation highs when the bunched moving avera
 
 Launch Pad is a follow-on setup after institutions have shown their hand by pushing price through important moving averages. Former resistance MAs should begin acting as support. (source: 3 Early Entry Techniques To Improve Win Rate.md)
 
-Entries can come from multi-day support at a rising MA, a break above a consolidation high, or a short-term pattern such as an inside day. Stops usually sit below recent lows or below the relevant moving averages. (source: 3 Early Entry Techniques To Improve Win Rate.md)
+Entries can come from multi-day support at a rising MA, a break above a consolidation high, or a short-term pattern such as an inside day. Stops usually sit below recent lows (preferably within 3-5% of entry) or below the relevant moving averages. A Launch Pad does **not** require a prior Power of 3 trigger to be valid. (source: 3 Early Entry Techniques To Improve Win Rate.md; live article 2026-07-02)
 
 ## High Volume Close
 
 High Volume Close works best when a stock breaks out to new highs on a positive earnings report or news reaction. The source looks for a 10%+ gap, highest volume in one year / since IPO / ever, closing range above 75%, and upward revisions to sales or EPS expectations. (source: 3 Early Entry Techniques To Improve Win Rate.md)
 
 Entry tactics include buying near gap-day volume support, buying near the high-volume close, or entering near relevant lower-timeframe moving averages if risk can be controlled. Stops can be below day-one volume support, below the day-one low, on a close below the HVC, or on a close below a relevant intraday moving average. (source: 3 Early Entry Techniques To Improve Win Rate.md)
+
+## Shakeout +3 (added 2026-07-02 from live scrape)
+
+Shakeout +3 (credited to Jesse Livermore) is an early entry inside a **W-bottom / double-bottom base that forms after a prolonged uptrend**. The second low must undercut the first low — the shakeout that transfers shares from weak hands to institutions. (source: shakeout-plus-3-early-entry article)
+
+Entry rules:
+
+- Buy when price recovers to **$3 above the first low** for ~$30 stocks, **$6 above** for $60+ stocks, or roughly **10% above the first low** as the general form.
+- This triggers well before the traditional W mid-point breakout (UBER 2023 example: ~8% before the standard pivot).
+- It is an *earlier* entry, not a *looser* one: the base context (prolonged uptrend, recognizable W, quick recovery off the undercut low) must be present. "More of an art than a science." (source: shakeout-plus-3-early-entry article)
+
+Examples cited: UBER, NVDA, ELF, SNOW (all 2023).
+
+## Range Entries And ORB — Moglen Case-Study Doctrine (added 2026-07-02)
+
+Richard Moglen's weekly case studies define how TraderLion actually uses intraday entries. The load-bearing rule: **the setup is identified on the daily and weekly timeframe first; intraday timeframes are only for execution.** "For ranges I typically like to go down to a 65 minute timeframe. This is AFTER I have identified the setup on a daily & weekly timeframe." (source: W range breakout case study)
+
+Four entry tactics for trading ranges:
+
+1. **Anticipation** — position inside the range before the move.
+2. **Accumulation versus range lows** — buy tests of the lows showing support.
+3. **Standard breakout** — buy the range break itself.
+4. **Undercut and rally (U&R)** — price undercuts the range low, then rallies back through; Moglen's stated favorite, because it occurs on the day the stock is actually making its move.
+
+Qualifying conditions that gate ALL four tactics:
+
+- The stock must come from a **strong trend pulling back to the 21ema and/or a tight, defined range**. "Choppier names should be avoided." (source: W range breakout case study)
+- RS leadership matters: the TEM ORB trade required weeks of visible relative strength (top of leaders screen) and a pullback to the 10ema + prior pivot confluence *before* any intraday signal counted. (source: TEM ORB case study)
+- Market context is part of the setup: the best U&R/ORB days were market gap-downs that rallied off the open, giving a low-risk stop at low-of-day.
+- Stops: low of the entry bar / LoD, typically **under 3% position risk**; raise to breakeven on follow-through.
+- Health check: a valid ORB/U&R entry is **immediately profitable** — "Both would immediately have been profitable, the best sign for an entry." If it stalls or goes red, the signal is suspect.
+- ORB timeframes used in the case studies: **5-minute** opening range for the trigger, **65-minute** for range structure. (A 15-minute opening range is a reasonable variant of the same idea; the timeframe is not the edge — the pre-qualified daily setup is.)
+
+## Oops Reversal (added 2026-07-02 from live scrape)
+
+The Oops Reversal (developed by Larry Williams, taught by Richard Moglen) is a short-term pullback entry tactic: the stock **gaps below the prior day's low, then rallies back through that level**. The prior day's low is the pivot; the gap-down stops out weak holders and shorts pile in, then institutions absorb the supply — the reclaim squeezes both groups back in. (source: the-oops-reversal-entry-setup-tactic article)
+
+Context requirements (same "setup first" doctrine as all TraderLion tactics):
+
+- Use in a **strong stock up the right side of a base or shortly after a breakout** — where institutions are still building positions.
+- The gap-down cause should ideally be **market-driven** (CPI, macro news), not stock-specific. Stock-specific gaps are case-by-case.
+- Best when the gap-down open lands near a key level: base pivot, 10ema, 21ema, or prior resistance — and when the stock is forming a short pullback / higher-low range.
+- An Oops in an **extended** stock is a day-trade at best, not a swing entry.
+
+Execution:
+
+- Textbook entry: as price pushes back through the prior day's low. Stop = low of day, position risk **under ~3%**; raise the stop to below the oops pivot once ~3% above it.
+- Anticipation variants on large gap-downs (4%+ from the pivot): an **opening range breakout below the oops pivot**, or a key-daily-level reclaim — with tighter stops (**under 2%** position risk). This is the one sanctioned use of an ORB *below* a daily pivot, and it still requires the daily/weekly setup to be qualified first.
+- Pre-market planning is mandatory: alerts ~0.5% below the prior day's low on focus-list names only ("stocks... setup on a daily and weekly timeframe up the right side of a base or shortly in their trends after a breakout").
+
+**Follow-through is the confirmation**: day-1 should close strong with at least ~1R (~3%) cushion, ideally near the day's high and the prior day's high (best ones are positive outside days), and the next day should continue. No follow-through = suspect signal.
 
 ## How This Maps To The Wiki
 
@@ -665,6 +716,8 @@ Penalize:
 - HVC entries where the day closes poorly or volume is ordinary.
 - Post-gap trades that never tighten after the initial catalyst.
 - Stops that sit far beyond the tight area, destroying the early-entry edge.
+- **ORB/U&R entries in choppy, wide-and-loose ranges** — the case studies explicitly exclude choppier names; the intraday trigger cannot substitute for a qualified daily setup.
+- Shakeout entries where the "W" lacks a prolonged prior uptrend, or entries taken **below** the +$3/+$6/+10% recovery threshold above the first low.
 
 ## Related pages
 
@@ -680,9 +733,9 @@ Penalize:
 
 **Summary**: The two primary entry methods across traders in this wiki are (1) pullbacks to rising moving averages and (2) breakouts from tight consolidations. The best entry setups often appear as tight areas after a base breakout, where price digests the move on low volume, prints a priming pattern, and then breaks a pivot.
 
-**Sources**: Alex's Swing Trading System.md, The blueprint to consistently making $10km+ in trading.md, The Complete Traders' Guide.md, 3 Early Entry Techniques To Improve Win Rate.md, user-provided tight-area entry setup image, user-provided priming-pattern image, user-provided post-gap volatility contraction image
+**Sources**: Alex's Swing Trading System.md, The blueprint to consistently making $10km+ in trading.md, The Complete Traders' Guide.md, 3 Early Entry Techniques To Improve Win Rate.md, user-provided tight-area entry setup image, user-provided priming-pattern image, user-provided post-gap volatility contraction image, TraderLion Moglen case studies (TEM ORB, W range breakout — live scrape 2026-07-02, URLs in traderlion-early-entry-techniques), GFS 2026-07-01 trade calibration (OpenD klines)
 
-**Last updated**: 2026-06-15
+**Last updated**: 2026-07-02
 
 ---
 
@@ -830,6 +883,30 @@ Rules:
 - Distinguish from genuine weakness: a *high-volume* pullback, a close decisively **below** the rising 21EMA, or a weak-RS name lagging a strong tape.
 
 Example (2026-06-15): TWLO was first scored 31/PASS as "relative weakness" — a mis-read. It was the first pullback to the rising 21EMA after an earnings EP (gap to ~238 on +229% volume), on RVol ~55% contraction, RS Rating 94. Corrected to WATCH (Conviction 66): buyable on the reclaim trigger above the 8EMA, stop below the pullback low. See traderlion-early-entry-techniques (Launch Pad / Power of 3) and gapper-entry.
+
+---
+
+## An intraday trigger is not a setup — ORB/U&R doctrine (2026-07-02 calibration)
+
+Opening-range breakouts (ORB/ORH — any timeframe: 1m/5m/15m/60m) and undercut-and-rally (U&R, "overshoot and come back") are **entry tactics**, not setups. They time an entry into a trade that already qualifies on the **daily/weekly** chart; they can never qualify the trade by themselves. TraderLion's own case studies state this explicitly: the intraday timeframe comes "AFTER I have identified the setup on a daily & weekly timeframe," and "choppier names should be avoided." (source: TraderLion TEM ORB and W range-breakout case studies, scraped 2026-07-02 — URLs in traderlion-early-entry-techniques)
+
+**When an ORB/U&R entry is permitted:**
+
+1. **EP day** — fresh catalyst, big gap, huge volume → ORH trigger (Qullamaggie 1m/5m/60m).
+2. **Day-1 breakout from a qualified tight base** → ORH as the sniper entry (SRxTrades 5m/15m; the base must already pass tightness/volume checks).
+3. **First pullback reclaim** — qualified PB-21EMA/POST-GAP-VCP, trigger = reclaim of the 8/10EMA or tight-area break on volume expansion.
+4. **U&R in a tight, defined range** — stock in a strong trend, RS leader, range tight (low RMV), undercut of the range low that rallies back through it **on the day the range actually breaks**. Stop = LoD, position risk under ~3%, and the entry should be immediately profitable; if it goes red quickly the signal was false.
+5. **Oops Reversal** — gap below the prior day's low that reclaims it, in a strong stock up the right side of a base / shortly post-breakout, ideally on a market-driven gap-down near a key MA. The codified "gap down and come back" tactic — full rules in traderlion-early-entry-techniques.
+
+**When it is forbidden (auto-PASS at the pre-screen, before any rubric scoring):**
+
+- The daily structure is **wide and loose** (repeated ±5%+ swings, alternating large up/down days) — an intraday bullish signal inside chop is noise, not a setup.
+- There are recent **high-volume distribution days** in or above the range.
+- The bounce/breakout day runs on **below-average volume** (RVOL < ~1 fails Jeff Sun's confirmation for any breakout-type entry).
+- The "undercut" did not undercut a *meaningful* prior low of the structure, or deeper lows sit unreclaimed below (overhead supply on every side).
+- Buying a mid-range bounce that has broken nothing: if price is still inside the range and below the pivot/mid-resistance, there is no trigger — same doctrine as the `NEWS-NO-TRIGGER` eval case.
+
+Worked example (2026-07-01, GFS): after a May EP run to ~92, June printed seven ±5–11% daily swings with a 21.7M-share (-9.8%) distribution day — textbook wide-and-loose. The Jun 29 undercut to 75.58 (which never undercut the true structure low of 70.38 from Jun 9) bounced to 82.4 on 0.65x volume; a 15-minute ORB read led to a ~82 mid-range entry with a ~78 stop (<1 ATR in a 6.8%-ATR name). Jul 1 gapped down through the stop, -6.29% close. Every forbidden condition above was present; the correct classification at entry time was PASS regardless of the intraday chart. Note the Shakeout+3 comparison: even TraderLion's *early* W-bottom entry would not have triggered until ~10% above the first low (~$86+), and only in a valid W after a prolonged uptrend. See traderlion-early-entry-techniques.
 
 ---
 

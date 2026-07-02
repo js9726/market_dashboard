@@ -5,7 +5,7 @@
   "target": "trader-scorer-stock/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-02T04:00:04.628Z",
+  "generatedAt": "2026-07-01T03:15:52.362Z",
   "renderHash": "081023ab68bfd4d1f40bbaa67b8df50a650fe0d63bbe7df105f516ff43b3843b",
   "sources": [
     {

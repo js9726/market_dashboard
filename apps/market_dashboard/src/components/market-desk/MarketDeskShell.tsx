@@ -109,7 +109,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
   "/dashboard/audits": {
     title: "Trade Audits",
-    subtitle: "Monthly grade-A/B/C trade rubric reviews from llm_traders_wiki",
+    subtitle: "Monthly grade-A/B/C trade rubric reviews from jie_wiki",
   },
   // ── Phase 0 multi-broker journal pages (feature-gated) ────────────────────
   "/dashboard/portfolio": {

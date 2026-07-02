@@ -60,3 +60,30 @@ packages/core-skills/morning-brief/_tmp_*.py
 packages/core-skills/morning-brief/brief_output_*.json
 packages/core-skills/morning-brief/holdings_review_*.json
 packages/core-skills/morning-brief/index_technicals_*.json
+
+# --- operator session scratch (Claude/Codex) — keep sync clean ---
+**/morning-brief/brief_output_*.json
+**/morning-brief/_update_brief_*.py
+**/morning-brief/_account_check_*.py
+**/morning-brief/_journal_*.py
+**/morning-brief/analyse_batch_*.py
+**/morning-brief/swing_metrics_*.py
+**/morning-brief/extract_levels_*.py
+**/morning-brief/nok_levels.py
+**/morning-brief/aaon_analyse.py
+**/morning-brief/qcom_tech_*.json
+**/morning-brief/candidate_technicals_*.json
+**/morning-brief/levels_*.json
+**/morning-brief/opend_live_*.json
+**/morning-brief/opend_now*.json
+**/morning-brief/gfs_cdw_live.json
+**/morning-brief/scr_enrich.json
+**/morning-brief/err.log
+**/morning-brief/watch_triggers*.py
+**/morning-brief/screener_go_watch.py
+**/scripts/_parse_*.py
+**/scripts/_detail_*.py
+_apply_conviction_scorer.py
+
+# backend session scratch
+apps/market_dashboard_backend/_*.py

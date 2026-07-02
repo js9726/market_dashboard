@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "description": "Versioned seed eval set for the trading brief / Conviction Score workflow.",
+  "scoreScale": "0-100",
+  "cases": [
+    {
+      "id": "textbook-vcp-breakout-go",
+      "name": "Textbook VCP breakout should clear GO",
+      "input": {
+        "ticker": "ALPH",
+        "setup": "BO-VCP",
+        "priceAction": "Tight volatility contraction base near highs; breakout above pivot on strong volume.",
+        "rvol": 2.1,
+        "rs": "new 3-month high",
+        "entry": "Breakout trigger above pivot",
+        "stop": "Base low / 1.5 ATR floor",
+        "catalyst": "Fresh earnings acceleration"
+      },
+      "expected": {
+        "verdict": "GO",
+        "scoreRange": [75, 95],
+        "setupTagsRequired": ["BO-VCP", "volume expansion"],
+        "riskFlagsForbidden": ["extended", "no trigger", "low rvol breakout"],
+        "mustMention": ["tight", "pivot", "stop"]
+      }
+    },
+    {
+      "id": "quiet-21ema-pullback-watch",
+      "name": "Low-volume 21EMA pullback should be WATCH, not auto-failed for low RVOL",
+      "input": {
+        "ticker": "BETA",
+        "setup": "PB-21EMA",
+        "priceAction": "Orderly pullback into rising 21EMA after a prior breakout; volume contracts below average.",
+        "rvol": 0.72,
+        "rs": "above 80, holding up versus market",
+        "entry": "Needs reversal trigger or tight area break",
+        "stop": "Under pullback low / ATR floor",
+        "catalyst": "Sector momentum intact"
+      },
+      "expected": {
+        "verdict": "WATCH",
+        "scoreRange": [50, 74],
+        "setupTagsRequired": ["PB-21EMA", "volume contraction"],
+        "riskFlagsForbidden": ["low rvol breakout", "auto fail"],
+        "mustMention": ["pullback", "trigger", "21EMA"]
+      }
+    },
+    {
+      "id": "parabolic-chase-pass",
+      "name": "Parabolic extension should fail the entry gate",
+      "input": {
+        "ticker": "GAMM",
+        "setup": "PARABOLIC",
+        "priceAction": "Three-day vertical move, far above the 21EMA and 50MA, no tight base.",
+        "rvol": 3.6,
+        "rs": "very high but extended",
+        "entry": "No fresh pivot; late chase",
+        "stop": "Would require wide stop below parabolic low",
+        "catalyst": "Crowded theme headline"
+      },
+      "expected": {
+        "verdict": "PASS",
+        "scoreRange": [0, 49],
+        "setupTagsRequired": ["PARABOLIC"],
+        "riskFlagsRequired": ["extended", "chase"],
+        "mustMention": ["extended", "late", "wide stop"]
+      }
+    },
+    {
+      "id": "catalyst-no-setup-watch",
+      "name": "Great catalyst without trigger should not become GO",
+      "input": {
+        "ticker": "DELT",
+        "setup": "NEWS-NO-TRIGGER",
+        "priceAction": "Strong news response but price is mid-range with no base, no pivot, and no clean risk point.",
+        "rvol": 1.4,
+        "rs": "improving but not leading",
+        "entry": "No actionable trigger yet",
+        "stop": "Not structurally defined",
+        "catalyst": "Major contract win"
+      },
+      "expected": {
+        "verdict": "WATCH",
+        "scoreRange": [35, 64],
+        "setupTagsRequired": ["NEWS-NO-TRIGGER"],
+        "riskFlagsRequired": ["no trigger"],
+        "riskFlagsForbidden": ["GO"],
+        "mustMention": ["catalyst", "no actionable trigger", "risk point"]
+      }
+    },
+    {
+      "id": "intraday-trigger-no-daily-setup-pass",
+      "name": "Intraday ORB/U&R signal inside a wide-loose range must PASS",
+      "input": {
+        "ticker": "EPSI",
+        "setup": "ORB-NO-SETUP",
+        "priceAction": "Wide loose range with repeated 5-11% daily swings and a high-volume distribution day; undercut of the range low bounces back mid-range on below-average volume; bullish 15-minute opening range breakout on the bounce day.",
+        "rvol": 0.65,
+        "rs": "high but structure is choppy",
+        "entry": "15m ORB pullback entry mid-range",
+        "stop": "Sub-ATR stop inside the range noise",
+        "catalyst": "None fresh"
+      },
+      "expected": {
+        "verdict": "PASS",
+        "scoreRange": [0, 49],
+        "setupTagsRequired": ["ORB-NO-SETUP"],
+        "riskFlagsRequired": ["loose range", "low rvol", "no daily setup"],
+        "mustMention": ["intraday", "trigger", "loose"]
+      }
+    }
+  ]
+}

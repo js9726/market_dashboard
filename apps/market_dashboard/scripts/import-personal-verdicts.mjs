@@ -25,7 +25,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DEFAULT_WIKI_DIR = path.resolve(__dirname, "../../../../jie_wiki/verdicts");
+const DEFAULT_WIKI_ROOT =
+  process.env.JIE_WIKI_ROOT ||
+  process.env.LLM_TRADERS_WIKI_ROOT ||
+  path.resolve(__dirname, "../../../../jie_wiki");
+const DEFAULT_WIKI_DIR = path.join(DEFAULT_WIKI_ROOT, "verdicts");
 const PROVIDER_TAG = "backfill-2026-05-07";
 
 function parseArgs(argv) {
