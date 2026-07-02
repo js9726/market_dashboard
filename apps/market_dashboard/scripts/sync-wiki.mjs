@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Sync llm_traders_wiki verdict artifacts for the dashboard.
+ * Sync jie_wiki verdict artifacts for the dashboard.
  *
  * Default: writes a local dev fallback under public/wiki/.
  *   npm run sync:wiki
@@ -9,7 +9,7 @@
  *   npm run sync:wiki -- --post
  *   npm run sync:wiki -- --post --dry-run
  *
- * Multi-operator: scans every immediate subdir under llm_traders_wiki/verdicts/
+ * Multi-operator: scans every immediate subdir under jie_wiki/verdicts/
  * (e.g. js/, xx/, ...) and tags every audit + trade row with the operator label
  * (uppercased dir name). Existing single-operator data continues to work — the
  * Postgres rows default to operatorLabel='JS'.
@@ -20,7 +20,7 @@ import { fileURLToPath } from "node:url";
 
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REPO_ROOT = path.resolve(APP_ROOT, "..", "..", "..");
-const VERDICTS_ROOT = path.join(REPO_ROOT, "llm_traders_wiki", "verdicts");
+const VERDICTS_ROOT = path.join(REPO_ROOT, "jie_wiki", "verdicts");
 const PUBLIC_DEST = path.join(APP_ROOT, "public", "wiki");
 
 const args = new Set(process.argv.slice(2));
@@ -78,7 +78,7 @@ function readJsonFile(p) {
 
 if (!fs.existsSync(VERDICTS_ROOT)) {
   console.error(`[sync:wiki] source missing: ${VERDICTS_ROOT}`);
-  console.error("[sync:wiki] expected ../llm_traders_wiki next to market_dashboard.");
+  console.error("[sync:wiki] expected ../jie_wiki next to market_dashboard.");
   process.exit(2);
 }
 

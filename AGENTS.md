@@ -146,7 +146,7 @@ Define success criteria. Loop until verified.
 - Each skill = canonical 7-file folder (`SKILL.md`, `prompt.md`, `knowledge.md`, `schema.json`, TS + Python handlers, `tests/golden.json`).
 - Use `/scaffold-skill <name>` to create. Use `/extract-prompt <file> <skill>` to migrate a hardcoded prompt.
 - Knowledge bodies are committed runtime artifacts. Refresh them from the authoring wiki/global skills with `npm run skills:sync`, controlled by `packages/core-skills/skill-sync.manifest.json`.
-- Run `npm run skills:check` before commits that touch `llm_traders_wiki`, global skill references, or `packages/core-skills`.
+- Run `npm run skills:check` before commits that touch `jie_wiki`, global skill references, or `packages/core-skills`.
 - Phase 3 scorer skills are intentionally split by use case: `trader-scorer-market`, `trader-scorer-stock`, and `trader-scorer-trade`.
 
 ### Auth (NextAuth v5)
@@ -234,7 +234,7 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 ## Cross-Agent Task Board (Mandatory for Claude Code AND Codex)
 
 Both agents coordinate through one shared ledger in the sibling wiki repo:
-`../llm_traders_wiki/wiki/agents/board.md` (full rules: `../llm_traders_wiki/wiki/agents/protocol.md`).
+`../jie_wiki/wiki/agents/board.md` (full rules: `../jie_wiki/wiki/agents/protocol.md`).
 
 - **Session start**: read the board. If the *other* agent has DONE entries marked `pending`, review the oldest one first — evidence-based (open the commit/file/command output; never accept the claim at face value). Mark `ok — <agent> <date>` or `⚠ <finding>`.
 - **Before** any multi-file task, repo commit, or deploy: add a one-line PLANNED row.

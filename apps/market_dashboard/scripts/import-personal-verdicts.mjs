@@ -2,7 +2,7 @@
 /**
  * One-time backfill: import operator's local verdict JSONs into Postgres.
  *
- * Reads verdicts/{YYYY}/*.json from llm_traders_wiki and inserts as
+ * Reads verdicts/{YYYY}/*.json from jie_wiki and inserts as
  * TradeVerdictHistory rows tagged provider='backfill-2026-05-07'.
  *
  * Matches each verdict to a Trade row by (userId, ticker, tradeDate).
@@ -16,7 +16,7 @@
  * Env vars (loaded by --env-file=.env.local):
  *   DATABASE_URL            Required for Prisma client init
  *   OWNER_EMAIL             Default operator email if --user not given
- *   WIKI_VERDICTS_DIR       Override path to llm_traders_wiki/verdicts (optional)
+ *   WIKI_VERDICTS_DIR       Override path to jie_wiki/verdicts (optional)
  */
 
 import { PrismaClient } from "@prisma/client";
@@ -25,7 +25,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DEFAULT_WIKI_DIR = path.resolve(__dirname, "../../../../llm_traders_wiki/verdicts");
+const DEFAULT_WIKI_DIR = path.resolve(__dirname, "../../../../jie_wiki/verdicts");
 const PROVIDER_TAG = "backfill-2026-05-07";
 
 function parseArgs(argv) {

@@ -15,7 +15,7 @@ You are a focused codebase exploration agent for the `market_dashboard` repo. De
 - **Frontend**: `apps/market_dashboard/` (Next.js 15.5, App Router, NextAuth v5, Prisma, Postgres)
 - **Backend pipeline**: `apps/market_dashboard_backend/` (Python — yfinance, Finviz, Gemini/OpenAI/Claude briefs)
 - **Runtime skills** (Phase 2+): `packages/core-skills/<name>/{SKILL.md, prompt.md, knowledge.md, schema.json, handler.{ts,py}, tests/}`
-- **Wiki source of truth**: resolve `LLM_TRADERS_WIKI_ROOT`, then sibling `../llm_traders_wiki/wiki` — 12 dense pages backing the runtime skills
+- **Wiki source of truth**: resolve `LLM_TRADERS_WIKI_ROOT`, then sibling `../jie_wiki/wiki` — 12 dense pages backing the runtime skills
 - **CLAUDE.md** at repo root and at `market_dashboard/` — read these for conventions
 - **`.learnings/LEARNINGS.md`** — known pitfalls; reference when answering "is this safe?"
 

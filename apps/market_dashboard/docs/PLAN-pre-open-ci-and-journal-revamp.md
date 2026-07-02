@@ -127,8 +127,8 @@ private half stored as `WIKI_SSH_KEY` GH secret. Workflows use `webfactory/ssh-a
 | Question | Default | Why |
 |---|---|---|
 | A-list criteria | Score ≥ 80 + GO verdict + RVOL ≥ 1.5× | Matches your existing Standout picks (JOYY 85, POWI 80, NTAP 82). ~2-4 candidates/day. |
-| Day-14 outcome | MFE/MAE excursion + outcome score 0-10 | Matches your existing `audit_trades.py` rubric in `llm_traders_wiki/scripts/`. |
-| Wiki sync to cloud | Mirror `llm_traders_wiki/wiki` → `market_dashboard/packages/core-skills/wiki/` via sync script + git hook | Wiki stays authoritative in source repo; mirror is auto-refreshed. |
+| Day-14 outcome | MFE/MAE excursion + outcome score 0-10 | Matches your existing `audit_trades.py` rubric in `jie_wiki/scripts/`. |
+| Wiki sync to cloud | Mirror `jie_wiki/wiki` → `market_dashboard/packages/core-skills/wiki/` via sync script + git hook | Wiki stays authoritative in source repo; mirror is auto-refreshed. |
 | Position UX | Personal-only, 5-min refresh when PC online, "stale Xh" badge when off | Privacy preserved; degraded gracefully when PC off. |
 
 ---
@@ -238,8 +238,8 @@ brief_snapshots: id, bucket_at, provider, structured_json, generated_by
 ### Wiki
 
 - Add `scripts/sync-wiki-from-source.sh` in `market_dashboard`
-- Pre-commit hook in `llm_traders_wiki`: when `wiki/` changes, auto-rsync to mirror + remind to commit
-- One-time copy: `cp -r llm_traders_wiki/wiki market_dashboard/packages/core-skills/wiki/`
+- Pre-commit hook in `jie_wiki`: when `wiki/` changes, auto-rsync to mirror + remind to commit
+- One-time copy: `cp -r jie_wiki/wiki market_dashboard/packages/core-skills/wiki/`
 
 ### New skill
 

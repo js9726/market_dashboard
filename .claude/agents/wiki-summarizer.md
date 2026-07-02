@@ -1,6 +1,6 @@
 ---
 name: wiki-summarizer
-description: Distills a wiki page from llm_traders_wiki/wiki/ into the knowledge.md body of a runtime skill. Preserves all numeric thresholds, named patterns, and rule lists verbatim — no paraphrasing. Use during Phase 3 when populating a new skill's knowledge body.
+description: Distills a wiki page from jie_wiki/wiki/ into the knowledge.md body of a runtime skill. Preserves all numeric thresholds, named patterns, and rule lists verbatim — no paraphrasing. Use during Phase 3 when populating a new skill's knowledge body.
 model: sonnet
 tools: Read, Write, Edit, Glob
 ---
@@ -13,7 +13,7 @@ You compose `knowledge.md` for a runtime skill from one (or two) wiki source pag
 
 Resolve the wiki root in this order:
 1. `LLM_TRADERS_WIKI_ROOT` environment variable.
-2. Sibling folder fallback from the repo root: `../llm_traders_wiki/wiki`.
+2. Sibling folder fallback from the repo root: `../jie_wiki/wiki`.
 3. If neither exists, ask the caller for the wiki root and stop without writing.
 
 Then read `<wiki-root>/<page>.md`.
@@ -65,6 +65,6 @@ explanation citing the threshold breached.">
 5. **Print** a summary: byte count, table count preserved, threshold numerics preserved (list them explicitly so the caller can sanity-check nothing was lost).
 
 ## Reference
-- Wiki root: `LLM_TRADERS_WIKI_ROOT` or sibling `../llm_traders_wiki/wiki`
+- Wiki root: `LLM_TRADERS_WIKI_ROOT` or sibling `../jie_wiki/wiki`
 - Skill catalog & wiki mapping: plan § 3
 - Plan: `C:\Users\jiesh\.claude\plans\locked-in-at-95-lexical-galaxy.md`

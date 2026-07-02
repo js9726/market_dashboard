@@ -11,7 +11,7 @@
  *      setup, grade the entry, and note patterns vs recent trades
  *   4. POSTs the structured JournalEntry to /api/journal/entries/ingest
  *
- * Mirrors the llm_traders_wiki/skills/trade-analyser scoring contract so the
+ * Mirrors the jie_wiki/skills/trade-analyser scoring contract so the
  * cloud journaler and the local interactive analyser produce comparable output.
  *
  * Usage (in journal_close.yml, 30 min post-close):

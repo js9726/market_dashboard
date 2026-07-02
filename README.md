@@ -42,13 +42,13 @@ There are three separate layers that should not be mixed up:
 
 | Layer | Location | Purpose |
 |---|---|---|
-| Authoring wiki | `../llm_traders_wiki/wiki/` | Source knowledge: trader styles, risk rules, setups, company dossiers |
+| Authoring wiki | `../jie_wiki/wiki/` | Source knowledge: trader styles, risk rules, setups, company dossiers |
 | Global assistant skills | `C:\Users\jiesh\.claude\skills` and `C:\Users\jiesh\.codex\skills` | Personal AI workflows: trade analysis, MooMoo API helper, B&Q repricer |
 | SaaS runtime skills | `packages/core-skills/` | Deployable prompt/knowledge/handler modules used by this app |
 
 The long-term rule:
 
-1. Edit knowledge in `llm_traders_wiki` or global skills first.
+1. Edit knowledge in `jie_wiki` or global skills first.
 2. Sync or generate runtime artifacts into `packages/core-skills/` using the formal manifest.
 3. The website calls `packages/core-skills/` in production.
 4. Personal assistant sessions may read the live local/global skills directly.
@@ -239,7 +239,7 @@ Current runtime skills include:
 - `trader-primetrading`
 - `agent-moderator`
 
-When trading knowledge changes, update `llm_traders_wiki` first, then refresh the relevant runtime skill.
+When trading knowledge changes, update `jie_wiki` first, then refresh the relevant runtime skill.
 
 Skill sync is controlled by:
 

@@ -7,7 +7,7 @@
  *   - TWO 1R bases: the stop you logged at entry, AND the wiki ATR-floor stop.
  *   - TWO savings metrics: Realized-vs-full-R, and Soft-tranche-vs-Hard-stop.
  *
- * Wiki sources: llm_traders_wiki/wiki/risk-management.md
+ * Wiki sources: jie_wiki/wiki/risk-management.md
  *   - "Stop distance floor by setup type" (ATR-floor rule)
  *   - "Trimming / Scaling Out" (SRxTrades 8EMA/21EMA tranche model)
  */

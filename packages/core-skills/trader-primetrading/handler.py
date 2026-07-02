@@ -7,7 +7,7 @@ DeepSeek, OpenAI, Gemini), parses JSON, and persists.
 
 Knowledge body lives in knowledge.md (committed runtime artifact). SYSTEM_PROMPT
 mirrors it for cases where you don't want to do file IO at runtime; the wiki
-mirror at llm_traders_wiki/wiki/persona-primetrading.md is for browsing only.
+mirror at jie_wiki/wiki/persona-primetrading.md is for browsing only.
 """
 from __future__ import annotations
 

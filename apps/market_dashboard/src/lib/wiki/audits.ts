@@ -1,7 +1,7 @@
 /**
  * Audit Markdown parser.
  *
- * Source format (from llm_traders_wiki/verdicts/js/_audit_YYYY-MM.md):
+ * Source format (from jie_wiki/verdicts/js/_audit_YYYY-MM.md):
  *
  *   # Audit Report — 2025-07
  *

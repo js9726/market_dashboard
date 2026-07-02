@@ -51,7 +51,7 @@ Present as a compact table: `Ticker · Badge · Setup · Score · RVOL · Entry/
 
 ## Notes
 
-- **Fail-closed on stale data:** for any A-List / entry analysis, pull live OpenD first; if OpenD is unreachable or a required field is stale/missing, **STOP and flag** — never present levels or push numbers off stale data (see `llm_traders_wiki/skills/trade-analyser/SKILL.md` Step 0.6).
+- **Fail-closed on stale data:** for any A-List / entry analysis, pull live OpenD first; if OpenD is unreachable or a required field is stale/missing, **STOP and flag** — never present levels or push numbers off stale data (see `jie_wiki/skills/trade-analyser/SKILL.md` Step 0.6).
 - **REC source of truth** is the TV-screener scored hits (the morning brief does NOT carry per-ticker score+rvol). The serverless `screeners/refresh` ingests REC via `ingestScreenerRec()`; the GH pre-open `tv_screener_fetch.py` is a redundant trigger (needs `DASHBOARD_URL`+`BRIEF_INGEST_KEY` in its step env to also push).
 - **HELD rows are ungated** — every real position is tracked regardless of entry quality; the entry grade is a learning overlay, not an admission test.
 - Auto-journal of closed trades + the nightly "what to learn" digest run post-close (`journal_close.yml` + `/api/journal/digest`) — no action needed here.

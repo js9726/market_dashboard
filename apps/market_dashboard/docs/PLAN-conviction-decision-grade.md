@@ -98,4 +98,4 @@ Driven by the operator audit ("page uninformative; MFE/MAE never update; closed 
 - **P5 — auto-calibrating scoring** (lesson digest → wiki edits + `skills:sync`); calibrates *within* the corrected P3.5 gate.
 - **P2 — OpenD/IBKR bridge push** as the authoritative daily-bar feed (cloud Yahoo/Stooq fallback already carries it unattended).
 
-**Amended order: P3.5 → P4 → P5 → P2.** Anti-reversion: P3.5/P5 scoring/gate doctrine lands in `llm_traders_wiki` first (done for the gate), then runtime + `skills:sync`.
+**Amended order: P3.5 → P4 → P5 → P2.** Anti-reversion: P3.5/P5 scoring/gate doctrine lands in `jie_wiki` first (done for the gate), then runtime + `skills:sync`.

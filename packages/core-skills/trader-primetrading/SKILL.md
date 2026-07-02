@@ -19,11 +19,11 @@ See `schema.json` → `output`. A single trader-review object:
 - `flags` — list of any specific violations (e.g., "extended >1×ATR from 21dma", "earnings within 7d", "below 21dma")
 
 ## Knowledge source
-- `knowledge.md` — distilled from `llm_traders_wiki/wiki/`:
+- `knowledge.md` — distilled from `jie_wiki/wiki/`:
   - `alex-swing-trading-system.md` (master framework)
   - `alex-scans-traderslab.md` (scan filters, RS composite, Liquid Leaders criteria)
   - `alex-trading-psychology.md` (discretion vs rules, drawdown handling)
   - `21dma-structure.md` (4 core behaviors, entry zone, stop logic)
 
 ## Mirror
-A trimmed copy of `knowledge.md` is kept at `llm_traders_wiki/wiki/persona-primetrading.md` for browsing alongside the source wiki pages. The skill does NOT read the wiki at runtime (SaaS portability rule); the runtime artifact is the committed `knowledge.md`.
+A trimmed copy of `knowledge.md` is kept at `jie_wiki/wiki/persona-primetrading.md` for browsing alongside the source wiki pages. The skill does NOT read the wiki at runtime (SaaS portability rule); the runtime artifact is the committed `knowledge.md`.

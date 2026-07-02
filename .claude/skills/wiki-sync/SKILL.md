@@ -1,13 +1,13 @@
 ---
 name: wiki-sync
-description: Refresh runtime skill artifacts from the formal skill-sync manifest. Use whenever llm_traders_wiki or mapped global Claude skills change.
+description: Refresh runtime skill artifacts from the formal skill-sync manifest. Use whenever jie_wiki or mapped global Claude skills change.
 ---
 
 # wiki-sync
 
 Runtime skill artifacts live in `packages/core-skills/` so the SaaS can deploy without reading local folders. The upstream authoring sources stay in:
 
-- `../llm_traders_wiki/wiki/`
+- `../jie_wiki/wiki/`
 - `C:/Users/jiesh/.claude/skills`
 
 The mapping is defined in:
@@ -42,8 +42,8 @@ npm run skills:sync -- --list
 Wiki sources resolve in this order:
 
 1. `LLM_TRADERS_WIKI_ROOT`
-2. Sibling folder: `../llm_traders_wiki`
-3. Local fallback: `C:/Users/jiesh/AI codes hub/llm_traders_wiki`
+2. Sibling folder: `../jie_wiki`
+3. Local fallback: `C:/Users/jiesh/AI codes hub/jie_wiki`
 
 Global skill sources resolve in this order:
 

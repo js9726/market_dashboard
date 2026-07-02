@@ -9,7 +9,7 @@
  * match grade comparing the day-0 prediction vs actual price action, and
  * inserts a kind='day-14-rescore' row with outcomeMetrics.
  *
- * Heuristic grading (mirrors scripts/audit_trades.py in llm_traders_wiki):
+ * Heuristic grading (mirrors scripts/audit_trades.py in jie_wiki):
  *   A — stop held + target hit
  *   C-whipsaw — stop breached but trade closed positive (drift: stop too tight)
  *   C-undershoot — stop held but target undershot by >50% (drift: target too ambitious)
