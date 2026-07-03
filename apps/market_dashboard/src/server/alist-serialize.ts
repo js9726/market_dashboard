@@ -53,6 +53,9 @@ export function serializeCandidate(r: AListCandidate) {
     agent: r.agentVerdict
       ? { verdict: r.agentVerdict, at: r.agentConvictionAt?.toISOString() ?? null, analysis: r.agentConviction }
       : null,
+    // 3-lot scale-out simulation from the trigger day (lib/alist-tranche-sim):
+    // entry=trigger close, stop=LoD/ATR-floor, thirds at +1R/+2R/+3R.
+    trancheSim: r.trancheSim ?? null,
     briefProvider: r.day0BriefProvider,
     briefBucketAt: r.day0BriefBucketAt?.toISOString() ?? null,
     day0Price: num(r.day0Price),

@@ -66,6 +66,20 @@ export interface AListRow {
     computedAt: string | null;
     final?: boolean; // true once the 14-session window is locked; else "so far"
   } | null;
+  // 3-lot scale-out sim from the trigger day (REC picks; lib/alist-tranche-sim).
+  trancheSim?: {
+    basis: string;
+    startDate: string;
+    entry: number;
+    stop: number;
+    stopSource: string;
+    rUnit: number;
+    events: Array<{ kind: string; date: string; dayIndex: number; price: number; lots: number; r: number }>;
+    lotsClosed: number;
+    blendedR: number | null;
+    realizedR: number | null;
+    done: boolean;
+  } | null;
   tags: unknown;
   notes: string | null;
 
@@ -116,7 +130,15 @@ const AGENT_COLOR: Record<string, string> = {
 function renderTrigger(r: AListRow) {
   if (r.isHeld) return <span className="text-[var(--fg-4)]">—</span>;
   const t = r.trigger;
-  if (!t) return <span className="text-[var(--fg-4)]">—</span>;
+  if (!t)
+    return (
+      <span
+        className="text-[10px] text-[var(--fg-3)]"
+        title="Not evaluated yet — the tracker runs post-close (a day-0 pick can't trigger before its first forward session)"
+      >
+        pending
+      </span>
+    );
   const s = TRIGGER_STYLE[t.state] ?? { bg: "var(--fg-4)", label: t.state };
   return (
     <span className="inline-flex flex-col items-start gap-0.5">
@@ -176,6 +198,7 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
             <Th>Grade</Th>
             <Th align="right">RVOL</Th>
             <Th>Sector</Th>
+            <Th align="right">3-Lot Sim</Th>
             <Th align="right">Save vs 1R</Th>
             <Th align="right">Soft↔Hard</Th>
             <Th align="right">Day-14 MFE</Th>
@@ -207,6 +230,7 @@ export default function AListTable({ rows, selectedId, onSelect }: Props) {
               <Td>{renderGrade(r.entryGrade)}</Td>
               <Td align="right">{r.rvol != null ? `${r.rvol.toFixed(1)}x` : "-"}</Td>
               <Td>{r.sector ?? "-"}</Td>
+              <Td align="right">{renderTrancheSim(r)}</Td>
               <Td align="right">{renderSaveR(r.savings?.saveRealizedR, r.savings?.saveRealizedUsd)}</Td>
               <Td align="right">{renderSaveR(r.savings?.saveSoftVsHardR, r.savings?.saveSoftVsHardUsd)}</Td>
               <Td align="right">{renderExcursion(r.day14?.mfeR, r.day14?.mfe, r.day14?.final, "mfe")}</Td>
@@ -309,6 +333,26 @@ function renderExcursion(
       ) : null}
       {abs != null ? <span className="text-[var(--fg-3)]"> {abs.toFixed(2)}</span> : null}
       {final === false ? <span className="ml-1 text-[9px] text-[var(--fg-3)]">·now</span> : null}
+    </span>
+  );
+}
+
+/** 3-lot scale-out result: blended R (or realized-so-far), with the event tape
+ *  on hover — "T1 d2 · T2 d5 · STOP d8". Answers "would the trigger have paid
+ *  before the stop, selling in three portions?" */
+function renderTrancheSim(row: AListRow) {
+  const s = row.trancheSim;
+  if (!s) return <span className="text-[var(--fg-3)]">-</span>;
+  const r = s.blendedR ?? s.realizedR;
+  const tape = s.events.map((e) => `${e.kind}${e.lots > 1 ? `×${e.lots}` : ""} d${e.dayIndex} @${e.price.toFixed(2)} (${e.r >= 0 ? "+" : ""}${e.r}R)`).join(" · ");
+  const title = `Entry ${s.entry.toFixed(2)} (trigger-day close) · stop ${s.stop.toFixed(2)} (${s.stopSource}) · 1R=${s.rUnit.toFixed(2)}\n${tape || "no exits yet"}`;
+  if (r == null) {
+    return <span className="t-mono text-[var(--fg-3)]" title={title}>open</span>;
+  }
+  const color = r >= 0 ? "var(--gain-fg)" : "var(--loss-fg)";
+  return (
+    <span className="t-mono" style={{ color }} title={title}>
+      {r >= 0 ? "+" : ""}{r.toFixed(2)}R{s.done ? "" : <span className="ml-1 text-[9px] text-[var(--fg-3)]">·now</span>}
     </span>
   );
 }

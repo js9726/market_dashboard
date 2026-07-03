@@ -61,3 +61,39 @@ describe("evaluateTrigger — PB-21EMA", () => {
     expect(r.state).toBe("INVALIDATED");
   });
 });
+
+// ── Wiki pre-screen (entry-methods 2026-07-02: intraday trigger ≠ setup) ──────
+import { preScreenStructure } from "../alist-triggers";
+
+describe("preScreenStructure — doctrine pre-screen", () => {
+  const steady = (d: number, px: number) =>
+    bar({ date: `2026-06-${String(d).padStart(2, "0")}`, o: px, h: px * 1.01, l: px * 0.99, c: px * 1.005, rvol: 0.9 });
+
+  it("passes a quiet, tight structure", () => {
+    const bars = Array.from({ length: 21 }, (_, i) => steady(i + 1, 100 + i * 0.2));
+    const r = preScreenStructure(bars);
+    expect(r.pass).toBe(true);
+  });
+
+  it("fails a wide-and-loose structure (the GFS 2026-07-01 case)", () => {
+    // Alternating ±6-8% swings like GFS's June range.
+    let px = 100;
+    const bars = [steady(1, px)];
+    for (let i = 2; i <= 21; i++) {
+      px = i % 2 === 0 ? px * 1.07 : px * 0.93;
+      bars.push(bar({ date: `2026-06-${String(i).padStart(2, "0")}`, o: px, h: px * 1.02, l: px * 0.98, c: px, rvol: 0.9 }));
+    }
+    const r = preScreenStructure(bars);
+    expect(r.pass).toBe(false);
+    expect(r.reason).toMatch(/wide-and-loose/);
+  });
+
+  it("fails on repeated high-volume distribution days", () => {
+    const bars = Array.from({ length: 21 }, (_, i) => steady(i + 1, 100));
+    bars[10] = bar({ date: "2026-06-11", o: 100, h: 100.5, l: 96, c: 97, rvol: 2.2 });
+    bars[15] = bar({ date: "2026-06-16", o: 99, h: 99.5, l: 95, c: 96, rvol: 1.8 });
+    const r = preScreenStructure(bars);
+    expect(r.pass).toBe(false);
+    expect(r.reason).toMatch(/distribution-heavy/);
+  });
+});

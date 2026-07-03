@@ -29,7 +29,8 @@ import { getOwnerUserId } from "@/server/a-list-extractor";
 import { emaSeries, atrSeries, lowestLow, type Candle } from "@/server/indicators";
 import { atrFloorStop, rUnit, realizedVsFullR, softVsHard } from "@/server/alist-metrics";
 import { reconcileClosedHeld } from "@/server/alist-close";
-import { evaluateTrigger } from "@/lib/alist-triggers";
+import { evaluateTrigger, preScreenStructure } from "@/lib/alist-triggers";
+import { simulateTranches } from "@/lib/alist-tranche-sim";
 import { runConvictionAnalysis, type ConvictionInput } from "@/server/conviction-analysis";
 import { marketContextNow } from "@/lib/market-context";
 
@@ -207,6 +208,9 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
 
     let triggerUpdate: { triggerState?: string; triggerStateAt?: Date | null; triggerReason?: string } = {};
     let triggered: CandResult["triggered"];
+    let statusOverride: string | null = null;
+    let trancheSimJson: Prisma.InputJsonValue | null = null;
+    let day0RvolFix: number | null = null;
 
     const candles = await fetchDailyCandles(cand.ticker);
     if (candles.length === 0) return { ticker: cand.ticker, processed: false, error: "no price feed (Yahoo + Stooq both unavailable)" };
@@ -277,13 +281,38 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
 
     // ── Entry-trigger lifecycle (REC picks only — HELD is already entered) ──
     if (!cand.isHeld) {
+      // Day-0 RVOL re-stamp: screener ingest captures a pre-market RVOL (0.0-0.2x
+      // junk). Once the pick day's full candle exists, stamp the close RVOL so
+      // the board shows a real number and the scorer sees real volume.
+      const d0Rvol = rvol[entryIdx];
+      const storedRvol = cand.day0Rvol?.toNumber() ?? null;
+      if (d0Rvol != null && (storedRvol == null || storedRvol < 0.5) && candles[entryIdx].date <= new Date(Date.now() - 12 * 3600_000).toISOString().slice(0, 10)) {
+        day0RvolFix = d0Rvol;
+      }
+
       const triggerPath = candles.slice(entryIdx, lastIdx + 1).map((c, k) => ({
         date: c.date, open: c.open, high: c.high, low: c.low, close: c.close,
         ema8: ema8[entryIdx + k], ema21: ema21[entryIdx + k], rvol: rvol[entryIdx + k],
       }));
-      const trig = evaluateTrigger(cand.setupClassification, triggerPath, cand.entryZone?.toNumber() ?? null);
-      // Only advance / record changes — never regress a fired trigger to ARMED.
       const prev = cand.triggerState;
+
+      // Wiki pre-screen (entry-methods 2026-07-02): a wide-and-loose or
+      // distribution-heavy daily structure is auto-PASS — no trigger applies.
+      // Only gate picks that haven't already fired.
+      let trig = null as ReturnType<typeof evaluateTrigger> | null;
+      if (prev == null || prev === "ARMED") {
+        const historyBars = candles.slice(Math.max(0, entryIdx - 21), entryIdx + 1).map((c, k, arr) => {
+          const idx = entryIdx - (arr.length - 1) + k;
+          return { date: c.date, open: c.open, high: c.high, low: c.low, close: c.close, ema8: ema8[idx], ema21: ema21[idx], rvol: rvol[idx] };
+        });
+        const screen = preScreenStructure(historyBars);
+        if (!screen.pass) {
+          trig = { state: "INVALIDATED", dayIndex: null, date: candles[lastIdx].date, reason: screen.reason };
+        }
+      }
+      trig = trig ?? evaluateTrigger(cand.setupClassification, triggerPath, cand.entryZone?.toNumber() ?? null);
+
+      // Only advance / record changes — never regress a fired trigger to ARMED.
       const terminalNow = trig.state === "TRIGGERED" || trig.state === "INVALIDATED";
       const prevTerminal = prev === "TRIGGERED" || prev === "INVALIDATED";
       if (!prevTerminal || terminalNow) {
@@ -293,20 +322,42 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
           triggerReason: trig.reason,
         };
       }
-      // Queue the LLM Conviction verdict once, on the ARMED→TRIGGERED flip.
-      if (trig.state === "TRIGGERED" && prev !== "TRIGGERED" && cand.agentConvictionAt == null) {
+
+      // Declutter: a REC whose trigger died (window expired or thesis broken)
+      // is no longer an entry candidate — retire the row so the Active board
+      // only shows actionable picks. (HELD rows are never status-flipped here.)
+      const effState = triggerUpdate.triggerState ?? prev;
+      if ((effState === "EXPIRED" || effState === "INVALIDATED") && cand.status === "ACTIVE" && !hitTarget && !hardHitLoggedAt && !hardHitAtrAt) {
+        statusOverride = "EXPIRED";
+      }
+
+      // ── 3-lot scale-out simulation from the trigger day (recomputed each run
+      //    until done) — "would the trigger have paid before the stop?" ──────
+      const trigDate = (triggerUpdate.triggerStateAt ?? cand.triggerStateAt)?.toISOString().slice(0, 10) ?? trig.date;
+      if ((effState === "TRIGGERED") && trigDate) {
+        const trigIdx = candles.findIndex((c) => c.date >= trigDate);
+        if (trigIdx >= 0) {
+          const sim = simulateTranches(candles.slice(trigIdx), atr14[trigIdx] ?? atrAtEntry);
+          if (sim) trancheSimJson = sim as unknown as Prisma.InputJsonValue;
+        }
+      }
+
+      // Queue the LLM Conviction verdict for TRIGGERED picks that don't have one
+      // yet — includes the backlog (earlier flips cut off by the per-run cap),
+      // which drains MAX_ANALYSES_PER_RUN per day.
+      if (effState === "TRIGGERED" && cand.agentConvictionAt == null) {
         triggered = {
           candId: cand.id,
           input: {
             ticker: cand.ticker,
             setup: cand.setupClassification,
             sector: cand.sector,
-            triggerState: trig.state,
-            triggerReason: trig.reason,
+            triggerState: effState,
+            triggerReason: triggerUpdate.triggerReason ?? cand.triggerReason ?? trig.reason,
             entryZone: cand.entryZone?.toNumber() ?? null,
             stop: cand.stop?.toNumber() ?? aStop ?? null,
             target: cand.target?.toNumber() ?? null,
-            rvol: cand.day0Rvol?.toNumber() ?? rvol[lastIdx] ?? null,
+            rvol: day0RvolFix ?? cand.day0Rvol?.toNumber() ?? rvol[lastIdx] ?? null,
             rsRating: null,
             day0Thesis: cand.day0Thesis,
             algo: { setup: cand.setupScore, entry: cand.entryScore, theme: cand.themeScore, sentiment: cand.sentimentScore },
@@ -378,8 +429,11 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
         day14MaeR: dec(maeR),
         day14Outcome: outcome,
         day14ComputedAt: windowComplete ? new Date() : cand.day14ComputedAt,
-        status,
+        // Terminal outcomes (target/stop) win; otherwise a dead trigger retires the REC.
+        status: status !== "ACTIVE" ? status : (statusOverride ?? status),
         ...(exitMkt ? { exitMarket: exitMkt as unknown as Prisma.InputJsonValue } : {}),
+        ...(trancheSimJson ? { trancheSim: trancheSimJson } : {}),
+        ...(day0RvolFix != null ? { day0Rvol: dec(day0RvolFix) } : {}),
         ...triggerUpdate,
       },
     });
@@ -402,9 +456,18 @@ export async function GET(req: Request) {
   // picked within the last ~30 calendar days (covers 14 trading sessions).
   const since = new Date();
   since.setUTCDate(since.getUTCDate() - 35);
+  // Newest first: if the run is ever cut short by the function budget, fresh
+  // picks (the actionable ones) are guaranteed to have been evaluated.
   const candidates = await prisma.aListCandidate.findMany({
     where: { userId, status: "ACTIVE", pickDate: { gte: since } },
-    orderBy: { pickDate: "asc" },
+    orderBy: { pickDate: "desc" },
+  });
+
+  // Housekeeping: anything ACTIVE that fell out of the 35-day window can never
+  // trigger or track again — retire it so the Active board stays actionable.
+  const staleRetired = await prisma.aListCandidate.updateMany({
+    where: { userId, status: "ACTIVE", isHeld: false, pickDate: { lt: since } },
+    data: { status: "EXPIRED" },
   });
 
   // ── Process in bounded-parallel batches so the whole run fits the budget ──
@@ -461,6 +524,7 @@ export async function GET(req: Request) {
     ok: true,
     candidates: candidates.length,
     processed,
+    staleRetired: staleRetired.count,
     triggered: newlyTriggered.length,
     analyzed,
     autoClosed,

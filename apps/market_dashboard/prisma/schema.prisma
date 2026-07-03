@@ -568,6 +568,12 @@ model AListCandidate {
   triggerStateAt   DateTime?
   triggerReason    String?
 
+  // ── 3-lot scale-out simulation (computed on TRIGGERED; lib/alist-tranche-sim) ──
+  /// TrancheSim JSON: entry=trigger-day close, stop=LoD/ATR-floor, lots at
+  /// +1R/+2R/+3R with breakeven raise after T1. Answers "would the trigger
+  /// have paid before the stop, selling in three portions?"
+  trancheSim       Json?
+
   // ── Multi-agent Conviction verdict (R4; runs once on TRIGGERED) ────────────
   /// LLM Conviction breakdown + per-component reasoning (ConvictionAnalysis).
   agentConviction   Json?

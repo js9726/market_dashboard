@@ -18,8 +18,9 @@ import AListFilters, { type AListFilterState } from "./AListFilters";
 import AListDetailPanel from "./AListDetailPanel";
 import AListScoreboard from "./AListScoreboard";
 
-const TODAY_LIMIT = 200;
+const TODAY_LIMIT = 500;
 type Board = "active" | "closed";
+type Lane = "all" | "held" | "triggered" | "armed";
 
 const CLOSED_STATUSES = new Set(["STOPPED_OUT", "CLOSED", "HIT_TARGET", "EXPIRED", "MANUALLY_CLOSED", "CONVERTED"]);
 /** A pick is "finished" when its status is terminal or its day-14 window locked.
@@ -35,6 +36,7 @@ export default function AListView() {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [board, setBoard] = useState<Board>("active");
+  const [lane, setLane] = useState<Lane>("all");
   const [filters, setFilters] = useState<AListFilterState>({
     from: defaultFromDate(),
     to: defaultToDate(),
@@ -86,7 +88,30 @@ export default function AListView() {
 
   const activeRows = useMemo(() => rows.filter((r) => !isClosed(r)), [rows]);
   const closedRows = useMemo(() => rows.filter(isClosed), [rows]);
-  const shown = board === "active" ? activeRows : closedRows;
+  const boardRows = board === "active" ? activeRows : closedRows;
+  const laneCounts = useMemo(
+    () => ({
+      all: boardRows.length,
+      held: boardRows.filter((r) => r.isHeld).length,
+      triggered: boardRows.filter((r) => r.trigger?.state === "TRIGGERED").length,
+      armed: boardRows.filter((r) => r.trigger?.state === "ARMED").length,
+    }),
+    [boardRows],
+  );
+  const shown = useMemo(() => {
+    if (lane === "held") return boardRows.filter((r) => r.isHeld);
+    if (lane === "triggered") return boardRows.filter((r) => r.trigger?.state === "TRIGGERED");
+    if (lane === "armed") return boardRows.filter((r) => r.trigger?.state === "ARMED");
+    return boardRows;
+  }, [boardRows, lane]);
+
+  // Recently TRIGGERED picks (entry alerts): last 2 sessions, newest first.
+  const recentTriggers = useMemo(() => {
+    const cutoff = Date.now() - 4 * 86_400_000; // ~2 trading sessions incl. weekend
+    return rows
+      .filter((r) => r.trigger?.state === "TRIGGERED" && r.trigger.at && new Date(r.trigger.at).getTime() >= cutoff && r.status === "ACTIVE")
+      .sort((a, b) => (b.trigger!.at ?? "").localeCompare(a.trigger!.at ?? ""));
+  }, [rows]);
 
   // Selected row for detail panel (search across both boards)
   const selected = useMemo(() => rows.find((r) => r.id === selectedId) ?? null, [rows, selectedId]);
@@ -101,7 +126,9 @@ export default function AListView() {
           <div>
             <p className="t-overline text-[var(--fg-3)]">A-List Candidates</p>
             <p className="t-caption">
-              GO &ge; 75 Conviction (Setup/40 + Entry/30 + Theme/20 + Sentiment/10), RVOL &ge; 1.5x.
+              Screener RECs scored by Conviction (Setup/40 + Entry/30 + Theme/20 + Sentiment/10).
+              A pick is buyable only when its <strong>Trigger</strong> fires per wiki entry rules —
+              loose/distribution-heavy structures are auto-invalidated at the pre-screen.
               Tracked day-0 to day-14; held positions tracked to broker exit.
             </p>
           </div>
@@ -114,14 +141,65 @@ export default function AListView() {
         </div>
       </div>
 
+      {/* Entry alerts: picks whose trigger fired in the last ~2 sessions */}
+      {recentTriggers.length > 0 && (
+        <div className="mx-5 rounded border border-[var(--accent)] bg-[var(--accent-soft-bg)] p-3">
+          <p className="t-overline mb-1 text-[var(--fg-3)]">Entry alerts — triggered recently</p>
+          <div className="flex flex-wrap gap-2">
+            {recentTriggers.slice(0, 8).map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setSelectedId(r.id)}
+                className="rounded border border-[var(--line)] bg-[var(--bg-surface)] px-2 py-1 text-left text-xs hover:border-[var(--accent)]"
+                title={r.trigger?.reason ?? ""}
+              >
+                <strong>{r.ticker}</strong>
+                <span className="ml-1 t-mono text-[var(--fg-3)]">{r.trigger?.at?.slice(0, 10)}</span>
+                {r.agent?.verdict && (
+                  <span
+                    className="ml-1 font-semibold"
+                    style={{ color: r.agent.verdict === "ENTER" ? "var(--gain-fg)" : r.agent.verdict === "PASS" ? "var(--loss-fg)" : "var(--accent)" }}
+                  >
+                    {r.agent.verdict}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <AListScoreboard rows={rows} />
 
       <AListFilters filters={filters} onChange={setFilters} />
 
-      {/* Active vs Closed/Review boards */}
-      <div className="flex gap-1 border-b border-[var(--line)] px-1">
+      {/* Active vs Closed/Review boards + lane chips */}
+      <div className="flex flex-wrap items-center gap-1 border-b border-[var(--line)] px-1">
         <BoardTab label="Active" count={activeRows.length} active={board === "active"} onClick={() => setBoard("active")} />
         <BoardTab label="Closed / Review" count={closedRows.length} active={board === "closed"} onClick={() => setBoard("closed")} />
+        <span className="mx-2 h-4 w-px bg-[var(--line)]" />
+        {(
+          [
+            ["all", "All"],
+            ["held", "Bought (HELD)"],
+            ["triggered", "Triggered"],
+            ["armed", "Armed"],
+          ] as Array<[Lane, string]>
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setLane(key)}
+            className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition ${
+              lane === key
+                ? "border-[var(--accent)] text-[var(--fg-1)]"
+                : "border-[var(--line)] text-[var(--fg-3)] hover:text-[var(--fg-1)]"
+            }`}
+          >
+            {label} <span className="t-mono">{laneCounts[key]}</span>
+          </button>
+        ))}
       </div>
 
       {loading ? (

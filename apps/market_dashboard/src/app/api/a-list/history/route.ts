@@ -106,7 +106,7 @@ export async function GET(req: Request) {
   }
 
   // ── Pagination ───────────────────────────────────────────────────────
-  const limit = Math.min(parseInt(qp.get("limit") ?? "50"), 200);
+  const limit = Math.min(parseInt(qp.get("limit") ?? "50"), 500);
   const cursor = qp.get("cursor");
 
   const rows = await prisma.aListCandidate.findMany({

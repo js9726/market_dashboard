@@ -38,6 +38,47 @@ export interface TriggerResult {
 const RVOL_OK = 1.0; // volume at least average (expansion proxy)
 const RVOL_HIGH = 1.5; // distribution-grade volume on a down day
 
+// ── Wiki pre-screen (entry-methods.md "intraday trigger is not a setup",
+//    2026-07-02 calibration): forbidden daily structures are auto-PASS before
+//    any trigger is considered. GFS 2026-07-01 is the worked example. ──────────
+const LOOSE_SWING_PCT = 5; // a ±5%+ close-to-close day counts as a loose swing
+const LOOSE_SWING_MAX = 4; // ≥4 such days in the lookback = wide-and-loose
+const DISTRIBUTION_MAX = 2; // ≥2 high-volume down days = distribution-heavy
+const PRESCREEN_LOOKBACK = 20; // trading sessions inspected before pick day
+
+export interface PreScreenResult {
+  pass: boolean;
+  reason: string;
+  looseSwings: number;
+  distributionDays: number;
+}
+
+/**
+ * Doctrine pre-screen on the ~20 daily bars up to and including pick day.
+ * Fails (auto-PASS the pick) when the structure is wide-and-loose or carries
+ * repeated high-volume distribution days — the conditions under which an
+ * intraday/daily trigger is forbidden per wiki/entry-methods.md.
+ */
+export function preScreenStructure(history: TriggerBar[]): PreScreenResult {
+  const bars = history.slice(-PRESCREEN_LOOKBACK - 1);
+  let looseSwings = 0;
+  let distributionDays = 0;
+  for (let i = 1; i < bars.length; i++) {
+    const prev = bars[i - 1];
+    const b = bars[i];
+    if (prev.close > 0) {
+      const chg = ((b.close - prev.close) / prev.close) * 100;
+      if (Math.abs(chg) >= LOOSE_SWING_PCT) looseSwings++;
+    }
+    if ((b.rvol ?? 0) >= RVOL_HIGH && b.close < b.open) distributionDays++;
+  }
+  if (looseSwings >= LOOSE_SWING_MAX)
+    return { pass: false, looseSwings, distributionDays, reason: `wiki pre-screen: wide-and-loose (${looseSwings} days of ±${LOOSE_SWING_PCT}%+ in last ${PRESCREEN_LOOKBACK})` };
+  if (distributionDays >= DISTRIBUTION_MAX)
+    return { pass: false, looseSwings, distributionDays, reason: `wiki pre-screen: distribution-heavy (${distributionDays} high-volume down days in last ${PRESCREEN_LOOKBACK})` };
+  return { pass: true, looseSwings, distributionDays, reason: "pre-screen ok" };
+}
+
 function family(setup: string | null | undefined): "EP" | "PULLBACK" | "BREAKOUT" {
   const s = (setup ?? "").toUpperCase();
   if (s.startsWith("EP") || s === "PARABOLIC") return "EP";
