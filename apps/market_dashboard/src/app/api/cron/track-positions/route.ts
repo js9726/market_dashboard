@@ -60,7 +60,25 @@ function authorized(req: Request): boolean {
   return false;
 }
 
-async function fetchYahooCandles(yahooSymbol: string): Promise<Candle[]> {
+// ── Symbol normalization ─────────────────────────────────────────────────────
+// DB tickers may carry a market prefix ("US.GFS") and class shares use dots
+// ("BH.A"). Yahoo wants dashes (BH-A), Stooq wants lowercase dashes + ".us"
+// (bh-a.us), broker bars store the bare base ticker. The old code stripped
+// everything before the LAST dot, which mangled "BH.A" into "A" and made every
+// dotted class share error with "no price feed".
+const MARKET_PREFIX = /^(US|HK|SH|SZ|CN|SG)\./i;
+function baseTicker(symbol: string): string {
+  return symbol.replace(MARKET_PREFIX, "").toUpperCase();
+}
+function toYahooSymbol(symbol: string): string {
+  return baseTicker(symbol).replace(/\./g, "-");
+}
+function toStooqSymbol(symbol: string): string {
+  return `${baseTicker(symbol).toLowerCase().replace(/\./g, "-")}.us`;
+}
+
+async function fetchYahooCandles(symbol: string): Promise<Candle[]> {
+  const yahooSymbol = toYahooSymbol(symbol);
   const url = `${YAHOO_CHART_URL}/${encodeURIComponent(yahooSymbol)}?interval=1d&range=3mo`;
   const res = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0 (compatible; MarketDashboardBot/1.0)" },
@@ -95,7 +113,7 @@ async function fetchYahooCandles(yahooSymbol: string): Promise<Candle[]> {
 /** Stooq daily CSV fallback (keyless, separate infra from Yahoo — the two rarely
  *  rate-limit at the same time). Format: Date,Open,High,Low,Close,Volume. */
 async function fetchStooqCandles(symbol: string): Promise<Candle[]> {
-  const stooqSymbol = `${symbol.toLowerCase()}.us`;
+  const stooqSymbol = toStooqSymbol(symbol);
   const url = `https://stooq.com/q/d/l/?s=${encodeURIComponent(stooqSymbol)}&i=d`;
   const res = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0 (compatible; MarketDashboardBot/1.0)" },
@@ -122,7 +140,7 @@ async function fetchStooqCandles(symbol: string): Promise<Candle[]> {
  *  the cloud feeds when fresh (latest bar within ~4 days) and deep enough for the
  *  EMA/ATR windows — so MFE/MAE use the broker's own price basis. */
 async function fetchBrokerBars(symbol: string): Promise<Candle[]> {
-  const ticker = symbol.includes(".") ? symbol.slice(symbol.lastIndexOf(".") + 1).toUpperCase() : symbol.toUpperCase();
+  const ticker = baseTicker(symbol);
   const since = new Date();
   since.setUTCDate(since.getUTCDate() - 120);
   const rows = await prisma.brokerDailyBar.findMany({

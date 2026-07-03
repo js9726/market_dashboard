@@ -25,9 +25,10 @@ function authorized(req: Request): boolean {
   return new URL(req.url).searchParams.get("key") === expected;
 }
 
+/** Strip only a known market prefix ("US.GFS" → "GFS"). Class-share dots are
+ *  part of the ticker ("BH.A") — slicing at the last dot mangled them to "A". */
 function plain(t: string): string {
-  const i = t.lastIndexOf(".");
-  return (i >= 0 ? t.slice(i + 1) : t).toUpperCase();
+  return t.replace(/^(US|HK|SH|SZ|CN|SG)\./i, "").toUpperCase();
 }
 
 const dec = (v: unknown): Prisma.Decimal | null => {

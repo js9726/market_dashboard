@@ -30,6 +30,16 @@ function isClosed(r: AListRow): boolean {
   return CLOSED_STATUSES.has(r.status) || r.day14?.final === true;
 }
 
+/** Active board reads top-down by actionability: your book first, then picks
+ *  whose entry fired, then armed picks still waiting, then everything else.
+ *  Within a band the fetch order (date desc) is preserved. */
+function actionBand(r: AListRow): number {
+  if (r.isHeld) return 0;
+  if (r.trigger?.state === "TRIGGERED") return 1;
+  if (r.trigger?.state === "ARMED") return 2;
+  return 3;
+}
+
 export default function AListView() {
   const [rows, setRows] = useState<AListRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,7 +96,13 @@ export default function AListView() {
     };
   }, [filters]);
 
-  const activeRows = useMemo(() => rows.filter((r) => !isClosed(r)), [rows]);
+  const activeRows = useMemo(() => {
+    const open = rows.filter((r) => !isClosed(r));
+    return open
+      .map((r, i) => [r, i] as const)
+      .sort((a, b) => actionBand(a[0]) - actionBand(b[0]) || a[1] - b[1])
+      .map(([r]) => r);
+  }, [rows]);
   const closedRows = useMemo(() => rows.filter(isClosed), [rows]);
   const boardRows = board === "active" ? activeRows : closedRows;
   const laneCounts = useMemo(
