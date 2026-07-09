@@ -226,7 +226,9 @@ export default function PortfolioClient() {
       {data.accounts.length === 0 && (
         <div style={{ padding: "2rem", textAlign: "center", border: "1px dashed #ddd", borderRadius: "0.5rem", color: "#666" }}>
           No broker accounts yet.{" "}
-          <Link href="/dashboard/settings/brokers" style={{ color: "#1d4ed8" }}>Add one</Link>.
+          <Link href="/dashboard/settings/brokers" style={{ color: "#1d4ed8" }}>Add one</Link> to start
+          tracking positions, or read the{" "}
+          <Link href="/dashboard/guide" style={{ color: "#1d4ed8" }}>2-minute guide</Link>.
         </div>
       )}
 

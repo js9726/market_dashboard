@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Decimal } from "@prisma/client/runtime/library";
 
 type Trade = {
@@ -1321,7 +1322,18 @@ export default function TradeLog() {
             {loading ? (
               <tr><td colSpan={13} className="px-3 py-6 text-center text-[var(--fg-3)]">Loading…</td></tr>
             ) : trades.length === 0 ? (
-              <tr><td colSpan={13} className="px-3 py-6 text-center text-[var(--fg-3)]">No trades found</td></tr>
+              <tr>
+                <td colSpan={13} className="px-3 py-8 text-center text-[var(--fg-3)]">
+                  <p className="font-semibold text-[var(--fg-2)]">No trades yet — let&apos;s get your first one in.</p>
+                  <p className="mt-2">
+                    <Link href="/dashboard/portfolio/new" className="text-[var(--accent)] underline">Log a trade manually</Link>
+                    {", "}
+                    <Link href="/dashboard/portfolio/import" className="text-[var(--accent)] underline">import your broker CSV</Link>
+                    {", or read the "}
+                    <Link href="/dashboard/guide" className="text-[var(--accent)] underline">2-minute guide</Link>.
+                  </p>
+                </td>
+              </tr>
             ) : trades.map((t, i) => {
               const { text: pnlText, color: pnlColor, title: pnlTitle } = fmtPnlRow(t);
               const isOpen = t.pnl === null;
