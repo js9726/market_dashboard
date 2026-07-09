@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { observedLabel, usMarketSession } from "@/lib/market-clock";
 
@@ -66,10 +66,80 @@ function pnlColor(n: number | null | undefined): string {
   return "#6b7280";
 }
 
+/** Close-position inline form state (client-beta: user-defined qty/price/date). */
+type CloseDraft = {
+  accountId: string;
+  ticker: string;
+  maxQty: number;
+  qty: string;
+  price: string;
+  date: string; // YYYY-MM-DD, user-editable
+};
+
 export default function PortfolioClient() {
   const [data, setData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [closeDraft, setCloseDraft] = useState<CloseDraft | null>(null);
+  const [closeBusy, setCloseBusy] = useState(false);
+  const [closeError, setCloseError] = useState<string | null>(null);
+
+  function startClose(accountId: string, p: Position) {
+    setCloseError(null);
+    setCloseDraft({
+      accountId,
+      ticker: p.ticker,
+      maxQty: p.qty,
+      qty: String(p.qty),
+      price: p.currentPrice != null ? String(p.currentPrice) : String(p.avgCost),
+      date: new Date().toISOString().slice(0, 10),
+    });
+  }
+
+  async function submitClose() {
+    if (!closeDraft) return;
+    const qty = Number(closeDraft.qty);
+    const price = Number(closeDraft.price);
+    if (!Number.isFinite(qty) || qty <= 0 || qty > closeDraft.maxQty) {
+      setCloseError(`Quantity must be between 0 and ${closeDraft.maxQty}.`);
+      return;
+    }
+    if (!Number.isFinite(price) || price <= 0) {
+      setCloseError("Enter the exit price you actually sold at.");
+      return;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(closeDraft.date)) {
+      setCloseError("Pick the exit date.");
+      return;
+    }
+    setCloseBusy(true);
+    setCloseError(null);
+    try {
+      // executedAt: the user picks the DATE; time is pinned to 16:00 ET (20:00
+      // UTC) — the session close — so journal ordering is sensible.
+      const res = await fetch("/api/trades/manual", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brokerAccountId: closeDraft.accountId,
+          ticker: closeDraft.ticker,
+          side: "SELL",
+          qty,
+          price,
+          executedAt: `${closeDraft.date}T20:00:00.000Z`,
+          notes: "Closed from Portfolio",
+        }),
+      });
+      const j = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(j.error ?? `HTTP ${res.status}`);
+      setCloseDraft(null);
+      await load();
+    } catch (e) {
+      setCloseError(e instanceof Error ? e.message : "Close failed.");
+    } finally {
+      setCloseBusy(false);
+    }
+  }
 
   async function load() {
     setRefreshing(true);
@@ -281,11 +351,13 @@ export default function PortfolioClient() {
                   <th style={{ padding: "0.5rem" }}>Market value</th>
                   <th style={{ padding: "0.5rem" }}>Unrealised P&amp;L</th>
                   <th style={{ padding: "0.5rem" }}>Return</th>
+                  <th style={{ padding: "0.5rem" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {acct.positions.map((p) => (
-                  <tr key={p.id} style={{ borderBottom: "1px solid #f3f4f6", textAlign: "right" }}>
+                  <Fragment key={p.id}>
+                  <tr style={{ borderBottom: "1px solid #f3f4f6", textAlign: "right" }}>
                     <td style={{ padding: "0.5rem", textAlign: "left", fontWeight: 600 }}>
                       {p.latestTradeRecordId ? (
                         <Link
@@ -299,7 +371,7 @@ export default function PortfolioClient() {
                         <span>{p.ticker}</span>
                       )}
                       {p.stale && (
-                        <span title="Stale quote (>15min)" style={{ color: "#f59e0b", marginLeft: "0.25rem" }}>
+                        <span title="Stale quote — server prices refresh twice per hour during US market hours" style={{ color: "#f59e0b", marginLeft: "0.25rem" }}>
                           ⏱
                         </span>
                       )}
@@ -326,7 +398,56 @@ export default function PortfolioClient() {
                         ? `${p.unrealizedPlPct >= 0 ? "+" : ""}${fmt(p.unrealizedPlPct)}%`
                         : "—"}
                     </td>
+                    <td style={{ padding: "0.5rem" }}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          closeDraft?.accountId === acct.id && closeDraft.ticker === p.ticker
+                            ? setCloseDraft(null)
+                            : startClose(acct.id, p)
+                        }
+                        style={{ padding: "0.15rem 0.6rem", fontSize: "0.8rem", border: "1px solid #d1d5db", borderRadius: "0.35rem", background: "#fff", cursor: "pointer" }}
+                      >
+                        {closeDraft?.accountId === acct.id && closeDraft.ticker === p.ticker ? "Cancel" : "Close"}
+                      </button>
+                    </td>
                   </tr>
+                  {closeDraft?.accountId === acct.id && closeDraft.ticker === p.ticker && (
+                    <tr style={{ background: "#f9fafb", borderBottom: "1px solid #f3f4f6" }}>
+                      <td colSpan={9} style={{ padding: "0.6rem 0.5rem" }}>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "end" }}>
+                          <strong style={{ fontSize: "0.85rem" }}>Close {p.ticker}:</strong>
+                          <label style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                            Quantity (max {fmt(closeDraft.maxQty, 0)})<br />
+                            <input type="number" min={0} max={closeDraft.maxQty} step="any" value={closeDraft.qty}
+                              onChange={(e) => setCloseDraft({ ...closeDraft, qty: e.target.value })}
+                              style={{ width: "6.5rem", padding: "0.25rem", border: "1px solid #d1d5db", borderRadius: "0.25rem" }} />
+                          </label>
+                          <label style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                            Exit price<br />
+                            <input type="number" min={0} step="any" value={closeDraft.price}
+                              onChange={(e) => setCloseDraft({ ...closeDraft, price: e.target.value })}
+                              style={{ width: "6.5rem", padding: "0.25rem", border: "1px solid #d1d5db", borderRadius: "0.25rem" }} />
+                          </label>
+                          <label style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                            Exit date<br />
+                            <input type="date" value={closeDraft.date}
+                              onChange={(e) => setCloseDraft({ ...closeDraft, date: e.target.value })}
+                              style={{ padding: "0.25rem", border: "1px solid #d1d5db", borderRadius: "0.25rem" }} />
+                          </label>
+                          <button type="button" onClick={submitClose} disabled={closeBusy}
+                            style={{ padding: "0.35rem 0.9rem", fontSize: "0.8rem", fontWeight: 600, border: "none", borderRadius: "0.35rem", background: closeBusy ? "#9ca3af" : "#dc2626", color: "#fff", cursor: closeBusy ? "wait" : "pointer" }}>
+                            {closeBusy ? "Closing…" : Number(closeDraft.qty) < closeDraft.maxQty ? "Sell partial" : "Close position"}
+                          </button>
+                          {closeError && <span style={{ color: "#b91c1c", fontSize: "0.8rem" }}>{closeError}</span>}
+                        </div>
+                        <p style={{ margin: "0.4rem 0 0", fontSize: "0.72rem", color: "#9ca3af" }}>
+                          Records a SELL fill at your price/date — the journal entry closes (or trims) automatically. Fees auto-calculated from the account preset.
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>

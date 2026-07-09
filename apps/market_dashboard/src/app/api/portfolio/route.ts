@@ -32,7 +32,12 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-const STALE_THRESHOLD_MS = 15 * 60 * 1000;  // 15 min — quote older than this is "stale"
+// Staleness is source-aware: bridge LiveQuote streams near-realtime (15 min),
+// while server MarketQuote rows refresh on a deliberately GENTLE cron
+// (2x/hour market hours — free-tier rate-limit budget), so they get 45 min
+// before being flagged stale.
+const STALE_LIVE_MS = 15 * 60 * 1000;
+const STALE_MARKET_MS = 45 * 60 * 1000;
 
 function toNum(d: unknown): number {
   if (d == null) return 0;
@@ -183,9 +188,10 @@ export async function GET() {
             : null;
 
       const priceObservedAt = quote?.observedAt ?? (brokerPrice != null ? p.asOf : null);
+      const staleAfterMs = quote?.source === "yahoo" ? STALE_MARKET_MS : STALE_LIVE_MS;
       const stale =
         priceObservedAt == null ||
-        now - priceObservedAt.getTime() > STALE_THRESHOLD_MS;
+        now - priceObservedAt.getTime() > staleAfterMs;
 
       acctCostAll += cost;
       if (marketValue != null) {
