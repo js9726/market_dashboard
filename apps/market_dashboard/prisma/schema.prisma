@@ -66,6 +66,11 @@ model User {
   dailyScansLimit  Int      @default(20)
   lastQuotaResetAt DateTime @default(now())
 
+  /// When the user accepted the beta disclaimer (educational ideas, not
+  /// financial advice). Null = not yet accepted; the Ideas tab (Phase 1) and
+  /// the acceptance banner key off this. Client-beta Phase 0.3.
+  disclaimerAcceptedAt DateTime?
+
   // ── Feature 5 + 8: public profile + leaderboard ───────────────────────────
   // username is the URL handle (@handle in UI, stored without @). Lowercase
   // alphanumeric + underscore, 3-30 chars. Unique. Nullable so existing rows

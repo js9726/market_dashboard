@@ -45,7 +45,10 @@ export default auth((req) => {
     pathname.startsWith("/api/bridge/sync") ||
     // Public profile pages — visible to anyone, gated server-side by
     // publicProfileEnabled in /profile/[username]/page.tsx itself.
-    pathname.startsWith("/profile/")
+    pathname.startsWith("/profile/") ||
+    // Legal / disclaimer page — must be readable BEFORE sign-in so invitees
+    // can review terms first (client-beta Phase 0.3).
+    pathname.startsWith("/legal")
   ) {
     return NextResponse.next();
   }

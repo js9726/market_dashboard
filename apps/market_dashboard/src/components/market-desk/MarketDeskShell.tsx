@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import Icon from "./Icon";
 import MarketTape from "./MarketTape";
 import FailureBanner from "./FailureBanner";
+import DisclaimerBanner from "./DisclaimerBanner";
 import { features } from "@/lib/features";
 
 // Nav items can declare a `featureFlag` (key of features) — when the flag is
@@ -44,6 +45,7 @@ const TOOL_NAV: NavItem[] = [
   { href: "/dashboard/playbooks", label: "Playbooks", icon: "template" },
   { href: "/dashboard/replay", label: "Replay", icon: "replay" },
   { href: "/dashboard/settings", label: "Settings", icon: "accounts" },
+  { href: "/dashboard/guide", label: "Guide", icon: "template" },
 ];
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -127,6 +129,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard/settings/brokers": {
     title: "Broker accounts",
     subtitle: "Link brokers, configure fee presets, manage bridge tokens",
+  },
+  "/dashboard/guide": {
+    title: "Guide",
+    subtitle: "How to journal - manual entry, CSV import, live bridge",
   },
 };
 
@@ -261,6 +267,8 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
               </button>
             </div>
           </header>
+          {/* Client-beta Phase 0.3: one-time disclaimer acceptance. */}
+          <DisclaimerBanner />
           {/* Phase 6: top-of-page alerts for stale brief / CI failure. */}
           <FailureBanner />
           <div className="market-page">{children}</div>
