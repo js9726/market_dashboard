@@ -26,6 +26,7 @@ import {
   parseNumeric,
   type BrokerFormat,
 } from "@/lib/csv-broker-formats";
+import { reconcileBrokerTrades } from "@/server/trade-reconciler";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
@@ -305,6 +306,18 @@ export async function POST(req: Request) {
     }
   }
 
+  // Reconcile fills → journal TradeRecords for THIS account immediately, so the
+  // imported trades appear in the journal right away instead of waiting for the
+  // nightly reconcile cron (client-beta Phase 0 fix). Best-effort — the import
+  // itself already succeeded; the nightly run remains the backstop.
+  let journalled: { created: number; linked: number; closed: number } | null = null;
+  try {
+    const rec = await reconcileBrokerTrades({ brokerAccountId: brokerAccount.id });
+    journalled = { created: rec.recordsCreated, linked: rec.fillsLinked, closed: rec.recordsClosed };
+  } catch (e) {
+    commitErrors.push(`journal reconcile deferred to nightly run: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
   // Remember mapping for next time
   try {
     await prisma.csvImportMapping.upsert({
@@ -325,6 +338,7 @@ export async function POST(req: Request) {
     detected: format.name,
     imported,
     skipped,
+    journalled,
     errors: commitErrors.slice(0, 50),
   });
 }
