@@ -47,7 +47,14 @@ Do not delete items — strike with `~~text~~` so decision history stays legible
 
 ## B. Phases
 
-### Phase 0 — Beta-ready core (week 1) → *invite the first 5 after this*
+### Phase 0 — Beta-ready core → *SHIPPED + VALIDATED 2026-07-09 (commits b2dfbeb8, 53779c92)*
+
+> Validated as a REAL minted member session against prod: all pages 200, all
+> personal APIs zero-rows (isolation), disclaimer accept cycle persisted,
+> journal flag live, and the full journaling chain executed end-to-end
+> (preset → broker account → manual trade → journal row → portfolio).
+> Honest caveats: CSV import validated at page/pipeline level (no file POSTed);
+> full Sentry deferred (needs a DSN) — Vercel logs + FailureBanner cover beta.
 - **0.1 Fresh-member pass:** walk every page as a brand-new member; fix empty states (Trades Hub, A-list personal lanes, Equity, Analytics) so zero-data renders helpfully, each with a "start here" CTA.
 - **0.2 Onboarding:** polish pending→member approval (admin member-book page: list, approve, deny, revoke); welcome page after approval; "How to journal" docs page (manual + CSV, with moomoo/IBKR export screenshots).
 - **0.3 Legal & trust:** disclaimer page (educational ideas, not financial advice; no performance guarantee), privacy note (data isolation statement), accept-once gate before the Ideas tab.
