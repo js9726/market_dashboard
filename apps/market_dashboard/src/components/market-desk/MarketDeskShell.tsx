@@ -42,8 +42,8 @@ const TOOL_NAV: NavItem[] = [
   { href: "/dashboard/leaderboard", label: "Leaderboard", icon: "review" },
   { href: "/dashboard/profile", label: "Profile", icon: "accounts" },
   { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
-  { href: "/dashboard/playbooks", label: "Playbooks", icon: "template" },
-  { href: "/dashboard/replay", label: "Replay", icon: "replay" },
+  // Playbooks + Replay are placeholder pages — hidden from nav until real
+  // (TradesViz-platform P0; Playbooks returns in P1, Replay in P5).
   { href: "/dashboard/settings", label: "Settings", icon: "accounts" },
   { href: "/dashboard/guide", label: "Guide", icon: "template" },
 ];

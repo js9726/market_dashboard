@@ -1,7 +1,7 @@
 # Plan — TradesViz-Class Trading Platform (US + Bursa Malaysia)
 
 **Owner:** Jie Sheng
-**Status:** AUDIT + PLAN for approval, 2026-07-10. **No code until Jie approves.**
+**Status:** **APPROVED by Jie 2026-07-10** — phases distributed on the agent board (TVP-P0/P1/P1.5 rows). P0 in progress: Codex committed the doctrine tree (e72cd905) + Portfolio restyle (b2c489fa); Claude shipped MY.↔.KL symbols, Python↔TS scorer parity, tags/screenshots/mistakes + Playbook/Goal schema, placeholder nav hidden.
 **Origin:** Codex handover brief (10-pillar audit vs TradesViz/TraderSync-Cypher; audit-first) + Jie's decisions 2026-07-10: Bursa = journal+analytics first; all 4 pillars (analytics, chart-trades, playbooks, AI coach) in scope; **two-surface IA (Journal home + Market Desk)**.
 **Supersedes:** absorbs `PLAN-client-beta-launch.md` Phases 1–4 (still valid, re-sequenced here) and revives `ROADMAP.md`'s two-surface concept.
 

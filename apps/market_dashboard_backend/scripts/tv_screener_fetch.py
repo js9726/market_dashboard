@@ -330,10 +330,15 @@ def _compute_stages(hit: dict, market_sentiment: float = 6.0) -> dict:
     close_d       = float(hit.get("close")            or 0)
     premarket_chg = float(hit.get("premarket_change") or 0)
 
-    # Pattern classification (feeds the Setup score)
-    is_ep        = chg_day > 8 and perf_1m < 15 and rvol > 2.5
+    # Pattern classification (feeds the Setup score).
+    # PARITY (TradesViz-platform P0, 2026-07-10): thresholds mirror
+    # src/server/screener-scanner.ts exactly — the two engines score the same
+    # ticker on the same day and must agree. Doctrine: wiki
+    # a-list-gate-and-screener.md calibration log (EP tightened 2026-06-26 to
+    # chg>10/RVOL>3; pullback = NON-surging volume, no low-RVOL floor).
+    is_ep        = chg_day > 10 and perf_1m < 15 and rvol > 3
     is_breakout  = 3 < chg_day < 20 and 8 < perf_1m < 50 and rvol > 1.5
-    is_pullback  = abs(chg_day) < 5 and perf_1m > 5 and rvol >= 0.8
+    is_pullback  = abs(chg_day) < 5 and perf_1m > 5 and rvol < 1.5
     is_parabolic = perf_1m > 70 or (chg_day > 25 and perf_1m > 30)
     is_stage4    = perf_1m < -15
 
@@ -344,9 +349,16 @@ def _compute_stages(hit: dict, market_sentiment: float = 6.0) -> dict:
     elif is_breakout:  setup = 30
     elif is_pullback:  setup = 26
     else:              setup = 14    # unclear
-    if   rvol >= 3: setup += 6
-    elif rvol >= 2: setup += 3
-    elif rvol < 1:  setup -= 6       # no volume confirmation
+    # RVOL read by setup class (wiki gate doctrine): a pullback WANTS
+    # contraction — reward the dry-up, only fault a high-volume pullback.
+    if is_pullback:
+        if   rvol <= 0.7: setup += 4
+        elif rvol <= 1.0: setup += 2
+        elif rvol > 2:    setup -= 4
+    else:
+        if   rvol >= 3: setup += 6
+        elif rvol >= 2: setup += 3
+        elif rvol < 1:  setup -= 6   # no volume confirmation
     if   perf_1m > 80: setup -= 8    # extended / late base
     elif perf_1m > 60: setup -= 4
     setup = max(0, min(40, setup))
