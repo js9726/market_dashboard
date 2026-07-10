@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Decimal } from "@prisma/client/runtime/library";
+import Icon from "@/components/market-desk/Icon";
 
 type Trade = {
   id: string;
@@ -1344,7 +1345,10 @@ export default function TradeLog() {
               </tr>
             ) : trades.map((t, i) => {
               const { text: pnlText, color: pnlColor, title: pnlTitle } = fmtPnlRow(t);
-              const isOpen = t.pnl === null;
+              const state = t.state?.toUpperCase() ?? null;
+              const isOpen = state != null
+                ? state === "OPEN" || state === "SEMI-OPEN" || state === "PLANNING"
+                : t.pnl === null;
               const isLive = t.source === "LIVE";
               const liveU = t.liveUnrealizedPl;
               const grade = t.wikiVerdict?.qualityGrade ?? gradeFromScore(t.verdictScore);
@@ -1352,6 +1356,7 @@ export default function TradeLog() {
               const verdictSummary = verdict
                 ? `${verdict.overall_verdict}${verdict.best_match ? " · " + verdict.best_match : ""}`
                 : null;
+              const rowCurrency = ccSymbol(t.currencyCode ?? t.currency);
               return (
                 <tr key={t.id} className="border-t border-[var(--line)] hover:bg-[var(--bg-raised)]">
                   <td className="px-3 py-2 text-[var(--fg-3)]">{(page - 1) * 50 + i + 1}</td>
@@ -1368,7 +1373,21 @@ export default function TradeLog() {
                         >
                           {t.ticker}
                         </button>
+                      ) : !t.synthetic ? (
+                        <Link className="text-[var(--accent)] underline-offset-2 hover:underline" href={`/dashboard/journal/trades/${t.id}`}>
+                          {t.ticker}
+                        </Link>
                       ) : t.ticker}
+                      {isOpen && !t.synthetic ? (
+                        <Link
+                          aria-label={`Open ${t.ticker} trade detail`}
+                          className="rounded p-0.5 text-[var(--fg-3)] hover:bg-[var(--bg-surface)] hover:text-[var(--accent)]"
+                          href={`/dashboard/journal/trades/${t.id}`}
+                          title="Open trade detail"
+                        >
+                          <Icon className="h-3.5 w-3.5" name="eye" />
+                        </Link>
+                      ) : null}
                       {isLive && (
                         <span
                           className="rounded border border-[var(--accent)] px-1 py-px text-[9px] font-semibold leading-none text-[var(--accent)]"
@@ -1390,13 +1409,13 @@ export default function TradeLog() {
                     ) : "—"}
                   </td>
                   <td className="px-3 py-2 text-[var(--fg-1)]">{fmtNum(t.quantity)}</td>
-                  <td className="px-3 py-2 text-[var(--fg-1)]">${fmtNum(t.buyPrice)}</td>
-                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.exitPrice ? `$${fmtNum(t.exitPrice)}` : "—"}</td>
-                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.fees ? `$${fmtNum(t.fees)}` : "—"}</td>
+                  <td className="px-3 py-2 text-[var(--fg-1)]">{t.buyPrice != null ? `${rowCurrency}${fmtNum(t.buyPrice)}` : "—"}</td>
+                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.exitPrice != null ? `${rowCurrency}${fmtNum(t.exitPrice)}` : "—"}</td>
+                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.fees != null ? `${rowCurrency}${fmtNum(t.fees)}` : "—"}</td>
                   <td className="px-3 py-2 font-medium">
                     {isLive && liveU != null ? (
                       <span className={liveU >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]"}>
-                        {liveU >= 0 ? "+" : ""}${Math.abs(liveU).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        {liveU >= 0 ? "+" : "-"}{rowCurrency}{Math.abs(liveU).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                         <span className="ml-1 text-[10px] text-[var(--fg-4)]">{t.stale ? "stale" : "live"}</span>
                       </span>
                     ) : isLive ? (
@@ -1406,7 +1425,7 @@ export default function TradeLog() {
                     ) : t.pnl != null ? (
                       <span className={pnlColor} title={pnlTitle}>{pnlText}</span>
                     ) : (
-                      <span className="text-[var(--fg-3)]">Open</span>
+                      <span className="text-[var(--fg-3)]">{isOpen ? "Open" : "Not recorded"}</span>
                     )}
                   </td>
                   <td className="px-3 py-2">{stateBadge(t.state)}</td>

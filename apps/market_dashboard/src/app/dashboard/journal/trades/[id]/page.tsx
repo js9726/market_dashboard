@@ -3,11 +3,17 @@ import { redirect } from "next/navigation";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { features } from "@/lib/features";
 import { prisma } from "@/lib/prisma";
-import JournalEditorClient from "@/components/broker-journal/JournalEditorClient";
+import JournalEditorClient from "@/components/journal/JournalEditorClient";
 
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ id: string }> };
+
+const tradeOrder = [
+  { tradeDate: "desc" as const },
+  { executedAt: "desc" as const },
+  { id: "asc" as const },
+];
 
 function jsonStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
@@ -17,6 +23,12 @@ function dec(value: { toString(): string } | null | undefined): number | null {
   if (value == null) return null;
   const n = Number(value.toString());
   return Number.isFinite(n) ? n : null;
+}
+
+function jsonObject(value: unknown): Record<string, unknown> | null {
+  return value != null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
 }
 
 export default async function JournalEditorPage({ params }: Props) {
@@ -70,6 +82,37 @@ export default async function JournalEditorPage({ params }: Props) {
       tags: true,
       screenshots: true,
       mistakes: true,
+      verdict: true,
+      verdictScore: true,
+      verdictGeneratedAt: true,
+      syncedAt: true,
+      fills: {
+        orderBy: [{ executedAt: "asc" }, { id: "asc" }],
+        take: 100,
+        select: {
+          id: true,
+          side: true,
+          qty: true,
+          price: true,
+          executedAt: true,
+          fees: true,
+          currency: true,
+          source: true,
+        },
+      },
+      verdictHistory: {
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: {
+          id: true,
+          provider: true,
+          model: true,
+          kind: true,
+          score: true,
+          verdict: true,
+          createdAt: true,
+        },
+      },
     },
   });
   if (!trade) {
@@ -81,15 +124,49 @@ export default async function JournalEditorPage({ params }: Props) {
     );
   }
 
-  const neighbors = await prisma.tradeRecord.findMany({
-    where: { userId: userScopeId },
-    orderBy: [{ tradeDate: "desc" }, { executedAt: "desc" }, { id: "asc" }],
-    select: { id: true, ticker: true, tradeDate: true, executedAt: true },
-    take: 250,
-  });
-  const idx = neighbors.findIndex((row) => row.id === trade.id);
-  const newer = idx > 0 ? neighbors[idx - 1] : null;
-  const older = idx >= 0 && idx < neighbors.length - 1 ? neighbors[idx + 1] : null;
+  const neighborSelect = { id: true, ticker: true } as const;
+  const [newerRows, olderRows] = await Promise.all([
+    prisma.tradeRecord.findMany({
+      where: { userId: userScopeId },
+      orderBy: tradeOrder,
+      cursor: { id: trade.id },
+      skip: 1,
+      take: -1,
+      select: neighborSelect,
+    }),
+    prisma.tradeRecord.findMany({
+      where: { userId: userScopeId },
+      orderBy: tradeOrder,
+      cursor: { id: trade.id },
+      skip: 1,
+      take: 1,
+      select: neighborSelect,
+    }),
+  ]);
+  const newer = newerRows[0] ?? null;
+  const older = olderRows[0] ?? null;
+
+  const verdictHistory = trade.verdictHistory.map((item) => ({
+    id: item.id,
+    provider: item.provider,
+    model: item.model,
+    kind: item.kind,
+    score: item.score,
+    verdict: jsonObject(item.verdict) ?? {},
+    createdAt: item.createdAt.toISOString(),
+  }));
+  const cachedVerdict = jsonObject(trade.verdict);
+  if (!verdictHistory.length && cachedVerdict) {
+    verdictHistory.push({
+      id: `cached-${trade.id}`,
+      provider: "cached",
+      model: "latest",
+      kind: "day-0",
+      score: trade.verdictScore,
+      verdict: cachedVerdict,
+      createdAt: trade.verdictGeneratedAt?.toISOString() ?? trade.syncedAt.toISOString(),
+    });
+  }
 
   const tradeSerialized = {
     id: trade.id,
@@ -118,9 +195,20 @@ export default async function JournalEditorPage({ params }: Props) {
     tags: jsonStringArray(trade.tags),
     screenshots: jsonStringArray(trade.screenshots),
     mistakes: jsonStringArray(trade.mistakes),
+    fills: trade.fills.map((fill) => ({
+      id: fill.id,
+      side: fill.side,
+      qty: dec(fill.qty),
+      price: dec(fill.price),
+      executedAt: fill.executedAt.toISOString(),
+      fees: dec(fill.fees),
+      currency: fill.currency,
+      source: fill.source,
+    })),
+    verdictHistory,
     newerTrade: newer ? { id: newer.id, ticker: newer.ticker } : null,
     olderTrade: older ? { id: older.id, ticker: older.ticker } : null,
   };
 
-  return <JournalEditorClient trade={tradeSerialized} />;
+  return <JournalEditorClient key={trade.id} trade={tradeSerialized} />;
 }
