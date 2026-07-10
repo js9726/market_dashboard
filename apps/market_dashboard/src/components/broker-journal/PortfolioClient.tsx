@@ -383,7 +383,7 @@ export default function PortfolioClient() {
                               {p.stale ? (
                                 <span
                                   className="rounded bg-[var(--bg-raised)] px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase text-[var(--warn-500)]"
-                                  title="Stale quote - server prices refresh twice per hour during US market hours"
+                                  title="Stale quote - server prices refresh hourly during US market hours"
                                 >
                                   stale
                                 </span>
