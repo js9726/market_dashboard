@@ -397,6 +397,7 @@ ${renderDeepDiveGrounding(deepDiveGrounding)}`;
         upcoming_catalysts: Array.isArray(analysis.upcoming_catalysts) ? analysis.upcoming_catalysts : [],
         analyst_target_changes: Array.isArray(analysis.analyst_target_changes) ? analysis.analyst_target_changes : [],
         big_move_reasons: Array.isArray(analysis.big_move_reasons) ? analysis.big_move_reasons : [],
+        medical_biotech_risk: text(analysis.medical_biotech_risk),
         unverified_flags: Array.isArray(analysis.unverified_flags) ? analysis.unverified_flags : [],
         ticker_news: tickerNews,
         sector_news: sectorNews,

@@ -251,6 +251,7 @@ type StockAnalysisResult = {
   upcoming_catalysts?: UpcomingCatalyst[];
   analyst_target_changes?: AnalystTargetChange[];
   big_move_reasons?: string[];
+  medical_biotech_risk?: string | null;
   unverified_flags?: string[];
   trader_analysis: TraderAnalysis[];
   entry_plan: StockEntryPlan;
@@ -410,6 +411,13 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
                 <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-raised)] px-4 py-3">
                   <SectionTitle>Professional Summary</SectionTitle>
                   <p className="text-xs leading-relaxed text-[var(--fg-2)]">{result.professional_summary}</p>
+                </div>
+              ) : null}
+
+              {result.medical_biotech_risk && result.medical_biotech_risk.toLowerCase() !== "n/a" ? (
+                <div className="rounded-lg border border-[var(--warn-500)] bg-[var(--bg-raised)] px-4 py-3">
+                  <SectionTitle>Medical / Biotech Risk</SectionTitle>
+                  <p className="text-xs leading-relaxed text-[var(--fg-2)]">{result.medical_biotech_risk}</p>
                 </div>
               ) : null}
 

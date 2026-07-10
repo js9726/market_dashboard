@@ -42,6 +42,14 @@
       "setupTags": ["ORB-NO-SETUP"],
       "riskFlags": ["loose range", "low rvol", "no daily setup"],
       "brief": "PASS because an intraday ORB trigger is not enough when the daily chart is a loose range with low RVOL and no daily setup. Wait for the range to tighten or reclaim a real pivot with defined risk."
+    },
+    {
+      "id": "intraday-cumulative-rvol-understated-ep",
+      "verdict": "WATCH",
+      "convictionScore": 68,
+      "setupTags": ["EP-FRESH", "fresh catalyst gap", "volume expansion"],
+      "riskFlags": ["gap entry needs an intraday pullback trigger"],
+      "brief": "WATCH, not a volume fail: the 1.1x TradingView reading is cumulative-so-far-today and understates a genuine high-volume gap (OpenD volume_ratio is ~3.9x for the same tape). Treat it as a fresh EP and wait for an intraday pullback or opening-range reclaim, with the stop below the gap-day low."
     }
   ]
 }

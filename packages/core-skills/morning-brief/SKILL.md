@@ -119,6 +119,12 @@ Output is urgency-sorted: `CUT` (regular-session stop broken) → `CUT-ON-OPEN`
 (after-hours below stop — decide on the open, don't chase the thin AH print) → `WARN`
 (within 0.3 ATR of stop, or below 8EMA) → `OK`. R is `(last−entry)/(entry−stop)`.
 
+- **Sweep BOTH brokers (2026-07-09).** `holdings_review.py` covers moomoo only. Jie also
+  holds positions at IBKR (U19791550 — e.g. RBRK; ONTO previously), which a moomoo-only
+  sweep silently misses. Also run the read-only IBKR dry run:
+  `cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\dashboard-bridge"; & ".venv\Scripts\python.exe" ibkr_bridge.py`
+  (no `--post` = dry run; needs TWS at 127.0.0.1:7496). If TWS is down, fail-closed:
+  report the IBKR book as UNVERIFIED — never state "no other positions".
 - **Skip this step in CI / GitHub Actions / SaaS** — there is no broker there. It is for
   manual operator runs only (OpenD on `127.0.0.1:11111`).
 - If any holding is `CUT` / `CUT-ON-OPEN` / `WARN`, or you want the full per-holding
@@ -161,6 +167,8 @@ Navigate Chrome to each screener and note the top 5 tickers visible:
 
 Combine top tickers from all screeners, deduplicate, and merge with `$WATCHLIST_TICKERS`.
 Store the merged list as `$FULL_WATCHLIST` (personal + screener extras, deduplicated).
+
+Before promoting any screener ticker to `GO`, apply the catalyst-source gate from `jie_wiki/wiki/ticker-catalyst-analysis.md`: recent events, insider/institutional activity, peer/sector trend, next catalysts, analyst actions, and source gaps must be present or explicitly unavailable. Medical/biotech/healthcare/FDA-driven names are rotation/speculation indicators first and stay `WAIT` unless company stage, catalyst, peer confirmation, binary risk, and insider read are clear.
 
 If Chrome is unavailable, skip this step. The screener results from the last daily run
 are already embedded in the snapshot via `tv_screeners.json`.

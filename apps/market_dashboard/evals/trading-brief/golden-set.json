@@ -108,6 +108,28 @@
         "riskFlagsRequired": ["loose range", "low rvol", "no daily setup"],
         "mustMention": ["intraday", "trigger", "loose"]
       }
+    },
+    {
+      "id": "intraday-cumulative-rvol-understated-ep",
+      "name": "Fresh EP with understated intraday (cumulative) RVOL must not be auto-failed for low volume",
+      "input": {
+        "ticker": "WULF",
+        "setup": "EP-FRESH",
+        "priceAction": "Gaps +15% on a fresh multi-year datacenter-lease catalyst with heavy volume near the open. TradingView's intraday relative_volume_10d_calc reads only 1.1x because it is cumulative-so-far-today against a full-day average; OpenD's time-adjusted volume_ratio reads ~3.9x for the same tape.",
+        "rvolTradingViewCumulative": 1.1,
+        "rvolSessionAdjusted": 3.9,
+        "rs": "fresh gap off a neglected base",
+        "entry": "The gap is the trigger; a safe entry needs an intraday pullback or opening-range reclaim",
+        "stop": "Below the opening-range / gap-day low",
+        "catalyst": "20-year datacenter lease"
+      },
+      "expected": {
+        "allowedVerdicts": ["GO", "WATCH"],
+        "scoreRange": [55, 90],
+        "setupTagsRequired": ["EP"],
+        "riskFlagsForbidden": ["low rvol", "low relative volume", "no volume"],
+        "mustMention": ["volume", "gap"]
+      }
     }
   ]
 }

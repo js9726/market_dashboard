@@ -128,6 +128,7 @@
         }
       },
       "big_move_reasons": { "type": "array", "items": { "type": "string" } },
+      "medical_biotech_risk": { "type": "string" },
       "unverified_flags": { "type": "array", "items": { "type": "string" } },
       "trader_analysis": {
         "type": "array",

@@ -207,6 +207,106 @@ def fetch_screener(screener_cfg: dict, columns: list) -> list:
 #    Rule: RVOL < 1 = no institutional confirmation = avoid. Mcap < $300M
 #    = thin, fade-prone. Mcap > $1B + RVOL > 2 = institutional grade.
 
+# --------------------------------------------------------------------------
+# Intraday RVOL normalization (time-of-day correction)
+# --------------------------------------------------------------------------
+# TradingView's `relative_volume_10d_calc` is, intraday, CUMULATIVE-so-far-today
+# volume / the 10-day AVERAGE FULL-DAY volume. So early/mid-session it is
+# systematically UNDERSTATED — you are comparing a partial day against a whole
+# day. Evidence (2026-07-06 ~11:06 ET run): WULF read 1.07x raw vs 3.9x live,
+# CRDO 0.22x vs 0.8x, ALGM 0.09x vs 0.4x. Fed raw into the scorer, this made 24
+# of 25 top-gainers fail every pattern's RVOL gate (EP>2.5 / breakout>1.5 /
+# pullback>=0.8), collapse to the UNCLEAR floor, AND eat the rvol<1 penalty —
+# i.e. "setup 8 / low RVOL" on the whole board, zero discrimination.
+#
+# Fix: divide the raw RVOL by the fraction of the day's volume expected to have
+# traded by now, turning "cumulative / full-day-avg" into "projected-full-day /
+# full-day-avg" — the RVOL the name is on track to finish with. That is exactly
+# what OpenD's `volume_ratio` (量比, a per-minute-rate metric) reports natively.
+# Intraday volume is U-shaped (front- and back-loaded), so we interpolate an
+# empirical cumulative-volume curve rather than a naive linear time fraction.
+#
+# The correction is ONE-SIDED and only applies while the market is open: the
+# fraction is <= 1, so it can only RAISE the RVOL, never lower it, and the
+# pre-market / closed-market path is left byte-identical (fraction == 1.0 →
+# effective == raw). The authoritative live check remains the separate OpenD
+# overlay in the daily workflow; this only stops the scorer mislabelling movers.
+
+# (minutes since 09:30 ET, cumulative fraction of the regular session's volume)
+_INTRADAY_VOLUME_CURVE = [
+    (0, 0.00), (30, 0.13), (60, 0.22), (90, 0.30), (120, 0.37),
+    (150, 0.43), (180, 0.49), (210, 0.55), (240, 0.61), (270, 0.67),
+    (300, 0.74), (330, 0.82), (360, 0.91), (390, 1.00),
+]
+_SESSION_MINUTES = 390            # 09:30–16:00 ET regular session
+_MIN_VOLUME_FRACTION = 0.12       # floor: caps the early-session multiplier (~8.3x)
+
+
+def session_volume_fraction(now_et) -> float:
+    """Fraction (0 < f <= 1) of the regular session's volume expected to have
+    traded by `now_et`, from an empirical U-shaped intraday volume curve.
+
+    Returns 1.0 outside the 09:30–16:00 ET session (weekends, pre-market, or
+    after the close) so callers on the closed path get the raw RVOL unchanged.
+    """
+    open_t = datetime.time(9, 30)
+    close_t = datetime.time(16, 0)
+    t = now_et.time()
+    if now_et.weekday() >= 5 or t < open_t or t >= close_t:
+        return 1.0
+    mins = (now_et.hour - 9) * 60 + (now_et.minute - 30) + now_et.second / 60.0
+    mins = max(0.0, min(float(_SESSION_MINUTES), mins))
+    frac = 1.0
+    for (m0, f0), (m1, f1) in zip(_INTRADAY_VOLUME_CURVE, _INTRADAY_VOLUME_CURVE[1:]):
+        if mins <= m1:
+            span = (m1 - m0) or 1
+            frac = f0 + (f1 - f0) * (mins - m0) / span
+            break
+    return max(_MIN_VOLUME_FRACTION, min(1.0, frac))
+
+
+def effective_rvol(raw_rvol, session_fraction: float):
+    """Intraday-adjusted RVOL for scoring: the cumulative TV RVOL projected to a
+    full session by dividing by `session_fraction`. One-sided (result >= raw,
+    since fraction <= 1). No-op when the market is closed (session_fraction ==
+    1.0) or the value is missing / non-positive."""
+    try:
+        r = float(raw_rvol)
+    except (TypeError, ValueError):
+        return raw_rvol
+    if r <= 0 or session_fraction >= 1.0:
+        return r
+    return round(r / session_fraction, 3)
+
+
+def annotate_intraday_rvol(hits: list, session_fraction: float) -> None:
+    """Attach the intraday-adjusted RVOL to each hit BEFORE scoring so the scorer
+    sees a projected (not cumulative-so-far) relative volume during market hours.
+
+    Preserves the raw TradingView value on `rvol_raw`; leaves the original
+    `relative_volume_10d_calc` field untouched for transparency. When the market
+    is closed (session_fraction == 1.0) `rvol_effective` == the raw value, so the
+    downstream scoring is identical to the pre-fix behaviour.
+    """
+    adjusting = session_fraction < 1.0
+    for hit in hits:
+        raw = hit.get("relative_volume_10d_calc")
+        eff = effective_rvol(raw, session_fraction)
+        hit["rvol_raw"] = raw
+        hit["rvol_effective"] = eff
+        hit["rvol_adjusted"] = bool(adjusting and raw is not None and eff != raw)
+
+
+def _hit_rvol(hit: dict) -> float:
+    """Resolve the RVOL the scorer should use: the intraday-adjusted value when
+    present (set by annotate_intraday_rvol), else the raw TradingView field.
+    Keeps callers that pass bare hits (e.g. unit tests) working on the raw value."""
+    eff = hit.get("rvol_effective")
+    if eff is None:
+        eff = hit.get("relative_volume_10d_calc")
+    return float(eff or 0)
+
+
 def _compute_stages(hit: dict, market_sentiment: float = 6.0) -> dict:
     """
     Deterministic Conviction sub-scores from screener data (2026-06-15 model;
@@ -223,7 +323,7 @@ def _compute_stages(hit: dict, market_sentiment: float = 6.0) -> dict:
     perf_1m       = float(hit.get("Perf.1M") or 0)
     perf_1w       = float(hit.get("Perf.W")  or 0)
     chg_day       = float(hit.get("change")  or 0)
-    rvol          = float(hit.get("relative_volume_10d_calc") or 0)
+    rvol          = _hit_rvol(hit)  # intraday-adjusted when market open, else raw TV RVOL
     mcap          = float(hit.get("market_cap_basic")         or 0)
     high_d        = float(hit.get("high")             or 0)
     low_d         = float(hit.get("low")              or 0)
@@ -336,7 +436,7 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
     perf_1m       = float(hit.get("Perf.1M") or 0)
     perf_1w       = float(hit.get("Perf.W")  or 0)
     chg_day       = float(hit.get("change")  or 0)
-    rvol          = float(hit.get("relative_volume_10d_calc") or 0)
+    rvol          = _hit_rvol(hit)  # intraday-adjusted when market open, else raw TV RVOL
     high_d        = float(hit.get("high")             or 0)
     low_d         = float(hit.get("low")              or 0)
     close_d       = float(hit.get("close")            or 0)
@@ -386,7 +486,12 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
                     f"Sector: {hit.get('sector', 'N/A')} | Industry: {hit.get('industry', 'N/A')}\n"
                     f"Price: ${close_d:.2f} | Today: {chg_day:+.1f}% | "
                     f"1W: {perf_1w:+.1f}% | 1M: {perf_1m:+.1f}%\n"
-                    f"RVOL: {rvol:.2f} | MCap: ${(hit.get('market_cap_basic') or 0)/1e9:.1f}B\n"
+                    f"RVOL: {rvol:.2f}"
+                    + (
+                        f" (session-adjusted from {float(hit.get('rvol_raw') or 0):.2f} cumulative-so-far TV RVOL)"
+                        if hit.get("rvol_adjusted") else ""
+                    )
+                    + f" | MCap: ${(hit.get('market_cap_basic') or 0)/1e9:.1f}B\n"
                     f"{candle_line}\n"
                     f"{premarket_line}\n\n"
                     f"{stage_block}\n"
@@ -507,8 +612,13 @@ def push_alist_candidates(screeners_out: list) -> None:
                 score = int(round(float(hit.get("score"))))
             except (TypeError, ValueError):
                 continue
-            rvol_raw = hit.get("relative_volume_10d_calc")
-            rvol = float(rvol_raw) if rvol_raw is not None else None
+            # Use the intraday-adjusted RVOL (set by annotate_intraday_rvol) so a
+            # true high-volume mover is not excluded on an understated cumulative
+            # TV reading; falls back to the raw field pre-market / closed.
+            rvol_src = hit.get("rvol_effective")
+            if rvol_src is None:
+                rvol_src = hit.get("relative_volume_10d_calc")
+            rvol = float(rvol_src) if rvol_src is not None else None
             if not ticker or score < 75 or verdict != "GO" or rvol is None or rvol < 1.5:
                 continue
             cand = {
@@ -581,6 +691,9 @@ def main():
         _now_et.weekday() < 5
         and datetime.time(9, 30) <= _now_et.time() <= datetime.time(16, 0)
     )
+    # Fraction of the session's volume expected to have traded by now. 1.0 when
+    # the market is closed → intraday RVOL correction is a no-op on that path.
+    _session_frac = session_volume_fraction(_now_et)
 
     deepseek_scored_at = None  # set below only when DeepSeek runs
 
@@ -591,6 +704,9 @@ def main():
         total_hits += len(hits)
 
         if hits:
+            # Correct TradingView's cumulative-so-far intraday RVOL to a projected
+            # full-session RVOL BEFORE scoring (no-op when the market is closed).
+            annotate_intraday_rvol(hits, _session_frac)
             # Always apply free algorithmic scoring — never skip this step.
             # This ensures intraday refreshes always have scores even without --score.
             algo_score_all(hits)
@@ -632,6 +748,10 @@ def main():
         #   True  → intraday prices; scores age quickly (recheck every 30 min)
         #   False → EOD/pre-market prices; scores remain valid until next session
         "market_was_open": _market_was_open,
+        # Fraction of the session's volume expected to have traded when fetched.
+        # < 1.0 means the scorer projected each hit's cumulative TV RVOL up to a
+        # full-session RVOL (rvol_effective) before scoring; 1.0 = raw TV RVOL.
+        "session_volume_fraction": round(_session_frac, 3),
         "screeners": screeners_out,
     }
     out_path = os.path.join(args.out_dir, "tv_screeners.json")
@@ -642,7 +762,12 @@ def main():
         if args.score else
         "algo all (no DeepSeek)"
     )
-    print(f"[tv] wrote {out_path} ({total_hits} total hits, {score_label}, market_open={_market_was_open})")
+    _rvol_note = (
+        f", intraday RVOL x{1/_session_frac:.1f} (session_frac={_session_frac:.2f})"
+        if _session_frac < 1.0 else ", raw TV RVOL (market closed)"
+    )
+    print(f"[tv] wrote {out_path} ({total_hits} total hits, {score_label}, "
+          f"market_open={_market_was_open}{_rvol_note})")
 
     # Populate the dashboard's REC A-list lane from screener hits that clear the bar.
     push_alist_candidates(screeners_out)
