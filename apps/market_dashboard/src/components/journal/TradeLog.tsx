@@ -1356,7 +1356,6 @@ export default function TradeLog() {
               const verdictSummary = verdict
                 ? `${verdict.overall_verdict}${verdict.best_match ? " · " + verdict.best_match : ""}`
                 : null;
-              const rowCurrency = ccSymbol(t.currencyCode ?? t.currency);
               return (
                 <tr key={t.id} className="border-t border-[var(--line)] hover:bg-[var(--bg-raised)]">
                   <td className="px-3 py-2 text-[var(--fg-3)]">{(page - 1) * 50 + i + 1}</td>
@@ -1409,13 +1408,13 @@ export default function TradeLog() {
                     ) : "—"}
                   </td>
                   <td className="px-3 py-2 text-[var(--fg-1)]">{fmtNum(t.quantity)}</td>
-                  <td className="px-3 py-2 text-[var(--fg-1)]">{t.buyPrice != null ? `${rowCurrency}${fmtNum(t.buyPrice)}` : "—"}</td>
-                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.exitPrice != null ? `${rowCurrency}${fmtNum(t.exitPrice)}` : "—"}</td>
-                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.fees != null ? `${rowCurrency}${fmtNum(t.fees)}` : "—"}</td>
+                  <td className="px-3 py-2 text-[var(--fg-1)]">{t.buyPrice != null ? `$${fmtNum(t.buyPrice)}` : "—"}</td>
+                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.exitPrice != null ? `$${fmtNum(t.exitPrice)}` : "—"}</td>
+                  <td className="px-3 py-2 text-[var(--fg-2)]">{t.fees != null ? `$${fmtNum(t.fees)}` : "—"}</td>
                   <td className="px-3 py-2 font-medium">
                     {isLive && liveU != null ? (
                       <span className={liveU >= 0 ? "text-[var(--gain-fg)]" : "text-[var(--loss-fg)]"}>
-                        {liveU >= 0 ? "+" : "-"}{rowCurrency}{Math.abs(liveU).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        {liveU >= 0 ? "+" : "-"}${Math.abs(liveU).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                         <span className="ml-1 text-[10px] text-[var(--fg-4)]">{t.stale ? "stale" : "live"}</span>
                       </span>
                     ) : isLive ? (
