@@ -8,10 +8,10 @@ export const dynamic = "force-dynamic";
 export default async function PortfolioPage() {
   if (!features.brokerJournal) {
     return (
-      <div style={{ padding: "2rem", color: "#666" }}>
-        <h1>Portfolio</h1>
-        <p>This feature is not yet enabled in this environment.</p>
-      </div>
+      <section className="market-panel p-6">
+        <h1 className="mb-2 text-[22px] font-extrabold text-[var(--fg-1)]">Portfolio</h1>
+        <p className="text-sm text-[var(--fg-3)]">This feature is not yet enabled in this environment.</p>
+      </section>
     );
   }
   const session = await auth();

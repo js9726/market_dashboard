@@ -1,8 +1,10 @@
 "use client";
 
 import { Fragment, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { observedLabel, usMarketSession } from "@/lib/market-clock";
+import Icon from "@/components/market-desk/Icon";
 
 type Position = {
   id: string;
@@ -59,11 +61,40 @@ function fmt(n: number | null | undefined, digits = 2): string {
   return n.toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
-function pnlColor(n: number | null | undefined): string {
-  if (n == null) return "#6b7280";
-  if (n > 0) return "#16a34a";
-  if (n < 0) return "#dc2626";
-  return "#6b7280";
+function toneClass(n: number | null | undefined): string {
+  if (n == null) return "text-[var(--fg-3)]";
+  if (n > 0) return "gain";
+  if (n < 0) return "loss";
+  return "text-[var(--fg-3)]";
+}
+
+function signedValue(n: number | null | undefined, digits = 2, suffix = ""): string {
+  if (n == null || !Number.isFinite(n)) return "—";
+  return `${n >= 0 ? "+" : ""}${fmt(n, digits)}${suffix}`;
+}
+
+function StatTile({
+  label,
+  value,
+  note,
+  tone,
+}: {
+  label: string;
+  value: ReactNode;
+  note?: ReactNode;
+  tone?: string;
+}) {
+  return (
+    <div className="market-panel p-4">
+      <div className="mb-1 flex min-h-[18px] items-center justify-between gap-2">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--fg-3)]">{label}</p>
+        {note ? <span className="font-mono text-[10px] font-bold text-[var(--warn-500)]">{note}</span> : null}
+      </div>
+      <p className={`font-mono text-[20px] font-extrabold tabular-nums ${tone ?? "text-[var(--fg-1)]"}`}>
+        {value}
+      </p>
+    </div>
+  );
 }
 
 /** Close-position inline form state (client-beta: user-defined qty/price/date). */
@@ -75,6 +106,9 @@ type CloseDraft = {
   price: string;
   date: string; // YYYY-MM-DD, user-editable
 };
+
+const inputClass =
+  "mt-1 rounded border border-[var(--line)] bg-[var(--bg-surface)] px-2 py-1.5 font-mono text-[12px] normal-case text-[var(--fg-1)] outline-none focus:border-[var(--accent)]";
 
 export default function PortfolioClient() {
   const [data, setData] = useState<PortfolioData | null>(null);
@@ -116,7 +150,7 @@ export default function PortfolioClient() {
     setCloseError(null);
     try {
       // executedAt: the user picks the DATE; time is pinned to 16:00 ET (20:00
-      // UTC) — the session close — so journal ordering is sensible.
+      // UTC) so journal ordering is sensible.
       const res = await fetch("/api/trades/manual", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -152,12 +186,25 @@ export default function PortfolioClient() {
 
   useEffect(() => {
     load();
-    const id = setInterval(load, 60_000);  // auto-refresh every 60s
+    const id = setInterval(load, 60_000);
     return () => clearInterval(id);
   }, []);
 
-  if (loading) return <div style={{ padding: "2rem" }}>Loading portfolio…</div>;
-  if (!data) return <div style={{ padding: "2rem", color: "#b91c1c" }}>Failed to load.</div>;
+  if (loading) {
+    return (
+      <section className="market-panel p-6">
+        <p className="t-caption">Loading portfolio...</p>
+      </section>
+    );
+  }
+
+  if (!data) {
+    return (
+      <section className="market-panel p-6">
+        <p className="t-caption text-[var(--loss-fg)]">Failed to load portfolio.</p>
+      </section>
+    );
+  }
 
   const marketSession = usMarketSession();
   const marketOpen = marketSession === "REGULAR";
@@ -169,288 +216,268 @@ export default function PortfolioClient() {
   const positionChangeIsLive = (p: Position) =>
     marketOpen ? !p.stale : extendedSessionLive && !p.stale && p.priceSource === "moomoo";
 
+  const pricedNote =
+    data.grandTotals.unpricedCount > 0
+      ? `${data.grandTotals.pricedCount}/${data.grandTotals.pricedCount + data.grandTotals.unpricedCount} priced`
+      : null;
+
   return (
-    <div style={{ padding: "1.5rem" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-        <div>
-          <h1 style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>Portfolio</h1>
-          <p style={{ color: "#666", margin: 0, fontSize: "0.85rem" }}>
-            As of {new Date(data.asOf).toLocaleString()} {refreshing && <span>· refreshing…</span>}
-            {extendedSessionLive && (
-              <span style={{ marginLeft: "0.5rem", color: "#047857", fontWeight: 600 }}>
-                {" - "}
-                {marketSession === "PREMARKET" ? "PREMARKET" : "AFTER HOURS"}
-                {" - moomoo OpenD live quotes"}
+    <div className="space-y-5">
+      <header className="market-panel p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <div className="mb-3 flex items-center gap-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--bg-raised)] text-[var(--accent)]">
+                <Icon name="portfolio" />
               </span>
-            )}
-            {!extendedSessionLive && !marketOpen && (
-              <span style={{ marginLeft: "0.5rem", color: "#b45309", fontWeight: 600 }}>
-                · MARKET CLOSED — &ldquo;Today&rdquo; shows the last session, not live
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--fg-3)]">Broker journal</p>
+                <h1 className="text-[22px] font-extrabold leading-tight text-[var(--fg-1)]">Portfolio</h1>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded bg-[var(--bg-raised)] px-2 py-1 font-mono text-[11px] text-[var(--fg-2)]">
+                As of {new Date(data.asOf).toLocaleString()}
               </span>
-            )}
-          </p>
-        </div>
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <Link
-            href="/dashboard/settings/brokers"
-            title="Manage broker accounts"
-            style={{
-              padding: "0.5rem 0.75rem",
-              background: "transparent",
-              border: "1px solid #ddd",
-              borderRadius: "0.375rem",
-              color: "#374151",
-              textDecoration: "none",
-              fontSize: "0.9rem",
-            }}
-          >
-            ⚙ Brokers
-          </Link>
-          <Link
-            href="/dashboard/portfolio/import"
-            style={{
-              padding: "0.5rem 0.75rem",
-              background: "transparent",
-              border: "1px solid #ddd",
-              borderRadius: "0.375rem",
-              color: "#374151",
-              textDecoration: "none",
-              fontSize: "0.9rem",
-            }}
-          >
-            Import CSV
-          </Link>
-          <button
-            onClick={load}
-            style={{
-              padding: "0.5rem 0.75rem",
-              background: "transparent",
-              border: "1px solid #ddd",
-              borderRadius: "0.375rem",
-              cursor: "pointer",
-            }}
-          >
-            Refresh
-          </button>
-          <Link
-            href="/dashboard/portfolio/new"
-            style={{
-              padding: "0.5rem 1rem",
-              background: "#1d4ed8",
-              color: "white",
-              borderRadius: "0.375rem",
-              textDecoration: "none",
-            }}
-          >
-            + New trade
-          </Link>
+              {refreshing ? (
+                <span className="rounded bg-[var(--accent-soft-bg)] px-2 py-1 font-mono text-[11px] font-bold text-[var(--accent)]">
+                  refreshing...
+                </span>
+              ) : null}
+              {extendedSessionLive ? (
+                <span className="rounded bg-[var(--gain-bg)] px-2 py-1 font-mono text-[11px] font-bold text-[var(--gain-fg)]">
+                  {marketSession === "PREMARKET" ? "PREMARKET" : "AFTER HOURS"} - moomoo OpenD live quotes
+                </span>
+              ) : null}
+              {!extendedSessionLive && !marketOpen ? (
+                <span className="rounded bg-[var(--bg-raised)] px-2 py-1 font-mono text-[11px] font-bold text-[var(--warn-500)]">
+                  MARKET CLOSED - Today shows last session
+                </span>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Link className="mds-button h-9 px-3 text-[12px]" href="/dashboard/settings/brokers" title="Manage broker accounts">
+              <Icon name="accounts" />
+              Brokers
+            </Link>
+            <Link className="mds-button h-9 px-3 text-[12px]" href="/dashboard/portfolio/import">
+              <Icon name="import" />
+              Import CSV
+            </Link>
+            <button className="mds-button h-9 px-3 text-[12px]" disabled={refreshing} onClick={load} type="button">
+              <Icon name="replay" />
+              Refresh
+            </button>
+            <Link className="mds-button mds-button--primary h-9 px-3 text-[12px]" href="/dashboard/portfolio/new">
+              <Icon name="plus" />
+              New trade
+            </Link>
+          </div>
         </div>
       </header>
 
-      {/* Grand totals */}
-      <div
-        style={{
-          padding: "1rem",
-          background: "#f9fafb",
-          border: "1px solid #e5e7eb",
-          borderRadius: "0.5rem",
-          marginBottom: "1.5rem",
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "1rem",
-        }}
-      >
-        <div>
-          <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>Cost basis</div>
-          <div style={{ fontSize: "1.25rem", fontWeight: 600 }}>{fmt(data.grandTotals.cost)}</div>
-        </div>
-        <div>
-          <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>Market value</div>
-          <div style={{ fontSize: "1.25rem", fontWeight: 600 }}>{fmt(data.grandTotals.marketValue)}</div>
-        </div>
-        <div>
-          <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>
-            Unrealised P&amp;L
-            {data.grandTotals.unpricedCount > 0 && (
-              <span title="Excludes positions awaiting live quote" style={{ color: "#f59e0b", marginLeft: "0.25rem" }}>
-                · {data.grandTotals.pricedCount}/{data.grandTotals.pricedCount + data.grandTotals.unpricedCount} priced
-              </span>
-            )}
-          </div>
-          <div style={{ fontSize: "1.25rem", fontWeight: 600, color: pnlColor(data.grandTotals.unrealizedPl) }}>
-            {data.grandTotals.unrealizedPl != null
-              ? `${data.grandTotals.unrealizedPl >= 0 ? "+" : ""}${fmt(data.grandTotals.unrealizedPl)}`
-              : "—"}
-          </div>
-        </div>
-        <div>
-          <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>Return</div>
-          <div style={{ fontSize: "1.25rem", fontWeight: 600, color: pnlColor(data.grandTotals.unrealizedPlPct) }}>
-            {data.grandTotals.unrealizedPlPct != null
-              ? `${data.grandTotals.unrealizedPlPct >= 0 ? "+" : ""}${fmt(data.grandTotals.unrealizedPlPct)}%`
-              : "—"}
-          </div>
-        </div>
-      </div>
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <StatTile label="Cost basis" value={fmt(data.grandTotals.cost)} />
+        <StatTile label="Market value" value={fmt(data.grandTotals.marketValue)} />
+        <StatTile
+          label="Unrealised P&L"
+          note={pricedNote}
+          tone={toneClass(data.grandTotals.unrealizedPl)}
+          value={signedValue(data.grandTotals.unrealizedPl)}
+        />
+        <StatTile
+          label="Return"
+          tone={toneClass(data.grandTotals.unrealizedPlPct)}
+          value={signedValue(data.grandTotals.unrealizedPlPct, 2, "%")}
+        />
+      </section>
 
-      {data.accounts.length === 0 && (
-        <div style={{ padding: "2rem", textAlign: "center", border: "1px dashed #ddd", borderRadius: "0.5rem", color: "#666" }}>
-          No broker accounts yet.{" "}
-          <Link href="/dashboard/settings/brokers" style={{ color: "#1d4ed8" }}>Add one</Link> to start
-          tracking positions, or read the{" "}
-          <Link href="/dashboard/guide" style={{ color: "#1d4ed8" }}>2-minute guide</Link>.
-        </div>
-      )}
+      {data.accounts.length === 0 ? (
+        <section className="market-panel border-dashed p-6 text-center">
+          <p className="mb-4 text-sm text-[var(--fg-2)]">
+            No broker accounts yet. Add one to start tracking positions, or read the quick guide.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Link className="mds-button mds-button--primary h-9 px-4 text-[12px]" href="/dashboard/settings/brokers">
+              <Icon name="accounts" />
+              Add account
+            </Link>
+            <Link className="mds-button h-9 px-4 text-[12px]" href="/dashboard/guide">
+              <Icon name="journal" />
+              Guide
+            </Link>
+          </div>
+        </section>
+      ) : null}
 
       {data.accounts.map((acct) => (
-        <section key={acct.id} style={{ marginBottom: "2rem" }}>
-          <header
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "baseline",
-              padding: "0.5rem 0",
-              borderBottom: "2px solid #e5e7eb",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: "1.1rem" }}>
-              {acct.alias}{" "}
-              <span style={{ color: "#6b7280", fontWeight: "normal", fontSize: "0.9rem" }}>
-                · {acct.presetName} · {acct.region} · {acct.currency} {acct.isLive ? "· Live" : "· Paper"}
-              </span>
-            </h2>
-            <div style={{ fontSize: "0.9rem", color: pnlColor(acct.totals.unrealizedPl) }}>
-              {acct.totals.unrealizedPl != null
-                ? `${acct.totals.unrealizedPl >= 0 ? "+" : ""}${fmt(acct.totals.unrealizedPl)}`
-                : "Awaiting quotes"}
-              {acct.totals.unrealizedPlPct != null && (
-                <span> ({acct.totals.unrealizedPlPct >= 0 ? "+" : ""}{fmt(acct.totals.unrealizedPlPct)}%)</span>
-              )}
-              {acct.unpricedCount > 0 && acct.pricedCount > 0 && (
-                <span style={{ color: "#f59e0b", marginLeft: "0.25rem" }}>
-                  · {acct.pricedCount}/{acct.pricedCount + acct.unpricedCount} priced
+        <section className="market-panel overflow-hidden" key={acct.id}>
+          <header className="flex flex-col gap-3 border-b border-[var(--line)] bg-[var(--bg-raised)] p-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-base font-extrabold text-[var(--fg-1)]">{acct.alias}</h2>
+                <span className="rounded bg-[var(--bg-surface)] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-[var(--fg-3)]">
+                  {acct.isLive ? "Live" : "Paper"}
                 </span>
-              )}
+              </div>
+              <p className="mt-1 font-mono text-[11px] text-[var(--fg-3)]">
+                {acct.presetName} / {acct.region} / {acct.currency}
+              </p>
+            </div>
+            <div className="font-mono text-sm font-extrabold tabular-nums">
+              <span className={toneClass(acct.totals.unrealizedPl)}>
+                {acct.totals.unrealizedPl != null ? signedValue(acct.totals.unrealizedPl) : "Awaiting quotes"}
+              </span>
+              {acct.totals.unrealizedPlPct != null ? (
+                <span className={`ml-2 ${toneClass(acct.totals.unrealizedPlPct)}`}>
+                  ({signedValue(acct.totals.unrealizedPlPct, 2, "%")})
+                </span>
+              ) : null}
+              {acct.unpricedCount > 0 && acct.pricedCount > 0 ? (
+                <span className="ml-2 text-[11px] text-[var(--warn-500)]">
+                  {acct.pricedCount}/{acct.pricedCount + acct.unpricedCount} priced
+                </span>
+              ) : null}
             </div>
           </header>
 
           {acct.positions.length === 0 ? (
-            <div style={{ padding: "1rem", color: "#6b7280", fontStyle: "italic" }}>
-              No open positions in this account.
-            </div>
+            <p className="p-4 text-[12px] italic text-[var(--fg-3)]">No open positions in this account.</p>
           ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
-              <thead>
-                <tr style={{ textAlign: "right", color: "#6b7280", borderBottom: "1px solid #e5e7eb" }}>
-                  <th style={{ padding: "0.5rem", textAlign: "left" }}>Ticker</th>
-                  <th style={{ padding: "0.5rem" }}>Qty</th>
-                  <th style={{ padding: "0.5rem" }}>Avg cost</th>
-                  <th style={{ padding: "0.5rem" }}>Last price</th>
-                  <th style={{ padding: "0.5rem" }}>Today</th>
-                  <th style={{ padding: "0.5rem" }}>Market value</th>
-                  <th style={{ padding: "0.5rem" }}>Unrealised P&amp;L</th>
-                  <th style={{ padding: "0.5rem" }}>Return</th>
-                  <th style={{ padding: "0.5rem" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {acct.positions.map((p) => (
-                  <Fragment key={p.id}>
-                  <tr style={{ borderBottom: "1px solid #f3f4f6", textAlign: "right" }}>
-                    <td style={{ padding: "0.5rem", textAlign: "left", fontWeight: 600 }}>
-                      {p.latestTradeRecordId ? (
-                        <Link
-                          href={`/dashboard/journal/trades/${p.latestTradeRecordId}`}
-                          title="Open journal entry"
-                          style={{ color: "#1d4ed8", textDecoration: "none" }}
-                        >
-                          {p.ticker}
-                        </Link>
-                      ) : (
-                        <span>{p.ticker}</span>
-                      )}
-                      {p.stale && (
-                        <span title="Stale quote — server prices refresh twice per hour during US market hours" style={{ color: "#f59e0b", marginLeft: "0.25rem" }}>
-                          ⏱
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: "0.5rem" }}>{fmt(p.qty, 0)}</td>
-                    <td style={{ padding: "0.5rem" }}>{fmt(p.avgCost, 4)}</td>
-                    <td style={{ padding: "0.5rem" }}>{p.currentPrice != null ? fmt(p.currentPrice, 4) : "—"}</td>
-                    <td style={{ padding: "0.5rem", color: positionChangeIsLive(p) ? pnlColor(p.changePct) : "#9ca3af" }}>
-                      {p.changePct != null ? `${p.changePct >= 0 ? "+" : ""}${fmt(p.changePct)}%` : "—"}
-                      {p.changePct != null && !positionChangeIsLive(p) && (
-                        <span style={{ display: "block", fontSize: "0.7rem", color: "#9ca3af" }}>
-                          as of {observedLabel(p.priceObservedAt) ?? "last session"}
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: "0.5rem" }}>{p.marketValue != null ? fmt(p.marketValue) : "—"}</td>
-                    <td style={{ padding: "0.5rem", color: pnlColor(p.unrealizedPl) }}>
-                      {p.unrealizedPl != null
-                        ? `${p.unrealizedPl >= 0 ? "+" : ""}${fmt(p.unrealizedPl)}`
-                        : "—"}
-                    </td>
-                    <td style={{ padding: "0.5rem", color: pnlColor(p.unrealizedPlPct) }}>
-                      {p.unrealizedPlPct != null
-                        ? `${p.unrealizedPlPct >= 0 ? "+" : ""}${fmt(p.unrealizedPlPct)}%`
-                        : "—"}
-                    </td>
-                    <td style={{ padding: "0.5rem" }}>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          closeDraft?.accountId === acct.id && closeDraft.ticker === p.ticker
-                            ? setCloseDraft(null)
-                            : startClose(acct.id, p)
-                        }
-                        style={{ padding: "0.15rem 0.6rem", fontSize: "0.8rem", border: "1px solid #d1d5db", borderRadius: "0.35rem", background: "#fff", cursor: "pointer" }}
-                      >
-                        {closeDraft?.accountId === acct.id && closeDraft.ticker === p.ticker ? "Cancel" : "Close"}
-                      </button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[980px] text-right text-[12px]">
+                <thead className="text-[10px] uppercase tracking-[0.12em] text-[var(--fg-3)]">
+                  <tr className="border-b border-[var(--line)]">
+                    <th className="py-2 pl-4 pr-3 text-left font-bold">Ticker</th>
+                    <th className="px-3 py-2 font-bold">Qty</th>
+                    <th className="px-3 py-2 font-bold">Avg cost</th>
+                    <th className="px-3 py-2 font-bold">Last price</th>
+                    <th className="px-3 py-2 font-bold">Today</th>
+                    <th className="px-3 py-2 font-bold">Market value</th>
+                    <th className="px-3 py-2 font-bold">Unrealised P&L</th>
+                    <th className="px-3 py-2 font-bold">Return</th>
+                    <th className="py-2 pl-3 pr-4 font-bold">Actions</th>
                   </tr>
-                  {closeDraft?.accountId === acct.id && closeDraft.ticker === p.ticker && (
-                    <tr style={{ background: "#f9fafb", borderBottom: "1px solid #f3f4f6" }}>
-                      <td colSpan={9} style={{ padding: "0.6rem 0.5rem" }}>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "end" }}>
-                          <strong style={{ fontSize: "0.85rem" }}>Close {p.ticker}:</strong>
-                          <label style={{ fontSize: "0.75rem", color: "#6b7280" }}>
-                            Quantity (max {fmt(closeDraft.maxQty, 0)})<br />
-                            <input type="number" min={0} max={closeDraft.maxQty} step="any" value={closeDraft.qty}
-                              onChange={(e) => setCloseDraft({ ...closeDraft, qty: e.target.value })}
-                              style={{ width: "6.5rem", padding: "0.25rem", border: "1px solid #d1d5db", borderRadius: "0.25rem" }} />
-                          </label>
-                          <label style={{ fontSize: "0.75rem", color: "#6b7280" }}>
-                            Exit price<br />
-                            <input type="number" min={0} step="any" value={closeDraft.price}
-                              onChange={(e) => setCloseDraft({ ...closeDraft, price: e.target.value })}
-                              style={{ width: "6.5rem", padding: "0.25rem", border: "1px solid #d1d5db", borderRadius: "0.25rem" }} />
-                          </label>
-                          <label style={{ fontSize: "0.75rem", color: "#6b7280" }}>
-                            Exit date<br />
-                            <input type="date" value={closeDraft.date}
-                              onChange={(e) => setCloseDraft({ ...closeDraft, date: e.target.value })}
-                              style={{ padding: "0.25rem", border: "1px solid #d1d5db", borderRadius: "0.25rem" }} />
-                          </label>
-                          <button type="button" onClick={submitClose} disabled={closeBusy}
-                            style={{ padding: "0.35rem 0.9rem", fontSize: "0.8rem", fontWeight: 600, border: "none", borderRadius: "0.35rem", background: closeBusy ? "#9ca3af" : "#dc2626", color: "#fff", cursor: closeBusy ? "wait" : "pointer" }}>
-                            {closeBusy ? "Closing…" : Number(closeDraft.qty) < closeDraft.maxQty ? "Sell partial" : "Close position"}
-                          </button>
-                          {closeError && <span style={{ color: "#b91c1c", fontSize: "0.8rem" }}>{closeError}</span>}
-                        </div>
-                        <p style={{ margin: "0.4rem 0 0", fontSize: "0.72rem", color: "#9ca3af" }}>
-                          Records a SELL fill at your price/date — the journal entry closes (or trims) automatically. Fees auto-calculated from the account preset.
-                        </p>
-                      </td>
-                    </tr>
-                  )}
-                  </Fragment>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {acct.positions.map((p) => {
+                    const closeActive = closeDraft?.accountId === acct.id && closeDraft.ticker === p.ticker;
+                    return (
+                      <Fragment key={p.id}>
+                        <tr className="border-b border-[var(--line)] last:border-0">
+                          <td className="py-3 pl-4 pr-3 text-left">
+                            <div className="flex flex-wrap items-center gap-2">
+                              {p.latestTradeRecordId ? (
+                                <Link
+                                  className="t-ticker text-[var(--accent)] hover:underline"
+                                  href={`/dashboard/journal/trades/${p.latestTradeRecordId}`}
+                                  title="Open journal entry"
+                                >
+                                  {p.ticker}
+                                </Link>
+                              ) : (
+                                <span className="t-ticker">{p.ticker}</span>
+                              )}
+                              {p.stale ? (
+                                <span
+                                  className="rounded bg-[var(--bg-raised)] px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase text-[var(--warn-500)]"
+                                  title="Stale quote - server prices refresh twice per hour during US market hours"
+                                >
+                                  stale
+                                </span>
+                              ) : null}
+                            </div>
+                            <p className="mt-0.5 font-mono text-[10px] text-[var(--fg-3)]">{p.currency}</p>
+                          </td>
+                          <td className="px-3 py-3 font-mono tabular-nums">{fmt(p.qty, 0)}</td>
+                          <td className="px-3 py-3 font-mono tabular-nums">{fmt(p.avgCost, 4)}</td>
+                          <td className="px-3 py-3 font-mono tabular-nums">{fmt(p.currentPrice, 4)}</td>
+                          <td className={`px-3 py-3 font-mono tabular-nums ${positionChangeIsLive(p) ? toneClass(p.changePct) : "text-[var(--fg-3)]"}`}>
+                            {signedValue(p.changePct, 2, "%")}
+                            {p.changePct != null && !positionChangeIsLive(p) ? (
+                              <span className="block text-[10px] font-normal text-[var(--fg-3)]">
+                                as of {observedLabel(p.priceObservedAt) ?? "last session"}
+                              </span>
+                            ) : null}
+                          </td>
+                          <td className="px-3 py-3 font-mono tabular-nums">{fmt(p.marketValue)}</td>
+                          <td className={`px-3 py-3 font-mono tabular-nums ${toneClass(p.unrealizedPl)}`}>
+                            {signedValue(p.unrealizedPl)}
+                          </td>
+                          <td className={`px-3 py-3 font-mono tabular-nums ${toneClass(p.unrealizedPlPct)}`}>
+                            {signedValue(p.unrealizedPlPct, 2, "%")}
+                          </td>
+                          <td className="py-3 pl-3 pr-4">
+                            <button
+                              className={`mds-button h-7 px-2 text-[11px] ${closeActive ? "border-[var(--warn-500)] text-[var(--warn-500)]" : ""}`}
+                              onClick={() => (closeActive ? setCloseDraft(null) : startClose(acct.id, p))}
+                              type="button"
+                            >
+                              {closeActive ? "Cancel" : "Close"}
+                            </button>
+                          </td>
+                        </tr>
+                        {closeActive ? (
+                          <tr className="border-b border-[var(--line)] bg-[var(--bg-raised)]">
+                            <td className="px-4 py-3" colSpan={9}>
+                              <div className="flex flex-wrap items-end gap-3">
+                                <strong className="text-[12px] text-[var(--fg-1)]">Close {p.ticker}</strong>
+                                <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--fg-3)]">
+                                  Quantity (max {fmt(closeDraft.maxQty, 0)})
+                                  <input
+                                    className={`${inputClass} w-28`}
+                                    max={closeDraft.maxQty}
+                                    min={0}
+                                    onChange={(e) => setCloseDraft({ ...closeDraft, qty: e.target.value })}
+                                    step="any"
+                                    type="number"
+                                    value={closeDraft.qty}
+                                  />
+                                </label>
+                                <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--fg-3)]">
+                                  Exit price
+                                  <input
+                                    className={`${inputClass} w-28`}
+                                    min={0}
+                                    onChange={(e) => setCloseDraft({ ...closeDraft, price: e.target.value })}
+                                    step="any"
+                                    type="number"
+                                    value={closeDraft.price}
+                                  />
+                                </label>
+                                <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--fg-3)]">
+                                  Exit date
+                                  <input
+                                    className={`${inputClass} w-36`}
+                                    onChange={(e) => setCloseDraft({ ...closeDraft, date: e.target.value })}
+                                    type="date"
+                                    value={closeDraft.date}
+                                  />
+                                </label>
+                                <button
+                                  className="mds-button h-8 px-3 text-[11px] disabled:cursor-wait disabled:opacity-60"
+                                  disabled={closeBusy}
+                                  onClick={submitClose}
+                                  type="button"
+                                >
+                                  {closeBusy ? "Closing..." : Number(closeDraft.qty) < closeDraft.maxQty ? "Sell partial" : "Close position"}
+                                </button>
+                                {closeError ? <span className="text-[12px] text-[var(--loss-fg)]">{closeError}</span> : null}
+                              </div>
+                              <p className="mt-2 text-[11px] leading-relaxed text-[var(--fg-3)]">
+                                Records a SELL fill at your price/date. The journal entry closes or trims automatically, and fees come from the account preset.
+                              </p>
+                            </td>
+                          </tr>
+                        ) : null}
+                      </Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </section>
       ))}
