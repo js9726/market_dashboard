@@ -85,6 +85,19 @@ Severity: 🟢 solid · 🟡 partial · 🔴 missing.
 
 **Explicitly deferred:** Bursa ideas-desk (screeners/breadth/GO for KLSE) = post-P5 phase; options/futures asset classes; public signup; auto-execution (never).
 
+## C2. UX addendum (2026-07-10, Jie asked "are the pages good vs TradesViz?")
+
+Honest verdict: **data plumbing is ahead of TradesViz in places; the journal EXPERIENCE is structurally behind.** The gap is architecture-of-interaction, not cosmetics:
+
+1. **Trades are buried 2 levels deep** (`/dashboard/trades` → Journal tab → Trades sub-tab; calendar lives on the *Equity* page). TradesViz: every core object is one click. → **P1 must flatten**: `/journal`, `/journal/trades`, `/journal/calendar`, `/journal/analytics`, `/journal/daily`, `/journal/playbooks` — one object per page, no nested tabs.
+2. **No global filter context** — TradesViz's UX backbone is a persistent account/date-range/symbol/tag filter bar that follows you across dashboard→trades→analytics. Nothing like it exists. → **P1 item (🄺)**: URL-persisted FilterContext across the Journal surface; every widget/table/report consumes it.
+3. **Nothing drills** — stats aren't clickable into filtered trade lists, calendar days don't open, no prev/next on trade detail, no row-expand. → **P2 micro-interaction parity list (🄲)**: click-any-stat→filtered trades; day-click panel; prev/next trade nav; row expand with mini-chart; bulk tag edit.
+4. **Charts are nearly absent from the journal** (one equity curve; no per-trade candles, no distributions, no thumbnails). TradesViz is chart-saturated. → covered by P2 chart-trades + pivot, keep as the P2 acceptance bar: "no journal page without at least one meaningful chart."
+5. **Portfolio page is off-brand** (raw inline styles vs the mds token system everywhere else — looks like a different app). → **P1 restyle (🄲)**.
+6. **Sidebar overload**: 15+ mixed-audience items incl. placeholder dead-ends. → P1 two-surface split fixes; placeholders hidden in P0.
+
+Where the current UX **beats** TradesViz (protect these): the Market Desk itself (no equivalent), fail-closed freshness labeling (stale badges/source provenance — TradesViz hides this), wiki-doctrine AI trade reviews with verdict history, and the A-list trigger/scoreboard flow.
+
 ## D. Distribution & protocol
 
 On approval: each phase gets PLANNED rows on `jie_wiki/wiki/agents/board.md` with the 🄲/🄺 split above; Codex starts at **P0 (commit own tree) → P1 trade-detail/table** while Claude does P0 schema/symbols → P1 IA/routes. Cross-review per protocol at each DONE. Conflicts: any same-file work is sequenced through the board before starting. Scoring/doctrine changes remain wiki-first + `skills:sync`.
