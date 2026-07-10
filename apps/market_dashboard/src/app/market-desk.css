@@ -78,6 +78,12 @@
   padding: var(--space-5) 14px;
 }
 
+.market-sidebar__close,
+.market-sidebar__backdrop,
+.market-mobile-nav-toggle {
+  display: none;
+}
+
 .market-sidebar__brand {
   display: flex;
   align-items: center;
@@ -221,6 +227,13 @@
   background: color-mix(in oklch, var(--bg-canvas) 94%, transparent);
   padding: 14px 28px;
   backdrop-filter: blur(14px);
+}
+
+.market-topbar__leading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .market-topbar__title {
@@ -650,16 +663,59 @@
 
 @media (max-width: 980px) {
   .market-desk-frame {
-    grid-template-columns: 1fr;
+    display: block;
   }
 
   .market-sidebar {
-    position: static;
-    height: auto;
+    position: fixed;
+    top: 32px;
+    bottom: 0;
+    left: 0;
+    z-index: 70;
+    width: min(84vw, 300px);
+    height: calc(100vh - 32px);
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-modal);
+    transition: transform var(--dur-normal) var(--ease-out);
+  }
+
+  .market-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .market-sidebar__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 1;
+    display: inline-flex;
+  }
+
+  .market-sidebar__brand {
+    padding-right: 44px;
+  }
+
+  .market-sidebar__backdrop {
+    position: fixed;
+    inset: 32px 0 0;
+    z-index: 65;
+    display: block;
+    border: 0;
+    background: rgb(0 0 0 / 42%);
+    cursor: pointer;
+  }
+
+  .market-mobile-nav-toggle {
+    display: inline-flex;
   }
 
   .market-topbar {
     top: 32px;
+    padding: 12px 18px;
+  }
+
+  .market-page {
+    padding: 18px 18px 36px;
   }
 
   .conviction-grid,
@@ -675,5 +731,39 @@
 
   .pipeline-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .market-topbar {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: 10px 14px;
+  }
+
+  .market-topbar__leading {
+    width: 100%;
+  }
+
+  .market-topbar__title {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .market-topbar__subtitle {
+    display: none;
+  }
+
+  .market-topbar__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .market-page {
+    padding: 16px 14px 32px;
+  }
+
+  .pipeline-grid {
+    grid-template-columns: 1fr;
   }
 }

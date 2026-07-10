@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Icon from "./Icon";
 import MarketTape from "./MarketTape";
 import FailureBanner from "./FailureBanner";
@@ -184,19 +184,80 @@ function visibleNav(items: NavItem[]): NavItem[] {
 
 export default function MarketDeskShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const page = useMemo(
-    () => PAGE_TITLES[pathname] ?? { title: "Market Desk JS", subtitle: "Working In Progress" },
-    [pathname],
-  );
+  const [isCompact, setIsCompact] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const navCloseRef = useRef<HTMLButtonElement>(null);
+  const navToggleRef = useRef<HTMLButtonElement>(null);
+  const page = useMemo(() => {
+    if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
+    if (pathname.startsWith("/dashboard/journal/trades/")) {
+      return { title: "Trade Detail", subtitle: "Anatomy - executions - review history" };
+    }
+    return { title: "Market Desk JS", subtitle: "Working In Progress" };
+  }, [pathname]);
   const workflowNav = useMemo(() => visibleNav(WORKFLOW_NAV), []);
   const toolNav = useMemo(() => visibleNav(TOOL_NAV), []);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 980px)");
+    const update = () => {
+      setIsCompact(query.matches);
+      if (!query.matches) setNavOpen(false);
+    };
+
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    setNavOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isCompact || !navOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setNavOpen(false);
+        window.requestAnimationFrame(() => navToggleRef.current?.focus());
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.requestAnimationFrame(() => navCloseRef.current?.focus());
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isCompact, navOpen]);
 
   return (
     <div className="market-desk-shell">
       <MarketTape />
       <div className="market-desk-frame">
-        <aside className="market-sidebar">
-          <Link className="market-sidebar__brand" href="/dashboard">
+        <aside
+          aria-hidden={isCompact && !navOpen}
+          className={`market-sidebar ${navOpen ? "is-open" : ""}`}
+          id="market-navigation"
+          inert={isCompact && !navOpen}
+        >
+          <button
+            aria-label="Close navigation"
+            className="mds-button mds-button--icon market-sidebar__close"
+            onClick={() => {
+              setNavOpen(false);
+              window.requestAnimationFrame(() => navToggleRef.current?.focus());
+            }}
+            ref={navCloseRef}
+            title="Close navigation"
+            type="button"
+          >
+            <Icon name="x" />
+          </button>
+          <Link className="market-sidebar__brand" href="/dashboard" onClick={() => setNavOpen(false)}>
             <span className="market-sidebar__mark">JS</span>
             <span>
               <span className="market-sidebar__name">Market Desk JS</span>
@@ -213,6 +274,7 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
                 }`}
                 href={item.href}
                 key={item.href}
+                onClick={() => setNavOpen(false)}
               >
                 <Icon name={item.icon} />
                 <span>{item.label}</span>
@@ -228,6 +290,7 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
                 className={`market-nav__item ${isActive(pathname, item.href) ? "is-active" : ""}`}
                 href={item.href}
                 key={item.href}
+                onClick={() => setNavOpen(false)}
               >
                 <Icon name={item.icon} />
                 <span>{item.label}</span>
@@ -247,11 +310,41 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
           </div>
         </aside>
 
-        <main className="market-main">
+        {isCompact && navOpen ? (
+          <button
+            aria-label="Close navigation"
+            className="market-sidebar__backdrop"
+            onClick={() => {
+              setNavOpen(false);
+              window.requestAnimationFrame(() => navToggleRef.current?.focus());
+            }}
+            type="button"
+          />
+        ) : null}
+
+        <main
+          aria-hidden={isCompact && navOpen}
+          className="market-main"
+          inert={isCompact && navOpen}
+        >
           <header className="market-topbar">
-            <div className="market-topbar__title">
-              <h1>{page.title}</h1>
-              <span className="market-topbar__subtitle">{page.subtitle}</span>
+            <div className="market-topbar__leading">
+              <button
+                aria-controls="market-navigation"
+                aria-expanded={navOpen}
+                aria-label="Open navigation"
+                className="mds-button mds-button--icon market-mobile-nav-toggle"
+                onClick={() => setNavOpen(true)}
+                ref={navToggleRef}
+                title="Open navigation"
+                type="button"
+              >
+                <Icon name="dashboard" />
+              </button>
+              <div className="market-topbar__title">
+                <h1>{page.title}</h1>
+                <span className="market-topbar__subtitle">{page.subtitle}</span>
+              </div>
             </div>
             <div className="market-topbar__actions">
               <ThemeToggle />
