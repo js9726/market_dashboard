@@ -33,11 +33,13 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 // Staleness is source-aware: bridge LiveQuote streams near-realtime (15 min),
-// while server MarketQuote rows refresh on a deliberately GENTLE cron
-// (2x/hour market hours — free-tier rate-limit budget), so they get 45 min
-// before being flagged stale.
+// while server MarketQuote rows refresh on a deliberately GENTLE cron —
+// HOURLY during US market hours as separate once-a-day entries (Vercel Hobby
+// rejects any single cron entry that runs more than once per day; this
+// exact rule broke all deploys 2026-07-09→10). Hourly cadence gets a 75-min
+// stale window so the flag doesn't flap between refreshes.
 const STALE_LIVE_MS = 15 * 60 * 1000;
-const STALE_MARKET_MS = 45 * 60 * 1000;
+const STALE_MARKET_MS = 75 * 60 * 1000;
 
 function toNum(d: unknown): number {
   if (d == null) return 0;
