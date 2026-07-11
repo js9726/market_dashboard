@@ -61,6 +61,10 @@ export async function generateTradeVerdict(
   if (!dbTrade || !dbTrade.buyPrice) throw new Error("Trade not found or missing buy price");
 
   const style: ReviewStyle = opts.style ?? "trader-debate";
+  const reviewNotes = [
+    dbTrade.notes,
+    dbTrade.thoughts ? `Trader's own reflection:\n${dbTrade.thoughts}` : null,
+  ].filter((value): value is string => Boolean(value?.trim())).join("\n\n") || null;
 
   const tradeData: TradePromptInput = {
     ticker: dbTrade.ticker,
@@ -71,7 +75,7 @@ export async function generateTradeVerdict(
     quantity: dbTrade.quantity?.toString(),
     fees: dbTrade.fees?.toString(),
     pnl: dbTrade.pnl?.toString() ?? null,
-    notes: dbTrade.notes,
+    notes: reviewNotes,
     strategy: dbTrade.strategy,
     industry: dbTrade.industry,
     platform: dbTrade.platform,
@@ -103,7 +107,7 @@ export async function generateTradeVerdict(
         exitPrice: dbTrade.exitPrice?.toString() ?? null,
         quantity: dbTrade.quantity?.toString() ?? null,
         pnl: dbTrade.pnl?.toString() ?? null,
-        notes: dbTrade.notes,
+        notes: reviewNotes,
         proposedEntry: dbTrade.proposedEntry?.toString() ?? null,
         proposedSL: dbTrade.proposedSL?.toString() ?? null,
         proposedTP: dbTrade.proposedTP?.toString() ?? null,

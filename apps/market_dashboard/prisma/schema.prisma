@@ -93,6 +93,7 @@ model User {
   dailyReflections    DailyReflection[]
   // Per-trade journal analysis (trade-analyser output home).
   tradeJournalEntries JournalEntry[]
+  tradeJournalLogs    TradeJournalLog[]
   // Multi-broker (Phase 0+ feature, gated behind NEXT_PUBLIC_FEATURE_BROKER_JOURNAL).
   brokerAccounts      UserBrokerAccount[]
   brokerPresets       BrokerPreset[]
@@ -187,6 +188,9 @@ model TradeRecord {
   side      String? // "Long" | "Short"
   fees      Decimal?  @db.Decimal(12, 2)
   notes     String?
+  /// User-authored trade thesis/reflection. Kept separate from imported or
+  /// bridge-generated notes and included in every in-page AI coaching run.
+  thoughts  String?   @db.Text
   /// TradesViz-platform P0 (for the P1 trade-detail page): free-form labels
   /// (["gap-up","earnings"]), chart/screenshot URLs, and mistake
   /// classifications (["chased","moved-stop"]). All string arrays.
@@ -228,6 +232,7 @@ model TradeRecord {
 
   verdictHistory TradeVerdictHistory[]
   journalEntry   JournalEntry?
+  journalLogs    TradeJournalLog[]
   fills          TradeFill[]
 
   @@unique([brokerAccountId, brokerOrderId], name: "brokerAccount_brokerOrderId")
@@ -262,6 +267,23 @@ model TradeVerdictHistory {
   @@index([ticker, tradeDate])
   @@index([kind, createdAt]) // for cron: find day-0 verdicts 14+ days old
   @@index([tradeId, kind]) // for cron: check if day-14-rescore already exists
+}
+
+/// Append-only user-authored notes for a trade. The current editable reflection
+/// remains on TradeRecord.thoughts for prompt construction; this table preserves
+/// the sequence so the detail page can show a real journal timeline.
+model TradeJournalLog {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradeId   String
+  trade     TradeRecord @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  kind      String      @default("THOUGHT")
+  body      String      @db.Text
+  createdAt DateTime    @default(now())
+
+  @@index([tradeId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 // ── Phase 4: Multi-tenant scanner + agent pipeline ───────────────────────────

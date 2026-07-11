@@ -36,18 +36,43 @@ export async function PATCH(req: Request, { params }: Params) {
   if (parsed.value.tags !== undefined) data.tags = parsed.value.tags as Prisma.InputJsonValue;
   if (parsed.value.screenshots !== undefined) data.screenshots = parsed.value.screenshots as Prisma.InputJsonValue;
   if (parsed.value.mistakes !== undefined) data.mistakes = parsed.value.mistakes as Prisma.InputJsonValue;
+  if (parsed.value.thoughts !== undefined) data.thoughts = parsed.value.thoughts;
 
   try {
-    const updated = await prisma.tradeRecord.update({
-      where: { id, userId: userScopeId },
-      data,
-      select: {
-        id: true,
-        tags: true,
-        screenshots: true,
-        mistakes: true,
-      },
+    const updated = await prisma.$transaction(async (tx) => {
+      const existing = await tx.tradeRecord.findFirst({
+        where: { id, userId: userScopeId },
+        select: { thoughts: true },
+      });
+      if (!existing) return null;
+
+      const next = await tx.tradeRecord.update({
+        where: { id, userId: userScopeId },
+        data,
+        select: {
+          id: true,
+          tags: true,
+          screenshots: true,
+          mistakes: true,
+          thoughts: true,
+        },
+      });
+      if (
+        parsed.value.thoughts != null &&
+        parsed.value.thoughts !== existing.thoughts
+      ) {
+        await tx.tradeJournalLog.create({
+          data: {
+            userId: userScopeId,
+            tradeId: id,
+            kind: "THOUGHT",
+            body: parsed.value.thoughts,
+          },
+        });
+      }
+      return next;
     });
+    if (!updated) return NextResponse.json({ error: "Trade not found" }, { status: 404 });
     return NextResponse.json({ ok: true, trade: updated });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {

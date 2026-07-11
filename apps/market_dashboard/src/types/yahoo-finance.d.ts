@@ -188,6 +188,10 @@ declare module 'yahoo-finance2' {
     interval: '1d' | '1wk' | '1mo';
   }
 
+  interface ChartResult {
+    quotes: HistoricalData[];
+  }
+
   interface YahooFinance {
     quote(symbol: string): Promise<QuoteResponse>;
     quoteSummary(symbol: string, options: QuoteSummaryOptions): Promise<{
@@ -207,9 +211,10 @@ declare module 'yahoo-finance2' {
         strongSell: number;
       }[];
     }>;
+    chart(symbol: string, options: HistoricalOptions): Promise<ChartResult>;
     historical(symbol: string, options: HistoricalOptions): Promise<HistoricalData[]>;
   }
 
   const yahooFinance: YahooFinance;
   export default yahooFinance;
-} 
+}

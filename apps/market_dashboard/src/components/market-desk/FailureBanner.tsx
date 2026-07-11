@@ -20,6 +20,7 @@
  */
 
 import { useEffect, useState } from "react";
+import Icon from "@/components/market-desk/Icon";
 
 type Severity = "warning" | "error" | "info";
 
@@ -41,6 +42,12 @@ interface ProviderRow {
   generatedAt: string | null;
   error: string | null;
   ageH: number | null;
+}
+
+function severityClass(severity: Severity): string {
+  if (severity === "error") return "border-[var(--loss-fg)] bg-[var(--loss-bg)]";
+  if (severity === "warning") return "border-[var(--warn-500)] bg-[var(--warn-bg)]";
+  return "border-[var(--accent)] bg-[var(--accent-soft-bg)]";
 }
 
 const DISMISS_KEY = "failure-banner-dismissed";
@@ -154,35 +161,41 @@ export default function FailureBanner() {
   const visible = messages.filter((m) => !dismissed.has(`${m.severity}:${m.title}`));
   if (visible.length === 0) return null;
 
+  const errorCount = visible.filter((message) => message.severity === "error").length;
+
   return (
-    <div className="space-y-1 p-2">
-      {visible.map((m) => (
-        <div
-          key={`${m.severity}:${m.title}`}
-          className="flex items-start justify-between rounded border px-3 py-2"
-          style={{
-            background:
-              m.severity === "error" ? "var(--loss-bg)"
-              : m.severity === "warning" ? "var(--warn-bg)"
-              : "var(--accent-bg)",
-            borderColor:
-              m.severity === "error" ? "var(--loss-fg)"
-              : m.severity === "warning" ? "var(--warn-fg)"
-              : "var(--accent-fg)",
-          }}
-        >
-          <div>
-            <p className="t-mono font-semibold">{m.title}</p>
-            <p className="t-caption">{m.body}</p>
-          </div>
-          <button
-            className="t-caption text-[var(--fg-3)] hover:text-[var(--fg)]"
-            onClick={() => dismiss(`${m.severity}:${m.title}`)}
-          >
-            Dismiss
-          </button>
+    <div className="px-2 pt-2">
+      <details className="group rounded border border-[var(--line)] bg-[var(--bg-raised)]" id="system-alerts">
+        <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2">
+          <span className="flex min-w-0 items-center gap-2 text-[12px] font-bold text-[var(--fg-2)]">
+            <span className={`h-2 w-2 shrink-0 rounded-full ${errorCount ? "bg-[var(--loss-fg)]" : "bg-[var(--warn-500)]"}`} />
+            {visible.length} system {visible.length === 1 ? "alert" : "alerts"}
+          </span>
+          <Icon className="h-4 w-4 shrink-0 text-[var(--fg-3)] transition group-open:rotate-180" name="chevron-down" />
+        </summary>
+        <div className="space-y-1 border-t border-[var(--line)] p-2">
+          {visible.map((message) => {
+            const key = `${message.severity}:${message.title}`;
+            return (
+              <div className={`flex items-start justify-between gap-3 rounded border px-3 py-2 ${severityClass(message.severity)}`} key={key}>
+                <div className="min-w-0">
+                  <p className="t-mono font-semibold">{message.title}</p>
+                  <p className="t-caption break-words">{message.body}</p>
+                </div>
+                <button
+                  aria-label={`Dismiss ${message.title}`}
+                  className="mds-button mds-button--icon h-7 w-7 shrink-0"
+                  onClick={() => dismiss(key)}
+                  title="Dismiss alert"
+                  type="button"
+                >
+                  <Icon className="h-3.5 w-3.5" name="x" />
+                </button>
+              </div>
+            );
+          })}
         </div>
-      ))}
+      </details>
     </div>
   );
 }

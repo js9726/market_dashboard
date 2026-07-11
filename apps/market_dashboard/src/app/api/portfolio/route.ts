@@ -28,9 +28,14 @@
 import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
+import { plainTicker } from "@/lib/trade-episodes";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
+
+function journalTickerKey(value: string): string {
+  return plainTicker(value).replace(/\.KL$/i, "");
+}
 
 // Staleness is source-aware: bridge LiveQuote streams near-realtime (15 min),
 // while server MarketQuote rows refresh on a deliberately GENTLE cron —
@@ -121,22 +126,41 @@ export async function GET() {
   // Find the latest TradeRecord per (brokerAccountId, ticker) so rows can deep-link
   // to the journal editor without a second round-trip from the UI.
   const accountIds = accounts.map((a) => a.id);
+  const journalTickers = Array.from(new Set(tickerList.flatMap((ticker) => {
+    const plain = journalTickerKey(ticker);
+    return [ticker, plain, `${plain}.KL`];
+  })));
   const tradeRecords =
     accountIds.length && tickers.size
       ? await prisma.tradeRecord.findMany({
           where: {
             brokerAccountId: { in: accountIds },
-            ticker: { in: tickerList },
+            ticker: { in: journalTickers },
           },
-          select: { id: true, brokerAccountId: true, ticker: true, executedAt: true, tradeDate: true },
-          orderBy: [{ executedAt: "desc" }, { tradeDate: "desc" }],
+          select: {
+            id: true,
+            brokerAccountId: true,
+            ticker: true,
+            executedAt: true,
+            tradeDate: true,
+            state: true,
+            pnl: true,
+          },
         })
       : [];
-  // Index by (accountId|ticker) → first match wins (already sorted desc)
+  // Open journal rows win for each normalized account/ticker, then newest.
+  tradeRecords.sort((left, right) => {
+    const leftOpen = left.pnl == null || ["OPEN", "SEMI-OPEN", "PLANNING"].includes(left.state?.toUpperCase() ?? "");
+    const rightOpen = right.pnl == null || ["OPEN", "SEMI-OPEN", "PLANNING"].includes(right.state?.toUpperCase() ?? "");
+    if (leftOpen !== rightOpen) return leftOpen ? -1 : 1;
+    const leftAt = left.executedAt ?? left.tradeDate;
+    const rightAt = right.executedAt ?? right.tradeDate;
+    return (rightAt?.getTime() ?? 0) - (leftAt?.getTime() ?? 0);
+  });
   const tradeIdMap = new Map<string, string>();
   for (const t of tradeRecords) {
     if (!t.brokerAccountId) continue;
-    const key = `${t.brokerAccountId}|${t.ticker}`;
+    const key = `${t.brokerAccountId}|${journalTickerKey(t.ticker)}`;
     if (!tradeIdMap.has(key)) tradeIdMap.set(key, t.id);
   }
 
@@ -205,7 +229,7 @@ export async function GET() {
       }
 
       const latestTradeRecordId =
-        tradeIdMap.get(`${acct.id}|${p.ticker}`) ?? null;
+        tradeIdMap.get(`${acct.id}|${journalTickerKey(p.ticker)}`) ?? null;
 
       return {
         id: p.id,

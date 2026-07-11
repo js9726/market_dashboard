@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildEpisodes,
   pickCanonical,
+  pickEpisodeForRecord,
   plainTicker,
   type CanonicalCandidate,
   type FillLike,
@@ -79,6 +80,21 @@ describe("buildEpisodes", () => {
     expect(eps[1].buyQty).toBe(8);
   });
 
+  it("keeps a refreshed position anchored to the fill-proven open episode", () => {
+    const eps = buildEpisodes([
+      fill({ ticker: "US.TWLO", side: "BUY", qty: 3, price: 206.11, at: "2026-06-15T08:29:08Z" }),
+      fill({ ticker: "US.TWLO", side: "BUY", qty: 2, price: 206.11, at: "2026-06-15T08:29:09Z" }),
+      fill({ ticker: "US.TWLO", side: "SELL", qty: 5, price: 197.67, at: "2026-06-16T09:30:17Z" }),
+      fill({ ticker: "US.TWLO", side: "BUY", qty: 5, price: 198.88, at: "2026-06-30T11:17:47Z" }),
+    ]);
+
+    expect(eps).toHaveLength(2);
+    expect(eps[1].openedAt.toISOString()).toBe("2026-06-30T11:17:47.000Z");
+    expect(eps[1].closedAt).toBeNull();
+    expect(eps[1].buyQty - eps[1].sellQty).toBe(5);
+    expect(eps[1].avgBuy).toBeCloseTo(198.88, 4);
+  });
+
   it("marks non-USD fills usdSafe=false", () => {
     const eps = buildEpisodes([
       fill({ ticker: "HK.00700", currency: "HKD", side: "BUY", qty: 100, price: 300, at: "2026-05-01T02:00:00Z" }),
@@ -142,5 +158,44 @@ describe("pickCanonical", () => {
     const wrongQty = candidate({ id: "wrongQty", quantity: 5 });
     const rightQty = candidate({ id: "rightQty", quantity: 14 });
     expect(pickCanonical([wrongQty, rightQty], episode)?.id).toBe("rightQty");
+  });
+});
+
+describe("pickEpisodeForRecord", () => {
+  const episodes = buildEpisodes([
+    fill({ ticker: "US.TWLO", side: "BUY", qty: 5, price: 206.11, at: "2026-06-15T08:29:08Z" }),
+    fill({ ticker: "US.TWLO", side: "SELL", qty: 5, price: 197.67, at: "2026-06-16T09:30:17Z" }),
+    fill({ ticker: "US.TWLO", side: "BUY", qty: 5, price: 198.88, at: "2026-06-30T11:17:47Z" }),
+  ]);
+
+  it("distinguishes a closed trade from its later open re-entry", () => {
+    expect(pickEpisodeForRecord(episodes, {
+      ticker: "TWLO",
+      quantity: 5,
+      buyPrice: 206.11,
+      tradeDate: new Date("2026-06-15T00:00:00Z"),
+      executedAt: null,
+      state: "CLOSE",
+    })?.openedAt.toISOString()).toBe("2026-06-15T08:29:08.000Z");
+
+    expect(pickEpisodeForRecord(episodes, {
+      ticker: "TWLO",
+      quantity: 5,
+      buyPrice: 198.88,
+      tradeDate: new Date("2026-06-30T00:00:00Z"),
+      executedAt: null,
+      state: "OPEN",
+    })?.openedAt.toISOString()).toBe("2026-06-30T11:17:47.000Z");
+  });
+
+  it("does not infer an episode outside the bounded date window", () => {
+    expect(pickEpisodeForRecord(episodes, {
+      ticker: "TWLO",
+      quantity: 5,
+      buyPrice: 198.88,
+      tradeDate: new Date("2026-07-10T00:00:00Z"),
+      executedAt: null,
+      state: "OPEN",
+    })).toBeNull();
   });
 });

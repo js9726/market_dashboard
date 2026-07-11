@@ -2,11 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Icon from "@/components/market-desk/Icon";
+import TradePriceChart from "@/components/journal/TradePriceChart";
 import {
   MAX_TRADE_METADATA_ITEMS,
   MAX_TRADE_METADATA_TEXT_LENGTH,
   MAX_TRADE_SCREENSHOT_URL_LENGTH,
+  MAX_TRADE_THOUGHTS_LENGTH,
   normalizeTradeScreenshotUrl,
   type TradeMetadata,
   type TradeMetadataPatch,
@@ -35,6 +38,22 @@ type VerdictHistoryItem = {
   createdAt: string;
 };
 
+type JournalLogItem = {
+  id: string;
+  kind: string;
+  body: string;
+  createdAt: string;
+};
+
+type TimelineItem = {
+  id: string;
+  at: string;
+  title: string;
+  body: string | null;
+  meta: string;
+  dotClass: string;
+};
+
 type Trade = {
   id: string;
   ticker: string;
@@ -49,6 +68,7 @@ type Trade = {
   industry: string | null;
   strategy: string | null;
   notes: string | null;
+  thoughts: string | null;
   state: string | null;
   proposedEntry: number | null;
   proposedSL: number | null;
@@ -64,6 +84,7 @@ type Trade = {
   mistakes: string[];
   fills: TradeFill[];
   verdictHistory: VerdictHistoryItem[];
+  journalLogs: JournalLogItem[];
   newerTrade: TradeNav;
   olderTrade: TradeNav;
 };
@@ -186,11 +207,12 @@ function sameStrings(left: string[], right: string[]): boolean {
   return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
-function metadataFromTrade(trade: Pick<Trade, "tags" | "screenshots" | "mistakes">): TradeMetadata {
+function metadataFromTrade(trade: Pick<Trade, "tags" | "screenshots" | "mistakes" | "thoughts">): TradeMetadata {
   return {
     tags: [...trade.tags],
     screenshots: [...trade.screenshots],
     mistakes: [...trade.mistakes],
+    thoughts: trade.thoughts,
   };
 }
 
@@ -235,7 +257,45 @@ function verdictSummary(verdict: Record<string, unknown>) {
   };
 }
 
+function buildTimeline(trade: Pick<Trade, "currency" | "fills" | "journalLogs" | "verdictHistory">): TimelineItem[] {
+  const reflections: TimelineItem[] = trade.journalLogs.map((item) => ({
+    id: `log-${item.id}`,
+    at: item.createdAt,
+    title: item.kind === "THOUGHT" ? "Trader reflection" : item.kind.replaceAll("_", " "),
+    body: item.body,
+    meta: "Journal note",
+    dotClass: "bg-[var(--accent)]",
+  }));
+  const executions: TimelineItem[] = trade.fills.map((fill) => {
+    const isBuy = fill.side.toUpperCase() === "BUY";
+    return {
+      id: `fill-${fill.id}`,
+      at: fill.executedAt,
+      title: `${isBuy ? "Bought" : "Sold"} ${fmtQuantity(fill.qty)} @ ${fmtMoney(fill.price, fill.currency ?? trade.currency)}`,
+      body: fill.fees != null ? `Fees ${fmtMoney(fill.fees, fill.currency ?? trade.currency)}` : null,
+      meta: `${fill.source} execution`,
+      dotClass: isBuy ? "bg-[var(--gain-fg)]" : "bg-[var(--loss-fg)]",
+    };
+  });
+  const reviews: TimelineItem[] = trade.verdictHistory.map((item) => {
+    const summary = verdictSummary(item.verdict);
+    return {
+      id: `review-${item.id}`,
+      at: item.createdAt,
+      title: `AI review · ${summary.title}`,
+      body: summary.summary ?? summary.lesson,
+      meta: `${item.provider} / ${item.model}`,
+      dotClass: "bg-[var(--warn-500)]",
+    };
+  });
+
+  return [...reflections, ...executions, ...reviews]
+    .sort((left, right) => new Date(right.at).getTime() - new Date(left.at).getTime())
+    .slice(0, 40);
+}
+
 export default function JournalEditorClient({ trade }: { trade: Trade }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [metadataSaving, setMetadataSaving] = useState(false);
@@ -243,6 +303,10 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
   const [success, setSuccess] = useState<string | null>(null);
   const [metadataError, setMetadataError] = useState<string | null>(null);
   const [metadataSuccess, setMetadataSuccess] = useState<string | null>(null);
+  const [coaching, setCoaching] = useState(false);
+  const [coachError, setCoachError] = useState<string | null>(null);
+  const [coachSuccess, setCoachSuccess] = useState<string | null>(null);
+  const [coachResult, setCoachResult] = useState<Record<string, unknown> | null>(null);
 
   const [setupType, setSetupType] = useState("");
   const [primingPattern, setPrimingPattern] = useState("");
@@ -259,6 +323,7 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
   const [screenshots, setScreenshots] = useState<string[]>(trade.screenshots);
   const [screenshotInput, setScreenshotInput] = useState("");
   const [mistakes, setMistakes] = useState<string[]>(trade.mistakes);
+  const [thoughts, setThoughts] = useState(trade.thoughts ?? "");
   const [savedMetadata, setSavedMetadata] = useState<TradeMetadata>(() => metadataFromTrade(trade));
 
   useEffect(() => {
@@ -309,6 +374,7 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
       }, 0) / TRADERS.length,
     [scores],
   );
+  const timelineItems = useMemo(() => buildTimeline(trade), [trade]);
 
   function updateScore(trader: string, field: keyof TraderScore, value: string | number) {
     setScores((prev) => ({
@@ -408,6 +474,7 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
         tags: stringArray(persisted.tags),
         screenshots: stringArray(persisted.screenshots),
         mistakes: stringArray(persisted.mistakes),
+        thoughts: savedMetadata.thoughts,
       };
       setTags(nextMetadata.tags);
       setScreenshots(nextMetadata.screenshots);
@@ -418,6 +485,61 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
       setMetadataError(e instanceof Error ? e.message : String(e));
     } finally {
       setMetadataSaving(false);
+    }
+  }
+
+  async function saveThoughtsAndReview() {
+    setCoaching(true);
+    setCoachError(null);
+    setCoachSuccess(null);
+    let thoughtsSaved = false;
+    try {
+      const metadataResponse = await fetch(`/api/journal/trades/${trade.id}/metadata`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ thoughts }),
+      });
+      const metadataJson = await metadataResponse.json().catch(() => null);
+      if (!metadataResponse.ok) throw new Error(responseError(metadataJson, "Could not save thoughts"));
+      const persisted = metadataJson && typeof metadataJson === "object" && !Array.isArray(metadataJson)
+        ? (metadataJson as { trade?: Record<string, unknown> }).trade
+        : null;
+      if (!persisted) throw new Error("Save response did not include the trade");
+      const persistedThoughts = typeof persisted.thoughts === "string" && persisted.thoughts.trim()
+        ? persisted.thoughts.trim()
+        : null;
+      setThoughts(persistedThoughts ?? "");
+      setSavedMetadata((previous) => ({ ...previous, thoughts: persistedThoughts }));
+      thoughtsSaved = true;
+
+      if (!persistedThoughts) {
+        setCoachResult(null);
+        setCoachSuccess("Thoughts cleared");
+        router.refresh();
+        return;
+      }
+
+      const reviewResponse = await fetch("/api/analysis/trade-review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tradeId: trade.id, force: true, style: "trader-debate" }),
+      });
+      const reviewJson = await reviewResponse.json().catch(() => null);
+      if (!reviewResponse.ok) throw new Error(responseError(reviewJson, "AI review failed"));
+      if (!reviewJson || typeof reviewJson !== "object" || Array.isArray(reviewJson)) {
+        throw new Error("AI review returned an invalid response");
+      }
+      const review = Object.fromEntries(
+        Object.entries(reviewJson as Record<string, unknown>).filter(([key]) => key !== "_meta"),
+      );
+      setCoachResult(review);
+      setCoachSuccess("Thoughts saved and AI review added to history");
+      router.refresh();
+    } catch (coachFailure) {
+      const message = coachFailure instanceof Error ? coachFailure.message : "Review failed";
+      setCoachError(thoughtsSaved ? `Thoughts saved, but ${message}` : message);
+    } finally {
+      setCoaching(false);
     }
   }
 
@@ -501,6 +623,9 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
       tone: gradeClass(trade.pnl),
     },
   ];
+  const latestCoachVerdict = coachResult ?? trade.verdictHistory[0]?.verdict ?? null;
+  const latestCoachSummary = latestCoachVerdict ? verdictSummary(latestCoachVerdict) : null;
+  const thoughtsCanSave = thoughts.trim().length > 0 || savedMetadata.thoughts != null;
 
   return (
     <div className="space-y-5">
@@ -576,6 +701,111 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
           </div>
         </div>
       </header>
+
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,0.75fr)]">
+        <TradePriceChart
+          entry={trade.buyPrice}
+          exit={trade.exitPrice}
+          fills={trade.fills}
+          stop={trade.proposedSL}
+          target={trade.proposedTP}
+          ticker={trade.ticker}
+          tradeId={trade.id}
+        />
+
+        <section className="market-panel p-5">
+          <div className="market-section-head">
+            <div>
+              <h2 className="text-sm font-extrabold text-[var(--fg-1)]">Trade Thesis &amp; AI Coach</h2>
+              <p className="t-caption">Your decision record and latest persisted coaching verdict.</p>
+            </div>
+            <button
+              aria-busy={coaching}
+              className="mds-button mds-button--primary h-9 px-3 text-[12px] disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={coaching || !thoughtsCanSave}
+              onClick={saveThoughtsAndReview}
+              type="button"
+            >
+              <Icon className="h-4 w-4" name="bolt" />
+              {coaching ? "Reviewing..." : "Save & review"}
+            </button>
+          </div>
+
+          <label className={labelClass} htmlFor="trade-thoughts">Your thesis and reflection</label>
+          <textarea
+            className={`${fieldClass} min-h-40 resize-y leading-relaxed`}
+            id="trade-thoughts"
+            maxLength={MAX_TRADE_THOUGHTS_LENGTH}
+            name="trade-thoughts"
+            onChange={(event) => setThoughts(event.target.value)}
+            onKeyDown={(event) => {
+              if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && !coaching && thoughtsCanSave) {
+                event.preventDefault();
+                void saveThoughtsAndReview();
+              }
+            }}
+            placeholder="Setup, trigger, risk, emotions, and what changed after entry"
+            value={thoughts}
+          />
+          <div className="mt-1 text-right font-mono text-[10px] text-[var(--fg-4)]">
+            {thoughts.length}/{MAX_TRADE_THOUGHTS_LENGTH}
+          </div>
+
+          <div className="mt-4 border-t border-[var(--line)] pt-4">
+            <p className={labelClass}>Latest AI feedback</p>
+            {latestCoachSummary ? (
+              <div className="mt-2 space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded border border-[var(--accent)] px-2 py-1 text-[11px] font-extrabold text-[var(--accent)]">
+                    {latestCoachSummary.title}
+                  </span>
+                  {latestCoachSummary.bestMatch ? <span className="text-[11px] text-[var(--fg-3)]">{latestCoachSummary.bestMatch}</span> : null}
+                </div>
+                {latestCoachSummary.summary ? <p className="text-[12px] leading-relaxed text-[var(--fg-1)]">{latestCoachSummary.summary}</p> : null}
+                {latestCoachSummary.lesson && latestCoachSummary.lesson !== latestCoachSummary.summary ? (
+                  <p className="text-[12px] leading-relaxed text-[var(--fg-2)]">{latestCoachSummary.lesson}</p>
+                ) : null}
+                {latestCoachSummary.weakest ? (
+                  <p className="border-t border-[var(--line)] pt-3 text-[11px] text-[var(--fg-3)]">
+                    Weakest dimension: <strong className="text-[var(--warn-500)]">{latestCoachSummary.weakest}</strong>
+                  </p>
+                ) : null}
+              </div>
+            ) : <p className="mt-2 text-[12px] text-[var(--fg-3)]">No persisted AI feedback yet.</p>}
+          </div>
+
+          <div aria-live="polite">
+            {coachError ? <p className="mt-3 text-[12px] text-[var(--loss-fg)]" role="alert">{coachError}</p> : null}
+            {coachSuccess ? <p className="mt-3 text-[12px] text-[var(--gain-fg)]" role="status">{coachSuccess}</p> : null}
+          </div>
+        </section>
+      </div>
+
+      <section className="market-panel overflow-hidden">
+        <header className="border-b border-[var(--line)] px-5 py-4">
+          <h2 className="text-sm font-extrabold text-[var(--fg-1)]">Journal Timeline</h2>
+          <p className="t-caption">Reflections, executions, and AI reviews in one audit trail.</p>
+        </header>
+        {timelineItems.length ? (
+          <ol className="divide-y divide-[var(--line)]">
+            {timelineItems.map((item) => (
+              <li className="flex gap-3 px-5 py-3" key={item.id}>
+                <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.dotClass}`} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                    <p className="text-[12px] font-extrabold text-[var(--fg-1)]">{item.title}</p>
+                    <time className="font-mono text-[10px] text-[var(--fg-3)]" dateTime={item.at}>{fmtDateTime(item.at)}</time>
+                  </div>
+                  <p className="mt-0.5 font-mono text-[9px] uppercase text-[var(--fg-4)]">{item.meta}</p>
+                  {item.body ? <p className="mt-2 whitespace-pre-wrap break-words text-[12px] leading-relaxed text-[var(--fg-2)]">{item.body}</p> : null}
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="px-5 py-5 text-[12px] text-[var(--fg-3)]">No timeline events have been recorded yet.</p>
+        )}
+      </section>
 
       <section className="market-panel p-5">
         <div className="market-section-head">

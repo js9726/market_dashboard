@@ -348,8 +348,19 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
             </div>
             <div className="market-topbar__actions">
               <ThemeToggle />
-              <button className="mds-button mds-button--icon" title="Notifications" type="button">
-                <Icon name="eye" />
+              <button
+                aria-label="Open system alerts"
+                className="mds-button mds-button--icon"
+                onClick={() => {
+                  const alerts = document.getElementById("system-alerts") as HTMLDetailsElement | null;
+                  if (!alerts) return;
+                  alerts.open = true;
+                  alerts.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                title="System alerts"
+                type="button"
+              >
+                <Icon className="h-4 w-4" name="eye" />
               </button>
               <button
                 className="mds-button"

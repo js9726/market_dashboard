@@ -3,6 +3,12 @@ import { redirect } from "next/navigation";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { features } from "@/lib/features";
 import { prisma } from "@/lib/prisma";
+import {
+  buildEpisodes,
+  pickEpisodeForRecord,
+  plainTicker,
+  type FillLike,
+} from "@/lib/trade-episodes";
 import JournalEditorClient from "@/components/journal/JournalEditorClient";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +37,16 @@ function jsonObject(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
+function tickerKey(value: string): string {
+  return plainTicker(value).replace(/\.KL$/i, "");
+}
+
+function addDays(value: Date, days: number): Date {
+  const next = new Date(value);
+  next.setUTCDate(next.getUTCDate() + days);
+  return next;
+}
+
 export default async function JournalEditorPage({ params }: Props) {
   if (!features.brokerJournal) {
     return (
@@ -56,6 +72,7 @@ export default async function JournalEditorPage({ params }: Props) {
     where: { id, userId: userScopeId },
     select: {
       id: true,
+      brokerAccountId: true,
       ticker: true,
       side: true,
       buyPrice: true,
@@ -68,6 +85,7 @@ export default async function JournalEditorPage({ params }: Props) {
       industry: true,
       strategy: true,
       notes: true,
+      thoughts: true,
       state: true,
       proposedEntry: true,
       proposedSL: true,
@@ -91,6 +109,7 @@ export default async function JournalEditorPage({ params }: Props) {
         take: 100,
         select: {
           id: true,
+          ticker: true,
           side: true,
           qty: true,
           price: true,
@@ -98,6 +117,7 @@ export default async function JournalEditorPage({ params }: Props) {
           fees: true,
           currency: true,
           source: true,
+          tradeRecordId: true,
         },
       },
       verdictHistory: {
@@ -113,6 +133,16 @@ export default async function JournalEditorPage({ params }: Props) {
           createdAt: true,
         },
       },
+      journalLogs: {
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        select: {
+          id: true,
+          kind: true,
+          body: true,
+          createdAt: true,
+        },
+      },
     },
   });
   if (!trade) {
@@ -125,7 +155,8 @@ export default async function JournalEditorPage({ params }: Props) {
   }
 
   const neighborSelect = { id: true, ticker: true } as const;
-  const [newerRows, olderRows] = await Promise.all([
+  const anchor = trade.executedAt ?? trade.tradeDate;
+  const [newerRows, olderRows, nearbyFills] = await Promise.all([
     prisma.tradeRecord.findMany({
       where: { userId: userScopeId },
       orderBy: tradeOrder,
@@ -142,9 +173,64 @@ export default async function JournalEditorPage({ params }: Props) {
       take: 1,
       select: neighborSelect,
     }),
+    trade.brokerAccountId && anchor
+      ? prisma.tradeFill.findMany({
+          where: {
+            brokerAccountId: trade.brokerAccountId,
+            executedAt: { gte: addDays(anchor, -3), lte: addDays(new Date(), 1) },
+          },
+          orderBy: [{ executedAt: "asc" }, { id: "asc" }],
+          take: 1000,
+          select: {
+            id: true,
+            ticker: true,
+            side: true,
+            qty: true,
+            price: true,
+            executedAt: true,
+            fees: true,
+            currency: true,
+            source: true,
+            tradeRecordId: true,
+          },
+        })
+      : Promise.resolve([]),
   ]);
   const newer = newerRows[0] ?? null;
   const older = olderRows[0] ?? null;
+
+  let displayFills = trade.fills;
+  if (nearbyFills.length) {
+    const sameTickerFills = nearbyFills.filter((fill) => tickerKey(fill.ticker) === tickerKey(trade.ticker));
+    const fillLikes: FillLike[] = sameTickerFills.map((fill) => ({
+      id: fill.id,
+      ticker: fill.ticker,
+      side: fill.side,
+      qty: Number(fill.qty),
+      price: Number(fill.price),
+      fees: fill.fees == null ? null : Number(fill.fees),
+      currency: fill.currency,
+      executedAt: fill.executedAt,
+      tradeRecordId: fill.tradeRecordId,
+    }));
+    const episode = pickEpisodeForRecord(buildEpisodes(fillLikes), {
+      ticker: trade.ticker,
+      quantity: dec(trade.quantity),
+      buyPrice: dec(trade.buyPrice),
+      tradeDate: trade.tradeDate,
+      executedAt: trade.executedAt,
+      state: trade.state,
+    });
+    if (episode) {
+      const episodeIds = new Set(episode.fillIds);
+      const merged = new Map(trade.fills.map((fill) => [fill.id, fill]));
+      for (const fill of sameTickerFills) {
+        if (episodeIds.has(fill.id)) merged.set(fill.id, fill);
+      }
+      displayFills = Array.from(merged.values()).sort((left, right) =>
+        left.executedAt.getTime() - right.executedAt.getTime() || left.id.localeCompare(right.id));
+    }
+  }
 
   const verdictHistory = trade.verdictHistory.map((item) => ({
     id: item.id,
@@ -182,6 +268,7 @@ export default async function JournalEditorPage({ params }: Props) {
     industry: trade.industry,
     strategy: trade.strategy,
     notes: trade.notes,
+    thoughts: trade.thoughts,
     state: trade.state,
     proposedEntry: dec(trade.proposedEntry),
     proposedSL: dec(trade.proposedSL),
@@ -195,7 +282,7 @@ export default async function JournalEditorPage({ params }: Props) {
     tags: jsonStringArray(trade.tags),
     screenshots: jsonStringArray(trade.screenshots),
     mistakes: jsonStringArray(trade.mistakes),
-    fills: trade.fills.map((fill) => ({
+    fills: displayFills.map((fill) => ({
       id: fill.id,
       side: fill.side,
       qty: dec(fill.qty),
@@ -206,6 +293,12 @@ export default async function JournalEditorPage({ params }: Props) {
       source: fill.source,
     })),
     verdictHistory,
+    journalLogs: trade.journalLogs.map((item) => ({
+      id: item.id,
+      kind: item.kind,
+      body: item.body,
+      createdAt: item.createdAt.toISOString(),
+    })),
     newerTrade: newer ? { id: newer.id, ticker: newer.ticker } : null,
     olderTrade: older ? { id: older.id, ticker: older.ticker } : null,
   };

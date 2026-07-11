@@ -1,11 +1,13 @@
 export const MAX_TRADE_METADATA_ITEMS = 24;
 export const MAX_TRADE_METADATA_TEXT_LENGTH = 80;
 export const MAX_TRADE_SCREENSHOT_URL_LENGTH = 500;
+export const MAX_TRADE_THOUGHTS_LENGTH = 4000;
 
 export type TradeMetadata = {
   tags: string[];
   screenshots: string[];
   mistakes: string[];
+  thoughts: string | null;
 };
 
 export type TradeMetadataPatch = Partial<TradeMetadata>;
@@ -18,7 +20,7 @@ type UrlResult =
   | { ok: true; value: string }
   | { ok: false; error: string };
 
-const METADATA_FIELDS = new Set<keyof TradeMetadata>(["tags", "screenshots", "mistakes"]);
+const METADATA_FIELDS = new Set<keyof TradeMetadata>(["tags", "screenshots", "mistakes", "thoughts"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -90,6 +92,17 @@ function parseScreenshotArray(value: unknown): string[] | string {
   return output;
 }
 
+function parseThoughts(value: unknown): string | null | { error: string } {
+  if (value == null) return null;
+  if (typeof value !== "string") return { error: "thoughts must be a string or null" };
+  const clean = value.trim();
+  if (!clean) return null;
+  if (clean.length > MAX_TRADE_THOUGHTS_LENGTH) {
+    return { error: `thoughts cannot exceed ${MAX_TRADE_THOUGHTS_LENGTH} characters` };
+  }
+  return clean;
+}
+
 export function parseTradeMetadataPatch(value: unknown): ParseResult {
   if (!isRecord(value)) return { ok: false, error: "Body must be a JSON object" };
 
@@ -111,6 +124,11 @@ export function parseTradeMetadataPatch(value: unknown): ParseResult {
     const screenshots = parseScreenshotArray(value.screenshots);
     if (typeof screenshots === "string") return { ok: false, error: screenshots };
     patch.screenshots = screenshots;
+  }
+  if (Object.prototype.hasOwnProperty.call(value, "thoughts")) {
+    const thoughts = parseThoughts(value.thoughts);
+    if (thoughts && typeof thoughts === "object") return { ok: false, error: thoughts.error };
+    patch.thoughts = thoughts;
   }
 
   if (!Object.keys(patch).length) {

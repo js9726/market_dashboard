@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   MAX_TRADE_METADATA_ITEMS,
   MAX_TRADE_METADATA_TEXT_LENGTH,
+  MAX_TRADE_THOUGHTS_LENGTH,
   normalizeTradeScreenshotUrl,
   parseTradeMetadataPatch,
 } from "@/lib/journal/trade-metadata";
@@ -43,6 +44,19 @@ describe("parseTradeMetadataPatch", () => {
       ok: true,
       value: { screenshots: ["https://example.com/chart.png"] },
     });
+  });
+
+  it("normalizes thoughts while preserving partial PATCH semantics", () => {
+    expect(parseTradeMetadataPatch({ thoughts: "  I chased the first push.  " })).toEqual({
+      ok: true,
+      value: { thoughts: "I chased the first push." },
+    });
+    expect(parseTradeMetadataPatch({ thoughts: "   " })).toEqual({
+      ok: true,
+      value: { thoughts: null },
+    });
+    expect(parseTradeMetadataPatch({ thoughts: 42 })).toMatchObject({ ok: false });
+    expect(parseTradeMetadataPatch({ thoughts: "x".repeat(MAX_TRADE_THOUGHTS_LENGTH + 1) })).toMatchObject({ ok: false });
   });
 });
 

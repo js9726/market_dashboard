@@ -35,6 +35,15 @@ export interface Episode {
   usdSafe: boolean;
 }
 
+export interface EpisodeRecordIdentity {
+  ticker: string;
+  quantity: number | null;
+  buyPrice: number | null;
+  tradeDate: Date | null;
+  executedAt: Date | null;
+  state: string | null;
+}
+
 export function plainTicker(t: string): string {
   return t.replace(/^[A-Za-z]{2}\./, "").toUpperCase();
 }
@@ -92,6 +101,38 @@ export function buildEpisodes(fills: FillLike[]): Episode[] {
 
   if (current) episodes.push(current); // trailing open episode
   return episodes;
+}
+
+/** Match a legacy/unlinked journal row back to its immutable fill episode. */
+export function pickEpisodeForRecord(
+  episodes: Episode[],
+  record: EpisodeRecordIdentity,
+): Episode | null {
+  const anchor = record.executedAt ?? record.tradeDate;
+  if (!anchor) return null;
+  const ticker = plainTicker(record.ticker).replace(/\.KL$/i, "");
+  const openState = ["OPEN", "SEMI-OPEN", "PLANNING"].includes(record.state?.toUpperCase() ?? "");
+  const windowMs = MATCH_WINDOW_DAYS * 86_400_000;
+
+  const candidates = episodes
+    .filter((episode) => episode.ticker.replace(/\.KL$/i, "") === ticker)
+    .map((episode) => {
+      const distance = Math.abs(episode.openedAt.getTime() - anchor.getTime());
+      if (distance > windowMs) return null;
+      const quantityMatches = record.quantity != null &&
+        Math.abs(episode.buyQty - record.quantity) <= Math.max(QTY_EPS, Math.abs(record.quantity) * 0.001);
+      const priceMatches = record.buyPrice != null &&
+        Math.abs(episode.avgBuy - record.buyPrice) <= Math.max(0.01, Math.abs(record.buyPrice) * 0.001);
+      const sameDay = episode.openedAt.toISOString().slice(0, 10) === anchor.toISOString().slice(0, 10);
+      const lifecycleMatches = openState === (episode.closedAt == null);
+      const score = (sameDay ? 8 : 0) + (quantityMatches ? 4 : 0) + (priceMatches ? 3 : 0) + (lifecycleMatches ? 1 : 0);
+      return { episode, distance, score };
+    })
+    .filter((candidate): candidate is { episode: Episode; distance: number; score: number } => candidate != null)
+    .sort((left, right) => right.score - left.score || left.distance - right.distance ||
+      left.episode.openedAt.getTime() - right.episode.openedAt.getTime());
+
+  return candidates[0]?.episode ?? null;
 }
 
 /** Prisma-free shape of a TradeRecord candidate for canonical matching. */

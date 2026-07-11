@@ -1,7 +1,9 @@
 import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { getUsdMyrRate } from "@/lib/equity-currency";
+import { buildJournalCalendarData } from "@/lib/journal/calendar-data";
 import { prisma } from "@/lib/prisma";
+import { isClosedTradeRecord } from "@/lib/profile/trade-metrics";
 import { NextResponse } from "next/server";
 import { Decimal } from "@prisma/client/runtime/library";
 
@@ -48,8 +50,7 @@ export async function GET() {
         : null;
 
   // Use state as primary source; fall back to pnl for trades without state
-  const isClosed = (t: typeof trades[0]) =>
-    t.state ? t.state.toUpperCase() === "CLOSE" : t.pnl !== null;
+  const isClosed = (t: typeof trades[0]) => isClosedTradeRecord(t);
   const closed = trades.filter(isClosed);
   const valued = closed
     .map((t) => ({ trade: t, usd: usdVal(t) }))
@@ -121,14 +122,16 @@ export async function GET() {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([month, v]) => ({ month, ...v, pnl: Math.round(v.pnl * 100) / 100 }));
 
-  // Calendar data
-  const calendarData = Object.entries(dailyMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, pnl]) => ({
-      date,
-      pnl: Math.round(pnl * 100) / 100,
-      trades: valued.filter(({ trade }) => trade.tradeDate?.toISOString().slice(0, 10) === date).length,
-    }));
+  // Calendar is an activity surface, not only a realized-P&L chart. Open broker
+  // trades stay visible while their unrealized P&L remains excluded from totals.
+  const calendarData = buildJournalCalendarData(trades.map((trade) => ({
+    id: trade.id,
+    ticker: trade.ticker,
+    state: trade.state,
+    occurredAt: trade.tradeDate ?? trade.executedAt,
+    closed: isClosed(trade),
+    usdPnl: isClosed(trade) ? usdVal(trade) : null,
+  })));
 
   return NextResponse.json({
     totalPnl: Math.round(totalPnl * 100) / 100,

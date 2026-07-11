@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import StatsCards from "@/components/journal/StatsCards";
 import CalendarView from "@/components/journal/CalendarView";
+import type { JournalCalendarDay } from "@/lib/journal/calendar-data";
 
 type Stats = {
   totalPnl: number;
@@ -21,7 +22,7 @@ type Stats = {
   currentStreak: number;
   unconvertedCount?: number;
   fxUsdMyr: number | null;
-  calendarData: { date: string; pnl: number; trades: number }[];
+  calendarData: JournalCalendarDay[];
 };
 
 type Ccy = "USD" | "MYR";

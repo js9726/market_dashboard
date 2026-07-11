@@ -228,7 +228,7 @@ export default function PortfolioClient() {
           <div className="min-w-0">
             <div className="mb-3 flex items-center gap-3">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--bg-raised)] text-[var(--accent)]">
-                <Icon name="portfolio" />
+                <Icon className="h-4 w-4" name="portfolio" />
               </span>
               <div className="min-w-0">
                 <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--fg-3)]">Broker journal</p>
@@ -278,7 +278,7 @@ export default function PortfolioClient() {
         </div>
       </header>
 
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <StatTile label="Cost basis" value={fmt(data.grandTotals.cost)} />
         <StatTile label="Market value" value={fmt(data.grandTotals.marketValue)} />
         <StatTile
