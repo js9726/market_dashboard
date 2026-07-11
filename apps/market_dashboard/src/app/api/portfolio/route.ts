@@ -29,6 +29,7 @@ import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { plainTicker } from "@/lib/trade-episodes";
+import { brokerKey } from "@/lib/trades/position-trade-records";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -126,6 +127,11 @@ export async function GET() {
   // Find the latest TradeRecord per (brokerAccountId, ticker) so rows can deep-link
   // to the journal editor without a second round-trip from the UI.
   const accountIds = accounts.map((a) => a.id);
+  const brokerKeyCounts = new Map<string, number>();
+  for (const account of accounts) {
+    const key = brokerKey(account.alias);
+    brokerKeyCounts.set(key, (brokerKeyCounts.get(key) ?? 0) + 1);
+  }
   const journalTickers = Array.from(new Set(tickerList.flatMap((ticker) => {
     const plain = journalTickerKey(ticker);
     return [ticker, plain, `${plain}.KL`];
@@ -134,7 +140,10 @@ export async function GET() {
     accountIds.length && tickers.size
       ? await prisma.tradeRecord.findMany({
           where: {
-            brokerAccountId: { in: accountIds },
+            OR: [
+              { brokerAccountId: { in: accountIds } },
+              { brokerAccountId: null },
+            ],
             ticker: { in: journalTickers },
           },
           select: {
@@ -145,6 +154,7 @@ export async function GET() {
             tradeDate: true,
             state: true,
             pnl: true,
+            platform: true,
           },
         })
       : [];
@@ -158,10 +168,16 @@ export async function GET() {
     return (rightAt?.getTime() ?? 0) - (leftAt?.getTime() ?? 0);
   });
   const tradeIdMap = new Map<string, string>();
+  const legacyTradeIdMap = new Map<string, string>();
   for (const t of tradeRecords) {
-    if (!t.brokerAccountId) continue;
-    const key = `${t.brokerAccountId}|${journalTickerKey(t.ticker)}`;
-    if (!tradeIdMap.has(key)) tradeIdMap.set(key, t.id);
+    const ticker = journalTickerKey(t.ticker);
+    if (t.brokerAccountId) {
+      const key = `${t.brokerAccountId}|${ticker}`;
+      if (!tradeIdMap.has(key)) tradeIdMap.set(key, t.id);
+    } else if (t.platform) {
+      const key = `${brokerKey(t.platform)}|${ticker}`;
+      if (!legacyTradeIdMap.has(key)) legacyTradeIdMap.set(key, t.id);
+    }
   }
 
   const quoteMap = new Map(quotes.map((q) => [q.symbol, q]));
@@ -229,7 +245,10 @@ export async function GET() {
       }
 
       const latestTradeRecordId =
-        tradeIdMap.get(`${acct.id}|${journalTickerKey(p.ticker)}`) ?? null;
+        tradeIdMap.get(`${acct.id}|${journalTickerKey(p.ticker)}`) ??
+        (brokerKeyCounts.get(brokerKey(acct.alias)) === 1
+          ? legacyTradeIdMap.get(`${brokerKey(acct.alias)}|${journalTickerKey(p.ticker)}`) ?? null
+          : null);
 
       return {
         id: p.id,
