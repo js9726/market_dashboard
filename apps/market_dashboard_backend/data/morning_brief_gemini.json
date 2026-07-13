@@ -1,167 +1,137 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-ON",
+    "label": "CAUTIOUSLY-RISK-OFF",
     "posture": "WAIT",
-    "summary": "Futures are mixed after a tech-led rally yesterday, with focus on the Nasdaq debut of chipmaker SK Hynix and ongoing geopolitical tensions in the Middle East."
+    "summary": "Geopolitical tensions between the U.S. and Iran are pushing oil prices higher, leading to a mixed and cautious tone in pre-market activity. Tech futures are down while the Dow is flat, as traders await key inflation data and the start of earnings season this week."
   },
   "breadth": {
-    "up": 2481,
-    "down": 1654
+    "up": null,
+    "down": null
   },
   "fearGreed": {
-    "score": 43,
-    "label": "Fear"
+    "score": null,
+    "label": null
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": 750.35,
-      "changePct": -0.18,
+      "level": null,
+      "changePct": -0.26,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: Investing.com [8]"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
-      "level": 719.13,
-      "changePct": -0.57,
+      "level": null,
+      "changePct": -0.82,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: Investing.com [8]"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
-      "level": 524.98,
-      "changePct": 0.15,
+      "level": null,
+      "changePct": -0.04,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: Investing.com [8]"
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
-      "level": 296.73,
-      "changePct": -0.17,
+      "level": null,
+      "changePct": -0.22,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: Investing.com [8]"
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 15.84,
-      "changePct": -6.3,
-      "note": "previous close",
-      "citation": "Source: Zacks Investment Research"
+      "level": null,
+      "changePct": null,
+      "note": "unavailable"
     },
     {
       "symbol": "^TNX",
       "name": "10-Yr Treasury Yield",
       "level": 4.56,
       "changePct": null,
-      "note": "yield",
-      "citation": "Source: Trading Economics"
+      "note": "level",
+      "citation": "Source: TipRanks [1]"
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil (WTI)",
-      "level": 71.39,
-      "changePct": -0.96,
-      "note": "futures",
-      "citation": "Source: Trading Economics"
+      "name": "Crude Oil",
+      "level": 72.85,
+      "changePct": 1.67,
+      "note": "live",
+      "citation": "Source: TipRanks [1]"
     }
   ],
-  "indicesNarrative": "US futures are mixed, with the Dow showing slight gains while the tech-heavy Nasdaq 100 is pulling back after a strong chip-driven rally yesterday. Investors are weighing ongoing US-Iran tensions against the highly anticipated Nasdaq debut of memory chip giant SK Hynix. Treasury yields remain elevated, holding near 4.56%.",
+  "indicesNarrative": "US futures are mixed, with the Nasdaq leading declines due to pressure on tech and semiconductor stocks. [6, 4] The Dow remains relatively flat. The primary driver is an escalation in U.S.-Iran military tensions over the weekend, which has caused a spike in oil prices and raised concerns about inflation and global supply chain disruptions. [1, 2]",
   "technicals": null,
   "technicalsNarrative": "Technical data was not available at the time of generation.",
-  "sectorsThemes": [
-    {
-      "symbol": "XLK",
-      "name": "Technology",
-      "changePct": 1.2,
-      "rs": null,
-      "note": "Led yesterday's rally on AI chip strength."
-    },
-    {
-      "symbol": "XLY",
-      "name": "Consumer Discretionary",
-      "changePct": -1.8,
-      "rs": null,
-      "note": "Lagged in the previous session."
-    },
-    {
-      "symbol": "XLF",
-      "name": "Financials",
-      "changePct": -1.9,
-      "rs": null,
-      "note": "Underperformed yesterday."
-    },
-    {
-      "symbol": "XLE",
-      "name": "Energy",
-      "changePct": 1.8,
-      "rs": null,
-      "note": "Showed strength in the prior session."
-    }
-  ],
-  "sectorsNarrative": "Technology, particularly semiconductors, showed strong leadership in the previous session, while financials and consumer discretionary lagged. The market is watching to see if the AI-driven momentum can be sustained.",
-  "industryNarrative": "Semiconductors were the clear standout group, surging on optimism around AI demand ahead of the SK Hynix IPO. The Philadelphia Semiconductor Index (SOX) jumped 3.1% yesterday.",
+  "sectorsThemes": [],
+  "sectorsNarrative": "Sector performance data from the previous session is not available, but overnight news suggests potential strength in the energy sector due to rising oil prices and weakness in technology, particularly semiconductors, following a sharp pullback in SK Hynix after its recent debut. [4]",
+  "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "WDFC",
+      "ticker": "VEEE",
       "side": "LONG",
-      "changePct": 16.11,
-      "why": "Reported strong quarterly earnings, beating estimates.",
-      "traderLens": "Qullamaggie style Episodic Pivot on earnings surprise."
+      "changePct": 95.6,
+      "why": "Announced a merger with a USFM subsidiary to take its recreational marine business private.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "GMM",
+      "ticker": "QTTB",
       "side": "LONG",
-      "changePct": 125.41,
-      "why": "High momentum, unclear fundamental catalyst, likely a low-float play.",
-      "traderLens": "High-risk momentum, not suitable for Minervini or disciplined styles."
+      "changePct": 61.46,
+      "why": "Positive results from a mid-stage trial for its alopecia (hair loss) drug, showing significant hair regrowth.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "ZBAO",
+      "ticker": "AGEN",
       "side": "LONG",
-      "changePct": 102.7,
-      "why": "High momentum, unclear fundamental catalyst, likely a low-float play.",
-      "traderLens": "High-risk momentum, not suitable for Minervini or disciplined styles."
+      "changePct": 59.7,
+      "why": "Secured up to $340 million in a private placement financing package.",
+      "traderLens": "Minervini"
+    },
+    {
+      "ticker": "SHOP",
+      "side": "LONG",
+      "changePct": 2.9,
+      "why": "Upgraded to 'buy' from 'hold' at Jefferies with a price target increase, citing pre-earnings momentum.",
+      "traderLens": "Ted Zhang"
+    },
+    {
+      "ticker": "MGM",
+      "side": "LONG",
+      "changePct": 2.6,
+      "why": "Reports that Barry Diller is in private talks to acquire the company.",
+      "traderLens": "Ted Zhang"
+    },
+    {
+      "ticker": "SKHY",
+      "side": "SHORT",
+      "changePct": -15.4,
+      "why": "Sharp pullback in Seoul trading after a strong Wall Street debut on Friday, weighing on the semiconductor sector. [2, 4]",
+      "traderLens": "Jeff"
     },
     {
       "ticker": "JLHL",
-      "side": "LONG",
-      "changePct": 51.84,
-      "why": "High momentum, unclear fundamental catalyst.",
-      "traderLens": "High-risk momentum, not suitable for Minervini or disciplined styles."
-    },
-    {
-      "ticker": "ELAB",
-      "side": "LONG",
-      "changePct": 23.59,
-      "why": "Announced a merger between two wholly-owned subsidiaries.",
-      "traderLens": "Event-driven catalyst play."
-    },
-    {
-      "ticker": "JEM",
       "side": "SHORT",
-      "changePct": -34.9,
-      "why": "Giving back recent gains, unclear fundamental catalyst.",
-      "traderLens": "Fading momentum on a low-float stock."
+      "changePct": -22.2,
+      "why": "Catalyst not immediately clear.",
+      "traderLens": "Jeff"
     },
     {
-      "ticker": "EDBL",
+      "ticker": "ZHTI",
       "side": "SHORT",
-      "changePct": -22.41,
-      "why": "Continued downside momentum, unclear fundamental catalyst.",
-      "traderLens": "Fading momentum on a low-float stock."
-    },
-    {
-      "ticker": "FIEE",
-      "side": "SHORT",
-      "changePct": -21.95,
-      "why": "Reversing recent gains, unclear fundamental catalyst.",
-      "traderLens": "Fading momentum on a low-float stock."
+      "changePct": null,
+      "why": "Listed as a top premarket loser, specific catalyst not immediately clear. [3]",
+      "traderLens": "Jeff"
     }
   ],
   "watchlist": [
@@ -170,221 +140,242 @@
       "level": null,
       "changePct": null,
       "abc": "A",
-      "note": "Key beneficiary of AI theme, watching relative strength post-SK Hynix IPO."
+      "note": "Closed strong Friday, but tech futures are weak. Watching relative strength."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Watching for direction within its current consolidation range."
+      "note": "Sensitive to broad market risk-off sentiment. Watching for support."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Consolidating, needs a catalyst to break out."
+      "note": "General market weakness in tech could present a pullback opportunity."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
       "abc": "A",
-      "note": "Leader in AI space, continues to show relative strength."
+      "note": "A market leader, will watch to see if it holds up better than the broader tech sector."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for a break from its recent range."
+      "abc": "C",
+      "note": "Consumer discretionary could be impacted by inflation fears from rising oil."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
       "abc": "A",
-      "note": "Rose 4.7% yesterday on reports of in-house AI chip manufacturing plans."
+      "note": "Showed strong momentum on Friday, but facing pre-market headwinds."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Continues to be a core holding in the AI theme."
+      "note": "Watching to see if it maintains its recent uptrend amid sector weakness."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Strong participant in the semiconductor rally."
+      "abc": "C",
+      "note": "Semiconductor sector is under pressure pre-market. [4]"
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "High-beta name in the AI server space, watching for volatility."
+      "abc": "C",
+      "note": "High-beta name, likely to be volatile with Nasdaq weakness."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Watching for a pickup in volume and a move out of the base."
+      "note": "Could see interest given geopolitical news, but tech headwinds are strong."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Cybersecurity leader, consolidating near recent highs."
+      "note": "Cybersecurity may see a bid on conflict news, but caught in the tech downdraft."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "High correlation to Bitcoin, which is showing pre-market strength."
+      "note": "High correlation to Bitcoin, watching crypto sentiment amid risk-off mood."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a rally attempt, but mixed signals warrant caution. Focus on A-grade setups only."
+      "view": "Market is showing weakness, especially in tech. Not an ideal environment to be aggressive with new long positions. Raise stops."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear rotation into Technology and Semiconductors yesterday. Watch for follow-through or a rotation out today."
+      "view": "Potential rotation into energy stocks given the spike in oil. Tech and consumer discretionary may see outflows."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is choppy. Futures are mixed, geopolitical risks remain. Not an ideal environment for aggressive long positions."
+      "view": "Mixed futures and geopolitical headlines create a choppy, low-grade environment. Best to wait for the market to digest the news."
     },
     {
       "name": "SRxTrades",
-      "view": "Wait for clean pivots and volume confirmation. Chasing pre-market moves in this tape is low-probability."
+      "view": "No clean pivots to enter pre-market. Chasing longs here is dangerous given the weak Nasdaq futures. Wait for the open to confirm direction."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your rules. Honor your stops. The mixed pre-market is a reminder that the market can reverse quickly."
+      "view": "Follow the rules. Respect stops. The overnight news has changed the context; don't be married to Friday's bullish bias."
     },
     {
       "name": "Qullamaggie",
-      "view": "Look for episodic pivots with strong volume. DAL had an earnings beat but is trading down pre-market, indicating a weak reaction."
+      "view": "The pre-market movers have episodic pivots, but the overall market weakness makes breakouts less likely to follow through. Be cautious."
     },
     {
       "name": "Composite",
-      "view": "Be patient today. The tape is mixed after a strong tech run. Wait for the market to establish a clear direction after the open. Focus on managing existing positions rather than initiating new aggressive ones."
+      "view": "Stay on the sidelines at the open. The conflict in the Middle East is the dominant variable, creating a risk-off lean, particularly for tech. Watch oil and defense stocks for relative strength. It is not a day to force trades."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "DAL",
-        "consensus": "EPS $1.47 / Rev $18.57B"
+        "ticker": "DNB.OL",
+        "consensus": "Rev $2.3B"
       }
     ],
-    "amc": [],
-    "yesterdayReactions": [
+    "amc": [
       {
-        "ticker": "DAL",
-        "result": "beat EPS ($1.56 vs $1.51 est), missed Rev ($17.67B vs $17.76B est), raised guidance",
-        "movePct": -1.0
+        "ticker": "FBK",
+        "consensus": "EPS $1.14 / Rev $177.9M"
+      },
+      {
+        "ticker": "EQBK",
+        "consensus": "EPS $1.24 / Rev $84.2M"
+      },
+      {
+        "ticker": "RR",
+        "consensus": "EPS $-0.03 / Rev $1.9M"
       }
-    ]
+    ],
+    "yesterdayReactions": []
   },
   "calendar": [
     {
-      "time": "12:00 ET",
-      "name": "WASDE Report",
-      "consensus": null
+      "time": "All Day",
+      "name": "Quiet start to the week, major bank earnings and CPI data due starting Tuesday.",
+      "consensus": ""
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "VOD",
-        "firm": "New Street Research",
+        "ticker": "SHOP",
+        "firm": "Jefferies",
         "rating": "Buy",
+        "pt": 140
+      },
+      {
+        "ticker": "BIIB",
+        "firm": "Analyst",
+        "rating": "Bullish",
         "pt": null
       },
       {
-        "ticker": "CUBE",
-        "firm": "Barclays",
-        "rating": "Overweight",
+        "ticker": "AXP",
+        "firm": "Analyst",
+        "rating": "Upgrade",
         "pt": null
       }
     ],
-    "downgrades": [
-      {
-        "ticker": "HLI",
-        "firm": "Keefe, Bruyette & Woods",
-        "rating": "Outperform",
-        "pt": 160
-      }
-    ]
+    "downgrades": []
   },
-  "alert": "Highly anticipated Nasdaq debut of South Korean chipmaker SK Hynix today.",
+  "alert": "Geopolitical tensions flare as U.S.-Iran strikes escalate, sending oil prices higher and pressuring tech futures.",
   "news": [
     {
-      "headline": "US stock futures mixed as traders weigh tech rally against geopolitical risks and SK Hynix IPO.",
+      "headline": "U.S. and Iran carry out airstrikes, escalating military tensions and pushing oil prices higher.",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
-        "SMH"
-      ],
-      "source": "The Sunday Guardian - https://www.thesundayguardian.com/business/us-stock-market-prediction-today-july-10-sp-500-futures-hold-flat-as-nasdaq-100-slips-0-3-dow-futures-gain-94-points-while-oil-cools-on-renewed-us-iran-deal-hopes",
-      "time": "July 10, 2026"
-    },
-    {
-      "headline": "Delta Air Lines reports mixed Q2 results, beating on EPS but missing revenue estimates; raises full-year guidance.",
-      "impact": "MED",
-      "tickers": [
-        "DAL",
-        "JETS"
-      ],
-      "source": "Zacks.com - https://www.zacks.com/stock/news/2293439/pre-markets-flat-to-close-out-trading-week-july-10-2026",
-      "time": "July 10, 2026"
-    },
-    {
-      "headline": "Asian markets were mostly higher, while European markets were mixed as tech stocks came under pressure.",
-      "impact": "LOW",
-      "tickers": null,
-      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-7-10-26-futures-mixed-as-iran-tensions-keep-investors-on-edge",
-      "time": "July 10, 2026"
-    },
-    {
-      "headline": "Oil prices fell as investors weighed ongoing US-Iran tensions against reports that diplomatic talks could resume.",
-      "impact": "MED",
-      "tickers": [
         "CL=F",
         "XLE"
       ],
-      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-7-10-26-futures-mixed-as-iran-tensions-keep-investors-on-edge",
-      "time": "July 10, 2026"
+      "source": "WKMG News 6 & TipRanks - https://www.clickorlando.com/news/world/2026/07/13/oil-prices-jump-and-world-shares-are-mixed-as-us-and-iran-carry-out-airstrikes/",
+      "time": "Overnight"
+    },
+    {
+      "headline": "Asian markets were mixed and European markets edged higher as traders digest geopolitical news; Japan's Nikkei fell 1.9% while South Korea's Kospi sank.",
+      "impact": "MED",
+      "tickers": null,
+      "source": "WKMG News 6 - https://www.clickorlando.com/news/world/2026/07/13/oil-prices-jump-and-world-shares-are-mixed-as-us-and-iran-carry-out-airstrikes/",
+      "time": "Overnight"
+    },
+    {
+      "headline": "Investors look ahead to a crucial week of data with the Consumer Price Index (CPI) on Tuesday and the start of Q2 earnings season, led by major banks.",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
+        "XLF"
+      ],
+      "source": "The Sunday Guardian - https://sundayguardianlive.com/business/us-stock-market-prediction-today-july-13-dow-sp-500-nasdaq-futures-fall-as-us-iran-conflict-escalates-oil-prices-surge-near-80-and-investors-await-cpi-ppi-data-big-bank-earnings",
+      "time": "Pre-market"
+    },
+    {
+      "headline": "Shopify (SHOP) upgraded to 'Buy' at Jefferies on pre-earnings momentum.",
+      "impact": "MED",
+      "tickers": [
+        "SHOP"
+      ],
+      "source": "Schaeffer's Investment Research - https://www.schaeffersresearch.com/content/news/2026/07/13/nasdaq-futures-slide-amid-heightened-us-iran-tensions",
+      "time": "Pre-market"
+    },
+    {
+      "headline": "SK Hynix shares slump 15.4% in Seoul after soaring on its Friday Wall Street debut, weighing on semiconductor sentiment.",
+      "impact": "MED",
+      "tickers": [
+        "SMH",
+        "NVDA",
+        "AMD"
+      ],
+      "source": "WKMG News 6 - https://www.clickorlando.com/news/world/2026/07/13/oil-prices-jump-and-world-shares-are-mixed-as-us-and-iran-carry-out-airstrikes/",
+      "time": "Overnight"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Benzinga - https://www.benzinga.com/general/earnings/26/07/39707258/earnings-scheduled-for-july-10-2026",
-    "FinHacker.cz - https://finhacker.cz/fear-and-greed-index-cnn/",
-    "Benzinga - https://www.benzinga.com/stock-ratings",
-    "Investing.com - https://www.investing.com/earnings-calendar/",
-    "Delta Air Lines - https://news.delta.com/delta-air-lines-announces-june-quarter-2026-financial-results",
-    "24/7 Wall St. - https://247wallst.com/investing/2026/07/10/here-are-fridays-best-wall-street-analyst-research-calls-cubesmart-digital-realty-trust-honeywell-aerospace-ibm-pepsico-seagate-shopify-toll-brothers-twilio-and-more/",
-    "Investing.com - https://www.investing.com/indices/pre-market",
-    "Zacks.com - https://www.zacks.com/stock/news/2293439/pre-markets-flat-to-close-out-trading-week-july-10-2026",
-    "TheStreet - https://www.thestreet.com/markets/stock-market-today-july-10-2026-nasdaq-futures-slip-ahead-of-sk-hynix-debut",
-    "MarketWatch - https://www.marketwatch.com/tools/stockresearch/premarket",
-    "Zacks Investment Research - https://www.zacks.com/stock/news/2293397/stock-market-news-for-july-10-2026",
-    "The Sunday Guardian - https://www.thesundayguardian.com/business/us-stock-market-prediction-today-july-10-sp-500-futures-hold-flat-as-nasdaq-100-slips-0-3-dow-futures-gain-94-points-while-oil-cools-on-renewed-us-iran-deal-hopes",
-    "TipRanks - https://www.tipranks.com/news/stock-market-news-today-7-10-26-futures-mixed-as-iran-tensions-keep-investors-on-edge",
-    "Trading Economics - https://tradingeconomics.com/united-states/10-year-treasury-yield",
-    "Trading Economics - https://tradingeconomics.com/commodity/crude-oil"
+    "TipRanks 05:38 AM EDT — https://www.tipranks.com/news/stock-market-news-today-7-13-26-futures-waver-as-u-s-iran-tensions-rise-earnings-and-cpi-in-focus",
+    "WKMG News 6 — https://www.clickorlando.com/news/world/2026/07/13/oil-prices-jump-and-world-shares-are-mixed-as-us-and-iran-carry-out-airstrikes/",
+    "Stock Analysis — https://stockanalysis.com/markets/premarket",
+    "Schaeffer's Investment Research — https://www.schaeffersresearch.com/content/news/2026/07/13/nasdaq-futures-slide-amid-heightened-us-iran-tensions",
+    "Robinhood — https://robinhood.com/prediction-markets/SPX-20260713",
+    "The Sunday Guardian — https://sundayguardianlive.com/business/us-stock-market-prediction-today-july-13-dow-sp-500-nasdaq-futures-fall-as-us-iran-conflict-escalates-oil-prices-surge-near-80-and-investors-await-cpi-ppi-data-big-bank-earnings",
+    "YouTube, Earnings Whispers — https://www.youtube.com/watch?v=your_video_id",
+    "Investing.com — https://www.investing.com/indices/pre-market",
+    "Benzinga — https://www.benzinga.com/premarket",
+    "GuruFocus — https://www.gurufocus.com/news/2619491/cof-maintained-by-jp-morgan--price-target-raised-to-245",
+    "TipRanks.com — https://www.tipranks.com/news/earnings-to-watch-this-week-july-13-17-2026",
+    "ticker.com — https://ticker.com/EarningsCalendar/2026/7/",
+    "TheStockCatalyst — https://www.thestockcatalyst.com/premarket/",
+    "Earnings Whispers — https://www.earningswhispers.com/calendar?sb=s&d=2&t=all&v=s",
+    "Digrin — https://www.digrin.com/earnings/2026-07-13",
+    "MarketBeat — https://www.marketbeat.com/pre-market/",
+    "MarketBeat — https://www.marketbeat.com/gaps/NASDAQ/ATLC/2026-07-13/",
+    "Oppenheimer.com — https://www.oppenheimer.com/news-insights/2026/market-commentary/07-13-26-market-strategy.aspx",
+    "Zacks.com — https://www.zacks.com/commentary/2296499/the-zacks-analyst-blog-highlights-moat-spy-and-loha"
   ]
 }
