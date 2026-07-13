@@ -5,8 +5,8 @@
   "target": "trader-scorer-stock/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-09T16:36:04.387Z",
-  "renderHash": "a8b7c99f00a331579be56935fc59541dc96317165c3a361d64b5c6907bc0f7b5",
+  "generatedAt": "2026-07-11T04:36:56.713Z",
+  "renderHash": "d4966c0d2ed8dccfbf12c884fd73ad66f3f6a9fdc443acda8fe3db468040ffed",
   "sources": [
     {
       "root": "wiki",
@@ -36,7 +36,7 @@
     {
       "root": "wiki",
       "path": "wiki/ticker-catalyst-analysis.md",
-      "sha256": "74f2b96acf98c7ea381fbcc9f2984bccd9c6e9883a815d9117ba020ae9272087"
+      "sha256": "f59eb15854de9d58ad1f62d284f96eb199d347137bd28a7fab1589436fea3793"
     },
     {
       "root": "wiki",
@@ -46,7 +46,7 @@
     {
       "root": "wiki",
       "path": "wiki/qullamaggie-breakouts-episodic-pivots.md",
-      "sha256": "d7db757ce68e7f2f43e4717c037546f851e80f199dc93be4d0e5ede7c9b70ae4"
+      "sha256": "f33b3facff2e5a5b78176d13c48185119845191ea16373a21a1d1fb01dab1175"
     },
     {
       "root": "wiki",
@@ -83,9 +83,9 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
 - wiki:wiki/fundamental-analysis.md sha256:857839e81082
-- wiki:wiki/ticker-catalyst-analysis.md sha256:74f2b96acf98
+- wiki:wiki/ticker-catalyst-analysis.md sha256:f59eb15854de
 - wiki:wiki/relative-strength.md sha256:588b842eccce
-- wiki:wiki/qullamaggie-breakouts-episodic-pivots.md sha256:d7db757ce68e
+- wiki:wiki/qullamaggie-breakouts-episodic-pivots.md sha256:f33b3facff2e
 - wiki:wiki/lengyan-cold-eye.md sha256:2796af9cbbbc
 - wiki:wiki/lengyan-stock-analyses.md sha256:e8cd93d2f551
 - wiki:wiki/duan-yongping.md sha256:8eb042e59a09
@@ -851,6 +851,18 @@ Evidence from the current style stack:
 - PrimeTrading/Alex excludes biotech and healthcare from the liquid-leader universe.
 - The local Qullamaggie rubric already marks "biotech with binary catalyst" as a skip condition.
 
+### US Investing Championship cross-check (2026-07-10)
+
+Operator asked whether "avoid medical, use it as an indicator" matches how USIC champions actually trade. Read (from training-knowledge recall — **needs web verification**, search quota exhausted at review time; the Qullamaggie/Jeff Sun/Alex items above are already source-backed):
+
+- **Mark Minervini** (USIC 1997 +155%, 2021 +334.8%) does **not** avoid medical — his superperformance studies repeatedly list health-care/medical among the most fertile sectors, and several of his own big winners were commercial-stage medical names. His protection is process, not sector bans: Stage-2 liquid leaders only, hard stops, never holding through binary events without cushion.
+- **David Ryan** (triple champion 1985-87, CANSLIM) trades whatever group *leads*; medical was repeatedly a leading O'Neil model-book group across cycles. Group RS decides, not a ban.
+- **Oliver Kell** (2020, +941%) and **Leif Soreide** (2019, +348%) won on the cycle's dominant institutional growth theme (2020 = EV/tech) — not biotech-centric, but by concentration in leadership, not sector exclusion.
+- **Matthew Caruso** (2020 money-manager division, +346%) publicly cautions against holding developmental biotech through binary readouts.
+- **Jeff Sun** (2021 USIC standings — sourced above) is the strictest: no single-name biotech at all, ETF exposure only.
+
+**Verdict**: the operator's rule is directionally right *for this desk's style stack* (Jeff Sun + Alex are stricter than the champions), but the champion evidence supports **special handling, not a blanket ban**: (a) no binary-event holds — universal; (b) only liquid, commercial-stage, Stage-2 leaders ever qualify; (c) sympathy pops and clinical-stage lotteries are skipped; (d) **big-cap defensive medical (mega-pharma/insurers/managed care) leading the tape is a risk-off rotation signal, not a long theme** — confirmed by this desk's own 2026-07-07 tape (JNJ/LLY/BAX/ALL/PGR topped the gainers on the failed-bounce risk-off day). Hence the Practical rule below: indicator first, single-name GO only through the full gate.
+
 Practical rule:
 
 1. Medical/biotech strength may be logged as a **rotation indicator** for risk appetite, speculation, or healthcare/biotech breadth.
@@ -995,7 +1007,7 @@ The goal is not a high win rate. The goal is small controlled losses plus occasi
 
 ## Setup 1: Common Breakout
 
-### Preconditions
+### Breakout Preconditions
 
 The stock should already be a leader.
 
@@ -1007,7 +1019,7 @@ The stock should already be a leader.
 | Base quality | Orderly pullback or sideways consolidation, higher lows, tightening range |
 | Moving averages | Price often rides the rising 10-day and 20-day MAs, sometimes 50-day |
 
-### Entry
+### Breakout Entry
 
 Enter when price breaks out of the consolidation.
 
@@ -1020,11 +1032,11 @@ Preferred triggers:
 
 Anticipating the breakout is possible but lower quality and requires more experience.
 
-### Stop
+### Breakout Stop
 
 Initial stop is the low of day. The stop should not exceed **1× to 1.5×** the ATR or ADR of the stock; if the stop is wider than 1.5× the normal daily range, risk/reward is usually broken. (source: qullamaggie.com/my-3-timeless-setups-that-have-made-me-tens-of-millions/)
 
-### Exit
+### Breakout Exit
 
 Qullamaggie's default breakout management:
 
@@ -1053,7 +1065,7 @@ Penalize a trade when any of these appear:
 
 An episodic pivot is a catalyst-driven repricing event. The best long EPs usually start with unexpected good news, especially earnings or guidance, that forces institutions to revalue the stock.
 
-### Preconditions
+### Episodic Pivot Preconditions
 
 | Requirement | Rule |
 |---|---|
@@ -1066,7 +1078,7 @@ An episodic pivot is a catalyst-driven repricing event. The best long EPs usuall
 
 ChartMill's practical screen is less strict than Qullamaggie's pure definition, but useful for finding candidates: price above 3, adequate market cap, average volume above 300k, recent gap up, recent earnings catalyst, 5%+ price change, and volume at least 100% above the previous day.
 
-### Entry
+### Episodic Pivot Entry
 
 Identify the EP in after-hours or pre-market. Enter through opening-range highs:
 
@@ -1076,11 +1088,11 @@ Identify the EP in after-hours or pre-market. Enter through opening-range highs:
 
 Avoid EPs that gap straight into major resistance or fail to hold momentum after the opening range.
 
-### Stop
+### Episodic Pivot Stop
 
 Initial stop is the low of day. This keeps risk defined around the day the market repriced the stock.
 
-### Exit
+### Episodic Pivot Exit
 
 Trail with the 10-day or 20-day moving average once those averages rise above the initial stop. The specific trailing rule can be tuned by trader preference, but the key is to let genuine EP trends breathe while cutting failed EPs fast.
 

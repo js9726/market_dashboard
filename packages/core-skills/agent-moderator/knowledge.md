@@ -5,8 +5,8 @@
   "target": "agent-moderator/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-09T16:36:04.367Z",
-  "renderHash": "63c3ded2d838faff69a965e6b09babcf3c24ae4a6e7a9e5d290e603070b72ace",
+  "generatedAt": "2026-07-11T04:36:56.686Z",
+  "renderHash": "d17d707d2409225a1c0ff71913dd5215ac85097c7c22e6058168de4c3d71315e",
   "sources": [
     {
       "root": "wiki",
@@ -61,7 +61,7 @@
     {
       "root": "wiki",
       "path": "wiki/qullamaggie-breakouts-episodic-pivots.md",
-      "sha256": "d7db757ce68e7f2f43e4717c037546f851e80f199dc93be4d0e5ede7c9b70ae4"
+      "sha256": "f33b3facff2e5a5b78176d13c48185119845191ea16373a21a1d1fb01dab1175"
     }
   ]
 }
@@ -83,7 +83,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/position-sizing.md sha256:23dc116bc8f1
 - wiki:wiki/relative-strength.md sha256:588b842eccce
 - wiki:wiki/fundamental-analysis.md sha256:857839e81082
-- wiki:wiki/qullamaggie-breakouts-episodic-pivots.md sha256:d7db757ce68e
+- wiki:wiki/qullamaggie-breakouts-episodic-pivots.md sha256:f33b3facff2e
 
 ## Application Notes
 - Use this artifact as shared judgment context when routing or reconciling trader-style agents.
@@ -1406,7 +1406,7 @@ The goal is not a high win rate. The goal is small controlled losses plus occasi
 
 ## Setup 1: Common Breakout
 
-### Preconditions
+### Breakout Preconditions
 
 The stock should already be a leader.
 
@@ -1418,7 +1418,7 @@ The stock should already be a leader.
 | Base quality | Orderly pullback or sideways consolidation, higher lows, tightening range |
 | Moving averages | Price often rides the rising 10-day and 20-day MAs, sometimes 50-day |
 
-### Entry
+### Breakout Entry
 
 Enter when price breaks out of the consolidation.
 
@@ -1431,11 +1431,11 @@ Preferred triggers:
 
 Anticipating the breakout is possible but lower quality and requires more experience.
 
-### Stop
+### Breakout Stop
 
 Initial stop is the low of day. The stop should not exceed **1× to 1.5×** the ATR or ADR of the stock; if the stop is wider than 1.5× the normal daily range, risk/reward is usually broken. (source: qullamaggie.com/my-3-timeless-setups-that-have-made-me-tens-of-millions/)
 
-### Exit
+### Breakout Exit
 
 Qullamaggie's default breakout management:
 
@@ -1464,7 +1464,7 @@ Penalize a trade when any of these appear:
 
 An episodic pivot is a catalyst-driven repricing event. The best long EPs usually start with unexpected good news, especially earnings or guidance, that forces institutions to revalue the stock.
 
-### Preconditions
+### Episodic Pivot Preconditions
 
 | Requirement | Rule |
 |---|---|
@@ -1477,7 +1477,7 @@ An episodic pivot is a catalyst-driven repricing event. The best long EPs usuall
 
 ChartMill's practical screen is less strict than Qullamaggie's pure definition, but useful for finding candidates: price above 3, adequate market cap, average volume above 300k, recent gap up, recent earnings catalyst, 5%+ price change, and volume at least 100% above the previous day.
 
-### Entry
+### Episodic Pivot Entry
 
 Identify the EP in after-hours or pre-market. Enter through opening-range highs:
 
@@ -1487,11 +1487,11 @@ Identify the EP in after-hours or pre-market. Enter through opening-range highs:
 
 Avoid EPs that gap straight into major resistance or fail to hold momentum after the opening range.
 
-### Stop
+### Episodic Pivot Stop
 
 Initial stop is the low of day. This keeps risk defined around the day the market repriced the stock.
 
-### Exit
+### Episodic Pivot Exit
 
 Trail with the 10-day or 20-day moving average once those averages rise above the initial stop. The specific trailing rule can be tuned by trader preference, but the key is to let genuine EP trends breathe while cutting failed EPs fast.
 
