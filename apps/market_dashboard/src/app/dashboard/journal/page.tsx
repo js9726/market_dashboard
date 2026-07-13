@@ -1,5 +1,5 @@
-import JournalShell from "@/components/journal/JournalShell";
+import JournalHome from "@/components/journal/JournalHome";
 
 export default function JournalPage() {
-  return <JournalShell />;
+  return <JournalHome />;
 }

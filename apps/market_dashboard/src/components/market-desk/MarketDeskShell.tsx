@@ -21,27 +21,34 @@ type NavItem = {
   featureFlag?: keyof typeof features;
 };
 
-const WORKFLOW_NAV: NavItem[] = [
-  { href: "/dashboard", label: "Conviction Desk", icon: "dashboard", count: "5", exact: true },
-  // A-List sits between the daily brief (Conviction Desk) and the executed
-  // book (Portfolio). It's the strict-quality picks promoted from every brief,
-  // tracked day-0 → day-14. See PLAN-pre-open-ci-and-journal-revamp.md.
-  { href: "/dashboard/trades", label: "Trades Hub", icon: "journal" },
-  // Portfolio sits next — natural flow from "ideas" → "executed positions".
-  // Gated behind brokerJournal flag; invisible for users who haven't opted in.
+// Two-surface IA (TradesViz-platform P1-🄺): the JOURNAL surface (your book —
+// journal-first, the client landing) is separated from the MARKET DESK surface
+// (ideas/research). Journal-family routes render in the light data-mode, the
+// desk in dark (bound by route in the layout).
+const JOURNAL_NAV: NavItem[] = [
+  { href: "/dashboard/journal", label: "Journal", icon: "journal", exact: true },
+  { href: "/dashboard/trades", label: "Trades Hub", icon: "review" },
+  { href: "/dashboard/journal/calendar", label: "Calendar", icon: "analytics" },
+  { href: "/dashboard/analytics", label: "Analytics", icon: "review" },
+  // Portfolio + Equity — the executed book. Portfolio gated behind the
+  // brokerJournal flag; invisible for users who haven't opted in.
   { href: "/dashboard/portfolio", label: "Portfolio", icon: "portfolio", featureFlag: "brokerJournal" },
-  // Equity timeline - each approved user sees their own account data.
   { href: "/dashboard/equity", label: "Equity", icon: "analytics" },
-  // Market Internals — Sectors / RVOL / Theme Radar / Rotation in one place.
+];
+
+const DESK_NAV: NavItem[] = [
+  { href: "/dashboard", label: "Conviction Desk", icon: "dashboard", count: "5", exact: true },
+  // A-List — strict-quality picks promoted from every brief, tracked day-0 → 14.
+  { href: "/dashboard/a-list", label: "A-List", icon: "bolt" },
   { href: "/dashboard/internals", label: "Market Internals", icon: "analytics" },
+  { href: "/dashboard/scanner", label: "Scanner", icon: "search" },
+  { href: "/dashboard/analysis", label: "Multi-Agent Analysis", icon: "bolt" },
+  { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
 ];
 
 const TOOL_NAV: NavItem[] = [
-  { href: "/dashboard/scanner", label: "Scanner", icon: "search" },
-  { href: "/dashboard/analysis", label: "Multi-Agent Analysis", icon: "bolt" },
   { href: "/dashboard/leaderboard", label: "Leaderboard", icon: "review" },
   { href: "/dashboard/profile", label: "Profile", icon: "accounts" },
-  { href: "/dashboard/chat", label: "AI Chat", icon: "bolt" },
   // Playbooks + Replay are placeholder pages — hidden from nav until real
   // (TradesViz-platform P0; Playbooks returns in P1, Replay in P5).
   { href: "/dashboard/settings", label: "Settings", icon: "accounts" },
@@ -107,7 +114,15 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
   "/dashboard/journal": {
     title: "Journal",
-    subtitle: "Trades - calendar - analytics",
+    subtitle: "Your trading dashboard - stats, positions, recent trades",
+  },
+  "/dashboard/journal/calendar": {
+    title: "Calendar",
+    subtitle: "P&L by day - click a day to drill into trades and notes",
+  },
+  "/dashboard/journal/daily": {
+    title: "Daily Journal",
+    subtitle: "Mood - sleep - market conditions - plan adherence - lessons",
   },
   "/dashboard/audits": {
     title: "Trade Audits",
@@ -195,7 +210,8 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
     }
     return { title: "Market Desk JS", subtitle: "Working In Progress" };
   }, [pathname]);
-  const workflowNav = useMemo(() => visibleNav(WORKFLOW_NAV), []);
+  const journalNav = useMemo(() => visibleNav(JOURNAL_NAV), []);
+  const deskNav = useMemo(() => visibleNav(DESK_NAV), []);
   const toolNav = useMemo(() => visibleNav(TOOL_NAV), []);
 
   useEffect(() => {
@@ -265,9 +281,27 @@ export default function MarketDeskShell({ children }: { children: React.ReactNod
             </span>
           </Link>
 
-          <nav className="market-nav" aria-label="Workflow">
-            <span className="market-nav__label">Workflow</span>
-            {workflowNav.map((item) => (
+          <nav className="market-nav" aria-label="Journal">
+            <span className="market-nav__label">Journal</span>
+            {journalNav.map((item) => (
+              <Link
+                className={`market-nav__item ${
+                  isActive(pathname, item.href, item.exact) ? "is-active" : ""
+                }`}
+                href={item.href}
+                key={item.href}
+                onClick={() => setNavOpen(false)}
+              >
+                <Icon name={item.icon} />
+                <span>{item.label}</span>
+                {item.count ? <span className="market-nav__count">{item.count}</span> : null}
+              </Link>
+            ))}
+          </nav>
+
+          <nav className="market-nav" aria-label="Market Desk">
+            <span className="market-nav__label">Market Desk</span>
+            {deskNav.map((item) => (
               <Link
                 className={`market-nav__item ${
                   isActive(pathname, item.href, item.exact) ? "is-active" : ""
