@@ -29,7 +29,9 @@ const JOURNAL_NAV: NavItem[] = [
   { href: "/dashboard/journal", label: "Journal", icon: "journal", exact: true },
   { href: "/dashboard/trades", label: "Trades Hub", icon: "review" },
   { href: "/dashboard/journal/calendar", label: "Calendar", icon: "analytics" },
-  { href: "/dashboard/analytics", label: "Analytics", icon: "review" },
+  { href: "/dashboard/analytics", label: "Analytics", icon: "review", exact: true },
+  // Pivot explorer — "group my trades by ANY field" (TradesViz-platform P2).
+  { href: "/dashboard/analytics/pivot", label: "Explore", icon: "search" },
   // Portfolio + Equity — the executed book. Portfolio gated behind the
   // brokerJournal flag; invisible for users who haven't opted in.
   { href: "/dashboard/portfolio", label: "Portfolio", icon: "portfolio", featureFlag: "brokerJournal" },
@@ -115,6 +117,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard/journal": {
     title: "Journal",
     subtitle: "Your trading dashboard - stats, positions, recent trades",
+  },
+  "/dashboard/analytics/pivot": {
+    title: "Explore",
+    subtitle: "Group your trades by any field - setup, tag, day, broker - and measure it",
   },
   "/dashboard/journal/calendar": {
     title: "Calendar",

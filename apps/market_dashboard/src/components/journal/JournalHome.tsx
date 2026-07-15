@@ -223,9 +223,10 @@ export default function JournalHome() {
       </div>
 
       {/* Quick-nav into the rest of the Journal surface */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <NavCard href="/dashboard/trades" icon="journal" title="Trades Hub" desc="Every trade, tags, filters" />
         <NavCard href="/dashboard/journal/calendar" icon="analytics" title="Calendar" desc="P&L by day, drill in" />
+        <NavCard href="/dashboard/analytics/pivot" icon="search" title="Explore" desc="Group by any field" />
         <NavCard href="/dashboard/analytics" icon="review" title="Analytics" desc="Edge, setups, coaching" />
         <NavCard href="/dashboard/journal/daily" icon="template" title="Daily journal" desc="Mood, plan, lessons" />
         <NavCard href="/dashboard/equity" icon="portfolio" title="Equity" desc="Account curve + drawdown" />
