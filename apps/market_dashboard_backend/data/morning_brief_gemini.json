@@ -1,109 +1,188 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-OFF",
+    "label": "CAUTIOUSLY-RISK-ON",
     "posture": "WAIT",
-    "summary": "Geopolitical tensions in the Strait of Hormuz are pushing oil prices higher, reviving inflation fears and creating a mixed sentiment despite cooler-than-expected US CPI data."
+    "summary": "Cooler-than-expected CPI data is boosting sentiment and lifting futures, but escalating Middle East tensions and a mixed earnings picture (strong banks, weak IBM) warrant a cautious approach."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": 43,
-    "label": "Fear"
+    "score": 49,
+    "label": "Neutral"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.1,
+      "changePct": 0.23,
       "note": "futures",
-      "citation": null
+      "citation": ""
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 0.5,
+      "changePct": 0.51,
       "note": "futures",
-      "citation": null
+      "citation": ""
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": -0.3,
+      "changePct": 0.22,
       "note": "futures",
-      "citation": null
+      "citation": ""
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility",
-      "level": 17.16,
-      "changePct": 14.17,
+      "name": "Volatility Index",
+      "level": 16.5,
+      "changePct": -3.85,
       "note": "live",
-      "citation": null
+      "citation": ""
     },
     {
       "symbol": "^TNX",
-      "name": "10Y Yield",
-      "level": 4.609,
-      "changePct": 0.88,
+      "name": "10-Yr Treasury Yield",
+      "level": 4.61,
+      "changePct": 0.02,
       "note": "live",
-      "citation": null
+      "citation": ""
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil",
-      "level": 80.55,
-      "changePct": 3.1,
-      "note": "live",
-      "citation": null
+      "name": "Crude Oil (WTI)",
+      "level": 79.95,
+      "changePct": 0.77,
+      "note": "futures",
+      "citation": ""
     }
   ],
-  "indicesNarrative": "US futures are mixed this morning, with the Nasdaq showing resilience on the back of a semiconductor rebound, while the Dow and S&P 500 are slightly down. The key driver is a spike in oil prices due to escalating US-Iran tensions, which is overshadowing a surprisingly soft US CPI report. Volatility is elevated, with the VIX jumping over 14%.",
-  "technicals": null,
-  "technicalsNarrative": null,
-  "sectorsThemes": [],
-  "sectorsNarrative": "Energy stocks are expected to lead given the surge in crude oil prices, while technology, particularly semiconductors, is attempting a rebound after recent weakness.",
-  "industryNarrative": null,
-  "industryMovers": [],
+  "indicesNarrative": "US futures are pointing to a higher open, building on yesterday's gains which were driven by a soft CPI report. The Nasdaq is showing relative strength, suggesting a risk-on sentiment in tech. However, rising oil prices due to geopolitical tensions in the Strait of Hormuz and elevated bond yields are keeping gains in check.",
+  "technicals": {
+    "SPY": null,
+    "QQQ": null,
+    "DIA": null
+  },
+  "technicalsNarrative": "Technical data was not available at the time of generation. Cannot assess entry risk or momentum indicators.",
+  "sectorsThemes": [
+    {
+      "symbol": "XLK",
+      "name": "Technology",
+      "changePct": 1.3,
+      "rs": null,
+      "note": "Led the market higher on Tuesday, rebounding from recent weakness."
+    },
+    {
+      "symbol": "XLF",
+      "name": "Financials",
+      "changePct": null,
+      "rs": null,
+      "note": "Strong performance from major banks reporting solid Q2 earnings."
+    },
+    {
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": 0.4,
+      "rs": null,
+      "note": "Continues to be strong, benefiting from rising crude oil prices amid Middle East tensions."
+    },
+    {
+      "symbol": "XLV",
+      "name": "Health Care",
+      "changePct": -1.9,
+      "rs": null,
+      "note": "Lagged the market significantly in the previous session."
+    }
+  ],
+  "sectorsNarrative": "A clear rotation was visible yesterday, with money flowing into Technology and Financials, fueled by soft inflation data and strong bank earnings. Energy remains a leadership group due to geopolitical catalysts.",
+  "industryNarrative": "Semiconductors showed significant strength, rebounding sharply and signaling renewed interest in the AI trade. In contrast, legacy software stocks faced heavy selling pressure following IBM's weak preliminary results, highlighting a divergence within the tech sector.",
+  "industryMovers": [
+    {
+      "industry": "Semiconductors",
+      "sector": "Technology",
+      "changePct": null,
+      "perf1W": null,
+      "perf1M": null,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [
+        {
+          "ticker": "DELL",
+          "changePct": 7.1,
+          "rvol": null,
+          "source": "Zacks Investment Research"
+        },
+        {
+          "ticker": "NVDA",
+          "changePct": 4.1,
+          "rvol": null,
+          "source": "Associated Press"
+        }
+      ],
+      "note": "Chip stocks rebounded strongly on cooling inflation data, with the group seen as a primary beneficiary of the AI infrastructure buildout."
+    }
+  ],
   "movers": [
     {
-      "ticker": "IBM",
-      "side": "SHORT",
-      "changePct": -22.4,
-      "why": "Preliminary Q2 results missed analyst expectations on both earnings and revenue, citing weakness in software and infrastructure.",
+      "ticker": "PYPL",
+      "side": "LONG",
+      "changePct": 18.5,
+      "why": "Reported takeover offer for over $53 billion from Stripe and Advent International.",
       "traderLens": "Episodic Pivot (Qullamaggie)"
+    },
+    {
+      "ticker": "ASML",
+      "side": "LONG",
+      "changePct": 2.8,
+      "why": "Q2 earnings and revenue beat expectations, and the company raised its annual sales forecast on strong AI-driven demand.",
+      "traderLens": "Minervini"
+    },
+    {
+      "ticker": "BLK",
+      "side": "LONG",
+      "changePct": 3.8,
+      "why": "Reported a jump in second-quarter profit as the market rally boosted assets under management.",
+      "traderLens": "Ted Zhang"
+    },
+    {
+      "ticker": "CRWD",
+      "side": "LONG",
+      "changePct": 12.14,
+      "why": "Cybersecurity stocks rallied sharply in the previous session.",
+      "traderLens": "Qullamaggie"
     },
     {
       "ticker": "GS",
       "side": "LONG",
-      "changePct": 2.8,
-      "why": "Posted strong Q2 earnings and revenue that beat analyst estimates.",
-      "traderLens": "Earnings Catalyst"
+      "changePct": 7.4,
+      "why": "Posted a blowout quarter, leading gains in the Dow Jones.",
+      "traderLens": "Ted Zhang"
     },
     {
-      "ticker": "VMAR",
-      "side": "LONG",
-      "changePct": 57.45,
-      "why": "Reported strong revenue and gross profit for the first nine months of fiscal 2026.",
-      "traderLens": "Momentum (Qullamaggie)"
-    },
-    {
-      "ticker": "AAPL",
+      "ticker": "PNR",
       "side": "SHORT",
-      "changePct": -1.0,
-      "why": "Downgraded to 'Underweight' at KeyBanc, which warned that price increases could pressure customer demand.",
-      "traderLens": "Catalyst (Analyst Downgrade)"
+      "changePct": -26.02,
+      "why": "Cut its Q2 and full-year 2026 financial guidance and announced the resignation of its CFO.",
+      "traderLens": "Jeff"
     },
     {
-      "ticker": "AMD",
-      "side": "LONG",
-      "changePct": null,
-      "why": "Wolfe Research reiterated an Outperform rating and raised its price target to $650 from $450, citing potential for $25+ in earnings power.",
-      "traderLens": "Catalyst (Analyst Upgrade)"
+      "ticker": "IBM",
+      "side": "SHORT",
+      "changePct": -25.21,
+      "why": "Multiple analyst downgrades after the company released weaker-than-expected preliminary Q2 results.",
+      "traderLens": "Jeff"
+    },
+    {
+      "ticker": "SKHY",
+      "side": "SHORT",
+      "changePct": -6.23,
+      "why": "Memory chip sector is under pressure in pre-market trading.",
+      "traderLens": "Ted Zhang"
     }
   ],
   "watchlist": [
@@ -111,261 +190,297 @@
       "ticker": "NVDA",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for rebound with semi sector after recent sell-off."
+      "abc": "A",
+      "note": "Key leader in the semiconductor space, showing strength yesterday."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Consolidating, needs to reclaim key moving averages."
+      "abc": "B",
+      "note": "Watching for response to broad market risk-on sentiment."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Under pressure from a downgrade, watching for support levels."
+      "abc": "B",
+      "note": "Part of the Mag7, but showing less momentum than pure-play AI names."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Holding up relatively well, a potential leader if market firms up."
+      "abc": "A",
+      "note": "AI narrative remains strong, but saw some pressure from IBM's software warning."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "In a range, needs a catalyst to break out."
+      "abc": "B",
+      "note": "Consumer and cloud play, watching for broader economic cues."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Showing relative strength, watching for a move higher."
+      "note": "AI and digital advertising play."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Lagging other megacaps, needs to show signs of accumulation."
+      "abc": "B",
+      "note": "AI narrative is a key driver."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
       "abc": "A",
-      "note": "Strong catalyst from analyst upgrade, watching for follow-through."
+      "note": "Another key semiconductor name benefiting from the AI theme."
     },
     {
       "ticker": "SMCI",
-      "level": null,
-      "changePct": null,
-      "abc": "B",
-      "note": "Volatile name in the AI space, high risk/reward."
+      "level": 27.69,
+      "changePct": 0.14,
+      "abc": "C",
+      "note": "AI server play, relatively flat in pre-market."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "Needs to base and build a cause for the next move up."
+      "note": "AI software name, could be impacted by the IBM read-through."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Cybersecurity theme remains strong, watching for setup."
+      "abc": "A",
+      "note": "Showed exceptional strength yesterday, leading cybersecurity stocks."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "High correlation to Bitcoin, which is currently weak."
+      "note": "High-beta crypto play, sensitive to Bitcoin price movements."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is choppy and volatile (VIX spike). Not an ideal environment for Stage 2 breakouts. Best to be patient and protect capital."
+      "view": "Market is in a confirmed uptrend but showing some chop. Focus on A-grade setups in leading sectors like Semis and Financials."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear rotation into Energy due to geopolitical catalysts. Technology is trying to find its footing after a sell-off. Financials are mixed on earnings."
+      "view": "Clear rotation into Tech (Semis) and Financials, away from Healthcare. Follow the institutional flow."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is a C. Cross-currents from geopolitics (negative) and CPI (positive) create uncertainty. Not a time for aggressive long positions."
+      "view": "Market context improved with the soft CPI print, but geopolitical risks are a concern. Entry grade is B+. Raise the bar for new entries."
     },
     {
       "name": "SRxTrades",
-      "view": "Wait for clean pivots and volume confirmation. Chasing overnight gaps in this tape is a low-probability play."
+      "view": "Look for clean pivots and volume confirmation on leaders like NVDA and CRWD. Avoid chasing extended names."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your rules. The spike in volatility means position sizes should be smaller and stops should be respected without question."
+      "view": "Respect hard stops, especially with overnight geopolitical headline risk. Don't get chopped up by volatility."
     },
     {
       "name": "Qullamaggie",
-      "view": "Look for names with true episodic pivots, like IBM on the short side. The broader market isn't offering clean breakouts for momentum longs."
+      "view": "The PYPL news provides a potential episodic pivot. Watch for momentum breakouts in strong sectors."
     },
     {
       "name": "Composite",
-      "view": "The tape is messy. Geopolitical headlines are driving oil and inflation fears, countering the bullish CPI print. The best course of action is to wait for the dust to settle, observe which sectors show true strength, and avoid taking on large new positions. Focus on managing existing trades."
+      "view": "The tape is bullishly biased due to inflation data, but headline risk is elevated. Wait for the market to open and confirm direction. Focus on leading groups (Semis, Cyber, Financials) but be nimble."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "GS",
-        "consensus": "EPS $20.98 / Rev $20.34B (Reported)"
+        "ticker": "JNJ",
+        "consensus": "EPS $2.83"
       },
       {
-        "ticker": "BAC",
-        "consensus": "Earnings reported, details pending."
+        "ticker": "MS",
+        "consensus": "EPS $2.94"
       },
       {
-        "ticker": "WFC",
-        "consensus": "Earnings reported, details pending."
+        "ticker": "BLK",
+        "consensus": null
       },
       {
-        "ticker": "C",
-        "consensus": "Earnings expected."
+        "ticker": "PNC",
+        "consensus": "EPS $4.54"
+      },
+      {
+        "ticker": "ASML",
+        "consensus": null
+      },
+      {
+        "ticker": "CTAS",
+        "consensus": null
       }
     ],
-    "amc": [],
-    "yesterdayReactions": []
+    "amc": [
+      {
+        "ticker": "UAL",
+        "consensus": "EPS $1.77"
+      },
+      {
+        "ticker": "KMI",
+        "consensus": "EPS $0.31"
+      }
+    ],
+    "yesterdayReactions": [
+      {
+        "ticker": "IBM",
+        "result": "warned on Q2 revenue",
+        "movePct": -25.2
+      },
+      {
+        "ticker": "GS",
+        "result": "beat estimates",
+        "movePct": 7.4
+      },
+      {
+        "ticker": "JPM",
+        "result": "beat estimates",
+        "movePct": 2.8
+      }
+    ]
   },
   "calendar": [
     {
       "time": "08:30 ET",
-      "name": "CPI YoY (Jun)",
-      "consensus": "3.8% (Actual 3.5%)"
+      "name": "PPI (Jun)",
+      "consensus": "+0.3%"
     },
     {
       "time": "08:30 ET",
-      "name": "Core CPI YoY (Jun)",
-      "consensus": "2.9% (Actual 2.6%)"
+      "name": "Empire State Manufacturing Index (Jul)",
+      "consensus": null
     },
     {
-      "time": "10:00 ET",
-      "name": "Fed Chair Warsh Testifies"
+      "time": "14:00 ET",
+      "name": "Fed's Beige Book",
+      "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "HAL",
-        "firm": "Piper Sandler",
-        "rating": "Overweight",
-        "pt": 43
-      },
-      {
-        "ticker": "FCEL",
-        "firm": "UBS",
+        "ticker": "AMC",
+        "firm": "Texas Capital",
         "rating": "Buy",
-        "pt": 27
+        "pt": null
       }
     ],
     "downgrades": [
       {
-        "ticker": "AAPL",
-        "firm": "KeyBanc",
-        "rating": "Underweight",
-        "pt": 250
-      },
-      {
         "ticker": "IBM",
-        "firm": "HSBC",
-        "rating": "Reduce",
-        "pt": 191
+        "firm": "Oppenheimer",
+        "rating": "Perform",
+        "pt": null
       },
       {
-        "ticker": "CRCL",
-        "firm": "Mizuho",
-        "rating": "Underperform",
-        "pt": 40
+        "ticker": "CHKP",
+        "firm": "Raymond James",
+        "rating": "Market Perform",
+        "pt": null
+      },
+      {
+        "ticker": "ALL",
+        "firm": "UBS",
+        "rating": "Neutral",
+        "pt": 261
       }
     ]
   },
-  "alert": "Oil surges and VIX spikes on US-Iran tensions, creating market uncertainty despite soft CPI.",
+  "alert": "US PPI inflation data at 08:30 ET is the next major catalyst.",
   "news": [
     {
-      "headline": "US-Iran tensions escalate over Strait of Hormuz, pushing oil prices to one-month highs",
+      "headline": "Cooler-than-expected US CPI data boosts hopes for Fed to hold rates.",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
+        "QQQ"
+      ],
+      "source": "Zacks Investment Research - https://www.zacks.com/stock/news/2299837/stock-market-news-for-july-15-2026",
+      "time": "Jul 15, 2026"
+    },
+    {
+      "headline": "PayPal shares surge over 18% in premarket on report of a $53B takeover offer from Stripe and Advent.",
+      "impact": "HIGH",
+      "tickers": [
+        "PYPL"
+      ],
+      "source": "TradingKey - https://www.tradingkey.com/en/news/us-pre-market-ppi-data-imminent-sk-hynix-falls-over-6-asml-rises-nearly-3-paypal-acquisition-rumors-ignite-stock-price-260715064600-111d1e",
+      "time": "Jul 15, 2026"
+    },
+    {
+      "headline": "Oil prices rise as US forces conduct another round of strikes against Iran and reinstate naval blockade near Strait of Hormuz.",
       "impact": "HIGH",
       "tickers": [
         "CL=F",
-        "XLE",
-        "SPY"
+        "XLE"
       ],
-      "source": "Global Banking & Finance Review — https://www.globalbankingandfinance.com/asia-markets-volatile-as-trump-hormuz-levy-hits-oil-stocks-react/",
-      "time": "Overnight"
+      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-july-15-2026",
+      "time": "Jul 15, 2026"
     },
     {
-      "headline": "US June CPI comes in cooler than expected, with headline inflation falling to 3.5%",
-      "impact": "HIGH",
-      "tickers": [
-        "SPY",
-        "QQQ",
-        "^TNX"
-      ],
-      "source": "CNBC — https://www.cnbc.com/2026/07/14/stock-market-today-live-updates.html",
-      "time": "08:30 ET"
-    },
-    {
-      "headline": "IBM shares plunge over 20% in pre-market after preliminary Q2 results miss expectations",
+      "headline": "IBM shares tumbled 25% after warning Q2 revenue would miss estimates, pressuring the software sector.",
       "impact": "MED",
       "tickers": [
         "IBM",
-        "DIA"
+        "XLK"
       ],
-      "source": "CNBC — https://www.cnbc.com/2026/07/14/stock-market-today-live-updates.html",
-      "time": "Pre-market"
+      "source": "Reuters - https://www.reuters.com/markets/us/sp-500-nasdaq-end-higher-cool-inflation-data-solid-bank-earnings-2026-07-14/",
+      "time": "Jul 14, 2026"
     },
     {
-      "headline": "Fed Chair Warsh vows to 'get monetary policy right' and defeat inflation in prepared congressional testimony",
+      "headline": "Major US banks like JPMorgan and Goldman Sachs reported strong Q2 earnings, lifting the financials sector.",
       "impact": "MED",
       "tickers": [
-        "SPY",
-        "TLT"
+        "JPM",
+        "GS",
+        "XLF"
       ],
-      "source": "CNBC — https://www.cnbc.com/2026/07/14/stock-market-today-live-updates.html",
-      "time": "Pre-market"
+      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-july-14-2026",
+      "time": "Jul 14, 2026"
     },
     {
-      "headline": "Asian markets were mixed and European markets opened lower amid geopolitical jitters",
-      "impact": "LOW",
-      "tickers": null,
-      "source": "Associated Press — https://wral.com/oil-prices-jump-as-fighting-flares-in-the-middle-east-while-asian-shares-are-mixed/21234567/",
-      "time": "Overnight"
+      "headline": "ASML raises sales forecast on strong demand for AI chip-making equipment.",
+      "impact": "MED",
+      "tickers": [
+        "ASML",
+        "SMH"
+      ],
+      "source": "TradingKey - https://www.tradingkey.com/en/news/us-pre-market-ppi-data-imminent-sk-hynix-falls-over-6-asml-rises-nearly-3-paypal-acquisition-rumors-ignite-stock-price-260715064600-111d1e",
+      "time": "Jul 15, 2026"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Global Banking & Finance Review — https://www.globalbankingandfinance.com/asia-markets-volatile-as-trump-hormuz-levy-hits-oil-stocks-react/ [2]",
-    "YCharts — https://ycharts.com/indicators/cboe_spx_volatility_index_vix [3]",
-    "Schaeffer's Investment Research — https://www.schaeffersresearch.com/content/news/2026/07/14/stock-futures-mixed-as-investors-unpack-inflation-data-bank-earnings [4]",
-    "Saxo Bank — https://www.home.saxo/content/articles/market-quick-take/market-quick-take-14072026 [5]",
-    "CNBC — https://www.cnbc.com/2026/07/14/stock-market-today-live-updates.html [6]",
-    "Wells Fargo — https://newsroom.wf.com/English/news-releases/news-release-details/2026/Wells-Fargo-Reports-Second-Quarter-2026-Financial-Results/default.aspx [7]",
-    "The Sunday Guardian — https://www.sundayguardianlive.com/business/us-stock-market-prediction-today-july-14-dow-sp-500-futures-hold-steady-nasdaq-futures-rise-brent-crude-hits-one-month-high-investors-await-inflation-data-big-bank-earnings [8]",
-    "TipRanks — https://www.tipranks.com/news/stock-market-news-today-7-14-26-futures-wobble-ahead-of-inflation-report-and-bank-earnings [9]",
-    "Benzinga — https://www.benzinga.com/markets/futures/26/07/12345678/stock-market-today-dow-s-p-500-nasdaq-100-futures-rise-on-better-than-expected-cpi-data-tower [10]",
-    "LiteFinance — https://www.litefinance.com/trading/instruments/vix/ [11]",
-    "Goldman Sachs — https://www.goldmansachs.com/media-relations/press-releases/2026/2026-07-14-q2-earnings.html [12]",
-    "MarketScreener — https://www.marketscreener.com/news/latest/Zonebourse-corporate-earnings-calendar-July-14-2026--45678901/ [13]",
-    "FinHacker.cz — https://finhacker.cz/fear-and-greed-index-cnn-historie-graf/ [14]",
-    "Investing.com — https://www.investing.com/indices/us-10-yr-t-note [15]",
-    "24/7 Wall St. — https://247wallst.com/investing/2026/07/14/here-are-tuesdays-best-wall-street-analyst-research-calls-apple-bloom-energy-circle-internet-group-first-solar-halliburton-ibm-intuit-newmont-sk-hynix-and-more/ [24]",
-    "24/7 Wall St. — https://247wallst.com/investing/2026/07/14/stock-market-live-july-14-2026-s-p-500-spy-regaining-lost-ground-on-inflation-report/ [31]"
+    "TipRanks - https://www.tipranks.com/news/options-volatility-and-implied-earnings-moves-today-july-15-2026",
+    "TheStreet - https://www.thestreet.com/markets/stock-market-today-july-15-2026",
+    "Zacks Investment Research - https://www.zacks.com/stock/news/2299837/stock-market-news-for-july-15-2026",
+    "TheStreet - https://www.thestreet.com/markets/stock-market-today-july-14-2026",
+    "TipRanks - https://www.tipranks.com/news/stock-market-news-today-7-15-26-futures-rise-as-soft-inflation-and-bank-earnings-lift-sentiment",
+    "Associated Press - https://apnews.com/article/stock-market-today-wall-street-inflation-earnings-07-14-2026-b932235948705a7e6b911a37c88b3f8d",
+    "TheStreet - https://www.thestreet.com/markets/stock-market-today-july-15-2026",
+    "Scotiabank - https://www.scotiabank.com/ca/en/about/economics/economics-publications/post.token-path.html/content/scotia-economics/en/economics-publications/!ut/p/z1/04_Sj9CPykssy0xPLMnMz0vMAfIjo8ziLwInAydDA093A3dDA0czQ3d_Vw8nMz0w8z1vfSj8LKAAG-AAjgA_VFg_f_2c_N1A_d383Q38LCP1I_Ep_eHI_cnA00PfB34e-bmp-gW5EeUAs4isw!/",
+    "24/7 Wall St. - https://247wallst.com/investing/2026/07/15/here-are-wednesdays-top-wall-street-analyst-research-calls-allstate-amc-entertainment-boeing-cava-group-check-point-software-digital-realty-trust-fedex-ibm-ups-and-more/",
+    "MARKETSnap - https://marketsnap.io/stock-market-summary/july-14-2026",
+    "FinHacker.cz - https://finhacker.cz/fear-and-greed-index-historical-data-chart/",
+    "Reuters - https://www.reuters.com/markets/us/sp-500-nasdaq-end-higher-cool-inflation-data-solid-bank-earnings-2026-07-14/",
+    "Trading Economics - https://tradingeconomics.com/united-states/10-year-treasury-yield"
   ]
 }
