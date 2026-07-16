@@ -32,9 +32,24 @@ type TradeRow = {
   side?: string | null;
   tradeDate?: string | null;
   executedAt?: string | null;
-  pnl: number | null;
+  // /api/journal/trades spreads the Prisma record, so Decimal columns arrive as
+  // STRINGS ("-123.45") — never assume number here. Open/LIVE rows carry
+  // pnl:null with the sheet value moved to sheetPnl.
+  pnl: number | string | null;
+  pnlUsd?: number | string | null;
   source?: string | null;
 };
+
+/** Decimal-safe number coercion (Prisma Decimal → JSON string). */
+function num(v: unknown): number | null {
+  if (v == null) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+/** Realized P&L for a row, USD-true: prefer the converted pnlUsd. */
+function rowPnl(t: TradeRow): number | null {
+  return num(t.pnlUsd) ?? num(t.pnl);
+}
 
 type Position = { ticker: string; qty: number; unrealizedPl: number | null; stale?: boolean };
 type Portfolio = { accounts: { positions: Position[] }[] } | null;
@@ -75,8 +90,10 @@ function NavCard({ href, icon, title, desc }: { href: string; icon: string; titl
       href={href}
       className="market-panel flex items-center gap-3 p-4 transition hover:border-[var(--accent)]"
     >
+      {/* Icon has NO default size — an unsized <svg> renders full-bleed and
+          swallows the card (same defect Codex hit on Portfolio). Always size it. */}
       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--bg-raised)] text-[var(--accent)]">
-        <Icon name={icon} />
+        <Icon className="h-4 w-4" name={icon} />
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-bold text-[var(--fg-1)]">{title}</span>
@@ -134,7 +151,7 @@ export default function JournalHome() {
   const recentClosed = useMemo(
     () =>
       trades
-        .filter((t) => t.pnl != null)
+        .filter((t) => rowPnl(t) != null)
         .sort((a, b) => (b.executedAt ?? b.tradeDate ?? "").localeCompare(a.executedAt ?? a.tradeDate ?? ""))
         .slice(0, 8),
     [trades],
@@ -213,7 +230,7 @@ export default function JournalHome() {
                   <Link href={`/dashboard/journal/trades/${t.id}`} className="flex items-center justify-between py-1.5 text-sm hover:opacity-80">
                     <span className="font-semibold text-[var(--fg-1)]">{t.ticker}</span>
                     <span className="t-caption text-[var(--fg-3)]">{(t.executedAt ?? t.tradeDate ?? "").slice(0, 10)}</span>
-                    <span className={`font-mono text-sm ${tone(t.pnl)}`}>{fmtMoney(t.pnl, true)}</span>
+                    <span className={`font-mono text-sm ${tone(rowPnl(t))}`}>{fmtMoney(rowPnl(t), true)}</span>
                   </Link>
                 </li>
               ))}
