@@ -71,6 +71,49 @@ export function atrSeries(candles: Candle[], period = 14): (number | null)[] {
 }
 
 /** Lowest low across the last `n` candles ending at (and including) index `idx`. */
+/**
+ * Wilder RSI series aligned to `closes` (null until `period`+1 samples exist).
+ * Mirrors compute_index_technicals.py so the dashboard and the brief agree.
+ */
+export function rsiSeries(closes: number[], period = 14): (number | null)[] {
+  const out: (number | null)[] = closes.map(() => null);
+  if (closes.length < period + 1) return out;
+  let avgGain = 0;
+  let avgLoss = 0;
+  for (let i = 1; i <= period; i++) {
+    const d = closes[i] - closes[i - 1];
+    avgGain += Math.max(d, 0);
+    avgLoss += Math.max(-d, 0);
+  }
+  avgGain /= period;
+  avgLoss /= period;
+  const rsiOf = (g: number, l: number) => (l === 0 ? 100 : 100 - 100 / (1 + g / l));
+  out[period] = rsiOf(avgGain, avgLoss);
+  for (let i = period + 1; i < closes.length; i++) {
+    const d = closes[i] - closes[i - 1];
+    avgGain = (avgGain * (period - 1) + Math.max(d, 0)) / period;
+    avgLoss = (avgLoss * (period - 1) + Math.max(-d, 0)) / period;
+    out[i] = rsiOf(avgGain, avgLoss);
+  }
+  return out;
+}
+
+export type EntryRisk = "EXTREME-EXTENDED" | "EXTENDED" | "FAIR" | "AT-MA" | "OVERSOLD-PB" | "UNKNOWN";
+
+/**
+ * Classify location by distance from the 21EMA in ATR units. Same rubric as
+ * compute_index_technicals.py (morning-brief Step 0.5) — keep the two in sync.
+ *   >= +3 EXTREME-EXTENDED | +2..+3 EXTENDED | +0.5..+2 FAIR | -0.5..+0.5 AT-MA | <= -0.5 OVERSOLD-PB
+ */
+export function classifyEntryRisk(dist21Atr: number | null): EntryRisk {
+  if (dist21Atr == null || !Number.isFinite(dist21Atr)) return "UNKNOWN";
+  if (dist21Atr >= 3) return "EXTREME-EXTENDED";
+  if (dist21Atr >= 2) return "EXTENDED";
+  if (dist21Atr >= 0.5) return "FAIR";
+  if (dist21Atr >= -0.5) return "AT-MA";
+  return "OVERSOLD-PB";
+}
+
 export function lowestLow(candles: Candle[], idx: number, n: number): number | null {
   const start = Math.max(0, idx - n + 1);
   const slice = candles.slice(start, idx + 1);

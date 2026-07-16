@@ -45,6 +45,15 @@ describe("evaluateTrigger — BO-CB", () => {
     const r = evaluateTrigger("BO-CB", [d0, bar({ date: "2026-06-02", o: 61, h: 61.8, l: 60, c: 61, rvol: 0.7 })], 62);
     expect(r.state).toBe("ARMED");
   });
+
+  // 2026-07-16 (VCTR false-GO): a null pivot previously fell back to `d0.high`,
+  // and upstream the "pivot" was the pick-day CLOSE — so a breakout could fire
+  // with nothing to break out of. A breakout with no pivot now fails closed.
+  it("NEEDS-PIVOT when no prior-consolidation high exists (never falls back to d0.high)", () => {
+    const r = evaluateTrigger("BO-CB", [d0, bar({ date: "2026-06-02", o: 61, h: 63, l: 60, c: 62.5, rvol: 1.3 })], null);
+    expect(r.state).toBe("NEEDS-PIVOT");
+    expect(r.reason).toMatch(/not a pivot/);
+  });
 });
 
 describe("evaluateTrigger — PB-21EMA", () => {

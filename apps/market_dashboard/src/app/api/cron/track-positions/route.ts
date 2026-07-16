@@ -26,7 +26,8 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getOwnerUserId } from "@/server/a-list-extractor";
-import { emaSeries, atrSeries, lowestLow, type Candle } from "@/server/indicators";
+import { emaSeries, atrSeries, rsiSeries, classifyEntryRisk, lowestLow, type Candle } from "@/server/indicators";
+import { findPivot } from "@/server/alist-levels";
 import { atrFloorStop, rUnit, realizedVsFullR, softVsHard } from "@/server/alist-metrics";
 import { reconcileClosedHeld } from "@/server/alist-close";
 import { evaluateTrigger, preScreenStructure } from "@/lib/alist-triggers";
@@ -236,7 +237,9 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
     const closes = candles.map((c) => c.close);
     const ema8 = emaSeries(closes, 8);
     const ema21 = emaSeries(closes, 21);
+    const ema50 = emaSeries(closes, 50);
     const atr14 = atrSeries(candles, 14);
+    const rsi14 = rsiSeries(closes, 14);
     const rvol = rvolSeries(candles);
 
     const entryIdx = candles.findIndex((c) => c.date >= entryDateStr);
@@ -331,8 +334,10 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
       trig = trig ?? evaluateTrigger(cand.setupClassification, triggerPath, cand.entryZone?.toNumber() ?? null);
 
       // Only advance / record changes — never regress a fired trigger to ARMED.
-      const terminalNow = trig.state === "TRIGGERED" || trig.state === "INVALIDATED";
-      const prevTerminal = prev === "TRIGGERED" || prev === "INVALIDATED";
+      // NEEDS-PIVOT is terminal too: a breakout with nothing to break out of can
+      // never legitimately fire (2026-07-16 VCTR false-GO).
+      const terminalNow = trig.state === "TRIGGERED" || trig.state === "INVALIDATED" || trig.state === "NEEDS-PIVOT";
+      const prevTerminal = prev === "TRIGGERED" || prev === "INVALIDATED" || prev === "NEEDS-PIVOT";
       if (!prevTerminal || terminalNow) {
         triggerUpdate = {
           triggerState: trig.state,
@@ -345,7 +350,7 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
       // is no longer an entry candidate — retire the row so the Active board
       // only shows actionable picks. (HELD rows are never status-flipped here.)
       const effState = triggerUpdate.triggerState ?? prev;
-      if ((effState === "EXPIRED" || effState === "INVALIDATED") && cand.status === "ACTIVE" && !hitTarget && !hardHitLoggedAt && !hardHitAtrAt) {
+      if ((effState === "EXPIRED" || effState === "INVALIDATED" || effState === "NEEDS-PIVOT") && cand.status === "ACTIVE" && !hitTarget && !hardHitLoggedAt && !hardHitAtrAt) {
         statusOverride = "EXPIRED";
       }
 
@@ -364,6 +369,17 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
       // yet — includes the backlog (earlier flips cut off by the per-run cap),
       // which drains MAX_ANALYSES_PER_RUN per day.
       if (effState === "TRIGGERED" && cand.agentConvictionAt == null) {
+        // Location facts — the inputs whose absence let VCTR score Entry 27/30
+        // while sitting +2.82xATR above its 21EMA (2026-07-16). Fail-closed:
+        // when these cannot be computed the hard gate PASSes the candidate.
+        const atrNow = atr14[lastIdx] ?? null;
+        const closeNow = candles[lastIdx].close;
+        const e21Now = ema21[lastIdx] ?? null;
+        const e50Now = ema50[lastIdx] ?? null;
+        const dist21Atr = atrNow != null && atrNow > 0 && e21Now != null ? (closeNow - e21Now) / atrNow : null;
+        const dist50Atr = atrNow != null && atrNow > 0 && e50Now != null ? (closeNow - e50Now) / atrNow : null;
+        const pivot = findPivot(candles.slice(0, lastIdx + 1));
+
         triggered = {
           candId: cand.id,
           input: {
@@ -380,6 +396,14 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
             day0Thesis: cand.day0Thesis,
             algo: { setup: cand.setupScore, entry: cand.entryScore, theme: cand.themeScore, sentiment: cand.sentimentScore },
             recentPath: triggerPath.slice(-6).map((b) => ({ date: b.date, close: b.close, ema8: b.ema8, ema21: b.ema21, rvol: b.rvol })),
+            extension: {
+              atr14: atrNow,
+              dist21Atr,
+              dist50Atr,
+              rsi14: rsi14[lastIdx] ?? null,
+              entryRisk: classifyEntryRisk(dist21Atr),
+            },
+            pivotFound: pivot != null,
           },
         };
       }

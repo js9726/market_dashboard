@@ -6,6 +6,8 @@
  *   - TRIGGERED   — the entry actually became buyable (the "take it" signal)
  *   - INVALIDATED — the thesis broke before triggering (e.g. ONTO gap-fade)
  *   - EXPIRED     — no trigger within the setup's validity window
+ *   - NEEDS-PIVOT — BREAKOUT family with no real prior-consolidation high to
+ *                   break (fail-closed; added 2026-07-16 after the VCTR false-GO)
  *
  * Daily-bar limitation: EP "opening-range-high" is intraday; here it is
  * approximated by a daily continuation that holds the EP-day range. The state
@@ -25,7 +27,7 @@ export interface TriggerBar {
   rvol: number | null; // vs 50-day avg volume
 }
 
-export type TriggerState = "ARMED" | "TRIGGERED" | "INVALIDATED" | "EXPIRED";
+export type TriggerState = "ARMED" | "TRIGGERED" | "INVALIDATED" | "EXPIRED" | "NEEDS-PIVOT";
 
 export interface TriggerResult {
   state: TriggerState;
@@ -121,9 +123,15 @@ export function evaluateTrigger(
       // BREAKOUT: wait for a higher-low then a pivot break on volume.
       if (b.close < d0.low)
         return { state: "INVALIDATED", dayIndex: i, date: b.date, reason: `close < breakout-day low ${d0.low.toFixed(2)}` };
-      const pivotLevel = pivot ?? d0.high;
-      if (inWindow && b.low > d0.low && b.close > pivotLevel && rvol(b) >= RVOL_OK)
-        return { state: "TRIGGERED", dayIndex: i, date: b.date, reason: `higher-low + close > pivot ${pivotLevel.toFixed(2)} on RVOL ${rvol(b).toFixed(1)}x` };
+      // A breakout needs something to break OUT OF. `pivot` must be a real
+      // prior-consolidation high (alist-levels.findPivot). Falling back to
+      // `d0.high` — or, as before 2026-07-16, to the pick-day CLOSE — degrades
+      // this into "closed higher two days running", which is how VCTR triggered
+      // at +2.82 ATR above its 21EMA with no base. Fail closed instead.
+      if (pivot == null)
+        return { state: "NEEDS-PIVOT", dayIndex: null, date: b.date, reason: "no prior-consolidation high to break — the last close is not a pivot" };
+      if (inWindow && b.low > d0.low && b.close > pivot && rvol(b) >= RVOL_OK)
+        return { state: "TRIGGERED", dayIndex: i, date: b.date, reason: `higher-low + close > pivot ${pivot.toFixed(2)} on RVOL ${rvol(b).toFixed(1)}x` };
     }
   }
 

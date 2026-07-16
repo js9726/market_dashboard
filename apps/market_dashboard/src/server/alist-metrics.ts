@@ -23,6 +23,8 @@ function dir(side: Side): number {
  *   BO-CB/BO-VCP/EP-FRESH/POST-GAP-VCP/MA-PULLBACK -> 1.5x ATR(14)
  *   PB-21EMA -> 1.2x   |   EP-SECOND/CONTINUATION -> 1.3x
  *   PARABOLIC/ORH-INTRADAY -> 0 (tight stops intentional, no floor)
+ *
+ * A 0 here means "no FLOOR" — it must never widen the stop. See atrFloorStop.
  */
 export function atrFloorMultiplier(setup: string | null | undefined): number {
   switch ((setup ?? "").toUpperCase()) {
@@ -40,9 +42,34 @@ export function atrFloorMultiplier(setup: string | null | undefined): number {
 }
 
 /**
- * Wiki ATR-floor stop. For a long: `1.5xATR(14)` below entry OR the 5-day low,
- * whichever is WIDER (further from entry). 1.2x for PB-21EMA. Setups with a 0
- * multiplier fall back to the 5-day low (or entry-only ATR if no low given).
+ * Wiki risk CEILING (risk-management.md "Stop distance band ... FLOOR and CEILING",
+ * Qullamaggie ATR/ADR guardrail): a stop may never sit further than 1.5xATR(14)
+ * from entry. Wider than this and the setup has lost its asymmetry.
+ */
+export const RISK_CEILING_ATR_MULT = 1.5;
+
+/** The widest permissible stop for `entry`. Null when ATR is unknown. */
+export function riskCeilingStop(entry: number, atr14: number | null, side: Side = "LONG"): number | null {
+  if (atr14 == null || !(atr14 > 0)) return null;
+  return entry - RISK_CEILING_ATR_MULT * atr14 * dir(side);
+}
+
+/**
+ * Wiki stop = FLOOR clamped by CEILING (risk-management.md, updated 2026-07-16).
+ *
+ * For a long: `mult x ATR(14)` below entry OR the 5-day low, whichever is WIDER
+ * (further from entry) — then clamped so it is never wider than 1.5xATR.
+ *
+ * Two behaviours this function must NEVER exhibit again (2026-07-16 VCTR false-GO):
+ *   1. Returning an unbounded stop because the 5-day low was far away. The floor
+ *      protects against too-TIGHT stops; it is not a licence for unbounded risk.
+ *      A structural low beyond the ceiling means "no valid stop exists" -> the
+ *      admission path must PASS the candidate (see evaluateRiskGate), and the
+ *      measurement path clamps to the ceiling rather than inventing 12% risk.
+ *   2. Widening a `mult === 0` setup (PARABOLIC/ORH-INTRADAY) to the 5-day low.
+ *      "No floor" means KEEP IT TIGHT. Previously mult 0 -> atrStop null -> the
+ *      5-day low was the only candidate, so the most extended setups silently got
+ *      the WIDEST stops - the exact inverse of the wiki intent.
  */
 export function atrFloorStop(args: {
   entry: number;
@@ -53,11 +80,69 @@ export function atrFloorStop(args: {
 }): number | null {
   const { entry, atr14, fiveDayLow, setup, side = "LONG" } = args;
   const mult = atrFloorMultiplier(setup);
-  const atrStop = atr14 != null && mult > 0 ? entry - mult * atr14 * dir(side) : null;
+  const ceiling = riskCeilingStop(entry, atr14, side);
+
+  // mult === 0 -> tight stops are intentional: never widen to the 5-day low.
+  if (mult === 0) return ceiling != null && fiveDayLow != null
+    ? (side === "LONG" ? Math.max(fiveDayLow, ceiling) : Math.min(fiveDayLow, ceiling))
+    : fiveDayLow ?? ceiling;
+
+  const atrStop = atr14 != null ? entry - mult * atr14 * dir(side) : null;
   // "wider" = further from entry. For longs that's the LOWER price; shorts the higher.
   const candidates = [atrStop, fiveDayLow].filter((v): v is number => v != null);
   if (candidates.length === 0) return null;
-  return side === "LONG" ? Math.min(...candidates) : Math.max(...candidates);
+  const floored = side === "LONG" ? Math.min(...candidates) : Math.max(...candidates);
+  if (ceiling == null) return floored;
+  // Clamp: never wider than the ceiling.
+  return side === "LONG" ? Math.max(floored, ceiling) : Math.min(floored, ceiling);
+}
+
+export interface RiskGateResult {
+  ok: boolean;
+  /** Risk expressed in ATR multiples, |entry-stop| / ATR. Null when inputs missing. */
+  riskAtr: number | null;
+  /** Risk as a fraction of entry price (0.124 = 12.4%). Null when inputs missing. */
+  riskPct: number | null;
+  reason: string;
+}
+
+/**
+ * HARD risk gate for the ADMISSION path (a-list-gate-and-screener.md "Hard pre-gates").
+ * Fail-closed: missing ATR or stop => FAIL, never "assume it passed".
+ *
+ * Risk must be measured to the PATTERN stop (trigger-day LoD / wedge low / base low),
+ * not a mechanical swing low - see entry-methods.md Rule 2 (HPE 2026-07-09).
+ */
+export function evaluateRiskGate(args: {
+  entry: number;
+  stop: number | null;
+  atr14: number | null;
+  side?: Side;
+}): RiskGateResult {
+  const { entry, stop, atr14, side = "LONG" } = args;
+  if (!Number.isFinite(entry) || entry <= 0)
+    return { ok: false, riskAtr: null, riskPct: null, reason: "RISK-GATE-FAIL: entry missing" };
+  if (stop == null || !Number.isFinite(stop))
+    return { ok: false, riskAtr: null, riskPct: null, reason: "RISK-GATE-FAIL: no stop (fail-closed)" };
+  if (atr14 == null || !(atr14 > 0))
+    return { ok: false, riskAtr: null, riskPct: null, reason: "RISK-GATE-FAIL: no ATR(14) (fail-closed)" };
+
+  const risk = (entry - stop) * dir(side);
+  if (!(risk > 0))
+    return { ok: false, riskAtr: null, riskPct: null, reason: "RISK-GATE-FAIL: stop on wrong side of entry" };
+
+  const riskAtr = risk / atr14;
+  const riskPct = risk / entry;
+  // Epsilon: a stop set EXACTLY at the ceiling must pass. Float error makes
+  // (entry - (entry - 1.5*atr))/atr evaluate to 1.5000000000000002.
+  if (riskAtr > RISK_CEILING_ATR_MULT + 1e-9)
+    return {
+      ok: false,
+      riskAtr,
+      riskPct,
+      reason: `RISK-GATE-FAIL: risk ${(riskPct * 100).toFixed(1)}% = ${riskAtr.toFixed(2)}xATR exceeds the ${RISK_CEILING_ATR_MULT}xATR ceiling`,
+    };
+  return { ok: true, riskAtr, riskPct, reason: `risk ${(riskPct * 100).toFixed(1)}% = ${riskAtr.toFixed(2)}xATR` };
 }
 
 /** 1R per share = |entry - stop|. Null if stop missing or degenerate. */
