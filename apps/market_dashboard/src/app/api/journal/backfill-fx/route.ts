@@ -56,15 +56,23 @@ const SELECT = {
   currencyCode: true,
 } as const;
 
-async function loadContext(userId: string) {
+async function loadContext(userId: string, recompute = false) {
   const [connection, closed] = await Promise.all([
     prisma.spreadsheetConnection.findUnique({ where: { userId }, select: { fixedFxRate: true } }),
     prisma.tradeRecord.findMany({ where: { userId, pnl: { not: null } }, select: SELECT }),
   ]);
   const storedRate = connection?.fixedFxRate != null ? Number(connection.fixedFxRate) : null;
 
-  // Candidates: realized, non-USD, not yet converted.
-  const candidates = closed.filter((t) => t.pnlUsd == null && num(t.pnl) != null && cur(t) !== "USD" && cur(t) !== "");
+  // Candidates: realized, non-USD, not yet converted. With `recompute`, ALSO
+  // re-take rows this route previously wrote (pnlSource="sheet-fixed-rate") so a
+  // corrected rate can be re-applied — broker-truth rows are never touched.
+  const candidates = closed.filter(
+    (t) =>
+      num(t.pnl) != null &&
+      (cur(t) !== "USD" || t.pnlSource === "sheet-fixed-rate") &&
+      cur(t) !== "" &&
+      (t.pnlUsd == null || (recompute && t.pnlSource === "sheet-fixed-rate")),
+  );
 
   // Anchors: rows whose USD side came from BROKER truth while the sheet value
   // stayed in the base currency — the only honest FX samples we have.
@@ -141,13 +149,14 @@ export async function POST(req: Request) {
   if (!canSeePersonalBook(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const userId = scopeUserId(session)!;
 
-  const body = (await req.json().catch(() => ({}))) as { commit?: unknown; rate?: unknown };
+  const body = (await req.json().catch(() => ({}))) as { commit?: unknown; rate?: unknown; recompute?: unknown };
   const override = num(body.rate);
   if (body.rate !== undefined && (override == null || override <= 0 || override >= 20)) {
     return NextResponse.json({ error: "rate must be a positive number under 20" }, { status: 400 });
   }
+  const recompute = body.recompute === true;
 
-  const { storedRate, candidates } = await loadContext(userId);
+  const { storedRate, candidates } = await loadContext(userId, recompute);
   const rate = override ?? storedRate;
   if (rate == null) {
     return NextResponse.json(
@@ -190,9 +199,11 @@ export async function POST(req: Request) {
     ok: true,
     rateUsed: rate,
     rateOrigin: override != null ? "request" : "stored",
+    recompute,
     candidates: candidates.length,
     updated,
     skipped,
     usdImpact: Math.round(usdImpact * 100) / 100,
+    note: "Re-run with { recompute: true, rate } to correct the rate later — only rows this route wrote (pnlSource='sheet-fixed-rate') are re-taken; broker-truth rows are never touched.",
   });
 }
