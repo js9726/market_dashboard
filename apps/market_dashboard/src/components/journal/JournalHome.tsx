@@ -13,6 +13,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Icon from "@/components/market-desk/Icon";
+import CoachCard from "@/components/journal/CoachCard";
 
 type Stats = {
   totalPnl: number;
@@ -238,6 +239,9 @@ export default function JournalHome() {
           )}
         </section>
       </div>
+
+      {/* AI coach over the journal (TradesViz-platform P3) */}
+      <CoachCard />
 
       {/* Quick-nav into the rest of the Journal surface */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">

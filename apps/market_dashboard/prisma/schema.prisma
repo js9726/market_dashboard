@@ -108,6 +108,8 @@ model User {
   // TradesViz-platform P0: strategy playbooks + goals (P1/P4 build on these).
   playbooks           Playbook[]
   goals               Goal[]
+  // TradesViz-platform P3: persisted AI-coach answers over the user's journal.
+  coachInsights       CoachInsight[]
 }
 
 model SpreadsheetConnection {
@@ -1044,6 +1046,25 @@ model Goal {
   updatedAt   DateTime  @updatedAt
 
   @@index([userId, active])
+}
+
+/// AI-coach Q&A over the user's OWN journal (TradesViz-platform P3). Every
+/// answer persists — "AI output must persist through dashboard schemas, not
+/// remain chat-only" (Codex audit brief pillar 5). `evidence` stores the exact
+/// aggregates the LLM was shown, so the answer stays auditable after the fact.
+model CoachInsight {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// "performance" | "risk" | "pattern" | "accountability"
+  mode      String   @default("performance")
+  question  String   @db.Text
+  answer    String   @db.Text
+  evidence  Json?
+  model     String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model MarketQuote {
