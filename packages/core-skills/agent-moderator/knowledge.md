@@ -5,8 +5,8 @@
   "target": "agent-moderator/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-11T04:36:56.686Z",
-  "renderHash": "d17d707d2409225a1c0ff71913dd5215ac85097c7c22e6058168de4c3d71315e",
+  "generatedAt": "2026-07-16T09:16:24.978Z",
+  "renderHash": "4806eaa38f550af5eb0368cebfad8ab050d96421e87ca23eb1772ea51172417e",
   "sources": [
     {
       "root": "wiki",
@@ -36,12 +36,12 @@
     {
       "root": "wiki",
       "path": "wiki/entry-methods.md",
-      "sha256": "53905bde10bdf8cdcb29751cd805b8a9044bdfb57d11d7fa85f442322d1ee0fe"
+      "sha256": "50edc351b90cbaa47d258194c153f1c4fe7ac1d251b945ba1f352695886d42dc"
     },
     {
       "root": "wiki",
       "path": "wiki/risk-management.md",
-      "sha256": "67607fb8a1239c3c36cb473c183bb06d724abc10d5470a26843c43940cb353e5"
+      "sha256": "f90cf08303b11d3d869eb1a748def14b60c5e7cc0fccf8ddb96056fdeec981fd"
     },
     {
       "root": "wiki",
@@ -78,8 +78,8 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
 - wiki:wiki/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
-- wiki:wiki/entry-methods.md sha256:53905bde10bd
-- wiki:wiki/risk-management.md sha256:67607fb8a123
+- wiki:wiki/entry-methods.md sha256:50edc351b90c
+- wiki:wiki/risk-management.md sha256:f90cf08303b1
 - wiki:wiki/position-sizing.md sha256:23dc116bc8f1
 - wiki:wiki/relative-strength.md sha256:588b842eccce
 - wiki:wiki/fundamental-analysis.md sha256:857839e81082
@@ -953,6 +953,21 @@ This is the same family as Launch Pad / Power-of-3 in traderlion-early-entry-tec
 
 ---
 
+## Midweek entries need a plan, not a chase (2026-07-13 calibration)
+
+Journal evidence (JS, 205 weekday closed trades, 5/5 half-year periods consistent): trades
+**entered Tuesday/Wednesday** ran a weaker win rate (21–29% vs 30–45%) and their winners were
+cut at roughly half the holding time of other days' winners, while loss management stayed
+uniform. Monday — the weekend-research day — has the best average winner. Interpretation: the
+midweek deficit is unplanned chases after Monday's move plus early harvesting of midweek winners.
+
+**Rule:** a Tuesday/Wednesday entry must be a **planned A-list/trigger entry** meeting one of
+this page's setups — never a FOMO chase of a move that already left. Exits on midweek entries
+follow the standard tranche/trailing rules; full detail + evidence in risk-management
+"Operator calibration 2026-07-13".
+
+---
+
 ## Volume at Entry
 
 Across all traders, volume is a key confirmation:
@@ -990,7 +1005,7 @@ Across all traders, volume is a key confirmation:
 
 **Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @Clement_Ang17 on X.md
 
-**Last updated**: 2026-05-25
+**Last updated**: 2026-07-16
 
 ---
 
@@ -1019,16 +1034,47 @@ For Qullamaggie-style breakouts and episodic pivots, the initial stop is normall
 
 > **Calibration note (2026-05-07, updated 2026-05-11)**: A 109-trade backfill found this strict LoD rule whipsawed **30% of trades that ultimately closed positive at +14d**. Updated guidance: keep the LoD stop strict for **fresh catalyst-day Episodic Pivots only** (the catalyst-day low is the genuine failure point), but use a structural stop for **Common Breakouts**, **VCP**, and **post-gap VCP / gapper entries**. For `POST-GAP-VCP`, risk usually belongs below the tight post-gap range, recent higher low, 10ema/21ema, or gap-day volume support. See qullamaggie-breakouts-episodic-pivots "Stop Calibration by Setup Type" and gapper-entry.
 
-### Stop distance floor by setup type
+### Stop distance band by setup type — FLOOR **and** CEILING
 
-Audit evidence across 7 months (2025-07 → 2026-05) shows the rubric still mispredicts stops ~25% of the time, always too tight. To stop the bleeding, apply this minimum-distance floor when computing `predicted_stop_price`:
+Stops have **two** bounds, and both are hard. A floor alone (added 2026-05-07/05-11) caused the
+2026-07-16 VCTR false-GO: see the calibration note below.
 
-- `BO-CB`, `BO-VCP`, `EP-FRESH`, `POST-GAP-VCP`, `MA-PULLBACK`: minimum `1.5 × ATR(14)` below entry, OR the 5-day low, whichever is **wider** (further from entry).
+**Floor (anti-whipsaw).** Audit evidence across 7 months (2025-07 → 2026-05) shows the rubric
+mispredicts stops ~25% of the time, always too tight. Minimum distance when computing
+`predicted_stop_price`:
+
+- `BO-CB`, `BO-VCP`, `EP-FRESH`, `POST-GAP-VCP`, `MA-PULLBACK`: minimum `1.5 × ATR(14)` below entry, OR the 5-day low, whichever is **wider** (further from entry) — **subject to the ceiling below**.
 - `PB-21EMA`: anchored to 21EMA, but never tighter than `1.2 × ATR(14)`.
-- `PARABOLIC`, `ORH-INTRADAY`: no minimum; tight stops are intentional.
+- `PARABOLIC`, `ORH-INTRADAY`: **no floor** — tight stops are intentional and correct for these. Never substitute a wider structural low (e.g. the 5-day low) for the tight stop; "no floor" means *keep it tight*, not *widen it*.
 - `EP-SECOND`, `CONTINUATION`: minimum `1.3 × ATR(14)`.
 
-This rule is enforced for AI-generated stops in trade-analyser and `scripts/audit_trades.py`. See rubric-stop-too-tight for the 15 historical whipsaw cases this rule would have saved.
+**Ceiling (anti-untradeable-risk) — HARD GATE.** Per the Qullamaggie ATR/ADR guardrail above, the
+stop must **not be wider than `1.5 × ATR(14)`** measured to the **pattern stop** (trigger-day LoD /
+wedge low / base low — see entry-methods Rule 2). This is not advisory.
+
+**When the floor exceeds the ceiling, the setup is REJECTED — you do not widen the stop.**
+A structural low further than `1.5 × ATR` from entry is *information*: the stock has travelled too
+far from its last real failure point, so no tight stop exists and the asymmetry is gone. Emit
+`RISK-GATE-FAIL` and PASS the candidate. The floor exists to stop you entering with a *too-tight*
+stop; it was never a licence to accept unbounded risk.
+
+> **Calibration note (2026-07-16, VCTR false-GO — operator-found).** VCTR was auto-proposed ENTER at
+> conviction 80 with entry 97.70 / stop 85.59 = **12.4% risk = 3.86 × ATR**, i.e. 2.6× the ceiling.
+> Root cause: this section's floor rule ("whichever is **wider**") was implemented in the runtime
+> (`alist-metrics.ts` `atrFloorStop`) while the ceiling in "Qullamaggie's Low-of-Day + ATR/ADR
+> Guardrail" above was never ported — the two rules on this page **contradicted each other** and the
+> code followed the permissive one. The system's own ATR stop (93.00) was correct and got overridden
+> by the wider 5-day low. Compounding it: `PARABOLIC`/`ORH-INTRADAY` "no minimum" was implemented as
+> multiplier `0` → ATR stop `null` → fell back to the 5-day low, meaning **the most extended setups
+> received the widest stops** — the exact inverse of the intent. Both are now fixed here and in the
+> runtime. Same root cause as the HPE 2026-07-09 miss (mechanical swing-low stop instead of a pattern
+> stop) — there it produced a false PASS, here a false GO. **Risk must be measured to the pattern
+> stop and gated at both ends.**
+
+This rule is enforced for AI-generated stops in trade-analyser and `scripts/audit_trades.py`, and
+at runtime in `market_dashboard` `alist-metrics.ts` (`atrFloorStop` → `RISK-GATE-FAIL`). See
+rubric-stop-too-tight for the 15 historical whipsaw cases the floor saved, and
+a-list-gate-and-screener for the A-list hard gate.
 
 ## Trimming / Scaling Out
 
@@ -1045,6 +1091,30 @@ Systematic partial exits protect gains while keeping exposure for the trend:
 - 25% on 50 EMA break on closing basis
 
 (see position-sizing for full detail)
+
+### Operator calibration 2026-07-13 — midweek-entry winners get cut early (JS journal evidence)
+
+Period-sliced audit of JS's full FX-complete journal (205 weekday closed trades, weekend
+date-artifacts excluded): **trades entered Tuesday/Wednesday had a lower average winner AND a
+worse profit factor than other days in 5 of 5 half-year periods** (2024-H1 → 2026-H1) — a
+market-regime effect would have flipped some periods; none flipped. Mechanism: **winners from
+Tue/Wed entries were held 8.3 days on average vs 17.9 days for other-day entries (roughly 1/3
+of the $ per winner), while losers were managed identically everywhere** (held ~5 days, avgLoss
+stable −$53..−$94). Loss discipline is fine; midweek-entry winners get harvested early.
+(Caveat: winner-holding sample n=11 vs n=29 — thin; re-audit as the journal grows.)
+
+**Rule (operator-approved 2026-07-13):**
+1. **Winners from Tue/Wed entries follow the SAME tranche/trailing exits as any other trade**
+   (Alex 2R-trim + 21dma trail, or SRxTrades 8/21/50 EMA tranches above) — no discretionary
+   quick profit-taking just because the entry was midweek.
+2. **Pre-entry check on Tue/Wed:** is this a planned A-list/trigger entry, or a chase after
+   Monday's move? Unplanned midweek chases are the likely source of the weaker win rate
+   (21–29% vs 30–45%) — if it isn't on the plan, it needs the full entry-methods trigger,
+   not FOMO.
+
+When reviewing a JS trade entered on a Tuesday or Wednesday, check the exit against this rule
+and flag early discretionary profit-taking as an execution mistake ("cut winner short —
+midweek pattern").
 
 ## Exposure Management by Market Phase
 
