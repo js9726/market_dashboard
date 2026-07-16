@@ -120,7 +120,7 @@ Output is urgency-sorted: `CUT` (regular-session stop broken) → `CUT-ON-OPEN`
 (within 0.3 ATR of stop, or below 8EMA) → `OK`. R is `(last−entry)/(entry−stop)`.
 
 - **Sweep BOTH brokers (2026-07-09).** `holdings_review.py` covers moomoo only. Jie also
-  holds positions at IBKR (U19791550 — e.g. RBRK; ONTO previously), which a moomoo-only
+  holds positions at IBKR (account identifier intentionally omitted; e.g. RBRK; ONTO previously), which a moomoo-only
   sweep silently misses. Also run the read-only IBKR dry run:
   `cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\dashboard-bridge"; & ".venv\Scripts\python.exe" ibkr_bridge.py`
   (no `--post` = dry run; needs TWS at 127.0.0.1:7496). If TWS is down, fail-closed:
