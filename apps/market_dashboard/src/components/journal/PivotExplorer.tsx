@@ -33,6 +33,7 @@ type PivotResp = {
   sorts: string[];
   rows: PivotRow[];
   totals: { trades: number; measuredTrades: number; totalPnl: number; winRate: number | null; unconvertedExcluded: number };
+  dataQuality?: { weekendDated: number; weekendSample: string[]; warning: string | null };
   note: string;
 };
 
@@ -172,6 +173,18 @@ export default function PivotExplorer() {
             <span className="t-caption text-[var(--warn-fg,#f59e0b)]" title="Non-USD trades with no FX rate are counted but excluded from money metrics — currency-truth rule">
               ⚠ {data.totals.unconvertedExcluded} unconverted (excluded from $ metrics)
             </span>
+          )}
+        </section>
+      )}
+
+      {/* Data-quality warning — surfaced, never silently applied */}
+      {data?.dataQuality?.warning && (
+        <section className="market-panel border-l-2 border-[var(--warn-fg,#f59e0b)] p-4">
+          <p className="t-caption text-[var(--fg-2)]">
+            <strong className="text-[var(--warn-fg,#f59e0b)]">⚠ Data quality:</strong> {data.dataQuality.warning}
+          </p>
+          {data.dataQuality.weekendSample.length > 0 && (
+            <p className="t-caption mt-1 font-mono text-[var(--fg-3)]">{data.dataQuality.weekendSample.join(" · ")}</p>
           )}
         </section>
       )}

@@ -194,8 +194,19 @@ export async function GET(req: Request) {
   let overallPnl = 0;
   let overallWins = 0;
   let overallPriced = 0;
+  // Data quality: trades whose recorded date lands on a weekend. Markets are
+  // shut Sat/Sun, so these are source-sheet date errors, NOT trading days. They
+  // are NOT silently dropped (that would hide the problem) — they are counted
+  // and surfaced so a day-of-week read isn't taken at face value.
+  let weekendDated = 0;
+  const weekendTickers: string[] = [];
 
   for (const t of trades) {
+    const when = t.tradeDate ?? t.executedAt;
+    if (when && (when.getUTCDay() === 0 || when.getUTCDay() === 6)) {
+      weekendDated++;
+      if (weekendTickers.length < 15) weekendTickers.push(`${t.ticker} ${when.toISOString().slice(0, 10)}`);
+    }
     const p = usdPnl(t);
     if (p == null) unconvertedExcluded++;
     for (const key of keysFor(groupBy, t)) {
@@ -278,10 +289,20 @@ export async function GET(req: Request) {
       winRate: overallPriced > 0 ? r2((overallWins / overallPriced) * 100) : null,
       unconvertedExcluded,
     },
+    dataQuality: {
+      weekendDated,
+      weekendSample: weekendTickers,
+      // Only a day-of-week read is actually distorted by a bad weekday.
+      warning:
+        weekendDated > 0 && groupBy === "dow"
+          ? `${weekendDated} trade(s) are dated Saturday/Sunday in the source sheet — markets are shut, so those are recorded-date errors, not trading days. They are shown (not dropped) but the Sat/Sun rows are not real sessions; fix the dates at source and re-sync.`
+          : null,
+    },
     note: [
       "Closed trades only (realized P&L).",
       "P&L is USD-true: non-USD trades without an FX rate are counted but excluded from money metrics.",
       multiCount ? "A trade contributes to every tag/mistake it carries, so group counts can exceed trade count." : null,
+      groupBy === "dow" ? "Grouped by ENTRY date (tradeDate), which is what 'which day do I trade badly' means." : null,
     ]
       .filter(Boolean)
       .join(" "),
