@@ -39,6 +39,10 @@ export default auth((req) => {
     // A-list daily-bar ingest (P2): the local OpenD/IBKR bridge pushes bars via
     // BRIEF_INGEST_KEY. Key/bearer auth inside the handler — must bypass session.
     pathname.startsWith("/api/a-list/bars-ingest") ||
+    // Paper-trader signal feed (2026-07-16): the operator-local SIMULATE bridge
+    // reads actionable ENTER signals via BRIEF_INGEST_KEY bearer auth inside
+    // the handler. Read-only, no user/account data.
+    pathname.startsWith("/api/alist/actionable") ||
     // Bridge daemon uses bearer-token auth (BrokerBridgeToken.tokenHash) plus
     // X-Timestamp replay protection. Token endpoint stays session-authed
     // because only logged-in users generate/revoke their own tokens.
