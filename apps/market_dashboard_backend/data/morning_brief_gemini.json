@@ -1,483 +1,424 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-OFF",
-    "posture": "RAISE-THE-BAR",
-    "summary": "Overnight pressure on semiconductor stocks following a sell-off in Asia is setting a cautious tone, despite a major M&A catalyst in the payments sector. Key US retail sales data this morning will be the next major test for the market."
+    "label": "RISK-OFF",
+    "posture": "WAIT",
+    "summary": "A global tech and semiconductor sell-off is driving a risk-off sentiment, with US futures pointing to a sharply lower open. Heightened geopolitical tensions in the Middle East are adding to market jitters."
   },
   "breadth": {
-    "up": 1631,
-    "down": 1112
+    "up": null,
+    "down": null
   },
   "fearGreed": {
-    "score": 43,
-    "label": "Fear"
+    "score": null,
+    "label": null
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.1,
+      "changePct": -0.85,
       "note": "futures",
-      "citation": "Source: Morningstar 07:47 GMT"
+      "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": -0.29,
+      "changePct": -1.84,
       "note": "futures",
-      "citation": "Source: TipRanks 05:43 AM EDT"
+      "citation": null
     },
     {
       "symbol": "DIA",
-      "name": "Dow Jones",
+      "name": "Dow Jones Industrial Average",
       "level": null,
-      "changePct": 0.0,
+      "changePct": -0.58,
       "note": "futures",
-      "citation": "Source: Morningstar 07:47 GMT"
+      "citation": null
+    },
+    {
+      "symbol": "IWM",
+      "name": "Russell 2000",
+      "level": null,
+      "changePct": -0.76,
+      "note": "futures",
+      "citation": null
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility",
-      "level": 16.02,
-      "changePct": 2.23,
+      "name": "Volatility Index",
+      "level": 19,
+      "changePct": null,
       "note": "live",
-      "citation": "Source: Google Finance 09:06 AM GMT-5"
+      "citation": null
     },
     {
       "symbol": "^TNX",
-      "name": "10Y Yield",
-      "level": 4.57,
-      "changePct": 0.44,
+      "name": "10-Year Treasury Yield",
+      "level": 4.547,
+      "changePct": null,
       "note": "live",
-      "citation": "Source: Morningstar 07:47 GMT"
+      "citation": null
     },
     {
       "symbol": "CL=F",
-      "name": "WTI Crude",
-      "level": 79.34,
-      "changePct": -0.65,
+      "name": "Crude Oil",
+      "level": 80.51,
+      "changePct": 2,
       "note": "futures",
-      "citation": "Source: TipRanks"
+      "citation": null
     }
   ],
-  "indicesNarrative": "US futures are mixed to slightly lower, with the Nasdaq leading declines due to a rollover in Asian semiconductor stocks. This tech weakness is creating a headwind for the broader market, despite recent soft inflation data that has pushed down Treasury yields. Volatility is ticking up, and oil remains near one-month highs amid geopolitical tensions, adding to a cautious tone ahead of key retail sales data.",
-  "technicals": {
-    "SPY": null,
-    "QQQ": null,
-    "DIA": null
-  },
-  "technicalsNarrative": "Detailed daily technical data for indices was not available at the time of generation.",
-  "sectorsThemes": [
-    {
-      "symbol": "XLK",
-      "name": "Technology",
-      "changePct": 0.75,
-      "rs": null,
-      "note": "Gained yesterday but facing pre-market pressure from semis."
-    },
-    {
-      "symbol": "XLY",
-      "name": "Consumer Discretionary",
-      "changePct": 0.54,
-      "rs": null,
-      "note": "Showing relative strength ahead of retail sales report."
-    },
-    {
-      "symbol": "XLF",
-      "name": "Financials",
-      "changePct": 0.28,
-      "rs": null,
-      "note": "Watching M&A news in the payments space (PYPL)."
-    },
-    {
-      "symbol": "XLV",
-      "name": "Health Care",
-      "changePct": -0.58,
-      "rs": null,
-      "note": "Lagged the broader market in the previous session."
-    },
-    {
-      "symbol": "XLE",
-      "name": "Energy",
-      "changePct": 0.03,
-      "rs": null,
-      "note": "Flat, but holding near highs as crude oil prices remain elevated."
-    }
-  ],
-  "sectorsNarrative": "Technology led gains yesterday but is poised for weakness at the open. There appears to be a slight rotation into more defensive sectors and recent laggards like Financials, which are benefiting from M&A activity.",
-  "industryNarrative": null,
+  "indicesNarrative": "US index futures are sharply lower, led by a significant drop in the Nasdaq, as a global sell-off in semiconductor and AI-related stocks continues. The VIX has risen to a nine-day high, indicating increasing investor anxiety. Crude oil is trading higher due to escalating tensions in the Middle East.",
+  "technicals": null,
+  "technicalsNarrative": null,
+  "sectorsThemes": [],
+  "sectorsNarrative": "The technology sector, particularly semiconductors, is experiencing a significant downturn, dragging the broader market lower. This follows a period of strong performance, suggesting profit-taking and concerns about the sustainability of high valuations in the AI space.",
+  "industryNarrative": "Semiconductor and AI-related industries are leading the market decline. Storage chip and optical communications sectors are also seeing significant pre-market losses.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "PYPL",
-      "side": "LONG",
-      "changePct": 15.6,
-      "why": "Reports of a $53B ($60.50/share) takeover offer from Stripe and Advent International.",
-      "traderLens": "Qullamaggie (Episodic Pivot)"
-    },
-    {
-      "ticker": "VIVS",
-      "side": "LONG",
-      "changePct": 77.9,
-      "why": "High pre-market volume, specific catalyst not identified.",
-      "traderLens": "Momentum"
-    },
-    {
-      "ticker": "AEHR",
-      "side": "LONG",
-      "changePct": 35.1,
-      "why": "Continued momentum in semiconductor testing space.",
-      "traderLens": "Minervini (High RS stock)"
-    },
-    {
-      "ticker": "BLK",
-      "side": "LONG",
-      "changePct": 6.63,
-      "why": "Upgraded to Overweight with a raised price target at JP Morgan following strong Q2 earnings.",
-      "traderLens": "Ted Zhang (Institutional Flow)"
-    },
-    {
-      "ticker": "GE",
-      "side": "LONG",
-      "changePct": null,
-      "why": "Beat Q2 earnings and revenue expectations and raised full-year guidance.",
-      "traderLens": "Earnings Catalyst"
-    },
-    {
-      "ticker": "PGR",
+      "ticker": "ISRG",
       "side": "SHORT",
-      "changePct": -9.1,
-      "why": "Monthly earnings report showed deteriorating combined ratio and rising loss costs, prompting analyst downgrades.",
-      "traderLens": "Fundamental/News-driven fade"
+      "changePct": -10.3,
+      "why": "Soft US Da Vinci procedure growth.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "DELL",
+      "ticker": "NFLX",
       "side": "SHORT",
-      "changePct": -9.8,
-      "why": "General weakness in tech hardware sector.",
-      "traderLens": "Sector Fade"
+      "changePct": -11,
+      "why": "Q3 revenue guidance missed expectations.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "LGH",
+      "ticker": "SPCX",
       "side": "SHORT",
-      "changePct": -25.2,
-      "why": "High pre-market volume loser, specific catalyst not identified.",
-      "traderLens": "Momentum Fade"
+      "changePct": -4.1,
+      "why": "Starship launch was aborted.",
+      "traderLens": "Qullamaggie"
+    },
+    {
+      "ticker": "CJMB",
+      "side": "LONG",
+      "changePct": 41.7,
+      "why": "Pre-market stock surge, reason not specified.",
+      "traderLens": "Qullamaggie"
+    },
+    {
+      "ticker": "BIYA",
+      "side": "LONG",
+      "changePct": 31.25,
+      "why": "Pre-market stock surge, reason not specified.",
+      "traderLens": "Qullamaggie"
+    },
+    {
+      "ticker": "GCTK",
+      "side": "LONG",
+      "changePct": 21.46,
+      "why": "Pre-market stock surge, reason not specified.",
+      "traderLens": "Qullamaggie"
+    },
+    {
+      "ticker": "SDOT",
+      "side": "LONG",
+      "changePct": 21.4,
+      "why": "Pre-market stock surge, reason not specified.",
+      "traderLens": "Qullamaggie"
+    },
+    {
+      "ticker": "PMAX",
+      "side": "LONG",
+      "changePct": 18.22,
+      "why": "Pre-market stock surge, reason not specified.",
+      "traderLens": "Qullamaggie"
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": 209.0,
-      "changePct": -1.65,
-      "abc": "B",
-      "note": "Pulling back with broader semi weakness pre-market."
+      "level": null,
+      "changePct": -1,
+      "abc": null,
+      "note": "Pre-market decline in line with the broader semiconductor sell-off."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": null,
-      "abc": "C",
-      "note": "In a consolidation phase, needs to reclaim key moving averages."
+      "changePct": -1,
+      "abc": null,
+      "note": "Pre-market decline amid broad market weakness."
     },
     {
       "ticker": "AAPL",
-      "level": 328.3,
-      "changePct": 0.24,
-      "abc": "B",
-      "note": "Holding up better than other mega-cap tech pre-market."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Upgraded to Buy from Hold at HSBC."
     },
     {
       "ticker": "MSFT",
-      "level": 400.58,
-      "changePct": 1.25,
-      "abc": "A",
-      "note": "Showing pre-market strength, bucking the trend in Nasdaq futures."
+      "level": null,
+      "changePct": -1,
+      "abc": null,
+      "note": "Pre-market decline amid broad market weakness."
     },
     {
       "ticker": "AMZN",
-      "level": 250.52,
-      "changePct": null,
-      "abc": "B",
-      "note": "Watching for reaction to retail sales data."
+      "level": null,
+      "changePct": -1,
+      "abc": null,
+      "note": "Pre-market decline amid broad market weakness."
     },
     {
       "ticker": "META",
       "level": null,
-      "changePct": null,
-      "abc": "B",
-      "note": "Consolidating near recent highs."
+      "changePct": -1,
+      "abc": null,
+      "note": "Pre-market decline amid broad market weakness."
     },
     {
       "ticker": "GOOGL",
-      "level": 373.99,
-      "changePct": 0.83,
-      "abc": "B",
-      "note": "Positive pre-market action, showing relative strength."
+      "level": null,
+      "changePct": -1,
+      "abc": null,
+      "note": "Pre-market decline amid broad market weakness."
     },
     {
       "ticker": "AMD",
-      "level": 510.55,
-      "changePct": -3.51,
-      "abc": "C",
-      "note": "Under pressure with the rest of the semiconductor space."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Caught in the semiconductor sector downdraft."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "High-beta name likely to be volatile with semi weakness."
+      "abc": null,
+      "note": "Likely to be impacted by the negative sentiment in the AI and server space."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for a potential bounce off key support levels."
+      "abc": null,
+      "note": "Could see weakness due to the risk-off sentiment in the tech sector."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Cybersecurity sector has been consolidating; watching for a breakout."
+      "abc": null,
+      "note": "Cybersecurity stocks may be affected by broader tech selling."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "High correlation to Bitcoin; watching crypto market for direction."
+      "abc": null,
+      "note": "Bitcoin price is relatively stable, but the stock could be impacted by overall market weakness."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is showing some signs of distribution with tech weakness. Not an ideal environment to be aggressive on new long positions. Focus on protecting capital."
+      "view": "The current market is not conducive for buying. It's a time to protect capital and wait for high-quality setups to emerge in a confirmed uptrend."
     },
     {
       "name": "Ted Zhang",
-      "view": "Rotation is key today. Money seems to be flowing out of high-beta tech/semis and into financials (M&A) and potentially defensive names. Watch for confirmation."
+      "view": "There is a clear rotation out of technology and semiconductor stocks. It's important to see where institutional money is flowing next before making any aggressive moves."
     },
     {
       "name": "Clement Ang",
-      "view": "Context is mixed. Cooling inflation is a positive, but renewed tech weakness is a major concern. This is not an A-grade environment for breakouts; patience is required."
+      "view": "The market context is weak, and this is not the time to be aggressive. Focus on A-grade setups and wait for the market to show signs of strength before deploying capital."
     },
     {
       "name": "SRxTrades",
-      "view": "The gap up in PYPL is significant but chasing it here is risky. Wait for a clean pivot or pullback. The weakness in semis could offer short setups if volume confirms."
+      "view": "Avoid chasing breakdowns. Wait for prices to stabilize and form clean pivots before considering any entries. Volume confirmation will be key."
     },
     {
       "name": "Jeff",
-      "view": "Respect your stops, especially on existing tech longs. The character of the market could be changing. Do not add to losing positions."
+      "view": "Stick to your trading plan and risk management rules. Honor your stops and avoid emotional decision-making in this volatile environment."
     },
     {
       "name": "Qullamaggie",
-      "view": "PYPL is a clear episodic pivot on the M&A news. This is the primary long setup of interest. Be wary of sympathy plays and focus on the source of the catalyst."
+      "view": "The momentum has shifted to the downside. This is not the environment for chasing breakouts. Be patient and wait for the market to bottom and new leaders to emerge."
     },
     {
       "name": "Composite",
-      "view": "Posture should be defensive but opportunistic. Raise the bar for new long entries, focusing on relative strength outside of semiconductors. The PYPL situation is the standout catalyst, but manage risk around the headline-driven gap. Key focus is on the 8:30 AM ET data dump."
+      "view": "The market is in a risk-off mode, driven by a global tech sell-off. The best course of action is to wait on the sidelines, observe the price action, and preserve capital. Do not force trades in this environment."
     }
   ],
-  "standout": {
-    "ticker": "PYPL",
-    "side": "LONG",
-    "score": 85,
-    "sector": "Financials",
-    "rs": null,
-    "grade": "A",
-    "thesis": "Clear episodic pivot driven by a takeover offer at a significant premium ($60.50/share). The stock is trading below the offer price, providing a potential arbitrage opportunity if the deal progresses.",
-    "entry": 55.41,
-    "stop": 52.2,
-    "target": 60.5,
-    "rrr": 1.58,
-    "tags": [
-      "#merger-arbitrage",
-      "#episodic-pivot"
-    ]
-  },
+  "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "TSM",
-        "consensus": "EPS $3.80 / Rev $39.94B"
+        "ticker": "TRV",
+        "consensus": "EPS $4.94 / Rev $11.23B"
       },
       {
-        "ticker": "UNH",
-        "consensus": "EPS $4.84 / Rev $110.8B"
+        "ticker": "SPFI",
+        "consensus": "EPS $0.92 / Rev $63.56M"
       },
       {
-        "ticker": "GE",
-        "consensus": "EPS $1.87 / Rev $11.8B"
+        "ticker": "FITB",
+        "consensus": "EPS $0.88 / Rev $3.25B"
       },
       {
-        "ticker": "ABT",
-        "consensus": "EPS $1.28 / Rev $12.5B"
+        "ticker": "TFC",
+        "consensus": "EPS $1.08 / Rev $5.23B"
+      },
+      {
+        "ticker": "ALV",
+        "consensus": "EPS $2.43 / Rev $2.76B"
+      },
+      {
+        "ticker": "RF",
+        "consensus": "EPS $0.63 / Rev $1.95B"
       }
     ],
-    "amc": [
-      {
-        "ticker": "NFLX",
-        "consensus": null
-      },
-      {
-        "ticker": "IBKR",
-        "consensus": null
-      }
-    ],
+    "amc": [],
     "yesterdayReactions": [
       {
-        "ticker": "UAL",
-        "result": "Reported after close",
-        "movePct": null
+        "ticker": "NFLX",
+        "result": "Q3 revenue guidance missed expectations",
+        "movePct": -11
       },
       {
-        "ticker": "JBHT",
-        "result": "Reported after close",
-        "movePct": null
+        "ticker": "ISRG",
+        "result": "Soft US Da Vinci procedure growth",
+        "movePct": -10.3
+      },
+      {
+        "ticker": "AA",
+        "result": "Adjusted EPS missed",
+        "movePct": -1.8
       }
     ]
   },
   "calendar": [
     {
       "time": "08:30 ET",
-      "name": "Retail Sales MoM (Jun)",
-      "consensus": "0.2%"
-    },
-    {
-      "time": "08:30 ET",
-      "name": "Initial Jobless Claims",
-      "consensus": "216k"
-    },
-    {
-      "time": "08:30 ET",
-      "name": "Philadelphia Fed Manufacturing Index (Jul)",
-      "consensus": "13"
-    },
-    {
-      "time": "10:00 ET",
-      "name": "Pending Home Sales MoM (Jun)",
-      "consensus": "-0.5%"
+      "name": "Building Permits (Jun)",
+      "consensus": "1.40M"
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "BLK",
-        "firm": "JPMorgan",
-        "rating": "Overweight",
-        "pt": 1364
+        "ticker": "AAPL",
+        "firm": "HSBC",
+        "rating": "Buy",
+        "pt": null
       },
       {
-        "ticker": "RKT",
-        "firm": "Morgan Stanley",
+        "ticker": "MMM",
+        "firm": "JP Morgan",
         "rating": "Overweight",
-        "pt": 19
+        "pt": 180
       },
       {
-        "ticker": "CAVA",
-        "firm": "Morgan Stanley",
-        "rating": "Overweight",
-        "pt": 90
+        "ticker": "PPG",
+        "firm": "B of A Securities",
+        "rating": "Buy",
+        "pt": 134
       }
     ],
     "downgrades": [
       {
-        "ticker": "LULU",
-        "firm": "Truist Financial",
-        "rating": "Sell",
-        "pt": 94
+        "ticker": "NFLX",
+        "firm": "KGI Securities",
+        "rating": "Neutral",
+        "pt": 75
       },
       {
-        "ticker": "AEP",
-        "firm": "Goldman Sachs",
-        "rating": "Neutral",
-        "pt": 147
+        "ticker": "OKE",
+        "firm": "Jefferies",
+        "rating": "Hold",
+        "pt": 95
       },
       {
-        "ticker": "ETSY",
-        "firm": "BTIG",
+        "ticker": "AGNC",
+        "firm": "JPMorgan",
         "rating": "Neutral",
-        "pt": null
+        "pt": 12
       }
     ]
   },
-  "alert": "KEY DATA: US Retail Sales at 08:30 ET. Expect volatility.",
+  "alert": "Global tech and semiconductor sell-off is accelerating, with Nasdaq futures pointing to a sharply lower open. Exercise extreme caution.",
   "news": [
     {
-      "headline": "PayPal soars on reported $53B takeover offer from Stripe and Advent International",
-      "impact": "HIGH",
-      "tickers": [
-        "PYPL",
-        "V",
-        "MA"
-      ],
-      "source": "Reuters - https://www.reuters.com/",
-      "time": "Jul 15, 2026"
-    },
-    {
-      "headline": "Semiconductor stocks under pressure globally after sharp sell-off in South Korea's SK Hynix",
-      "impact": "HIGH",
-      "tickers": [
-        "SMH",
-        "NVDA",
-        "AMD",
-        "TSM"
-      ],
-      "source": "Substack - https://www.google.com/search?q=Edward+Corona+Substack",
-      "time": "Jul 16, 2026"
-    },
-    {
-      "headline": "GE, UnitedHealth, and TSM report strong earnings and raise guidance",
-      "impact": "MED",
-      "tickers": [
-        "GE",
-        "UNH",
-        "TSM"
-      ],
-      "source": "Substack - https://www.google.com/search?q=Edward+Corona+Substack",
-      "time": "07:00 ET"
-    },
-    {
-      "headline": "Progressive shares fall after monthly report shows rising loss costs",
-      "impact": "MED",
-      "tickers": [
-        "PGR",
-        "ALL"
-      ],
-      "source": "TradingKey - https://www.google.com/search?q=TradingKey+PGR",
-      "time": "Jul 15, 2026"
-    },
-    {
-      "headline": "US to release key Retail Sales and Jobless Claims data at 8:30 AM ET",
+      "headline": "World shares sink as slumping AI stocks drag markets lower",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ"
       ],
-      "source": "XTB - https://www.xtb.com/en/market-analysis/economic-calendar",
-      "time": "08:30 ET"
+      "source": "WSLS - https://www.wsls.com/business/2026/07/17/asian-shares-sink-with-tokyo-down-more-than-5-as-slumping-ai-stocks-drag-world-markets-lower/",
+      "time": "July 17, 2026"
+    },
+    {
+      "headline": "Netflix sinks 11% on soft Q3 guidance",
+      "impact": "HIGH",
+      "tickers": [
+        "NFLX"
+      ],
+      "source": "TradingKey - https://www.tradingkey.com/en/news-view/us-717-cdaa0f9a63ce4b2d90d9e67b6d76b1a5",
+      "time": "July 17, 2026"
+    },
+    {
+      "headline": "Oil prices surge as fighting in the Middle East intensifies",
+      "impact": "MED",
+      "tickers": [
+        "CL=F",
+        "XLE"
+      ],
+      "source": "WSLS - https://www.wsls.com/business/2026/07/17/asian-shares-sink-with-tokyo-down-more-than-5-as-slumping-ai-stocks-drag-world-markets-lower/",
+      "time": "July 17, 2026"
+    },
+    {
+      "headline": "Intuitive Surgical tumbles on soft US Da Vinci procedure growth",
+      "impact": "MED",
+      "tickers": [
+        "ISRG"
+      ],
+      "source": "Newsquawk - https://www.newsquawk.com/en/headlines/us-pre-market-movers-smh-mags-dram-aa-spcx-isrg-alv-sfnc-2026-07-17-05-36-00",
+      "time": "July 17, 2026"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Morningstar, July 16 2026, https://www.morningstar.com/news/dow-jones/20260716362/us-futures-mostly-flat-european-stocks-fall",
-    "TipRanks, July 16 2026, https://www.tipranks.com/news/stock-market-news-today-7-16-26-futures-slip-as-tech-selloff-continues-ahead-of-key-earnings",
-    "Google Finance, July 16 2026, https://www.google.com/finance/quote/VIX:INDEXCBOE",
-    "FinHacker.cz, July 13 2026, https://finhacker.cz/fear-and-greed-index-historical-data-chart/",
-    "McClellan Financial Publications, July 14 2026, https://www.mcoscillator.com/market_breadth_data/",
-    "Daily Market Outlook, July 16 2026, https://www.tickmill.com/blog/daily-market-outlook-july-16-2026",
-    "Crypto Briefing, July 16 2026, https://cryptobriefing.com/trader-bets-300k-on-paypal-calls-before-stripe-acquisition-news/",
-    "TradingKey, July 15 2026, https://www.google.com/search?q=TradingKey+PGR",
-    "Digrin, July 16 2026, https://digrin.com/earnings/calendar/2026-07-16",
-    "XTB, July 16 2026, https://www.xtb.com/en/market-analysis/news-and-research/economic-calendar-earnings-us-retail-sales-and-fed-to-fight-for-investors-attention-16-07-2026",
-    "24/7 Wall St., July 16 2026, https://247wallst.com/investing/2026/07/16/here-are-thursdays-top-wall-street-analyst-research-calls-alphabet-blackrock-etsy-flex-lululemon-athletica-meta-platforms-okta-palo-alto-networks-and-more/",
-    "Substack, Edward Corona, July 16 2026, https://www.google.com/search?q=Edward+Corona+Substack",
-    "Investing.com, July 16 2026, https://www.investing.com/news/stock-market-news/state-streets-quarterly-profit-jumps-56-on-strong-fee-income-3324301",
-    "Benzinga, July 15 2026, https://www.benzinga.com/markets/sectors/07/15/26/leading-and-lagging-sectors-for-july-15-2026"
+    "Newsquawk 05:36 ET — US PRE-MARKET MOVERS: SMH, MAGS, DRAM, AA, SPCX, ISRG, ALV, SFNC",
+    "Investing.com — Pre-market Movers",
+    "Benzinga — Earnings Scheduled For July 17, 2026 - Travelers Companies (NYSE:TRV), South Plains Financial (NASDAQ:SPF",
+    "TradingKey — US Premarket: Three Major Index Futures Fall Collectively, Memory Chips Continue Panic Selling, Netflix Drops Over 11% Premarket",
+    "TradingCharts — United States Economic Calendar for July 17, 2026",
+    "TradingCharts — Forex Economic Calendar for July 17, 2026",
+    "Benzinga — 12 Industrials Stocks Moving In Friday's Pre-Market Session - Callan Jmb (NASDAQ:CJMB), Baiya Internation",
+    "Digrin — Stock Earnings Calendar Jul 17, 2026",
+    "24/7 Wall St. — Here Are Friday's Top Wall Street Analyst Research Calls: Apple, Brinker International, Dutch Bros, Emerson Electric, Fervo Energy, Moody's, Netflix, Oneok, 3M Company, and More",
+    "Digrin — Stock Earnings Calendar Jul 17, 2026",
+    "Federal Home Loan Bank of New York — MSD Weekly Market Update: Week Ending July 17, 2026",
+    "Traderverse — Earnings Calendar: Week of July 13–17, 2026",
+    "WSLS — Asian shares sink, with Tokyo down more than 5% as slumping AI stocks drag world markets lower",
+    "Traderverse — Earnings Calendar: Week of July 13–17, 2026",
+    "TradingEconomics.com — Economic Calendar",
+    "Barchart — Today's Premarket Stock Movers",
+    "Guggenheim Investments — 2026 U.S. Economic Calendar",
+    "Investing.com — Stock Analyst Ratings: Upgrades and Downgrades",
+    "CaixaBank Research — Financial Markets Daily Report 17 July 2026",
+    "IC Markets — IC – Europe Fundamental Forecast | 17 July 2026 | IC Your Trading Edge | Official Blog",
+    "Global Banking & Finance Review — Global Chip Market Selloff Weighs on European and Asian Stocks",
+    "Morningstar — U.S. Stock Futures Lower as Chip Selloff Rocks Markets",
+    "Benzinga — This 3M Analyst Turns Bullish; Here Are Top 5 Upgrades For Friday",
+    "StoneX — Perspective: Morning Commentary for July 17",
+    "Benzinga — This ONEOK Analyst Is No Longer Bullish; Here Are Top 4 Downgrades For Friday",
+    "S&P Global Ratings — Chart Industries Inc. Upgraded To 'A-', Removed F | S&P Global Ratings",
+    "IC Markets — Friday 17th July 2026: U.S. Stock Futures Slip as Chip Stocks Extend Losses",
+    "TheStreet — Stock Market Today (July 17, 2026): Dow slides as global tech sell-off deepens, Netflix sinks",
+    "Cboe Global Markets — U.S. Futures Settlement Prices",
+    "CME Group — Crude Oil Futures Quotes"
   ]
 }
