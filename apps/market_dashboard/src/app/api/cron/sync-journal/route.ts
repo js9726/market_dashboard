@@ -14,8 +14,8 @@
  * blocks the rest. Skips LLM verdict generation (cost) — the manual Sync
  * button keeps that.
  *
- * Auth: Vercel cron Bearer <CRON_SECRET>, x-vercel-cron-signature, or
- * ?secret=<BRIEF_INGEST_KEY> for manual trigger (same pattern as track-positions).
+ * Auth: Vercel cron Bearer <CRON_SECRET>, or ?secret=<BRIEF_INGEST_KEY> for a
+ * manual operator trigger (same pattern as track-positions).
  * Schedule (vercel.json): 21:30 UTC weekdays — after US close, before the
  * 21:50 reconcile-trades backstop.
  */
@@ -34,7 +34,6 @@ function authorized(req: Request): boolean {
   const urlSecret = new URL(req.url).searchParams.get("secret");
   if (cronSecret && authHeader === `Bearer ${cronSecret}`) return true;
   if (ingestKey && urlSecret === ingestKey) return true;
-  if (req.headers.get("x-vercel-cron-signature")) return true;
   return false;
 }
 

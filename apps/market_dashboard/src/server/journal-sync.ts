@@ -19,6 +19,7 @@ import { prisma } from "@/lib/prisma";
 import { getGoogleAccessToken } from "@/lib/token-refresh";
 import { fetchSheetRows, parseTradeRows, DEFAULT_COL_MAP, type ColMap } from "@/lib/google-sheets";
 import { resolveTradeUsd } from "@/lib/currency";
+import { canonicalBrokerLabel } from "@/lib/broker-normalization";
 
 export class JournalSyncError extends Error {
   constructor(
@@ -159,7 +160,7 @@ export async function syncUserJournal(userId: string): Promise<JournalSyncResult
       rewardPct: t.rewardPct,
       positionPct: t.positionPct,
       currency: t.currency,
-      platform: t.platform,
+      platform: canonicalBrokerLabel(t.platform),
       industry: t.industry,
       strategy: t.strategy,
       state: t.state,

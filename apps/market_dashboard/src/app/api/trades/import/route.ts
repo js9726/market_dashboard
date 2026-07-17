@@ -57,6 +57,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { resolveTradeUsd } from "@/lib/currency";
+import { canonicalBrokerLabel } from "@/lib/broker-normalization";
 
 export const dynamic = "force-dynamic";
 
@@ -201,7 +202,7 @@ export async function POST(req: Request) {
     notes: typeof body.notes === "string" ? body.notes : null,
     state: typeof body.state === "string" ? body.state : null,
     currency: typeof body.currency === "string" ? body.currency : null,
-    platform: typeof body.platform === "string" ? body.platform : null,
+    platform: canonicalBrokerLabel(typeof body.platform === "string" ? body.platform : null),
     industry: typeof body.industry === "string" ? body.industry : null,
     strategy: typeof body.strategy === "string" ? body.strategy : null,
     proposedEntry: toDecimal(body.proposedEntry),

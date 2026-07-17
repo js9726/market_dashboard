@@ -38,6 +38,7 @@ import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { calculateFees, type FeeFormula, type FeeSide } from "@/lib/fees";
+import { canonicalBrokerLabel } from "@/lib/broker-normalization";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -156,7 +157,7 @@ export async function POST(req: Request) {
           notes,
           state: side === "BUY" ? "OPEN" : "CLOSE",
           currency,
-          platform: brokerAccount.preset.name,
+          platform: canonicalBrokerLabel(brokerAccount.alias),
           proposedSL: proposedSL != null ? new Prisma.Decimal(proposedSL) : null,
           proposedTP: proposedTP != null ? new Prisma.Decimal(proposedTP) : null,
           rawRow: {},

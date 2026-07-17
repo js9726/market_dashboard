@@ -12,6 +12,8 @@
  *   - tag/mistake are Json string arrays → a trade contributes to every group.
  */
 import { prisma } from "@/lib/prisma";
+import { canonicalBrokerLabel } from "@/lib/broker-normalization";
+import type { Prisma } from "@prisma/client";
 
 export const PIVOT_DIMENSIONS = [
   "ticker",
@@ -81,7 +83,7 @@ export function keysFor(dim: PivotDimension, t: PivotTradeRow): string[] {
     case "source":
       return [t.source || "(unknown)"];
     case "platform":
-      return [t.platform || "(unknown)"];
+      return [canonicalBrokerLabel(t.platform) || "(unknown)"];
     case "industry":
       return [t.industry || "(unknown)"];
     case "currency":
@@ -132,19 +134,28 @@ export interface PivotResult {
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
+export function closedTradesWhere(
+  userId: string,
+  from?: Date | null,
+  to?: Date | null,
+): Prisma.TradeRecordWhereInput {
+  return {
+    userId,
+    pnl: { not: null },
+    AND: [
+      { OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] },
+      ...(from || to
+        ? [{ tradeDate: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }]
+        : []),
+    ],
+  };
+}
+
 export async function loadClosedTrades(userId: string, from?: Date | null, to?: Date | null): Promise<PivotTradeRow[]> {
   return (await prisma.tradeRecord.findMany({
-    where: {
-      userId,
-      pnl: { not: null },
-      // Reconciler-marked duplicate episodes must not double-count (":dup").
-      // NULL-SAFE: sheet rows have brokerOrderId null; bare NOT{endsWith}
-      // drops them (SQL three-valued logic), so allow nulls explicitly.
-      OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }],
-      ...(from || to
-        ? { OR: [{ tradeDate: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }] }
-        : {}),
-    },
+    // Keep duplicate exclusion and the optional date range in separate AND
+    // clauses. Two object-level OR keys overwrite each other in JavaScript.
+    where: closedTradesWhere(userId, from, to),
     select: {
       ticker: true,
       side: true,

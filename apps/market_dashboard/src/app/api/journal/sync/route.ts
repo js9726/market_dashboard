@@ -54,6 +54,12 @@ export async function POST() {
     }
   });
 
-  const { connectionId: _omit, ...body } = result;
-  return NextResponse.json(body);
+  return NextResponse.json({
+    synced: result.synced,
+    open: result.open,
+    closed: result.closed,
+    datesResolved: result.datesResolved,
+    weekendRolled: result.weekendRolled,
+    sampleRawDates: result.sampleRawDates,
+  });
 }

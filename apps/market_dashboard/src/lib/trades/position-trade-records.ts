@@ -1,15 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
+import { brokerKey } from "@/lib/broker-normalization";
+
+export { brokerKey } from "@/lib/broker-normalization";
 
 export const OPEN_TRADE_STATES = ["OPEN", "SEMI-OPEN", "PLANNING"] as const;
-
-export function brokerKey(value: string | null | undefined): string {
-  const normalized = (value ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (normalized.includes("moomoo") || normalized.includes("futu")) return "moomoo";
-  if (normalized.includes("ibkr") || normalized.includes("interactivebrokers")) return "ibkr";
-  if (normalized.includes("tiger")) return "tiger";
-  return normalized || "unknown";
-}
 
 export function plainTicker(ticker: string): string {
   return ticker.replace(/^[A-Za-z]{2}\./, "").toUpperCase();
