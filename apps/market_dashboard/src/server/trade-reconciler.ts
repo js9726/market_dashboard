@@ -54,6 +54,7 @@ export async function reconcileBrokerTrades(opts: {
   userId?: string;
   brokerAccountId?: string;
   dryRun?: boolean;
+  stopgapsOnly?: boolean;
 }): Promise<ReconcileReport> {
   const dryRun = opts.dryRun ?? false;
   const report: ReconcileReport = {
@@ -194,6 +195,7 @@ export async function reconcileBrokerTrades(opts: {
         await prisma.tradeRecord.delete({ where: { id: stopgap.id } });
       }
     }
+    if (opts.stopgapsOnly) continue;
     const rawFills = await prisma.tradeFill.findMany({
       where: { brokerAccountId: account.id },
       orderBy: { executedAt: "asc" },

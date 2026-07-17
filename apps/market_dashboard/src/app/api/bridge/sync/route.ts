@@ -351,11 +351,15 @@ export async function POST(req: Request) {
   }
 
   // ── Reconcile fills → journal rows (close exited positions) ─────────────
-  // Run on every snapshot: stopgap cleanup does not require a new fill or a
-  // removed position. A reconciler error must never fail the bridge push.
+  // Run stopgap cleanup on every snapshot, but only scan full fill history
+  // when a fill arrived or a position disappeared. The minute bridge has a
+  // 30-second timeout, so unchanged snapshots must stay lightweight.
   let reconciled: { recordsClosed: number; duplicatesDeleted: number } | null = null;
   try {
-    const report = await reconcileBrokerTrades({ brokerAccountId: account.id });
+    const report = await reconcileBrokerTrades({
+      brokerAccountId: account.id,
+      stopgapsOnly: fillsInserted === 0 && removed.count === 0,
+    });
     reconciled = {
       recordsClosed: report.recordsClosed,
       duplicatesDeleted: report.duplicatesDeleted,
