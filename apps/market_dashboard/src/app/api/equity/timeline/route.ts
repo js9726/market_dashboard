@@ -230,7 +230,7 @@ export async function GET(req: Request) {
         repaired: row.repaired,
       };
     }),
-    accounts: accounts.map((a) => ({ id: a.id, alias: a.alias, currency: a.displayCurrency ?? a.preset.currency })),
+    accounts: accounts.map((a) => ({ id: a.id, alias: a.alias, currency: a.displayCurrency ?? a.preset.currency, isLive: a.isLive })),
   });
 }
 

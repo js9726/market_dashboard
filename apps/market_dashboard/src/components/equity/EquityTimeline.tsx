@@ -13,7 +13,7 @@ interface Reconciliation {
   latestCash: number | null;
   latestMarketVal: number | null;
 }
-interface Account { id: string; alias: string; currency: string }
+interface Account { id: string; alias: string; currency: string; isLive: boolean }
 interface PositionsPricing {
   source: "live-quote" | "position-cache" | "mixed";
   latestQuoteAt: string | null;
@@ -55,6 +55,7 @@ interface Resp {
 
 const CASH_KEY = "md-equity-cash-override";
 const CCY_KEY = "md-equity-ccy";
+const ACCT_KEY = "md-equity-account";
 const W = 800;
 const EQUITY_TOP = 14;
 const EQUITY_H = 160;
@@ -71,12 +72,15 @@ export default function EquityTimeline() {
   const [cashOverride, setCashOverride] = useState("");
   const [wantCcy, setWantCcy] = useState<Ccy>("USD");
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  // "" = all LIVE accounts (the server's default aggregate — paper excluded).
+  const [accountId, setAccountId] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setCashOverride(window.localStorage.getItem(CASH_KEY) ?? "");
     const c = window.localStorage.getItem(CCY_KEY);
     if (c === "USD" || c === "MYR") setWantCcy(c);
+    setAccountId(window.localStorage.getItem(ACCT_KEY) ?? "");
   }, []);
 
   useEffect(() => {
@@ -86,12 +90,20 @@ export default function EquityTimeline() {
     const to = new Date().toISOString().slice(0, 10);
     const fromD = new Date();
     fromD.setUTCDate(fromD.getUTCDate() - windowDays);
-    fetch(`/api/equity/timeline?from=${fromD.toISOString().slice(0, 10)}&to=${to}`, { cache: "no-store" })
+    const acctQ = accountId ? `&accountId=${encodeURIComponent(accountId)}` : "";
+    fetch(`/api/equity/timeline?from=${fromD.toISOString().slice(0, 10)}&to=${to}${acctQ}`, { cache: "no-store" })
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((j) => { if (!cancelled) { setData(j); setLoading(false); } })
       .catch((e) => { if (!cancelled) { setError((e as Error).message); setLoading(false); } });
     return () => { cancelled = true; };
-  }, [windowDays]);
+  }, [windowDays, accountId]);
+
+  function pickAccount(id: string) {
+    setAccountId(id);
+    if (typeof window === "undefined") return;
+    if (id === "") window.localStorage.removeItem(ACCT_KEY);
+    else window.localStorage.setItem(ACCT_KEY, id);
+  }
 
   function saveCash(v: string) {
     setCashOverride(v);
@@ -173,6 +185,19 @@ export default function EquityTimeline() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={accountId}
+            onChange={(e) => pickAccount(e.target.value)}
+            className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--bg-raised)] px-2 py-1 text-xs text-[var(--fg-1)] focus:border-[var(--accent)] focus:outline-none"
+            title="Account scope — the default aggregates live accounts only; paper accounts are viewable individually"
+          >
+            <option value="">All live accounts</option>
+            {(data?.accounts ?? []).map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.alias}{a.isLive ? "" : " (PAPER)"}
+              </option>
+            ))}
+          </select>
           <div className="inline-flex gap-1 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--bg-raised)] p-1">
             {(["USD", "MYR"] as Ccy[]).map((c) => (
               <button
@@ -204,6 +229,14 @@ export default function EquityTimeline() {
         </div>
       </div>
 
+      {data && accountId !== "" && (
+        <div className="rounded-[var(--radius-md)] border border-[var(--accent-soft-border)] bg-[var(--accent-soft-bg)] p-3 text-xs text-[var(--fg-2)]">
+          <span className="font-semibold text-[var(--accent)]">Single-account view.</span>{" "}
+          Showing {data.accounts.find((a) => a.id === accountId)?.alias ?? "the selected account"}
+          {data.accounts.find((a) => a.id === accountId)?.isLive === false ? " — a PAPER account (excluded from the default all-accounts curve)" : ""}. {""}
+          <button onClick={() => pickAccount("")} className="underline hover:text-[var(--fg-1)]">Back to all live accounts</button>
+        </div>
+      )}
       {data && !canConvert && (
         <div className="rounded-[var(--radius-md)] border border-[var(--warn-500)] p-3 text-xs text-[var(--fg-2)]">
           <span className="font-semibold text-[var(--warn-500)]">Live USD/MYR unavailable.</span>{" "}
