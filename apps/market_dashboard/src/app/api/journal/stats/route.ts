@@ -28,7 +28,11 @@ export async function GET() {
   const userId = scopeUserId(session)!;
 
   const trades = await prisma.tradeRecord.findMany({
-    where: { userId },
+    // Exclude reconciler-merged duplicate episodes (brokerOrderId "...:dup") —
+    // the SHEET row stays authoritative and the marked twin must not double a
+    // day's P&L (June-10 MDB showed -79.10 = the same -39.55 twice on the
+    // calendar; TradeLog hid it, the aggregates didn't).
+    where: { userId, NOT: { brokerOrderId: { endsWith: ":dup" } } },
     orderBy: { tradeDate: "asc" },
   });
 

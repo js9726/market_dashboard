@@ -137,6 +137,8 @@ export async function loadClosedTrades(userId: string, from?: Date | null, to?: 
     where: {
       userId,
       pnl: { not: null },
+      // Reconciler-marked duplicate episodes must not double-count (":dup").
+      NOT: { brokerOrderId: { endsWith: ":dup" } },
       ...(from || to
         ? { OR: [{ tradeDate: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }] }
         : {}),

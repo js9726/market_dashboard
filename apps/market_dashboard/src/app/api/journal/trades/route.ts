@@ -161,6 +161,10 @@ export async function GET(req: Request) {
 
   const where: Prisma.TradeRecordWhereInput = {
     userId: userScopeId,
+    // Reconciler-merged duplicate episodes are marked "...:dup" — never list
+    // them (the SHEET row is the visible one). Composed via AND so the
+    // win/loss NOT filters below stay independent.
+    AND: [{ NOT: { brokerOrderId: { endsWith: ":dup" } } }],
     ...(symbol ? { ticker: { contains: symbol } } : {}),
     ...(side ? { side } : {}),
     ...(stateFilter ? { state: stateFilter } : {}),
