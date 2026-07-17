@@ -1,0 +1,245 @@
+{
+  "generatedAt": "2026-07-17T11:15:48.869Z",
+  "method": "closed trades, :dup-excluded (NULL-safe), live accounts only, USD-true P&L, entry-date DOW",
+  "totals": {
+    "closedRows": 219,
+    "weekdayMeasured": 219,
+    "weekendDated": 0
+  },
+  "dayOfWeek": {
+    "Mon": {
+      "n": 60,
+      "totalPnl": 1522.81,
+      "winRate": 36.67,
+      "avgWin": 213.63,
+      "avgLoss": -83.6,
+      "profitFactor": 1.48
+    },
+    "Tue": {
+      "n": 45,
+      "totalPnl": -1744.09,
+      "winRate": 31.11,
+      "avgWin": 59.62,
+      "avgLoss": -83.19,
+      "profitFactor": 0.32
+    },
+    "Wed": {
+      "n": 35,
+      "totalPnl": -1195.92,
+      "winRate": 34.29,
+      "avgWin": 54.13,
+      "avgLoss": -80.24,
+      "profitFactor": 0.35
+    },
+    "Thu": {
+      "n": 46,
+      "totalPnl": 661.27,
+      "winRate": 39.13,
+      "avgWin": 142.24,
+      "avgLoss": -67.82,
+      "profitFactor": 1.35
+    },
+    "Fri": {
+      "n": 33,
+      "totalPnl": 157.23,
+      "winRate": 36.36,
+      "avgWin": 125.43,
+      "avgLoss": -64.19,
+      "profitFactor": 1.12
+    }
+  },
+  "signTest": {
+    "comparablePeriods": 5,
+    "avgWinWorseOnTueWed": 5,
+    "profitFactorWorseOnTueWed": 5,
+    "holds": true
+  },
+  "periodTable": [
+    {
+      "period": "2022-H2",
+      "tueWed": {
+        "n": 2,
+        "totalPnl": -23.41,
+        "winRate": 50,
+        "avgWin": 9.94,
+        "avgLoss": -33.35,
+        "profitFactor": 0.3
+      },
+      "other": {
+        "n": 4,
+        "totalPnl": -27.73,
+        "winRate": 25,
+        "avgWin": 41.51,
+        "avgLoss": -23.08,
+        "profitFactor": 0.6
+      }
+    },
+    {
+      "period": "2023-H1",
+      "tueWed": {
+        "n": 3,
+        "totalPnl": 31.62,
+        "winRate": 66.67,
+        "avgWin": 33.12,
+        "avgLoss": -34.62,
+        "profitFactor": 1.91
+      },
+      "other": {
+        "n": 2,
+        "totalPnl": 47.78,
+        "winRate": 50,
+        "avgWin": 94.18,
+        "avgLoss": -46.4,
+        "profitFactor": 2.03
+      }
+    },
+    {
+      "period": "2023-H2",
+      "tueWed": {
+        "n": 4,
+        "totalPnl": -154.65,
+        "winRate": 0,
+        "avgWin": null,
+        "avgLoss": -38.66,
+        "profitFactor": 0
+      },
+      "other": {
+        "n": 14,
+        "totalPnl": 205.83,
+        "winRate": 42.86,
+        "avgWin": 91.15,
+        "avgLoss": -42.63,
+        "profitFactor": 1.6
+      }
+    },
+    {
+      "period": "2024-H1",
+      "tueWed": {
+        "n": 10,
+        "totalPnl": -348.62,
+        "winRate": 50,
+        "avgWin": 24.16,
+        "avgLoss": -93.88,
+        "profitFactor": 0.26
+      },
+      "other": {
+        "n": 26,
+        "totalPnl": 2104.53,
+        "winRate": 50,
+        "avgWin": 198.13,
+        "avgLoss": -36.24,
+        "profitFactor": 5.47
+      }
+    },
+    {
+      "period": "2024-H2",
+      "tueWed": {
+        "n": 6,
+        "totalPnl": -598.35,
+        "winRate": 50,
+        "avgWin": 112.46,
+        "avgLoss": -311.91,
+        "profitFactor": 0.36
+      },
+      "other": {
+        "n": 20,
+        "totalPnl": -684.94,
+        "winRate": 35,
+        "avgWin": 273.12,
+        "avgLoss": -199.75,
+        "profitFactor": 0.74
+      }
+    },
+    {
+      "period": "2025-H1",
+      "tueWed": {
+        "n": 9,
+        "totalPnl": -585,
+        "winRate": 22.22,
+        "avgWin": 54.53,
+        "avgLoss": -99.15,
+        "profitFactor": 0.16
+      },
+      "other": {
+        "n": 10,
+        "totalPnl": -272.64,
+        "winRate": 30,
+        "avgWin": 58.48,
+        "avgLoss": -64.01,
+        "profitFactor": 0.39
+      }
+    },
+    {
+      "period": "2025-H2",
+      "tueWed": {
+        "n": 14,
+        "totalPnl": -359.78,
+        "winRate": 35.71,
+        "avgWin": 91.79,
+        "avgLoss": -90.97,
+        "profitFactor": 0.56
+      },
+      "other": {
+        "n": 14,
+        "totalPnl": 1119.7,
+        "winRate": 42.86,
+        "avgWin": 295.95,
+        "avgLoss": -82,
+        "profitFactor": 2.71
+      }
+    },
+    {
+      "period": "2026-H1",
+      "tueWed": {
+        "n": 31,
+        "totalPnl": -846,
+        "winRate": 25.81,
+        "avgWin": 47.72,
+        "avgLoss": -53.38,
+        "profitFactor": 0.31
+      },
+      "other": {
+        "n": 47,
+        "totalPnl": -144.96,
+        "winRate": 31.91,
+        "avgWin": 109.6,
+        "avgLoss": -55.91,
+        "profitFactor": 0.92
+      }
+    },
+    {
+      "period": "2026-H2",
+      "tueWed": {
+        "n": 1,
+        "totalPnl": -55.82,
+        "winRate": 0,
+        "avgWin": null,
+        "avgLoss": -55.82,
+        "profitFactor": 0
+      },
+      "other": {
+        "n": 2,
+        "totalPnl": -6.26,
+        "winRate": 0,
+        "avgWin": null,
+        "avgLoss": -3.13,
+        "profitFactor": 0
+      }
+    }
+  ],
+  "holdingSplit": {
+    "tueWed": {
+      "winnersAvgHoldDays": 8.75,
+      "winnersN": 13,
+      "losersAvgHoldDays": 4.65,
+      "losersN": 35
+    },
+    "other": {
+      "winnersAvgHoldDays": 17.97,
+      "winnersN": 30,
+      "losersAvgHoldDays": 4.74,
+      "losersN": 49
+    }
+  },
+  "calibrationRef": "jie_wiki/wiki/risk-management.md 'Operator calibration 2026-07-13'"
+}
