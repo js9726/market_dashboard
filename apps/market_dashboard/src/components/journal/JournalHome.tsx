@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Icon from "@/components/market-desk/Icon";
 import CoachCard from "@/components/journal/CoachCard";
+import GoalsAlertsCard from "@/components/journal/GoalsAlertsCard";
 
 type Stats = {
   totalPnl: number;
@@ -239,6 +240,9 @@ export default function JournalHome() {
           )}
         </section>
       </div>
+
+      {/* Alerts + goals (TradesViz-platform P4) — rule breaches first. */}
+      <GoalsAlertsCard />
 
       {/* AI coach over the journal (TradesViz-platform P3) */}
       <CoachCard />
