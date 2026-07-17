@@ -55,7 +55,11 @@ export async function GET(req: Request) {
 
   const fills = await prisma.tradeFill.findMany({
     where: {
-      brokerAccount: { userId: userScopeId },
+      // Default (all-accounts) view aggregates LIVE accounts only — paper/
+      // simulated accounts (isLive=false) are viewable by selecting their
+      // accountId explicitly, but must never pollute the real equity curve
+      // (2026-07-16, moomoo SIMULATE forward-validation account).
+      brokerAccount: accountId ? { userId: userScopeId } : { userId: userScopeId, isLive: true },
       currency: "USD",
       executedAt: { lte: to },
       ...(accountId ? { brokerAccountId: accountId } : {}),
@@ -87,6 +91,11 @@ export async function GET(req: Request) {
   let repairedSnapshots = 0;
   let skippedSnapshots = 0;
   for (const s of snapshots) {
+    // Same isLive rule as the fills query above: without an explicit accountId,
+    // paper/simulated account snapshots stay out of the aggregate curve.
+    if (!accountId && accountById.get(s.brokerAccountId)?.isLive === false) {
+      continue;
+    }
     const converted = snapshotToUsd(s, accountById.get(s.brokerAccountId), fxUsdMyr);
     if (!converted) {
       skippedSnapshots += 1;

@@ -38,7 +38,11 @@ function closeEnough(a: Prisma.Decimal | null, b: number, tolerance: number): bo
 
 export async function syncHeldPositions(userId: string): Promise<HeldSyncResult> {
   const positions = await prisma.position.findMany({
-    where: { brokerAccount: { userId } },
+    // isLive: the HELD lane mirrors the REAL book only (2026-05-30 locked
+    // decision: A-list = bought positions). Paper/simulated accounts (e.g. the
+    // moomoo SIMULATE forward-validation account, 2026-07-16) must never mint
+    // HELD rows or the validation experiment contaminates the real ledger.
+    where: { brokerAccount: { userId, isLive: true } },
     orderBy: { openedAt: "asc" },
   });
   const accountIds = Array.from(new Set(positions.map((position) => position.brokerAccountId)));
