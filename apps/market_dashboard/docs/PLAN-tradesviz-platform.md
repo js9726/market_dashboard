@@ -1,15 +1,41 @@
 # Plan — TradesViz-Class Trading Platform (US + Bursa Malaysia)
 
 **Owner:** Jie Sheng
-**Status:** **APPROVED by Jie 2026-07-10** — phases distributed on the agent board (TVP-P0/P1/P1.5 rows). P0 in progress: Codex committed the doctrine tree (e72cd905) + Portfolio restyle (b2c489fa); Claude shipped MY.↔.KL symbols, Python↔TS scorer parity, tags/screenshots/mistakes + Playbook/Goal schema, placeholder nav hidden.
+**Status:** **APPROVED by Jie 2026-07-10; integrity-reviewed 2026-07-17.** The phase order remains valid. P0 is complete; P1-P3 are partially delivered; P1.5 remains sample-blocked; P4-P5 have not started.
 **Origin:** Codex handover brief (10-pillar audit vs TradesViz/TraderSync-Cypher; audit-first) + Jie's decisions 2026-07-10: Bursa = journal+analytics first; all 4 pillars (analytics, chart-trades, playbooks, AI coach) in scope; **two-surface IA (Journal home + Market Desk)**.
 **Supersedes:** absorbs `PLAN-client-beta-launch.md` Phases 1–4 (still valid, re-sequenced here) and revives `ROADMAP.md`'s two-surface concept.
 
 North star: **TradesViz** (journal/analytics depth, chart-visualized trades, pivot analysis, custom dashboards) + **TraderSync Cypher** (AI coach roles) — fused with what those products DON'T have: Jie's Conviction/wiki engine, A-list ideas, and the owner-showcase.
 
+## Current phase state (reviewed 2026-07-17)
+
+The architecture and sequence remain intact; no phase should be removed or reordered. The amendment is a status and acceptance-gate correction so completed plumbing is not rebuilt and the remaining UX work stays visible.
+
+| Phase | State | Verified delivered | Still required / blocker |
+|---|---|---|---|
+| **P0** | **COMPLETE** | MY.↔.KL fail-closed symbol mapping, scorer parity, trade metadata fields, Playbook/Goal schema shells, placeholder nav hidden, portfolio restyle | No remaining P0 build item; preserve the integrity gates below |
+| **P1** | **PARTIAL** | Journal home, Journal/Market Desk nav split, dedicated calendar/daily routes, TradesViz-grade trade detail with tags/screenshots/mistakes and plan-vs-actual | Canonical `/journal/*` and `/markets/*` route families, removal of remaining nested Journal entry points, saved views, column chooser, tag/strategy table filters, global URL filter context, prev/next navigation, idea→journal provenance, whitelist projection |
+| **P1.5** | **BLOCKED / PARTIAL** | MY.↔.KL symbols, `.KL` quote plumbing, and an unverified moomoo-Malaysia CSV preset | Jie must supply real moomoo-MY and Rakuten Trade CSV samples to validate/correct mappings; Rakuten format, fee/board-lot presets, and stamped MYR/USD display-currency toggle remain |
+| **P2** | **PARTIAL** | USD-true pivot API/UI, day-click calendar trade drilldown, marked trade candlestick chart | Saved layouts/custom dashboards, time-of-day/holding/regime and MFE/MAE metrics, reflection/market-context/lesson day panel, stat→trade drilldown, row expand/bulk tag |
+| **P3** | **PARTIAL** | Evidence-first `/api/coach`, four coach modes, caller-scoped journal aggregates, persisted `CoachInsight`, Journal-home coach card | Full insight-history page, route-level isolation/evidence regression tests, coach polish |
+| **P4** | **NOT STARTED** | Goal schema shell only | Goals UI/progress, daily-loss/overtrade/bridge/idea alerts, Telegram GO channel and DMs |
+| **P5** | **NOT STARTED** | Chart foundation exists; placeholder remains hidden | Replay MVP, Sentry DSN, rate-limit/onboarding/brand hardening |
+
+### Cross-cutting journal integrity gates (apply to every remaining phase)
+
+1. **Open holdings:** live broker `Position` + freshest broker quote are authoritative for quantity, average cost, state, current price, and unrealized P&L. Sheet rows may provide only plan/history fields.
+2. **Realized performance:** calendar, stats, pivot, coach, and goals count money only for canonical `CLOSE` records with USD-resolved `pnlUsd`; OPEN/SEMI-OPEN partial P&L is not realized performance.
+3. **Currency truth:** broker-realized USD wins. Sheet-derived MYR P&L is reversed with the connection's stamped fixed rate (Jie's current JLaw rate: **4.2127**); unknown conversions fail closed.
+4. **Account separation:** simulated/paper broker rows never enter live Journal calendar or performance metrics; paper Portfolio/equity remains available only when that account is explicitly selected.
+5. **Date truth:** impossible weekend entry dates are corrected at source where possible and normalized during sync (including US market holidays) before calendar/month/day-of-week aggregation.
+6. **Lifecycle dedupe:** sheet sync must be followed by reconciliation; `:dup`/stopgap twins stay excluded with NULL-safe query clauses, and one broker episode maps to one canonical trade lifecycle.
+7. **Acceptance read-back:** every phase touching journal data must verify zero closed trades missing `pnlUsd`, zero non-USD closed performance rows, zero unintended paper rows, zero unresolved weekend entry dates, and an idempotent second reconciliation pass.
+
 ---
 
 ## A. Gap matrix (audited 2026-07-10)
+
+This is the original audit baseline. Use **Current phase state (reviewed 2026-07-17)** above for implementation status; do not treat the historical red/yellow cells as current.
 
 Severity: 🟢 solid · 🟡 partial · 🔴 missing.
 
@@ -42,44 +68,44 @@ Severity: 🟢 solid · 🟡 partial · 🔴 missing.
 
 **Workstream key:** 🄲 = Codex, 🄺 = Claude, split rows note both. Sequence: P0 → (P1 ∥ P1.5) → P2 → P3 → (P4 ∥ P5 polish). Every phase validated per `wiki/projects/dashboard-validation-loop.md` (build → deploy → minted-member browser/API probe → fix), and schema/scoring doctrine stays wiki-first.
 
-### P0 — Unblock & holes (≤1 day)
+### P0 — Unblock & holes (≤1 day) — **COMPLETE**
 - 🄲 Commit + push the uncommitted doctrine tree (their own work) — *first, before anything else*.
 - 🄺 `symbol-format.ts`: add `MY.` ↔ `.KL` both directions + fail-closed unknown-prefix warning; refresh-quotes covers `.KL`.
 - 🄺 Schema (one migration): `TradeRecord.tags Json?`, `screenshots Json?` (URL list), `mistakes Json?`; `Playbook` + `Goal` tables (empty-shipped for P1/P4).
 - 🄺 Nav: hide `/playbooks` `/replay` placeholders from member nav until real.
 - **Accept:** tree clean; `MY.1155` round-trips to `1155.KL`; migration applied; `npx tsc --noEmit` + build green.
 
-### P1 — Journal excellence + two-surface IA skeleton (week 1)
+### P1 — Journal excellence + two-surface IA skeleton (week 1) — **PARTIAL**
 - 🄺 Route/IA restructure: `/journal` home (light `data-mode`, client landing after login) with dashboard cards (today, week P&L, open positions, streaks); desk family under `/markets/*` (redirects from old routes); nav split per ROADMAP two-surface tokens.
 - 🄲 Trade detail page to TradesViz grade: tags editor, screenshot upload (Vercel Blob or URL-paste v1), mistake classification picker, plan-vs-actual block (proposedSL/TP vs fills), AI-review + verdict history (exists) unified.
 - 🄲 Trades table: saved filters/views, tag/strategy filters, column chooser.
 - 🄺 Idea→journal loop (absorbed client-beta P1): showcase whitelist projection + "Jie entered ✓" + Watch/"I took this" provenance.
 - **Accept:** minted member lands on `/journal`, tags+screenshot a trade, saves a view; showcase payload grep shows zero size/$ fields.
 
-### P1.5 — Bursa journal support (∥ P1, week 1–2)
+### P1.5 — Bursa journal support (∥ P1, week 1–2) — **BLOCKED / PARTIAL**
 - 🄲 Bursa broker presets (fees: brokerage/stamp/clearing; 100-lot), Rakuten Trade + moomoo-MY CSV formats (Jie supplies sample exports), MY. tickers in manual form.
 - 🄺 Display-currency: per-account currency truth + MYR/USD toggle for aggregate stats (single FX source, stamped).
 - **Accept:** member imports a Rakuten CSV, sees MYR positions with .KL quotes at the gentle cadence, stats aggregate correctly in chosen display currency.
 
-### P2 — Analytics: pivot, calendar, chart-trades (week 2–3)
+### P2 — Analytics: pivot, calendar, chart-trades (week 2–3) — **PARTIAL**
 - 🄺 Aggregation API: `/api/analytics/pivot` — group journal trades by any field (setup/tag/ticker/dow/tod/holding-bucket/regime/broker/currency) × metric (count/winRate/PF/expectancy/avgR/MFE-capture); server-side, user-scoped.
 - 🄲 Pivot UI: group-by picker + chart/table render + **saved layouts** (`DashboardLayout` table) = custom dashboards v1.
 - 🄲 Calendar upgrade: day-click drilldown panel (trades, reflection, market context from day0Market, lessons).
 - 🄺 Chart-visualized trades: `/api/trades/[id]/bars` (BrokerDailyBar→Yahoo fallback window) + lightweight-charts component with entry/exit/stop markers on detail page + calendar drilldown.
 - **Accept:** "expectancy by day-of-week" renders in 2 clicks and saves as a layout; every closed trade shows a marked candlestick chart.
 
-### P3 — AI coach over the journal (week 3–4)
+### P3 — AI coach over the journal (week 3–4) — **PARTIAL**
 - 🄺 Tooled coach endpoint: LLM + safe aggregation tools (the P2 pivot API + stats + digest) over the CALLER's data only; Cypher-style modes (performance analyst / risk coach / pattern detector / accountability); every answer persisted (`CoachInsight` table: question, answer, evidence JSON, mode) and surfaced on `/journal` home ("this week's insight").
 - 🄲 Coach UI on Journal home + insight history page.
 - **Accept:** "why do I lose on Fridays?" returns a data-grounded answer citing the member's own numbers; insight row persisted; zero cross-tenant reads (probe-verified).
 - Cost guard: reuses `dailyScans` quota.
 
-### P4 — Alerts, goals, Telegram (week 4–5)
+### P4 — Alerts, goals, Telegram (week 4–5) — **NOT STARTED**
 - 🄺 Telegram GO channel + intraday trigger tick (client-beta P3, unchanged scope).
 - 🄲 Goals (P&L/drawdown/process targets w/ progress on Journal home) + user alerts (daily-loss breach, overtrading count, bridge-stale, idea-triggered) via dashboard + Telegram DM.
 - **Accept:** a triggered A-list idea and a daily-loss breach both notify within the tick cadence; goals render with live progress.
 
-### P5 — Replay v1 + client hardening (week 5+)
+### P5 — Replay v1 + client hardening (week 5+) — **NOT STARTED**
 - 🄲 Replay MVP: bar-by-bar step-through of a closed trade's chart ("what would I do now?"), journaling the answer — only after P2 charts exist.
 - 🄺 Beta hardening: Sentry (needs DSN), rate limits, onboarding polish for MY clients, brand pass (JS Trade Journal light / Market Desk dark per ROADMAP tokens).
 
