@@ -162,9 +162,10 @@ export async function GET(req: Request) {
   const where: Prisma.TradeRecordWhereInput = {
     userId: userScopeId,
     // Reconciler-merged duplicate episodes are marked "...:dup" — never list
-    // them (the SHEET row is the visible one). Composed via AND so the
-    // win/loss NOT filters below stay independent.
-    AND: [{ NOT: { brokerOrderId: { endsWith: ":dup" } } }],
+    // them (the SHEET row is the visible one). NULL-SAFE via the OR-null branch
+    // (SQL `NOT LIKE` is UNKNOWN for NULL and would drop all sheet rows).
+    // Composed via AND so the win/loss NOT filters below stay independent.
+    AND: [{ OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] }],
     ...(symbol ? { ticker: { contains: symbol } } : {}),
     ...(side ? { side } : {}),
     ...(stateFilter ? { state: stateFilter } : {}),

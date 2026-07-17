@@ -138,7 +138,9 @@ export async function loadClosedTrades(userId: string, from?: Date | null, to?: 
       userId,
       pnl: { not: null },
       // Reconciler-marked duplicate episodes must not double-count (":dup").
-      NOT: { brokerOrderId: { endsWith: ":dup" } },
+      // NULL-SAFE: sheet rows have brokerOrderId null; bare NOT{endsWith}
+      // drops them (SQL three-valued logic), so allow nulls explicitly.
+      OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }],
       ...(from || to
         ? { OR: [{ tradeDate: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }] }
         : {}),

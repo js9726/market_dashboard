@@ -30,9 +30,13 @@ export async function GET() {
   const trades = await prisma.tradeRecord.findMany({
     // Exclude reconciler-merged duplicate episodes (brokerOrderId "...:dup") —
     // the SHEET row stays authoritative and the marked twin must not double a
-    // day's P&L (June-10 MDB showed -79.10 = the same -39.55 twice on the
-    // calendar; TradeLog hid it, the aggregates didn't).
-    where: { userId, NOT: { brokerOrderId: { endsWith: ":dup" } } },
+    // day's P&L. NULL-SAFE: a bare NOT{endsWith} compiles to SQL
+    // `NOT (col LIKE '%:dup')`, which is UNKNOWN for NULL and silently dropped
+    // EVERY sheet row (brokerOrderId null) — emptied the whole June calendar.
+    where: {
+      userId,
+      OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }],
+    },
     orderBy: { tradeDate: "asc" },
   });
 
