@@ -1,13 +1,13 @@
 import { auth } from "@/auth";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
-import { getGoogleAccessToken } from "@/lib/token-refresh";
-import { fetchSheetRows, parseTradeRows, DEFAULT_COL_MAP, ColMap } from "@/lib/google-sheets";
 import { generateTradeVerdict } from "@/lib/generate-trade-verdict";
-import { resolveTradeUsd } from "@/lib/currency";
+import { syncUserJournal, JournalSyncError } from "@/server/journal-sync";
 import { NextResponse, after } from "next/server";
 
-// Allow up to 60 s for the background verdict generation after response is sent
+// Thin session wrapper over server/journal-sync.ts (shared with the nightly
+// /api/cron/sync-journal). Verdict generation stays on THIS path only — the
+// cron path skips LLM spend.
 export const maxDuration = 60;
 
 export async function POST() {
@@ -18,109 +18,23 @@ export async function POST() {
   }
   const userScopeId = scopeUserId(session)!;
 
-  const connection = await prisma.spreadsheetConnection.findUnique({
-    where: { userId: userScopeId },
-  });
-  if (!connection) return NextResponse.json({ error: "No spreadsheet connected" }, { status: 400 });
-
-  let accessToken: string;
+  let result;
   try {
-    accessToken = await getGoogleAccessToken(userScopeId);
+    result = await syncUserJournal(userScopeId);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg === "REAUTH_REQUIRED") {
-      return NextResponse.json({ error: "REAUTH_REQUIRED" }, { status: 401 });
+    if (e instanceof JournalSyncError) {
+      if (e.code === "NO_CONNECTION") return NextResponse.json({ error: "No spreadsheet connected" }, { status: 400 });
+      if (e.code === "REAUTH_REQUIRED") return NextResponse.json({ error: "REAUTH_REQUIRED" }, { status: 401 });
+      if (e.code === "GOOGLE_AUTH") return NextResponse.json({ error: `Google auth failed: ${e.message}` }, { status: 500 });
+      if (e.code === "SHEETS_FETCH") return NextResponse.json({ error: `Sheets fetch failed: ${e.message}` }, { status: 500 });
+      return NextResponse.json({ error: `DB write failed: ${e.message}` }, { status: 500 });
     }
-    return NextResponse.json({ error: `Google auth failed: ${msg}` }, { status: 500 });
+    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
   }
-
-  const colMap: ColMap = Object.keys(connection.colMap as object).length
-    ? (connection.colMap as ColMap)
-    : DEFAULT_COL_MAP;
-
-  let rows: string[][];
-  try {
-    rows = await fetchSheetRows(
-      connection.spreadsheetId,
-      connection.sheetTab,
-      connection.headerRow,
-      accessToken
-    );
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ error: `Sheets fetch failed: ${msg}` }, { status: 500 });
-  }
-
-  const trades = parseTradeRows(rows, colMap);
-
-  // Currency normalization: the sheet reports P&L in MYR via one fixed rate.
-  // Reverse it to USD at write time (broker-true overlay happens at read time /
-  // backfill). No fills here (sheet wipe+recreate), so this is the fixed-rate
-  // path; if no rate is set yet, pnlUsd stays null until the backfill detects it.
-  const fixedRate = connection.fixedFxRate != null ? Number(connection.fixedFxRate) : null;
-
-  try {
-  await prisma.$transaction([
-    prisma.tradeRecord.deleteMany({ where: { connectionId: connection.id } }),
-    prisma.tradeRecord.createMany({
-      data: trades.map((t) => {
-        const usd = resolveTradeUsd({
-          ticker: t.ticker,
-          rawPnl: t.pnl,
-          fixedRate,
-          sheetBaseCurrency: "MYR",
-        });
-        return {
-          userId: userScopeId,
-          connectionId: connection.id,
-          ticker: t.ticker,
-          tradeDate: t.tradeDate,
-          buyPrice: t.buyPrice,
-          quantity: t.quantity,
-          pnl: t.pnl,
-          pnlUsd: usd.pnlUsd,
-          currencyCode: usd.currencyCode,
-          fxRate: usd.fxRate,
-          pnlSource: usd.pnlSource,
-          exitPrice: t.exitPrice,
-          side: t.side,
-          fees: t.fees,
-          notes: t.notes,
-          rawRow: t.rawRow,
-          proposedEntry: t.proposedEntry,
-          proposedSL: t.proposedSL,
-          proposedTP: t.proposedTP,
-          rrr: t.rrr,
-          riskPct: t.riskPct,
-          rewardPct: t.rewardPct,
-          positionPct: t.positionPct,
-          currency: t.currency,
-          platform: t.platform,
-          industry: t.industry,
-          strategy: t.strategy,
-          state: t.state,
-        };
-      }),
-    }),
-    prisma.spreadsheetConnection.update({
-      where: { id: connection.id },
-      data: { lastSyncedAt: new Date() },
-    }),
-  ]);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ error: `DB write failed: ${msg}` }, { status: 500 });
-  }
-
-  const OPEN_STATES = ["OPEN", "SEMI-OPEN", "PLANNING"];
-  const open = trades.filter((t) => t.state ? OPEN_STATES.includes(t.state.toUpperCase()) : t.pnl === null).length;
-  const closed = trades.length - open;
-  const datesResolved = trades.filter((t) => t.tradeDate !== null).length;
-  const sampleRawDates = rows.slice(1, 4).map((r) => r[colMap.date]);
 
   // Generate verdicts after response is sent — after() keeps the function alive on Vercel
   const userId = userScopeId;
-  const connectionId = connection.id;
+  const connectionId = result.connectionId;
   after(async () => {
     try {
       const unscored = await prisma.tradeRecord.findMany({
@@ -131,10 +45,15 @@ export async function POST() {
       for (const { id } of unscored) {
         try {
           await generateTradeVerdict(id, userId, { tier: "fast" });
-        } catch { /* non-fatal */ }
+        } catch {
+          /* non-fatal */
+        }
       }
-    } catch { /* non-fatal */ }
+    } catch {
+      /* non-fatal */
+    }
   });
 
-  return NextResponse.json({ synced: trades.length, open, closed, datesResolved, sampleRawDates });
+  const { connectionId: _omit, ...body } = result;
+  return NextResponse.json(body);
 }

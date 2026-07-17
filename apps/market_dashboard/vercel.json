@@ -5,6 +5,10 @@
   "outputDirectory": ".next",
   "crons": [
     {
+      "path": "/api/cron/sync-journal",
+      "schedule": "30 21 * * 1-5"
+    },
+    {
       "path": "/api/cron/refresh-quotes",
       "schedule": "10 13 * * 1-5"
     },
