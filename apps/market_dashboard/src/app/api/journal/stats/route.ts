@@ -35,7 +35,13 @@ export async function GET() {
     // EVERY sheet row (brokerOrderId null) — emptied the whole June calendar.
     where: {
       userId,
-      OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }],
+      AND: [
+        { OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] },
+        // Calendar/performance is the real journal. Paper accounts remain
+        // available on their explicit Portfolio/equity account views, but must
+        // not create calendar activity or alter journal statistics.
+        { OR: [{ brokerAccountId: null }, { brokerAccount: { isLive: true } }] },
+      ],
     },
     orderBy: { tradeDate: "asc" },
   });
