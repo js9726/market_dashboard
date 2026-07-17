@@ -35,6 +35,13 @@ export interface Episode {
   usdSafe: boolean;
 }
 
+export interface SellOnlyBasis {
+  ticker: string;
+  openedAt: Date;
+  buyQty: number;
+  avgBuy: number;
+}
+
 export interface EpisodeRecordIdentity {
   ticker: string;
   quantity: number | null;
@@ -103,6 +110,52 @@ export function buildEpisodes(fills: FillLike[]): Episode[] {
   return episodes;
 }
 
+/**
+ * Recover a closure when the broker API supplied only the exit fills but a
+ * prior position snapshot preserved the entry quantity and average cost.
+ * This is common with IBKR because the live socket exposes recent executions,
+ * not the older opening fill. Fail closed unless the USD sells exactly flatten
+ * the preserved quantity.
+ */
+export function buildSellOnlyClosure(fills: FillLike[], basis: SellOnlyBasis): Episode | null {
+  if (
+    fills.length === 0 ||
+    !Number.isFinite(basis.buyQty) ||
+    basis.buyQty <= QTY_EPS ||
+    !Number.isFinite(basis.avgBuy) ||
+    basis.avgBuy <= 0
+  ) return null;
+
+  const ordered = [...fills].sort((a, b) => a.executedAt.getTime() - b.executedAt.getTime());
+  if (ordered.some((fill) => fill.side.toUpperCase() !== "SELL" || fill.executedAt < basis.openedAt)) {
+    return null;
+  }
+  const sellQty = ordered.reduce((sum, fill) => sum + Math.abs(fill.qty), 0);
+  if (Math.abs(sellQty - basis.buyQty) > Math.max(QTY_EPS, basis.buyQty * 0.001)) return null;
+
+  const usdSafe = ordered.every((fill) =>
+    fill.currency === "USD" || (fill.currency == null && /^US\./i.test(fill.ticker))
+  );
+  if (!usdSafe) return null;
+
+  const sellNotional = ordered.reduce((sum, fill) => sum + Math.abs(fill.qty) * fill.price, 0);
+  const fees = ordered.reduce((sum, fill) => sum + (fill.fees ?? 0), 0);
+  const avgSell = sellNotional / sellQty;
+  return {
+    ticker: plainTicker(basis.ticker),
+    fillIds: ordered.map((fill) => fill.id),
+    openedAt: basis.openedAt,
+    closedAt: ordered[ordered.length - 1].executedAt,
+    buyQty: basis.buyQty,
+    sellQty,
+    avgBuy: basis.avgBuy,
+    avgSell,
+    fees,
+    realized: sellNotional - basis.buyQty * basis.avgBuy - fees,
+    usdSafe: true,
+  };
+}
+
 /** Match a legacy/unlinked journal row back to its immutable fill episode. */
 export function pickEpisodeForRecord(
   episodes: Episode[],
@@ -145,9 +198,11 @@ export interface CanonicalCandidate {
   connectionId: string | null;
   brokerOrderId: string | null;
   quantity: number | null;
+  buyPrice: number | null;
   tradeDate: Date | null;
   executedAt: Date | null;
   platform: string | null;
+  brokerAccountId: string | null;
   hasVerdict: boolean;
 }
 

@@ -25,6 +25,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   buildEpisodes,
+  buildSellOnlyClosure,
   inWindow,
   isStopgap,
   pickCanonical,
@@ -32,6 +33,7 @@ import {
   type CanonicalCandidate,
   type FillLike,
 } from "@/lib/trade-episodes";
+import { brokerKey } from "@/lib/broker-normalization";
 
 export interface ReconcileReport {
   dryRun: boolean;
@@ -78,6 +80,11 @@ export async function reconcileBrokerTrades(opts: {
   report.accounts = accounts.length;
 
   for (const account of accounts) {
+    const livePositions = await prisma.position.findMany({
+      where: { brokerAccountId: account.id },
+      select: { ticker: true },
+    });
+    const livePositionTickers = new Set(livePositions.map((position) => plainTicker(position.ticker)));
     const rawFills = await prisma.tradeFill.findMany({
       where: { brokerAccountId: account.id },
       orderBy: { executedAt: "asc" },
@@ -110,14 +117,13 @@ export async function reconcileBrokerTrades(opts: {
 
     for (const [ticker, fills] of Array.from(byTicker.entries())) {
       const episodes = buildEpisodes(fills).filter((e) => e.closedAt != null);
-      if (episodes.length === 0) continue;
-
       const rawCandidates = await prisma.tradeRecord.findMany({
         where: { userId: account.userId, ticker },
         select: {
           id: true, ticker: true, state: true, source: true, notes: true,
-          connectionId: true, brokerOrderId: true, quantity: true,
+          connectionId: true, brokerOrderId: true, quantity: true, buyPrice: true,
           tradeDate: true, executedAt: true, platform: true, verdict: true,
+          brokerAccountId: true,
         },
       });
       const candidates: CanonicalCandidate[] = rawCandidates.map((r) => ({
@@ -129,9 +135,11 @@ export async function reconcileBrokerTrades(opts: {
         connectionId: r.connectionId,
         brokerOrderId: r.brokerOrderId,
         quantity: r.quantity == null ? null : Number(r.quantity),
+        buyPrice: r.buyPrice == null ? null : Number(r.buyPrice),
         tradeDate: r.tradeDate,
         executedAt: r.executedAt,
         platform: r.platform,
+        brokerAccountId: r.brokerAccountId,
         hasVerdict: r.verdict != null,
       }));
 
@@ -304,6 +312,106 @@ export async function reconcileBrokerTrades(opts: {
             }
             await prisma.tradeRecord.delete({ where: { id: dup.id } });
           }
+        }
+      }
+
+      // IBKR's live socket can expose only the recent SELL executions for a
+      // position opened before the session/history window. If those USD sells
+      // exactly flatten a preserved journal quantity and no live position
+      // remains, close the user-authored row using its cost basis. This keeps
+      // broker truth durable after sheet re-syncs without inventing a BUY fill.
+      if (!livePositionTickers.has(ticker) && !fills.some((fill) => fill.side.toUpperCase() === "BUY")) {
+        const unlinkedSells = fills.filter(
+          (fill) => fill.side.toUpperCase() === "SELL" && fill.tradeRecordId == null,
+        );
+        const totalSellQty = unlinkedSells.reduce((sum, fill) => sum + Math.abs(fill.qty), 0);
+        const authoredMatches = candidates.filter((candidate) => {
+          const openedAt = candidate.tradeDate ?? candidate.executedAt;
+          return (
+            (candidate.source === "SHEET" || candidate.source === "MANUAL") &&
+            candidate.state?.toUpperCase() === "CLOSE" &&
+            candidate.buyPrice != null &&
+            candidate.quantity != null &&
+            openedAt != null &&
+            unlinkedSells.every((fill) => fill.executedAt >= openedAt) &&
+            Math.abs(candidate.quantity - totalSellQty) <= Math.max(1e-6, totalSellQty * 0.001) &&
+            (candidate.brokerAccountId === account.id ||
+              (candidate.brokerAccountId == null && brokerKey(candidate.platform) === brokerKey(account.alias)))
+          );
+        });
+
+        if (unlinkedSells.length > 0 && authoredMatches.length === 1) {
+          const canonical = authoredMatches[0];
+          const canonicalOpenedAt = canonical.tradeDate ?? canonical.executedAt!;
+          const stopgaps = candidates.filter((candidate) =>
+            candidate.brokerAccountId === account.id &&
+            isStopgap(candidate) &&
+            candidate.quantity != null &&
+            Math.abs(candidate.quantity - totalSellQty) <= Math.max(1e-6, totalSellQty * 0.001)
+          );
+          const basisStopgap = stopgaps.find((candidate) => {
+            const openedAt = candidate.tradeDate ?? candidate.executedAt;
+            return openedAt != null && Math.abs(openedAt.getTime() - canonicalOpenedAt.getTime()) <= 3 * 86_400_000;
+          });
+          const basisOpenedAt = basisStopgap?.tradeDate ?? basisStopgap?.executedAt ?? canonicalOpenedAt;
+          const closure = buildSellOnlyClosure(unlinkedSells, {
+            ticker,
+            openedAt: basisOpenedAt,
+            buyQty: basisStopgap?.quantity ?? canonical.quantity!,
+            avgBuy: basisStopgap?.buyPrice ?? canonical.buyPrice!,
+          });
+
+          if (closure?.closedAt && closure.realized != null) {
+            report.recordsClosed++;
+            report.actions.push(
+              `${dryRun ? "[dry] " : ""}sell-only close ${ticker} → ${canonical.id} ` +
+              `entry ${closure.avgBuy.toFixed(2)} exit ${closure.avgSell.toFixed(2)} pnl ${closure.realized.toFixed(2)} USD`,
+            );
+            if (!dryRun) {
+              await prisma.tradeRecord.update({
+                where: { id: canonical.id },
+                data: {
+                  state: "CLOSE",
+                  buyPrice: new Prisma.Decimal(closure.avgBuy.toFixed(4)),
+                  quantity: new Prisma.Decimal(closure.buyQty.toFixed(2)),
+                  exitPrice: new Prisma.Decimal(closure.avgSell.toFixed(4)),
+                  executedAt: closure.closedAt,
+                  brokerAccountId: account.id,
+                  pnlUsd: new Prisma.Decimal(closure.realized.toFixed(2)),
+                  currencyCode: "USD",
+                  fxRate: null,
+                  pnlSource: "broker",
+                },
+              });
+              const linked = await prisma.tradeFill.updateMany({
+                where: { id: { in: closure.fillIds } },
+                data: { tradeRecordId: canonical.id },
+              });
+              report.fillsLinked += linked.count;
+
+              for (const stopgap of stopgaps) {
+                const details = await prisma.tradeRecord.findUnique({
+                  where: { id: stopgap.id },
+                  select: {
+                    verdict: true,
+                    journalEntry: { select: { id: true } },
+                    _count: { select: { verdictHistory: true } },
+                  },
+                });
+                if (details?.verdict != null || details?.journalEntry != null || (details?._count.verdictHistory ?? 0) > 0) {
+                  report.conflicts.push(`sell-only stopgap ${stopgap.id} has journal content and was not deleted`);
+                  continue;
+                }
+                await prisma.tradeRecord.delete({ where: { id: stopgap.id } });
+                report.duplicatesDeleted++;
+              }
+            } else {
+              report.fillsLinked += closure.fillIds.length;
+              report.duplicatesDeleted += stopgaps.length;
+            }
+          }
+        } else if (unlinkedSells.length > 0 && authoredMatches.length > 1) {
+          report.conflicts.push(`ambiguous sell-only closure ${ticker}: ${authoredMatches.length} authored matches`);
         }
       }
     }

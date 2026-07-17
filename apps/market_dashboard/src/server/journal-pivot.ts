@@ -141,9 +141,12 @@ export function closedTradesWhere(
 ): Prisma.TradeRecordWhereInput {
   return {
     userId,
-    pnl: { not: null },
     AND: [
       { OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] },
+      // Match calendar/stats semantics: an explicit OPEN/SEMI-OPEN row stays
+      // open even when it carries partial realized P&L. Only CLOSE (or legacy
+      // rows with no state and a P&L) belongs in closed-trade performance.
+      { OR: [{ state: "CLOSE" }, { state: null, pnl: { not: null } }] },
       ...(from || to
         ? [{ tradeDate: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }]
         : []),

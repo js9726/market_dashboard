@@ -32,6 +32,7 @@ describe("journal pivot query and broker grouping", () => {
     const where = closedTradesWhere("user-1", from, to);
     expect(where.AND).toEqual([
       { OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] },
+      { OR: [{ state: "CLOSE" }, { state: null, pnl: { not: null } }] },
       { tradeDate: { gte: from, lte: to } },
     ]);
   });

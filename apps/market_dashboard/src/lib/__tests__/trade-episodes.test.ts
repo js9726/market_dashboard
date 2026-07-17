@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildEpisodes,
+  buildSellOnlyClosure,
   pickCanonical,
   pickEpisodeForRecord,
   plainTicker,
@@ -104,6 +105,37 @@ describe("buildEpisodes", () => {
   });
 });
 
+describe("buildSellOnlyClosure", () => {
+  it("recovers the complete RBRK exit from the preserved IBKR cost basis", () => {
+    const closure = buildSellOnlyClosure([
+      fill({ ticker: "RBRK", currency: "USD", side: "SELL", qty: 4, price: 82.86, fees: 1.0076, at: "2026-07-15T14:55:58Z" }),
+      fill({ ticker: "RBRK", currency: "USD", side: "SELL", qty: 3, price: 78.56, fees: 1.0054, at: "2026-07-16T15:35:57Z" }),
+      fill({ ticker: "RBRK", currency: "USD", side: "SELL", qty: 2, price: 78.5603, fees: 0.0036, at: "2026-07-16T15:35:57Z" }),
+    ], {
+      ticker: "RBRK",
+      openedAt: new Date("2026-06-29T04:15:52Z"),
+      buyQty: 9,
+      avgBuy: 70.6111,
+    });
+
+    expect(closure?.closedAt?.toISOString()).toBe("2026-07-16T15:35:57.000Z");
+    expect(closure?.avgSell).toBeCloseTo(80.4712, 4);
+    expect(closure?.realized).toBeCloseTo(86.7241, 4);
+  });
+
+  it("fails closed when sell quantity does not flatten the preserved position", () => {
+    const closure = buildSellOnlyClosure([
+      fill({ ticker: "RBRK", currency: "USD", side: "SELL", qty: 4, price: 82.86, at: "2026-07-15T14:55:58Z" }),
+    ], {
+      ticker: "RBRK",
+      openedAt: new Date("2026-06-29T04:15:52Z"),
+      buyQty: 9,
+      avgBuy: 70.6111,
+    });
+    expect(closure).toBeNull();
+  });
+});
+
 describe("pickCanonical", () => {
   const episode = buildEpisodes([
     fill({ side: "BUY", qty: 14, price: 97.4, at: "2026-06-04T10:32:23Z" }),
@@ -119,9 +151,11 @@ describe("pickCanonical", () => {
       connectionId: "conn1",
       brokerOrderId: null,
       quantity: 14,
+      buyPrice: 97.4,
       tradeDate: new Date("2026-06-04T00:00:00Z"),
       executedAt: null,
       platform: "Moo Moo",
+      brokerAccountId: null,
       hasVerdict: false,
       ...p,
     };
