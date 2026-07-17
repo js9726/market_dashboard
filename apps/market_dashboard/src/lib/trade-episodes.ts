@@ -206,6 +206,11 @@ export interface CanonicalCandidate {
   hasVerdict: boolean;
 }
 
+export interface LivePositionLike {
+  ticker: string;
+  qty: number;
+}
+
 function recordDate(r: CanonicalCandidate): Date | null {
   return r.tradeDate ?? r.executedAt;
 }
@@ -231,6 +236,40 @@ const AUTO_NOTE_PREFIX = "Auto-created from live broker position";
 export function isStopgap(r: CanonicalCandidate): boolean {
   if (r.source !== "BRIDGE" || !(r.brokerOrderId?.startsWith("position:") ?? false)) return false;
   return !r.notes || r.notes.startsWith(AUTO_NOTE_PREFIX);
+}
+
+/** Match a position-snapshot stopgap to one authored lifecycle row. */
+export function pickAuthoredRecordForStopgap(
+  candidates: CanonicalCandidate[],
+  stopgap: CanonicalCandidate,
+  livePosition: LivePositionLike | null,
+): CanonicalCandidate | null {
+  if (!isStopgap(stopgap)) return null;
+  const stopgapDate = recordDate(stopgap);
+  if (!stopgapDate || stopgap.buyPrice == null || stopgap.quantity == null) return null;
+  const stopgapBuyPrice = stopgap.buyPrice;
+  const stopgapQuantity = stopgap.quantity;
+  const expectedStates = livePosition
+    ? new Set(["OPEN", "SEMI-OPEN", "PLANNING"])
+    : new Set(["CLOSE"]);
+  const liveQty = livePosition ? Math.abs(livePosition.qty) : null;
+
+  const matches = candidates.filter((candidate) => {
+    if (candidate.id === stopgap.id || plainTicker(candidate.ticker) !== plainTicker(stopgap.ticker)) return false;
+    if (candidate.source !== "SHEET" && candidate.source !== "MANUAL") return false;
+    if (!expectedStates.has(candidate.state?.toUpperCase() ?? "")) return false;
+    const candidateDate = recordDate(candidate);
+    if (!candidateDate || Math.abs(candidateDate.getTime() - stopgapDate.getTime()) > MATCH_WINDOW_DAYS * 86_400_000) {
+      return false;
+    }
+    if (candidate.buyPrice == null || candidate.quantity == null) return false;
+    const priceTolerance = Math.max(0.05, Math.abs(stopgapBuyPrice) * 0.01);
+    if (Math.abs(candidate.buyPrice - stopgapBuyPrice) > priceTolerance) return false;
+    if (liveQty != null) return candidate.quantity + QTY_EPS >= liveQty;
+    return Math.abs(candidate.quantity - stopgapQuantity) <= Math.max(QTY_EPS, stopgapQuantity * 0.001);
+  });
+
+  return matches.length === 1 ? matches[0] : null;
 }
 
 /**

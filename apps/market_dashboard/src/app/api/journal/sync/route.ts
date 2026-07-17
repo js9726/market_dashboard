@@ -3,6 +3,7 @@ import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { generateTradeVerdict } from "@/lib/generate-trade-verdict";
 import { syncUserJournal, JournalSyncError } from "@/server/journal-sync";
+import { reconcileBrokerTrades } from "@/server/trade-reconciler";
 import { NextResponse, after } from "next/server";
 
 // Thin session wrapper over server/journal-sync.ts (shared with the nightly
@@ -21,6 +22,7 @@ export async function POST() {
   let result;
   try {
     result = await syncUserJournal(userScopeId);
+    await reconcileBrokerTrades({ userId: userScopeId });
   } catch (e) {
     if (e instanceof JournalSyncError) {
       if (e.code === "NO_CONNECTION") return NextResponse.json({ error: "No spreadsheet connected" }, { status: 400 });

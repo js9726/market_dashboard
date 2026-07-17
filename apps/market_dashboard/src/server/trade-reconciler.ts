@@ -28,6 +28,7 @@ import {
   buildSellOnlyClosure,
   inWindow,
   isStopgap,
+  pickAuthoredRecordForStopgap,
   pickCanonical,
   plainTicker,
   type CanonicalCandidate,
@@ -82,9 +83,117 @@ export async function reconcileBrokerTrades(opts: {
   for (const account of accounts) {
     const livePositions = await prisma.position.findMany({
       where: { brokerAccountId: account.id },
-      select: { ticker: true },
+      select: { ticker: true, qty: true },
     });
     const livePositionTickers = new Set(livePositions.map((position) => plainTicker(position.ticker)));
+    const livePositionByTicker = new Map(livePositions.map((position) => [
+      plainTicker(position.ticker),
+      { ticker: position.ticker, qty: Number(position.qty) },
+    ]));
+
+    // A position snapshot may have materialized a BRIDGE row before its sheet
+    // lifecycle was synced. Remove that twin while the position is live (also
+    // after a partial sale) or after the broker has gone flat. No fills needed.
+    const stopgapRows = await prisma.tradeRecord.findMany({
+      where: {
+        userId: account.userId,
+        brokerAccountId: account.id,
+        source: "BRIDGE",
+        brokerOrderId: { startsWith: "position:" },
+      },
+      select: {
+        id: true, ticker: true, state: true, source: true, notes: true,
+        connectionId: true, brokerOrderId: true, quantity: true, buyPrice: true,
+        tradeDate: true, executedAt: true, platform: true, verdict: true,
+        brokerAccountId: true,
+      },
+    });
+    for (const rawStopgap of stopgapRows) {
+      const stopgap: CanonicalCandidate = {
+        ...rawStopgap,
+        quantity: rawStopgap.quantity == null ? null : Number(rawStopgap.quantity),
+        buyPrice: rawStopgap.buyPrice == null ? null : Number(rawStopgap.buyPrice),
+        hasVerdict: rawStopgap.verdict != null,
+      };
+      const authoredRows = await prisma.tradeRecord.findMany({
+        where: {
+          userId: account.userId,
+          ticker: plainTicker(stopgap.ticker),
+          source: { in: ["SHEET", "MANUAL"] },
+        },
+        select: {
+          id: true, ticker: true, state: true, source: true, notes: true,
+          connectionId: true, brokerOrderId: true, quantity: true, buyPrice: true,
+          tradeDate: true, executedAt: true, platform: true, verdict: true,
+          brokerAccountId: true,
+        },
+      });
+      const candidates: CanonicalCandidate[] = authoredRows
+        .filter((row) =>
+          row.brokerAccountId === account.id ||
+          (row.brokerAccountId == null && brokerKey(row.platform) === brokerKey(account.alias))
+        )
+        .map((row) => ({
+          ...row,
+          quantity: row.quantity == null ? null : Number(row.quantity),
+          buyPrice: row.buyPrice == null ? null : Number(row.buyPrice),
+          hasVerdict: row.verdict != null,
+        }));
+      const canonical = pickAuthoredRecordForStopgap(
+        candidates,
+        stopgap,
+        livePositionByTicker.get(plainTicker(stopgap.ticker)) ?? null,
+      );
+      if (!canonical) continue;
+
+      const [stopgapDetails, canonicalEntry] = await Promise.all([
+        prisma.tradeRecord.findUnique({
+          where: { id: stopgap.id },
+          select: {
+            verdict: true, verdictScore: true, verdictGeneratedAt: true,
+            journalEntry: { select: { id: true } },
+          },
+        }),
+        prisma.journalEntry.findUnique({ where: { tradeRecordId: canonical.id }, select: { id: true } }),
+      ]);
+      if (stopgapDetails?.journalEntry && canonicalEntry) {
+        report.conflicts.push(`both ${stopgap.id} (stopgap) and ${canonical.id} have a JournalEntry; duplicate kept`);
+        continue;
+      }
+
+      report.duplicatesDeleted++;
+      report.actions.push(
+        `${dryRun ? "[dry] " : ""}merge+delete ${livePositionByTicker.has(plainTicker(stopgap.ticker)) ? "live" : "stale"} ` +
+        `stopgap ${stopgap.id} into ${canonical.id}`,
+      );
+      if (!dryRun) {
+        const moved = await prisma.tradeVerdictHistory.updateMany({
+          where: { tradeId: stopgap.id },
+          data: { tradeId: canonical.id },
+        });
+        report.verdictsMoved += moved.count;
+        if (stopgapDetails?.journalEntry && !canonicalEntry) {
+          await prisma.journalEntry.update({
+            where: { id: stopgapDetails.journalEntry.id },
+            data: { tradeRecordId: canonical.id },
+          });
+        }
+        await prisma.tradeRecord.update({
+          where: { id: canonical.id },
+          data: {
+            brokerAccountId: account.id,
+            ...(stopgapDetails?.verdict != null && !canonical.hasVerdict
+              ? {
+                  verdict: stopgapDetails.verdict as Prisma.InputJsonValue,
+                  verdictScore: stopgapDetails.verdictScore,
+                  verdictGeneratedAt: stopgapDetails.verdictGeneratedAt,
+                }
+              : {}),
+          },
+        });
+        await prisma.tradeRecord.delete({ where: { id: stopgap.id } });
+      }
+    }
     const rawFills = await prisma.tradeFill.findMany({
       where: { brokerAccountId: account.id },
       orderBy: { executedAt: "asc" },

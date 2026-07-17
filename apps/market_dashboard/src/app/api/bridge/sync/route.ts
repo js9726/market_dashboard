@@ -351,20 +351,17 @@ export async function POST(req: Request) {
   }
 
   // ── Reconcile fills → journal rows (close exited positions) ─────────────
-  // Runs whenever this batch inserted fills or removed positions — both are
-  // the signals that an episode may have closed. Non-fatal: a reconciler
-  // error must never fail the bridge push.
+  // Run on every snapshot: stopgap cleanup does not require a new fill or a
+  // removed position. A reconciler error must never fail the bridge push.
   let reconciled: { recordsClosed: number; duplicatesDeleted: number } | null = null;
-  if (fillsInserted > 0 || removed.count > 0) {
-    try {
-      const report = await reconcileBrokerTrades({ brokerAccountId: account.id });
-      reconciled = {
-        recordsClosed: report.recordsClosed,
-        duplicatesDeleted: report.duplicatesDeleted,
-      };
-    } catch (e) {
-      console.error("[bridge/sync] reconcile failed (non-fatal):", e);
-    }
+  try {
+    const report = await reconcileBrokerTrades({ brokerAccountId: account.id });
+    reconciled = {
+      recordsClosed: report.recordsClosed,
+      duplicatesDeleted: report.duplicatesDeleted,
+    };
+  } catch (e) {
+    console.error("[bridge/sync] reconcile failed (non-fatal):", e);
   }
 
   // ── Heartbeat ──────────────────────────────────────────────────────────

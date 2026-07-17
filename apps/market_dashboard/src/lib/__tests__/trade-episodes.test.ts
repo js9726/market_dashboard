@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildEpisodes,
   buildSellOnlyClosure,
+  pickAuthoredRecordForStopgap,
   pickCanonical,
   pickEpisodeForRecord,
   plainTicker,
@@ -192,6 +193,78 @@ describe("pickCanonical", () => {
     const wrongQty = candidate({ id: "wrongQty", quantity: 5 });
     const rightQty = candidate({ id: "rightQty", quantity: 14 });
     expect(pickCanonical([wrongQty, rightQty], episode)?.id).toBe("rightQty");
+  });
+});
+
+describe("pickAuthoredRecordForStopgap", () => {
+  function candidate(p: Partial<CanonicalCandidate> & { id: string }): CanonicalCandidate {
+    return {
+      ticker: "OKTA",
+      state: "SEMI-OPEN",
+      source: "SHEET",
+      notes: null,
+      connectionId: "conn1",
+      brokerOrderId: null,
+      quantity: 10,
+      buyPrice: 116.94,
+      tradeDate: new Date("2026-06-22T00:00:00Z"),
+      executedAt: null,
+      platform: "moomoo Malaysia",
+      brokerAccountId: null,
+      hasVerdict: false,
+      ...p,
+    };
+  }
+
+  it("merges a live partial-position twin into its semi-open sheet row", () => {
+    const sheet = candidate({ id: "sheet-okta" });
+    const stopgap = candidate({
+      id: "stopgap-okta",
+      source: "BRIDGE",
+      connectionId: null,
+      brokerOrderId: "position:OKTA",
+      quantity: 7,
+      notes: "Auto-created from live broker position so the journal can score the open trade.",
+    });
+    expect(pickAuthoredRecordForStopgap([sheet], stopgap, { ticker: "US.OKTA", qty: 7 })?.id).toBe("sheet-okta");
+  });
+
+  it("removes a stale flat-position twin only when it exactly matches a closed row", () => {
+    const closed = candidate({
+      id: "sheet-aaon",
+      ticker: "AAON",
+      state: "CLOSE",
+      quantity: 5,
+      buyPrice: 134.57,
+      tradeDate: new Date("2026-06-18T00:00:00Z"),
+    });
+    const stopgap = candidate({
+      id: "stopgap-aaon",
+      ticker: "AAON",
+      state: "OPEN",
+      source: "BRIDGE",
+      connectionId: null,
+      brokerOrderId: "position:AAON",
+      quantity: 5,
+      buyPrice: 134.77,
+      tradeDate: new Date("2026-06-19T00:00:00Z"),
+      notes: "Auto-created from live broker position so the journal can score the open trade.",
+    });
+    expect(pickAuthoredRecordForStopgap([closed], stopgap, null)?.id).toBe("sheet-aaon");
+  });
+
+  it("fails closed when two authored rows could match", () => {
+    const stopgap = candidate({
+      id: "stopgap-okta",
+      source: "BRIDGE",
+      connectionId: null,
+      brokerOrderId: "position:OKTA",
+      notes: "Auto-created from live broker position so the journal can score the open trade.",
+    });
+    expect(pickAuthoredRecordForStopgap([
+      candidate({ id: "sheet-a" }),
+      candidate({ id: "sheet-b" }),
+    ], stopgap, { ticker: "US.OKTA", qty: 7 })).toBeNull();
   });
 });
 
