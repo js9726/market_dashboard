@@ -5,8 +5,8 @@
   "target": "trader-scorer-trade/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-16T09:16:25.002Z",
-  "renderHash": "6cff942cd25acda74b9440737a150598b76a599625239f81491be79c36458199",
+  "generatedAt": "2026-07-17T16:31:52.934Z",
+  "renderHash": "a71a7726f39de5ff810af1055938bf9370944ff058b5902556db2e18b6d8e7c7",
   "sources": [
     {
       "root": "wiki",
@@ -31,7 +31,12 @@
     {
       "root": "wiki",
       "path": "wiki/entry-methods.md",
-      "sha256": "50edc351b90cbaa47d258194c153f1c4fe7ac1d251b945ba1f352695886d42dc"
+      "sha256": "99bf0130bc8783d035bb03e87d79e4105347ed1846ba56248d8e736897769dca"
+    },
+    {
+      "root": "wiki",
+      "path": "wiki/lockout-rally.md",
+      "sha256": "22014c94765db7142f8b4addc6683bb7796b7d878b3302e18bbfa6ff01e33528"
     },
     {
       "root": "wiki",
@@ -72,7 +77,8 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trader-style-profiles.md sha256:86b243e654ed
 - wiki:wiki/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
-- wiki:wiki/entry-methods.md sha256:50edc351b90c
+- wiki:wiki/entry-methods.md sha256:99bf0130bc87
+- wiki:wiki/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
 - wiki:wiki/risk-management.md sha256:f90cf08303b1
 - wiki:wiki/position-sizing.md sha256:23dc116bc8f1
@@ -621,9 +627,9 @@ Score risk lower when:
 
 **Summary**: The two primary entry methods across traders in this wiki are (1) pullbacks to rising moving averages and (2) breakouts from tight consolidations. The best entry setups often appear as tight areas after a base breakout, where price digests the move on low volume, prints a priming pattern, and then breaks a pivot.
 
-**Sources**: Alex's Swing Trading System.md, The blueprint to consistently making $10km+ in trading.md, The Complete Traders' Guide.md, 3 Early Entry Techniques To Improve Win Rate.md, user-provided tight-area entry setup image, user-provided priming-pattern image, user-provided post-gap volatility contraction image, TraderLion Moglen case studies (TEM ORB, W range breakout — live scrape 2026-07-02, URLs in traderlion-early-entry-techniques), GFS 2026-07-01 trade calibration (OpenD klines)
+**Sources**: Alex's Swing Trading System.md, The blueprint to consistently making $10km+ in trading.md, The Complete Traders' Guide.md, 3 Early Entry Techniques To Improve Win Rate.md, user-provided tight-area entry setup image, user-provided priming-pattern image, user-provided post-gap volatility contraction image, TraderLion Moglen case studies (TEM ORB, W range breakout — live scrape 2026-07-02, URLs in traderlion-early-entry-techniques), GFS 2026-07-01 trade calibration (OpenD klines), Julian Komar post-earnings second-opportunity post (2026-07-16; raw clipping filename begins `(2) Julian Komar`; [source post](https://x.com/BlogJulianKomar/status/2077732241535349246)), Sean Trades lockout-rally post (2026-04-16; raw clipping filename begins `(2) Sean trades`; [source post](https://x.com/SRxTrades/status/2044536242319380640))
 
-**Last updated**: 2026-07-09
+**Last updated**: 2026-07-18
 
 ---
 
@@ -744,6 +750,10 @@ Quality filters:
 
 See qullamaggie-breakouts-episodic-pivots and gapper-entry for the full rubric.
 
+### Post-earnings qualification versus trigger
+
+For the `POST-GAP-VCP` lane, treat the earnings response as a **qualification event**, not an automatic entry. Before a post-earnings name becomes `GO`, require it to hold most of the move for the first few sessions, build a tight flag/flat base/VCP, contract in range and pullback volume, retain relative strength, and then break a real pivot on renewed volume. Begin smaller because post-earnings volatility remains elevated; add only after price proves the setup. A day-one `EP-FRESH` opening-range entry is a different setup and must be labelled as such. (source: Julian Komar post-earnings second-opportunity post, 2026-07-16; full state model in gapper-entry)
+
 ## Breakout Confirmation: Wait for Higher-Low (2026-05-07 calibration)
 
 A 109-trade backfill (2023–2026) found that **30% of breakout entries got whipsawed below the entry-day LoD before recovering** at +14d. Diagnosis: entries are happening on day 1 of the breakout, before any post-breakout consolidation has produced a higher low — so the entry-day's low is inside the volatility envelope, not below the structural failure point.
@@ -839,6 +849,17 @@ follow the standard tranche/trailing rules; full detail + evidence in risk-manag
 
 ---
 
+## Lockout-rally entries: wait for structure, not comfort
+
+A lockout-rally creates urgency because normal pullbacks do not appear. That urgency is not an entry trigger. Use one of two lanes: (source: Sean Trades lockout-rally post)
+
+1. **Established leader / time correction**: wait for the first tight shelf, flag, VCP, priming pattern, or orderly 8/10/21EMA pullback. Enter only from the new pivot or reclaim after volume contracts during the pause and expands on the trigger.
+2. **Rotation candidate**: require peer confirmation, RS improvement, and a real breakout or MA-reclaim trigger. Treat it as tactical until the stock proves durable leadership.
+
+Do not chase the third green candle. A stock holding green while the index is red is watchlist evidence; it becomes actionable only after location, pivot, trigger volume, and risk-to-pattern-stop pass the normal GO gate.
+
+---
+
 ## Volume at Entry
 
 Across all traders, volume is a key confirmation:
@@ -868,6 +889,87 @@ Across all traders, volume is a key confirmation:
 - stock-scanning
 - market-timing
 - qullamaggie-breakouts-episodic-pivots
+- lockout-rally
+## Source: wiki:wiki/lockout-rally.md
+
+# Lockout Rally
+
+**Summary**: A lockout rally is a fast, persistent advance that offers few normal pullbacks, leaving late buyers and sidelined cash without a comfortable entry. The tradeable response is to distinguish established leaders that need time to digest from lagging groups receiving rotation flows; neither lane justifies chasing an extended candle.
+
+**Sources**: `(2) Sean trades on X A lot of you have probably seen the words lockout rally on your timeline a million times alreadyBUTwhat actually is a lockout rally & How can you take advantage of itA lockout rally is essentially a fast, aggressive move hig.md` ([source post](https://x.com/SRxTrades/status/2044536242319380640)); Post by @martinlukkt on X.md
+
+**Last updated**: 2026-07-18
+
+---
+
+## Definition
+
+A lockout rally is a fast, aggressive move higher with few proper pullbacks. Price gaps or pushes higher, early buyers are already positioned, shorts repeatedly try to call the top, late buyers chase, and sidelined cash waits for a dip that does not arrive. The defining feature is not simply a green market; it is the persistent absence of a low-risk re-entry. (source: Sean Trades lockout-rally post)
+
+The term describes **market behavior**, not a buy signal. A stock holding up while the index falls supplies relative-strength evidence, but it still needs a valid setup, pivot, extension check, and pattern stop before entry.
+
+## Two Effects Of A Lockout Rally
+
+### 1. Capital rotates into lagging groups
+
+When the original leaders become too extended, traders still seeking exposure may move capital into lagging industries or stocks. Sean cites software, quantum, and nuclear as examples of themes that can re-emerge during such rotation. These moves can produce fast momentum, but a rotating laggard is not automatically the market's next durable leader. (source: Sean Trades lockout-rally post)
+
+Operational read:
+
+- Require several peers to confirm the group move.
+- Prefer the strongest stock in the group, not a weak sympathy name.
+- Demand a real pivot and trigger volume.
+- Use shorter expectations until the stock proves sustained institutional leadership.
+
+### 2. Leaders correct through time instead of price
+
+The strongest leaders may refuse to pull back deeply. Instead, they move sideways while the 8/10/21-day averages catch up and volatility contracts. This time correction can eventually produce the first proper continuation base or moving-average pullback. (source: Sean Trades lockout-rally post)
+
+Operational read:
+
+- Do not chase the third green candle or a vertical extension.
+- Let the stock form its first tight shelf, flag, VCP, or orderly MA pullback.
+- Require volume to contract during the pause and expand at the trigger.
+- Enter from the new pivot or reclaim, with risk measured to the new structure.
+
+## Execution Lanes
+
+| Lane | What it looks like | Entry state | Main danger |
+|---|---|---|---|
+| Established leader / time correction | Major leader remains near highs while short-term MAs catch up | `WATCH` until a tight base, priming pattern, or MA-reclaim trigger forms | Chasing an extended leader because it looks invincible |
+| Rotation candidate | Lagging group begins outperforming as capital seeks a new home | `WATCH` until peer confirmation, RS, pivot, and trigger volume appear | Confusing a short rotation trade with a new secular leader |
+| Emerging Stage 2 leader | A stock begins its own Stage 2 while the index rally is already mature | Candidate-generation lane; apply the full GO gate | Projecting a historical analogue onto an unproven stock |
+
+This connects Sean's execution framework with Martin Luk's QCOM analogy. The broad rally and an individual stock can be on different clocks, but a young stock-stage does not excuse a late entry. (source: Post by @martinlukkt on X.md)
+
+## GO-Gate Rules
+
+A lockout-rally candidate cannot become `GO` unless it passes the normal GO gate:
+
+1. **Location**: not more than 2 ATR above the rising 21EMA.
+2. **Structure**: a real consolidation high, reclaim level, or MA-pullback trigger exists; the latest close is not relabelled as a pivot.
+3. **Volume**: contraction during the base or pullback, followed by expansion at the trigger.
+4. **Risk**: the pattern stop is no wider than 1.5 ATR; if no valid stop exists, the stock is not actionable.
+5. **Leadership**: RS is confirmed against the index and, where relevant, against sector peers.
+6. **Catalyst**: the theme or company catalyst is source-backed rather than inferred from price alone.
+7. **Market exposure**: a weak or deteriorating index reduces size even when the stock is holding up.
+
+## Common Misreads
+
+- **"It will not pull back, so I must buy now."** That is the emotional condition the rally creates, not an edge.
+- **"Holding green in a red tape is the entry."** It is evidence for the watchlist; structure supplies the entry.
+- **"Rotation means the laggard is the next leader."** Rotation can be brief and tactical.
+- **"A mature index means no new leaders can emerge."** Individual stocks can begin Stage 2 later, but still require a proper base and trigger.
+- **"The moving averages will catch up eventually."** Time correction is useful only if price remains constructive and volume shows supply drying up.
+
+## Related pages
+
+- relative-strength
+- market-phases
+- stock-scanning
+- entry-methods
+- risk-management
+- a-list-gate-and-screener
 ## Source: wiki:wiki/traderlion-early-entry-techniques.md
 
 # TraderLion Early Entry Techniques

@@ -5,8 +5,8 @@
   "target": "trader-scorer-market/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-11T04:36:56.704Z",
-  "renderHash": "8269bbe1ea4ecd3d2149977c3a325021855950545c14f128205df39a6abc0fb8",
+  "generatedAt": "2026-07-17T16:31:52.917Z",
+  "renderHash": "568369eab5e50b047be45afab6994830f6bd0709830844b410a1a11e537b9928",
   "sources": [
     {
       "root": "wiki",
@@ -26,17 +26,22 @@
     {
       "root": "wiki",
       "path": "wiki/market-phases.md",
-      "sha256": "05103d3a5f620d54d2ce4039bf30e6223ce33e1b4e841c2a65dbdf3b59f480d2"
+      "sha256": "40aa98ce1088bdeed010946b46f84013c70b1b576c77c5ce18bc2ad54c2fcb27"
+    },
+    {
+      "root": "wiki",
+      "path": "wiki/lockout-rally.md",
+      "sha256": "22014c94765db7142f8b4addc6683bb7796b7d878b3302e18bbfa6ff01e33528"
     },
     {
       "root": "wiki",
       "path": "wiki/relative-strength.md",
-      "sha256": "588b842eccceb6a8bcff15880a80a7b5201b603fca514756b691583975f25f49"
+      "sha256": "3c49bdb0cd3cdc5f7685333b6342d31b70df691eb987c3ec722f3fd7aaac1b78"
     },
     {
       "root": "wiki",
       "path": "wiki/stock-scanning.md",
-      "sha256": "2b17f406de7ffc78600a25785ff469bab914be73d31dbe2305b1e87e9dd9b7da"
+      "sha256": "73fb529748da030418636d809656cc34f414d08b6f14515d90b5f6acc09cd6a9"
     },
     {
       "root": "wiki",
@@ -61,9 +66,10 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trader-styles.md sha256:bf82142a7ab8
 - wiki:wiki/trader-style-profiles.md sha256:86b243e654ed
 - wiki:wiki/market-timing.md sha256:5c0d5e42fdf3
-- wiki:wiki/market-phases.md sha256:05103d3a5f62
-- wiki:wiki/relative-strength.md sha256:588b842eccce
-- wiki:wiki/stock-scanning.md sha256:2b17f406de7f
+- wiki:wiki/market-phases.md sha256:40aa98ce1088
+- wiki:wiki/lockout-rally.md sha256:22014c94765d
+- wiki:wiki/relative-strength.md sha256:3c49bdb0cd3c
+- wiki:wiki/stock-scanning.md sha256:73fb529748da
 - wiki:wiki/steve-jacobs-market-dashboard.md sha256:5b6b3c1e7a52
 - wiki:wiki/qullamaggie-breakouts-episodic-pivots.md sha256:f33b3facff2e
 
@@ -521,9 +527,9 @@ During low-opportunity environments, the correct action is **not** to force trad
 
 **Summary**: Markets cycle through distinct phases — uptrend, pullback, correction, and breakdown — each requiring a different level of exposure and a different set of expectations.
 
-**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md
+**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @martinlukkt on X.md, `(2) Sean trades on X A lot of you have probably seen the words lockout rally...hig.md`
 
-**Last updated**: 2026-04-23
+**Last updated**: 2026-07-18
 
 ---
 
@@ -547,6 +553,24 @@ Steve Jacobs' dashboard tracks stocks by **Stage Analysis** — a framework iden
 - **Stage 4**: Downtrend — avoid or short
 
 Swing and day traders focus primarily on **Stage 2** stocks. (source: Post by @SteveDJacobs on X.md)
+
+## Two Clocks: Market Phase And Stock Stage
+
+Do not assume every stock is as mature as the index. The broad market has a phase clock, while each stock and industry group has its own Stage 1–4 clock. A market rally can be mature while a newly emerging company or theme is only transitioning from Stage 1 into Stage 2.
+
+Martin Luk's QCOM analogy illustrates the distinction: he places QCOM's Stage 2 start in January 1999, late in the rally that began in late 1998, and points to PANW's May 2026 Stage 2 transition plus pullback strength in CRWD, FTNT, and NET as a possible modern rhyme. This is a **candidate-generation hypothesis**, not a forecast that the same return or duration will repeat. (source: Post by @martinlukkt on X.md)
+
+Operationally:
+
+1. Use market phase to set total exposure and the hurdle for new risk.
+2. Continue scanning for fresh Stage 2 transitions even when established leaders look mature.
+3. Demand RS during market weakness, a rising long-term trend, base quality, theme confirmation, and a valid entry trigger.
+4. In an extended or deteriorating market, keep size smaller even when the individual stock is early Stage 2.
+5. Never use “late market, early stock” to excuse chasing an extended first move.
+
+## Lockout-Rally Phase Behavior
+
+A lockout-rally is not a fifth market phase. It is a fast advance that can occur inside an uptrend and create two secondary effects: established leaders correct through time while their moving averages catch up, and capital rotates toward lagging groups because traders still want exposure. The correct phase response is to keep scanning but raise the entry hurdle: established leaders need a first proper base or MA pullback, while rotation names need peer confirmation and a real trigger. (source: Sean Trades lockout-rally post)
 
 ## Identifying Phase via Price Structure
 
@@ -591,15 +615,98 @@ Avoid acting on the first signal; wait for confirmation reduces false starts.
 - risk-management
 - trading-psychology
 - moving-averages
+- relative-strength
+- stock-scanning
+- lockout-rally
+## Source: wiki:wiki/lockout-rally.md
+
+# Lockout Rally
+
+**Summary**: A lockout rally is a fast, persistent advance that offers few normal pullbacks, leaving late buyers and sidelined cash without a comfortable entry. The tradeable response is to distinguish established leaders that need time to digest from lagging groups receiving rotation flows; neither lane justifies chasing an extended candle.
+
+**Sources**: `(2) Sean trades on X A lot of you have probably seen the words lockout rally on your timeline a million times alreadyBUTwhat actually is a lockout rally & How can you take advantage of itA lockout rally is essentially a fast, aggressive move hig.md` ([source post](https://x.com/SRxTrades/status/2044536242319380640)); Post by @martinlukkt on X.md
+
+**Last updated**: 2026-07-18
+
+---
+
+## Definition
+
+A lockout rally is a fast, aggressive move higher with few proper pullbacks. Price gaps or pushes higher, early buyers are already positioned, shorts repeatedly try to call the top, late buyers chase, and sidelined cash waits for a dip that does not arrive. The defining feature is not simply a green market; it is the persistent absence of a low-risk re-entry. (source: Sean Trades lockout-rally post)
+
+The term describes **market behavior**, not a buy signal. A stock holding up while the index falls supplies relative-strength evidence, but it still needs a valid setup, pivot, extension check, and pattern stop before entry.
+
+## Two Effects Of A Lockout Rally
+
+### 1. Capital rotates into lagging groups
+
+When the original leaders become too extended, traders still seeking exposure may move capital into lagging industries or stocks. Sean cites software, quantum, and nuclear as examples of themes that can re-emerge during such rotation. These moves can produce fast momentum, but a rotating laggard is not automatically the market's next durable leader. (source: Sean Trades lockout-rally post)
+
+Operational read:
+
+- Require several peers to confirm the group move.
+- Prefer the strongest stock in the group, not a weak sympathy name.
+- Demand a real pivot and trigger volume.
+- Use shorter expectations until the stock proves sustained institutional leadership.
+
+### 2. Leaders correct through time instead of price
+
+The strongest leaders may refuse to pull back deeply. Instead, they move sideways while the 8/10/21-day averages catch up and volatility contracts. This time correction can eventually produce the first proper continuation base or moving-average pullback. (source: Sean Trades lockout-rally post)
+
+Operational read:
+
+- Do not chase the third green candle or a vertical extension.
+- Let the stock form its first tight shelf, flag, VCP, or orderly MA pullback.
+- Require volume to contract during the pause and expand at the trigger.
+- Enter from the new pivot or reclaim, with risk measured to the new structure.
+
+## Execution Lanes
+
+| Lane | What it looks like | Entry state | Main danger |
+|---|---|---|---|
+| Established leader / time correction | Major leader remains near highs while short-term MAs catch up | `WATCH` until a tight base, priming pattern, or MA-reclaim trigger forms | Chasing an extended leader because it looks invincible |
+| Rotation candidate | Lagging group begins outperforming as capital seeks a new home | `WATCH` until peer confirmation, RS, pivot, and trigger volume appear | Confusing a short rotation trade with a new secular leader |
+| Emerging Stage 2 leader | A stock begins its own Stage 2 while the index rally is already mature | Candidate-generation lane; apply the full GO gate | Projecting a historical analogue onto an unproven stock |
+
+This connects Sean's execution framework with Martin Luk's QCOM analogy. The broad rally and an individual stock can be on different clocks, but a young stock-stage does not excuse a late entry. (source: Post by @martinlukkt on X.md)
+
+## GO-Gate Rules
+
+A lockout-rally candidate cannot become `GO` unless it passes the normal GO gate:
+
+1. **Location**: not more than 2 ATR above the rising 21EMA.
+2. **Structure**: a real consolidation high, reclaim level, or MA-pullback trigger exists; the latest close is not relabelled as a pivot.
+3. **Volume**: contraction during the base or pullback, followed by expansion at the trigger.
+4. **Risk**: the pattern stop is no wider than 1.5 ATR; if no valid stop exists, the stock is not actionable.
+5. **Leadership**: RS is confirmed against the index and, where relevant, against sector peers.
+6. **Catalyst**: the theme or company catalyst is source-backed rather than inferred from price alone.
+7. **Market exposure**: a weak or deteriorating index reduces size even when the stock is holding up.
+
+## Common Misreads
+
+- **"It will not pull back, so I must buy now."** That is the emotional condition the rally creates, not an edge.
+- **"Holding green in a red tape is the entry."** It is evidence for the watchlist; structure supplies the entry.
+- **"Rotation means the laggard is the next leader."** Rotation can be brief and tactical.
+- **"A mature index means no new leaders can emerge."** Individual stocks can begin Stage 2 later, but still require a proper base and trigger.
+- **"The moving averages will catch up eventually."** Time correction is useful only if price remains constructive and volume shows supply drying up.
+
+## Related pages
+
+- relative-strength
+- market-phases
+- stock-scanning
+- entry-methods
+- risk-management
+- a-list-gate-and-screener
 ## Source: wiki:wiki/relative-strength.md
 
 # Relative Strength
 
 **Summary**: Relative strength (RS) measures how a stock performs vs. a benchmark (usually SPY). Multiple traders use RS as the primary filter for identifying market leaders worth trading.
 
-**Sources**: Alex's scans (TradersLab).md, Alex's Swing Trading System.md, Post by @SteveDJacobs on X.md, The Complete Traders' Guide.md, Trading termsconcepts GLOSSARY.md
+**Sources**: Alex's scans (TradersLab).md, Alex's Swing Trading System.md, Post by @SteveDJacobs on X.md, The Complete Traders' Guide.md, Trading termsconcepts GLOSSARY.md, Post by @martinlukkt on X.md, `(2) Martin Luk on X $QCOM...lockout rally.md` (duplicate capture of the same 2026-07-17 post), `(2) Sean trades on X A lot of you have probably seen the words lockout rally...hig.md`
 
-**Last updated**: 2026-04-23
+**Last updated**: 2026-07-18
 
 ---
 
@@ -637,11 +744,28 @@ Stocks in the **top 3% on three RS timeframes** (Day, Week, Month) simultaneousl
 - Price structure (21dma, base quality) is the **entry trigger**
 - Never buy on RS alone — wait for a proper entry setup
 
+## Emerging Leadership Can Appear Late In A Rally
+
+The current leaders are not necessarily the final leaders of a bull market. Martin Luk uses QCOM in 1999 as the historical analogy: in his account, QCOM began its Stage 2 uptrend in January 1999, after the late-1998 market rally was already mature, and subsequently advanced about 2,900% after its breakout. The source uses PANW's May 2026 Stage 2 transition and the pullback strength in CRWD, FTNT, and NET as a present-day hypothesis that cybersecurity could contain an emerging leader. (source: Post by @martinlukkt on X.md)
+
+The durable lesson is **leadership rotation, not historical repetition**:
+
+- The index can be late in its advance while an individual stock is early in its own Stage 2 lifecycle.
+- A new leader often reveals itself by holding firm or advancing during a broad-market pullback.
+- Strength across several peers improves the theme hypothesis, but it does not make every peer buyable.
+- RS identifies the candidate; a completed base, valid pivot, catalyst, acceptable extension, and defined risk determine whether it is actionable.
+
+The exact 2,900% return remains attributed to Martin Luk's post: OpenD returned no QCOM bars for the requested 1998–2000 window in the 2026-07-17 verification run. Qualcomm's own records do confirm exceptional 1999 repricing and two stock splits that year—a 2-for-1 in May and a 4-for-1 in December—but those facts do not validate a precise breakout-to-peak percentage. ([Qualcomm split history](https://investor.qualcomm.com/stock-info/dividend-split-history/default.aspx))
+
+Martin Luk does not formally define "lockout rally" in his source, but Sean Trades supplies the missing execution definition: a fast advance with few proper pullbacks that leaves sidelined buyers waiting for an entry. The durable opportunity is either capital rotation into lagging groups or a time correction in established leaders while moving averages catch up. In both cases, RS qualifies the candidate; it does not replace the setup, pivot, extension, or risk gates. See lockout-rally. (source: Sean Trades lockout-rally post)
+
 ## Related pages
 
 - stock-scanning
+- lockout-rally
 - 21dma-structure
 - market-timing
+- market-phases
 - trader-styles
 ## Source: wiki:wiki/stock-scanning.md
 
@@ -649,9 +773,9 @@ Stocks in the **top 3% on three RS timeframes** (Day, Week, Month) simultaneousl
 
 **Summary**: Stock scanning is the process of filtering the universe of equities down to a focused watchlist of actionable ideas. Multiple traders maintain distinct scans targeting different setup types.
 
-**Sources**: Alex's scans (TradersLab).md, Alex's Swing Trading System.md, The blueprint to consistently making $10km+ in trading.md, Post by @SteveDJacobs on X.md, The Complete Traders' Guide.md
+**Sources**: Alex's scans (TradersLab).md, Alex's Swing Trading System.md, The blueprint to consistently making $10km+ in trading.md, Post by @SteveDJacobs on X.md, The Complete Traders' Guide.md, Post by @martinlukkt on X.md, `(2) Sean trades on X A lot of you have probably seen the words lockout rally...hig.md`
 
-**Last updated**: 2026-04-23
+**Last updated**: 2026-07-18
 
 ---
 
@@ -768,6 +892,28 @@ Practical screening can start with: price above 3, adequate market cap, average 
 
 See qullamaggie-breakouts-episodic-pivots.
 
+## Emerging Stage-2 Leadership Scan
+
+Use this scan to avoid anchoring only to the leaders that began the current bull market. The goal is to find stocks whose **individual** Stage 2 is young even when the **market** rally is mature. (source: Post by @martinlukkt on X.md)
+
+1. Find recent Stage 1-to-Stage 2 transitions after a substantial base, with price above rising 50/150/200-day averages.
+2. Rank candidates by RS during the latest SPY/QQQ pullback, not only by absolute multi-month return.
+3. Look for peer confirmation: several stocks in the same industry holding up suggests a real capital-rotation theme.
+4. Separate the strongest one or two leaders from weaker sympathy names.
+5. Require a fresh base, proper pivot, catalyst/story, acceptable extension, and risk-gate pass before `GO`.
+
+The QCOM 1999 example is a reminder to keep searching; it is not a template for projecting a 2,900% target onto PANW, CRWD, FTNT, NET, or any other current candidate.
+
+## Lockout-Rally Rotation Scan
+
+When established leaders are extended and the market keeps advancing without normal pullbacks, run a separate lockout-rally rotation scan rather than lowering the entry standard. (source: Sean Trades lockout-rally post)
+
+1. Identify groups improving against SPY/QQQ while the original leaders are extended.
+2. Require multiple peers to confirm the rotation and rank the group by RS.
+3. Separate tactical laggard catch-up from a genuine new Stage 2 leader.
+4. Put established leaders on a time-correction watch for the first tight base or MA catch-up.
+5. Keep every result at `WATCH` until it has a real pivot, volume-confirmed trigger, acceptable extension, source-backed catalyst, and a pattern stop within 1.5 ATR.
+
 ## Scan-to-Watchlist Workflow
 
 1. Run scans post-market → populate dedicated watchlists by setup type
@@ -783,6 +929,7 @@ See qullamaggie-breakouts-episodic-pivots.
 - trading-routine
 - market-phases
 - qullamaggie-breakouts-episodic-pivots
+- lockout-rally
 ## Source: wiki:wiki/steve-jacobs-market-dashboard.md
 
 # Steve Jacobs' Market Metrics Dashboard
