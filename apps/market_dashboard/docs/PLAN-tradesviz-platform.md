@@ -1,7 +1,7 @@
 # Plan — TradesViz-Class Trading Platform (US + Bursa Malaysia)
 
 **Owner:** Jie Sheng
-**Status:** **APPROVED by Jie 2026-07-10; integrity-reviewed 2026-07-17.** The phase order remains valid. P0 is complete; P1-P3 are partially delivered; P1.5 remains sample-blocked; P4-P5 have not started.
+**Status:** **APPROVED by Jie 2026-07-10; integrity-reviewed 2026-07-17.** The phase order remains valid. P0 is complete; P1-P3 are partially delivered; P1.5 remains sample-blocked; P4's in-app half (goals + alerts) is shipped with Telegram on hold; P5 has not started.
 **Origin:** Codex handover brief (10-pillar audit vs TradesViz/TraderSync-Cypher; audit-first) + Jie's decisions 2026-07-10: Bursa = journal+analytics first; all 4 pillars (analytics, chart-trades, playbooks, AI coach) in scope; **two-surface IA (Journal home + Market Desk)**.
 **Supersedes:** absorbs `PLAN-client-beta-launch.md` Phases 1–4 (still valid, re-sequenced here) and revives `ROADMAP.md`'s two-surface concept.
 
@@ -18,7 +18,7 @@ The architecture and sequence remain intact; no phase should be removed or reord
 | **P1.5** | **BLOCKED / PARTIAL** | MY.↔.KL symbols, `.KL` quote plumbing, and an unverified moomoo-Malaysia CSV preset | Jie must supply real moomoo-MY and Rakuten Trade CSV samples to validate/correct mappings; Rakuten format, fee/board-lot presets, and stamped MYR/USD display-currency toggle remain |
 | **P2** | **PARTIAL** | USD-true pivot API/UI, day-click calendar trade drilldown, marked trade candlestick chart | Saved layouts/custom dashboards, time-of-day/holding/regime and MFE/MAE metrics, reflection/market-context/lesson day panel, stat→trade drilldown, row expand/bulk tag |
 | **P3** | **PARTIAL** | Evidence-first `/api/coach`, four coach modes, caller-scoped journal aggregates, persisted `CoachInsight`, Journal-home coach card | Full insight-history page, route-level isolation/evidence regression tests, coach polish |
-| **P4** | **NOT STARTED** | Goal schema shell only | Goals UI/progress, daily-loss/overtrade/bridge/idea alerts, Telegram GO channel and DMs |
+| **P4** | **PARTIAL** | Goals engine + `/api/goals` CRUD + in-app alerts + Journal-home card SHIPPED (🄺, commit `240ce0a0`, live-validated). Goal schema shell filled. | Telegram GO channel + DMs (ON HOLD per Jie — no bot token yet); goals UI polish (🄲) |
 | **P5** | **NOT STARTED** | Chart foundation exists; placeholder remains hidden | Replay MVP, Sentry DSN, rate-limit/onboarding/brand hardening |
 
 ### Cross-cutting journal integrity gates (apply to every remaining phase)
@@ -100,10 +100,11 @@ Severity: 🟢 solid · 🟡 partial · 🔴 missing.
 - **Accept:** "why do I lose on Fridays?" returns a data-grounded answer citing the member's own numbers; insight row persisted; zero cross-tenant reads (probe-verified).
 - Cost guard: reuses `dailyScans` quota.
 
-### P4 — Alerts, goals, Telegram (week 4–5) — **NOT STARTED**
-- 🄺 Telegram GO channel + intraday trigger tick (client-beta P3, unchanged scope).
-- 🄲 Goals (P&L/drawdown/process targets w/ progress on Journal home) + user alerts (daily-loss breach, overtrading count, bridge-stale, idea-triggered) via dashboard + Telegram DM.
-- **Accept:** a triggered A-list idea and a daily-loss breach both notify within the tick cadence; goals render with live progress.
+### P4 — Alerts, goals, Telegram (week 4–5) — **PARTIAL (in-app half SHIPPED; Telegram ON HOLD)**
+- ✅ 🄺 **Goals + in-app alerts SHIPPED** (commit `240ce0a0`, live-validated 2026-07-18). `server/goals-alerts.ts`: `computeGoalProgress` (PNL / MAX_DAILY_LOSS / MAX_DRAWDOWN / WIN_RATE / PROCESS) + `computeAlerts` (daily-loss breach/near, overtrading, bridge-stale, idea-triggered, unconverted-P&L). Both reuse the canonical `closedTradesWhere()` + `usdPnl()` + LIVE-account-only filter (gates #2/#3/#4). `/api/goals` full CRUD + `/api/alerts` GET. `GoalsAlertsCard` on Journal home (alerts first, inline goal CRUD). Alert payload is shaped as exactly what a push channel would consume, so wiring Telegram later is delivery-only.
+- ⏸ 🄺 **Telegram GO channel + intraday trigger tick — ON HOLD** (Jie, 2026-07-17: "onhold telegram bot first"). Resume when Jie supplies a bot token; the `/api/alerts` payload is the ready-made source.
+- 🄲 Goals UI polish (grouping, edit-in-place, period pickers) per the plan.
+- **Accept:** ✅ a triggered A-list idea and a daily-loss breach both surface in-app (`/api/alerts` live-returns the idea-triggered alert; MAX_DAILY_LOSS goal live-computed breach vs limit); goals render with live progress. ⏸ notify-within-tick-cadence pending Telegram.
 
 ### P5 — Replay v1 + client hardening (week 5+) — **NOT STARTED**
 - 🄲 Replay MVP: bar-by-bar step-through of a closed trade's chart ("what would I do now?"), journaling the answer — only after P2 charts exist.
