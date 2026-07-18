@@ -41,8 +41,41 @@ export interface ResolveResult {
   currencyCode: string;
 }
 
+export interface ReportedPnl {
+  value: number | null;
+  currencyCode: "USD";
+  unconverted: boolean;
+}
+
 const EPS = 1e-9;
 const round2 = (n: number) => Number(n.toFixed(2));
+
+/**
+ * Pick the value a USD-reporting surface may render. Persisted pnlUsd always
+ * wins. Raw P&L is allowed only when the row explicitly says USD; unknown or
+ * non-USD raw values fail closed instead of receiving a dollar sign.
+ */
+export function reportedPnlUsd(input: {
+  pnlUsd: number | null;
+  rawPnl: number | null;
+  currencyCode: string | null | undefined;
+}): ReportedPnl {
+  if (input.pnlUsd != null && Number.isFinite(input.pnlUsd)) {
+    return { value: input.pnlUsd, currencyCode: "USD", unconverted: false };
+  }
+  if (
+    input.rawPnl != null &&
+    Number.isFinite(input.rawPnl) &&
+    input.currencyCode?.toUpperCase() === "USD"
+  ) {
+    return { value: input.rawPnl, currencyCode: "USD", unconverted: false };
+  }
+  return {
+    value: null,
+    currencyCode: "USD",
+    unconverted: input.rawPnl != null && Number.isFinite(input.rawPnl),
+  };
+}
 
 export function resolveTradeUsd(input: ResolveInput): ResolveResult {
   const fills = input.fills ?? [];

@@ -78,9 +78,9 @@
   padding: var(--space-5) 14px;
 }
 
-.market-sidebar__close,
+.market-sidebar .market-sidebar__close,
 .market-sidebar__backdrop,
-.market-mobile-nav-toggle {
+.market-topbar .market-mobile-nav-toggle {
   display: none;
 }
 
@@ -683,7 +683,7 @@
     transform: translateX(0);
   }
 
-  .market-sidebar__close {
+  .market-sidebar .market-sidebar__close {
     position: absolute;
     top: 14px;
     right: 14px;
@@ -705,7 +705,7 @@
     cursor: pointer;
   }
 
-  .market-mobile-nav-toggle {
+  .market-topbar .market-mobile-nav-toggle {
     display: inline-flex;
   }
 

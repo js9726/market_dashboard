@@ -59,6 +59,14 @@ export async function GET(req: Request) {
   const rows = pivot.rows.filter((r) => r.count >= minCount).sort((a, b) => pick(b) - pick(a));
 
   const multiCount = groupBy === "tag" || groupBy === "mistake";
+  const qualityWarnings = [
+    pivot.dataQuality.weekendDated > 0 && groupBy === "dow"
+      ? `${pivot.dataQuality.weekendDated} trade(s) are dated Saturday/Sunday in the source sheet — markets are shut, so those are recorded-date errors, not trading days. They are shown (not dropped) but the Sat/Sun rows are not real sessions; fix the dates at source and re-sync.`
+      : null,
+    pivot.dataQuality.numericStrategyCodes > 0 && groupBy === "strategy"
+      ? `${pivot.dataQuality.numericStrategyCodes} trade(s) use numeric legacy strategy codes (${pivot.dataQuality.numericStrategySamples.join(", ")}). They remain visible as legacy codes but should be remapped to named setups at source.`
+      : null,
+  ].filter((warning): warning is string => warning != null);
   return NextResponse.json({
     groupBy,
     sort,
@@ -70,10 +78,7 @@ export async function GET(req: Request) {
     totals: pivot.totals,
     dataQuality: {
       ...pivot.dataQuality,
-      warning:
-        pivot.dataQuality.weekendDated > 0 && groupBy === "dow"
-          ? `${pivot.dataQuality.weekendDated} trade(s) are dated Saturday/Sunday in the source sheet — markets are shut, so those are recorded-date errors, not trading days. They are shown (not dropped) but the Sat/Sun rows are not real sessions; fix the dates at source and re-sync.`
-          : null,
+      warning: qualityWarnings.length ? qualityWarnings.join(" ") : null,
     },
     note: [
       "Closed trades only (realized P&L).",

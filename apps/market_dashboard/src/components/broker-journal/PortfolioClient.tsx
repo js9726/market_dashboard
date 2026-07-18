@@ -53,6 +53,8 @@ type PortfolioData = {
     pricedCount: number;
     unpricedCount: number;
   };
+  liveTotals?: PortfolioData["grandTotals"];
+  paperTotals?: PortfolioData["grandTotals"];
   asOf: string;
 };
 
@@ -71,6 +73,13 @@ function toneClass(n: number | null | undefined): string {
 function signedValue(n: number | null | undefined, digits = 2, suffix = ""): string {
   if (n == null || !Number.isFinite(n)) return "—";
   return `${n >= 0 ? "+" : ""}${fmt(n, digits)}${suffix}`;
+}
+
+function fmtQty(n: number): string {
+  return n.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: Number.isInteger(n) ? 0 : 4,
+  });
 }
 
 function StatTile({
@@ -114,6 +123,7 @@ export default function PortfolioClient() {
   const [data, setData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [closeDraft, setCloseDraft] = useState<CloseDraft | null>(null);
   const [closeBusy, setCloseBusy] = useState(false);
   const [closeError, setCloseError] = useState<string | null>(null);
@@ -177,16 +187,26 @@ export default function PortfolioClient() {
 
   async function load() {
     setRefreshing(true);
-    const res = await fetch("/api/portfolio");
-    const json = await res.json();
-    setData(json);
-    setLoading(false);
-    setRefreshing(false);
+    setLoadError(null);
+    try {
+      const res = await fetch("/api/portfolio", { cache: "no-store" });
+      const json = (await res.json().catch(() => null)) as PortfolioData | { error?: string } | null;
+      if (!res.ok || !json || !("accounts" in json)) {
+        const message = json && "error" in json ? json.error : null;
+        throw new Error(message ?? `Portfolio request failed (HTTP ${res.status})`);
+      }
+      setData(json);
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : "Portfolio request failed");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }
 
   useEffect(() => {
-    load();
-    const id = setInterval(load, 60_000);
+    void load();
+    const id = setInterval(() => void load(), 60_000);
     return () => clearInterval(id);
   }, []);
 
@@ -201,7 +221,10 @@ export default function PortfolioClient() {
   if (!data) {
     return (
       <section className="market-panel p-6">
-        <p className="t-caption text-[var(--loss-fg)]">Failed to load portfolio.</p>
+        <p className="t-caption text-[var(--loss-fg)]">Failed to load portfolio{loadError ? `: ${loadError}` : "."}</p>
+        <button className="mds-button mt-3 h-8 px-3 text-[11px]" onClick={() => void load()} type="button">
+          Retry
+        </button>
       </section>
     );
   }
@@ -216,9 +239,13 @@ export default function PortfolioClient() {
   const positionChangeIsLive = (p: Position) =>
     marketOpen ? !p.stale : extendedSessionLive && !p.stale && p.priceSource === "moomoo";
 
+  const liveTotals = data.liveTotals ?? data.grandTotals;
+  const liveAccounts = data.accounts.filter((account) => account.isLive);
+  const paperAccounts = data.accounts.filter((account) => !account.isLive);
+  const displayAccounts = [...liveAccounts, ...paperAccounts];
   const pricedNote =
-    data.grandTotals.unpricedCount > 0
-      ? `${data.grandTotals.pricedCount}/${data.grandTotals.pricedCount + data.grandTotals.unpricedCount} priced`
+    liveTotals.unpricedCount > 0
+      ? `${liveTotals.pricedCount}/${liveTotals.pricedCount + liveTotals.unpricedCount} priced`
       : null;
 
   return (
@@ -279,18 +306,18 @@ export default function PortfolioClient() {
       </header>
 
       <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <StatTile label="Cost basis" value={fmt(data.grandTotals.cost)} />
-        <StatTile label="Market value" value={fmt(data.grandTotals.marketValue)} />
+        <StatTile label="Live cost basis" value={fmt(liveTotals.cost)} />
+        <StatTile label="Live market value" value={fmt(liveTotals.marketValue)} />
         <StatTile
-          label="Unrealised P&L"
+          label="Live unrealised P&L"
           note={pricedNote}
-          tone={toneClass(data.grandTotals.unrealizedPl)}
-          value={signedValue(data.grandTotals.unrealizedPl)}
+          tone={toneClass(liveTotals.unrealizedPl)}
+          value={signedValue(liveTotals.unrealizedPl)}
         />
         <StatTile
-          label="Return"
-          tone={toneClass(data.grandTotals.unrealizedPlPct)}
-          value={signedValue(data.grandTotals.unrealizedPlPct, 2, "%")}
+          label="Live return"
+          tone={toneClass(liveTotals.unrealizedPlPct)}
+          value={signedValue(liveTotals.unrealizedPlPct, 2, "%")}
         />
       </section>
 
@@ -312,7 +339,15 @@ export default function PortfolioClient() {
         </section>
       ) : null}
 
-      {data.accounts.map((acct) => (
+      {paperAccounts.length > 0 ? (
+        <section className="market-panel border-l-2 border-[var(--warn-500)] p-3">
+          <p className="t-caption text-[var(--fg-2)]">
+            Paper accounts remain visible below for review, but they are excluded from the live totals and Journal open positions.
+          </p>
+        </section>
+      ) : null}
+
+      {displayAccounts.map((acct) => (
         <section className="market-panel overflow-hidden" key={acct.id}>
           <header className="flex flex-col gap-3 border-b border-[var(--line)] bg-[var(--bg-raised)] p-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
@@ -391,7 +426,7 @@ export default function PortfolioClient() {
                             </div>
                             <p className="mt-0.5 font-mono text-[10px] text-[var(--fg-3)]">{p.currency}</p>
                           </td>
-                          <td className="px-3 py-3 font-mono tabular-nums">{fmt(p.qty, 0)}</td>
+                          <td className="px-3 py-3 font-mono tabular-nums">{fmtQty(p.qty)}</td>
                           <td className="px-3 py-3 font-mono tabular-nums">{fmt(p.avgCost, 4)}</td>
                           <td className="px-3 py-3 font-mono tabular-nums">{fmt(p.currentPrice, 4)}</td>
                           <td className={`px-3 py-3 font-mono tabular-nums ${positionChangeIsLive(p) ? toneClass(p.changePct) : "text-[var(--fg-3)]"}`}>
@@ -425,7 +460,7 @@ export default function PortfolioClient() {
                               <div className="flex flex-wrap items-end gap-3">
                                 <strong className="text-[12px] text-[var(--fg-1)]">Close {p.ticker}</strong>
                                 <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--fg-3)]">
-                                  Quantity (max {fmt(closeDraft.maxQty, 0)})
+                                  Quantity (max {fmtQty(closeDraft.maxQty)})
                                   <input
                                     className={`${inputClass} w-28`}
                                     max={closeDraft.maxQty}

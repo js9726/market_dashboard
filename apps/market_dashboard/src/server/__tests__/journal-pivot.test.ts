@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { closedTradesWhere, keysFor, type PivotTradeRow } from "@/server/journal-pivot";
+import { closedTradesWhere, computePivot, keysFor, type PivotTradeRow } from "@/server/journal-pivot";
 
 const row = (platform: string): PivotTradeRow => ({
   ticker: "TEST",
@@ -33,7 +33,17 @@ describe("journal pivot query and broker grouping", () => {
     expect(where.AND).toEqual([
       { OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] },
       { OR: [{ state: "CLOSE" }, { state: null, pnl: { not: null } }] },
+      { OR: [{ brokerAccountId: null }, { brokerAccount: { isLive: true } }] },
       { tradeDate: { gte: from, lte: to } },
     ]);
+  });
+
+  it("surfaces numeric legacy strategy codes as data-quality debt", () => {
+    const trade = { ...row("IBKR"), strategy: "3" };
+    const result = computePivot([trade], "strategy");
+
+    expect(result.rows[0].key).toBe("3");
+    expect(result.dataQuality.numericStrategyCodes).toBe(1);
+    expect(result.dataQuality.numericStrategySamples).toEqual(["3"]);
   });
 });

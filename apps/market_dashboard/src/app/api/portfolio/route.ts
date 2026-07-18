@@ -140,6 +140,10 @@ export async function GET() {
     accountIds.length && tickers.size
       ? await prisma.tradeRecord.findMany({
           where: {
+            // User scope is mandatory even for legacy rows without a linked
+            // brokerAccountId. Without it, the lookup scans every user's
+            // unlinked journal rows and can return another user's record id.
+            userId: userScopeId,
             OR: [
               { brokerAccountId: { in: accountIds } },
               { brokerAccountId: null },
@@ -309,6 +313,32 @@ export async function GET() {
       ? (grandUnrealizedPl / Math.abs(grandCostPriced)) * 100
       : null;
 
+  const totalsFor = (selected: typeof enrichedAccounts) => {
+    const cost = selected.reduce((sum, account) => sum + account.totals.cost, 0);
+    const marketValue = selected.reduce(
+      (sum, account) => sum + (account.totals.marketValue ?? 0),
+      0,
+    );
+    const unrealizedPl = selected.reduce(
+      (sum, account) => sum + (account.totals.unrealizedPl ?? 0),
+      0,
+    );
+    const pricedCount = selected.reduce((sum, account) => sum + account.pricedCount, 0);
+    const unpricedCount = selected.reduce((sum, account) => sum + account.unpricedCount, 0);
+    const pricedCost = marketValue - unrealizedPl;
+    return {
+      cost,
+      marketValue: pricedCount > 0 ? marketValue : null,
+      unrealizedPl: pricedCount > 0 ? unrealizedPl : null,
+      unrealizedPlPct:
+        pricedCount > 0 && pricedCost !== 0
+          ? (unrealizedPl / Math.abs(pricedCost)) * 100
+          : null,
+      pricedCount,
+      unpricedCount,
+    };
+  };
+
   return NextResponse.json({
     accounts: enrichedAccounts,
     grandTotals: {
@@ -319,6 +349,11 @@ export async function GET() {
       pricedCount: grandPriced,
       unpricedCount: grandUnpriced,
     },
+    // The Portfolio landing page is a live-book surface. Keep all-account
+    // totals for backwards compatibility, but provide explicit scopes so the
+    // UI never mixes paper gains into live risk/P&L.
+    liveTotals: totalsFor(enrichedAccounts.filter((account) => account.isLive)),
+    paperTotals: totalsFor(enrichedAccounts.filter((account) => !account.isLive)),
     asOf: new Date().toISOString(),
   });
 }

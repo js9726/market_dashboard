@@ -138,7 +138,12 @@ export async function computeGoalProgress(userId: string): Promise<GoalProgress[
         // target = the loss LIMIT (positive magnitude). actual = worst day.
         let worstDay = 0;
         let worstKey = "";
-        for (const [k, v] of Array.from(byDay.entries())) if (v < worstDay) (worstDay = v), (worstKey = k);
+        for (const [k, v] of Array.from(byDay.entries())) {
+          if (v < worstDay) {
+            worstDay = v;
+            worstKey = k;
+          }
+        }
         actual = r2(Math.abs(Math.min(0, worstDay)));
         if (target && target > 0) {
           progress = Math.max(0, Math.min(1, actual / target));

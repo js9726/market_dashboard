@@ -7,6 +7,7 @@ import BreadthBar from "./BreadthBar";
 import StageAnalysisBar from "./StageAnalysisBar";
 import FreshnessBadge from "./FreshnessBadge";
 import { SNAPSHOT_THRESHOLDS } from "@/lib/freshness";
+import { isUSMarketOpen } from "@/lib/market-clock";
 
 function formatPct(value: number | null | undefined, signed = false): string {
   if (value == null || Number.isNaN(value)) return "-";
@@ -34,6 +35,7 @@ function deltaRank(row: SectorRow | IndustryRow): number {
 
 export default function MarketBreadthPanels() {
   const { data, loading, error } = useBreadth();
+  const marketOpen = isUSMarketOpen();
   const universeText = data?.market.universe_size
     ? `${data.market.universe_size.toLocaleString()} usable rows`
     : "daily composite scan";
@@ -56,10 +58,13 @@ export default function MarketBreadthPanels() {
           /* Freshness priority: DB _meta.refreshedAt (push path) > built_at > as_of.
              The DB-backed /api/breadth always carries _meta.refreshedAt; the
              static-file fallback carries built_at/as_of. */
-          <FreshnessBadge
-            timestamp={data?._meta?.refreshedAt ?? data?.built_at ?? data?.as_of}
-            thresholds={SNAPSHOT_THRESHOLDS}
-          />
+          <span className="inline-flex flex-wrap items-center justify-end gap-1 t-caption t-mono">
+            {!marketOpen ? <span className="text-[var(--warn-500)]">MARKET CLOSED · last regular-session data · refreshed</span> : null}
+            <FreshnessBadge
+              timestamp={data?._meta?.refreshedAt ?? data?.built_at ?? data?.as_of}
+              thresholds={SNAPSHOT_THRESHOLDS}
+            />
+          </span>
         )}
       </div>
 

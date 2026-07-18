@@ -129,7 +129,12 @@ export interface PivotResult {
     winRate: number | null;
     unconvertedExcluded: number;
   };
-  dataQuality: { weekendDated: number; weekendSample: string[] };
+  dataQuality: {
+    weekendDated: number;
+    weekendSample: string[];
+    numericStrategyCodes: number;
+    numericStrategySamples: string[];
+  };
 }
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -147,6 +152,10 @@ export function closedTradesWhere(
       // open even when it carries partial realized P&L. Only CLOSE (or legacy
       // rows with no state and a P&L) belongs in closed-trade performance.
       { OR: [{ state: "CLOSE" }, { state: null, pnl: { not: null } }] },
+      // Paper trades belong only in explicit paper-account views. Explore,
+      // coach, goals, and journal stats must all measure the same live-or-
+      // legacy journal book.
+      { OR: [{ brokerAccountId: null }, { brokerAccount: { isLive: true } }] },
       ...(from || to
         ? [{ tradeDate: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }]
         : []),
@@ -203,12 +212,21 @@ export function computePivot(trades: PivotTradeRow[], groupBy: PivotDimension): 
   let overallPriced = 0;
   let weekendDated = 0;
   const weekendSample: string[] = [];
+  let numericStrategyCodes = 0;
+  const numericStrategySamples: string[] = [];
 
   for (const t of trades) {
     const when = t.tradeDate ?? t.executedAt;
     if (when && (when.getUTCDay() === 0 || when.getUTCDay() === 6)) {
       weekendDated++;
       if (weekendSample.length < 15) weekendSample.push(`${t.ticker} ${when.toISOString().slice(0, 10)}`);
+    }
+    const strategy = t.strategy?.trim() ?? "";
+    if (/^\d+$/.test(strategy)) {
+      numericStrategyCodes++;
+      if (!numericStrategySamples.includes(strategy) && numericStrategySamples.length < 15) {
+        numericStrategySamples.push(strategy);
+      }
     }
     const p = usdPnl(t);
     if (p == null) unconvertedExcluded++;
@@ -275,6 +293,11 @@ export function computePivot(trades: PivotTradeRow[], groupBy: PivotDimension): 
       winRate: overallPriced > 0 ? r2((overallWins / overallPriced) * 100) : null,
       unconvertedExcluded,
     },
-    dataQuality: { weekendDated, weekendSample },
+    dataQuality: {
+      weekendDated,
+      weekendSample,
+      numericStrategyCodes,
+      numericStrategySamples,
+    },
   };
 }

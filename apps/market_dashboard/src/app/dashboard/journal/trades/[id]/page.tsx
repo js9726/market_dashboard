@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { canSeePersonalBook, scopeUserId } from "@/lib/access";
 import { features } from "@/lib/features";
 import { prisma } from "@/lib/prisma";
+import { reportedPnlUsd } from "@/lib/currency";
 import {
   buildEpisodes,
   pickEpisodeForRecord,
@@ -79,6 +80,7 @@ export default async function JournalEditorPage({ params }: Props) {
       quantity: true,
       exitPrice: true,
       pnl: true,
+      pnlUsd: true,
       fees: true,
       tradeDate: true,
       executedAt: true,
@@ -158,7 +160,13 @@ export default async function JournalEditorPage({ params }: Props) {
   const anchor = trade.executedAt ?? trade.tradeDate;
   const [newerRows, olderRows, nearbyFills] = await Promise.all([
     prisma.tradeRecord.findMany({
-      where: { userId: userScopeId },
+      where: {
+        userId: userScopeId,
+        AND: [
+          { OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] },
+          { OR: [{ brokerAccountId: null }, { brokerAccount: { isLive: true } }] },
+        ],
+      },
       orderBy: tradeOrder,
       cursor: { id: trade.id },
       skip: 1,
@@ -166,7 +174,13 @@ export default async function JournalEditorPage({ params }: Props) {
       select: neighborSelect,
     }),
     prisma.tradeRecord.findMany({
-      where: { userId: userScopeId },
+      where: {
+        userId: userScopeId,
+        AND: [
+          { OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] },
+          { OR: [{ brokerAccountId: null }, { brokerAccount: { isLive: true } }] },
+        ],
+      },
       orderBy: tradeOrder,
       cursor: { id: trade.id },
       skip: 1,
@@ -254,6 +268,11 @@ export default async function JournalEditorPage({ params }: Props) {
     });
   }
 
+  const reportedPnl = reportedPnlUsd({
+    pnlUsd: dec(trade.pnlUsd),
+    rawPnl: dec(trade.pnl),
+    currencyCode: trade.currencyCode ?? trade.currency,
+  });
   const tradeSerialized = {
     id: trade.id,
     ticker: trade.ticker,
@@ -261,7 +280,9 @@ export default async function JournalEditorPage({ params }: Props) {
     buyPrice: dec(trade.buyPrice),
     quantity: dec(trade.quantity),
     exitPrice: dec(trade.exitPrice),
-    pnl: dec(trade.pnl),
+    pnl: reportedPnl.value,
+    pnlCurrency: reportedPnl.currencyCode,
+    pnlUnconverted: reportedPnl.unconverted,
     fees: dec(trade.fees),
     tradeDate: trade.tradeDate?.toISOString() ?? null,
     executedAt: trade.executedAt?.toISOString() ?? null,

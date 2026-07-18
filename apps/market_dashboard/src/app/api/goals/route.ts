@@ -81,13 +81,26 @@ export async function PATCH(req: Request) {
   const b = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const id = typeof b.id === "string" ? b.id : "";
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
-  const owned = await prisma.goal.findFirst({ where: { id, userId: a.userId }, select: { id: true } });
+  const owned = await prisma.goal.findFirst({
+    where: { id, userId: a.userId },
+    select: { id: true, kind: true },
+  });
   if (!owned) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const data: Prisma.GoalUpdateInput = {};
-  if (typeof b.label === "string") data.label = b.label.trim().slice(0, 120);
+  if (typeof b.label === "string") {
+    const label = b.label.trim().slice(0, 120);
+    if (label.length < 2) return NextResponse.json({ error: "label required" }, { status: 400 });
+    data.label = label;
+  }
   if ("target" in b) {
     const t = num(b.target);
+    if ((owned.kind === "MAX_DAILY_LOSS" || owned.kind === "MAX_DRAWDOWN") && t != null && t <= 0) {
+      return NextResponse.json(
+        { error: "loss/drawdown targets are positive magnitudes (e.g. 200 = -$200)" },
+        { status: 400 },
+      );
+    }
     data.target = t != null ? new Prisma.Decimal(t) : null;
   }
   if (typeof b.active === "boolean") data.active = b.active;

@@ -54,7 +54,7 @@ function rowPnl(t: TradeRow): number | null {
 }
 
 type Position = { ticker: string; qty: number; unrealizedPl: number | null; stale?: boolean };
-type Portfolio = { accounts: { positions: Position[] }[] } | null;
+type Portfolio = { accounts: { isLive: boolean; positions: Position[] }[] } | null;
 
 function fmtMoney(n: number | null | undefined, sign = false): string {
   if (n == null || !Number.isFinite(n)) return "—";
@@ -146,7 +146,10 @@ export default function JournalHome() {
 
   const openPositions = useMemo(() => {
     const out: Position[] = [];
-    for (const a of portfolio?.accounts ?? []) for (const p of a.positions) out.push(p);
+    for (const a of portfolio?.accounts ?? []) {
+      if (!a.isLive) continue;
+      for (const p of a.positions) out.push(p);
+    }
     return out;
   }, [portfolio]);
 

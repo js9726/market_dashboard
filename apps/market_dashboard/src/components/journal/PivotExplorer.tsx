@@ -33,7 +33,13 @@ type PivotResp = {
   sorts: string[];
   rows: PivotRow[];
   totals: { trades: number; measuredTrades: number; totalPnl: number; winRate: number | null; unconvertedExcluded: number };
-  dataQuality?: { weekendDated: number; weekendSample: string[]; warning: string | null };
+  dataQuality?: {
+    weekendDated: number;
+    weekendSample: string[];
+    numericStrategyCodes?: number;
+    numericStrategySamples?: string[];
+    warning: string | null;
+  };
   note: string;
 };
 
@@ -66,6 +72,10 @@ function fmt(n: number | null | undefined, digits = 0, sign = false): string {
 function tone(n: number | null | undefined): string {
   if (n == null || n === 0) return "text-[var(--fg-2)]";
   return n > 0 ? "gain" : "loss";
+}
+
+function groupLabel(groupBy: string, key: string): string {
+  return groupBy === "strategy" && /^\d+$/.test(key) ? `Legacy code ${key}` : key;
 }
 
 export default function PivotExplorer() {
@@ -222,7 +232,7 @@ export default function PivotExplorer() {
                   const pct = Math.min(100, (Math.abs(val) / maxAbs) * 100);
                   return (
                     <tr key={r.key} className="border-b border-[var(--line)]/50">
-                      <td className="py-2 pr-3 font-semibold text-[var(--fg-1)]">{r.key}</td>
+                      <td className="py-2 pr-3 font-semibold text-[var(--fg-1)]">{groupLabel(data.groupBy, r.key)}</td>
                       <td className="px-2 py-2">
                         <div className="flex items-center gap-2">
                           <div className="h-2 w-24 overflow-hidden rounded-full bg-[var(--bg-raised)]">

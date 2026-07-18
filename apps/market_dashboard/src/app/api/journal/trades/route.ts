@@ -77,7 +77,7 @@ export async function GET(req: Request) {
   const side = searchParams.get("side") ?? "";
   const result = searchParams.get("result") ?? "";
   const stateFilter = searchParams.get("state") ?? "";
-  await materializeOpenPositionTradeRecords(userScopeId, { symbol });
+  await materializeOpenPositionTradeRecords(userScopeId, { symbol, liveOnly: true });
   const liveQuoteStaleMs = liveQuoteThresholdsForNow().staleSec * 1000;
   const connection = await prisma.spreadsheetConnection.findUnique({
     where: { userId: userScopeId },
@@ -90,7 +90,7 @@ export async function GET(req: Request) {
 
   // ── Live broker positions: truth for currently-open holdings ──────────────
   const positions = await prisma.position.findMany({
-    where: { brokerAccount: { userId: userScopeId } },
+    where: { brokerAccount: { userId: userScopeId, isLive: true } },
     select: {
       ticker: true, qty: true, avgCost: true, currentPrice: true,
       unrealizedPl: true, unrealizedPlPct: true, openedAt: true,
@@ -150,7 +150,13 @@ export async function GET(req: Request) {
   // also synthesize a broker-only row for them). Keyed both by accountId and
   // by alias text so either match form suppresses the synthetic row.
   const openSheet = await prisma.tradeRecord.findMany({
-    where: { userId: userScopeId, OR: [{ state: { in: [...OPEN_TRADE_STATES] } }, { state: null, pnl: null }] },
+    where: {
+      userId: userScopeId,
+      AND: [
+        { OR: [{ brokerAccountId: null }, { brokerAccount: { isLive: true } }] },
+        { OR: [{ state: { in: [...OPEN_TRADE_STATES] } }, { state: null, pnl: null }] },
+      ],
+    },
     select: { ticker: true, platform: true, brokerAccountId: true },
   });
   const openSheetKeys = new Set<string>();
@@ -165,7 +171,10 @@ export async function GET(req: Request) {
     // them (the SHEET row is the visible one). NULL-SAFE via the OR-null branch
     // (SQL `NOT LIKE` is UNKNOWN for NULL and would drop all sheet rows).
     // Composed via AND so the win/loss NOT filters below stay independent.
-    AND: [{ OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] }],
+    AND: [
+      { OR: [{ brokerOrderId: null }, { NOT: { brokerOrderId: { endsWith: ":dup" } } }] },
+      { OR: [{ brokerAccountId: null }, { brokerAccount: { isLive: true } }] },
+    ],
     ...(symbol ? { ticker: { contains: symbol } } : {}),
     ...(side ? { side } : {}),
     ...(stateFilter ? { state: stateFilter } : {}),

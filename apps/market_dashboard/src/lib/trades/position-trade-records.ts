@@ -30,11 +30,16 @@ export function activeTradePriority(row: {
 
 export async function materializeOpenPositionTradeRecords(
   userId: string,
-  options: { symbol?: string } = {},
+  options: { symbol?: string; liveOnly?: boolean } = {},
 ): Promise<{ created: number; updated: number; skippedExisting: number }> {
   const symbol = options.symbol?.trim().toUpperCase() ?? "";
   const positions = await prisma.position.findMany({
-    where: { brokerAccount: { userId } },
+    where: {
+      brokerAccount: {
+        userId,
+        ...(options.liveOnly ? { isLive: true } : {}),
+      },
+    },
     include: { brokerAccount: { select: { id: true, alias: true } } },
     orderBy: { openedAt: "desc" },
   });

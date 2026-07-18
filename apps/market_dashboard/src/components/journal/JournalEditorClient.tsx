@@ -62,6 +62,8 @@ type Trade = {
   quantity: number | null;
   exitPrice: number | null;
   pnl: number | null;
+  pnlCurrency: "USD";
+  pnlUnconverted: boolean;
   fees: number | null;
   tradeDate: string | null;
   executedAt: string | null;
@@ -592,7 +594,13 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
     normalizedState === "SEMI-OPEN" ||
     normalizedState === "PLANNING" ||
     (normalizedState == null && trade.pnl == null);
-  const pendingResult = normalizedState === "PLANNING" ? "Planned" : isOpen ? "Open" : "Not recorded";
+  const pendingResult = normalizedState === "PLANNING"
+    ? "Planned"
+    : isOpen
+      ? "Open"
+      : trade.pnlUnconverted
+        ? "Set FX rate"
+        : "Not recorded";
   const planRows = [
     {
       label: "Entry",
@@ -618,7 +626,7 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
     {
       label: "Risk / result",
       planned: fmtNum(trade.riskPct, 1, "%"),
-      actual: trade.pnl == null ? pendingResult : fmtSigned(trade.pnl, trade.currency),
+      actual: trade.pnl == null ? pendingResult : fmtSigned(trade.pnl, trade.pnlCurrency),
       delta: "-",
       tone: gradeClass(trade.pnl),
     },
@@ -695,7 +703,7 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
               {isOpen ? "Position status" : "Realised P&L"}
             </p>
             <p className={`font-mono text-[24px] font-extrabold ${gradeClass(trade.pnl)}`}>
-              {trade.pnl == null ? pendingResult : fmtSigned(trade.pnl, trade.currency)}
+              {trade.pnl == null ? pendingResult : fmtSigned(trade.pnl, trade.pnlCurrency)}
             </p>
             <p className="mt-1 text-[11px] text-[var(--fg-3)]">Fees {fmtMoney(trade.fees, trade.currency)}</p>
           </div>
