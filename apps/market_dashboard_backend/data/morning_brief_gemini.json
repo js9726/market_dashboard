@@ -1,12 +1,12 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-ON",
-    "posture": "RAISE-THE-BAR",
-    "summary": "The primary driver today is a strong rebound in the technology and AI sectors, but this is happening against a tense geopolitical backdrop with the ongoing US-Iran conflict keeping oil prices firm and creating headline risk."
+    "label": "CAUTIOUSLY-RISK-OFF",
+    "posture": "WAIT",
+    "summary": "Surging oil prices due to escalating US-Iran tensions are the primary driver, creating a risk-off sentiment despite a tech rebound in Asia. All eyes are on big tech earnings after the bell to justify high valuations."
   },
   "breadth": {
-    "up": null,
-    "down": null
+    "up": 1514,
+    "down": 1247
   },
   "fearGreed": {
     "score": null,
@@ -15,383 +15,443 @@
   "indices": [
     {
       "symbol": "SPY",
-      "name": "S&P 500 Futures",
+      "name": "S&P 500",
       "level": null,
-      "changePct": 0.54,
+      "changePct": -0.41,
       "note": "futures",
-      "citation": "Source: TipRanks 05:43 AM ET"
+      "citation": null
     },
     {
       "symbol": "QQQ",
-      "name": "Nasdaq 100 Futures",
+      "name": "Nasdaq 100",
       "level": null,
-      "changePct": 1.37,
+      "changePct": -1.0,
       "note": "futures",
-      "citation": "Source: TipRanks 05:43 AM ET"
+      "citation": null
     },
     {
       "symbol": "DIA",
-      "name": "Dow Jones Futures",
+      "name": "Dow Jones",
       "level": null,
-      "changePct": 0.35,
+      "changePct": -0.23,
       "note": "futures",
-      "citation": "Source: TipRanks 05:43 AM ET"
+      "citation": null
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility Index",
-      "level": 18.65,
-      "changePct": -0.6,
-      "note": "previous day close",
-      "citation": "Source: Zacks Investment Research"
+      "name": "Volatility",
+      "level": 17.58,
+      "changePct": 3.11,
+      "note": "live",
+      "citation": null
     },
     {
       "symbol": "^TNX",
-      "name": "10-Yr Treasury Yield",
-      "level": 4.59,
-      "changePct": null,
+      "name": "10Y Yield",
+      "level": 4.65,
+      "changePct": 0.02,
       "note": "live",
-      "citation": "Source: TipRanks"
+      "citation": null
     },
     {
       "symbol": "CL=F",
-      "name": "WTI Crude Oil",
-      "level": 83.16,
-      "changePct": null,
-      "note": "futures",
-      "citation": "Source: TipRanks 05:43 AM ET"
+      "name": "Crude Oil",
+      "level": 88.07,
+      "changePct": 4.4,
+      "note": "live",
+      "citation": null
     }
   ],
-  "indicesNarrative": "US futures are pointing to a strong open, led by a significant rebound in Nasdaq and technology stocks, following a similar move in Asian markets. The rally in tech appears to be driven by dip-buying after a recent sell-off. However, broader market sentiment remains cautious due to escalating US-Iran tensions, which are supporting oil prices and keeping Treasury yields elevated.",
+  "indicesNarrative": "US futures are pointing lower, with tech showing relative weakness as investors take risk off the table ahead of key earnings from Tesla and Alphabet. Surging crude oil prices, up over 4% due to heightened Middle East tensions, are fueling inflation concerns and weighing on sentiment. The VIX is up over 3%, and the 10-year yield is holding firm at 4.65%, reflecting the cautious mood.",
   "technicals": {
     "SPY": null,
     "QQQ": null,
     "DIA": null,
-    "IWM": null
+    "IWM": null,
+    "SMH": null
   },
-  "technicalsNarrative": "Specific daily-bar technical data (ATR, RSI, MACD) is unavailable via web search. Traders should rely on their own charting platforms for precise technical analysis and entry/stop levels.",
+  "technicalsNarrative": "Technical data was not available at the time of generation.",
   "sectorsThemes": [
     {
       "symbol": "XLK",
       "name": "Technology",
-      "changePct": null,
+      "changePct": 2.4,
       "rs": null,
-      "note": "Leading the pre-market rally on a rebound in chip and AI-related names."
-    },
-    {
-      "symbol": "SMH",
-      "name": "Semiconductors",
-      "changePct": null,
-      "rs": null,
-      "note": "Strong buying seen overnight in Asia, with sentiment boosted by Nvidia's investment in Nebius."
+      "note": "Led the market higher in the previous session on a semiconductor rebound."
     },
     {
       "symbol": "XLE",
       "name": "Energy",
-      "changePct": null,
+      "changePct": 1.2,
       "rs": null,
-      "note": "Remains sensitive to geopolitical headlines from the Middle East, with crude prices firm."
+      "note": "Gained on elevated oil prices amid geopolitical uncertainty."
+    },
+    {
+      "symbol": "XLP",
+      "name": "Consumer Staples",
+      "changePct": -1.0,
+      "rs": null,
+      "note": "Lagged the broader market, indicating a rotation away from defensive names."
     }
   ],
-  "sectorsNarrative": "A clear risk-on rotation back into Technology and Semiconductors is underway this morning. Energy stocks remain a key focus due to the high geopolitical risk premium in oil.",
-  "industryNarrative": null,
+  "sectorsNarrative": "Yesterday saw a strong rebound in the Technology sector, particularly semiconductors, as dip buyers emerged. Energy also performed well due to rising crude prices. However, money flowed out of more defensive areas like Consumer Staples.",
+  "industryNarrative": "Semiconductors were the clear leaders in the previous session, with the SOX index gaining over 5% as investors bought the recent dip in AI-related names. Conversely, data-centric and defensive software names struggled, suggesting a rebalancing from high-multiple software into hardware.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "NBIS",
+      "ticker": "SMCI",
       "side": "LONG",
-      "changePct": 6.8,
-      "why": "NVIDIA disclosed a 9.3% passive stake in the AI cloud provider.",
-      "traderLens": "Qullamaggie - Episodic pivot on high-impact news catalyst."
+      "changePct": 15.1,
+      "why": "Raised Q4 gross margin outlook and reported record backlog and order growth.",
+      "traderLens": "Qullamaggie - Episodic pivot on exceptional fundamental news."
     },
     {
-      "ticker": "NVDA",
+      "ticker": "WAB",
       "side": "LONG",
-      "changePct": 1.7,
-      "why": "Gaining on its strategic investment in Nebius (NBIS), reinforcing its ecosystem dominance.",
-      "traderLens": "Minervini - Market leader showing strength on a positive catalyst."
+      "changePct": 10.7,
+      "why": "Strong Q2 earnings beat and raised full-year guidance.",
+      "traderLens": "Minervini - Earnings-driven breakout."
     },
     {
-      "ticker": "GM",
+      "ticker": "DELL",
       "side": "LONG",
-      "changePct": null,
-      "why": "Reported Q2 earnings that topped Wall Street expectations.",
-      "traderLens": "Qullamaggie - Potential earnings-driven breakout."
+      "changePct": 10.2,
+      "why": "Gained in sympathy with Super Micro's positive business update for the AI infrastructure sector.",
+      "traderLens": "Ted Zhang - Riding sector/theme momentum."
     },
     {
-      "ticker": "SHOP",
+      "ticker": "OKLO",
+      "side": "LONG",
+      "changePct": 4.0,
+      "why": "Reported to be joining a Trump administration-led program to accelerate nuclear power for AI data centers.",
+      "traderLens": "Qullamaggie - News-driven catalyst."
+    },
+    {
+      "ticker": "T",
+      "side": "LONG",
+      "changePct": 4.0,
+      "why": "Beat Q2 2026 EPS expectations and reported strong subscriber growth.",
+      "traderLens": "Value/turnaround play on strong earnings."
+    },
+    {
+      "ticker": "PEGA",
       "side": "SHORT",
-      "changePct": -4.5,
-      "why": "Downgraded to Neutral by Rothschild, citing competitive threats from Meta's AI tools.",
-      "traderLens": "Fundamental catalyst-driven downside momentum."
+      "changePct": -16.7,
+      "why": "Missed Q2 earnings expectations and warned of AI-driven spending delays.",
+      "traderLens": "Post-earnings downward drift."
     },
     {
-      "ticker": "ZION",
+      "ticker": "GEV",
       "side": "SHORT",
-      "changePct": -5.7,
-      "why": "Falling in pre-market trading, specific catalyst not immediately clear but reflects weakness in regional banks.",
-      "traderLens": "Relative weakness play."
+      "changePct": -6.7,
+      "why": "Missed Q2 earnings per share expectations.",
+      "traderLens": "Fundamental weakness."
+    },
+    {
+      "ticker": "DASH",
+      "side": "SHORT",
+      "changePct": -4.3,
+      "why": "Pre-market decline without a clear catalyst, potentially profit-taking.",
+      "traderLens": "Fading relative weakness."
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": null,
-      "changePct": 1.7,
-      "abc": "A",
-      "note": "Showing strength on strategic investment news, a key market leader."
+      "level": 203.27,
+      "changePct": -1.32,
+      "abc": null,
+      "note": "Watching pivot around $202.50-$205 as a key confirmation for the semi sector."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Watching for movement with overall tech rebound."
+      "note": "Earnings after the bell. Focus on margins and autonomous driving updates. Pivot around $380."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "A market bellwether, will follow the broader tech sentiment."
+      "note": "Watching for a hold above $333 to maintain bullish structure."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Key player in AI space, will benefit from positive sector sentiment."
+      "note": "Awaiting earnings on July 29th, focus will be on Azure growth."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Watching for relative strength or weakness."
+      "note": "Cloud infrastructure peer, will react to GOOGL's cloud numbers."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "In focus after being cited as a competitive threat to Shopify."
+      "note": "Awaiting its earnings report for cues on digital advertising spending."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Awaiting earnings this week for clearer direction."
+      "note": "Earnings after the bell. Key test for AI monetization and cloud growth."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Will participate in any semiconductor rally."
+      "note": "Rallied with other chip stocks yesterday, will be sensitive to NVDA's direction."
     },
     {
       "ticker": "SMCI",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "High-beta AI name, sensitive to sector flows."
+      "changePct": 15.1,
+      "abc": "A",
+      "note": "Huge gap up on stellar margin guidance. A potential leader, but high risk of chasing."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Another high-beta name to watch in a risk-on tape."
+      "note": "Watching for reaction to broader tech sentiment post-earnings."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Cybersecurity theme, watching for sector rotation."
+      "note": "Cybersecurity name, sensitive to enterprise spending commentary from big tech."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Bitcoin proxy, sensitive to crypto market movements."
+      "note": "Awaiting earnings on July 30th, a proxy for crypto sentiment."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is attempting a rally, but caution is warranted. Focus on A+ setups in leading stocks that are showing strength on positive news, like NVDA."
+      "view": "Market is under pressure from macro headwinds (oil, yields). Prudent to be defensive and wait for low-risk setups to emerge after earnings volatility."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear institutional rotation back into the semiconductor and AI space. This is the theme to follow for now."
+      "view": "Rotation out of software and into semiconductor hardware was evident. Energy is a key theme to watch given the geopolitical catalyst."
     },
     {
       "name": "Clement Ang",
-      "view": "The market context is mixed (risk-on tech vs. geopolitical risk). This is not an environment for aggressive new buys. Raise the bar for entries; only A-grade setups."
+      "view": "A choppy, headline-driven market. Not an environment for A-grade setups. Best to sit on hands until the picture clears up post-megacap earnings."
     },
     {
       "name": "SRxTrades",
-      "view": "Wait for clean pivots and volume confirmation, especially with the Nasdaq gapping up. Chasing into the open is a low-probability play."
+      "view": "Volatility is elevated. Chasing gaps like SMCI is dangerous. Wait for price to settle and form clean pivots with volume confirmation."
     },
     {
       "name": "Jeff",
-      "view": "Respect hard stops. Geopolitical headline risk is high and can turn the market quickly. Do not get caught on the wrong side of a sudden reversal."
+      "view": "Stick to the plan. With futures indicating a weak open, respect stops and don't add to losing positions. Earnings season is a time for risk management, not heroics."
     },
     {
       "name": "Qullamaggie",
-      "view": "Look for episodic pivots on news like NBIS or earnings beats like GM. The momentum is in tech today, so that's where the focus should be."
+      "view": "SMCI has an episodic pivot, but the entry is extended pre-market. The broader market lacks breakout momentum. Be patient."
     },
     {
       "name": "Composite",
-      "view": "Focus on the tech rebound, but be nimble. Given the gap up, consider waiting for an intraday pullback or consolidation before entering new long positions. The geopolitical situation is a wildcard that requires tighter-than-usual stops."
+      "view": "Wait and observe. The surge in oil is a significant macro overhang. Let the market react to earnings from GOOGL and TSLA tonight before committing capital. The risk of a broader market pullback is elevated."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "GM",
-        "consensus": "Topped Wall Street's second-quarter earnings expectations."
+        "ticker": "CME",
+        "consensus": "Adjusted EPS $2.99"
       },
       {
-        "ticker": "DHR",
-        "consensus": "Reported Q2 Non-GAAP EPS of $1.94, raised full-year guidance."
+        "ticker": "PHM",
+        "consensus": "EPS $2.48"
       },
       {
-        "ticker": "MMM",
-        "consensus": "Expected to report before market open."
-      },
-      {
-        "ticker": "HAL",
-        "consensus": "Expected to report before market open."
+        "ticker": "T",
+        "consensus": "EPS $0.65"
       }
     ],
     "amc": [
       {
-        "ticker": "ALK",
-        "consensus": "Expected to report after market close."
+        "ticker": "TSLA",
+        "consensus": "EPS $0.48 / Rev $25.5B"
       },
       {
-        "ticker": "COF",
-        "consensus": "Expected to report quarterly earnings at $4.80 per share on revenue of $15.73 billion."
+        "ticker": "GOOGL",
+        "consensus": "EPS $2.86-$2.95 / Rev $120B"
       },
       {
-        "ticker": "CB",
-        "consensus": "Expected to report quarterly earnings at $6.67 per share on revenue of $13.58 billion."
+        "ticker": "IBM",
+        "consensus": null
+      },
+      {
+        "ticker": "NOW",
+        "consensus": null
+      },
+      {
+        "ticker": "TXN",
+        "consensus": null
       }
     ],
-    "yesterdayReactions": []
+    "yesterdayReactions": [
+      {
+        "ticker": "GM",
+        "result": "beat",
+        "movePct": 4.9
+      },
+      {
+        "ticker": "MMM",
+        "result": "beat",
+        "movePct": 7.3
+      },
+      {
+        "ticker": "EWBC",
+        "result": "beat",
+        "movePct": -1.69
+      },
+      {
+        "ticker": "SYF",
+        "result": "miss",
+        "movePct": -1.6
+      }
+    ]
   },
-  "calendar": [],
+  "calendar": [
+    {
+      "time": "10:30 ET",
+      "name": "EIA Weekly Petroleum Status Report",
+      "consensus": null
+    }
+  ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "RL",
-        "firm": "Raymond James",
-        "rating": "Outperform",
+        "ticker": "OMAB",
+        "firm": "JP Morgan",
+        "rating": "Neutral",
         "pt": null
       }
     ],
     "downgrades": [
       {
-        "ticker": "SHOP",
-        "firm": "Rothschild & Co",
+        "ticker": "CCK",
+        "firm": "JP Morgan",
         "rating": "Neutral",
-        "pt": 130
+        "pt": 121
       },
       {
-        "ticker": "PD",
-        "firm": "Morgan Stanley",
-        "rating": "Underweight",
-        "pt": 9
+        "ticker": "UTZ",
+        "firm": "DA Davidson",
+        "rating": "Neutral",
+        "pt": 14.25
       },
       {
-        "ticker": "CALX",
-        "firm": "Rosenblatt",
-        "rating": null,
-        "pt": 55
+        "ticker": "AMCR",
+        "firm": "Jefferies",
+        "rating": "Hold",
+        "pt": null
       }
     ]
   },
-  "alert": "Heightened geopolitical risk: US-Iran conflict continues to escalate, monitor headlines closely.",
+  "alert": "Crude Oil surges over 4% on escalating US-Iran conflict, pressuring markets.",
   "news": [
     {
-      "headline": "U.S. conducts 10th consecutive night of strikes on Iran as Tehran attacks tanker in Strait of Hormuz",
+      "headline": "Crude Oil surges over 4% to $88 as US-Iran military conflict escalates, threatening key shipping corridors.",
       "impact": "HIGH",
       "tickers": [
         "CL=F",
         "XLE",
-        "SPY"
+        "SPY",
+        "QQQ"
       ],
-      "source": "The Hindu — https://www.thehindu.com/news/international/west-asia-war-live-us-strikes-iran-for-10th-consecutive-night-as-tehran-strikes-tanker-in-the-strait-of-hormuz/article68425337.ece",
-      "time": "July 21, 2026"
+      "source": "Investing.com — https://www.investing.com/news/commodities-news/crude-oil-futures-price-today-wti-432SI-3652033",
+      "time": "Overnight"
     },
     {
-      "headline": "NVIDIA discloses 9.3% stake in AI cloud provider Nebius Group, boosting sentiment in the sector",
+      "headline": "U.S. stock futures fall as oil spike and pre-earnings caution weigh on sentiment.",
       "impact": "HIGH",
       "tickers": [
-        "NVDA",
-        "NBIS",
-        "SMH"
-      ],
-      "source": "Investing.com — https://www.investing.com/news/stock-market-news/nvidias-93-nebius-stake-signals-growing-confidence-in-ai-infrastructure-3654231",
-      "time": "July 21, 2026"
-    },
-    {
-      "headline": "Asian markets rebound sharply, led by a recovery in chip and AI-related stocks",
-      "impact": "MED",
-      "tickers": [
+        "SPY",
         "QQQ",
-        "SMH"
+        "DIA"
       ],
-      "source": "Share Talk — https://www.share-talk.com/what-happened-overnight-tuesday-21st-july-2026/",
-      "time": "July 21, 2026"
+      "source": "Morningstar — https://www.morningstar.com/news/dow-jones/202607223180/us-futures-fall-european-stocks-mostly-down",
+      "time": "07:48 ET"
     },
     {
-      "headline": "Rothschild downgrades Shopify to Neutral, citing competitive threat from Meta's AI initiatives",
+      "headline": "Asian markets rise, led by a rebound in technology and semiconductor stocks.",
       "impact": "MED",
       "tickers": [
-        "SHOP",
-        "META"
+        "SMH",
+        "XLK"
       ],
-      "source": "Investing.com — https://www.investing.com/news/stock-market-news/rothschild-redburn-cuts-shopify-stock-rating-on-meta-threat-3654230",
-      "time": "July 21, 2026"
+      "source": "Share Talk — https://www.share-talk.com/what-happened-overnight-wednesday-22nd-july-2026/",
+      "time": "Overnight"
     },
     {
-      "headline": "General Motors reports Q2 earnings beat before the opening bell",
+      "headline": "Super Micro Computer (SMCI) surges 15% pre-market after raising Q4 margin guidance and reporting a record order backlog.",
       "impact": "MED",
       "tickers": [
-        "GM"
+        "SMCI",
+        "DELL",
+        "NVDA"
       ],
-      "source": "TheStreet — https://www.thestreet.com/markets/stock-market-today-sp-500-climbs-on-earnings-optimism-despite-middle-east-tension-01j3b0z1z4z7",
-      "time": "July 21, 2026"
+      "source": "Seeking Alpha — https://seekingalpha.com/news/4122330-biggest-stock-movers-wednesday-smci-dyn-oklo-and-more",
+      "time": "05:14 ET"
+    },
+    {
+      "headline": "AT&T (T) beats Q2 earnings expectations, stock rises over 4% pre-market.",
+      "impact": "MED",
+      "tickers": [
+        "T"
+      ],
+      "source": "Benzinga — https://www.benzinga.com/premarket",
+      "time": "05:41 ET"
+    },
+    {
+      "headline": "Tesla (TSLA) and Alphabet (GOOGL) set to report earnings after the close, providing a key test for the AI-driven rally.",
+      "impact": "HIGH",
+      "tickers": [
+        "TSLA",
+        "GOOGL",
+        "QQQ"
+      ],
+      "source": "TheStreet — https://www.thestreet.com/markets/stock-market-today-july-22-2026",
+      "time": "Pre-market"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TipRanks.com, July 21 2026 — Options Volatility and Implied Earnings Moves Today",
-    "Benzinga, July 21 2026 — Earnings Scheduled For July 21, 2026",
-    "Investing.com, July 21 2026 — Rothschild Redburn cuts Shopify stock rating on Meta threat",
-    "TipRanks.com, July 21 2026 — Shopify downgraded to Neutral from Buy at Rothschild & Co Redburn",
-    "W.Media, March 12 2026 — NVIDIA invests US$ 2 billion in Nebius Group to expand AI cloud infrastructure",
-    "NVIDIA Newsroom, March 11 2026 — NVIDIA and Nebius partner to scale full-stack AI cloud",
-    "GuruFocus, July 21 2026 — SHOP Downgraded by Rothschild & Co",
-    "Investing.com, July 21 2026 — Why is Shopify stock sliding today?",
-    "The Hindu, July 21 2026 — West Asia war LIVE: U.S. strikes Iran for 10th consecutive night",
-    "Just Security, July 21 2026 — Early Edition: July 21, 2026",
-    "Fox News, July 21 2026 — US forces strike Iranian military targets as tensions soar",
-    "CBS News, July 21 2026 — Latest Updates: Iran launches new attacks on U.S. allies",
-    "Investing.com, July 21 2026 — Nvidia's 9.3% Nebius Stake Signals Growing Confidence",
-    "Investing.com, July 21 2026 — Nvidia discloses 9.3% stake in neocloud computing firm Nebius",
-    "The Washington Post, July 21 2026 — A Red Sea blockade threatens a new front in U.S.-Iran war",
-    "Zacks Investment Research, July 21 2026 — Stock Market News for July 21, 2026",
-    "TipRanks, July 21 2026 — Stock Market News Today, 7/21/26 – Futures Rise as Q2 Earnings Take Center Stage",
-    "TheStreet, July 21 2026 — Stock Market Today (July 21, 2026): S&P 500 climbs on earnings optimism",
-    "Share Talk, July 21 2026 — What happened overnight - Tuesday 21st July 2026",
-    "The Sunday Guardian, July 21 2026 — US Stock Market Today: Dow Jones, NASDAQ & S&P 500 Trading Higher",
-    "PR Newswire, July 21 2026 — Danaher Reports Second Quarter 2026 Results"
+    "Investing.com",
+    "Trading Economics",
+    "Cboe Global Markets",
+    "Morningstar",
+    "Simply Wall St",
+    "Zacks Investment Research",
+    "McClellan Financial Publications",
+    "TheStreet",
+    "Benzinga",
+    "Seeking Alpha",
+    "Share Talk",
+    "TipRanks.com",
+    "BitMEX Blog",
+    "Scotiabank",
+    "MARKETSnap"
   ]
 }
