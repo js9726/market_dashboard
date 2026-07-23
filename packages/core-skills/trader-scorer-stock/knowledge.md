@@ -5,8 +5,8 @@
   "target": "trader-scorer-stock/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-17T16:31:52.925Z",
-  "renderHash": "82265752243d36a4f8c621fc9fb703f69ffde5ab4f5e87e058911c913c87e945",
+  "generatedAt": "2026-07-21T17:02:33.423Z",
+  "renderHash": "223d5e02ccba573c5bb2e6431738454855ceed2efe11de982e8f98c1a61a90dd",
   "sources": [
     {
       "root": "wiki",
@@ -42,6 +42,11 @@
       "root": "wiki",
       "path": "wiki/relative-strength.md",
       "sha256": "3c49bdb0cd3cdc5f7685333b6342d31b70df691eb987c3ec722f3fd7aaac1b78"
+    },
+    {
+      "root": "wiki",
+      "path": "wiki/go-chart-evidence-and-action-day.md",
+      "sha256": "e9f6dc25fc3e6b88b0f4f025dcc3339f6e3148926a29131b639cdd82969e5b4d"
     },
     {
       "root": "wiki",
@@ -90,6 +95,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/fundamental-analysis.md sha256:857839e81082
 - wiki:wiki/ticker-catalyst-analysis.md sha256:f59eb15854de
 - wiki:wiki/relative-strength.md sha256:3c49bdb0cd3c
+- wiki:wiki/go-chart-evidence-and-action-day.md sha256:e9f6dc25fc3e
 - wiki:wiki/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/qullamaggie-breakouts-episodic-pivots.md sha256:f33b3facff2e
 - wiki:wiki/lengyan-cold-eye.md sha256:2796af9cbbbc
@@ -991,6 +997,62 @@ Martin Luk does not formally define "lockout rally" in his source, but Sean Trad
 - market-timing
 - market-phases
 - trader-styles
+## Source: wiki:wiki/go-chart-evidence-and-action-day.md
+
+# GO Chart Evidence And Action Day
+
+**Summary**: A ticker cannot be promoted to `GO` from a daily screener score alone. Every proposed `GO` needs current daily and weekly TradingView chart evidence, a visual pattern comparison, and an explicit statement of when the setup can actually be acted on.
+
+**Sources**: Operator calibration 2026-07-22; traderlion-early-entry-techniques; entry-methods; a-list-gate-and-screener; priming-patterns; `skills/tradingview-daily-screener/`.
+
+**Last updated**: 2026-07-22
+
+---
+
+## Mandatory GO chart evidence
+
+Before either Claude or Codex calls a screener candidate `GO`:
+
+1. Open the ticker in the operator's authenticated TradingView session using the available Chrome browser control.
+2. Capture both the daily and weekly chart during the current or most-recent U.S. session. Save the timestamp, timezone, symbol, interval, and screenshot path in the daily report.
+3. Read the visible chart rather than trusting the machine label. Record the actual pivot, pattern stop, distance to the 8/10/21EMA in ATR units, overhead supply, trigger-day close quality, and volume/RVOL.
+4. Compare the chart with the relevant TraderLion family: Power of 3 / Launch Pad, HVC, Shakeout +3, Oops Reversal, qualified ORB/U&R, or VCP. A resemblance is evidence, not an override of the risk, freshness, catalyst, or market-regime gates.
+5. If authenticated TradingView evidence cannot be captured, cap the ticker at `WATCH` with `missing=TradingView daily/weekly chart evidence`. Do not promote it from OHLC or a screener score alone.
+
+The saved image is evidence, not decoration. A chart screenshot that does not show the ticker, interval, current bar, moving averages, and volume is incomplete.
+
+## Visual rejection rules
+
+Reject the machine `GO` when the chart shows any of the following:
+
+- The claimed VCP is a V-shaped rebound, a wide-and-loose range, or lacks progressively smaller contractions and dry-up.
+- The entry is in open air above the true pivot or the stop to the pattern failure point is greater than 1.5 ATR.
+- A day-one `BO-CB` or `BO-VCP` has not produced the required subsequent higher low, unless a separately qualified daily/weekly setup permits an explicitly labelled intraday ORH tactic.
+- A fresh earnings gap follows an already extended run rather than a neglected three-to-six-month base.
+- The daily chart looks strong but the weekly chart shows late-stage structure or nearby overhead supply.
+
+## Action-day contract
+
+Every daily GO report must end with four explicit fields:
+
+- `TODAY`: `GO`, `WATCH`, or `NO-TRADE`.
+- `EARLIEST DECISION WINDOW`: the next named U.S. trading day and time window when the setup can be reassessed.
+- `TRIGGER`: the exact price/structure and volume condition required.
+- `CANCEL`: the level, event, or market condition that invalidates the plan.
+
+The decision window is conditional, not a promise that a trade will exist. Tuesday or Wednesday entries must already be planned and pass the full A-list gate; an unplanned midweek gap is not chased. Event risk such as earnings, CPI, FOMC, or a major index constituent's report can move the decision window later.
+
+## Evidence ownership
+
+Claude and Codex use the same authoring files in this repository. Both assistants must cite the saved chart paths in their report and must not accept the other assistant's `GO` claim without reopening the evidence and checking the gate.
+
+## Related pages
+
+- a-list-gate-and-screener
+- traderlion-early-entry-techniques
+- entry-methods
+- priming-patterns
+- risk-management
 ## Source: wiki:wiki/lockout-rally.md
 
 # Lockout Rally
