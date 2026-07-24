@@ -1,15 +1,15 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-OFF",
+    "label": "RISK-OFF",
     "posture": "WAIT",
-    "summary": "Surging oil prices from Middle East tensions and rising Treasury yields are creating a risk-off tape, compounded by post-earnings weakness in tech megacaps (GOOGL, TSLA) over heavy AI spending concerns."
+    "summary": "Markets are in a risk-off posture following a sharp tech-led selloff driven by AI spending concerns from Alphabet and Tesla. New broad US tariffs on 60 countries are further dampening sentiment, especially in Asia."
   },
   "breadth": {
-    "up": 1204,
-    "down": 1549
+    "up": null,
+    "down": null
   },
   "fearGreed": {
-    "score": 42,
+    "score": 39,
     "label": "Fear"
   },
   "indices": [
@@ -17,403 +17,423 @@
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.4,
+      "changePct": 0.23,
       "note": "futures",
-      "citation": "Source: Morningstar 03:50 ET"
+      "citation": "Source: TipRanks 05:33 ET"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": -0.4,
+      "changePct": 0.11,
       "note": "futures",
-      "citation": "Source: IC Your Trading Edge"
+      "citation": "Source: TipRanks 05:33 ET"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": -0.5,
+      "changePct": 0.5,
       "note": "futures",
-      "citation": "Source: Morningstar 03:50 ET"
+      "citation": "Source: TipRanks 05:33 ET"
     },
     {
       "symbol": "^VIX",
       "name": "Volatility",
-      "level": 16.64,
-      "changePct": null,
-      "note": "live",
-      "citation": "Source: Saxo Bank"
+      "level": 18.98,
+      "changePct": 14.06,
+      "note": "previous close",
+      "citation": "Source: MARKETSnap"
     },
     {
       "symbol": "^TNX",
-      "name": "10Y Yield",
-      "level": 4.674,
+      "name": "10-Yr Yield",
+      "level": 4.68,
       "changePct": null,
       "note": "live",
-      "citation": "Source: Morningstar 03:50 ET"
+      "citation": "Source: TipRanks"
     },
     {
       "symbol": "CL=F",
-      "name": "WTI Crude",
-      "level": 90.31,
-      "changePct": 4.0,
+      "name": "Crude Oil",
+      "level": 89.66,
+      "changePct": -3.39,
       "note": "live",
-      "citation": "Source: TheStreet"
+      "citation": "Source: TipRanks 05:33 ET"
     }
   ],
-  "indicesNarrative": "US futures are pointing to a lower open, with tech-heavy Nasdaq leading the weakness after disappointing reactions to Alphabet and Tesla earnings. Surging crude oil prices and a corresponding rise in the 10-year Treasury yield are adding broad macro pressure, signaling a risk-off sentiment.",
-  "technicals": null,
-  "technicalsNarrative": "No technical data provided. Cannot assess entry risk or momentum.",
-  "sectorsThemes": [],
-  "sectorsNarrative": "A clear rotation is expected today, with money flowing out of Technology and into the Energy sector. The catalyst is dual-sided: rising geopolitical risk premium in oil and concerns about the profitability of AI spending in megacap tech.",
-  "industryNarrative": "Oil & Gas Exploration & Production are showing significant strength due to the spike in crude prices. Conversely, megacap technology and EV manufacturers are under pressure from earnings reactions and margin concerns.",
-  "industryMovers": [
+  "indicesNarrative": "U.S. indices are pointing to a slightly higher open after Thursday's sharp sell-off, which saw the Nasdaq drop over 2%. The prior session's weakness was driven by heavy-volume selling in megacaps like Tesla and Alphabet on fears of runaway AI spending. Breadth was negative, with decliners outpacing advancers, and the VIX spiked, signaling rising investor fear.",
+  "technicals": {},
+  "technicalsNarrative": "Technical data for individual indices is not available at this time. Analysis of entry risk, momentum, and key moving averages cannot be performed.",
+  "sectorsThemes": [
     {
-      "industry": "Oil & Gas E&P",
-      "sector": "Energy",
+      "symbol": "XLC",
+      "name": "Communication Services",
+      "changePct": -1.3,
+      "rs": null,
+      "note": "Led declines on GOOGL weakness."
+    },
+    {
+      "symbol": "XLY",
+      "name": "Consumer Discretionary",
+      "changePct": -0.8,
+      "rs": null,
+      "note": "Dragged down by TSLA's sharp drop."
+    },
+    {
+      "symbol": "XLK",
+      "name": "Technology",
       "changePct": null,
-      "perf1W": null,
-      "perf1M": null,
-      "breadthPct": null,
-      "deltaWow": null,
-      "leaders": [
-        {
-          "ticker": "OXY",
-          "changePct": null,
-          "rvol": null,
-          "source": "COTRADING"
-        }
-      ],
-      "note": "Brent crude topping $94 a barrel on escalating Middle East conflict is lifting the entire group on supply risk."
+      "rs": null,
+      "note": "Broadly weak following AI spending concerns."
+    },
+    {
+      "symbol": "XLU",
+      "name": "Utilities",
+      "changePct": 2.3,
+      "rs": null,
+      "note": "Strong defensive bid amid market turmoil."
+    },
+    {
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": null,
+      "rs": null,
+      "note": "Volatile with oil prices, but showing relative strength for the week."
     }
   ],
+  "sectorsNarrative": "Thursday saw a clear rotation out of growth sectors like Technology and Consumer Discretionary. Defensive sectors such as Utilities saw inflows as investors sought safety from the tech wreck.",
+  "industryNarrative": null,
+  "industryMovers": [],
   "movers": [
-    {
-      "ticker": "ALLE",
-      "side": "LONG",
-      "changePct": 10.64,
-      "why": "Decisive Q2 earnings and EPS beat.",
-      "traderLens": "Episodic pivot on earnings surprise (Qullamaggie)."
-    },
-    {
-      "ticker": "URI",
-      "side": "LONG",
-      "changePct": 7.83,
-      "why": "Posted record Q2 results, signaling robust industrial activity.",
-      "traderLens": "Fundamental strength, potential Stage 2 continuation (Minervini)."
-    },
-    {
-      "ticker": "SMCI",
-      "side": "LONG",
-      "changePct": null,
-      "why": "Reported quarterly orders topped $60B and doubled margin guidance.",
-      "traderLens": "Strong momentum and fundamental catalyst (Qullamaggie)."
-    },
-    {
-      "ticker": "DELL",
-      "side": "LONG",
-      "changePct": null,
-      "why": "Multiple analyst price target hikes (JPMorgan, Evercore, Morgan Stanley) on record AI server demand.",
-      "traderLens": "Institutional support and theme strength (Ted Zhang)."
-    },
-    {
-      "ticker": "LMT",
-      "side": "LONG",
-      "changePct": 5.0,
-      "why": "Lifted 2026 forecast as geopolitical tensions drive restocking demand.",
-      "traderLens": "Geopolitical catalyst driving sector rotation (Ted Zhang)."
-    },
-    {
-      "ticker": "LESL",
-      "side": "SHORT",
-      "changePct": -36.93,
-      "why": "Negative earnings reaction.",
-      "traderLens": "Post-earnings breakdown."
-    },
     {
       "ticker": "TSLA",
       "side": "SHORT",
-      "changePct": -5.86,
-      "why": "Q2 earnings missed profit expectations and operating margin collapsed.",
-      "traderLens": "Fundamental weakness after earnings (Post-earnings drift short)."
+      "changePct": -14.52,
+      "why": "Missed profit estimates and guidance for a 'massive capex year' spooked investors about returns on AI spending.",
+      "traderLens": "Qullamaggie (episodic pivot to the downside)"
     },
     {
       "ticker": "GOOGL",
       "side": "SHORT",
-      "changePct": -3.95,
-      "why": "Beat earnings but spooked investors by raising 2026 capital expenditure guidance to $205 billion.",
-      "traderLens": "Sentiment shift on capex fears."
+      "changePct": -7.13,
+      "why": "Despite beating earnings, the stock fell sharply after raising its capital expenditure forecast for AI investment.",
+      "traderLens": "Institutional selling pressure"
+    },
+    {
+      "ticker": "LVWR",
+      "side": "LONG",
+      "changePct": 101.95,
+      "why": "Stock surged after reporting strong Q2 results and positive commentary on its earnings call.",
+      "traderLens": "Earnings momentum"
+    },
+    {
+      "ticker": "TMUS",
+      "side": "SHORT",
+      "changePct": -11.0,
+      "why": "Stock fell after the wireless carrier's Q2 results missed revenue expectations.",
+      "traderLens": "Post-earnings weakness"
+    },
+    {
+      "ticker": "DECK",
+      "side": "SHORT",
+      "changePct": -3.0,
+      "why": "Fell in pre-market after warning of future margin pressure from freight costs and tariffs, despite record revenue.",
+      "traderLens": "Guidance-driven weakness"
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Watching for signs of contagion from GOOGL's capex narrative. A key bellwether for AI sentiment."
+      "level": 204.77,
+      "changePct": -1.22,
+      "abc": "B",
+      "note": "Caught in the AI spending downdraft; watching for support."
     },
     {
       "ticker": "TSLA",
-      "level": null,
-      "changePct": -5.86,
-      "abc": null,
-      "note": "Breaking down post-earnings on margin collapse. Watching key support levels around $340-$345."
+      "level": 319.69,
+      "changePct": -14.52,
+      "abc": "C",
+      "note": "Major breakdown on earnings/guidance. High-risk short setup."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching to see if it acts as a defensive haven within big tech or gets pulled down by broad selling."
+      "abc": "B",
+      "note": "Watching for relative strength or weakness amid tech sell-off."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Also a heavy AI spender; will be sensitive to the capex narrative pressuring GOOGL."
+      "abc": "B",
+      "note": "Key watch to see if AI spending fears contagion."
     },
     {
       "ticker": "AMZN",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Another major cloud/AI player; will be watched for sentiment shift on spending."
+      "level": 233.66,
+      "changePct": -4.57,
+      "abc": "C",
+      "note": "Sold off with other megacaps, approaching potential support."
     },
     {
       "ticker": "META",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Will be under scrutiny for its own AI/metaverse spending in light of the market's current mood."
+      "level": 606.1,
+      "changePct": -3.36,
+      "abc": "C",
+      "note": "Also hit by the AI spending sentiment shift."
     },
     {
       "ticker": "GOOGL",
-      "level": null,
-      "changePct": -3.95,
-      "abc": null,
-      "note": "Gapping down on capex fears despite an earnings beat. A confidence problem, not a results problem."
+      "level": 317.69,
+      "changePct": -7.13,
+      "abc": "C",
+      "note": "Significant post-earnings distribution, looking for a bottom."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Semiconductor peer to NVDA, will be sensitive to overall tech sentiment and AI hardware narrative."
+      "abc": "B",
+      "note": "Semis under pressure, watching for signs of stabilization."
     },
     {
       "ticker": "SMCI",
-      "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "Showing relative strength on massive order book and margin guidance, bucking the negative tech trend."
+      "level": 29.27,
+      "changePct": 14.8,
+      "abc": "A",
+      "note": "Showing relative strength on strong guidance, bucking the trend."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "High-beta name, likely to be weak in a risk-off tape."
+      "abc": "B",
+      "note": "Watching to see how it holds up in the software space."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Software name, could see weakness in sympathy with broader tech selling."
+      "abc": "B",
+      "note": "Cybersecurity name, watching for defensive characteristics."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "High-beta crypto proxy, will be extremely sensitive to risk-off sentiment."
+      "abc": "C",
+      "note": "High-beta name likely to be volatile in a risk-off tape."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is showing weakness with megacaps breaking down. Not an environment for new long positions. Focus on protecting capital."
+      "view": "Market in correction. No long setups meet criteria. Cash is the correct position."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear rotation from Tech into Energy and Defense, driven by geopolitical catalysts. Follow the institutional flow."
+      "view": "Clear rotation out of tech/growth into defensive names like Utilities. Follow the institutional outflows from megacaps."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is poor. The combination of macro headwinds (oil, rates) and weakness in market leaders makes this an F-grade environment for new entries."
+      "view": "Market context is poor. A-grade setups are non-existent. Best to sit on hands and observe."
     },
     {
       "name": "SRxTrades",
-      "view": "Choppy, headline-driven action. Wait for clean pivots and volume confirmation; avoid chasing gaps in either direction."
+      "view": "Breakdowns in TSLA and GOOGL are on massive volume, confirming distribution. Avoid trying to catch these falling knives."
     },
     {
       "name": "Jeff",
-      "view": "Respect hard stops on any existing positions. The character of the market has changed overnight; don't fight it."
+      "view": "Respect stops. The market has shown its hand to the downside. Do not fight the tape."
     },
     {
       "name": "Qullamaggie",
-      "view": "The broad market weakness means most breakout setups will fail. The only momentum is in specific catalyst-driven names (earnings winners) or macro themes (energy)."
+      "view": "No clean breakouts. The episodic pivot is happening to the downside in former leaders. Avoid longs until the market proves itself."
     },
     {
       "name": "Composite",
-      "view": "Stay defensive. The tape is heavy with pressure from rising yields and weak tech leadership. Raise cash, tighten stops, and watch energy for relative strength. Do not initiate new growth-stock longs today."
+      "view": "Stay defensive. The tape is heavy with distribution in key leadership stocks. Wait for volatility to subside and a new trend to emerge. Raising cash and tightening stops on any existing longs is prudent."
     }
   ],
-  "standout": null,
+  "standout": {
+    "ticker": "TSLA",
+    "side": "SHORT",
+    "score": 70,
+    "sector": "Consumer Discretionary",
+    "rs": null,
+    "grade": "B",
+    "thesis": "TSLA is breaking down on massive volume after earnings and guidance on heavy AI spending spooked investors. This represents a major shift in sentiment for a market leader.",
+    "entry": null,
+    "stop": null,
+    "target": null,
+    "rrr": null,
+    "tags": [
+      "#breakdown",
+      "#earnings"
+    ]
+  },
   "earnings": {
     "bmo": [
       {
-        "ticker": "AAL",
-        "consensus": null
+        "ticker": "AXP",
+        "consensus": "EPS $4.41 / Rev $19.7B"
       },
       {
-        "ticker": "LMT",
-        "consensus": null
+        "ticker": "VZ",
+        "consensus": "EPS $1.27 / Rev $35.2B"
       },
       {
-        "ticker": "HON",
-        "consensus": null
-      },
-      {
-        "ticker": "UNP",
-        "consensus": "EPS $3.19 / Rev $6.65B"
-      },
-      {
-        "ticker": "DOW",
-        "consensus": null
+        "ticker": "HCA",
+        "consensus": "EPS $7.56 / Rev $19.8B"
       }
     ],
-    "amc": [
-      {
-        "ticker": "INTC",
-        "consensus": null
-      }
-    ],
+    "amc": [],
     "yesterdayReactions": [
       {
-        "ticker": "GOOGL",
-        "result": "Beat EPS/Rev but raised capex guidance",
-        "movePct": -3.95
+        "ticker": "TSLA",
+        "result": "missed profit estimates, warned of high capex",
+        "movePct": -14.52
       },
       {
-        "ticker": "TSLA",
-        "result": "Missed EPS estimates, operating margin collapsed",
-        "movePct": -5.86
+        "ticker": "GOOGL",
+        "result": "beat estimates but raised capex forecast significantly",
+        "movePct": -7.13
+      },
+      {
+        "ticker": "TMUS",
+        "result": "missed revenue expectations",
+        "movePct": -11.0
       }
     ]
   },
   "calendar": [
     {
-      "time": "08:15 ET",
-      "name": "ECB Main Refinancing Rate",
+      "time": "09:45 ET",
+      "name": "S&P Global US Manufacturing PMI (Flash)",
       "consensus": null
     },
     {
-      "time": "08:30 ET",
-      "name": "US Initial Jobless Claims",
-      "consensus": "211K"
+      "time": "09:45 ET",
+      "name": "S&P Global US Services PMI (Flash)",
+      "consensus": null
+    },
+    {
+      "time": "10:00 ET",
+      "name": "New Home Sales (Jun)",
+      "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "T",
-        "firm": "Wolfe Research",
-        "rating": "Outperform",
-        "pt": null
-      },
-      {
-        "ticker": "VRSK",
-        "firm": "Jefferies",
-        "rating": "Buy",
-        "pt": 235
-      },
-      {
         "ticker": "PYPL",
+        "firm": "Truist Securities",
+        "rating": "Hold",
+        "pt": 57
+      },
+      {
+        "ticker": "PGR",
         "firm": "Morgan Stanley",
-        "rating": "Overweight",
-        "pt": 23
+        "rating": "Equal-Weight",
+        "pt": 210
+      },
+      {
+        "ticker": "DOV",
+        "firm": "BMO Capital",
+        "rating": "Outperform",
+        "pt": 240
       }
     ],
     "downgrades": [
       {
-        "ticker": "PEGA",
-        "firm": "William Blair",
-        "rating": "Market Perform",
-        "pt": null
+        "ticker": "ROL",
+        "firm": "JP Morgan",
+        "rating": "Neutral",
+        "pt": 45
       },
       {
-        "ticker": "TSLA",
+        "ticker": "CAKE",
         "firm": "Mizuho",
-        "rating": "Price Target Cut",
-        "pt": 450
+        "rating": "Neutral",
+        "pt": 85
+      },
+      {
+        "ticker": "ACI",
+        "firm": "BMO Capital",
+        "rating": "Market Perform",
+        "pt": 12
       }
     ]
   },
-  "alert": "RISK-OFF: Surging Oil and Tech Capex Fears Pressure Markets.",
+  "alert": "High volatility expected. Market reacting to tech spending fears and new US tariffs.",
   "news": [
     {
-      "headline": "Oil Prices Surge as Middle East Tensions Escalate, Brent Nears $99",
+      "headline": "Investors Zero In on Runaway Tech Spending, Putting Dent in AI Trade",
       "impact": "HIGH",
       "tickers": [
-        "CL=F",
-        "XLE",
-        "SPY"
+        "QQQ",
+        "GOOGL",
+        "TSLA",
+        "NVDA",
+        "MSFT"
       ],
-      "source": "The Capital Breakdown Morning Macro Brief: July 23, 2026 - moomoo Community",
-      "time": "Overnight"
+      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/20260724303/dow-jones-top-markets-headlines-at-3-am-et-oil-prices-roar-back-threatening-economy-and-gops-midterm-hopes",
+      "time": "03:00 ET"
     },
     {
-      "headline": "Alphabet, Tesla Fall Pre-Market on AI Spending and Margin Concerns, Dragging Tech Futures Lower",
+      "headline": "Trump Unveils New Tariffs Designed to Withstand Legal Scrutiny, hitting 60 countries with 10-12.5% duties",
       "impact": "HIGH",
       "tickers": [
-        "GOOGL",
+        "SPY"
+      ],
+      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/20260724303/dow-jones-top-markets-headlines-at-3-am-et-oil-prices-roar-back-threatening-economy-and-gops-midterm-hopes",
+      "time": "03:00 ET"
+    },
+    {
+      "headline": "Asian markets close sharply lower after U.S. imposes new tariffs",
+      "impact": "MED",
+      "tickers": [],
+      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-7-24-26-futures-edge-higher-as-investors-assess-oil-prices",
+      "time": "05:30 ET"
+    },
+    {
+      "headline": "Oil prices fall back below $100 a barrel but geopolitical tensions remain high",
+      "impact": "MED",
+      "tickers": [
+        "CL=F",
+        "XLE"
+      ],
+      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/20260724450/dow-jones-top-markets-headlines-at-9-am-et-global-goods-trade-rose-again-in-may-but-new-tariffs-loom",
+      "time": "09:00 ET"
+    },
+    {
+      "headline": "Tesla shares dip more than 14% after the company reported mixed Q2 financial results",
+      "impact": "MED",
+      "tickers": [
         "TSLA",
         "QQQ"
       ],
-      "source": "Stock Market News Today, 7/23/26 – Futures Fall as AI Capex Concerns, Iran Tensions Weigh on Markets - TipRanks",
-      "time": "Pre-Market"
-    },
-    {
-      "headline": "10-Year Treasury Yield Climbs Toward 2026 High as Surging Oil Reignites Inflation Fears",
-      "impact": "HIGH",
-      "tickers": [
-        "^TNX",
-        "TLT",
-        "QQQ"
-      ],
-      "source": "Dow Jones Top Markets Headlines at 9 AM ET - Morningstar",
-      "time": "Pre-Market"
-    },
-    {
-      "headline": "European Central Bank (ECB) Rate Decision Due Today Amid Inflation Pressure from Energy Prices",
-      "impact": "MED",
-      "tickers": [
-        "SPY"
-      ],
-      "source": "Calendar of Economic Release Dates (July 2026) | Post - Scotiabank",
-      "time": "08:15 ET"
+      "source": "Benzinga - https://www.benzinga.com/markets/26/07/39908868/nasdaq-tumbles-over-2-amid-higher-oil-prices-investor-sentiment-weakens-greed-index-remains-in-fe",
+      "time": "July 24, 2026"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Fear and Greed Index: 42 (Fear) | Stock Market Sentiment",
-    "Market Quick Take - Big Tech's capex test, oil tops $96 - 23 July 2026 - Saxo Bank",
-    "U.S. Futures Down, European Stocks Fall - Morningstar",
-    "Thursday 23rd July 2026: U.S. Futures Slip as AI Spending and Rising Oil Prices Weigh on Markets | IC Your Trading Edge | Official Blog",
-    "Stock Market Breadth Data | Daily Oscillator Data - McClellan Financial Publications",
-    "Options Brief - Calm index split tape - 23 July 2026 - Saxo Bank",
-    "Crude Oil WTI Futures Historical Prices - Investing.com",
-    "Pre-market Movers - Investing.com",
-    "Stock Market Today (July 23, 2026): Nasdaq falls as Middle East tensions lift oil prices",
-    "The Capital Breakdown Morning Macro Brief: July 23, 2026 - moomoo Community",
-    "Initial jobless claims headline Thursday's economic calendar - Investing.com Nigeria",
-    "PEGA Downgraded by William Blair -- Rating Changed to Market Perform - GuruFocus",
-    "Stock Analyst Ratings: Upgrades and Downgrades - Investing.com",
-    "2026-07-23 Top 5 US Stocks to Watch (Pre-Market) | COTRADING - YouTube",
-    "Calendar of Economic Release Dates (July 2026) | Post - Scotiabank"
+    "TipRanks - https://www.tipranks.com/news/stock-market-news-today-7-24-26-futures-edge-higher-as-investors-assess-oil-prices",
+    "San Mateo Daily Journal - https://www.smdailyjournal.com/news/national/how-major-us-stock-indexes-fared-thursday-7-23-2026/article_01851e3e-493e-11ef-8051-d7f4955365e8.html",
+    "Zacks Investment Research - https://www.zacks.com/stock/news/2299801/stock-market-news-for-july-23-2026",
+    "FinHacker.cz - https://finhacker.cz/fear-and-greed-index-cnn-historical-data/",
+    "MARKETSnap - https://www.marketsnap.io/stock-market-summary/july-23-2026",
+    "TheStreet - https://www.thestreet.com/markets/stock-market-today-072326",
+    "Barchart.com - https://www.barchart.com/story/news/25049971/how-major-us-stock-indexes-fared-thursday-7-23-2026",
+    "Benzinga - https://www.benzinga.com/markets/26/07/39908868/nasdaq-tumbles-over-2-amid-higher-oil-prices-investor-sentiment-weakens-greed-index-remains-in-fe",
+    "Las Vegas Sun News - https://lasvegassun.com/news/2026/jul/23/how-major-us-stock-indexes-fared-thursday-7-23-20/",
+    "River Country NCN - https://www.rivercountry.news/national/how-major-us-stock-indexes-fared-thursday-7-23-2026/article_01851e3e-493e-11ef-8051-d7f4955365e8.html",
+    "Morningstar - https://www.morningstar.com/news/dow-jones/20260724450/dow-jones-top-markets-headlines-at-9-am-et-global-goods-trade-rose-again-in-may-but-new-tariffs-loom",
+    "Benzinga Analyst Ratings - https://www.benzinga.com/analyst-ratings/downgrades/26/07/39909282/this-cheesecake-factory-analyst-is-no-longer-bullish-here-are-top-5-downgrades-for-friday",
+    "Benzinga Upgrades - https://www.benzinga.com/analyst-ratings/upgrades"
   ]
 }
