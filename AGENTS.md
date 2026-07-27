@@ -42,7 +42,7 @@ rows for the same ticker/broker open holding.
 | Layer | Path | Stack |
 |---|---|---|
 | Data Pipeline | `apps/market_dashboard_backend/scripts/` | Python, yfinance, Finviz |
-| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | Gemini 2.5 Pro + GPT-4o + Codex (web search, HTML out) |
+| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | Gemini 2.5 Pro + GPT-4o + Claude (web search, HTML out) |
 | Frontend | `apps/market_dashboard/` | Next.js 15.5, TypeScript, Tailwind, Recharts |
 | AI Agents | `apps/market_dashboard/agents/` | Fundamental (yahoo-finance2 + DeepSeek), Technical |
 | Runtime Skills | `packages/core-skills/` | LLM prompts + dual TS/Python handlers |
@@ -54,7 +54,7 @@ rows for the same ticker/broker open holding.
 
 ```
 build_data.py → data/snapshot.json + data/charts/*.png
-morning_brief.py → data/morning_brief_{gemini,openai,Codex}.html + data/morning_brief_meta.json
+morning_brief.py → data/morning_brief_{gemini,openai,claude}.html + data/morning_brief_meta.json
 sync step → public/market-dashboard/  →  Vercel serves static files
 ```
 
@@ -167,7 +167,7 @@ Define success criteria. Loop until verified.
 |---|---|---|
 | `GEMINI_API_KEY` | Yes (≥1 brief key) | Morning brief — Gemini 2.5 Pro + Search Grounding |
 | `OPENAI_API_KEY` | Optional | Morning brief — GPT-4o + web_search_preview |
-| `ANTHROPIC_API_KEY` | Optional | Morning brief — Codex Sonnet 4.6 + web search |
+| `ANTHROPIC_API_KEY` | Optional | Morning brief — Claude Sonnet 4.6 + web search |
 | `GOOGLE_CLIENT_ID` / `_SECRET` | Yes | Google OAuth (NextAuth v5) |
 | `AUTH_SECRET` | Yes | NextAuth v5 session signing |
 | `DATABASE_URL` | Yes | Postgres (Prisma) |
@@ -192,7 +192,7 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 | Workflow loops forever | missing `[skip ci]` in commit message |
 | Morning brief tab errors | `morning_brief_meta.json` not in `public/market-dashboard/` — run brief then `sync:market` |
 | Brief provider button greyed | API key missing or `generated: false` in meta |
-| OpenAI / Codex brief fails | `pip install openai>=1.70.0` / `anthropic>=0.49.0` |
+| OpenAI / Claude brief fails | `pip install openai>=1.70.0` / `anthropic>=0.49.0` |
 
 ---
 
@@ -200,7 +200,7 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 
 **Always prefer a subagent for routine, lower-thinking work.** Spawn via the Agent tool with `model: sonnet` (or `haiku` for trivial lookups). Reserve Opus for complex design, large-diff review, or when Sonnet has visibly underperformed in this session.
 
-**Use prebuilt subagents in `.Codex/agents/` over ad-hoc Explore calls:**
+**Use prebuilt subagents in `.codex/agents/` over ad-hoc Explore calls:**
 
 | Agent | When to use | Model |
 |---|---|---|
@@ -208,7 +208,7 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 | `prompt-extractor` | Phase 3 prompt migration — one prompt at a time | Sonnet |
 | `wiki-summarizer` | Composing `knowledge.md` for a runtime skill | Sonnet |
 
-**Slash commands** (`.Codex/skills/`):
+**Slash commands** (`.claude/skills/`):
 
 | Command | Purpose |
 |---|---|
