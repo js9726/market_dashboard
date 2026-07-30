@@ -1,15 +1,15 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-OFF",
+    "label": "CAUTIOUSLY-RISK-ON",
     "posture": "WAIT",
-    "summary": "Geopolitical tensions in the Middle East are flaring up, spiking oil prices and adding to market uncertainty ahead of this afternoon's pivotal Federal Reserve interest rate decision."
+    "summary": "Markets are attempting a slight rebound after yesterday's sharp sell-off, driven by strong earnings from Microsoft, but sentiment remains fragile amid geopolitical tensions and a hawkish Fed stance."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": 39,
+    "score": 32,
     "label": "Fear"
   },
   "indices": [
@@ -17,7 +17,7 @@
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": 0.21,
+      "changePct": 0.63,
       "note": "futures",
       "citation": null
     },
@@ -25,7 +25,7 @@
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 0.2,
+      "changePct": 1.3,
       "note": "futures",
       "citation": null
     },
@@ -33,376 +33,363 @@
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": -0.32,
+      "changePct": 0.42,
+      "note": "futures",
+      "citation": null
+    },
+    {
+      "symbol": "IWM",
+      "name": "Russell 2000",
+      "level": null,
+      "changePct": 0.55,
       "note": "futures",
       "citation": null
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 18.92,
-      "changePct": 3.9,
+      "level": 20.66,
+      "changePct": 13.45,
       "note": "live",
       "citation": null
     },
     {
       "symbol": "^TNX",
       "name": "10-Yr Treasury Yield",
-      "level": 4.63,
-      "changePct": 0.02,
+      "level": 4.68,
+      "changePct": null,
       "note": "live",
       "citation": null
     },
     {
       "symbol": "CL=F",
-      "name": "WTI Crude Oil",
-      "level": 82.16,
-      "changePct": 3.44,
+      "name": "Crude Oil",
+      "level": 83.66,
+      "changePct": -0.95,
       "note": "futures",
       "citation": null
     }
   ],
-  "indicesNarrative": "US futures are mixed, with the Dow lagging while the Nasdaq and S&P 500 show slight gains. The market is in a holding pattern ahead of the Fed's policy decision. A spike in oil due to Middle East tensions and a continued sell-off in semiconductor stocks are the main drivers of caution.",
-  "technicals": {},
+  "indicesNarrative": "US futures are pointing to a higher open, led by the tech-heavy Nasdaq, as strong earnings from Microsoft buoy sentiment after a sharp sell-off. Yesterday, the Dow had its worst session since April 2025. The VIX remains elevated, reflecting ongoing uncertainty following the Fed's hawkish hold and escalating US-Iran tensions.",
+  "technicals": null,
   "technicalsNarrative": null,
   "sectorsThemes": [],
-  "sectorsNarrative": "A clear rotation out of technology and semiconductors is underway, driven by concerns over AI spending returns and competition. Defensive sectors may see strength amid the geopolitical uncertainty and pre-Fed jitters.",
-  "industryNarrative": "Semiconductors and AI-related hardware stocks are under significant pressure globally, following disappointing guidance from South Korea's SK Hynix. This weakness is the primary drag on the tech sector.",
+  "sectorsNarrative": "A sharp rotation out of semiconductor and AI-related names was a key theme in the recent sell-off, with investors now looking for stabilization. Strong earnings from cloud services are providing a pocket of strength.",
+  "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "MANH",
+      "ticker": "MSFT",
       "side": "LONG",
-      "changePct": 10,
-      "why": "Surged in premarket trading after the software solutions company beat Wall Street's second-quarter earnings expectations.",
+      "changePct": 8.0,
+      "why": "Cloud revenue growth beat expectations and the company maintained its 2026 capex guidance.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "GEHC",
+      "ticker": "META",
+      "side": "SHORT",
+      "changePct": -10.0,
+      "why": "Revenue guidance underwhelmed and concerns about rising AI spending without clear monetization are weighing on the stock.",
+      "traderLens": "Minervini"
+    },
+    {
+      "ticker": "PN",
       "side": "LONG",
-      "changePct": 9.2,
-      "why": "Gained after the medical technology company exceeded analysts' second-quarter earnings estimates.",
+      "changePct": 27.8,
+      "why": "Pre-market surge, reason not specified in available reports.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "LFUS",
+      "ticker": "CMCO",
       "side": "LONG",
-      "changePct": 8.2,
-      "why": "Climbed after the electrical parts maker posted better-than-expected second-quarter results.",
-      "traderLens": "Momentum"
-    },
-    {
-      "ticker": "F",
-      "side": "LONG",
-      "changePct": 4.5,
-      "why": "Rose after reporting better-than-expected second-quarter earnings and raising its FY26 adjusted EBIT guidance.",
-      "traderLens": "Value/Turnaround"
-    },
-    {
-      "ticker": "STX",
-      "side": "LONG",
-      "changePct": 6,
-      "why": "Rose premarket after beating earnings estimates and providing strong guidance, citing AI data center storage demand.",
+      "changePct": 25.29,
+      "why": "Positive Q1 earnings release.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "SWKS",
-      "side": "SHORT",
-      "changePct": -10,
-      "why": "Fell sharply in premarket, caught in the broad semiconductor sector sell-off.",
-      "traderLens": "Minervini (Stage 4)"
+      "ticker": "XCHG",
+      "side": "LONG",
+      "changePct": 15.12,
+      "why": "Pre-market surge, reason not specified in available reports.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "NBIS",
+      "ticker": "NCRA",
       "side": "SHORT",
-      "changePct": -8.6,
-      "why": "Fell as the neocloud company struggled with a sector-wide risk-off rotation out of high-multiple AI infrastructure stocks.",
-      "traderLens": "Minervini (Stage 4)"
+      "changePct": -24.7,
+      "why": "Pre-market decline, reason not specified in available reports.",
+      "traderLens": "Minervini"
     },
     {
-      "ticker": "AMD",
+      "ticker": "AGRZ",
       "side": "SHORT",
-      "changePct": -8.15,
-      "why": "Extended sell-off due to the global chip rout triggered by SK Hynix's results and broad concerns over AI spending.",
-      "traderLens": "Minervini (Stage 4)"
+      "changePct": -17.63,
+      "why": "Pre-market decline, reason not specified in available reports.",
+      "traderLens": "Minervini"
+    },
+    {
+      "ticker": "EGG",
+      "side": "SHORT",
+      "changePct": -16.33,
+      "why": "Pre-market decline, reason not specified in available reports.",
+      "traderLens": "Minervini"
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": 193.37,
-      "changePct": -1.04,
+      "level": null,
+      "changePct": null,
       "abc": null,
-      "note": "Caught in the semiconductor sell-off, watching for support."
+      "note": "Watching for signs of stabilization after the recent sharp sell-off in the semiconductor sector."
     },
     {
       "ticker": "TSLA",
-      "level": 311.4,
+      "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Watching key support levels as market sentiment sours."
+      "note": "Monitoring for relative strength or weakness amidst broad market volatility."
     },
     {
       "ticker": "AAPL",
-      "level": 341.25,
-      "changePct": 0.34,
+      "level": null,
+      "changePct": null,
       "abc": null,
-      "note": "Holding up relatively well ahead of earnings this week."
+      "note": "Awaiting earnings results after the market close."
     },
     {
       "ticker": "MSFT",
-      "level": 393.9,
-      "changePct": 1,
-      "abc": null,
-      "note": "Slightly up pre-market ahead of critical earnings report tonight."
+      "level": null,
+      "changePct": null,
+      "abc": "A",
+      "note": "Strong earnings and positive pre-market action could make it a leadership name."
     },
     {
       "ticker": "AMZN",
-      "level": 231.55,
-      "changePct": -0.23,
+      "level": null,
+      "changePct": null,
       "abc": null,
-      "note": "Slightly down, awaiting its earnings report later this week."
+      "note": "Awaiting earnings results after the market close."
     },
     {
       "ticker": "META",
-      "level": 597.37,
-      "changePct": 0.67,
-      "abc": null,
-      "note": "Slightly up ahead of earnings tonight; focus will be on capex."
+      "level": null,
+      "changePct": null,
+      "abc": "C",
+      "note": "Significant pre-market weakness following disappointing guidance."
     },
     {
       "ticker": "GOOGL",
-      "level": 333.9,
-      "changePct": 0.06,
+      "level": null,
+      "changePct": null,
       "abc": null,
-      "note": "Trading flat as the market awaits the Fed and big tech earnings."
+      "note": "Watching to see how it reacts to Microsoft's strong cloud results."
     },
     {
       "ticker": "AMD",
-      "level": 452.6,
-      "changePct": -8.15,
+      "level": null,
+      "changePct": null,
       "abc": null,
-      "note": "Leading the semiconductor weakness, breaking below key levels."
+      "note": "Part of the semiconductor sector to watch for a potential bounce."
     },
     {
       "ticker": "SMCI",
-      "level": 28.15,
-      "changePct": -1.05,
+      "level": null,
+      "changePct": null,
       "abc": null,
-      "note": "Continuing its multi-day fall amid the AI hardware sell-off."
+      "note": "Another key AI-related name to watch after the recent sector-wide pullback."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Watching for reaction to broad market and tech sentiment."
+      "note": "Monitoring for any signs of renewed institutional interest."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "High-beta tech name, sensitive to market risk-off tone."
+      "note": "Cybersecurity sector name to watch for relative strength."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Watching Bitcoin's movement, which is currently trading higher."
+      "note": "Bitcoin proxy, watching for movement in cryptocurrencies."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is showing risk-off characteristics. Not an environment for buying extended breakouts. Focus on capital preservation."
+      "view": "Market is in a correction. Stay mostly in cash. Not an environment for high-probability Stage 2 setups."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear rotation out of technology and semiconductors. Money may be flowing to more defensive sectors or value names."
+      "view": "Rotation out of AI and semis is clear. Money flowing into defensive names or sitting on the sidelines. Watch for strength in cloud post-MSFT earnings."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is poor. Geopolitical risk, Fed uncertainty, and a breakdown in market leaders (semis). Not a time for A-grade setups."
+      "view": "Market context is poor. A-grade setups are scarce. Best to observe and wait for conditions to improve."
     },
     {
       "name": "SRxTrades",
-      "view": "Choppy, headline-driven action. Wait for the dust to settle after the Fed announcement. No clean pivots to enter."
+      "view": "Volatility is high. Wait for clean pivots and volume confirmation before entering any new positions. Avoid chasing gaps."
     },
     {
       "name": "Jeff",
-      "view": "Respect hard stops, especially on tech longs. The character of the market has changed in the short term."
+      "view": "Respect hard stops. The market is showing weakness, so it's crucial to cut losses quickly."
     },
     {
       "name": "Qullamaggie",
-      "view": "Momentum is breaking down in key leadership groups. Episodic pivots are failing. Stay on the sidelines until strength returns."
+      "view": "Some episodic pivots on earnings (like MSFT) might work, but the overall market weakness is a headwind. Be selective."
     },
     {
       "name": "Composite",
-      "view": "Stay patient and defensive. The combination of geopolitical flare-ups and a hawkish Fed is a recipe for volatility. Wait for the Fed's statement and press conference before making any aggressive moves. The risk is to the downside, particularly in tech."
+      "view": "Patience is key today. The market is attempting a bounce, but conviction is low. Focus on observing which stocks and sectors show relative strength. Avoid initiating new long positions until the market proves itself."
     }
   ],
   "standout": null,
   "earnings": {
-    "bmo": [
-      {
-        "ticker": "GEHC",
-        "consensus": null
-      },
-      {
-        "ticker": "HUM",
-        "consensus": null
-      },
-      {
-        "ticker": "BSX",
-        "consensus": null
-      },
-      {
-        "ticker": "ADP",
-        "consensus": null
-      }
-    ],
+    "bmo": [],
     "amc": [
       {
-        "ticker": "MSFT",
-        "consensus": "EPS $4.22 / Rev $87.63B"
+        "ticker": "AAPL",
+        "consensus": null
       },
       {
-        "ticker": "META",
-        "consensus": "EPS $7.23 / Rev $59.50B"
+        "ticker": "AMZN",
+        "consensus": null
       }
     ],
     "yesterdayReactions": [
       {
-        "ticker": "UPS",
-        "result": "beat",
-        "movePct": null
-      },
-      {
-        "ticker": "KO",
-        "result": "beat and raise",
-        "movePct": null
-      },
-      {
-        "ticker": "BA",
-        "result": "rev beat, EPS miss",
-        "movePct": null
+        "ticker": "META",
+        "result": "miss",
+        "movePct": -10.0
       }
     ]
   },
   "calendar": [
     {
-      "time": "10:30 ET",
-      "name": "EIA Crude Oil Inventories",
-      "consensus": "-1.3M"
-    },
-    {
-      "time": "14:00 ET",
-      "name": "FOMC Interest Rate Decision",
-      "consensus": "No Change"
-    },
-    {
-      "time": "14:30 ET",
-      "name": "FOMC Press Conference",
+      "time": "08:30 ET",
+      "name": "US Q2 GDP (Advance)",
       "consensus": null
+    },
+    {
+      "time": "08:30 ET",
+      "name": "US PCE Inflation",
+      "consensus": null
+    },
+    {
+      "time": "08:30 ET",
+      "name": "US Weekly Jobless Claims",
+      "consensus": "200K"
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "SNOW",
-        "firm": "Wells Fargo",
-        "rating": "Overweight",
-        "pt": 500
+        "ticker": "GTX",
+        "firm": "Deutsche Bank",
+        "rating": "Buy",
+        "pt": 36
+      },
+      {
+        "ticker": "CORZ",
+        "firm": "Keefe, Bruyette & Woods",
+        "rating": "Outperform",
+        "pt": 28
       }
     ],
     "downgrades": [
       {
-        "ticker": "CAT",
-        "firm": "Baird",
-        "rating": "Neutral",
-        "pt": 900
+        "ticker": "META",
+        "firm": "Barclays",
+        "rating": "Overweight",
+        "pt": 780
       },
       {
-        "ticker": "OKE",
-        "firm": "Morgan Stanley",
-        "rating": "Equal-Weight",
-        "pt": 103
-      },
-      {
-        "ticker": "CSGP",
-        "firm": "Keefe, Bruyette & Woods",
-        "rating": "Market Perform",
-        "pt": 29
+        "ticker": "IONS",
+        "firm": "HC Wainwright & Co.",
+        "rating": "Buy",
+        "pt": 115
       }
     ]
   },
-  "alert": "FOMC Rate Decision at 2:00 PM ET - Expect High Volatility",
+  "alert": null,
   "news": [
     {
-      "headline": "Iran fires ballistic missiles at U.S. forces; U.S. and Saudi Arabia retaliate, spiking oil prices",
-      "impact": "HIGH",
-      "tickers": [
-        "CL=F",
-        "XLE",
-        "SPY"
-      ],
-      "source": "24/7 Wall St. — https://247wallst.com/investing/2026/07/29/stock-market-live-july-29-2026-s-p-500-spy-slightly-higher-as-markets-wait-on-the-fed/",
-      "time": "Overnight"
-    },
-    {
-      "headline": "Markets brace for Federal Reserve interest rate decision and policy statement at 2:00 PM ET",
+      "headline": "US futures point to a rebound after sharp sell-off, led by Microsoft earnings",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
-        "DIA",
-        "^TNX"
+        "MSFT"
       ],
-      "source": "TheStreet — https://www.thestreet.com/markets/stock-market-today-july-29-2026-nasdaq-edges-lower-ahead-of-fed-decision-big-tech-earnings",
-      "time": "Today"
+      "source": "AP News - https://apnews.com/article/stock-market-today-iran-fed-earnings-microsoft-d2805c8223594879684347209a393d25",
+      "time": "09:37 ET"
     },
     {
-      "headline": "Global semiconductor rout deepens after SK Hynix results miss lofty expectations, raising concerns about AI spending ROI",
+      "headline": "Fed holds rates steady in a hawkish stance, providing minimal forward guidance",
       "impact": "HIGH",
       "tickers": [
-        "SMH",
-        "NVDA",
-        "AMD",
-        "INTC"
+        "SPY",
+        "DIA",
+        "TLT"
       ],
-      "source": "TipRanks — https://www.tipranks.com/news/semiconductor-stocks-nvda-amd-micron-and-sndk-extend-their-sell-off-in-pre-market-today-july-29-what-triggered-the-latest-slide",
-      "time": "Overnight"
+      "source": "STL.News - https://www.stl.news/global-market-shockwaves-overnight-overseas-trading-recovers-amid-tech-rotation-and-energy-shifts/30072026/",
+      "time": "July 29, 2026"
     },
     {
-      "headline": "Microsoft and Meta to report earnings after the bell, with investor focus squarely on AI-related capital expenditures",
+      "headline": "Oil prices retreat after surging on escalating US-Iran tensions",
       "impact": "MED",
       "tickers": [
-        "MSFT",
-        "META",
+        "CL=F",
+        "XLE"
+      ],
+      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-live-july-30-2026-sp-500-spy-pivoting-from-fed-induced-drop",
+      "time": "July 30, 2026"
+    },
+    {
+      "headline": "Asian markets mixed, with South Korea's Kospi falling further on AI stock sell-off",
+      "impact": "MED",
+      "tickers": null,
+      "source": "WKMG News 6 - https://www.clickorlando.com/business/2026/07/30/oil-prices-slip-and-world-shares-are-mixed-as-investors-sell-ai-stocks-in-asia/",
+      "time": "July 30, 2026"
+    },
+    {
+      "headline": "Key US economic data including Q2 GDP and PCE inflation due today",
+      "impact": "HIGH",
+      "tickers": [
+        "SPY",
         "QQQ"
       ],
-      "source": "TheStreet — https://www.thestreet.com/markets/stock-market-today-july-29-2026-nasdaq-edges-lower-ahead-of-fed-decision-big-tech-earnings",
-      "time": "Today"
-    },
-    {
-      "headline": "Wells Fargo raises Snowflake (SNOW) price target to $500, arguing AI demand is a growth driver, not a disruptor",
-      "impact": "MED",
-      "tickers": [
-        "SNOW"
-      ],
-      "source": "24/7 Wall St. — https://247wallst.com/investing/2026/07/29/stock-market-live-july-29-2026-s-p-500-spy-slightly-higher-as-markets-wait-on-the-fed/",
-      "time": "Pre-market"
+      "source": "XTB - https://www.xtb.com/en/market-analysis/economic-calendar",
+      "time": "08:30 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TheStreet, July 29 2026 — https://www.thestreet.com/markets/stock-market-today-july-29-2026-nasdaq-edges-lower-ahead-of-fed-decision-big-tech-earnings",
-    "24/7 Wall St., July 29 2026 — https://247wallst.com/investing/2026/07/29/stock-market-live-july-29-2026-s-p-500-spy-slightly-higher-as-markets-wait-on-the-fed/",
-    "TipRanks, July 29 2026 — https://www.tipranks.com/news/stock-market-news-today-7-29-26-futures-mixed-ahead-of-fed-rate-decision-msft-meta-earnings-in-focus",
-    "FinHacker.cz, July 27 2026 — https://finhacker.cz/fear-and-greed-index-historical-data-chart/",
-    "XTB, July 29 2026 — https://www.xtb.com/en/market-analysis/news/economic-calendar-all-at-once-fed-rate-decision-and-big-tech-earnings-to-stretch-investors-29-07-2026",
-    "Benzinga, July 29 2026 — https://www.benzinga.com/analyst-ratings/26/07/39986889/this-caterpillar-analyst-is-no-longer-bullish-here-are-top-5-downgrades-for-wednesday"
+    "XTB - https://www.xtb.com/en/market-analysis/economic-calendar",
+    "Reddit - r/EconReports - https://www.reddit.com/r/EconReports/comments/1dd513c/us_economic_calendar_july_30th_2026/",
+    "FinHacker.cz - https://finhacker.cz/fear-and-greed-index-cnn-graf-historie/",
+    "STL.News - https://www.stl.news/global-market-shockwaves-overnight-overseas-trading-recovers-amid-tech-rotation-and-energy-shifts/30072026/",
+    "Trading Economics - https://tradingeconomics.com/calendar",
+    "TradingCharts - https://tradingcharts.com/economic_calendar/2026/07/30.html",
+    "Investing.com - https://www.investing.com/tools/pre-market",
+    "WKMG News 6 - https://www.clickorlando.com/business/2026/07/30/oil-prices-slip-and-world-shares-are-mixed-as-investors-sell-ai-stocks-in-asia/",
+    "Benzinga - https://www.benzinga.com/markets/ movers/26/07/39992031/12-industrials-stocks-moving-in-thursdays-pre-market-session",
+    "MacroMicro - https://en.macromicro.me/charts/39123/cnn-fear-and-greed-index",
+    "AP News - https://apnews.com/article/stock-market-today-iran-fed-earnings-microsoft-d2805c8223594879684347209a393d25",
+    "MarketForces Africa - https://www.marketforcesafrica.com/us-equities-sold-off-european-markets-diverge-as-sentiment-shifts/",
+    "MarketWatch - https://www.marketwatch.com/tools/stockresearch/premarket",
+    "FactSet - https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "TheStreet - https://www.thestreet.com/markets/stock-market-live-july-30-2026-sp-500-spy-pivoting-from-fed-induced-drop",
+    "Cboe - https://www.cboe.com/tradable_products/vix/",
+    "Barchart - https://www.barchart.com/futures/quotes/VI*1",
+    "Benzinga - https://www.benzinga.com/analyst-ratings/analyst-color/26/07/39992123/microsoft-to-rally-more-than-40-here-are-10-top-analyst-forecasts-for-thursday"
   ]
 }
