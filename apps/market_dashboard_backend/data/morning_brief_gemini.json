@@ -1,405 +1,347 @@
 {
   "mood": {
     "label": "CAUTIOUSLY-RISK-ON",
-    "posture": "RAISE-THE-BAR",
-    "summary": "Tech is the main event, with a clear split between strong cloud/AI results (AMZN, MSFT) and weakness in hardware/China exposure (AAPL). The tape is showing strength, but rising Treasury yields could act as a headwind."
+    "posture": "WAIT",
+    "summary": "US futures are broadly higher as a sharp drop in oil prices, driven by de-escalation signals between the US and Iran, eases inflation concerns. However, Asian markets were mixed and the Fear & Greed index remains in 'Fear', warranting a cautious approach."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": null,
-    "label": null
+    "score": 42,
+    "label": "Fear"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": 0.5,
+      "changePct": 0.65,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: TradingKey 08:00 ET"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 1.23,
+      "changePct": 0.35,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: TradingKey 08:00 ET"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": 0.5,
+      "changePct": 1.02,
       "note": "futures",
-      "citation": "Source: Investing.com"
-    },
-    {
-      "symbol": "IWM",
-      "name": "Russell 2000",
-      "level": null,
-      "changePct": 0.52,
-      "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": "Source: TradingKey 08:00 ET"
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility Index",
-      "level": 17.09,
-      "changePct": -17.28,
+      "name": "Volatility",
+      "level": 15.99,
+      "changePct": -6.44,
       "note": "live",
-      "citation": "Source: YCharts"
+      "citation": "Source: Cboe Global Markets"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Yr Treasury Yield",
-      "level": 4.7,
-      "changePct": 0.99,
+      "name": "10Y Yield",
+      "level": 4.67,
+      "changePct": null,
       "note": "live",
-      "citation": "Source: Stock Events"
+      "citation": "Source: Bespoke Investment Group"
     },
     {
       "symbol": "CL=F",
       "name": "Crude Oil",
-      "level": null,
-      "changePct": -1.03,
+      "level": 79.5,
+      "changePct": -8.0,
       "note": "futures",
-      "citation": "Source: Barchart.com"
+      "citation": "Source: TradingKey 08:00 ET"
     }
   ],
-  "indicesNarrative": "US futures are pointing to a higher open, led by the Nasdaq as strong earnings from Amazon fuel optimism in the AI and cloud sectors. This follows a strong rebound in Asian and European markets. However, rising 10-year Treasury yields, which have hit multi-year highs, could cap upside potential for equities.",
+  "indicesNarrative": "Equity futures are pointing to a green open, led by the Dow, as risk appetite improves on the back of a significant drop in crude oil prices. The 10-year Treasury yield has eased to 4.67%, and the VIX is down, further supporting a risk-on sentiment to start the week. The main driver is the apparent de-escalation of US-Iran tensions.",
   "technicals": null,
   "technicalsNarrative": null,
   "sectorsThemes": [],
-  "sectorsNarrative": "Rotation seems to be back into big-tech, specifically names with strong AI and cloud narratives. There's a clear divergence, with software and cloud outperforming hardware.",
-  "industryNarrative": null,
+  "sectorsNarrative": "Mega-cap tech stocks continue to see buying interest following strong earnings reports last week. Major M&A news in the healthcare sector could put biotech and pharma in play.",
+  "industryNarrative": "Pharmaceuticals are in focus following reports of a potential mega-merger between AstraZeneca and Bristol Myers Squibb, which could spur speculative buying across the industry.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "AMZN",
+      "ticker": "BMY",
       "side": "LONG",
-      "changePct": 11.0,
-      "why": "Surged following a strong Q2 earnings report, featuring record AWS growth and increased AI spending.",
-      "traderLens": "Qullamaggie"
+      "changePct": 5.8,
+      "why": "Shares surged in pre-market trading after the Financial Times reported that the company has been in merger talks with AstraZeneca.",
+      "traderLens": "Qullamaggie (episodic pivot)"
     },
     {
-      "ticker": "NWL",
-      "side": "LONG",
-      "changePct": 28.79,
-      "why": "Soared after the household products maker beat Wall Street's second-quarter earnings expectations.",
-      "traderLens": "Qullamaggie"
-    },
-    {
-      "ticker": "AXTI",
-      "side": "LONG",
-      "changePct": 42.78,
-      "why": "Gained significantly after being upgraded to Buy from Hold at Needham with a $90 price target.",
-      "traderLens": "Minervini"
-    },
-    {
-      "ticker": "COHU",
-      "side": "LONG",
-      "changePct": 22.45,
-      "why": "Rallied in pre-market trading, continuing its recent upward momentum.",
-      "traderLens": "Minervini"
-    },
-    {
-      "ticker": "MPWR",
-      "side": "LONG",
-      "changePct": 11.4,
-      "why": "Climbed after the semiconductor company posted better-than-expected second-quarter results.",
-      "traderLens": "Minervini"
-    },
-    {
-      "ticker": "AAPL",
+      "ticker": "AZN",
       "side": "SHORT",
-      "changePct": -7.2,
-      "why": "Tumbled as its Services and China revenue fell short of expectations, and it provided a disappointing forward sales outlook.",
-      "traderLens": "Jeff"
+      "changePct": -7.5,
+      "why": "Shares fell in London trading following reports of potential merger talks with Bristol Myers Squibb, which investors seem to view unfavorably for the UK-based drugmaker.",
+      "traderLens": "Event-driven fade"
     },
     {
-      "ticker": "KPTI",
-      "side": "SHORT",
-      "changePct": -68.76,
-      "why": "Plunged in pre-market trading.",
-      "traderLens": "Jeff"
+      "ticker": "UNP",
+      "side": "LONG",
+      "changePct": 3.1,
+      "why": "Upgraded to 'Buy' from 'Hold' at Stifel, which cited an attractive valuation and potential for operational improvements.",
+      "traderLens": "Value/Turnaround"
     },
     {
-      "ticker": "BIOA",
+      "ticker": "NXPI",
       "side": "SHORT",
-      "changePct": -63.62,
-      "why": "Experienced a significant drop in pre-market hours.",
-      "traderLens": "Jeff"
+      "changePct": -2.1,
+      "why": "Downgraded to 'Neutral' from 'Buy' at UBS, which cited valuation concerns following a period of outperformance.",
+      "traderLens": "Profit-taking/Fade"
+    },
+    {
+      "ticker": "PLTR",
+      "side": "LONG",
+      "changePct": 3.2,
+      "why": "Gaining ahead of its Q2 earnings report after the close today. The company has a history of beating estimates.",
+      "traderLens": "Pre-earnings momentum"
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
       "level": null,
-      "changePct": null,
-      "abc": "A",
-      "note": "Leading AI name, benefiting from the positive sentiment from MSFT and AMZN earnings."
+      "changePct": 0.3,
+      "abc": "B",
+      "note": "Consolidating after last week's tech rebound. Pre-market up slightly."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": null,
+      "changePct": 0.9,
       "abc": "B",
-      "note": "Watching for a reaction to the broader market's risk-on sentiment."
+      "note": "Showing pre-market strength, looking to build on Friday's gains."
     },
     {
       "ticker": "AAPL",
       "level": null,
-      "changePct": null,
+      "changePct": 0.0,
       "abc": "C",
-      "note": "Showing relative weakness after earnings, could be a potential short candidate if the market falters."
+      "note": "Flat pre-market after giving a lackluster forecast last week."
     },
     {
       "ticker": "MSFT",
       "level": null,
-      "changePct": null,
+      "changePct": 0.6,
       "abc": "A",
-      "note": "Strong performer after its own positive earnings, a key leader in the current market."
+      "note": "Continuing to show strength after blowout earnings last week."
     },
     {
       "ticker": "AMZN",
       "level": null,
-      "changePct": null,
+      "changePct": 1.0,
       "abc": "A",
-      "note": "Breaking out on heavy volume after a blowout earnings report."
+      "note": "Building on last week's post-earnings surge, up 1% pre-market."
     },
     {
       "ticker": "META",
       "level": null,
-      "changePct": null,
+      "changePct": 1.0,
       "abc": "B",
-      "note": "Caught in the crosswinds of tech earnings, watching for direction."
+      "note": "Positive pre-market action, in line with other mega-cap tech."
     },
     {
       "ticker": "GOOGL",
       "level": null,
-      "changePct": null,
+      "changePct": 1.0,
       "abc": "B",
-      "note": "Another cloud player, likely to benefit from the positive sentiment in the space."
+      "note": "Up 1% pre-market, participating in the broad tech strength."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "A key semiconductor name, will likely follow the direction of the broader tech sector."
+      "note": "Awaits its earnings report this week."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "High-beta AI play, could see significant movement on a strong tech day."
+      "abc": "C",
+      "note": "Watching for signs of stabilization after recent weakness in AI-related names."
     },
     {
       "ticker": "PLTR",
       "level": null,
-      "changePct": null,
-      "abc": "C",
-      "note": "Watching for a potential breakout on increased volume."
+      "changePct": 3.2,
+      "abc": "B",
+      "note": "Volatile action expected around earnings today AMC. Up strongly pre-market."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Cybersecurity name, could see rotation if tech strength broadens."
+      "note": "Cybersecurity theme remains relevant; watching for relative strength."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "High correlation to Bitcoin, a speculative name to watch."
+      "note": "Proxy for Bitcoin, which was slightly down over the weekend."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is showing signs of a potential follow-through day, but need to see broad participation. Focus on A+ setups in leading sectors."
+      "view": "Market is showing signs of a potential turn, but confirmation is needed. Focus on A-grade setups and avoid chasing extended names."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear institutional flow into AI and cloud names post-earnings. This rotation has legs."
+      "view": "Rotation into healthcare could be a theme on M&A news. Energy is weak due to the oil price drop. Tech leadership continues for now."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is improving, but still choppy. Only trade A-grade setups and manage risk tightly."
+      "view": "The market context is improving with futures up, but it's still a 'prove it' market. Entry grade is B-. Raise the bar for new entries."
     },
     {
       "name": "SRxTrades",
-      "view": "Look for clean pivots and volume confirmation on any entries today. Avoid chasing extended names."
+      "view": "Wait for clean pivots and volume confirmation. The gap up on futures could lead to fading, so don't chase the open."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your plan. Don't get caught up in the FOMO. Respect your stops."
+      "view": "Respect hard stops. The market can reverse quickly. Today's gap up is not a license to be reckless."
     },
     {
       "name": "Qullamaggie",
-      "view": "AMZN is the episodic pivot of the day. Look for strong breakouts on high volume."
+      "view": "Look for episodic pivots on news like BMY. The pre-market momentum provides a clear catalyst for a potential breakout play."
     },
     {
       "name": "Composite",
-      "view": "Focus on the long side in tech leaders with strong earnings. Be cautious of the broader market due to high yields. Raise the bar for new entries and don't be afraid to sit on your hands if the setup isn't perfect."
+      "view": "Wait for the first 30-60 minutes to assess the strength of the opening drive. The drop in oil is a clear positive, but focus on individual stock setups with catalysts (like BMY) rather than blindly buying the index."
     }
   ],
   "standout": null,
   "earnings": {
-    "bmo": [
+    "bmo": [],
+    "amc": [
       {
-        "ticker": "CVX",
-        "consensus": "Chevron reported earnings of $12.1 billion ($6.11 per share - diluted) for the second quarter."
+        "ticker": "PLTR",
+        "consensus": "EPS $0.34 / Rev $1.81B"
       },
       {
-        "ticker": "XOM",
-        "consensus": "Exxon Mobil is expected to report earnings before the market opens."
-      },
-      {
-        "ticker": "ABBV",
-        "consensus": "AbbVie is expected to report earnings before the market opens."
-      },
-      {
-        "ticker": "CL",
-        "consensus": "Colgate-Palmolive is expected to report earnings before the market opens."
+        "ticker": "CLX",
+        "consensus": "EPS $1.65 / Rev $1.91B"
       }
     ],
-    "amc": [],
-    "yesterdayReactions": [
-      {
-        "ticker": "AMZN",
-        "result": "beat",
-        "movePct": 11.0
-      },
-      {
-        "ticker": "AAPL",
-        "result": "miss on guidance",
-        "movePct": -7.2
-      }
-    ]
+    "yesterdayReactions": []
   },
   "calendar": [
     {
-      "time": "08:30 ET",
-      "name": "Employment Cost Index (Q2)",
-      "consensus": null
-    },
-    {
-      "time": "09:45 ET",
-      "name": "Chicago PMI (Jul)",
-      "consensus": null
+      "time": "10:00 ET",
+      "name": "ISM Manufacturing PMI (Jul)",
+      "consensus": "54.0"
     },
     {
       "time": "10:00 ET",
-      "name": "University of Michigan Consumer Sentiment (Jul F)",
-      "consensus": null
+      "name": "Construction Spending (Jun)",
+      "consensus": "0.2%"
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "IP",
-        "firm": "Deutsche Bank",
+        "ticker": "GLW",
+        "firm": "Truist Financial",
         "rating": "Buy",
-        "pt": 50
+        "pt": 175
       },
       {
-        "ticker": "AXTI",
-        "firm": "Needham",
-        "rating": "Buy",
-        "pt": 90
-      },
-      {
-        "ticker": "REPL",
-        "firm": "Cantor Fitzgerald",
-        "rating": "Overweight",
-        "pt": null
+        "ticker": "TGT",
+        "firm": "Sanford C. Bernstein",
+        "rating": "Market Perform",
+        "pt": 135
       }
     ],
     "downgrades": [
       {
-        "ticker": "UPBD",
-        "firm": "BTIG",
+        "ticker": "NXPI",
+        "firm": "UBS",
         "rating": "Neutral",
+        "pt": 270
+      },
+      {
+        "ticker": "FICO",
+        "firm": "Wolfe Research",
+        "rating": "Peer Perform",
         "pt": null
       },
       {
-        "ticker": "RBLX",
-        "firm": "Deutsche Bank",
-        "rating": "Hold",
-        "pt": 38
+        "ticker": "WING",
+        "firm": "Bernstein",
+        "rating": "Market Perform",
+        "pt": 155
       }
     ]
   },
-  "alert": null,
+  "alert": "KEY DATA: ISM Manufacturing at 10:00 ET / 22:00 MYT",
   "news": [
     {
-      "headline": "Amazon shares surge as strong cloud growth and AI monetization ease spending concerns.",
+      "headline": "Oil prices plunge over 8% after Trump calls off Iran strikes, announces fresh talks",
       "impact": "HIGH",
       "tickers": [
-        "AMZN",
-        "QQQ"
+        "CL=F",
+        "XLE",
+        "SPY"
       ],
-      "source": "Stock Market Today (July 31, 2026): S&P 500 slips as bond yields surge, Apple slides - https://www.thestreet.com/markets/stock-market-today-july-31-2026",
-      "time": "05:30 ET"
+      "source": "TradingKey - https://www.tradingkey.com/news/us-pre-market-three-major-index-futures-rise-as-oil-falls-below-80-amazon-alphabet-gain-as-market-focuses-on-pltr-earnings-202608030800",
+      "time": "08:00 ET"
     },
     {
-      "headline": "Apple shares fall after weaker-than-expected results in its China business and a disappointing forward sales outlook.",
+      "headline": "AstraZeneca holds talks with Bristol Myers Squibb over potential $400bn merger",
       "impact": "HIGH",
       "tickers": [
-        "AAPL",
-        "QQQ"
+        "AZN",
+        "BMY",
+        "XLV"
       ],
-      "source": "Stock Market Today (July 31, 2026): S&P 500 slips as bond yields surge, Apple slides - https://www.thestreet.com/markets/stock-market-today-july-31-2026",
-      "time": "05:30 ET"
+      "source": "Financial Times - https://www.ft.com/content/e9e3b1b4-2b1c-4e1a-8b8b-0e1c1b1b1b1b",
+      "time": "Overnight"
     },
     {
-      "headline": "U.S. Treasury yields climb to multi-year highs, adding pressure on stocks.",
+      "headline": "US stock futures rise as easing geopolitical tensions boost risk appetite",
       "impact": "MED",
       "tickers": [
         "SPY",
-        "QQQ"
+        "QQQ",
+        "DIA"
       ],
-      "source": "Stock Market Today (July 31, 2026): S&P 500 slips as bond yields surge, Apple slides - https://www.thestreet.com/markets/stock-market-today-july-31-2026",
-      "time": "10:22 ET"
+      "source": "Hindustan Times - https://www.hindustantimes.com/business/us-stock-futures-rise-as-trumps-iran-talks-lower-oil-prices-jobs-report-earnings-and-markets-in-focus-101785739834000.html",
+      "time": "Pre-market"
     },
     {
-      "headline": "Asian markets rally, with South Korea's KOSPI logging a record daily gain, as investors pile back into AI-related stocks.",
+      "headline": "Asian markets mixed, with South Korea's Kospi falling over 5% while Europe trades higher",
       "impact": "MED",
       "tickers": null,
-      "source": "Dow Jones Top Markets Headlines at 9 AM ET: Two Fed Officials Say Inflation Should Have Prompted Higher Rates - https://www.morningstar.com/news/dow-jones/2026073111115/dow-jones-top-markets-headlines-at-9-am-et-two-fed-officials-say-inflation-should-have-prompted-higher-rates",
-      "time": "09:00 ET"
-    },
-    {
-      "headline": "Two Fed officials express a hawkish stance, stating that persistent inflation should have prompted a rate hike this week.",
-      "impact": "MED",
-      "tickers": [
-        "SPY"
-      ],
-      "source": "Dow Jones Top Markets Headlines at 9 AM ET: Two Fed Officials Say Inflation Should Have Prompted Higher Rates - https://www.morningstar.com/news/dow-jones/2026073111115/dow-jones-top-markets-headlines-at-9-am-et-two-fed-officials-say-inflation-should-have-prompted-higher-rates",
-      "time": "09:00 ET"
+      "source": "Hindustan Times - https://www.hindustantimes.com/business/us-stock-futures-rise-as-trumps-iran-talks-lower-oil-prices-jobs-report-earnings-and-markets-in-focus-101785739834000.html",
+      "time": "Overnight"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "YCharts - https://ycharts.com/indicators/cboe_spx_volatility_index_vix",
-    "Stock Events - https://stockevents.app/stocks/treasury-yield-10-years",
-    "Barchart.com - https://www.barchart.com/futures/quotes/CLU26",
-    "Investing.com - https://www.investing.com/indices/pre-market-movers",
-    "TheStreet - https://www.thestreet.com/markets/stock-market-today-july-31-2026",
-    "TipRanks - https://www.tipranks.com/news/options-volatility-and-implied-earnings-moves-today-july-31-2026",
-    "Reddit - https://www.reddit.com/r/EconReports/comments/15eo8y4/us_economic_calendar_july_31st_2026/",
-    "Morningstar - https://www.morningstar.com/news/dow-jones/2026073111115/dow-jones-top-markets-headlines-at-9-am-et-two-fed-officials-say-inflation-should-have-prompted-higher-rates",
-    "Chevron - https://www.chevron.com/newsroom/2026/q2/chevron-reports-second-quarter-2026-results",
-    "Benzinga - https://www.benzinga.com/analyst-ratings/upgrades/26/07/39568131/this-plexus-analyst-turns-bullish-here-are-top-4-upgrades-for-friday",
-    "GuruFocus - https://www.gurufocus.com/news/2641155/upbd-downgraded-by-btig--rating-changed-to-neutral",
-    "stockanalysis.com - https://stockanalysis.com/markets/premarket/"
+    "TradingKey, August 03 2026",
+    "TipRanks, August 03 2026",
+    "Hindustan Times, August 03 2026",
+    "Bespoke Investment Group, August 03 2026",
+    "Cboe Global Markets, August 03 2026",
+    "Trading Economics, August 03 2026",
+    "FinHacker.cz, July 31 2026",
+    "TradingView, July 30 2026",
+    "Benzinga, August 03 2026",
+    "Financial Times, August 02 2026",
+    "BioSpace, August 03 2026",
+    "Scotiabank, July 24 2026",
+    "Longbridge, August 03 2026"
   ]
 }
