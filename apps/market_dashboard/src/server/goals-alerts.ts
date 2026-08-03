@@ -298,7 +298,43 @@ export async function computeAlerts(userId: string): Promise<Alert[]> {
     });
   }
 
-  // 5) Data quality — closed rows that money metrics must skip (gate #3/#7).
+  // 5) Conviction pipeline stalled — TRIGGERED ideas that never got a verdict.
+  // Without this the loop is INVISIBLY dead: no ENTER verdict means the paper
+  // forward-validation bridge sees zero signals and places nothing, which looks
+  // identical to "a quiet tape". Anything older than 2 days is a real stall.
+  const stallCutoff = new Date(now - 2 * 86400000);
+  const stalled = await prisma.aListCandidate.count({
+    where: {
+      userId,
+      status: "ACTIVE",
+      triggerState: "TRIGGERED",
+      agentConvictionAt: null,
+      triggerStateAt: { lt: stallCutoff },
+    },
+  });
+  if (stalled > 0) {
+    const oldest = await prisma.aListCandidate.findFirst({
+      where: { userId, status: "ACTIVE", triggerState: "TRIGGERED", agentConvictionAt: null },
+      select: { ticker: true, triggerStateAt: true },
+      orderBy: { triggerStateAt: "asc" },
+    });
+    const days = oldest?.triggerStateAt
+      ? Math.floor((now - oldest.triggerStateAt.getTime()) / 86400000)
+      : null;
+    alerts.push({
+      key: "conviction-stalled",
+      severity: "warn",
+      title: `${stalled} triggered idea${stalled > 1 ? "s" : ""} never got a Conviction verdict`,
+      detail:
+        `Oldest: ${oldest?.ticker ?? "?"}${days != null ? ` (${days}d)` : ""}. ` +
+        `No verdict means no ENTER signal, so paper forward-validation places nothing ` +
+        `and the strategy generates no reward data. Check the analysis step of the ` +
+        `track-positions cron.`,
+      href: "/dashboard/a-list",
+    });
+  }
+
+  // 6) Data quality — closed rows that money metrics must skip (gate #3/#7).
   const unconverted = rows.length - rows.filter((t) => usdPnl(t) != null).length;
   if (unconverted > 0) {
     alerts.push({
