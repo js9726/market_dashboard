@@ -128,11 +128,19 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true", help="show decisions; place nothing, sync nothing")
     ap.add_argument("--no-orders", action="store_true", help="skip order placement; still sync the book")
     ap.add_argument("--no-sync", action="store_true", help="skip the dashboard sync")
+    ap.add_argument("--flatten", action="store_true",
+                    help="close EVERY paper position (marketable limit sells) and place no new "
+                         "entries; use to reset the experiment to a clean book")
     args = ap.parse_args()
 
     cfg = load_config()
-    signals = fetch_signals(cfg)
-    log(f"actionable ENTER signals: {len(signals)}" + (f" -> {[s['ticker'] for s in signals]}" if signals else ""))
+    # --flatten is an exit-only reset: never consult the signal feed, so a
+    # network blip on the dashboard cannot stop us from closing the book.
+    signals = [] if args.flatten else fetch_signals(cfg)
+    if args.flatten:
+        log("FLATTEN MODE — closing every paper position; no entries this run")
+    else:
+        log(f"actionable ENTER signals: {len(signals)}" + (f" -> {[s['ticker'] for s in signals]}" if signals else ""))
 
     state = load_state()
     qctx = OpenQuoteContext(host=HOST, port=PORT)
@@ -213,28 +221,32 @@ def main() -> int:
         # ── Stop management (soft: exit on last <= stop) ─────────────────────
         for t, p in positions.items():
             st = state.get(t, {}).get("stop")
-            if st is None:
+            if st is None and not args.flatten:
                 log(f"  {t}: position has no journaled paper stop — flagging (no auto-exit without a stop)")
                 continue
             last = last_px.get(t)
             if last is None or last <= 0:
+                if args.flatten:
+                    log(f"  {t}: FLATTEN skipped — no quote (never sell blind)")
                 continue
-            if last <= float(st):
+            # Flatten exits unconditionally; normal runs only on a stop breach.
+            if args.flatten or last <= float(st):
                 qty = int(float(p.get("can_sell_qty", p.get("qty", 0))))
                 if qty < 1:
                     continue
                 limit = round(last * 0.995, 2)
+                why = "FLATTEN" if args.flatten else f"stop {st} breached"
                 if args.dry_run or args.no_orders:
-                    log(f"  {t}: WOULD SELL {qty} @ {limit} (stop {st} breached, last {last})")
+                    log(f"  {t}: WOULD SELL {qty} @ {limit} ({why}, last {last})")
                     continue
                 ret, resp = tctx.place_order(price=limit, qty=qty, code="US." + t, trd_side=TrdSide.SELL,
                                              order_type=OrderType.NORMAL, trd_env=TrdEnv.SIMULATE, acc_id=PAPER_ACC_ID)
                 if ret == RET_OK:
                     exited.append(t)
                     state.setdefault(t, {})["exitedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
-                    log(f"  {t}: STOP EXIT {qty} @ {limit} placed")
+                    log(f"  {t}: {'FLATTEN' if args.flatten else 'STOP'} EXIT {qty} @ {limit} placed")
                 else:
-                    log(f"  {t}: stop-exit place_order FAILED: {resp}")
+                    log(f"  {t}: {'flatten' if args.flatten else 'stop'}-exit place_order FAILED: {resp}")
 
         if not args.dry_run:
             save_state(state)
