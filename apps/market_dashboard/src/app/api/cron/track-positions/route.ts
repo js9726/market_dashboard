@@ -36,8 +36,10 @@ import { runConvictionAnalysis, type ConvictionInput } from "@/server/conviction
 import { marketContextNow } from "@/lib/market-context";
 
 // Cap LLM Conviction analyses per cron run so a day with many triggers can't
-// blow the function budget; the rest get picked up next run.
-const MAX_ANALYSES_PER_RUN = 5;
+// blow the function budget; the rest get picked up next run. 8 x ~15s worst
+// case still leaves headroom in the 300s budget after the candidate scan, and
+// clears a typical backlog in days rather than weeks.
+const MAX_ANALYSES_PER_RUN = 8;
 // How many candidates to price-fetch concurrently. Keeps the whole run inside
 // the function budget while bounding parallel pressure on the price feeds.
 const FETCH_CONCURRENCY = 8;
@@ -208,7 +210,8 @@ interface CandResult {
   ticker: string;
   processed: boolean;
   error?: string;
-  triggered?: { candId: string; input: ConvictionInput };
+  /** triggeredAtMs orders the analysis queue oldest-first so it drains. */
+  triggered?: { candId: string; triggeredAtMs: number; input: ConvictionInput };
 }
 
 /** Process one candidate: fetch the path, append daily tracks, derive savings +
@@ -382,6 +385,7 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
 
         triggered = {
           candId: cand.id,
+          triggeredAtMs: (triggerUpdate.triggerStateAt ?? cand.triggerStateAt)?.getTime() ?? 0,
           input: {
             ticker: cand.ticker,
             setup: cand.setupClassification,
@@ -532,10 +536,22 @@ export async function GET(req: Request) {
   // Runs only on the trigger flip, bounded per run, never fails the cron.
   let analyzed = 0;
   if (process.env.LLM_DISABLED !== "1") {
-    for (const item of newlyTriggered.slice(0, MAX_ANALYSES_PER_RUN)) {
+    // Drain OLDEST-triggered first. The queue is every TRIGGERED row still
+    // lacking a verdict (see processCandidate), so ordering it newest-first —
+    // as the candidate scan does — let a few permanently-failing rows sit at
+    // the head and starve the rest: the same 5 were retried every run while 28
+    // others never got a turn, and the loop looked idle rather than broken.
+    const queue = [...newlyTriggered].sort((a, b) => a.triggeredAtMs - b.triggeredAtMs);
+    for (const item of queue.slice(0, MAX_ANALYSES_PER_RUN)) {
       try {
         const verdict = await runConvictionAnalysis(item.input);
-        if (!verdict) continue;
+        if (!verdict) {
+          // Never swallow this. A null verdict means the LLM call failed or
+          // returned unparseable JSON; staying silent is what hid a fully
+          // stalled pipeline for days.
+          errors.push(`analyze ${item.input.ticker}: no verdict (LLM failed or unparseable)`);
+          continue;
+        }
         await prisma.aListCandidate.update({
           where: { id: item.candId },
           data: {
