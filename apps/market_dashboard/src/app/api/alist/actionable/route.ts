@@ -1,6 +1,8 @@
 /**
- * GET /api/alist/actionable — machine-readable feed of currently actionable
- * A-list signals for the operator-local paper-trading bridge (SIMULATE only).
+ * GET /api/alist/actionable — legacy machine-readable A-list diagnostics.
+ *
+ * This route is NOT paper-execution authority. The SIMULATE bridge consumes
+ * only /api/daily-screener/paper-signals from the persisted strict v2 GO list.
  *
  * A signal is actionable when the row is ACTIVE, its trigger has FIRED, and the
  * multi-agent verdict is ENTER (which, since 2026-07-16, requires the hard

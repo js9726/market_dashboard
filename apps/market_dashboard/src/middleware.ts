@@ -20,6 +20,8 @@ export default auth((req) => {
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/cron") ||
     pathname.startsWith("/api/morning-verdict/ingest") ||
+    pathname.startsWith("/api/daily-screener/ingest") ||
+    pathname.startsWith("/api/daily-screener/paper-signals") ||
     pathname.startsWith("/api/wiki/audits/ingest") ||
     pathname.startsWith("/api/watchlist/export") ||
     pathname.startsWith("/api/live-quotes/ingest") ||

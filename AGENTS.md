@@ -33,7 +33,7 @@ only supply the plan (`proposedEntry`, stop, target, RRR, notes/strategy). Never
 display stale sheet P&L as live P&L, and do not create duplicate live + sheet
 rows for the same ticker/broker open holding.
 
-**Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard (breadth, screeners + REC A-list, quotes, HELD seed + track), run the morning brief, then present today's A-List (REC + HELD) in chat.
+**Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard, apply the final chart/catalyst/risk gates, update both briefs, persist the v2 final run, and verify the idempotent Telegram receipt before presenting the result.
 
 ---
 
@@ -174,6 +174,10 @@ Define success criteria. Loop until verified.
 | `OWNER_EMAIL` | Yes | Auto-promoted to `owner` role |
 | `NEXTAUTH_URL` | Yes (prod) | Base URL for internal API calls |
 | `DEEPSEEK_API_KEY` | Optional | AI stock analysis tab |
+| `SCREENER_INGEST_KEY` | Optional | Dedicated bearer key for final daily-screener ingest; falls back to `BRIEF_INGEST_KEY` |
+| `TELEGRAM_GO_BOT_TOKEN` | For Telegram | Dedicated trading-notification bot token |
+| `TELEGRAM_GO_CHAT_ID` | For Telegram | Private chat/channel target for the final GO list |
+| `TELEGRAM_GO_THREAD_ID` | Optional | Telegram forum-topic target |
 
 Never commit `.env.local`. Never log keys. Never hardcode secrets.
 

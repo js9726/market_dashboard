@@ -385,6 +385,69 @@ model MorningBriefCache {
   @@index([generatedAt(sort: Desc)])
 }
 
+/// Evidence-backed final output of the full TradingView daily-screener routine.
+/// This is intentionally separate from AListCandidate: the latter is an
+/// automated pre-filter, while this run has already passed (or explicitly
+/// failed) freshness, authenticated-chart, catalyst, extension, stop, and
+/// timing gates. Telegram GO notifications are derived only from this payload.
+model DailyScreenerRun {
+  id             String   @id @default(cuid())
+  runDate        DateTime @db.Date
+  source         String
+  schemaVersion  String
+  generatedBy    String
+  generatedAt    DateTime
+  reportMarkdown String   @db.Text
+  payload        Json
+  goListHash     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  chunks DailyScreenerChunk[]
+
+  @@unique([runDate, source])
+  @@index([runDate(sort: Desc)])
+  @@index([updatedAt(sort: Desc)])
+}
+
+model DailyScreenerChunk {
+  id        String           @id @default(cuid())
+  runId     String
+  run       DailyScreenerRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  chunkKey  String
+  kind      String
+  ticker    String?
+  grade     String?
+  title     String
+  text      String           @db.Text
+  data      Json?
+  ordinal   Int
+  createdAt DateTime         @default(now())
+
+  @@unique([runId, chunkKey])
+  @@index([ticker])
+  @@index([runId, ordinal])
+}
+
+/// Idempotency/audit receipt for an external notification. No bot token or
+/// recipient ID is stored here; those remain in the deployment secret store.
+model TelegramDelivery {
+  id                String    @id @default(cuid())
+  dedupeKey         String    @unique
+  kind              String
+  payloadHash       String
+  status            String    @default("PENDING")
+  attemptedAt       DateTime  @default(now())
+  sentAt            DateTime?
+  telegramMessageId String?
+  errorMessage      String?   @db.Text
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([kind, createdAt(sort: Desc)])
+  @@index([status, updatedAt(sort: Desc)])
+}
+
 model WikiAudit {
   operatorLabel String   @default("JS")
   period        String // YYYY-MM

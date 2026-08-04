@@ -33,7 +33,7 @@ only supply the plan (`proposedEntry`, stop, target, RRR, notes/strategy). Never
 display stale sheet P&L as live P&L, and do not create duplicate live + sheet
 rows for the same ticker/broker open holding.
 
-**Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard (breadth, screeners + REC A-list, quotes, HELD seed + track), run the morning brief, then present today's A-List (REC + HELD) in chat.
+**Morning dailies:** when Jie says "do morning dailies" (or "morning dailies" / "run the dailies"), follow [`MORNING-DAILIES.md`](./MORNING-DAILIES.md) — refresh the dashboard, apply the final chart/catalyst/risk gates, update both briefs, persist the v2 final run, and verify the idempotent Telegram receipt before presenting the result.
 
 ---
 
@@ -166,6 +166,10 @@ Define success criteria. Loop until verified.
 | `DEEPSEEK_API_KEY` | Yes (Phase 5) | AI stock analysis tab + intraday morning verdict regen |
 | `BRIEF_INGEST_KEY` | Yes (Phase 5) | Shared secret for `POST /api/morning-verdict/ingest` (cron writes brief rows) |
 | `LIVE_QUOTE_INGEST_KEY` | Yes (Phase 5) | Shared secret for `POST /api/live-quotes/ingest` (moomoo daemon + Yahoo fallback) |
+| `SCREENER_INGEST_KEY` | Optional | Dedicated bearer key for final daily-screener ingest; falls back to `BRIEF_INGEST_KEY` |
+| `TELEGRAM_GO_BOT_TOKEN` | For Telegram | Dedicated trading-notification bot token |
+| `TELEGRAM_GO_CHAT_ID` | For Telegram | Private chat/channel target for the final GO list |
+| `TELEGRAM_GO_THREAD_ID` | Optional | Telegram forum-topic target |
 | `MOOMOO_OPEND_HOST` | Optional (local-only) | moomoo OpenD host for local bridge scripts (default `127.0.0.1`) |
 | `MOOMOO_OPEND_PORT` | Optional (local-only) | moomoo OpenD port (default `11111`) |
 | `BLOB_READ_WRITE_TOKEN` | Optional (Feature 7.2) | Vercel Blob token for journal-entry image attachments. Get via `vercel env pull` or Vercel dashboard. Without it, `/api/journal/entry/attachments` returns 503 cleanly. |
