@@ -59,6 +59,22 @@ describe("daily screener v2 payload", () => {
     expect(formatTelegramGoList(parsed)).toContain("No GO tickers");
   });
 
+  it("accepts the keyed technicals object emitted by the packager", () => {
+    const parsed = dailyScreenerPayloadSchema.parse(
+      payload({
+        candidates: {
+          goList: [],
+          watchList: [],
+          technicals: { generated_at: "2026-07-26T12:00:00Z", candidates: [] },
+        },
+      }),
+    );
+    expect(parsed.candidates.technicals).toEqual({
+      generated_at: "2026-07-26T12:00:00Z",
+      candidates: [],
+    });
+  });
+
   it("normalizes a valid GO ticker and formats the risk contract", () => {
     const parsed = dailyScreenerPayloadSchema.parse(
       payload({

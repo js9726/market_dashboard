@@ -92,7 +92,7 @@ export const dailyScreenerPayloadSchema = z
     candidates: z.object({
       goList: z.array(finalGoCandidateSchema),
       watchList: z.array(watchCandidateSchema),
-      technicals: z.array(z.unknown()).optional(),
+      technicals: z.unknown().optional(),
     }),
     evidence: z
       .object({
