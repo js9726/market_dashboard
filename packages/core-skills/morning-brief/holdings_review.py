@@ -132,8 +132,26 @@ def _load_stops(arg: str | None) -> dict:
         return {}
 
 
+# Permanent non-trading holds (operator-confirmed). These are NEVER reported as a
+# NO-STOP defect and contribute 0 to the progressive-exposure risk budget. Source of
+# truth: jie_wiki/wiki/companies/materialise.md ("Holding classification - PERMANENT
+# HOLD"). Override with HOLD_EXEMPT_TICKERS (comma-separated) without a code change.
+HOLD_EXEMPT = {
+    t.strip().upper()
+    for t in os.environ.get("HOLD_EXEMPT_TICKERS", "MTLS").split(",")
+    if t.strip()
+}
+
+
 def classify(h: dict) -> dict:
     """Attach stop-status + urgency to one holding row."""
+    if h.get("ticker", "").upper() in HOLD_EXEMPT:
+        # Still shown for completeness; company news stays in scope. No stop nagging,
+        # no 8EMA soft-stop WARN, no risk-budget contribution.
+        h["stop_status"], h["urgency"] = "HOLD-EXEMPT", "OK"
+        h["notes"] = ["permanent hold (operator rule) - excluded from risk budget"]
+        return h
+
     last = h.get("last")
     after = h.get("after_price")
     stop = h.get("stop")

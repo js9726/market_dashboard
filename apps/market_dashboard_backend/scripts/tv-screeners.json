@@ -30,15 +30,15 @@
       "query": {
         "filter": [
           {"left": "change",                       "operation": "egreater", "right": 3},
-          {"left": "relative_volume_10d_calc",     "operation": "egreater", "right": 1.5},
+          {"left": "relative_volume_10d_calc",     "operation": "egreater", "right": 0.75},
           {"left": "close",                        "operation": "egreater", "right": "SMA50"},
           {"left": "market_cap_basic",             "operation": "egreater", "right": 1000000000},
           {"left": "exchange",                     "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
         ],
         "options": {"lang": "en"},
         "markets": ["america"],
-        "sort":   {"sortBy": "relative_volume_10d_calc", "sortOrder": "desc"},
-        "range":  [0, 25]
+        "sort":   {"sortBy": "change", "sortOrder": "desc"},
+        "range":  [0, 50]
       }
     },
     {
@@ -48,7 +48,7 @@
       "query": {
         "filter": [
           {"left": "change",                       "operation": "egreater", "right": 3},
-          {"left": "relative_volume_10d_calc",     "operation": "egreater", "right": 1.5},
+          {"left": "relative_volume_10d_calc",     "operation": "egreater", "right": 0.75},
           {"left": "close",                        "operation": "egreater", "right": "SMA50"},
           {"left": "average_volume_30d_calc",      "operation": "egreater", "right": 500000},
           {"left": "market_cap_basic",             "operation": "egreater", "right": 300000000},
@@ -56,8 +56,8 @@
         ],
         "options": {"lang": "en"},
         "markets": ["america"],
-        "sort":   {"sortBy": "relative_volume_10d_calc", "sortOrder": "desc"},
-        "range":  [0, 25]
+        "sort":   {"sortBy": "change", "sortOrder": "desc"},
+        "range":  [0, 50]
       }
     },
     {
@@ -92,6 +92,28 @@
         "options": {"lang": "en"},
         "markets": ["america"],
         "sort":   {"sortBy": "relative_volume_10d_calc", "sortOrder": "desc"},
+        "range":  [0, 25]
+      }
+    },
+    {
+      "id": "leader-pullback",
+      "name": "Leader Pullback (reclaim day)",
+      "tv_url": "",
+      "_filter_notes": "B2 fix 2026-08-04: leaders near/reclaiming the 21dma BEFORE the move. Percentage-gainer screeners cannot see a leader on its reclaim day (2026-08-03: AVGO +0.76% and NVDA +2.93% invisible to every mover screener; both were the trade). Green day 0-4%, above EMA20 and SMA200, 6M perf >= 15, cap >= 2B. Validated live 2026-08-04: totalCount 179, row 1 = NVDA. Volume gate is rvol_effective >= 1.5 at scoring time, NOT a raw server filter (raw cumulative rel-vol reads ~0.5-0.6 mid-session for average volume; it rejected AEHR at 0.78 while +19.7%).",
+      "query": {
+        "filter": [
+          {"left": "market_cap_basic",             "operation": "egreater", "right": 2000000000},
+          {"left": "average_volume_30d_calc",      "operation": "egreater", "right": 1000000},
+          {"left": "Perf.6M",                      "operation": "egreater", "right": 15},
+          {"left": "close",                        "operation": "egreater", "right": "SMA200"},
+          {"left": "close",                        "operation": "egreater", "right": "EMA20"},
+          {"left": "change",                       "operation": "egreater", "right": 0},
+          {"left": "change",                       "operation": "eless",    "right": 4},
+          {"left": "exchange",                     "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
+        ],
+        "options": {"lang": "en"},
+        "markets": ["america"],
+        "sort":   {"sortBy": "market_cap_basic", "sortOrder": "desc"},
         "range":  [0, 25]
       }
     }

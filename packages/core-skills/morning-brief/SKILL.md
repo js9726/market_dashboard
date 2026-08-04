@@ -42,6 +42,39 @@ PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/Codex tabs)
 > **The push to the dashboard is MANDATORY — always run Step 4.**
 > The brief is useless sitting in memory. Step 4 is what puts it live for viewers.
 
+### Step 0.0 — Open TradingView in Chrome — MANDATORY FIRST ACTION
+
+**Do this before Step 0. Every run. No exceptions.**
+
+Open Jie's authenticated TradingView through the Chrome MCP (`mcp__claude-in-chrome__*`,
+his real Chrome with the logged-in session) — not the in-app browser, which has no
+TradingView login:
+
+```
+mcp__claude-in-chrome__navigate  ->  https://www.tradingview.com/watchlists/169793207/
+```
+
+Load the core tool set in ONE ToolSearch call before starting:
+`select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__computer,mcp__claude-in-chrome__read_page`
+
+Why this is first and not optional:
+
+- The authenticated chart panel is the ONLY source for `RS Rating`, `U/D Ratio`, `ADR%`,
+  `Rel. Vol`, `LoD Price`, `Off 52W High`, and `ATR% Multiple From MA`. None of these exist
+  in OpenD klines. On 2026-08-04 a brief scored AVGO from klines alone and missed
+  `RS Rating 67.7` / `U/D 1.0` — the two facts that most argued against the trade.
+- `tradingview-daily-screener/SKILL.md` already makes the authenticated daily+weekly chart a
+  hard gate: **missing either chart caps the ticker at `WATCH`.** The same cap applies here.
+
+Then scan `jie_wiki/tradingview_snapshots/raw` with `scripts/scan_user_snapshots.py`. Every
+newly indexed image is a **user-nominated `PRELIMINARY FOCUS`** candidate for the next US
+session and MUST appear in the Focus List — a nomination is never an automatic GO, but it is
+never silently dropped either. On 2026-08-04 RBRK and TOST were nominated and never made the
+report.
+
+If Chrome MCP cannot reach TradingView, say so explicitly in the brief and cap every affected
+ticker at `WATCH`. Do not silently continue on klines alone.
+
 ### Step 0 — Fetch live prices from moomoo OpenD (preferred over yfinance)
 
 Run `fetch_opend_live.py` to get real-time quotes, pre-market data, and RVOL from the
@@ -149,7 +182,7 @@ Parse them into a clean comma-separated list, e.g. `NVDA, TSLA, AAPL, ...`.
 
 Store as `$WATCHLIST_TICKERS`.
 
-If Chrome is unavailable or the page requires login:
+If Chrome is unavailable or the page requires login (Step 0.0 should already have established the session — treat a failure here as a data gap to report, not a silent fallback):
 - Fall back to the dashboard DB: `GET https://market-dashboard-ivory.vercel.app/api/watchlist/export`
   with `Authorization: Bearer <BRIEF_INGEST_KEY>` (key is in `.env.local`).
 - If still unavailable, proceed with the screener tickers only (Step 2).
@@ -170,8 +203,7 @@ Store the merged list as `$FULL_WATCHLIST` (personal + screener extras, deduplic
 
 Before promoting any screener ticker to `GO`, apply the catalyst-source gate from `jie_wiki/wiki/ticker-catalyst-analysis.md`: recent events, insider/institutional activity, peer/sector trend, next catalysts, analyst actions, and source gaps must be present or explicitly unavailable. Medical/biotech/healthcare/FDA-driven names are rotation/speculation indicators first and stay `WAIT` unless company stage, catalyst, peer confirmation, binary risk, and insider read are clear.
 
-If Chrome is unavailable, skip this step. The screener results from the last daily run
-are already embedded in the snapshot via `tv_screeners.json`.
+If Chrome is unavailable, fall back to the cached `tv_screeners.json` from the last daily run — but state in the brief that the screener read was cached, and cap any ticker whose authenticated chart was never opened at `WATCH`.
 
 ### Step 3 — Claude CLI generates the StructuredBrief itself
 
@@ -314,6 +346,54 @@ Claude CLI uses its own WebSearch tool, emits a StructuredBrief JSON, and pipes
 it through `ingest_to_dashboard.py` (which defaults to provider=claude).
 
 ---
+
+## Journal v2 contract — the brief MUST comply
+
+Source of truth: `jie_wiki/docs/agents/work/ai-managed-trading-journal-v2/spec.md`
+(approved by Jie 2026-08-04). The morning brief feeds the journal, so it uses the same
+vocabulary and the same caps. Divergence here is a defect, not a style choice.
+
+**Regime labels — use these exact five. No invented labels.**
+
+`EARLY RECOVERY` | `RISK-ON / CONFIRMED UPTREND` | `EXTENDED` | `RISK-OFF / BREAKDOWN` | `MIXED/SELECTIVE`
+
+Conflicting signals produce `MIXED/SELECTIVE`. Never a confident-sounding hybrid.
+(Observed defect 2026-08-04: a brief shipped `CAUTIOUSLY-RISK-ON`, which is not a valid label.)
+
+**Personal Traction overlay — always state it; it is separate from the regime.**
+
+`YELLOW` is the default (max 0.5% new trade risk). `GREEN` needs 2 of the last 3 compliant
+trades at +1R or protected with positive combined R (0.75–1.0%). `RED` halves risk
+0.5% -> 0.25% -> 0.125%. A -5% month-to-date drawdown blocks new risk entirely while GO
+candidates stay visible. Rule-breaking trades cannot prove positive traction.
+(Observed defect 2026-08-04: the brief carried no traction label at all.)
+
+**Portfolio caps — the allowed risk is the LOWEST of conviction tier, setup cap, regime,
+traction, portfolio, and event caps.**
+
+| Regime | Total new/open risk |
+|---|---|
+| Risk-Off | 0 |
+| Early Recovery | 0.5% |
+| Risk-On | up to 3.0% |
+| Extended | 0 new |
+
+Conviction 75–84 -> max 0.5%; 85–89 -> 0.75%; 90–100 -> 1.0%.
+
+**GO lifecycle.** An early scan produces `PRELIMINARY FOCUS` only. An execution GO needs a
+refresh within 60 minutes before the open or during the session, and deterministic gates
+revalidated every 15 minutes in Jie's active window. Untriggered signals expire at the close;
+no new paper entries after 00:00 MYT; no automated premarket paper entries at all.
+
+**Owner / validator.** The first of Claude or Codex to complete the full brief owns the
+session; the other validates later. One owner GO is sufficient. A factual error or hard-gate
+failure blocks it — a judgment difference alone is recorded as `JUDGMENT_DIFFERS` and does
+NOT cancel the owner's GO.
+
+**UNPROTECTED positions.** Any live position without an active broker-side stop is marked
+`UNPROTECTED` and blocks new live risk — except holdings explicitly classified `HOLD-EXEMPT`
+in the wiki (currently MTLS; see `jie_wiki/wiki/companies/materialise.md`). Do not report a
+HOLD-EXEMPT position as a stop defect and do not count it against the risk budget.
 
 ## Files
 
