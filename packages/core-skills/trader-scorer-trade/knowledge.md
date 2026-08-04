@@ -5,8 +5,8 @@
   "target": "trader-scorer-trade/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-07-17T16:31:52.934Z",
-  "renderHash": "a71a7726f39de5ff810af1055938bf9370944ff058b5902556db2e18b6d8e7c7",
+  "generatedAt": "2026-08-04T18:02:33.659Z",
+  "renderHash": "1870f9da6f6af2e1df879e70905aef4538da3bb2cdc7515e08182918e61b00c3",
   "sources": [
     {
       "root": "wiki",
@@ -31,7 +31,7 @@
     {
       "root": "wiki",
       "path": "wiki/entry-methods.md",
-      "sha256": "99bf0130bc8783d035bb03e87d79e4105347ed1846ba56248d8e736897769dca"
+      "sha256": "13608ed9c74e994c85ac199df2e6a5402164deddd025ddddd35f2a930d56cfb3"
     },
     {
       "root": "wiki",
@@ -77,7 +77,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trader-style-profiles.md sha256:86b243e654ed
 - wiki:wiki/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
-- wiki:wiki/entry-methods.md sha256:99bf0130bc87
+- wiki:wiki/entry-methods.md sha256:13608ed9c74e
 - wiki:wiki/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
 - wiki:wiki/risk-management.md sha256:f90cf08303b1
@@ -859,6 +859,35 @@ A lockout-rally creates urgency because normal pullbacks do not appear. That urg
 Do not chase the third green candle. A stock holding green while the index is red is watchlist evidence; it becomes actionable only after location, pivot, trigger volume, and risk-to-pattern-stop pass the normal GO gate.
 
 ---
+
+## Reclaim day = trigger day for the pullback lane (2026-08-04 calibration)
+
+Evidence: on 2026-08-03 the screener found HPE, classified it correctly (`PB-21EMA`, 0.47 ATR
+above the 21EMA, RVOL 1.51x), wrote "good location" - and still capped it WATCH for having
+"no actionable price trigger". HPE closed 50.24 that day and 53.15 the next. Same session,
+@PrimeTrading_ (Alex) entered HPE 47.65 / AVGO 381.34 / AEHR 89.44 / NVDA 206.35 on the
+reclaim itself, stops at the 21dma-low, and AVGO paid +2.8R by the time the "confirmation"
+trigger (412.30) fired on 08-04. Of six 08-03 judgment calls, four cost 2.7-10.5% by waiting
+for a breakout-lane trigger on pullback-lane setups; one (HUT) was saved. The errors are
+one-directional.
+
+**Rule.** For `PB-21EMA` / `MA-PULLBACK` / MA-reclaim early entries, **the reclaim IS the
+trigger**:
+
+- A rising-leader pullback that closes back above the 8/10/21-EMA structure on the reclaim day
+  is entryable **that day or at the next open** - no separate breakout pivot is required.
+- Stop = the reclaimed-MA low / reclaim-day LoD (pattern stop, per Rule 2), not a level above.
+- The deciding gate stays **volume expansion + close quality** (see the 2026-07-09
+  calibration) - not the presence of a drawn trigger line.
+- A breakout-lane trigger ("GO only above X") on a pullback-lane setup is a classification
+  error. Name the lane first; the lane defines what "trigger" means.
+- Extra weight when the operator is FLAT and the day matches his approved re-entry rule
+  (long lower whisker + MA-structure reclaim, stock not extended - journal-v2
+  `conversation.md`): surface the early-entry option explicitly instead of defaulting to
+  wait-for-confirmation.
+
+This is the second time this exact miss was calibrated (HPE 2026-07-09, HPE again 2026-08-03).
+There is no third pass; the lane rule above is now hard doctrine.
 
 ## Volume at Entry
 
