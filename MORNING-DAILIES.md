@@ -1,8 +1,10 @@
 # Morning Dailies — Agent Runbook
 
-**Trigger:** when Jie says **"do morning dailies"** (or "morning dailies", "run the dailies", "daily routine here"), the agent (Claude Code **or** Codex) runs this end-to-end: refresh everything the dashboard needs **and** present today's A-List in chat. Idempotent — safe to re-run any time.
+**Trigger:** when Jie says **"run analysis for today"**, **"analyse today's market"**, **"check today's market"**, **"any GO list today?"**, **"run today's analysis"**, **"do morning dailies"**, or semantically similar current-session wording, the agent (Claude Code **or** Codex) runs the complete workflow. Idempotent — safe to re-run any time.
 
-> Keys live in `apps/market_dashboard/.env` (`BRIEF_INGEST_KEY`, `CRON_SECRET`) and as GitHub/Vercel secrets. Prod base URL: `https://market-dashboard-ivory.vercel.app`. All endpoints below are idempotent and degrade gracefully.
+The trigger always means all six deliverables: (1) Finviz Day / Week / Month theme analysis, (2) a strict GO/WATCH/PASS list, (3) Jie's configured TradingView screener refresh and review, (4) authenticated TradingView daily/weekly snapshots for every serious GO candidate, (5) verified morning-brief updates for both Claude and Codex, and (6) final daily-screener persistence plus an idempotent Telegram delivery receipt. Do not silently reduce it to only a market summary, only one provider's brief, or only the automated screener score.
+
+> Keys live in `apps/market_dashboard/.env` and as GitHub/Vercel secrets. The final-run endpoint uses `SCREENER_INGEST_KEY` (or controlled `BRIEF_INGEST_KEY` fallback) plus `TELEGRAM_GO_BOT_TOKEN` / `TELEGRAM_GO_CHAT_ID`. Prod base URL: `https://market-dashboard-ivory.vercel.app`. All endpoints below are idempotent and fail closed.
 
 ---
 
@@ -41,10 +43,37 @@ This is the part Jie wants in chat. Compose it from the freshest data:
 
 Present as a compact table: `Ticker · Badge · Setup · Score · RVOL · Entry/Stop/Target · (HELD: day-0→14 status + Realized-vs-R + Soft-vs-Hard)`. Lead with the single highest-conviction standout.
 
-## Step 4 — Confirm
+## Step 4 — Morning briefs for Claude and Codex
+
+Run the portable **`morning-brief`** skill against the same grounded evidence:
+
+1. Generate and ingest the Claude StructuredBrief as `provider=claude`.
+2. Generate and ingest the Codex StructuredBrief as `provider=openai`.
+3. Independently read back both `MorningBriefCache` rows and record each row's ID, bucket, `hasStructuredJson`, `generatedBy`, and error state.
+
+DeepSeek/Gemini may continue to refresh on their own schedule, but they do not substitute for either required Claude/Codex receipt. One successful provider does not prove that the other was updated.
+
+## Step 5 — Persist the final run and notify Telegram
+
+After both morning-brief receipts have been added to the dated `report.md`, run the shared screener packager with `-Strict -Post -GeneratedBy <producer>`. The resulting `tradingview-daily-screener/v2` artifact is the final authority; `AListCandidate` and raw machine screener labels are not.
+
+The ingest endpoint stores `DailyScreenerRun` + chunks and sends `candidates.goList` through the dedicated Telegram bot. Identical run-date/list hashes are idempotent across Codex, Claude, and Gemini. A corrected final list sends a new notification; an empty GO list sends an explicit “No GO tickers” message. `not_configured` and `failed` are blockers.
+
+The MooMoo SIMULATE bridge reads only `/api/daily-screener/paper-signals`, which is derived from this persisted strict artifact. It never consumes raw `AListCandidate` rows. GO rows must contain one numeric entry, stop, and target with `stop < entry < target`; stale and already-consumed signals fail closed.
+
+Recheck conditional WATCH names in the afternoon decision window. If a documented trigger fires, repeat the authenticated chart, catalyst, risk, and timing gates and repost the corrected strict artifact. A price cross by itself is not permission for the paper bridge to buy.
+
+This is a trading-dashboard workflow only. Do not use Walplus Cloud Run, BigQuery, buckets, service accounts, or secrets.
+
+## Step 6 — Confirm
 
 - `screeners/refresh` reported `recCandidates: N` (REC rows upserted for today).
 - `sync-held-alist` reported created/linked counts; `track-positions` reported `processed: N`.
+- Finviz Day / Week / Month theme findings were reconciled with breadth and live ETF/index action.
+- Every proposed GO cites authenticated TradingView daily and weekly screenshots.
+- `MorningBriefCache` read-back confirms current structured rows for both `provider=claude` and `provider=openai`.
+- `DailyScreenerRun` ingest returned a run ID and Telegram returned `sent`, `already_sent`, or `in_progress`.
+- `/api/daily-screener/paper-signals` read-back names the same run/hash and the SIMULATE bridge dry-run reports the same GO tickers (or the same explicit empty list).
 - The dashboard A-List (`/dashboard/trades` → A-List) + Conviction Desk are now current. Optionally `GET /api/a-list/today` (owner session) to verify the merged board.
 
 ---
@@ -52,7 +81,8 @@ Present as a compact table: `Ticker · Badge · Setup · Score · RVOL · Entry/
 ## Notes
 
 - **Fail-closed on stale data:** for any A-List / entry analysis, pull live OpenD first; if OpenD is unreachable or a required field is stale/missing, **STOP and flag** — never present levels or push numbers off stale data (see `jie_wiki/skills/trade-analyser/SKILL.md` Step 0.6).
-- **REC source of truth** is the TV-screener scored hits (the morning brief does NOT carry per-ticker score+rvol). The serverless `screeners/refresh` ingests REC via `ingestScreenerRec()`; the GH pre-open `tv_screener_fetch.py` is a redundant trigger (needs `DASHBOARD_URL`+`BRIEF_INGEST_KEY` in its step env to also push).
+- **REC source of truth** is the TV-screener scored hits (the morning brief does NOT carry per-ticker score+rvol). The serverless `screeners/refresh` ingests REC via `ingestScreenerRec()`; the GH pre-open `tv_screener_fetch.py` is a redundant trigger (needs `DASHBOARD_URL`+`BRIEF_INGEST_KEY` in its step env to also push). A REC row is not automatically a final GO; the chart/catalyst/risk gates can downgrade it.
+- **Telegram and paper source of truth** is only the final v2 artifact's `candidates.goList`. The bot and SIMULATE bridge deliver/execute; they do not analyse. Any approved producer, including Gemini in a cloud job, must satisfy the same artifact schema and hard gates.
 - **HELD rows are ungated** — every real position is tracked regardless of entry quality; the entry grade is a learning overlay, not an admission test.
 - Auto-journal of closed trades + the nightly "what to learn" digest run post-close (`journal_close.yml` + `/api/journal/digest`) — no action needed here.
 - This runbook is committed so both Claude Code (`CLAUDE.md`) and Codex (`AGENTS.md`) can act on the trigger; the local-only `DAILY.md` has the owner's manual/desk variant.

@@ -2,10 +2,11 @@
 """
 paper_trader.py — SIMULATE-ONLY forward-validation trader (2026-07-16).
 
-Purpose: forward-validate the A-list strategy with real fills in the moomoo
-PAPER account. Reads currently-actionable ENTER signals from the dashboard
-(`GET /api/alist/actionable`, gate-vetted server-side since commit 5064ea79),
-places simulated entry orders, manages protective stops, and syncs the paper
+Purpose: forward-validate the final daily GO strategy with real fills in the
+moomoo PAPER account. Reads only the latest persisted, evidence-backed
+`tradingview-daily-screener/v2` GO list from
+`GET /api/daily-screener/paper-signals`, places simulated entry orders, manages
+protective stops, and syncs the paper
 book to the dashboard as the `moomoo Paper (SIM)` broker account so holdings
 and performance are visible (excluded from the real equity curve by isLive).
 
@@ -15,6 +16,7 @@ SAFETY INVARIANTS (do not weaken):
     get_acc_list() (trd_env must be SIMULATE) before any order call.
   * fills are NEVER posted to the dashboard (fills=[]) so paper activity can
     never reach the real trade journal / reconciler.
+  * raw AListCandidate/ENTER rows are never execution authority.
   * fail-closed: no signals endpoint, no OpenD, or account-verify mismatch
     => exit non-zero, place nothing.
 
@@ -85,20 +87,28 @@ def save_state(state: dict[str, Any]) -> None:
 
 
 def fetch_signals(cfg) -> list[dict[str, Any]]:
-    key = cfg.dashboard.brief_ingest_key or os.environ.get("BRIEF_INGEST_KEY")
+    key = (
+        os.environ.get("SCREENER_INGEST_KEY")
+        or cfg.dashboard.brief_ingest_key
+        or os.environ.get("BRIEF_INGEST_KEY")
+    )
     if not key:
         # Operator-local fallback: the app's main secrets file (same file the
         # morning-brief _env_loader chains to).
         envf = Path(__file__).resolve().parents[2] / "apps" / "market_dashboard" / ".env.local"
         if envf.exists():
+            values: dict[str, str] = {}
             for line in envf.read_text(encoding="utf-8-sig").splitlines():
-                if line.startswith("BRIEF_INGEST_KEY="):
-                    key = line.split("=", 1)[1].strip().strip('"')
-                    break
+                if "=" not in line or line.lstrip().startswith("#"):
+                    continue
+                name, value = line.split("=", 1)
+                if name in {"SCREENER_INGEST_KEY", "BRIEF_INGEST_KEY"}:
+                    values[name] = value.strip().strip('"')
+            key = values.get("SCREENER_INGEST_KEY") or values.get("BRIEF_INGEST_KEY")
     if not key:
-        raise SystemExit("FAIL-CLOSED: no BRIEF_INGEST_KEY available for the signals endpoint")
+        raise SystemExit("FAIL-CLOSED: no screener/brief ingest key available for the signals endpoint")
     r = requests.get(
-        f"{cfg.dashboard.url}/api/alist/actionable",
+        f"{cfg.dashboard.url}/api/daily-screener/paper-signals",
         headers={"Authorization": f"Bearer {key}"},
         timeout=30,
     )
@@ -106,7 +116,19 @@ def fetch_signals(cfg) -> list[dict[str, Any]]:
     body = r.json()
     if not body.get("ok"):
         raise SystemExit(f"FAIL-CLOSED: signals endpoint returned {body}")
-    return body.get("signals", [])
+    if body.get("authority") != "tradingview-daily-screener/v2":
+        raise SystemExit("FAIL-CLOSED: signals endpoint did not assert strict v2 authority")
+    signals = body.get("signals", [])
+    if not isinstance(signals, list):
+        raise SystemExit("FAIL-CLOSED: signals endpoint returned a non-list signals field")
+    reason = body.get("reason")
+    run = body.get("run") or {}
+    log(
+        "strict final GO feed: "
+        f"run={run.get('runDate') or 'none'} ageHours={run.get('ageHours', 'n/a')} "
+        f"reason={reason or 'actionable'}"
+    )
+    return signals
 
 
 def verify_paper_account(tctx: OpenSecTradeContext) -> None:
@@ -140,7 +162,7 @@ def main() -> int:
     if args.flatten:
         log("FLATTEN MODE — closing every paper position; no entries this run")
     else:
-        log(f"actionable ENTER signals: {len(signals)}" + (f" -> {[s['ticker'] for s in signals]}" if signals else ""))
+        log(f"strict final GO signals: {len(signals)}" + (f" -> {[s['ticker'] for s in signals]}" if signals else ""))
 
     state = load_state()
     qctx = OpenQuoteContext(host=HOST, port=PORT)
@@ -185,7 +207,14 @@ def main() -> int:
         # ── Entries ──────────────────────────────────────────────────────────
         for s in signals:
             t = s["ticker"]
+            signal_id = str(s.get("signalId") or "")
+            if not signal_id:
+                log(f"  {t}: missing deterministic signalId — fail-closed skip")
+                continue
             entry, stop = float(s["entryZone"]), float(s["stop"])
+            if state.get(t, {}).get("signalId") == signal_id:
+                log(f"  {t}: final GO signal already consumed — skip")
+                continue
             if t in positions or t in open_orders:
                 log(f"  {t}: already in book/ordered — skip")
                 continue
@@ -213,7 +242,16 @@ def main() -> int:
                                          order_type=OrderType.NORMAL, trd_env=TrdEnv.SIMULATE, acc_id=PAPER_ACC_ID)
             if ret == RET_OK:
                 placed.append(t)
-                state[t] = {"entry": entry, "stop": stop, "qty": qty, "placedAt": dt.datetime.now(dt.timezone.utc).isoformat(), "signalConviction": s.get("conviction")}
+                state[t] = {
+                    "entry": entry,
+                    "stop": stop,
+                    "qty": qty,
+                    "placedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+                    "signalConviction": s.get("conviction"),
+                    "signalId": signal_id,
+                    "runDate": s.get("runDate"),
+                    "runId": s.get("runId"),
+                }
                 log(f"  {t}: BUY {qty} @ {limit} placed (stop {stop})")
             else:
                 log(f"  {t}: place_order FAILED: {resp}")
