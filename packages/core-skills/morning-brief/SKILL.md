@@ -169,6 +169,79 @@ Output is urgency-sorted: `CUT` (regular-session stop broken) → `CUT-ON-OPEN`
   see position risk alongside the market posture. Never place or modify orders — give the
   levels; the operator executes.
 
+### Step 0.8 — THEME RADAR — MANDATORY (this step exists because it was missed)
+
+**Failure this prevents (2026-08-05).** Cybersecurity ran **+40% to +102% over three months**
+while SPY did +7.3%. It is the operator's single largest thematic exposure — OKTA, NET, CRWD,
+PANW, ZS, TENB, RBRK all appear in his journal. The brief never named it once across **six
+consecutive sessions (2026-07-21 -> 2026-08-04), every one of which produced an EMPTY GO list.**
+`CIBR` was in `_DEFAULT_TICKERS` the entire time. The quote was fetched every morning and
+discarded, because `sectorsThemes` was only ever populated with sector ETFs. This was an
+analysis gap, not a data gap. Do not let it recur.
+
+**Sector ETF != theme.** XLK does not tell you cybersecurity is leading. Neither does the
+screener's `industry` field — `Packaged Software` covers VEEV, TOST, CRWD and ZS, which trade
+nothing alike. Compute the theme explicitly.
+
+**0.8a — Rank themes by relative strength.** For each theme below pull the proxy ETF plus 2-4
+constituents, and compute 1W / 1M / 3M return **relative to SPY**. Rank descending. A theme is
+LEADING when its 1M and 3M both beat SPY and its proxy ETF is above a rising 21EMA.
+
+| Theme | Proxy | Constituents |
+|---|---|---|
+| Cybersecurity | `CIBR`, `HACK` | CRWD, PANW, ZS, OKTA, NET, FTNT, S, CYBR, TENB, RBRK |
+| Semis / AI silicon | `SMH` | NVDA, AVGO, AMD, MRVL, ALAB, CRDO, ARM |
+| Software / SaaS | `IGV` | SNOW, DDOG, MDB, VEEV, TOST, U |
+| Nuclear / power | `NLR` | CEG, LEU, SMR, TLN, VRT |
+| Crypto-adjacent | `WGMI` | HUT, CIFR, GLXY, CRCL, IREN |
+| Quantum / space | — | IONQ, RGTI, ASTS, RKLB |
+| Biotech / health | `XBI`, `IBB`, `XLV` | **INDICATOR ONLY - see 0.8c** |
+
+**0.8b — Derive the theme of HIS OWN book.** Read live holdings (Step 0.7) plus the journal's
+recent tickers and bucket them by theme. Report: *"Your book is currently N% <theme>; that theme
+is <LEADING|LAGGING> at <x>% 1M vs SPY <y>%."* If his largest exposure sits in a lagging theme,
+say so plainly. If a LEADING theme has zero representation in his book, say that too - that is
+the miss that generates FOMO.
+
+**0.8c — Health/biotech is an indicator, never an auto-theme.** Defensive pharma leading is a
+risk-off tell. Exclude health from theme-driven GO promotion unless the operator explicitly
+opts in, per `wiki/` medical-theme doctrine. (Verified 2026-08-05: XLV +0.1% 1M vs cyber +5.4%
+to +21.7% - the exclusion was correct.)
+
+**0.8d — Extension gate on every theme name.** Compute `(price - EMA21) / ATR14`. Operator's own
+216-trade record:
+
+| Zone | Verdict | Evidence |
+|---|---|---|
+| `< 0.5 ATR` (at/below MA) | HALF SIZE, requires volume expansion + close confirmation | n=17, PF **0.31** |
+| `0.5 - 2.5 ATR` | GREEN - full size | n=35, PF **1.69 - 4.31** |
+| `> 2.5 ATR` | **BLOCKED** | n=6, **0 wins** |
+
+A LEADING theme whose names are all `>2.5 ATR` is a theme to WAIT on, not chase. Say that
+explicitly rather than promoting an extended name because the theme is hot.
+
+**0.8e — Market-edge confluence (operator's A+ setup).** Flag a name only when ALL FOUR hold:
+
+1. Pullback **holds the moving averages** (launchpad intact)
+2. **Volume dries up on the pullback** - contraction, not distribution
+3. **RS holds or rises while the market drops** - the deciding tell
+4. **Theme is performing** (ex-health)
+
+Absent any one, it is WATCH, not GO.
+
+**0.8f — Empty-GO-list self-check - HARD REQUIREMENT.** If the GO list is empty for a
+**third consecutive session**, the brief MUST state:
+
+> "GO list empty N sessions running. This may be a broken gate rather than a quiet tape.
+> Leading theme is <X> at <y>% 1M. Names in the 0.5-2.5 ATR green zone right now: <list>."
+
+Six straight empty GO lists while cyber ran +40-102% is a system defect, not selectivity.
+Never present a persistently empty GO list as market caution without this check.
+
+**0.8g — Honesty contract.** End every brief with what was NOT verified: charts not opened,
+feeds stale, catalysts unconfirmed, themes not scanned. An unstated gap reads as a cleared
+check. Never imply coverage that did not happen.
+
 ### Step 1 — Read Jie's TV Watchlist via Chrome
 
 Navigate Chrome to the watchlist URL. The user must be logged in to TradingView in Chrome.
