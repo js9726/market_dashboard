@@ -218,6 +218,25 @@ is <LEADING|LAGGING> at <x>% 1M vs SPY <y>%."* If his largest exposure sits in a
 say so plainly. If a LEADING theme has zero representation in his book, say that too - that is
 the miss that generates FOMO.
 
+**0.8b-ii — Finviz FAIL-CLOSED + Chrome MCP escalation (MANDATORY).**
+
+Finviz changed its markup **twice on 2026-08-05** — the quote page moved to
+`a.quote-header_category`, and the groups table moved to a client-rendered JSON blob.
+The scripts parse the JSON and **fail loudly** rather than returning blanks. If you see
+`parsed 0 industries` or `UNCLASSIFIED` on liquid common stock, the scraper is broken:
+
+1. **Escalate to Chrome MCP** — open `https://finviz.com/groups.ashx?g=industry&v=210`
+   and `https://finviz.com/quote.ashx?t=<TICKER>` in the operator's authenticated Chrome
+   (`mcp__claude-in-chrome__navigate` + `get_page_text`) and read the rendered values.
+   Chrome sees the page after JS runs, so it survives markup changes that break regex.
+2. **Never substitute a sector ETF** for the missing industry data — that is the exact
+   lens error that hid cybersecurity for six sessions.
+3. **Say so in the brief.** A missing industry read is a stated gap, never a silent blank.
+
+A zero-row parse is a BROKEN SCRAPER, not a flat market. `build_data.py` returned empty
+industry lists for an unknown period before this was caught, and downstream that is
+indistinguishable from a quiet tape.
+
 **0.8c — Health/biotech is an indicator, never an auto-theme.** Defensive pharma leading is a
 risk-off tell. Exclude health from theme-driven GO promotion unless the operator explicitly
 opts in, per `wiki/` medical-theme doctrine. (Verified 2026-08-05: XLV +0.1% 1M vs cyber +5.4%
