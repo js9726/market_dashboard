@@ -218,7 +218,35 @@ is <LEADING|LAGGING> at <x>% 1M vs SPY <y>%."* If his largest exposure sits in a
 say so plainly. If a LEADING theme has zero representation in his book, say that too - that is
 the miss that generates FOMO.
 
-**0.8b-ii — Finviz FAIL-CLOSED + Chrome MCP escalation (MANDATORY).**
+**0.8b-ii — Chrome MCP Finviz read is a DEFAULT SECOND SOURCE, not just a fallback.**
+
+Every run, in parallel with the scripts, open Finviz in the operator's authenticated Chrome
+and capture it — `mcp__claude-in-chrome__navigate` then `get_page_text`, plus a
+`computer{action:"screenshot"}` saved alongside the run artifacts:
+
+```
+https://finviz.com/groups.ashx?g=industry&v=210&o=-perf1m     # industry leadership
+https://finviz.com/quote.ashx?t=<TICKER>                      # per-name confirmation
+```
+
+Two independent reads of the same fact. **If the scripted number and the Chrome read
+disagree, trust Chrome** (it sees the page after JS runs) and report the divergence — that
+disagreement is itself the early warning that the parser has broken again. The screenshot is
+the audit trail: a claim about industry leadership should be provable from a saved image, not
+only from a regex that may have silently started returning nothing.
+
+**Also mandatory: refresh `watchlist.json` from the live TradingView watchlist in Step 0.0.**
+It is a CACHE, never a maintained list. On 2026-08-05 the screener universe held 47 tickers
+and **none** of CRWD/NET/DDOG/PANW/ZS/OKTA/TENB/S/HPE/FFIV while cybersecurity was the #1
+industry — holdings + screener alone **cannot see the operator's theme**. The file warns when
+it is >3 days stale; a stale watchlist is a reported gap, never a silent one.
+
+**Red flags that mean the scraper broke — escalate to Chrome immediately:**
+`parsed 0 industries`, or `UNCLASSIFIED` on a liquid common stock. Never substitute a sector
+ETF for missing industry data — that is the exact lens error that hid cybersecurity for six
+sessions. A zero-row parse is a BROKEN SCRAPER, not a flat market.
+
+**Legacy note (kept deliberately):**
 
 Finviz changed its markup **twice on 2026-08-05** — the quote page moved to
 `a.quote-header_category`, and the groups table moved to a client-rendered JSON blob.
