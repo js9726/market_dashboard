@@ -42,6 +42,34 @@ PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/Codex tabs)
 > **The push to the dashboard is MANDATORY — always run Step 4.**
 > The brief is useless sitting in memory. Step 4 is what puts it live for viewers.
 
+### Step 0.0-PRE — RUN PREFLIGHT. NO RECEIPT, NO BRIEF.
+
+```bash
+python preflight.py    # exit 0 = proceed, exit 1 = BLOCKED
+```
+
+Everything below used to be prose, and prose is advice an agent skips under time
+pressure — which is how six consecutive empty GO lists shipped while cybersecurity was
+the #1 industry. `preflight.py` makes the mandatory checks executable and writes
+`preflight_receipt.json`. **If it exits non-zero, do not generate a brief. Report the
+blocked checks to Jie instead.**
+
+It enforces, in code:
+
+| Check | Hard? | What it catches |
+|---|---|---|
+| `focus_list` | yes | Scans `jie_wiki/tradingview_snapshots/raw` for **today/yesterday-dated** charts. **This is Jie's focus list — he snaps charts there deliberately.** Auto-merges them into `watchlist.json`. |
+| `watchlist` | yes | Exists, and today's focus names were folded in |
+| `themes` | yes | Finviz returns >100 industries. Fewer = **scraper broken, not a flat market** |
+| `universe` | yes | Every focus ticker actually reached the classified universe, and flags `UNCLASSIFIED` liquid names |
+| `empty_go` | warn | Counts consecutive empty GO lists. **3+ forces the brief to say it may be a broken gate**, name the leading theme, and list green-zone names |
+
+Quote the receipt hash in the brief. A brief without one is unverified by definition.
+
+**The agent does the clustering, not Jie.** He should never be asked to bucket names by
+theme — that is the job this pipeline exists to do, and asking him to do it by eye
+reintroduces the exact miss it was built to prevent.
+
 ### Step 0.0 — Open TradingView in Chrome — MANDATORY FIRST ACTION
 
 **Do this before Step 0. Every run. No exceptions.**
