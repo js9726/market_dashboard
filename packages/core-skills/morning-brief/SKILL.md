@@ -197,7 +197,22 @@ LEADING when its 1M and 3M both beat SPY and its proxy ETF is above a rising 21E
 | Quantum / space | — | IONQ, RGTI, ASTS, RKLB |
 | Biotech / health | `XBI`, `IBB`, `XLV` | **INDICATOR ONLY - see 0.8c** |
 
-**0.8b — Derive the theme of HIS OWN book.** Read live holdings (Step 0.7) plus the journal's
+**0.8b — Derive the theme of HIS OWN book — AUTOMATICALLY, never from a hand-typed list.**
+
+```bash
+python theme_radar.py --book OKTA,FFIV,MTLS      # Finviz auto-classifies every ticker
+python finviz_classify.py --industries           # all 144 industries ranked by 1M
+```
+
+`finviz_classify.py` pulls sector/industry per ticker from Finviz (30-day cache) and joins it
+to the live 144-industry performance ranking. **A hardcoded theme->ticker dict is forbidden as
+the primary classifier** — Jie flagged 2026-08-05 that any ticker missing from such a map falls
+through as "unthemed", which is the identical stale-list failure that caused the original
+cyber blind spot. The curated `THEMES` map in `theme_radar.py` is an OVERLAY that only adds
+resolution (e.g. "cybersecurity" is finer than Finviz's `Software - Infrastructure`); it never
+gates coverage. Report each holding's industry, its **rank out of 144**, and its 1M performance.
+
+Also read live holdings (Step 0.7) plus the journal's
 recent tickers and bucket them by theme. Report: *"Your book is currently N% <theme>; that theme
 is <LEADING|LAGGING> at <x>% 1M vs SPY <y>%."* If his largest exposure sits in a lagging theme,
 say so plainly. If a LEADING theme has zero representation in his book, say that too - that is

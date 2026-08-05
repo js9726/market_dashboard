@@ -150,15 +150,42 @@ def main() -> int:
 
     if a.book:
         held = [t.strip().upper() for t in a.book.split(",") if t.strip()]
-        buckets: dict[str, list[str]] = {}
+        # AUTOMATIC: Finviz classifies every ticker. No hand-maintained list, so a
+        # name can never silently fall through as "unthemed" (Jie, 2026-08-05).
+        try:
+            from finviz_classify import classify, industry_performance
+            cls = classify(held)
+            perf = {r["industry"]: r for r in industry_performance()}
+        except Exception as e:
+            print(f"finviz classify unavailable: {e}", file=sys.stderr)
+            cls, perf = {}, {}
+        by_ind: dict[str, list[str]] = {}
         for t in held:
-            for theme, (px, names) in THEMES.items():
-                if t in names or t in px:
-                    buckets.setdefault(theme, []).append(t)
+            ind = (cls.get(t) or {}).get("industry") or "UNCLASSIFIED"
+            by_ind.setdefault(ind, []).append(t)
+        ranked = sorted(perf.values(), key=lambda r: -r["perf_1m"])
+        rank_of = {r["industry"]: i + 1 for i, r in enumerate(ranked)}
         payload["book"] = {
             "held": held,
-            "by_theme": buckets,
-            "unthemed": [t for t in held if not any(t in v for v in buckets.values())],
+            "by_industry": {
+                ind: {
+                    "tickers": ts,
+                    "perf_1w": perf.get(ind, {}).get("perf_1w"),
+                    "perf_1m": perf.get(ind, {}).get("perf_1m"),
+                    "rank": rank_of.get(ind),
+                    "of": len(ranked) or None,
+                }
+                for ind, ts in by_ind.items()
+            },
+            # curated overlay only ADDS resolution; it never gates coverage
+            "theme_overlay": {
+                th: [t for t in held if t in names or t in px]
+                for th, (px, names) in THEMES.items()
+                if any(t in names or t in px for t in held)
+            },
+            "top_industries": [
+                {k: r[k] for k in ("industry", "perf_1w", "perf_1m")} for r in ranked[:5]
+            ],
         }
 
     if a.out:
@@ -181,13 +208,22 @@ def main() -> int:
                   f"Do not chase — wait for a pullback into the green zone.")
     if payload.get("book"):
         b = payload["book"]
-        print(f"\n  YOUR BOOK: {', '.join(b['held'])}")
-        for theme, ts in b["by_theme"].items():
-            st = next((x["status"] for x in out if x["theme"] == theme), "?")
-            print(f"    {theme:18s} {', '.join(ts):24s} -> theme is {st}")
-        led = [x["theme"] for x in out if x["status"] == "LEADING" and x["theme"] not in b["by_theme"]]
-        if led:
-            print(f"    NOT REPRESENTED in your book but LEADING: {', '.join(led)}")
+        print(f"\n  YOUR BOOK (auto-classified via Finviz — no manual list): {', '.join(b['held'])}")
+        for ind, v in sorted(b["by_industry"].items(),
+                             key=lambda kv: (kv[1]["rank"] is None, kv[1]["rank"] or 999)):
+            r = f"#{v['rank']}/{v['of']}" if v["rank"] else "unranked"
+            m = f"{v['perf_1m']:+.1f}% 1M" if v["perf_1m"] is not None else "no perf"
+            print(f"    {ind[:38]:39s} {', '.join(v['tickers']):20s} {r:>9s}  {m}")
+        if b["theme_overlay"]:
+            print("    overlay:", "; ".join(f"{k}: {', '.join(v)}" for k, v in b["theme_overlay"].items()))
+        print("\n  TOP INDUSTRIES NOW:")
+        held_inds = set(b["by_industry"])
+        for r in b["top_industries"]:
+            mark = "  <- you hold this" if r["industry"] in held_inds else ""
+            print(f"    {r['industry'][:38]:39s} {r['perf_1w']:+7.2f}% 1W {r['perf_1m']:+7.2f}% 1M{mark}")
+        missing = [r["industry"] for r in b["top_industries"] if r["industry"] not in held_inds]
+        if missing:
+            print(f"    NOT in your book but top-ranked: {', '.join(missing[:3])}")
     print()
     return 0
 
