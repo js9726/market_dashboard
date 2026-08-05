@@ -53,8 +53,12 @@ _DEFAULT_TICKERS = [
     "SPY", "QQQ", "IWM", "DIA",
     # Sector ETFs
     "XLK", "SMH", "XLF", "XLC", "XLY", "XLRE", "XLI", "XLE", "XLV", "XLP", "XLU",
-    # Thematic
-    "CIBR", "IGV", "IBB",
+    # Thematic — THEME RADAR proxies (SKILL.md Step 0.8). These are NOT decoration:
+    # every one must be ranked vs SPY in the brief. CIBR sat in this list unused
+    # from 2026-07-21 to 2026-08-04 while cybersecurity ran +40-102% over 3 months.
+    "CIBR", "HACK", "IGV", "IBB", "XBI", "NLR", "WGMI",
+    # Cyber constituents — operator's largest thematic exposure
+    "CRWD", "PANW", "ZS", "OKTA", "NET", "FTNT",
     # Rates / commodities proxy
     "TLT", "GLD",
     # Mega-cap / key momentum names
