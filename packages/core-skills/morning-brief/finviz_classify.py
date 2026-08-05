@@ -181,6 +181,25 @@ def universe(screeners_json: str | None = None, extra: list[str] | None = None) 
     except Exception as e:
         print(f"  (holdings unavailable: {e})", file=sys.stderr)
 
+    # operator WATCHLIST — the gap that mattered. On 2026-08-05 the screener universe
+    # held 47 tickers and NONE of CRWD/NET/DDOG/PANW/ZS/OKTA/TENB/S/HPE/FFIV, while
+    # cybersecurity was the #1 industry. Holdings + screener alone CANNOT see the theme.
+    # watchlist.json is a CACHE refreshed by Step 0.0 via Chrome MCP, never a hand list.
+    try:
+        wl = Path(__file__).with_name("watchlist.json")
+        if wl.exists():
+            blob = json.loads(wl.read_text(encoding="utf-8"))
+            out |= {t.upper() for t in blob.get("tickers", [])}
+            from datetime import date
+            upd = blob.get("updated")
+            if upd:
+                age = (date.today() - date.fromisoformat(upd)).days
+                if age > 3:
+                    print(f"  WARNING: watchlist.json is {age}d stale — refresh via Chrome MCP "
+                          f"(Step 0.0). Theme coverage may be incomplete.", file=sys.stderr)
+    except Exception as e:
+        print(f"  (watchlist unavailable: {e})", file=sys.stderr)
+
     # screener hits
     for cand in ([screeners_json] if screeners_json else []) + [
         "tv_screeners.json",
