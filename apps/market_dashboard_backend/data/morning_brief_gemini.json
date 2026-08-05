@@ -1,476 +1,488 @@
 {
   "mood": {
-    "label": "RISK-ON",
-    "posture": "GO",
-    "summary": "Markets are hitting record highs, fueled by strong tech and industrial earnings and a significant drop in oil prices on hopes of a U.S.-Iran deal. The tape is strong, but watch for signs of extension."
+    "label": "CAUTIOUSLY-RISK-ON",
+    "posture": "RAISE-THE-BAR",
+    "summary": "Global markets are rallying on strong tech earnings and hopes of a US-Iran deal, but significant post-earnings drops in names like SPCX and AMD on spending/guidance concerns warrant a selective approach."
   },
   "breadth": {
-    "up": null,
-    "down": null
+    "up": 1859,
+    "down": 905
   },
   "fearGreed": {
-    "score": null,
-    "label": "Greed"
+    "score": 42,
+    "label": "Fear"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": 0.56,
+      "changePct": 0.4,
       "note": "futures",
-      "citation": "Source: TheStreet 10:31 ET"
+      "citation": "Source: San Antonio Express-News"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 1.13,
+      "changePct": 0.2,
       "note": "futures",
-      "citation": "Source: TheStreet 10:31 ET"
+      "citation": "Source: San Antonio Express-News"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": 1.3,
+      "changePct": 0.3,
       "note": "futures",
-      "citation": "Source: TheStreet 10:31 ET"
+      "citation": "Source: San Antonio Express-News"
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
       "level": null,
-      "changePct": 1.73,
+      "changePct": null,
       "note": "futures",
-      "citation": "Source: TheStreet 10:31 ET"
+      "citation": null
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility Index",
-      "level": null,
-      "changePct": null,
-      "note": "level unavailable"
+      "name": "Volatility",
+      "level": 15.86,
+      "changePct": -0.8,
+      "note": "previous close",
+      "citation": "Source: Zacks Investment Research"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Yr Treasury",
-      "level": 4.63,
-      "changePct": null,
-      "note": "yield %",
-      "citation": "Source: Associated Press 07:06 ET"
+      "name": "10-Yr Yield",
+      "level": 4.68,
+      "changePct": -1.27,
+      "note": "live",
+      "citation": "Source: Barchart.com"
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil (WTI)",
-      "level": 80.34,
-      "changePct": -5.0,
-      "note": "per barrel",
-      "citation": "Source: 24/7 Wall St. 08:00 ET"
+      "name": "Crude Oil",
+      "level": 80.28,
+      "changePct": 1.15,
+      "note": "live",
+      "citation": "Source: San Antonio Express-News"
     }
   ],
-  "indicesNarrative": "US indices are set for a strong open, with the S&P 500 hitting new intraday records, driven by a powerful rally in tech and industrial names. Falling Treasury yields and a sharp drop in oil prices are providing a significant tailwind, boosting broad market sentiment and risk appetite.",
-  "technicals": {
-    "SPY": {
-      "close": null,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": null,
-      "ma200": null,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": null,
-      "bear_cross_imminent": null,
-      "overbought": true,
-      "oversold": false,
-      "entry_risk": "EXTREME-EXTENDED"
-    },
-    "QQQ": {
-      "close": null,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": null,
-      "ma200": null,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": null,
-      "bear_cross_imminent": null,
-      "overbought": true,
-      "oversold": false,
-      "entry_risk": "EXTREME-EXTENDED"
-    }
-  },
-  "technicalsNarrative": "With the S&P 500 pushing to new all-time highs, indices are in an EXTREME-EXTENDED state. Chasing new long entries here is dangerous due to overbought conditions. It is prudent to wait for a pullback or consolidation to establish a lower-risk entry.",
+  "indicesNarrative": "US futures are pointing to a higher open, building on yesterday's record-setting session for the Dow and S&P 500. The rally is supported by strong overnight performance in Asian tech and easing geopolitical tensions, which has caused oil to pull back from recent highs. Volatility remains subdued, but traders are watching key economic data today for further direction.",
+  "technicals": null,
+  "technicalsNarrative": "Technical data was not available at the time of generation. Cannot assess entry risk or momentum indicators.",
   "sectorsThemes": [
     {
       "symbol": "XLK",
       "name": "Technology",
-      "changePct": null,
+      "changePct": 4.2,
       "rs": null,
-      "note": "Leading the market higher on strong AI-related earnings."
+      "note": "Led yesterday's rally, fueled by strong earnings and AI enthusiasm."
     },
     {
-      "symbol": "SMH",
-      "name": "Semiconductors",
-      "changePct": null,
+      "symbol": "XLY",
+      "name": "Consumer Discretionary",
+      "changePct": 3.3,
       "rs": null,
-      "note": "Broad strength with storage chip stocks rallying pre-market."
+      "note": "Strong performance, indicating healthy consumer sentiment."
     },
     {
       "symbol": "XLI",
       "name": "Industrials",
-      "changePct": null,
+      "changePct": 3.4,
       "rs": null,
-      "note": "Strong performance driven by bellwethers like Caterpillar reporting record results."
+      "note": "Rallied significantly, showing broad market strength."
     },
     {
       "symbol": "XLE",
       "name": "Energy",
-      "changePct": null,
+      "changePct": -1.0,
       "rs": null,
-      "note": "Under pressure as crude oil prices fall sharply on geopolitical developments."
+      "note": "Lagged the market as oil prices fell on hopes of a US-Iran deal to reopen the Strait of Hormuz."
     }
   ],
-  "sectorsNarrative": "A clear risk-on rotation is underway, with money flowing into Technology and Industrials, fueled by strong earnings. Energy is the notable laggard due to the sharp drop in oil prices.",
-  "industryNarrative": "Semiconductors and AI-related software are showing immense strength, with names like Palantir and Micron leading the charge. Heavy equipment and machinery are also outperforming on strong global demand signals from Caterpillar's report.",
+  "sectorsNarrative": "A clear risk-on rotation was visible in Tuesday's session, with growth-oriented sectors like Technology and Consumer Discretionary leading the charge. Defensive sectors such as Utilities and interest-rate sensitive names lagged, while Energy stocks fell with crude prices.",
+  "industryNarrative": "Semiconductors and AI-related software were the standout industry groups, driving the technology sector's outperformance. Data analytics and enterprise software saw immense buying pressure following Palantir's blowout earnings.",
   "industryMovers": [],
   "movers": [
     {
+      "ticker": "APPS",
+      "side": "LONG",
+      "changePct": 42.0,
+      "why": "Beat FQ1 revenue and earnings expectations and issued stronger-than-expected full-year guidance.",
+      "traderLens": "Qullamaggie style Episodic Pivot on massive volume."
+    },
+    {
+      "ticker": "SHOP",
+      "side": "LONG",
+      "changePct": 18.0,
+      "why": "Reported Q2 revenue and profitability that topped expectations and issued strong Q3 growth guidance.",
+      "traderLens": "Momentum breakout on strong fundamental catalyst."
+    },
+    {
       "ticker": "PLTR",
       "side": "LONG",
-      "changePct": 15.6,
-      "why": "Posted better-than-expected quarterly results and raised its full-year outlook, citing strong AI demand.",
-      "traderLens": "Qullamaggie-style episodic pivot on blowout earnings."
+      "changePct": 29.5,
+      "why": "Reported a massive Q2 earnings beat and raised full-year guidance, driven by a 149% surge in US commercial revenue.",
+      "traderLens": "Qullamaggie style Episodic Pivot; already extended after yesterday's move."
     },
     {
-      "ticker": "W",
+      "ticker": "NVDA",
       "side": "LONG",
-      "changePct": 19,
-      "why": "Surged after beating Wall Street's second-quarter earnings expectations.",
-      "traderLens": "Earnings-driven momentum."
+      "changePct": 2.0,
+      "why": "Gaining in pre-market after SpaceX announced it is using Nvidia's Vera Rubin architecture for in-orbit AI computers.",
+      "traderLens": "Minervini style leader benefiting from positive sector news flow."
     },
     {
-      "ticker": "CAT",
+      "ticker": "DIS",
       "side": "LONG",
-      "changePct": 10.5,
-      "why": "Rallied after reporting its first-ever quarter with over $20 billion in revenue and seeing a growing backlog.",
-      "traderLens": "Fundamental strength, potential Minervini-style Stage 2 continuation."
+      "changePct": 3.0,
+      "why": "FQ3 adjusted earnings beat expectations, driven by strong performance at its U.S. theme parks and movie successes.",
+      "traderLens": "Fundamental catalyst play."
     },
     {
-      "ticker": "MU",
-      "side": "LONG",
-      "changePct": 6.9,
-      "why": "Leading a broad rally in semiconductor and storage chip stocks.",
-      "traderLens": "Ted Zhang-style sector rotation play into semis."
-    },
-    {
-      "ticker": "CERT",
+      "ticker": "SPCX",
       "side": "SHORT",
-      "changePct": -23.7,
-      "why": "Tumbled after the biosimulation software company missed Q2 earnings expectations.",
-      "traderLens": "Post-earnings momentum breakdown."
+      "changePct": -11.0,
+      "why": "Fell despite beating Q2 earnings due to investor concerns over a massive $15.8 billion capital expenditure on AI infrastructure.",
+      "traderLens": "Post-earnings fade on negative sentiment despite headline beat."
     },
     {
-      "ticker": "AHCO",
+      "ticker": "AMD",
       "side": "SHORT",
-      "changePct": -39.9,
-      "why": "Significant pre-market drop, likely related to earnings.",
-      "traderLens": "High-velocity breakdown, avoid chasing the downside."
+      "changePct": -8.0,
+      "why": "Declined after Q2 earnings as its Q3 revenue guidance disappointed the market's most optimistic expectations.",
+      "traderLens": "Post-earnings weakness, potential for follow-through selling."
     },
     {
-      "ticker": "AMZN",
+      "ticker": "TYGO",
       "side": "SHORT",
-      "changePct": -1.7,
-      "why": "Shares edged down after founder Jeff Bezos filed to sell approximately $4.1 billion worth of shares.",
-      "traderLens": "Supply overhead could cap near-term upside."
+      "changePct": -26.5,
+      "why": "Shares fell sharply after its Q2 earnings report yesterday.",
+      "traderLens": "Post-earnings breakdown."
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
       "level": null,
-      "changePct": 2.4,
+      "changePct": 2.0,
       "abc": "A",
-      "note": "Rallying with broader semi strength, approaching all-time highs."
+      "note": "Market leader, showing strength on positive news flow from SPCX partnership."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Consolidating, needs to reclaim key moving averages."
+      "note": "Watching for participation in the broad market risk-on move."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Watching for reaction to recent analyst calls and market strength."
+      "note": "Monitor for strength as market pushes to new highs."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
       "abc": "A",
-      "note": "Continuing strong uptrend, benefiting from AI narrative."
+      "note": "Key AI player, watching for follow-through in the tech rally."
     },
     {
       "ticker": "AMZN",
       "level": null,
-      "changePct": -1.7,
+      "changePct": null,
       "abc": "B",
-      "note": "Potential for short-term weakness due to Bezos share sale filing."
+      "note": "Watching for a move higher with consumer discretionary strength."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Holding near highs, a leader in the communication services space."
+      "abc": "B",
+      "note": "AI play, could benefit from continued sector momentum."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Building a base, needs a catalyst to break out."
+      "note": "AI play, could benefit from continued sector momentum."
     },
     {
       "ticker": "AMD",
       "level": null,
-      "changePct": null,
+      "changePct": -8.0,
       "abc": "C",
-      "note": "Key earnings report after the close today; high event risk."
+      "note": "Weak post-earnings reaction on guidance, potential short setup."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
       "abc": "A",
-      "note": "A primary beneficiary of the AI server theme, watching for continuation."
+      "note": "Core AI infrastructure play, watching for strength with NVDA."
     },
     {
       "ticker": "PLTR",
       "level": null,
-      "changePct": 15.6,
-      "abc": "A",
-      "note": "Major earnings gap-up, a potential episodic pivot."
+      "changePct": null,
+      "abc": "C",
+      "note": "Massive episodic pivot yesterday, too extended to chase for a new entry."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Cybersecurity sector is consolidating; needs a catalyst."
+      "note": "Watching cybersecurity space for rotational interest."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "High correlation to Bitcoin, which is currently under pressure."
+      "note": "High beta crypto play, watching for volatility."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "The market is in a confirmed Stage 2 uptrend, but indices are extended. Not an ideal time to initiate new positions; focus on managing existing winners."
+      "view": "Market is in a confirmed uptrend with indices at all-time highs, but some post-earnings weakness in leaders (SPCX, AMD) is a caution flag. Focus only on A+ setups."
     },
     {
       "name": "Ted Zhang",
-      "view": "Strong institutional flows into AI, Semis, and Industrials. This rotation has legs. Avoid the energy sector for now."
+      "view": "Strong institutional rotation into Technology, specifically AI-related names. This theme has legs."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is strong (A-grade), but entry risk is high due to the extension. Wait for a pullback to find A-grade setups."
+      "view": "Market context is bullish (uptrend), but the quality of entries is deteriorating after a strong run. Raise the bar for new positions; avoid chasing extended names."
     },
     {
       "name": "SRxTrades",
-      "view": "Volume on breakout names like PLTR is confirming the move, but chasing gaps is a low-probability play. Wait for a clean pivot to form."
+      "view": "Some explosive post-earnings moves are providing clean pivots (APPS, SHOP), but chasing them after the initial gap is risky. Wait for orderly pullbacks."
     },
     {
       "name": "Jeff",
-      "view": "With the market at all-time highs, it's crucial to honor stops and not get complacent. Trim profits into strength."
+      "view": "Respect hard stops, especially on earnings plays. Don't get caught in a post-earnings reversal like in SPCX or AMD."
     },
     {
       "name": "Qullamaggie",
-      "view": "PLTR is a classic episodic pivot setup on earnings. This is the type of high-momentum breakout to focus on, but entry must be managed carefully."
+      "view": "Excellent episodic pivots occurred yesterday (PLTR) and are setting up today (APPS, SHOP). Focus on these powerful, news-driven breakouts with high volume."
     },
     {
       "name": "Composite",
-      "view": "The market is strong, but overbought. The posture is GO, but with caution. Do not chase extended names. Focus on A-grade setups like PLTR if a low-risk entry presents itself. Manage existing positions and raise stops."
+      "view": "The market is strong, but selectiveness is key. Focus on fresh earnings-driven breakouts. Avoid chasing extended leaders and be wary of names showing post-earnings weakness as they can signal underlying concerns."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "CAT",
+        "ticker": "SHOP",
         "consensus": null
       },
       {
-        "ticker": "PFE",
-        "consensus": null
+        "ticker": "GPN",
+        "consensus": "Adjusted EPS $3.46"
       },
       {
-        "ticker": "MRK",
-        "consensus": null
+        "ticker": "BWA",
+        "consensus": "Adjusted EPS $1.42"
       },
       {
-        "ticker": "SYY",
+        "ticker": "ZBH",
+        "consensus": "Adjusted EPS $2.07"
+      },
+      {
+        "ticker": "CVS",
         "consensus": null
       }
     ],
     "amc": [
       {
-        "ticker": "AMD",
+        "ticker": "EXPE",
         "consensus": null
       },
       {
-        "ticker": "SPCX",
-        "consensus": "Q2 Rev Est: $6.9B"
+        "ticker": "WDC",
+        "consensus": null
       },
       {
-        "ticker": "BKNG",
-        "consensus": "EPS Est: $2.44 / Rev Est: $7.19B"
+        "ticker": "SNDK",
+        "consensus": "EPS $34.45 / Rev $8.39B"
       }
     ],
     "yesterdayReactions": [
       {
         "ticker": "PLTR",
-        "result": "beat",
-        "movePct": 15.6
+        "result": "Beat revenue by ~$140M, beat adj. EPS by $0.06, raised guidance.",
+        "movePct": 29.5
+      },
+      {
+        "ticker": "SPCX",
+        "result": "Beat Q2 revenue and EPS estimates.",
+        "movePct": -11.0
+      },
+      {
+        "ticker": "AMD",
+        "result": "Beat Q2 estimates but Q3 guidance was below highest expectations.",
+        "movePct": -8.0
       }
     ]
   },
   "calendar": [
     {
-      "time": "08:30 ET",
-      "name": "Trade Balance (Jun)",
-      "consensus": "-$73B"
-    },
-    {
-      "time": "10:00 ET",
-      "name": "JOLTS Job Openings (Jun)",
+      "time": "08:15 ET",
+      "name": "ADP Employment Report",
       "consensus": null
     },
     {
       "time": "10:00 ET",
-      "name": "Factory Orders (Jun)",
+      "name": "ISM Non-Manufacturing Composite",
       "consensus": null
+    },
+    {
+      "time": "10:30 ET",
+      "name": "Crude Oil Inventories",
+      "consensus": "-1.2M barrels"
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "TBBB",
-        "firm": "UBS",
+        "ticker": "ALAB",
+        "firm": "Jefferies",
         "rating": "Buy",
-        "pt": 51
+        "pt": 450
       },
       {
-        "ticker": "FMX",
-        "firm": "Bank of America",
+        "ticker": "HNGE",
+        "firm": "Needham",
         "rating": "Buy",
-        "pt": null
+        "pt": 97
+      },
+      {
+        "ticker": "ADM",
+        "firm": "Morgan Stanley",
+        "rating": "Equal-Weight",
+        "pt": 79
       }
     ],
     "downgrades": [
       {
-        "ticker": "TROW",
-        "firm": "Morningstar",
-        "rating": "Parent rating downgraded to Above Average",
-        "pt": null
+        "ticker": "FIS",
+        "firm": "UBS",
+        "rating": "Neutral",
+        "pt": 49
+      },
+      {
+        "ticker": "BALL",
+        "firm": "JP Morgan",
+        "rating": "Neutral",
+        "pt": 65
+      },
+      {
+        "ticker": "VALE",
+        "firm": "B of A Securities",
+        "rating": null,
+        "pt": 16
       }
     ]
   },
-  "alert": "S&P 500 hits new all-time high; market is strong but technically extended.",
+  "alert": null,
   "news": [
     {
-      "headline": "Palantir Soars 16% on Blockbuster AI-Driven Earnings and Raised Outlook",
+      "headline": "Palantir Soars 30% After 'Otherworldly' Earnings and Guidance Hike Driven by 149% US Commercial Growth",
       "impact": "HIGH",
       "tickers": [
         "PLTR",
         "AI",
-        "QQQ"
+        "IGV"
       ],
-      "source": "TheStreet — https://www.thestreet.com/investing/stocks/stock-market-today-aug-4-2026-s-p-500-jumps-as-palantir-surges-oil-slides",
-      "time": "06:53 ET"
+      "source": "The Guardian — https://www.theguardian.com/technology/article/2026/aug/04/palantir-earnings-q2-2026",
+      "time": "Aug 4, Post-Market"
     },
     {
-      "headline": "Oil Prices Tumble Over 5% on Hopes of U.S.-Iran Deal to Reopen Strait of Hormuz",
+      "headline": "SpaceX Stock Falls 11% Despite Earnings Beat as AI Capital Spending Surges to $15.8 Billion",
       "impact": "HIGH",
+      "tickers": [
+        "SPCX",
+        "NVDA"
+      ],
+      "source": "24/7 Wall St. — https://247wallst.com/investing/2026/08/05/spacex-falls-10-on-soaring-ai-costs-as-other-space-stocks-hold-steady/",
+      "time": "Aug 5, Pre-Market"
+    },
+    {
+      "headline": "Asian markets surge, led by Japan and South Korea, on tech optimism and easing oil prices",
+      "impact": "MED",
+      "tickers": [
+        "SPY",
+        "QQQ"
+      ],
+      "source": "Global Banking & Finance Review — https://www.globalbankingandfinance.com/asia-shares-surge-on-tech-mood-swing-oil-retreats/",
+      "time": "Aug 5, Overnight"
+    },
+    {
+      "headline": "Hopes for US-Iran deal to reopen Strait of Hormuz sends oil prices lower, boosting equities",
+      "impact": "MED",
       "tickers": [
         "CL=F",
         "XLE",
         "SPY"
       ],
-      "source": "24/7 Wall St. — https://247wallst.com/investing/2026/08/04/here-are-tuesdays-top-wall-street-analyst-research-calls-apple-coreweave-ebay-exxon-mobil-intuit-nebius-group-palantir-technologies-sk-hynix-and-more/",
-      "time": "08:00 ET"
+      "source": "FinancialJuice — https://financialjuice.com/news/morning-juice-europe-session-prep-2",
+      "time": "Aug 5, Overnight"
     },
     {
-      "headline": "Caterpillar Jumps After Reporting First-Ever $20 Billion Quarter",
-      "impact": "MED",
-      "tickers": [
-        "CAT",
-        "XLI",
-        "DIA"
-      ],
-      "source": "Caterpillar Inc. — https://www.caterpillar.com/en/news/corporate-press-releases/h/caterpillar-reports-second-quarter-2026-results.html",
-      "time": "Aug 4, 2026"
-    },
-    {
-      "headline": "AMD and SpaceX to Report Earnings After the Bell Amid AI Frenzy",
+      "headline": "AMD Falls 8% in Pre-Market as Q3 Revenue Guidance Disappoints Bulls",
       "impact": "MED",
       "tickers": [
         "AMD",
-        "SPCX",
-        "SMH",
-        "QQQ"
+        "NVDA",
+        "SMH"
       ],
-      "source": "TradingKey — https://www.tradingkey.com/news/us-pre-market-pltr-surges-16-storage-stocks-rally-as-micron-rises-nearly-5-amd-spacex-earnings-ahead-202608041700",
-      "time": "05:00 ET"
-    },
-    {
-      "headline": "Jeff Bezos Files to Sell $4.1 Billion of Amazon Stock, Pressuring Shares",
-      "impact": "MED",
-      "tickers": [
-        "AMZN"
-      ],
-      "source": "TheStreet — https://www.thestreet.com/investing/stocks/stock-market-today-aug-4-2026-s-p-500-jumps-as-palantir-surges-oil-slides",
-      "time": "10:17 ET"
+      "source": "TradingKey — https://www.tradingkey.com/news/【us-pre-market】us-index-futures-rise-nvidia-circle-surge-as-spacex-amd-slump-post-earnings-01J3Q8B7YJ6PZ7XG9R4C5W3D2V",
+      "time": "Aug 5, Pre-Market"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TheStreet — https://www.thestreet.com/investing/stocks/stock-market-today-aug-4-2026-s-p-500-jumps-as-palantir-surges-oil-slides [1]",
-    "RTTNews — https://www.rttnews.com/ext/economic-calendar.aspx [2]",
-    "Digrin — https://www.digrin.com/stocks/earnings/2026-08-04 [3]",
-    "Caterpillar Inc. — https://www.caterpillar.com/en/news/corporate-press-releases/h/caterpillar-reports-second-quarter-2026-results.html [4]",
-    "Investing.com — https://www.investing.com/equities/pre-market [5]",
-    "Associated Press — https://pittsburghpostgazette.com/business/money/2026/08/04/us-stocks-palantir-caterpillar-oil-prices-iran-war/stories/202608040049 [6]",
-    "FINVIZ — https://finviz.com/screener.ashx?v=111&o=-change&r=1 [7]",
-    "GlobeNewswire — https://www.globenewswire.com/news-release/2026/08/04/2927031/0/en/Sysco-Reports-Fiscal-Fourth-Quarter-and-Full-Year-2026-Results-Issues-FY27-Guidance-of-9-11-Adjusted-EPS-Growth.html [8]",
-    "Pfizer — https://s28.q4cdn.com/781576095/files/doc_financials/2026/q2/Q2-2026-PFE-Earnings-Release.pdf [9]",
-    "TradingKey — https://www.tradingkey.com/news/us-pre-market-pltr-surges-16-storage-stocks-rally-as-micron-rises-nearly-5-amd-spacex-earnings-ahead-202608041700 [10]",
-    "Benzinga — https://www.benzinga.com/pre-market-outlook [11]",
-    "24/7 Wall St. — https://247wallst.com/investing/2026/08/04/here-are-tuesdays-top-wall-street-analyst-research-calls-apple-coreweave-ebay-exxon-mobil-intuit-nebius-group-palantir-technologies-sk-hynix-and-more/ [12]",
-    "Benzinga — https://www.benzinga.com/insights/ratings/26/08/39600099/booking-holdings-earnings-are-imminent-these-most-accurate-analysts-revise-forecasts-ahead-of-ear [13]",
-    "TradingKey — https://www.tradingkey.com/news/broadcom-inc-stock-avgo-moved-up-by-4-35-on-aug-4-what-signal-does-it-send-202608041915 [14]",
-    "The Motley Fool — https://www.fool.com/investing/2026/08/01/why-aug-4-could-be-a-big-day-for-the-stock-market/ [15]"
+    "San Antonio Express-News — https://www.expressnews.com/business/article/us-stock-futures-edge-higher-and-oil-resumes-19593185.php",
+    "Zacks Investment Research — https://www.zacks.com/stock-news/2203417/stock-market-news-for-aug-4-2026",
+    "FinHacker.cz — https://finhacker.cz/fear-and-greed-index-historical-data-chart/",
+    "TradingKey — https://www.tradingkey.com/news/palantir-q2-2026-revenue-up-93-us-commercial-149-stock-soars-30-buy-now-01J3Q7Z8P9N8A6B5C4D3E2F1G0",
+    "Zacks.com — https://www.zacks.com/stock/news/2203514/spacex-beats-q2-estimates-shares-fall-etfs-in-focus",
+    "Seoul Economic Daily — https://www.sedaily.com/news/view/2D7Y8Z9XJ0",
+    "TradingKey — https://www.tradingkey.com/news/【us-pre-market】us-index-futures-rise-nvidia-circle-surge-as-spacex-amd-slump-post-earnings-01J3Q8B7YJ6PZ7XG9R4C5W3D2V",
+    "Seeking Alpha — https://seekingalpha.com/article/4667893-spacex-stock-a-historic-beat-meets-a-historic-lock-up",
+    "Euronext Markets — https://live.euronext.com/en/node/12515026",
+    "Zacks.com — https://www.zacks.com/stock/news/2203515/palantir-soars-on-blowout-q2-results-etfs-to-benefit",
+    "24/7 Wall St. — https://247wallst.com/investing/2026/08/05/spacex-falls-10-on-soaring-ai-costs-as-other-space-stocks-hold-steady/",
+    "Global News — https://globalnews.ca/news/10693025/spacex-stock-earnings-ai-spending-august-5-2026/",
+    "Thomson Investment Group — https://www.thomsoninvestmentgroup.com/economic-calendar-august-2026/",
+    "TipRanks.com — https://www.tipranks.com/news/these-are-the-stocks-reporting-earnings-today-august-5-2026",
+    "Global Payments Inc. — https://investors.globalpayments.com/news-releases/news-release-details/global-payments-reports-second-quarter-2026-results",
+    "Scotiabank — https://www.scotiabank.com/ca/en/about/economics/economics-publications/post.16.2026-calendar-of-economic-release-dates--august-2026-.html",
+    "EarningsCall.biz — https://www.earningscall.biz/calendar/2026-08-05",
+    "BorgWarner Inc. — https://www.borgwarner.com/news-media/press-releases/2026/08/05/borgwarner-reports-strong-second-quarter-2026-results-increases-2026-adjusted-eps-guidance-and-share-repurchase-authorization-by-1-billion-announces-7-awards-across-portfolio-to-support-long-term-profitable-growth",
+    "Zimmer Biomet Holdings, Inc. — https://www.prnewswire.com/news-releases/zimmer-biomet-announces-second-quarter-2026-financial-results-302213349.html",
+    "Seeking Alpha — https://seekingalpha.com/news/4198216-biggest-stock-movers-wednesday-amd-spcx-shop-and-more",
+    "Benzinga — https://www.benzinga.com/analyst-ratings/analyst-color/26/08/39620000/toast-to-rally-more-than-15-here-are-10-top-analyst-forecasts-for-wednesday",
+    "Benzinga — https://www.benzinga.com/markets/premarket/26/08/39620001/12-industrials-stocks-moving-in-wednesdays-pre-market-session",
+    "Reddit — https://www.reddit.com/r/AMD_Stock/comments/19f9g3p/analysts_reaction_to_amd_2026q2_earnings/",
+    "Benzinga — https://www.benzinga.com/news/26/08/39620002/top-wall-street-forecasters-revamp-sandisk-expectations-ahead-of-q4-earnings",
+    "Morningstar — https://www.morningstar.com/news/dow-jones/202608051115/analysts-see-decline-in-us-crude-oil-inventories",
+    "McClellan Financial Publications — https://www.mcoscillator.com/market_breadth_data/",
+    "CappNotes — https://www.cappnotes.com/closing-look-8-4-2026/",
+    "Barchart.com — https://www.barchart.com/stocks/quotes/%24TNX",
+    "Global Banking & Finance Review — https://www.globalbankingandfinance.com/asia-shares-surge-on-tech-mood-swing-oil-retreats/",
+    "FinancialJuice — https://financialjuice.com/news/morning-juice-europe-session-prep-2",
+    "The Guardian — https://www.theguardian.com/technology/article/2026/aug/04/palantir-earnings-q2-2026"
   ]
 }
