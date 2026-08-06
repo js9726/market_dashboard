@@ -42,6 +42,34 @@ PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/Codex tabs)
 > **The push to the dashboard is MANDATORY — always run Step 4.**
 > The brief is useless sitting in memory. Step 4 is what puts it live for viewers.
 
+### Step 0.0-PRE — RUN PREFLIGHT. NO RECEIPT, NO BRIEF.
+
+```bash
+python preflight.py    # exit 0 = proceed, exit 1 = BLOCKED
+```
+
+Everything below used to be prose, and prose is advice an agent skips under time
+pressure — which is how six consecutive empty GO lists shipped while cybersecurity was
+the #1 industry. `preflight.py` makes the mandatory checks executable and writes
+`preflight_receipt.json`. **If it exits non-zero, do not generate a brief. Report the
+blocked checks to Jie instead.**
+
+It enforces, in code:
+
+| Check | Hard? | What it catches |
+|---|---|---|
+| `focus_list` | yes | Scans `jie_wiki/tradingview_snapshots/raw` for **today/yesterday-dated** charts. **This is Jie's focus list — he snaps charts there deliberately.** Auto-merges them into `watchlist.json`. |
+| `watchlist` | yes | Exists, and today's focus names were folded in |
+| `themes` | yes | Finviz returns >100 industries. Fewer = **scraper broken, not a flat market** |
+| `universe` | yes | Every focus ticker actually reached the classified universe, and flags `UNCLASSIFIED` liquid names |
+| `empty_go` | warn | Counts consecutive empty GO lists. **3+ forces the brief to say it may be a broken gate**, name the leading theme, and list green-zone names |
+
+Quote the receipt hash in the brief. A brief without one is unverified by definition.
+
+**The agent does the clustering, not Jie.** He should never be asked to bucket names by
+theme — that is the job this pipeline exists to do, and asking him to do it by eye
+reintroduces the exact miss it was built to prevent.
+
 ### Step 0.0 — Open TradingView in Chrome — MANDATORY FIRST ACTION
 
 **Do this before Step 0. Every run. No exceptions.**
@@ -281,6 +309,24 @@ to +21.7% - the exclusion was correct.)
 
 A LEADING theme whose names are all `>2.5 ATR` is a theme to WAIT on, not chase. Say that
 explicitly rather than promoting an extended name because the theme is hot.
+
+**0.8d-ii — the gate is SETUP-SCOPED, not universal (2026-08-05).** The table above governs
+`BO-CB` / `BO-VCP` / `PB-21EMA` / `MA-PULLBACK` / `CONTINUATION`. It does **NOT** apply to
+`EP-FRESH` / `EP-SECOND` / `ORH-INTRADAY` / `POST-GAP-VCP`. An EP is *defined* as a 10%+
+catalyst gap, which lands price 3-5 ATR above the 21EMA on the gap bar **every time** — the
+gate returns BLOCKED for every EP that meets its own entry criteria, so it is a constant, not
+a filter. The `n=6, 0 wins` bucket also contains exactly one EP-FRESH trade, so the statistic
+does not transfer. For an EP use: **trigger = opening-range high (1m/5m/60m), stop = low of
+day**. Two related mis-applications to avoid on an EP: the **RS-Rating floor** (an EP creates
+RS; the rating lags — it is a SEPA/VCP filter) and the **$250M / $1B average-dollar-volume
+tiers** (position-size filters — judge liquidity against the intended size, not an absolute
+floor). What still refuses an EP is its own quality filters (gap size, volume surge, catalyst
+quality, gapping into resistance, fresh-vs-late) plus the **setup-agnostic regime / traction /
+portfolio caps** — an `EXTENDED` regime's 0% new-risk cap binds an EP exactly as it binds a
+breakout, and that is the correct place to say no. Source of truth:
+`jie_wiki/wiki/entry-methods.md` § "The 21EMA extension gate is setup-scoped, not universal".
+Origin: INTA 2026-08-05 was scored PASS 35/100 by stacking three gates that do not govern EPs;
+re-scored correctly as EP-FRESH it was 67/100 WATCH.
 
 **0.8e — Market-edge confluence (operator's A+ setup).** Flag a name only when ALL FOUR hold:
 
