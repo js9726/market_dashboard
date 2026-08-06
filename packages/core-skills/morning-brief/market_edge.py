@@ -29,15 +29,21 @@ MANUAL = [
     ("MCO hooked up from oversold", "$NYMO McClellan Oscillator",
      "https://stockcharts.com/h-sc/ui?s=$NYMO",
      "Look for the line turning UP from below -50/-100. The HOOK is the signal, not the extreme."),
-    ("MCO > +1.5 sigma (stretched)", "$NYMO",
+    ("MCO stretched", "$NYMO — read the LEVEL, not a sigma",
      "https://stockcharts.com/h-sc/ui?s=$NYMO",
-     "Above roughly +60/+80 = stretched. Alex called +1.6 sigma on 2026-08-04."),
+     "Use levels, not sigma: > +40 stretched, > +60 strong extreme, < -40 washed out, "
+     "0 +/- 20 neutral. Sigma is unreliable here — the ratio-adjusted NYMO sigma cannot be "
+     "measured from a free feed, so any 'x sigma' figure is a back-derivation, not a "
+     "measurement (flagged 2026-08-06). Alex's '+1.6 sigma' corresponded to NYMO ~23."),
     ("MCSI above zero and rising", "$NYSI McClellan Summation",
      "https://stockcharts.com/h-sc/ui?s=$NYSI",
      "Above zero AND sloping up = the move has staying power."),
-    ("% stocks above 5dma > 75%", "$SPXA50R / breadth",
-     "https://stockcharts.com/h-sc/ui?s=$SPXA50R",
-     ">75% = stretched, stress-test risk. Alex: 'approaching 78%'."),
+    ("% stocks above 5dma > 75%", "MEASURE IT — no 5-day series exists",
+     "run: python breadth_ma.py",
+     "StockCharts publishes $SPXA50R (50-DAY), NOT 5-day. Pointing at it for a 5-day "
+     "question is the wrong metric (error made 2026-08-06). breadth_ma.py measures the real "
+     "5/20/50-day figures off one TradingView scanner call; its 50-day agreed with $SPXA50R "
+     "to 0.3pp on first run, which validates it."),
     ("Follow-Through Day confirmed", "index price+volume",
      "https://www.investors.com/market-trend/stock-market-today/",
      "Day 4-7 of an attempted rally, index +1.25%+ on HIGHER volume than prior day."),
