@@ -38,6 +38,11 @@ export default auth((req) => {
     // entries/ingest (cron writes AI-scored JournalEntry via bearer).
     pathname.startsWith("/api/journal/closed-today") ||
     pathname.startsWith("/api/journal/entries/ingest") ||
+    // Trading Journal v2 (canonical session/rule store): sessions + rules are
+    // written by Claude/Codex and read by the Apps Script renderer, all via
+    // TRADING_JOURNAL_INGEST_KEY/BRIEF_INGEST_KEY bearer auth inside the handler.
+    // Must bypass session middleware or the 307→/login breaks the JSON contract.
+    pathname.startsWith("/api/trading-journal") ||
     // A-list daily-bar ingest (P2): the local OpenD/IBKR bridge pushes bars via
     // BRIEF_INGEST_KEY. Key/bearer auth inside the handler — must bypass session.
     pathname.startsWith("/api/a-list/bars-ingest") ||

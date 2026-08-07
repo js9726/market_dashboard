@@ -110,6 +110,9 @@ model User {
   goals               Goal[]
   // TradesViz-platform P3: persisted AI-coach answers over the user's journal.
   coachInsights       CoachInsight[]
+  tradingJournalSessions TradingJournalSession[]
+  tradingRules           TradingRule[]
+  tradingJournalThoughts TradingJournalThought[]
 }
 
 model SpreadsheetConnection {
@@ -820,6 +823,71 @@ model DailyReflection {
 
   @@unique([userId, entryDate])
   @@index([userId, entryDate(sort: Desc)])
+}
+
+/// Canonical structured record for one completed US trading session. The
+/// Google Doc is a rendered view of this row; it is never the source of truth.
+model TradingJournalSession {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionDate       DateTime @db.Date
+  schemaVersion     String
+  source            String
+  ownerProvider     String
+  ownerVerdict      String
+  validatorProvider String?
+  validatorStatus   String?
+  payload           Json
+  renderedMarkdown  String   @db.Text
+  riskBlocked       Boolean  @default(false)
+  docSyncStatus     String   @default("PENDING")
+  docSyncedAt       DateTime?
+  docSyncError      String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, sessionDate])
+  @@index([userId, sessionDate(sort: Desc)])
+  @@index([docSyncStatus, updatedAt(sort: Desc)])
+}
+
+/// Explicitly governed rules rendered into the Google Doc's Hard Rules and
+/// Conditional Playbooks review tabs. AI may propose; only Jie can approve.
+model TradingRule {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ruleKey        String
+  title          String
+  statement      String   @db.Text
+  stage          String
+  status         String   @default("PROPOSED")
+  evidence       Json     @default("[]")
+  sourceRefs     String[]
+  approvedAt     DateTime?
+  supersededAt   DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, ruleKey])
+  @@index([userId, stage, status])
+}
+
+/// User-authored thought captured only after explicit journal intent. Original
+/// text stays separate from later AI interpretation in TradingJournalSession.
+model TradingJournalThought {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionDate       DateTime @db.Date
+  source            String
+  externalMessageId String   @unique
+  text              String   @db.Text
+  capturedAt        DateTime
+  createdAt         DateTime @default(now())
+
+  @@index([userId, sessionDate(sort: Desc)])
 }
 
 // ── JournalEntry (NEW 2026-05) — per-trade analysis ─────────────────────────
