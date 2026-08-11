@@ -59,7 +59,7 @@ describe("trading journal session module", () => {
     const result = evaluateTradingSession(input);
     expect(result.riskBlocked).toBe(true);
     expect(result.violations).toContain("moomoo Malaysia:HPE is UNPROTECTED");
-    expect(renderTradingSessionMarkdown(result)).toContain("UNPROTECTED (MISSING)");
+    expect(renderTradingSessionMarkdown(result)).toContain("MISSING");
   });
 
   it("keeps an operator-approved permanent holding exempt from stop enforcement", () => {
@@ -98,7 +98,7 @@ describe("trading journal session module", () => {
     }];
     const result = evaluateTradingSession(input);
     expect(result.riskBlocked).toBe(true);
-    expect(renderTradingSessionMarkdown(result)).toContain("UNPROTECTED (WAITING_SUBMIT)");
+    expect(renderTradingSessionMarkdown(result)).toContain("WAITING SUBMIT");
   });
 
   it("keeps GO visible while an independent risk block is active", () => {

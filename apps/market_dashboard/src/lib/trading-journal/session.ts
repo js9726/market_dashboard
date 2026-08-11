@@ -198,7 +198,7 @@ function table(headers: string[], rows: string[][], empty: string): string {
 function protectionLabel(position: TradingSession["openPositions"][number]): string {
   if (position.stopStatus === "HOLD_EXEMPT") return "HOLD-EXEMPT";
   if (position.accountType !== "LIVE" || position.stopStatus === "ACTIVE") return position.stopStatus;
-  return `UNPROTECTED (${position.stopStatus})`;
+  return position.stopStatus.replaceAll("_", " ");
 }
 
 export function renderTradingSessionMarkdown(evaluation: SessionEvaluation): string {
