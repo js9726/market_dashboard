@@ -39,7 +39,7 @@ const entrySchema = z.object({
   fillPrice: z.number().positive(),
   quantity: z.number().positive(),
   stopPrice: z.number().positive(),
-  stopStatus: z.enum(["ACTIVE", "MISSING", "UNKNOWN"]),
+  stopStatus: z.enum(["ACTIVE", "ACTIVE_CONDITIONAL", "MISSING", "UNKNOWN"]),
   riskPct: z.number().nonnegative(),
   scoreAtEntry: z.number().min(0).max(100).optional(),
   campaignKey: z.string().optional(),
@@ -68,12 +68,36 @@ const openPositionSchema = z.object({
   currentPrice: z.number().positive().optional(),
   tradingDaysHeld: z.number().int().nonnegative(),
   stopPrice: z.number().positive().nullable(),
-  stopStatus: z.enum(["ACTIVE", "WAITING_SUBMIT", "MISSING", "UNKNOWN", "HOLD_EXEMPT"]),
+  stopStatus: z.enum(["ACTIVE", "ACTIVE_CONDITIONAL", "WAITING_SUBMIT", "MISSING", "UNKNOWN", "HOLD_EXEMPT"]),
+  brokerStopStatus: z.string().optional(),
+  stopOrderType: z.string().optional(),
+  stopCoveredQuantity: z.number().positive().optional(),
+  stopTimeInForce: z.string().optional(),
+  stopSession: z.string().optional(),
+  stopOutsideRth: z.boolean().optional(),
   stopAtBreakeven: z.boolean().default(false),
   trimmed: z.boolean().default(false),
   currentScore: z.number().min(0).max(100).optional(),
   currentR: z.number().optional(),
   pnlIfStopped: z.number().optional(),
+}).superRefine((position, context) => {
+  if (position.stopStatus !== "ACTIVE_CONDITIONAL") return;
+  const eligibleTypes = ["STOP", "STOP_LIMIT", "TRAILING_STOP", "TRAILING_STOP_LIMIT"];
+  if (position.brokerStopStatus !== "WAITING_SUBMIT") {
+    context.addIssue({ code: "custom", path: ["brokerStopStatus"], message: "ACTIVE_CONDITIONAL requires brokerStopStatus=WAITING_SUBMIT" });
+  }
+  if (!position.stopOrderType || !eligibleTypes.includes(position.stopOrderType)) {
+    context.addIssue({ code: "custom", path: ["stopOrderType"], message: "ACTIVE_CONDITIONAL requires an eligible conditional stop order type" });
+  }
+  if (!position.stopPrice) {
+    context.addIssue({ code: "custom", path: ["stopPrice"], message: "ACTIVE_CONDITIONAL requires a trigger price" });
+  }
+  if (!position.stopCoveredQuantity || position.stopCoveredQuantity < position.quantity) {
+    context.addIssue({ code: "custom", path: ["stopCoveredQuantity"], message: "ACTIVE_CONDITIONAL must cover the live quantity" });
+  }
+  if (!position.stopTimeInForce || !position.stopSession || position.stopOutsideRth === undefined) {
+    context.addIssue({ code: "custom", path: ["stopStatus"], message: "ACTIVE_CONDITIONAL requires TIF, session and outside-RTH fields" });
+  }
 });
 
 export const tradingSessionSchema = z.object({
@@ -159,7 +183,7 @@ export function evaluateTradingSession(input: unknown): SessionEvaluation {
   const violations = [...session.risk.explicitBlockReasons];
 
   for (const position of session.openPositions) {
-    if (position.accountType === "LIVE" && !["ACTIVE", "HOLD_EXEMPT"].includes(position.stopStatus)) {
+    if (position.accountType === "LIVE" && !["ACTIVE", "ACTIVE_CONDITIONAL", "HOLD_EXEMPT"].includes(position.stopStatus)) {
       violations.push(`${position.broker}:${position.ticker} is UNPROTECTED`);
     }
   }
@@ -197,6 +221,7 @@ function table(headers: string[], rows: string[][], empty: string): string {
 
 function protectionLabel(position: TradingSession["openPositions"][number]): string {
   if (position.stopStatus === "HOLD_EXEMPT") return "HOLD-EXEMPT";
+  if (position.stopStatus === "ACTIVE_CONDITIONAL") return "ARMED STOP";
   if (position.accountType !== "LIVE" || position.stopStatus === "ACTIVE") return position.stopStatus;
   return position.stopStatus.replaceAll("_", " ");
 }

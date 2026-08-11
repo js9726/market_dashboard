@@ -82,7 +82,50 @@ describe("trading journal session module", () => {
     expect(renderTradingSessionMarkdown(result)).toContain("HOLD-EXEMPT");
   });
 
-  it("shows a queued broker stop as unprotected without hiding its exact state", () => {
+  it("recognizes a validated broker-held conditional stop as armed protection", () => {
+    const input = baseSession();
+    input.openPositions = [{
+      broker: "moomoo",
+      accountType: "LIVE",
+      ticker: "TENB",
+      quantity: 21,
+      avgCost: 36.38,
+      tradingDaysHeld: 0,
+      stopPrice: 36.5,
+      stopStatus: "ACTIVE_CONDITIONAL",
+      brokerStopStatus: "WAITING_SUBMIT",
+      stopOrderType: "STOP",
+      stopCoveredQuantity: 21,
+      stopTimeInForce: "GTC",
+      stopSession: "RTH",
+      stopOutsideRth: false,
+      stopAtBreakeven: true,
+      trimmed: true,
+    }];
+    const result = evaluateTradingSession(input);
+    expect(result.riskBlocked).toBe(false);
+    expect(result.violations).toEqual([]);
+    expect(renderTradingSessionMarkdown(result)).toContain("ARMED STOP");
+  });
+
+  it("rejects ACTIVE_CONDITIONAL when broker validation fields are incomplete", () => {
+    const input = baseSession();
+    input.openPositions = [{
+      broker: "moomoo",
+      accountType: "LIVE",
+      ticker: "TENB",
+      quantity: 21,
+      avgCost: 36.38,
+      tradingDaysHeld: 0,
+      stopPrice: 36.5,
+      stopStatus: "ACTIVE_CONDITIONAL",
+      stopAtBreakeven: true,
+      trimmed: true,
+    }];
+    expect(() => evaluateTradingSession(input)).toThrow(/brokerStopStatus/);
+  });
+
+  it("still fails closed on an unvalidated raw WAITING_SUBMIT state", () => {
     const input = baseSession();
     input.openPositions = [{
       broker: "moomoo",
