@@ -59,7 +59,46 @@ describe("trading journal session module", () => {
     const result = evaluateTradingSession(input);
     expect(result.riskBlocked).toBe(true);
     expect(result.violations).toContain("moomoo Malaysia:HPE is UNPROTECTED");
-    expect(renderTradingSessionMarkdown(result)).toContain("UNPROTECTED");
+    expect(renderTradingSessionMarkdown(result)).toContain("UNPROTECTED (MISSING)");
+  });
+
+  it("keeps an operator-approved permanent holding exempt from stop enforcement", () => {
+    const input = baseSession();
+    input.openPositions = [{
+      broker: "moomoo",
+      accountType: "LIVE",
+      ticker: "MTLS",
+      quantity: 600,
+      avgCost: 6.723,
+      tradingDaysHeld: 58,
+      stopPrice: null,
+      stopStatus: "HOLD_EXEMPT",
+      stopAtBreakeven: false,
+      trimmed: false,
+    }];
+    const result = evaluateTradingSession(input);
+    expect(result.riskBlocked).toBe(false);
+    expect(result.violations).toEqual([]);
+    expect(renderTradingSessionMarkdown(result)).toContain("HOLD-EXEMPT");
+  });
+
+  it("shows a queued broker stop as unprotected without hiding its exact state", () => {
+    const input = baseSession();
+    input.openPositions = [{
+      broker: "moomoo",
+      accountType: "LIVE",
+      ticker: "TENB",
+      quantity: 21,
+      avgCost: 36.38,
+      tradingDaysHeld: 0,
+      stopPrice: 36.5,
+      stopStatus: "WAITING_SUBMIT",
+      stopAtBreakeven: true,
+      trimmed: true,
+    }];
+    const result = evaluateTradingSession(input);
+    expect(result.riskBlocked).toBe(true);
+    expect(renderTradingSessionMarkdown(result)).toContain("UNPROTECTED (WAITING_SUBMIT)");
   });
 
   it("keeps GO visible while an independent risk block is active", () => {
@@ -84,12 +123,19 @@ describe("trading journal session module", () => {
     expect(campaignWorstCase({ realizedTrimPnl: 400, corePnlAtStop: 100, addPnlAtStop: -900 })).toBe(-400);
   });
 
-  it.each(["2026-08-03", "2026-07-27"])("validates the %s approved backfill", (date) => {
-    const path = resolve(process.cwd(), `../../../jie_wiki/docs/agents/work/ai-managed-trading-journal-v2/backfill-${date}.json`);
+  it.each([
+    ["2026-07-27", "backfill-2026-07-27.json"],
+    ["2026-08-03", "backfill-2026-08-03.json"],
+    ["2026-08-04", "session-2026-08-04.json"],
+    ["2026-08-05", "session-2026-08-05.json"],
+    ["2026-08-06", "session-2026-08-06.json"],
+    ["2026-08-07", "session-2026-08-07.json"],
+    ["2026-08-10", "session-2026-08-10.json"],
+  ])("validates the %s approved session", (date, filename) => {
+    const path = resolve(process.cwd(), `../../../jie_wiki/docs/agents/work/ai-managed-trading-journal-v2/${filename}`);
     const input = JSON.parse(readFileSync(path, "utf8"));
     const result = evaluateTradingSession(input);
     expect(result.session.sessionDate).toBe(date);
-    expect(result.riskBlocked).toBe(true);
   });
 
   it("validates the approved rule registry", () => {

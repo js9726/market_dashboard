@@ -68,7 +68,7 @@ const openPositionSchema = z.object({
   currentPrice: z.number().positive().optional(),
   tradingDaysHeld: z.number().int().nonnegative(),
   stopPrice: z.number().positive().nullable(),
-  stopStatus: z.enum(["ACTIVE", "MISSING", "UNKNOWN"]),
+  stopStatus: z.enum(["ACTIVE", "WAITING_SUBMIT", "MISSING", "UNKNOWN", "HOLD_EXEMPT"]),
   stopAtBreakeven: z.boolean().default(false),
   trimmed: z.boolean().default(false),
   currentScore: z.number().min(0).max(100).optional(),
@@ -159,7 +159,7 @@ export function evaluateTradingSession(input: unknown): SessionEvaluation {
   const violations = [...session.risk.explicitBlockReasons];
 
   for (const position of session.openPositions) {
-    if (position.accountType === "LIVE" && position.stopStatus !== "ACTIVE") {
+    if (position.accountType === "LIVE" && !["ACTIVE", "HOLD_EXEMPT"].includes(position.stopStatus)) {
       violations.push(`${position.broker}:${position.ticker} is UNPROTECTED`);
     }
   }
@@ -195,6 +195,12 @@ function table(headers: string[], rows: string[][], empty: string): string {
   ].join("\n");
 }
 
+function protectionLabel(position: TradingSession["openPositions"][number]): string {
+  if (position.stopStatus === "HOLD_EXEMPT") return "HOLD-EXEMPT";
+  if (position.accountType !== "LIVE" || position.stopStatus === "ACTIVE") return position.stopStatus;
+  return `UNPROTECTED (${position.stopStatus})`;
+}
+
 export function renderTradingSessionMarkdown(evaluation: SessionEvaluation): string {
   const { session, counts, violations } = evaluation;
   const header = `${session.sessionDate} | ${session.market.regime} | ${session.market.traction} | OP: ${counts.open} | NP: ${counts.new} | CP: ${counts.closed} | Fear & Greed: ${session.market.fearGreed ?? "N/A"}`;
@@ -214,13 +220,13 @@ export function renderTradingSessionMarkdown(evaluation: SessionEvaluation): str
     "No entries or adds",
   );
   const exits = table(
-    ["Broker", "Ticker", "Kind", "Classification", "Price", "Qty", "Realized R", "Realized P&L"],
-    session.exits.map((exit) => [exit.broker, exit.ticker, exit.kind, exit.classification, exit.price.toString(), exit.quantity.toString(), exit.realizedR?.toString() ?? "N/A", exit.realizedPnl?.toString() ?? "N/A"]),
+    ["Broker", "Ticker", "Kind", "Exit type", "Price", "Qty", "R", "P&L"],
+    session.exits.map((exit) => [exit.broker, exit.ticker, exit.kind, exit.classification, exit.price.toString(), exit.quantity.toString(), exit.realizedR?.toString() ?? "N/A (risk basis unavailable)", exit.realizedPnl?.toString() ?? "N/A"]),
     "No exits or trims",
   );
   const positions = table(
-    ["Broker", "Ticker", "Qty", "Avg cost", "Days", "Stop", "Protection", "BE", "Trimmed", "Current R", "P&L if stopped"],
-    session.openPositions.map((position) => [position.broker, position.ticker, position.quantity.toString(), position.avgCost.toString(), position.tradingDaysHeld.toString(), position.stopPrice?.toString() ?? "NONE", position.accountType === "LIVE" && position.stopStatus !== "ACTIVE" ? "UNPROTECTED" : position.stopStatus, position.stopAtBreakeven ? "Y" : "N", position.trimmed ? "Y" : "N", position.currentR?.toString() ?? "N/A", position.pnlIfStopped?.toString() ?? "N/A"]),
+    ["Broker", "Ticker", "Qty", "Avg", "Days", "Stop", "Stop state", "Management", "R now", "P&L @ stop"],
+    session.openPositions.map((position) => [position.broker, position.ticker, position.quantity.toString(), position.avgCost.toString(), position.tradingDaysHeld.toString(), position.stopPrice?.toString() ?? "NONE", protectionLabel(position), `BE:${position.stopAtBreakeven ? "Y" : "N"} / Trim:${position.trimmed ? "Y" : "N"}`, position.currentR?.toString() ?? "N/A", position.pnlIfStopped?.toString() ?? "N/A"]),
     "No open positions",
   );
   const lessons = session.review.learnings.length
