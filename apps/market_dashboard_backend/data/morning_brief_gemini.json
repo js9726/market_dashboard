@@ -2,7 +2,7 @@
   "mood": {
     "label": "CAUTIOUSLY-RISK-ON",
     "posture": "RAISE-THE-BAR",
-    "summary": "Tech and AI-related names are showing strong leadership after positive earnings, but the broader market is mixed ahead of key PPI inflation data. Oil prices are retreating, easing some cost pressures."
+    "summary": "Markets are near all-time highs on cooling inflation data reducing Fed hike fears, but a surprise drop in retail sales and rising oil prices from Middle East tensions introduce a note of caution."
   },
   "breadth": {
     "up": null,
@@ -15,421 +15,329 @@
   "indices": [
     {
       "symbol": "SPY",
-      "name": "S&P 500",
+      "name": "S&P 500 Futures",
       "level": null,
-      "changePct": 0.19,
+      "changePct": 0.05,
       "note": "futures",
       "citation": null
     },
     {
       "symbol": "QQQ",
-      "name": "Nasdaq 100",
+      "name": "Nasdaq 100 Futures",
       "level": null,
-      "changePct": 0.07,
+      "changePct": 0.12,
       "note": "futures",
       "citation": null
     },
     {
       "symbol": "DIA",
-      "name": "Dow Jones",
+      "name": "Dow Jones Futures",
       "level": null,
-      "changePct": 0.24,
+      "changePct": -0.16,
       "note": "futures",
       "citation": null
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 14.55,
-      "changePct": -4.78,
+      "level": 14.56,
+      "changePct": null,
       "note": "live",
       "citation": null
     },
     {
       "symbol": "^TNX",
       "name": "10-Yr Treasury Yield",
-      "level": 4.657,
-      "changePct": -0.21,
+      "level": 4.66,
+      "changePct": null,
       "note": "live",
       "citation": null
     },
     {
       "symbol": "CL=F",
       "name": "WTI Crude Oil",
-      "level": 81.41,
-      "changePct": -2.2,
+      "level": 82.24,
+      "changePct": 1.21,
       "note": "futures",
       "citation": null
     }
   ],
-  "indicesNarrative": "US futures are pointing to a slightly higher open, with tech continuing to show relative strength following yesterday's softer CPI print and strong AI-related earnings. The drop in the VIX suggests reduced anxiety, but the market is largely in a holding pattern ahead of the Producer Price Index (PPI) report, which will be the next major inflation data point.",
+  "indicesNarrative": "US futures are mixed after the S&P 500 closed at a record high yesterday, buoyed by softer inflation data that has tempered expectations for a September rate hike. Tech is showing relative strength in the pre-market, while rising oil prices due to geopolitical tensions and a weak retail sales report are keeping broader sentiment in check.",
   "technicals": {
     "SPY": null,
     "QQQ": null,
     "DIA": null
   },
-  "technicalsNarrative": "Technical data was not available. Traders should proceed with caution and rely on price action and volume cues.",
-  "sectorsThemes": [
-    {
-      "symbol": "XLK",
-      "name": "Technology",
-      "changePct": null,
-      "rs": null,
-      "note": "Showing leadership on the back of strong AI-related earnings and momentum."
-    },
-    {
-      "symbol": "SMH",
-      "name": "Semiconductors",
-      "changePct": null,
-      "rs": null,
-      "note": "Very strong overnight action in Asian markets (SK Hynix +9%) suggests continued momentum in this group."
-    },
-    {
-      "symbol": "XLE",
-      "name": "Energy",
-      "changePct": null,
-      "rs": null,
-      "note": "Under pressure as WTI crude oil prices fall over 2% due to a large build in US inventories and weaker demand forecasts."
-    }
-  ],
-  "sectorsNarrative": "A clear rotation into technology and semiconductor stocks is underway, fueled by a strong AI narrative and positive earnings surprises. Energy is the notable laggard due to falling crude prices.",
+  "technicalsNarrative": "Technicals data not available. Cannot assess entry risk or momentum.",
+  "sectorsThemes": [],
+  "sectorsNarrative": "Overnight action in Asia showed a clear preference for technology and semiconductor stocks, with South Korea's KOSPI outperforming. Yesterday's session in the US was also led by Tech and Communication Services.",
   "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "HUBB",
+      "ticker": "RDDT",
       "side": "LONG",
-      "changePct": 6.82,
-      "why": "Pre-market gainer, specific catalyst not identified.",
-      "traderLens": "Qullamaggie"
+      "changePct": 12.4,
+      "why": "Set to join the S&P 500 index on August 18th.",
+      "traderLens": "Qullamaggie - Episodic pivot on index inclusion news."
     },
     {
-      "ticker": "MTSI",
+      "ticker": "NU",
       "side": "LONG",
-      "changePct": 6.03,
-      "why": "Initiated with a Buy rating at Benchmark with a $375 price target.",
-      "traderLens": "Momentum"
+      "changePct": 12,
+      "why": "Surged after reporting record Q2 net income exceeding $1 billion.",
+      "traderLens": "Qullamaggie - Earnings-driven episodic pivot."
     },
     {
-      "ticker": "SMCI",
+      "ticker": "SNDK",
       "side": "LONG",
-      "changePct": 1.8,
-      "why": "Continued momentum after beating earnings expectations yesterday.",
-      "traderLens": "Minervini"
+      "changePct": 7,
+      "why": "Gained following a bullish long-term financial outlook presented at its 2026 Investor Day.",
+      "traderLens": "Minervini - Positive catalyst while in a potential uptrend."
     },
     {
-      "ticker": "ENS",
+      "ticker": "TSLA",
       "side": "LONG",
-      "changePct": null,
-      "why": "Trading higher after better-than-expected Q1 results and an increased quarterly dividend.",
-      "traderLens": "Earnings Gap"
+      "changePct": 3.8,
+      "why": "General market strength and positive sentiment in tech/growth names pre-market.",
+      "traderLens": "Momentum play on a high-beta name."
     },
     {
-      "ticker": "CBRS",
+      "ticker": "WETO",
+      "side": "LONG",
+      "changePct": 188.1,
+      "why": "Significant pre-market move on low-float speculation; no fundamental news apparent.",
+      "traderLens": "High-risk momentum, likely not suitable for most styles."
+    },
+    {
+      "ticker": "AMAT",
       "side": "SHORT",
-      "changePct": -19.0,
-      "why": "Tumbled in premarket trading after missing Wall Street's second-quarter revenue estimates.",
-      "traderLens": "Post-earnings weakness"
-    },
-    {
-      "ticker": "ADP",
-      "side": "SHORT",
-      "changePct": -7.43,
-      "why": "Pre-market loser, specific catalyst not identified.",
-      "traderLens": "Reversal"
-    },
-    {
-      "ticker": "CSCO",
-      "side": "SHORT",
-      "changePct": -6.01,
-      "why": "Shares trading lower after Q4 financial results.",
-      "traderLens": "Post-earnings weakness"
+      "changePct": -6,
+      "why": "Stock fell despite a strong quarterly report and outlook as lofty investor expectations were not met.",
+      "traderLens": "Fade the 'sell the news' reaction post-earnings."
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": 223.66,
-      "changePct": -0.19,
-      "abc": "A",
-      "note": "Consolidating recent gains, watching for reaction to broad semi strength."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Watching for leadership in the semiconductor space."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": null,
-      "abc": "B",
-      "note": "Watching for direction within its current range."
+      "changePct": 3.8,
+      "abc": null,
+      "note": "Showing pre-market strength, one to watch for momentum."
     },
     {
       "ticker": "AAPL",
-      "level": 303.49,
-      "changePct": 0.41,
-      "abc": "B",
-      "note": "Slightly positive in pre-market, looking for follow-through."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Monitoring as a market bellwether near highs."
     },
     {
       "ticker": "MSFT",
-      "level": 492.59,
-      "changePct": 0.0,
-      "abc": "B",
-      "note": "Flat pre-market, consolidating near highs."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Key mega-cap, watching for relative strength."
     },
     {
       "ticker": "AMZN",
-      "level": 268.24,
-      "changePct": 0.36,
-      "abc": "B",
-      "note": "Modest pre-market pop, needs to clear resistance."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Watching for reaction to weak retail sales data."
     },
     {
       "ticker": "META",
-      "level": 581.92,
-      "changePct": 0.53,
-      "abc": "C",
-      "note": "Attempting to rebound from yesterday's decline."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Part of the leading Communication Services sector."
     },
     {
       "ticker": "GOOGL",
-      "level": 345.76,
-      "changePct": 0.65,
-      "abc": "B",
-      "note": "Showing strength in pre-market, nearing a potential breakout."
+      "level": null,
+      "changePct": null,
+      "abc": null,
+      "note": "Part of the leading Communication Services sector."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "Watching for momentum from the strong semiconductor theme."
+      "abc": null,
+      "note": "Following the semiconductor theme."
     },
     {
       "ticker": "SMCI",
       "level": null,
-      "changePct": 1.8,
-      "abc": "A",
-      "note": "Strong follow-through momentum after a major earnings beat."
+      "changePct": null,
+      "abc": null,
+      "note": "High-beta name in the AI server space."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Needs to prove itself with volume."
+      "abc": null,
+      "note": "Watching for momentum in software/AI names."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for signs of a new leg up in the cybersecurity space."
+      "abc": null,
+      "note": "Cybersecurity theme, watching for sector rotation."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "High beta crypto play, dependent on Bitcoin's direction."
+      "abc": null,
+      "note": "High-beta proxy for cryptocurrency sentiment."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is showing signs of a bifurcated character. Focus on leaders in strong sectors like Semis (SMCI) that are in confirmed Stage 2 uptrends."
+      "view": "Market is in a confirmed uptrend, but with indices extended, new buys need very tight VCP setups. Be selective."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear institutional flow into AI and semiconductor names. The surge in the KOSPI overnight highlights this rotation. Energy is the source of funds."
+      "view": "Clear rotation into Tech and Semis. Follow the institutional flow there, but be aware of potential profit-taking."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is improving but remains tentative ahead of PPI data. Only A-grade setups in leading groups should be considered. Not an environment for chasing extended names."
+      "view": "Market context is positive (uptrend), but conflicting signals (weak retail vs. low inflation) warrant caution. Only A-grade setups."
     },
     {
       "name": "SRxTrades",
-      "view": "Look for clean pivots and volume confirmation on entries. Avoid chasing pre-market gaps. Wait for the open to see how names like SMCI handle their momentum."
+      "view": "Wait for clean pivots and volume confirmation. Chasing extended names here is a low-probability trade."
     },
     {
       "name": "Jeff",
-      "view": "Respect hard stops, especially on earnings-related plays. Weakness after an earnings report (CBRS, CSCO) is a clear signal to stay away or look for short setups."
+      "view": "Respect hard stops. With the market at all-time highs, volatility can increase unexpectedly."
     },
     {
       "name": "Qullamaggie",
-      "view": "Episodic pivots are in play for stocks with massive earnings beats like SMCI. Look for orderly pullbacks to the ORH for potential entries with LOD as a stop."
+      "view": "Look for episodic pivots like RDDT (index inclusion) and NU (earnings) for potential high-momentum breakouts."
     },
     {
       "name": "Composite",
-      "view": "Focus on the AI/semiconductor theme, but be selective. The market is not giving a broad 'all-clear'. Raise the bar for new long entries and wait for confirmation after the PPI data. Chasing is not advised."
+      "view": "The market is bullish but potentially overbought. Raise the bar for new long entries; focus on A+ setups with clear catalysts. Avoid chasing extended names and be mindful of headline risk from oil/geopolitics."
     }
   ],
-  "standout": {
-    "ticker": "SMCI",
-    "side": "LONG",
-    "score": 85,
-    "sector": "Technology",
-    "rs": null,
-    "grade": "A",
-    "thesis": "Major episodic pivot candidate after reporting quarterly earnings and revenues far exceeding estimates, driven by the AI boom. Showing strong pre-market follow-through momentum.",
-    "entry": null,
-    "stop": null,
-    "target": null,
-    "rrr": null,
-    "tags": [
-      "#breakout",
-      "#earnings",
-      "#momentum",
-      "#AI"
-    ]
-  },
+  "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "JD",
-        "consensus": "Revenue estimate ~$51.6B"
+        "ticker": "RLX",
+        "consensus": "RLX Technology Inc."
       },
       {
-        "ticker": "NTES",
-        "consensus": null
+        "ticker": "OTLK",
+        "consensus": "Outlook Therapeutics, Inc."
       }
     ],
     "amc": [
       {
-        "ticker": "AMAT",
-        "consensus": "EPS estimate ~$3.39 / Rev ~$9.0B"
+        "ticker": "SIDU",
+        "consensus": "Sidus Space, Inc."
       },
       {
-        "ticker": "NU",
-        "consensus": null
+        "ticker": "NFGC",
+        "consensus": "New Found Gold Corp."
       }
     ],
     "yesterdayReactions": [
       {
-        "ticker": "SMCI",
-        "result": "beat",
-        "movePct": 18.83
+        "ticker": "NU",
+        "result": "Beat",
+        "movePct": 12
       },
       {
-        "ticker": "LITE",
-        "result": "beat",
-        "movePct": null
-      },
-      {
-        "ticker": "HRB",
-        "result": "beat",
-        "movePct": null
+        "ticker": "AMAT",
+        "result": "Beat",
+        "movePct": -6
       }
     ]
   },
   "calendar": [
     {
-      "time": "08:30 ET",
-      "name": "Producer Price Index (PPI)",
-      "consensus": "+0.2% MoM"
-    },
-    {
-      "time": "08:30 ET",
-      "name": "Initial Jobless Claims",
-      "consensus": null
+      "time": "07:30 ET",
+      "name": "Retail Sales MoM (Jul)",
+      "consensus": "0.1%"
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "ABT",
-        "firm": "Wolfe Research",
+        "ticker": "WWW",
+        "firm": "Baird",
         "rating": "Outperform",
-        "pt": 130
-      },
-      {
-        "ticker": "ABBV",
-        "firm": "Wolfe Research",
-        "rating": "Outperform",
-        "pt": 300
-      },
-      {
-        "ticker": "CRM",
-        "firm": "JPMorgan",
-        "rating": "Overweight",
-        "pt": 250
+        "pt": 26
       }
     ],
-    "downgrades": [
-      {
-        "ticker": "BTGO",
-        "firm": "Wedbush",
-        "rating": "Outperform (target cut)",
-        "pt": 8
-      },
-      {
-        "ticker": "LENZ",
-        "firm": "B. Riley Securities",
-        "rating": "Neutral (target cut)",
-        "pt": 7
-      },
-      {
-        "ticker": "AOSL",
-        "firm": "Needham",
-        "rating": "Buy (target cut)",
-        "pt": 45
-      }
-    ]
+    "downgrades": []
   },
-  "alert": "Key Inflation Data: US Producer Price Index (PPI) due at 08:30 ET / 20:30 MYT.",
+  "alert": "US RETAIL SALES UNEXPECTEDLY FELL 0.6% IN JULY, MISSING FORECASTS.",
   "news": [
     {
-      "headline": "Global shares mostly rise, powered by gains for AI-related stocks",
+      "headline": "US stocks near record highs as cooling inflation data eases fears of a September Fed rate hike",
       "impact": "HIGH",
       "tickers": [
-        "QQQ",
-        "SMH",
-        "NVDA",
-        "SMCI"
+        "SPY",
+        "QQQ"
       ],
-      "source": "Associated Press - https://www.bnnbloomberg.ca/global-shares-mostly-rise-after-buying-of-ai-related-shares-and-oil-prices-fall-1.2681318",
-      "time": "06:17 ET"
+      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/20260814310/dow-jones-top-markets-headlines-at-3-am-et-cool-inflation-data-propels-stocks-to-fresh-records",
+      "time": "03:15 ET"
     },
     {
-      "headline": "Cerebras (CBRS) tumbles 19% in premarket after missing Q2 revenue estimates",
-      "impact": "MED",
+      "headline": "US Retail Sales unexpectedly fall 0.6% in July, missing forecasts for a 0.1% rise",
+      "impact": "HIGH",
       "tickers": [
-        "CBRS"
+        "SPY",
+        "XLY",
+        "AMZN"
       ],
-      "source": "TheStreet - https://www.thestreet.com/investing/stock-market-today-dow-futures-edge-higher-ahead-of-inflation-report",
-      "time": "07:00 ET"
+      "source": "AP News - https://apnews.com/article/stock-market-today-wall-street-inflation-economy-f0d7b2a9e5b7a1e0b5d5c1b6a3e2c1a8",
+      "time": "09:55 ET"
     },
     {
-      "headline": "Crude oil prices fall ~2% on large US inventory build and weaker demand forecasts",
+      "headline": "Oil prices rise as US says it could maintain naval blockade of Iran indefinitely",
       "impact": "MED",
       "tickers": [
         "CL=F",
         "XLE"
       ],
-      "source": "BNN Bloomberg - https://www.bnnbloomberg.ca/global-shares-mostly-rise-after-buying-of-ai-related-shares-and-oil-prices-fall-1.2681318",
-      "time": "06:17 ET"
+      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-8-14-26-futures-mixed-after-sp-500-hits-record-high",
+      "time": "05:39 ET"
     },
     {
-      "headline": "Investors await key US Producer Price Index (PPI) report for further inflation cues",
-      "impact": "HIGH",
+      "headline": "Reddit (RDDT) shares soar 12% in pre-market after being selected to join the S&P 500 index",
+      "impact": "MED",
       "tickers": [
-        "SPY",
-        "QQQ",
-        "^TNX"
+        "RDDT"
       ],
-      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-8-13-26-futures-wobble-ahead-of-key-ppi-report",
-      "time": "02:46 ET"
+      "source": "Yahoo Finance - https://finance.yahoo.com/news/stock-market-today-aug-14-2026-nasdaq-edges-higher-following-markets-record-close-123000934.html",
+      "time": "pre-market"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "BNN Bloomberg, 06:17 ET - https://www.bnnbloomberg.ca/global-shares-mostly-rise-after-buying-of-ai-related-shares-and-oil-prices-fall-1.2681318",
-    "TipRanks, 02:46 ET - https://www.tipranks.com/news/stock-market-news-today-8-13-26-futures-wobble-ahead-of-key-ppi-report",
-    "StockTitan - https://stocktitan.net/news/",
-    "24/7 Wall St. - https://247wallst.com/investing/2026/08/13/here-are-thursdays-top-wall-street-analyst-research-calls-abbott-labs-abbvie-akamai-technologies-five-below-keurig-dr-pepper-salesforce-stryker-stubhub-and-more/",
-    "Crossing Wall Street - https://www.crossingwallstreet.com/2026/08/morning-news-august-13-2026.html",
-    "Zacks Investment Research - https://www.zacks.com/stock-news/2300037/stock-market-news-for-aug-13-2026",
-    "TheStreet - https://www.thestreet.com/investing/stock-market-today-dow-futures-edge-higher-ahead-of-inflation-report",
-    "Reddit r/TheRaceTo10Million - https://www.reddit.com/r/TheRaceTo10Million/comments/1c8j8f8/premarket_news_report_aug_13_2026/",
-    "Digrin Earnings Calendar - https://digrin.com/calendar/earnings/2026-08-13",
-    "24/7 Wall St. - https://247wallst.com/investing/2026/08/13/koreas-stock-market-surges-another-3-5-overnight-intel-coherent-and-micron-among-most-active-premarket-stocks-in-us-trading/"
+    "TipRanks - https://www.tipranks.com/news/stock-market-news-today-8-14-26-futures-mixed-after-sp-500-hits-record-high",
+    "AP News - https://apnews.com/article/stock-market-today-wall-street-inflation-economy-f0d7b2a9e5b7a1e0b5d5c1b6a3e2c1a8",
+    "Yahoo Finance - https://finance.yahoo.com/news/stock-market-today-aug-14-2026-nasdaq-edges-higher-following-markets-record-close-123000934.html",
+    "KSAT - https://www.ksat.com/news/world/2026/08/14/world-shares-mostly-fall-and-us-futures-are-mixed-after-us-inflation-data-improves/",
+    "Morningstar - https://www.morningstar.com/news/dow-jones/20260814310/dow-jones-top-markets-headlines-at-3-am-et-cool-inflation-data-propels-stocks-to-fresh-records",
+    "Benzinga - https://www.benzinga.com/markets/industrials/26/08/38202079/12-industrials-stocks-moving-in-fridays-pre-market-session",
+    "GuruFocus - https://www.gurufocus.com/news/2614302/www-maintains-by-baird--price-target-raised-to-2600",
+    "EarningsCall.biz - https://www.earningscall.biz/calendar/2026-08-14"
   ]
 }
