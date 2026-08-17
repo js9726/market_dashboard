@@ -223,6 +223,11 @@ def main(argv=None):
                     "after_price": s.get("after_price"), "after_chg": s.get("after_chg"),
                     "as_of": s.get("update_time"),
                     "ema8": tech.get("ema8"), "ema21": tech.get("ema21"), "ema50": tech.get("ema50"),
+                    # Alex soft stop: a CLOSE below the 21dma means the thesis failed.
+                    # It trails, so it is recomputed every run — never a remembered number.
+                    "soft_stop_21dma": tech.get("soft_stop_21dma"),
+                    "soft_stop_atr_mult": tech.get("soft_stop_atr_mult"),
+                    "sma21_rising": tech.get("sma21_rising"),
                     "atr14": tech.get("atr14"), "dist_21_atr": tech.get("dist_21_atr"),
                     "entry_risk": tech.get("entry_risk"), "rsi14": tech.get("rsi14"),
                     "macd_dir": tech.get("macd_dir"),
@@ -251,20 +256,27 @@ def main(argv=None):
     # Human-readable table
     as_of = next((r["as_of"] for r in rows if r.get("as_of")), "n/a")
     print(f"OPEN HOLDINGS REVIEW  (live as-of {as_of})")
-    print(f"{'TKR':<6}{'qty':>5}{'avg':>9}{'last':>9}{'day%':>7}{'AH%':>7}{'gain%':>7}"
-          f"{'R':>6}{'21ATR':>7}{'risk':>16}  {'STOP':>8} {'STATUS':<11} URGENCY / notes")
+    print(f"{'TKR':<6}{'qty':>5}{'avg':>9}{'last':>9}{'day%':>7}{'gain%':>7}"
+          f"{'R':>6}{'21ATR':>7}{'risk':>15}  {'SOFT':>8}{'xATR':>6}{'sl':>4}  {'HARD':>8} {'STATUS':<11} URGENCY / notes")
     for r in rows:
-        ah = r.get("after_chg")
+        soft = r.get("soft_stop_21dma")
+        rising = r.get("sma21_rising")
+        slope = "up" if rising else ("dn" if rising is False else "?")
         print(
             f"{r['ticker']:<6}{r['qty']:>5.0f}{r['avg_cost']:>9.2f}{(r['last'] or 0):>9.2f}"
-            f"{(r.get('change_pct') or 0):>7.2f}{(ah if ah is not None else 0):>7.2f}"
+            f"{(r.get('change_pct') or 0):>7.2f}"
             f"{(r.get('pct_gain') or 0):>7.1f}{(r.get('R') if r.get('R') is not None else 0):>6.1f}"
             f"{(r.get('dist_21_atr') if r.get('dist_21_atr') is not None else 0):>7.2f}"
-            f"{str(r.get('entry_risk') or ''):>16}  {(r.get('stop') or 0):>8.2f} "
+            f"{str(r.get('entry_risk') or ''):>15}  {(soft or 0):>8.2f}"
+            f"{(r.get('soft_stop_atr_mult') or 0):>6.2f}{slope:>4}  {(r.get('stop') or 0):>8.2f} "
             f"{r['stop_status']:<11} {r['urgency']}"
         )
         for n in r["notes"]:
             print(f"        - {n}")
+    print("\nSOFT = 21dma (Alex: a CLOSE below it = thesis failed). It TRAILS — this is today's")
+    print("level, not a fixed one. 'sl' is the 21dma slope: a pullback into a RISING average is")
+    print("constructive, into a flat/falling one it is not. HARD = the broker-side stop.")
+    print("Book Net Exposure Risk at the HARD stop — a soft stop never lowers worst-case loss.")
 
 
 if __name__ == "__main__":

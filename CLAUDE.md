@@ -170,6 +170,8 @@ Define success criteria. Loop until verified.
 | `TELEGRAM_GO_BOT_TOKEN` | For Telegram | Dedicated trading-notification bot token |
 | `TELEGRAM_GO_CHAT_ID` | For Telegram | Private chat/channel target for the final GO list |
 | `TELEGRAM_GO_THREAD_ID` | Optional | Telegram forum-topic target |
+| `TRADING_JOURNAL_INGEST_KEY` | Optional | Dedicated bearer for journal sessions/rules; falls back to `BRIEF_INGEST_KEY` |
+| `TELEGRAM_JOURNAL_WEBHOOK_SECRET` | For Telegram journal capture | Telegram webhook secret-token header; required and fail-closed |
 | `MOOMOO_OPEND_HOST` | Optional (local-only) | moomoo OpenD host for local bridge scripts (default `127.0.0.1`) |
 | `MOOMOO_OPEND_PORT` | Optional (local-only) | moomoo OpenD port (default `11111`) |
 | `BLOB_READ_WRITE_TOKEN` | Optional (Feature 7.2) | Vercel Blob token for journal-entry image attachments. Get via `vercel env pull` or Vercel dashboard. Without it, `/api/journal/entry/attachments` returns 503 cleanly. |

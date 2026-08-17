@@ -20,6 +20,18 @@ function newYorkDateParts(now: Date): { weekday: string; isoDate: string } {
   };
 }
 
+function timeParts(now: Date, timeZone: string): { hour: number; minute: number } {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((part) => part.type === type)?.value ?? "0");
+  return { hour: value("hour"), minute: value("minute") };
+}
+
 export function finalRunFreshness(
   runDate: string,
   generatedAt: string,
@@ -42,6 +54,35 @@ export function finalRunFreshness(
   };
 }
 
+export function paperExecutionEligibility(
+  runDate: string,
+  generatedAt: string,
+  now = new Date(),
+): { eligible: boolean; reason: string | null; ageMinutes: number } {
+  const generated = new Date(generatedAt);
+  const ageMinutes = (now.getTime() - generated.getTime()) / 60_000;
+  const ny = newYorkDateParts(now);
+  const nyTime = timeParts(now, "America/New_York");
+  const mytTime = timeParts(now, "Asia/Kuala_Lumpur");
+  const nyMinutes = nyTime.hour * 60 + nyTime.minute;
+  const mytMinutes = mytTime.hour * 60 + mytTime.minute;
+  const weekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(ny.weekday);
+
+  if (!Number.isFinite(ageMinutes) || ageMinutes < 0 || ageMinutes > 60) {
+    return { eligible: false, reason: "stale_execution_go", ageMinutes };
+  }
+  if (runDate !== ny.isoDate) {
+    return { eligible: false, reason: "execution_go_not_current_us_session", ageMinutes };
+  }
+  if (!weekday || nyMinutes < 9 * 60 + 30 || nyMinutes >= 16 * 60) {
+    return { eligible: false, reason: "outside_us_regular_session", ageMinutes };
+  }
+  if (mytMinutes < 21 * 60) {
+    return { eligible: false, reason: "outside_operator_entry_window", ageMinutes };
+  }
+  return { eligible: true, reason: null, ageMinutes };
+}
+
 export function buildPaperSignals(
   payload: DailyScreenerPayload,
   run: { id: string; goListHash: string },
@@ -59,5 +100,6 @@ export function buildPaperSignals(
     runId: run.id,
     runDate: payload.runDate,
     generatedAt: payload.generatedAt,
+    ownerProvider: payload.generatedBy,
   }));
 }

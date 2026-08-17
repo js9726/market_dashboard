@@ -178,6 +178,8 @@ Define success criteria. Loop until verified.
 | `TELEGRAM_GO_BOT_TOKEN` | For Telegram | Dedicated trading-notification bot token |
 | `TELEGRAM_GO_CHAT_ID` | For Telegram | Private chat/channel target for the final GO list |
 | `TELEGRAM_GO_THREAD_ID` | Optional | Telegram forum-topic target |
+| `TRADING_JOURNAL_INGEST_KEY` | Optional | Dedicated bearer for journal sessions/rules; falls back to `BRIEF_INGEST_KEY` |
+| `TELEGRAM_JOURNAL_WEBHOOK_SECRET` | For Telegram journal capture | Telegram webhook secret-token header; required and fail-closed |
 
 Never commit `.env.local`. Never log keys. Never hardcode secrets.
 

@@ -6,6 +6,7 @@ import {
   type DailyScreenerPayload,
 } from "@/lib/daily-screener/schema";
 import { deliverTelegramGoList } from "@/server/telegram-go";
+import { paperExecutionEligibility } from "@/server/daily-screener-paper";
 
 function payload(overrides: Record<string, unknown> = {}): unknown {
   return {
@@ -57,6 +58,22 @@ describe("daily screener v2 payload", () => {
     const parsed = dailyScreenerPayloadSchema.parse(payload());
     expect(parsed.candidates.goList).toEqual([]);
     expect(formatTelegramGoList(parsed)).toContain("No GO tickers");
+  });
+
+  it("accepts the keyed technicals object emitted by the packager", () => {
+    const parsed = dailyScreenerPayloadSchema.parse(
+      payload({
+        candidates: {
+          goList: [],
+          watchList: [],
+          technicals: { generated_at: "2026-07-26T12:00:00Z", candidates: [] },
+        },
+      }),
+    );
+    expect(parsed.candidates.technicals).toEqual({
+      generated_at: "2026-07-26T12:00:00Z",
+      candidates: [],
+    });
   });
 
   it("normalizes a valid GO ticker and formats the risk contract", () => {
@@ -154,5 +171,21 @@ describe("daily screener v2 payload", () => {
       if (oldToken) process.env.TELEGRAM_GO_BOT_TOKEN = oldToken;
       if (oldChatId) process.env.TELEGRAM_GO_CHAT_ID = oldChatId;
     }
+  });
+
+  it("requires a GO refresh inside 60 minutes and the operator regular-session window", () => {
+    const now = new Date("2026-08-03T14:15:00.000Z");
+    expect(paperExecutionEligibility("2026-08-03", "2026-08-03T13:30:00.000Z", now)).toMatchObject({
+      eligible: true,
+      reason: null,
+    });
+    expect(paperExecutionEligibility("2026-08-03", "2026-08-03T12:00:00.000Z", now)).toMatchObject({
+      eligible: false,
+      reason: "stale_execution_go",
+    });
+    expect(paperExecutionEligibility("2026-08-03", "2026-08-03T16:00:00.000Z", new Date("2026-08-03T16:30:00.000Z"))).toMatchObject({
+      eligible: false,
+      reason: "outside_operator_entry_window",
+    });
   });
 });

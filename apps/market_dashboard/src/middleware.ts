@@ -22,6 +22,7 @@ export default auth((req) => {
     pathname.startsWith("/api/morning-verdict/ingest") ||
     pathname.startsWith("/api/daily-screener/ingest") ||
     pathname.startsWith("/api/daily-screener/paper-signals") ||
+    pathname.startsWith("/api/telegram/trading-journal") ||
     pathname.startsWith("/api/wiki/audits/ingest") ||
     pathname.startsWith("/api/watchlist/export") ||
     pathname.startsWith("/api/live-quotes/ingest") ||
@@ -38,6 +39,7 @@ export default auth((req) => {
     // entries/ingest (cron writes AI-scored JournalEntry via bearer).
     pathname.startsWith("/api/journal/closed-today") ||
     pathname.startsWith("/api/journal/entries/ingest") ||
+    pathname.startsWith("/api/trading-journal") ||
     // A-list daily-bar ingest (P2): the local OpenD/IBKR bridge pushes bars via
     // BRIEF_INGEST_KEY. Key/bearer auth inside the handler — must bypass session.
     pathname.startsWith("/api/a-list/bars-ingest") ||

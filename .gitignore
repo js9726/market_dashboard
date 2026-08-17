@@ -56,6 +56,8 @@ site-screenshots/
 
 # Generated local broker / morning-brief scratch outputs
 packages/dashboard-bridge/ibkr_backfill.json
+packages/dashboard-bridge/paper_state.json
+packages/dashboard-bridge/paper_trader.log
 packages/core-skills/morning-brief/_tmp_*.py
 packages/core-skills/morning-brief/brief_output_*.json
 packages/core-skills/morning-brief/holdings_review_*.json
@@ -76,6 +78,14 @@ packages/core-skills/morning-brief/index_technicals_*.json
 **/morning-brief/levels_*.json
 **/morning-brief/opend_live_*.json
 **/morning-brief/opend_now*.json
+**/morning-brief/opend_*.json
+**/morning-brief/brief_manual_*.json
+**/morning-brief/cand_*.json
+**/morning-brief/followup_technicals_*.json
+**/morning-brief/finviz_cache.json
+**/morning-brief/preflight_receipt.json
+**/morning-brief/trv_*.json
+**/morning-brief/tv_screeners.json
 **/morning-brief/gfs_cdw_live.json
 **/morning-brief/scr_enrich.json
 **/morning-brief/err.log
