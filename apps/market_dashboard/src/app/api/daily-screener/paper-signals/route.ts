@@ -14,6 +14,7 @@ import {
 import {
   buildPaperSignals,
   finalRunFreshness,
+  paperExecutionEligibility,
   PAPER_SIGNAL_AUTHORITY,
 } from "@/server/daily-screener-paper";
 
@@ -96,11 +97,23 @@ export async function GET(req: Request) {
     });
   }
 
+  const execution = paperExecutionEligibility(payload.runDate, payload.generatedAt);
+  if (!execution.eligible) {
+    return NextResponse.json({
+      ok: true,
+      authority: PAPER_SIGNAL_AUTHORITY,
+      asOf: new Date().toISOString(),
+      run: { ...run, executionAgeMinutes: Number(execution.ageMinutes.toFixed(2)) },
+      signals: [],
+      reason: execution.reason,
+    });
+  }
+
   return NextResponse.json({
     ok: true,
     authority: PAPER_SIGNAL_AUTHORITY,
     asOf: new Date().toISOString(),
-    run,
+    run: { ...run, executionAgeMinutes: Number(execution.ageMinutes.toFixed(2)) },
     signals: buildPaperSignals(payload, row),
     reason: payload.candidates.goList.length === 0 ? "empty_final_go_list" : null,
   });

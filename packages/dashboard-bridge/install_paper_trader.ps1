@@ -1,8 +1,9 @@
 # install_paper_trader.ps1 — register the daily SIMULATE paper-trader task.
 #
-# Runs after the morning package, near the afternoon transition window, and
-# post-close: 23:00 Mon-Fri plus 02:15 and 04:10 Tue-Sat Malaysia time.
-# Repeated runs are idempotent by final-run signal ID.
+# Mirrors Jie's active window every 15 minutes from 21:30 to 23:45 Mon-Fri.
+# From 00:00 to 04:00 Tue-Sat it continues protection/sync only; the signal
+# endpoint blocks new entries after Malaysia midnight. Missed triggers use
+# StartWhenAvailable. Repeated runs are idempotent by final-run signal ID.
 # Requires OpenD on 127.0.0.1:11111 (kept alive by the existing watchdog task);
 # if OpenD is down the script exits non-zero and logs — fail-closed, no orders.
 #
@@ -31,11 +32,15 @@ $action = New-ScheduledTaskAction `
     -Argument "/c echo ===== %DATE% %TIME% ===== >> `"$Log`" 2>&1 && `"$Python`" `"$Script`" >> `"$Log`" 2>&1" `
     -WorkingDirectory $BridgeDir
 
-$triggers = @(
-    (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At 23:00),
-    (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Tuesday,Wednesday,Thursday,Friday,Saturday -At 02:15),
-    (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Tuesday,Wednesday,Thursday,Friday,Saturday -At 04:10)
-)
+$triggers = @()
+for ($minutes = 21 * 60 + 30; $minutes -le 23 * 60 + 45; $minutes += 15) {
+    $at = Get-Date -Hour ([math]::Floor($minutes / 60)) -Minute ($minutes % 60) -Second 0
+    $triggers += New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At $at
+}
+for ($minutes = 0; $minutes -le 4 * 60; $minutes += 15) {
+    $at = Get-Date -Hour ([math]::Floor($minutes / 60)) -Minute ($minutes % 60) -Second 0
+    $triggers += New-ScheduledTaskTrigger -Weekly -DaysOfWeek Tuesday,Wednesday,Thursday,Friday,Saturday -At $at
+}
 $settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -WakeToRun `
@@ -53,6 +58,6 @@ Register-ScheduledTask `
     -Trigger $triggers `
     -Settings $settings `
     -Principal $principal `
-    -Description "Intraday moomoo SIMULATE paper trader: strict final v2 GO signals -> paper orders + stop management + dashboard sync (paper_trader.py; SIMULATE acc hard-coded)." | Out-Null
+    -Description "Intraday moomoo SIMULATE forward validator: strict final v2 GO signals, fail-closed stop-capability gate, existing-position monitoring, and dashboard sync (paper account dynamically verified)." | Out-Null
 
-Write-Host "Registered $TaskName (23:00 Mon-Fri, 02:15 + 04:10 Tue-Sat local). Log: $Log"
+Write-Host "Registered $TaskName (15-minute monitoring: 21:30-23:45 Mon-Fri; protection/sync 00:00-04:00 Tue-Sat). Log: $Log"

@@ -161,6 +161,10 @@ def analyze(ticker: str, n: int = 100) -> dict | None:
     e8 = ema(closes, 8)
     e21 = ema(closes, 21)
     e50 = ema(closes, 50)
+    # 21-period SIMPLE average. Alex's soft-stop rule is "close below 21dma-structure",
+    # and dma means SMA — for OKTA on 2026-08-12 the SMA read 143.76 vs 143.33 for the EMA,
+    # so quoting the EMA as the soft stop is the wrong level. Keep both.
+    s21 = sma(closes, 21) if len(closes) >= 21 else [None] * len(closes)
     s200 = sma(closes, 200) if len(closes) >= 200 else [None] * len(closes)
     r14 = rsi(closes, 14)
     ml, ms, mh = macd_calc(closes)
@@ -185,6 +189,12 @@ def analyze(ticker: str, n: int = 100) -> dict | None:
         "atr14": round(atr_now, 2), "atr_pct": round(atr_now / last_close * 100, 2),
         "ema8": round(e8_now, 2) if e8_now else None,
         "ema21": round(e21_now, 2), "ema50": round(e50_now, 2),
+        # sma21 is the Alex soft-stop level (21dma). It TRAILS — recompute daily.
+        "sma21": round(s21[-1], 2) if s21[-1] else None,
+        "sma21_rising": (bool(s21[-1] > s21[-6]) if (len(s21) > 6 and s21[-1] and s21[-6]) else None),
+        "soft_stop_21dma": round(s21[-1], 2) if s21[-1] else None,
+        "soft_stop_atr_mult": (round((last_close - s21[-1]) / atr_now, 2)
+                               if (atr_now and s21[-1]) else None),
         "ma200": round(ma200_now, 2) if ma200_now else None,
         "dist_8_atr": round(dist_8_atr, 2) if dist_8_atr is not None else None,
         "dist_21_atr": round(dist_21_atr, 2), "dist_50_atr": round(dist_50_atr, 2),

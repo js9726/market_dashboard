@@ -6,6 +6,7 @@ import {
   type DailyScreenerPayload,
 } from "@/lib/daily-screener/schema";
 import { deliverTelegramGoList } from "@/server/telegram-go";
+import { paperExecutionEligibility } from "@/server/daily-screener-paper";
 
 function payload(overrides: Record<string, unknown> = {}): unknown {
   return {
@@ -170,5 +171,21 @@ describe("daily screener v2 payload", () => {
       if (oldToken) process.env.TELEGRAM_GO_BOT_TOKEN = oldToken;
       if (oldChatId) process.env.TELEGRAM_GO_CHAT_ID = oldChatId;
     }
+  });
+
+  it("requires a GO refresh inside 60 minutes and the operator regular-session window", () => {
+    const now = new Date("2026-08-03T14:15:00.000Z");
+    expect(paperExecutionEligibility("2026-08-03", "2026-08-03T13:30:00.000Z", now)).toMatchObject({
+      eligible: true,
+      reason: null,
+    });
+    expect(paperExecutionEligibility("2026-08-03", "2026-08-03T12:00:00.000Z", now)).toMatchObject({
+      eligible: false,
+      reason: "stale_execution_go",
+    });
+    expect(paperExecutionEligibility("2026-08-03", "2026-08-03T16:00:00.000Z", new Date("2026-08-03T16:30:00.000Z"))).toMatchObject({
+      eligible: false,
+      reason: "outside_operator_entry_window",
+    });
   });
 });
