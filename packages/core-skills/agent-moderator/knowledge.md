@@ -5,8 +5,8 @@
   "target": "agent-moderator/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-18T16:36:32.736Z",
-  "renderHash": "f9a008bdb63912e6faa12a0b9567ca862e542da2f83cb3aca8445dbc8a075e98",
+  "generatedAt": "2026-08-18T17:05:54.068Z",
+  "renderHash": "bf3e0bfa62ae47956ad9e177471f13dc6eb1f820569d6e4c1db1bdb9573983ee",
   "sources": [
     {
       "root": "wiki",
@@ -41,7 +41,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/risk/risk-management.md",
-      "sha256": "9fda9f6a19f86334695907ed0f1a682a8cfbc78983e6c007e3ac68170d0de974"
+      "sha256": "e5a141f3ebc05afa749c0bbe442e0616f7594d7480f3325b91acf556ec206138"
     },
     {
       "root": "wiki",
@@ -84,7 +84,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/traders/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
 - wiki:wiki/trading/traders/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
 - wiki:wiki/trading/concepts/entry-methods.md sha256:9c3c5e5a93a5
-- wiki:wiki/trading/risk/risk-management.md sha256:9fda9f6a19f8
+- wiki:wiki/trading/risk/risk-management.md sha256:e5a141f3ebc0
 - wiki:wiki/trading/risk/position-sizing.md sha256:51671f829f25
 - wiki:wiki/trading/concepts/relative-strength.md sha256:3c49bdb0cd3c
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:22014c94765d
@@ -1303,7 +1303,7 @@ midweek pattern").
 |---|---|
 | Early recovery / out of correction | 10–20% of risk budget |
 | Confirmed uptrend | Build to full exposure |
-| Extended / overbought | Stop adding, trim strength |
+| Extended / overbought (price stretch plus stalled breadth/leadership) | Stop adding, trim strength |
 | Correction / breakdown | Cut to cash |
 
 (source: Alex's Swing Trading System.md)

@@ -5,8 +5,8 @@
   "target": "trader-scorer-trade/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-18T16:36:32.754Z",
-  "renderHash": "0ee76e9cb64cfae85503017c52f4bc372ea360b1681a83888fa128c87bb08b13",
+  "generatedAt": "2026-08-18T17:05:54.091Z",
+  "renderHash": "743d40a34cd2c9e5e9653784dda5bccaecc9a5b6a9d9b0e88c110bf94929cc07",
   "sources": [
     {
       "root": "wiki",
@@ -46,7 +46,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/risk/risk-management.md",
-      "sha256": "9fda9f6a19f86334695907ed0f1a682a8cfbc78983e6c007e3ac68170d0de974"
+      "sha256": "e5a141f3ebc05afa749c0bbe442e0616f7594d7480f3325b91acf556ec206138"
     },
     {
       "root": "wiki",
@@ -80,7 +80,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/concepts/entry-methods.md sha256:9c3c5e5a93a5
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/trading/traders/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
-- wiki:wiki/trading/risk/risk-management.md sha256:9fda9f6a19f8
+- wiki:wiki/trading/risk/risk-management.md sha256:e5a141f3ebc0
 - wiki:wiki/trading/risk/position-sizing.md sha256:51671f829f25
 - wiki:wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md sha256:7a2301df36b9
 - wiki:wiki/trading/journal/trade-journal-workflow.md sha256:3cede4d53fbc
@@ -1377,7 +1377,7 @@ midweek pattern").
 |---|---|
 | Early recovery / out of correction | 10–20% of risk budget |
 | Confirmed uptrend | Build to full exposure |
-| Extended / overbought | Stop adding, trim strength |
+| Extended / overbought (price stretch plus stalled breadth/leadership) | Stop adding, trim strength |
 | Correction / breakdown | Cut to cash |
 
 (source: Alex's Swing Trading System.md)

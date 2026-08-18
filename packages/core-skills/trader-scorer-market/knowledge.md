@@ -5,8 +5,8 @@
   "target": "trader-scorer-market/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-18T16:36:32.745Z",
-  "renderHash": "fabdb064b8356cdf70f0834b5775bd5493e6380a009c5b0411eefe7879647c89",
+  "generatedAt": "2026-08-18T17:05:54.078Z",
+  "renderHash": "1319bf876787195ff2e0ab4df62a863e8b7763b0ee9c41e73fe07798ed1cd8a9",
   "sources": [
     {
       "root": "wiki",
@@ -21,12 +21,12 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/market-timing.md",
-      "sha256": "067321a3a537cd0b89b51bd2cb5a4a7e6e3ce813c719671ff9d3450a803c4d24"
+      "sha256": "1a931bdcbe441a469efb7c44a45f4bfed54897084026f5556fc7aa003906adcb"
     },
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/market-phases.md",
-      "sha256": "40aa98ce1088bdeed010946b46f84013c70b1b576c77c5ce18bc2ad54c2fcb27"
+      "sha256": "806ba3fb3189dc3733e5c503c5fa124fafca9fbbb5f034c09993fb623c452e6f"
     },
     {
       "root": "wiki",
@@ -65,8 +65,8 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 ## Sources
 - wiki:wiki/trading/traders/trader-styles.md sha256:3da04059b2e6
 - wiki:wiki/trading/traders/trader-style-profiles.md sha256:86b243e654ed
-- wiki:wiki/trading/concepts/market-timing.md sha256:067321a3a537
-- wiki:wiki/trading/concepts/market-phases.md sha256:40aa98ce1088
+- wiki:wiki/trading/concepts/market-timing.md sha256:1a931bdcbe44
+- wiki:wiki/trading/concepts/market-phases.md sha256:806ba3fb3189
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/trading/concepts/relative-strength.md sha256:3c49bdb0cd3c
 - wiki:wiki/trading/concepts/stock-scanning.md sha256:73fb529748da
@@ -455,9 +455,9 @@ Use this routing when analysing a candidate:
 
 **Summary**: Market timing is about identifying the current market phase and adjusting exposure accordingly — not predicting direction, but responding to what price structure and breadth are telling you.
 
-**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @SteveDJacobs on X.md, Post by @Clement_Ang17 on X.md
+**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @SteveDJacobs on X.md, Post by @Clement_Ang17 on X.md, [StockCharts DecisionPoint Chart Gallery](https://stockcharts.com/freecharts/dpgallery.html)
 
-**Last updated**: 2026-08-18
+**Last updated**: 2026-08-19
 
 ---
 
@@ -482,6 +482,15 @@ No setup is good enough to trade against a bad market. When the market is in cor
 - **Stage Analysis Summary** — distribution of stocks in Stage 1/2/3/4
 
 (source: Post by @SteveDJacobs on X.md)
+
+### DecisionPoint confirmation
+
+The decisionpoint-market-edge gallery adds a disciplined four-part cross-check:
+multi-horizon EMA/PMO trend, percent-of-stocks participation, A/D/new-high/McClellan
+breadth, and condition/sentiment extremes. It is confirmation, not a replacement for
+equal-weight breadth, leadership, or recent valid-trade feedback. The free gallery is
+S&P 500-only and its daily signals are confirmed only after the close. (source:
+[StockCharts DecisionPoint Chart Gallery](https://stockcharts.com/freecharts/dpgallery.html))
 
 ### SRxTrades' EMA System
 - **8/21/50 EMA on SPY/QQQ** — all above = bullish, press longs
@@ -510,6 +519,16 @@ failures is not fully confirmed Risk-On. (source: Post by @Clement_Ang17 on X.md
 
 (source: Alex's Swing Trading System.md)
 
+## DecisionPoint precedence rule
+
+Use 8/21/50 and the 21-day reclaim as the **fast tactical layer**; use DecisionPoint's
+20/50/200 model as the **slower structural layer**. Fast improvement while slower breadth
+lags can support `EARLY RECOVERY`. Fast deterioration while the slow model remains bullish
+is `EXTENDED` or `MIXED/SELECTIVE`, not automatic Risk-On. An overbought oscillator or
+sentiment extreme is a warning only; require breadth contraction, divergence, failed price
+structure, or weak leadership before reducing the regime label. See
+decisionpoint-market-edge for the compact daily read and freshness rules.
+
 ## Character Change Signals
 
 A **character change** around the 21dma-structure is the clearest signal the market phase is shifting:
@@ -532,15 +551,16 @@ During low-opportunity environments, the correct action is **not** to force trad
 - risk-management
 - trading-routine
 - relative-strength
+- decisionpoint-market-edge
 ## Source: wiki:wiki/trading/concepts/market-phases.md
 
 # Market Phases
 
 **Summary**: Markets cycle through distinct phases — uptrend, pullback, correction, and breakdown — each requiring a different level of exposure and a different set of expectations.
 
-**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @martinlukkt on X.md, `(2) Sean trades on X A lot of you have probably seen the words lockout rally...hig.md`
+**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @martinlukkt on X.md, `(2) Sean trades on X A lot of you have probably seen the words lockout rally...hig.md`, [StockCharts DecisionPoint Chart Gallery](https://stockcharts.com/freecharts/dpgallery.html)
 
-**Last updated**: 2026-07-18
+**Last updated**: 2026-08-19
 
 ---
 
@@ -554,6 +574,10 @@ During low-opportunity environments, the correct action is **not** to force trad
 | Breakdown | Market losing structure below key MAs; sellers in control | Cut to cash; capital preservation is the position |
 
 (source: Alex's Swing Trading System.md)
+
+`Overbought / Extended` describes price stretched from structure with participation or
+leadership no longer expanding. A standalone overbought oscillator is an early warning,
+not a phase change; see decisionpoint-market-edge.
 
 ## Stage Analysis (Broader Framework)
 

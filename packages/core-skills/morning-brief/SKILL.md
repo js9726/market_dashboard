@@ -192,6 +192,19 @@ Clement's contribution is the feedback loop: recent valid setups must actually w
 shift to chop must reduce exposure immediately. Do not attribute the whole indicator model
 to Clement. Source of truth: `jie_wiki/wiki/trading/concepts/market-timing.md`.
 
+For the latest completed US session, inspect the official StockCharts DecisionPoint Chart
+Gallery when reachable and apply the committed rules below. The local authoring source is
+`jie_wiki/wiki/trading/concepts/decisionpoint-market-edge.md`; deployed runs must not require
+that local path. Include this compact read in the market narrative:
+
+`DP CONFIRMATION: <CONFIRMS|DIVERGES|UNAVAILABLE> | trend=<...> | participation=<...> | condition=<...> | asof=<date>`
+
+This is a confirmation lane, not a new regime label or execution feed. Treat 20/50/200 as
+slower structural evidence than 8/21/50, and treat overbought/sentiment extremes as warnings
+rather than automatic sell signals. The free gallery is S&P 500-only. Daily readings are
+confirmed only after the close; label intraday readings `PROVISIONAL`. Never invent or reuse
+a stale gallery reading.
+
 ### Step 0.7 — Open Holdings Overnight Review — MANDATORY (operator-local)
 
 The watchlist/screener cover **new** opportunities; this step covers the **book you
