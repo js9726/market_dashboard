@@ -5,8 +5,8 @@
   "target": "trader-scorer-market/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-11T15:46:12.965Z",
-  "renderHash": "017761d02a9df1fefa5b076679ee94d35606e320bbfea3e4ec1aed3680b5ed2c",
+  "generatedAt": "2026-08-18T08:48:39.102Z",
+  "renderHash": "5bd4e868b0d67efec3fe4b2adca6aa02195539f1b5d43822c0f419772ef1ede9",
   "sources": [
     {
       "root": "wiki",
@@ -21,7 +21,7 @@
     {
       "root": "wiki",
       "path": "wiki/market-timing.md",
-      "sha256": "5c0d5e42fdf38df37497e3c5a5b2f55091187dd740a280bb3bdb7788f5e6ac27"
+      "sha256": "067321a3a537cd0b89b51bd2cb5a4a7e6e3ce813c719671ff9d3450a803c4d24"
     },
     {
       "root": "wiki",
@@ -65,7 +65,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 ## Sources
 - wiki:wiki/trader-styles.md sha256:3da04059b2e6
 - wiki:wiki/trader-style-profiles.md sha256:86b243e654ed
-- wiki:wiki/market-timing.md sha256:5c0d5e42fdf3
+- wiki:wiki/market-timing.md sha256:067321a3a537
 - wiki:wiki/market-phases.md sha256:40aa98ce1088
 - wiki:wiki/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/relative-strength.md sha256:3c49bdb0cd3c
@@ -455,9 +455,9 @@ Use this routing when analysing a candidate:
 
 **Summary**: Market timing is about identifying the current market phase and adjusting exposure accordingly — not predicting direction, but responding to what price structure and breadth are telling you.
 
-**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @SteveDJacobs on X.md
+**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @SteveDJacobs on X.md, Post by @Clement_Ang17 on X.md
 
-**Last updated**: 2026-04-23
+**Last updated**: 2026-08-18
 
 ---
 
@@ -490,12 +490,23 @@ No setup is good enough to trade against a bad market. When the market is in cor
 
 ## Market Phases and Exposure Levels
 
-| Phase | Action |
-|---|---|
-| Out of Correction / Early Uptrend | Start light, test with 1–2 names |
-| Pullback in Uptrend | Add back exposure aggressively |
-| Extended / Overbought | Stop adding, trim strength |
-| Breakdown / Correction | Cut to cash, preserve capital |
+Use the smallest label supported by all available evidence. MCO/MCSI and moving-average
+structure come mainly from Alex, SRxTrades and Steve Jacobs; Clement's additional lens is
+**market feedback** from the recent trade sample and the need to register a shift to chop
+immediately. Do not attribute the whole label system to Clement.
+
+| Canonical phase | Evidence required | Default action |
+|---|---|---|
+| **EARLY RECOVERY** | MCO turns positive from an oversold/recent lower-tail condition and the indices reclaim the 21-day average, but MCSI or broad participation is not yet confirmed | Start light; use probes and demand follow-through |
+| **RISK-ON / CONFIRMED UPTREND** | Indices hold above rising key averages; MCSI is above zero and rising; equal-weight breadth, leadership and follow-through confirm participation; recent valid setups are working | Add exposure progressively within the risk budget |
+| **EXTENDED** | Index structure remains bullish, but price is stretched while breadth or leadership stops expanding | Stop adding; trim or trail strength; wait for a reset |
+| **RISK-OFF / BREAKDOWN** | Indices fail key averages and breadth deteriorates; below the 8/21/50 stack is a hard defensive signal | No new risk; cut exposure and preserve capital |
+| **MIXED/SELECTIVE** | Price, breadth, leadership or recent-trade feedback conflict | Do not invent confidence; trade only the cleanest setups at reduced exposure |
+
+This reconciles the indicator framework with Clement's feedback loop: the indicators propose
+the phase, but the last 10 valid trades and the behaviour of current leaders must confirm that
+the claimed environment is actually paying. A bullish index label with repeated valid-setup
+failures is not fully confirmed Risk-On. (source: Post by @Clement_Ang17 on X.md)
 
 (source: Alex's Swing Trading System.md)
 

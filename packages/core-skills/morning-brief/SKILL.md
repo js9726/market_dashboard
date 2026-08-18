@@ -161,6 +161,37 @@ The brief's `technicals` field and `technicalsNarrative` MUST cite these numbers
 classify each index. If QQQ shows EXTREME-EXTENDED + RSI > 70 + MACD curving down,
 the brief's `posture` should reflect that — typically `WAIT` or `TRIM_TIGHTEN`, not `GO`.
 
+### Step 0.6 — Classify market regime from price, breadth, and feedback — MANDATORY
+
+```powershell
+python market_edge.py
+python breadth_ma.py --universe sp500 --json
+```
+
+`breadth_ma.py` measures TradingView's current `SP:SPX` membership and fails closed when
+fewer than 450 names are classified. It is the 5/20/50-day breadth source. `$SPXA50R` is
+only a 50-day cross-check; never use it as a 5-day series. Read MCO/MCSI from their actual
+charts and do not invent an `x sigma` value unless the underlying series and calculation
+window were measured.
+
+Use only these labels:
+
+- `EARLY RECOVERY`: MCO turns positive from an oversold/recent lower-tail condition and
+  indices reclaim the 21-day average, but MCSI or broader participation is not confirmed.
+- `RISK-ON / CONFIRMED UPTREND`: indices hold above rising key averages, MCSI is above
+  zero/rising, and equal-weight breadth, leadership, follow-through and recent valid-trade
+  feedback confirm participation.
+- `EXTENDED`: structure remains bullish, but price is stretched while breadth or
+  leadership stops expanding.
+- `RISK-OFF / BREAKDOWN`: indices fail key averages and breadth deteriorates; all below
+  the 8/21/50 stack is a hard defensive signal.
+- `MIXED/SELECTIVE`: inputs conflict. Never manufacture a confident label.
+
+MCO/MCSI and moving-average structure come mainly from Alex, SRxTrades and Steve Jacobs.
+Clement's contribution is the feedback loop: recent valid setups must actually work, and a
+shift to chop must reduce exposure immediately. Do not attribute the whole indicator model
+to Clement. Source of truth: `jie_wiki/wiki/market-timing.md`.
+
 ### Step 0.7 — Open Holdings Overnight Review — MANDATORY (operator-local)
 
 The watchlist/screener cover **new** opportunities; this step covers the **book you
@@ -327,6 +358,24 @@ breakout, and that is the correct place to say no. Source of truth:
 `jie_wiki/wiki/entry-methods.md` § "The 21EMA extension gate is setup-scoped, not universal".
 Origin: INTA 2026-08-05 was scored PASS 35/100 by stacking three gates that do not govern EPs;
 re-scored correctly as EP-FRESH it was 67/100 WATCH.
+
+**0.8d-iii — INDUSTRY PROXY BOARD — MANDATORY, print it in every brief.**
+
+```bash
+python industry_proxies.py
+python industry_proxies.py --tickers IGV,SMH,CIBR
+```
+
+A one-month industry rank cannot distinguish a broken group from a group consolidating
+before a reclaim. For every industry in play, report its chartable proxy, price and ATR
+distance versus the 21dma, five-session 21dma slope, and state (`HOLDING`, `UNDERCUT`,
+`LOST`, or `EXTENDED`). Industry rank may cap the Theme score, but it cannot by itself veto
+an `MA-RECLAIM`, `PB-21EMA`, or undercut-and-reclaim entry. A pullback into a rising 21dma
+on contracting volume is constructive.
+
+When no clean ETF exists (currently Computer Hardware and Communication Equipment), mark
+the proxy `loose`, name the constituents, and do not silently substitute a broad sector ETF.
+Source of truth: `jie_wiki/wiki/entry-methods.md` and `industry_proxies.py`.
 
 **0.8e — Market-edge confluence (operator's A+ setup).** Flag a name only when ALL FOUR hold:
 
