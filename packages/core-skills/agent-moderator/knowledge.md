@@ -5,8 +5,8 @@
   "target": "agent-moderator/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-11T15:46:12.957Z",
-  "renderHash": "6be94601381d97245b2b3477a099405b5f16c8da832eb58d5448072e29feb39c",
+  "generatedAt": "2026-08-17T17:13:28.066Z",
+  "renderHash": "85c17d857d442d966a70905917fd3e9bd9369931a19318df6979556aaf8f7be8",
   "sources": [
     {
       "root": "wiki",
@@ -36,12 +36,12 @@
     {
       "root": "wiki",
       "path": "wiki/entry-methods.md",
-      "sha256": "0a051f1f47979a96a461ce733884f270d96288a478a8630f7c70b967b2fa64b1"
+      "sha256": "e0f39e2098011453f5afd6a511d7d5a3f2981047edc046faf623668a856cf68b"
     },
     {
       "root": "wiki",
       "path": "wiki/risk-management.md",
-      "sha256": "f90cf08303b11d3d869eb1a748def14b60c5e7cc0fccf8ddb96056fdeec981fd"
+      "sha256": "9fda9f6a19f86334695907ed0f1a682a8cfbc78983e6c007e3ac68170d0de974"
     },
     {
       "root": "wiki",
@@ -83,8 +83,8 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
 - wiki:wiki/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
-- wiki:wiki/entry-methods.md sha256:0a051f1f4797
-- wiki:wiki/risk-management.md sha256:f90cf08303b1
+- wiki:wiki/entry-methods.md sha256:e0f39e209801
+- wiki:wiki/risk-management.md sha256:9fda9f6a19f8
 - wiki:wiki/position-sizing.md sha256:23dc116bc8f1
 - wiki:wiki/relative-strength.md sha256:3c49bdb0cd3c
 - wiki:wiki/lockout-rally.md sha256:22014c94765d
@@ -963,6 +963,66 @@ This is the same family as Launch Pad / Power-of-3 in traderlion-early-entry-tec
 
 ---
 
+## Industry-group rank must not veto a reclaim setup (2026-08-12 calibration)
+
+**The defect.** The 2026-08-10 brief scored DELL `WAIT` with `Theme 10/20`, reasoning
+"Computer Hardware #142/144, -11.1% 1M - good location, wrong neighbourhood." HPE was
+scored `WAIT 57` on similar grounds. Two sessions later DELL was **+9.87%** and HPE
+**+8.11%**, both completing an undercut-and-reclaim of their 50 SMA. DELL was at +1.10 ATR
+- inside the green zone - and the rank was the only thing standing against it.
+
+**Why the reasoning was circular.** A Finviz industry rank is a *trailing* 1-month
+performance statistic. When a leadership group pulls back, its rank collapses **because of
+the pullback** - the same pullback that creates the reclaim setup. Using the rank to veto
+the setup means the deeper and cleaner the consolidation, the lower the Theme score, and
+the more certainly the trade is rejected. The metric measures the opportunity and reports
+it as a disqualification.
+
+**A rank cannot distinguish "broken" from "basing". The 21 DMA can.**
+
+| Group state | 1M rank | 21 DMA reading | Correct verdict |
+|---|---|---|---|
+| Leaders consolidating | poor | pullback into a **rising** 21 DMA, held | constructive - this is the setup |
+| Group genuinely broken | poor | **falling** 21 DMA, lost and not reclaimed | avoid |
+
+Identical rank, opposite meaning.
+
+### Rules
+
+1. **Industry rank may cap the Theme sub-score; it may not by itself veto a `MA-RECLAIM`,
+   `PB-21EMA` or undercut-and-reclaim entry.** For those lanes the deciding gates remain
+   the ones in Rule 2 and Rule 3 above - pattern stop, and volume contraction into the
+   pullback followed by expansion on the reclaim.
+2. **Read the group's proxy chart before applying the rank.** If price is pulling back into
+   a *rising* 21 DMA on contracting volume, the weak rank IS the consolidation. Score it
+   constructively and say so explicitly in the brief.
+3. **Publish the Industry Proxy Board in every morning brief** - see
+   `market_dashboard/packages/core-skills/morning-brief/industry_proxies.py` and SKILL Step
+   0.8h. Per industry it reports the Finviz industry name, the **proxy ticker the operator
+   can chart**, price vs that proxy's 21 DMA, whether the 21 DMA is rising, and the state
+   (`HOLDING` / `UNDERCUT` / `LOST` / `EXTENDED`).
+4. **Where no clean ETF exists, say so and name the constituents.** Do not substitute a
+   broad sector ETF - that is the lens error that hid cybersecurity for six sessions
+   (a-list-gate-and-screener). `Computer Hardware` and `Communication Equipment`
+   currently have no clean proxy; they are flagged `loose` in the script.
+
+**Operator's own framing (Jeff Sun, @jfsrev, 2026-08-12, long both names):** *"These were
+proven leaders consolidating after big moves not doing anything wrong. One trip to the 50
+SMA for both names with a quick undercut and reclaim, volume remained low-confirming there
+was no distribution... lots of opinions on X implying these were 'old leaders'... it felt
+copy/paste. That's where opinions become bias and can start costing you... the only thing
+that can tell you the story has changed is price (and volume) action."*
+
+A trailing rank statistic is precisely the copy/paste proxy for thinking he describes.
+
+**Same root cause, third instance in eight days.** A rule was applied from the wrong setup
+lane: the 21EMA extension gate to a day-one EP (2026-08-05, INTA); the breakout stop-basis
+(5-day low / 1.5x ATR) to a reclaim entry, when Rule 2 specifies the **trigger-day LoD**
+(2026-08-12, OKTA - entry 150.99 after an undercut to 147.00 and reclaim of the prior close
+150.77, so the compliant stop was 147.00 = 0.66x ATR, not the 1.96x ATR stop that was set);
+and the industry rank to a reclaim (this section). **Classify the setup first
+(trade-analyser Step 2.5), then select the rule set. Never the reverse.**
+
 ## The 21EMA extension gate is setup-scoped, not universal (2026-08-05 calibration; corrected 2026-08-11)
 
 **The defect.** A catalyst-day `EP-FRESH` was being rejected solely because the gap placed price above the 21EMA. That confuses the setup's defining repricing event with a late breakout chase. The distance still must be calculated and disclosed, but it is not an automatic hard veto on a genuine fresh day-one EP.
@@ -1084,9 +1144,9 @@ Across all traders, volume is a key confirmation:
 
 **Summary**: Risk management is the set of rules and habits that prevent a bad trade from becoming a catastrophic loss, and bad luck from becoming a blown account.
 
-**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @Clement_Ang17 on X.md
+**Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @Clement_Ang17 on X.md, operator-approved private journal review (2026-08-13; private fills and P&L are not copied here)
 
-**Last updated**: 2026-07-16
+**Last updated**: 2026-08-18
 
 ---
 
@@ -1114,6 +1174,46 @@ On breakout entries, the stop is the **low of day** — creating a tight risk/re
 For Qullamaggie-style breakouts and episodic pivots, the initial stop is normally the **low of day**. The stop should not be wider than 1× to 1.5× ATR or ADR; if the stop is wider than the stock's normal daily range, the setup usually loses its asymmetric risk/reward. (source: Qullamaggie official setup posts)
 
 > **Calibration note (2026-05-07, updated 2026-05-11)**: A 109-trade backfill found this strict LoD rule whipsawed **30% of trades that ultimately closed positive at +14d**. Updated guidance: keep the LoD stop strict for **fresh catalyst-day Episodic Pivots only** (the catalyst-day low is the genuine failure point), but use a structural stop for **Common Breakouts**, **VCP**, and **post-gap VCP / gapper entries**. For `POST-GAP-VCP`, risk usually belongs below the tight post-gap range, recent higher low, 10ema/21ema, or gap-day volume support. See qullamaggie-breakouts-episodic-pivots "Stop Calibration by Setup Type" and gapper-entry.
+
+### ATR-based stop placement — APPROVED CONDITIONAL PLAYBOOK (2026-08-13)
+
+Approved by Jie 2026-08-13. Registered as `atr-based-stop-placement` in the v2 rule registry
+(`CONDITIONAL_PLAYBOOK` / `APPROVED`) and rendered on the Conditional Playbooks tab.
+
+**Set the stop before the size, from ATR and structure — never from a habitual percentage.**
+
+1. **Classify the setup first, then pick the stop basis.** This is where the errors happened,
+   not in the arithmetic:
+
+   | Setup class | Stop basis |
+   |---|---|
+   | `BO-CB`, `BO-VCP`, `PB-21EMA`, `POST-GAP-VCP`, `CONTINUATION` | wider of `entry − 1.5×ATR(14)` or the 5-day low |
+   | `MA-RECLAIM`, wedge-break, undercut-and-reclaim | **trigger-day LoD** (entry-methods Rule 2) |
+   | `EP-FRESH`, `ORH-INTRADAY` | low of day |
+
+2. **Check the result against the 1.5×ATR ceiling above.** If no stop location inside the
+   ceiling exists at the intended entry price, **the entry price is wrong** — do not widen the
+   stop to make the trade fit.
+3. **Only then size:** `shares = (dollars allowed to risk) / (entry − stop)`.
+
+**Two-tier stops (soft + hard).** Where overnight protection and opening-range room are both
+needed — the operator is UTC+8 and asleep for the US close — run Alex's pair:
+
+- **SOFT**, close-based, at the **21dma-structure**. A *close* below it means the thesis failed
+  (21dma-structure). It trails: recompute daily.
+- **HARD**, broker-side GTC, wider, as disaster/gap insurance only.
+- **Book Net Exposure Risk at the HARD stop.** A soft stop lowers *expected* loss; it never
+  lowers *worst-case* loss. Booking the soft number creates phantom risk budget.
+
+**Evidence boundary.** The private journal review found four recurring errors: placing a resting
+stop directly on a moving average, using a breakout stop basis for a reclaim setup, accepting a
+hard stop beyond the ATR ceiling, and choosing a habitual percentage before checking volatility.
+The individual fills, prices, holdings and P&L remain in the private journal/dashboard and are not
+published in this wiki.
+
+**Corollary — never place a resting broker stop exactly on a moving average.** If the rule is a
+*close* below the MA, a stop sitting on it converts a close-based rule into an intraday-touch
+rule. The journal review contained a concrete case of that failure mode.
 
 ### Stop distance band by setup type — FLOOR **and** CEILING
 
