@@ -1,194 +1,116 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-ON",
+    "label": "CAUTIOUSLY-RISK-OFF",
     "posture": "WAIT",
-    "summary": "US futures are mixed with tech showing strength while Dow lags, as rising Treasury yields apply pressure. The market is in a holding pattern ahead of key retail earnings this week and FOMC minutes on Wednesday."
+    "summary": "Rising geopolitical tensions in the Middle East are pushing bond yields and oil prices higher, creating a risk-off sentiment, particularly pressuring technology and semiconductor stocks."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": 65,
-    "label": "Greed"
+    "score": null,
+    "label": null
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": 0.11,
+      "changePct": -0.55,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 0.54,
+      "changePct": -1.17,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": -0.18,
+      "changePct": -0.15,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility",
-      "level": 14.25,
+      "name": "Volatility Index",
+      "level": 14.55,
       "changePct": null,
-      "note": "previous close",
-      "citation": "Source: Cboe Global Markets"
+      "note": "jumped to a two-week high",
+      "citation": null
     },
     {
       "symbol": "^TNX",
-      "name": "10Y Yield",
-      "level": 4.696,
+      "name": "10-Yr Treasury Yield",
+      "level": 4.74,
       "changePct": null,
-      "note": "near 19-month high",
-      "citation": "Source: TradingView"
+      "note": "approaching 20-month highs",
+      "citation": null
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil",
-      "level": 82.1,
+      "name": "WTI Crude Oil",
+      "level": 84.93,
       "changePct": null,
-      "note": "WTI",
-      "citation": "Source: Investing.com"
+      "note": "rising on US-Iran tensions",
+      "citation": null
     }
   ],
-  "indicesNarrative": "The tape shows a split personality this morning, with Nasdaq futures indicating strength in tech while Dow futures lag. This divergence is occurring under pressure from a rising 10-year Treasury yield, which is nearing multi-month highs and capping broad market enthusiasm. Overall action is muted as traders await key earnings from the retail sector and Fed minutes later in the week for clues on consumer health and monetary policy.",
-  "technicals": {
-    "SPY": {
-      "close": null,
-      "atr14": 1.55,
-      "atr_pct": null,
-      "ema21": 775.64,
-      "ema50": 771.09,
-      "ma200": 754.46,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": 57.28,
-      "macd": 0.93,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": false,
-      "bear_cross_imminent": false,
-      "overbought": false,
-      "oversold": false,
-      "entry_risk": "FAIR"
-    },
-    "QQQ": {
-      "close": null,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": 702.34,
-      "ema50": 713.02,
-      "ma200": 649,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": 60.14,
-      "macd": 4.59,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": false,
-      "bear_cross_imminent": false,
-      "overbought": false,
-      "oversold": false,
-      "entry_risk": "FAIR"
-    },
-    "DIA": {
-      "close": null,
-      "atr14": 1.24,
-      "atr_pct": null,
-      "ema21": 537.33,
-      "ema50": 536.53,
-      "ma200": 528.07,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": 45.79,
-      "macd": -0.49,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": false,
-      "bear_cross_imminent": false,
-      "overbought": false,
-      "oversold": false,
-      "entry_risk": "FAIR"
-    }
-  },
-  "technicalsNarrative": "All major indices are in a 'FAIR' entry risk zone, trading above their key moving averages. RSI levels are neutral, below overbought territory, suggesting some room to run if catalysts emerge. The MACD on DIA is negative, showing lagging momentum compared to SPY and QQQ, which aligns with the weakness seen in Dow futures.",
+  "indicesNarrative": "US futures are pointing to a lower open, with the tech-heavy Nasdaq leading losses as rising bond yields and oil prices weigh on sentiment. The 10-year Treasury yield is approaching multi-year highs, and the VIX is climbing, signaling increasing investor caution amid geopolitical uncertainty.",
+  "technicals": null,
+  "technicalsNarrative": "Technical data was not available. Cannot assess entry risk or momentum.",
   "sectorsThemes": [],
-  "sectorsNarrative": "Technology is indicating pre-market strength, while the broader market appears to be in a holding pattern. A clear rotation story has not yet emerged for the week.",
+  "sectorsNarrative": "Semiconductors are showing notable pre-market weakness due to the dual pressures of rising bond yields and geopolitical risk, suggesting a rotation away from high-duration growth sectors.",
   "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "IVF",
+      "ticker": "XOS",
       "side": "LONG",
-      "changePct": 173.78,
-      "why": "High pre-market volume, specific catalyst not immediately clear.",
-      "traderLens": "Qullamaggie - high momentum, high volume gap up."
+      "changePct": 129.0,
+      "why": "Announced an agreement with the US Air Force for mobile charging technology.",
+      "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "MBLY",
+      "ticker": "DXC",
       "side": "LONG",
-      "changePct": 3.9,
-      "why": "Upgraded to Buy from Hold at Berenberg, citing undervaluation after a recent selloff.",
-      "traderLens": "Minervini - potential catalyst to start a new upleg."
+      "changePct": 4.5,
+      "why": "Positive investor reaction to its multi-year AI turnaround strategy and new partnerships.",
+      "traderLens": "Minervini"
+    },
+    {
+      "ticker": "BBWI",
+      "side": "LONG",
+      "changePct": 3.2,
+      "why": "Upgraded to Buy from Neutral by Citi analysts ahead of its upcoming earnings report.",
+      "traderLens": "Ted Zhang"
+    },
+    {
+      "ticker": "WDC",
+      "side": "SHORT",
+      "changePct": -5.4,
+      "why": "Part of a broad semiconductor and tech sell-off amid rising bond yields and Middle East tensions.",
+      "traderLens": "Ted Zhang"
     },
     {
       "ticker": "SNDK",
-      "side": "LONG",
-      "changePct": 5.1,
-      "why": "Continued momentum following the company's investor day on Aug 13, where a strong long-term financial framework was presented.",
-      "traderLens": "Episodic pivot setup on a multi-day catalyst."
-    },
-    {
-      "ticker": "AAPL",
-      "side": "LONG",
-      "changePct": 0.4,
-      "why": "Upgraded to Buy at Rothschild & Co. with a new $400 price target, citing foldable iPhone and AI strategy as major catalysts.",
-      "traderLens": "Institutional catalyst, potential for sustained interest."
-    },
-    {
-      "ticker": "RDDT",
-      "side": "LONG",
-      "changePct": 12.63,
-      "why": "S&P Dow Jones Indices announced the stock will be added to the S&P 500.",
-      "traderLens": "Classic index inclusion catalyst play."
-    },
-    {
-      "ticker": "GIPR",
       "side": "SHORT",
-      "changePct": -31.11,
-      "why": "High pre-market volume on the downside, specific catalyst not immediately clear.",
-      "traderLens": "Potential for a gap down and continuation short."
+      "changePct": -4.4,
+      "why": "Chip stocks are under pressure from a risk-off macro environment.",
+      "traderLens": "Ted Zhang"
     },
     {
-      "ticker": "FUFU",
+      "ticker": "MU",
       "side": "SHORT",
-      "changePct": -20.69,
-      "why": "Negative reaction to its pre-market earnings report.",
-      "traderLens": "Earnings breakdown, potential for fading strength."
-    },
-    {
-      "ticker": "AVGO",
-      "side": "SHORT",
-      "changePct": -5.94,
-      "why": "Investors weighing AI oversight headlines and fresh security vulnerability reports.",
-      "traderLens": "Negative news flow on a market leader."
+      "changePct": -4.0,
+      "why": "Profit-taking in the semiconductor sector as rising yields make growth stocks less attractive.",
+      "traderLens": "Ted Zhang"
     }
   ],
   "watchlist": [
@@ -196,157 +118,137 @@
       "ticker": "NVDA",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching how it responds to tech strength and AVGO weakness."
+      "abc": null,
+      "note": "Watching for reaction to broad semiconductor weakness."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Consolidating, needs a catalyst to break out."
+      "abc": null,
+      "note": "Sensitive to rising yields and risk-off sentiment."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
-      "abc": "A",
-      "note": "In play on analyst upgrade and $400 PT."
+      "abc": null,
+      "note": "Mega-cap tech feeling pressure from higher rates."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching for leadership within big-cap tech."
+      "abc": null,
+      "note": "Watching for signs of institutional defense or distribution."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "A key name to watch ahead of retail earnings week."
+      "abc": null,
+      "note": "Consumer discretionary exposure in a cautious market."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Lagging other megacaps, needs to prove itself."
+      "abc": null,
+      "note": "Facing a 29-state lawsuit over claims its platforms harm youth."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Quietly constructive, watching for a move."
+      "abc": null,
+      "note": "Monitoring behavior amid broad tech pullback."
     },
     {
       "ticker": "AMD",
       "level": null,
-      "changePct": null,
-      "abc": "B",
-      "note": "Watching semi space for direction from NVDA/AVGO."
+      "changePct": -3.3,
+      "abc": null,
+      "note": "Pre-market weakness along with other chipmakers."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "High beta name, needs market risk-on to perform."
+      "abc": null,
+      "note": "High-beta name, sensitive to market shifts."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Watching for signs of renewed retail interest."
+      "abc": null,
+      "note": "Growth stock under pressure from rising rates."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Cybersecurity theme, watching for sector rotation."
+      "abc": null,
+      "note": "High-multiple software name to watch in a risk-off tape."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "High correlation to crypto, watching Bitcoin for cues."
+      "abc": null,
+      "note": "High correlation to Bitcoin, which has been range-bound."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is not in a confirmed uptrend; be highly selective. Focus on setups with strong catalysts, like the AAPL upgrade."
+      "view": "Market is showing risk-off behavior. Not an ideal environment to be buying breakouts; focus on preserving capital."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear pre-market flow into Technology, but broad market participation is lacking. Wait for confirmation."
+      "view": "Clear rotation out of technology and semiconductors due to macro headwinds. Money flowing to safety or commodities like oil."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is choppy and mixed. Not an environment for A-grade setups. Raise the bar for new entries."
+      "view": "Market context is deteriorating with rising yields and geopolitical risk. This is not an environment for A-grade setups. Best to sit on hands."
     },
     {
       "name": "SRxTrades",
-      "view": "Wait for clean pivots to form. Chasing pre-market gaps is a low-probability trade today."
+      "view": "Choppy, headline-driven action is likely. Wait for clean pivots and volume confirmation before committing capital; avoid chasing gaps."
     },
     {
       "name": "Jeff",
-      "view": "With a mixed open and key events later in the week, it's a good day to be patient and protect capital. Stick to your rules."
+      "view": "Respect hard stops. The macro environment has shifted, and positions can move against you quickly."
     },
     {
       "name": "Qullamaggie",
-      "view": "Some pre-market movers have high volume, but the overall market lacks conviction. A day to watch for episodic pivots forming rather than chasing breakouts at the open."
+      "view": "Episodic pivots on news (like XOS) can work, but broad market momentum for breakouts is absent. Be highly selective."
     },
     {
       "name": "Composite",
-      "view": "Patience is key today. The market is sending mixed signals with tech outperforming but yields rising. Focus on the watchlist, observe the reaction to the open, and wait for high-quality setups to emerge. Avoid forcing trades in a cautious environment."
+      "view": "Stay defensive today. The combination of rising yields and geopolitical headlines is a headwind for equities, especially tech. Wait for the tape to stabilize before deploying significant capital."
     }
   ],
-  "standout": {
-    "ticker": "AAPL",
-    "side": "LONG",
-    "score": 85,
-    "sector": "Technology",
-    "rs": null,
-    "grade": "A",
-    "thesis": "Major analyst upgrade to Buy with a $400 price target from Rothschild, citing two significant near-term catalysts: a foldable iPhone and a revamped AI strategy. This provides a clear institutional thesis.",
-    "entry": null,
-    "stop": null,
-    "target": 400,
-    "rrr": null,
-    "tags": [
-      "#upgrade",
-      "#catalyst"
-    ]
-  },
+  "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "HTHT",
-        "consensus": null
+        "ticker": "HD",
+        "consensus": "EPS $4.73 / Rev $47.24B"
       },
       {
-        "ticker": "FUFU",
-        "consensus": null
-      },
-      {
-        "ticker": "NSPR",
-        "consensus": null
+        "ticker": "BIDU",
+        "consensus": "EPS $1.39 / Rev $4.71B"
       }
     ],
     "amc": [
       {
-        "ticker": "DCGO",
-        "consensus": null
+        "ticker": "KEYS",
+        "consensus": "EPS $2.46 / Rev $1.7B"
       },
       {
-        "ticker": "FLXS",
-        "consensus": null
+        "ticker": "TOL",
+        "consensus": "EPS $2.90 / Rev $2.6B"
       }
     ],
     "yesterdayReactions": []
@@ -354,98 +256,110 @@
   "calendar": [
     {
       "time": "08:30 ET",
-      "name": "NY Empire State Manufacturing Index (Aug)",
+      "name": "Housing Starts (Jul)",
+      "consensus": null
+    },
+    {
+      "time": "08:30 ET",
+      "name": "Building Permits (Jul)",
+      "consensus": "1.37M"
+    },
+    {
+      "time": "09:15 ET",
+      "name": "Industrial Production (Jul)",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "AAPL",
-        "firm": "Rothschild & Co.",
+        "ticker": "BBWI",
+        "firm": "Citigroup",
         "rating": "Buy",
-        "pt": 400
+        "pt": 25
       },
       {
-        "ticker": "MBLY",
-        "firm": "Berenberg",
+        "ticker": "DUOL",
+        "firm": "DA Davidson",
         "rating": "Buy",
-        "pt": 11
+        "pt": 160
+      },
+      {
+        "ticker": "AMX",
+        "firm": "JPMorgan",
+        "rating": "Overweight",
+        "pt": 32
       }
     ],
     "downgrades": [
       {
-        "ticker": "WDAY",
-        "firm": "BTIG",
-        "rating": "Neutral",
+        "ticker": "ANF",
+        "firm": "Raymond James",
+        "rating": "Market Perform",
         "pt": null
       },
       {
-        "ticker": "JBLU",
-        "firm": "Seaport Global",
+        "ticker": "EYPT",
+        "firm": "HC Wainwright & Co.",
         "rating": "Neutral",
         "pt": null
-      },
-      {
-        "ticker": "AMCR",
-        "firm": "JP Morgan",
-        "rating": "Neutral",
-        "pt": 47
       }
     ]
   },
-  "alert": null,
+  "alert": "RISK-OFF: Rising yields and Middle East tensions are pressuring tech and growth stocks.",
   "news": [
     {
-      "headline": "US stock futures mixed with tech outperforming as investors await key retail earnings and Fed minutes.",
+      "headline": "US stock futures fall as fading Iran peace prospects drive up oil and bond yields",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
         "DIA"
       ],
-      "source": "Investing.com",
-      "time": "06:27 ET"
+      "source": "MarketScreener - https://www.marketscreener.com/news/latest/US-stock-futures-fall-as-fading-Iran-peace-prospects-drive-up-oil-yields-46587425/",
+      "time": "07:15 ET"
     },
     {
-      "headline": "Apple upgraded to Buy at Rothschild with $400 price target on foldable iPhone and AI catalyst hopes.",
+      "headline": "Semiconductor stocks fall broadly in pre-market on surging yields and geopolitical risk",
+      "impact": "HIGH",
+      "tickers": [
+        "SMH",
+        "MU",
+        "WDC",
+        "AMD"
+      ],
+      "source": "TheStreet - https://www.thestreet.com/investing/stocks/stock-market-today-sp-500-futures-slide-on-growing-iran-tensions",
+      "time": "07:35 ET"
+    },
+    {
+      "headline": "Xos, Inc. shares surge 129% pre-market after signing agreement with US Air Force",
       "impact": "MED",
       "tickers": [
-        "AAPL"
+        "XOS"
       ],
-      "source": "Stocktwits",
-      "time": "pre-market"
+      "source": "MarketScreener - https://www.marketscreener.com/quote/stock/XOS-INC-124485577/news/Xos-Inc-Rises-in-Premarket-After-Signing-Agreement-With-US-Air-Force-46587392/",
+      "time": "07:15 ET"
     },
     {
-      "headline": "Asian markets were mixed overnight while European shares edged slightly higher.",
-      "impact": "LOW",
-      "tickers": null,
-      "source": "Associated Press",
-      "time": "overnight"
-    },
-    {
-      "headline": "WTI crude oil holds above $82 a barrel amid ongoing geopolitical tensions in the Middle East.",
+      "headline": "Bath & Body Works (BBWI) upgraded to Buy at Citi ahead of earnings",
       "impact": "MED",
       "tickers": [
-        "XLE",
-        "CL=F"
+        "BBWI"
       ],
-      "source": "Trading Economics",
-      "time": "pre-market"
+      "source": "TheStreet - https://www.thestreet.com/investing/stocks/stock-market-today-sp-500-futures-slide-on-growing-iran-tensions",
+      "time": "06:51 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "FinHacker.cz, August 14 2026",
-    "Investing.com, August 17 2026",
-    "Associated Press, August 17 2026",
-    "US Stock Market Today, August 17 2026",
-    "TipRanks.com, August 17 2026",
-    "Stocktwits, August 17 2026",
-    "Benzinga, August 17 2026",
-    "LiteFinance, August 17 2026",
-    "Nasdaq, August 17 2026",
-    "AltIndex, August 17 2026",
-    "TradingView"
+    "TipRanks 05:46 ET — Futures Fall on Rising Middle East Tensions, Oil Prices Climb",
+    "TradingView 06:11 GMT-7 — US 10-Year Yield Rises to 20-Month High",
+    "Reuters 04:50 ET - US stock futures drop as fading Iran peace hopes lift oil, bond yields",
+    "TheStreet 07:35 ET - Stock Market Today (Aug. 18, 2026): S&P 500 futures slide on growing Iran tensions",
+    "MarketScreener 07:15 ET - Xos shares were up more than 129% in Tuesday's premarket activity",
+    "Digrin - Stock Earnings Calendar Aug 18, 2026",
+    "Benzinga - This Duolingo Analyst Turns Bullish; Here Are Top 5 Upgrades For Tuesday",
+    "GuruFocus - ANF Downgraded by Raymond James",
+    "Econoday - 2026 Economic Calendar"
   ]
 }
