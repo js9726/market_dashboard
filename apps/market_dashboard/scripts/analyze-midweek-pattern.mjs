@@ -1,7 +1,7 @@
 /**
  * analyze-midweek-pattern.mjs — durable, re-runnable evidence for the
  * 2026-07-13 wiki calibration "midweek-entry winners get cut early"
- * (jie_wiki/wiki/risk-management.md "Operator calibration 2026-07-13").
+ * (jie_wiki/wiki/trading/risk/risk-management.md "Operator calibration 2026-07-13").
  *
  * Committed in response to Codex's 2026-07-17 review finding: the original
  * analysis ran in ephemeral session scripts with no stable artifact. This
@@ -132,7 +132,7 @@ const out = {
   },
   periodTable,
   holdingSplit: holdStats,
-  calibrationRef: "jie_wiki/wiki/risk-management.md 'Operator calibration 2026-07-13'",
+  calibrationRef: "jie_wiki/wiki/trading/risk/risk-management.md 'Operator calibration 2026-07-13'",
 };
 
 const here = dirname(fileURLToPath(import.meta.url));

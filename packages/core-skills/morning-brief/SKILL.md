@@ -58,7 +58,7 @@ It enforces, in code:
 
 | Check | Hard? | What it catches |
 |---|---|---|
-| `focus_list` | yes | Scans `jie_wiki/tradingview_snapshots/raw` for **today/yesterday-dated** charts. **This is Jie's focus list — he snaps charts there deliberately.** Auto-merges them into `watchlist.json`. |
+| `focus_list` | yes | Scans `jie_wiki/sources/trading/charts/user-captures` for **today/yesterday-dated** charts. **This is Jie's focus list — he snaps charts there deliberately.** Auto-merges them into `watchlist.json`. |
 | `watchlist` | yes | Exists, and today's focus names were folded in |
 | `themes` | yes | Finviz returns >100 industries. Fewer = **scraper broken, not a flat market** |
 | `universe` | yes | Every focus ticker actually reached the classified universe, and flags `UNCLASSIFIED` liquid names |
@@ -94,7 +94,7 @@ Why this is first and not optional:
 - `tradingview-daily-screener/SKILL.md` already makes the authenticated daily+weekly chart a
   hard gate: **missing either chart caps the ticker at `WATCH`.** The same cap applies here.
 
-Then scan `jie_wiki/tradingview_snapshots/raw` with `scripts/scan_user_snapshots.py`. Every
+Then scan `jie_wiki/sources/trading/charts/user-captures` with `scripts/scan_user_snapshots.py`. Every
 newly indexed image is a **user-nominated `PRELIMINARY FOCUS`** candidate for the next US
 session and MUST appear in the Focus List — a nomination is never an automatic GO, but it is
 never silently dropped either. On 2026-08-04 RBRK and TOST were nominated and never made the
@@ -190,7 +190,7 @@ Use only these labels:
 MCO/MCSI and moving-average structure come mainly from Alex, SRxTrades and Steve Jacobs.
 Clement's contribution is the feedback loop: recent valid setups must actually work, and a
 shift to chop must reduce exposure immediately. Do not attribute the whole indicator model
-to Clement. Source of truth: `jie_wiki/wiki/market-timing.md`.
+to Clement. Source of truth: `jie_wiki/wiki/trading/concepts/market-timing.md`.
 
 ### Step 0.7 — Open Holdings Overnight Review — MANDATORY (operator-local)
 
@@ -355,7 +355,7 @@ floor). What still refuses an EP is its own quality filters (gap size, volume su
 quality, gapping into resistance, fresh-vs-late) plus the **setup-agnostic regime / traction /
 portfolio caps** — an `EXTENDED` regime's 0% new-risk cap binds an EP exactly as it binds a
 breakout, and that is the correct place to say no. Source of truth:
-`jie_wiki/wiki/entry-methods.md` § "The 21EMA extension gate is setup-scoped, not universal".
+`jie_wiki/wiki/trading/concepts/entry-methods.md` § "The 21EMA extension gate is setup-scoped, not universal".
 Origin: INTA 2026-08-05 was scored PASS 35/100 by stacking three gates that do not govern EPs;
 re-scored correctly as EP-FRESH it was 67/100 WATCH.
 
@@ -375,7 +375,7 @@ on contracting volume is constructive.
 
 When no clean ETF exists (currently Computer Hardware and Communication Equipment), mark
 the proxy `loose`, name the constituents, and do not silently substitute a broad sector ETF.
-Source of truth: `jie_wiki/wiki/entry-methods.md` and `industry_proxies.py`.
+Source of truth: `jie_wiki/wiki/trading/concepts/entry-methods.md` and `industry_proxies.py`.
 
 **0.8e — Market-edge confluence (operator's A+ setup).** Flag a name only when ALL FOUR hold:
 
@@ -431,7 +431,7 @@ Navigate Chrome to each screener and note the top 5 tickers visible:
 Combine top tickers from all screeners, deduplicate, and merge with `$WATCHLIST_TICKERS`.
 Store the merged list as `$FULL_WATCHLIST` (personal + screener extras, deduplicated).
 
-Before promoting any screener ticker to `GO`, apply the catalyst-source gate from `jie_wiki/wiki/ticker-catalyst-analysis.md`: recent events, insider/institutional activity, peer/sector trend, next catalysts, analyst actions, and source gaps must be present or explicitly unavailable. Medical/biotech/healthcare/FDA-driven names are rotation/speculation indicators first and stay `WAIT` unless company stage, catalyst, peer confirmation, binary risk, and insider read are clear.
+Before promoting any screener ticker to `GO`, apply the catalyst-source gate from `jie_wiki/wiki/trading/concepts/ticker-catalyst-analysis.md`: recent events, insider/institutional activity, peer/sector trend, next catalysts, analyst actions, and source gaps must be present or explicitly unavailable. Medical/biotech/healthcare/FDA-driven names are rotation/speculation indicators first and stay `WAIT` unless company stage, catalyst, peer confirmation, binary risk, and insider read are clear.
 
 If Chrome is unavailable, fall back to the cached `tv_screeners.json` from the last daily run — but state in the brief that the screener read was cached, and cap any ticker whose authenticated chart was never opened at `WATCH`.
 
@@ -579,7 +579,7 @@ it through `ingest_to_dashboard.py` (which defaults to provider=claude).
 
 ## Journal v2 contract — the brief MUST comply
 
-Source of truth: `jie_wiki/docs/agents/work/ai-managed-trading-journal-v2/spec.md`
+Source of truth: `jie_wiki/evidence/trading/journal-backfills/ai-managed-trading-journal-v2/spec.md`
 (approved by Jie 2026-08-04). The morning brief feeds the journal, so it uses the same
 vocabulary and the same caps. Divergence here is a defect, not a style choice.
 
@@ -622,7 +622,7 @@ NOT cancel the owner's GO.
 
 **UNPROTECTED positions.** Any live position without an active broker-side stop is marked
 `UNPROTECTED` and blocks new live risk — except holdings explicitly classified `HOLD-EXEMPT`
-in the wiki (currently MTLS; see `jie_wiki/wiki/companies/materialise.md`). Do not report a
+in the wiki (currently MTLS; see `jie_wiki/wiki/trading/companies/materialise.md`). Do not report a
 HOLD-EXEMPT position as a stop defect and do not count it against the risk budget.
 
 ## Files

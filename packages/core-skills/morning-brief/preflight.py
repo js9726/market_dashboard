@@ -17,7 +17,7 @@ actually block, rather than politely suggesting.
 
 Checks
 ------
-  1. focus_list   — scan jie_wiki/tradingview_snapshots/raw for TODAY-dated charts.
+  1. focus_list   — scan jie_wiki/sources/trading/charts/user-captures for TODAY-dated charts.
                     Jie's habit is to snap his focus list there; those tickers are
                     PRELIMINARY FOCUS and must reach the brief. Writes watchlist.json.
   2. watchlist    — exists and is <= 3 days old.
@@ -66,10 +66,10 @@ def _wiki(override: str | None) -> Path | None:
 
 
 def check_focus_list(wiki: Path | None) -> dict:
-    """Today-dated charts in tradingview_snapshots/raw = Jie's focus list."""
+    """Today-dated charts in sources/trading/charts/user-captures = Jie's focus list."""
     if not wiki:
         return {"ok": False, "hard": True, "detail": "wiki not found; cannot read focus list"}
-    raw = wiki / "tradingview_snapshots" / "raw"
+    raw = wiki / "sources" / "trading" / "charts" / "user-captures"
     if not raw.exists():
         return {"ok": False, "hard": True, "detail": f"missing {raw}"}
     today = date.today().isoformat()
@@ -171,7 +171,7 @@ def check_universe(focus: dict) -> dict:
 def check_empty_go(wiki: Path | None) -> dict:
     if not wiki:
         return {"ok": True, "hard": False, "detail": "wiki not found; skipped"}
-    daily = wiki / "tradingview_snapshots" / "daily"
+    daily = wiki / "evidence" / "trading" / "daily-runs"
     if not daily.exists():
         return {"ok": True, "hard": False, "detail": "no daily history"}
     streak, checked = 0, []

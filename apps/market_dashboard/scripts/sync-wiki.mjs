@@ -22,7 +22,7 @@ const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const REPO_ROOT = path.resolve(APP_ROOT, "..", "..", "..");
 const WIKI_ROOT =
   process.env.JIE_WIKI_ROOT ||
-  process.env.LLM_TRADERS_WIKI_ROOT ||
+  process.env.JIE_WIKI_ROOT ||
   path.join(REPO_ROOT, "jie_wiki");
 const VERDICTS_ROOT = path.join(WIKI_ROOT, "verdicts");
 const PUBLIC_DEST = path.join(APP_ROOT, "public", "wiki");

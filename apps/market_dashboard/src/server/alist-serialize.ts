@@ -37,7 +37,7 @@ export function serializeCandidate(r: AListCandidate) {
     rvol: num(r.day0Rvol),
     thesis: r.day0Thesis,
     traderLens: r.day0TraderLens,
-    // Conviction breakdown (wiki/trader-styles.md) + best-match persona.
+    // Conviction breakdown (wiki/trading/traders/trader-styles.md) + best-match persona.
     conviction: {
       setup: r.setupScore,
       entry: r.entryScore,

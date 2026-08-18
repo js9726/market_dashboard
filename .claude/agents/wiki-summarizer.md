@@ -12,7 +12,7 @@ You compose `knowledge.md` for a runtime skill from one (or two) wiki source pag
 ## Source
 
 Resolve the wiki root in this order:
-1. `LLM_TRADERS_WIKI_ROOT` environment variable.
+1. `JIE_WIKI_ROOT` environment variable.
 2. Sibling folder fallback from the repo root: `../jie_wiki/wiki`.
 3. If neither exists, ask the caller for the wiki root and stop without writing.
 
@@ -65,6 +65,6 @@ explanation citing the threshold breached.">
 5. **Print** a summary: byte count, table count preserved, threshold numerics preserved (list them explicitly so the caller can sanity-check nothing was lost).
 
 ## Reference
-- Wiki root: `LLM_TRADERS_WIKI_ROOT` or sibling `../jie_wiki/wiki`
+- Wiki root: `JIE_WIKI_ROOT` or sibling `../jie_wiki/wiki`
 - Skill catalog & wiki mapping: plan § 3
 - Plan: `C:\Users\jiesh\.claude\plans\locked-in-at-95-lexical-galaxy.md`

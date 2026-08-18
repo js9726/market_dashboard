@@ -310,7 +310,7 @@ def _hit_rvol(hit: dict) -> float:
 def _compute_stages(hit: dict, market_sentiment: float = 6.0) -> dict:
     """
     Deterministic Conviction sub-scores from screener data (2026-06-15 model;
-    see wiki/trader-styles.md "Conviction Scoring Model").
+    see wiki/trading/traders/trader-styles.md "Conviction Scoring Model").
 
         Conviction = Setup/40 + Entry/30 + Theme/20 + Sentiment/10  (0-100)
         GO >= 75, WAIT 50-74, PASS < 50.

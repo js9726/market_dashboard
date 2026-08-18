@@ -6,19 +6,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash 'C:\\Users\\jiesh\\AI codes hub\\market_dashboard\\.codex\\hooks\\check-ts.sh'",
+            "command": "bash .codex/hooks/check-ts.sh",
             "timeout": 30,
             "statusMessage": "Type-checking..."
           },
           {
             "type": "command",
-            "command": "bash 'C:\\Users\\jiesh\\AI codes hub\\market_dashboard\\.codex\\hooks\\lint.sh'",
+            "command": "bash .codex/hooks/lint.sh",
             "timeout": 30,
             "statusMessage": "Running ESLint..."
           },
           {
             "type": "command",
-            "command": "bash 'C:\\Users\\jiesh\\AI codes hub\\market_dashboard\\.codex\\hooks\\build.sh'",
+            "command": "bash .codex/hooks/build.sh",
             "timeout": 120,
             "statusMessage": "Checking Next.js build..."
           }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash 'C:\\Users\\jiesh\\AI codes hub\\market_dashboard\\.codex\\hooks\\self-improvement-reminder.sh'",
+            "command": "bash .codex/hooks/self-improvement-reminder.sh",
             "timeout": 5
           }
         ]

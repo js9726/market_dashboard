@@ -41,14 +41,15 @@ npm run skills:sync -- --list
 
 Wiki sources resolve in this order:
 
-1. `LLM_TRADERS_WIKI_ROOT`
+1. `JIE_WIKI_ROOT`
 2. Sibling folder: `../jie_wiki`
-3. Local fallback: `C:/Users/jiesh/AI codes hub/jie_wiki`
 
 Global skill sources resolve in this order:
 
-1. `CLAUDE_SKILLS_ROOT`
-2. Local fallback: `C:/Users/jiesh/.Codex/skills`
+1. `JIE_WIKI_SKILLS_ROOT`
+2. Sibling folder: `../jie_wiki/skills`
+3. `CLAUDE_SKILLS_ROOT`
+4. `CODEX_SKILLS_ROOT`
 
 ## Current Active Runtime Syncs
 

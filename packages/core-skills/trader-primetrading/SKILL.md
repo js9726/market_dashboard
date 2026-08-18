@@ -26,4 +26,4 @@ See `schema.json` → `output`. A single trader-review object:
   - `21dma-structure.md` (4 core behaviors, entry zone, stop logic)
 
 ## Mirror
-A trimmed copy of `knowledge.md` is kept at `jie_wiki/wiki/persona-primetrading.md` for browsing alongside the source wiki pages. The skill does NOT read the wiki at runtime (SaaS portability rule); the runtime artifact is the committed `knowledge.md`.
+A trimmed copy of `knowledge.md` is kept at `jie_wiki/wiki/trading/traders/persona-primetrading.md` for browsing alongside the source wiki pages. The skill does NOT read the wiki at runtime (SaaS portability rule); the runtime artifact is the committed `knowledge.md`.

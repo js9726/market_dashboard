@@ -1,7 +1,7 @@
 /**
  * alist-triggers.ts — per-setup entry-trigger state machine (pure).
  *
- * Encodes the wiki/entry-methods.md trigger rules on daily bars. A REC pick is
+ * Encodes the wiki/trading/concepts/entry-methods.md trigger rules on daily bars. A REC pick is
  * ARMED at pick day, then walks forward to a terminal state:
  *   - TRIGGERED   — the entry actually became buyable (the "take it" signal)
  *   - INVALIDATED — the thesis broke before triggering (e.g. ONTO gap-fade)
@@ -59,7 +59,7 @@ export interface PreScreenResult {
  * Doctrine pre-screen on the ~20 daily bars up to and including pick day.
  * Fails (auto-PASS the pick) when the structure is wide-and-loose or carries
  * repeated high-volume distribution days — the conditions under which an
- * intraday/daily trigger is forbidden per wiki/entry-methods.md.
+ * intraday/daily trigger is forbidden per wiki/trading/concepts/entry-methods.md.
  */
 export function preScreenStructure(history: TriggerBar[]): PreScreenResult {
   const bars = history.slice(-PRESCREEN_LOOKBACK - 1);

@@ -491,9 +491,9 @@ function DriftPanel({
             </tbody>
           </table>
           <p className="mt-2 t-caption text-[var(--fg-3)]">
-            Append resolution notes to <code>wiki/_skill-suggestions.md</code> manually after
+            Append resolution notes to <code>wiki/trading/_skill-suggestions.md</code> manually after
             you act on a suggestion. Promote recurring patterns to their own wiki page (see{" "}
-            <code>wiki/rubric-stop-too-tight.md</code> for the template).
+            <code>wiki/trading/risk/rubric-stop-too-tight.md</code> for the template).
           </p>
         </div>
       ) : null}

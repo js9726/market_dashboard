@@ -568,7 +568,7 @@ model AListCandidate {
   day0Thesis        String?   @db.Text
   /// Trader-style lens that fits best (e.g. "@Qullamaggie", "@markminervini").
   day0TraderLens    String?
-  /// Conviction sub-scores at pick day (wiki/trader-styles.md). Null for
+  /// Conviction sub-scores at pick day (wiki/trading/traders/trader-styles.md). Null for
   /// brief-sourced picks that don't carry the deterministic breakdown.
   setupScore        Int?
   entryScore        Int?
@@ -915,7 +915,7 @@ model JournalEntry {
   // 7-trader rubric — { [traderName]: { entry, risk, setup, total, wouldEnter, why } }
   traderScores Json
 
-  // Fundamental score (冷眼 A/B/C framework — see wiki/fundamental-analysis.md)
+  // Fundamental score (冷眼 A/B/C framework — see wiki/trading/concepts/fundamental-analysis.md)
   fundamentalGrade String? // A | B | C
   fundamentalData  Json? // { growth, profitability, valuation, balanceSheet }
 

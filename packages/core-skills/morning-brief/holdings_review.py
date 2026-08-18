@@ -134,7 +134,7 @@ def _load_stops(arg: str | None) -> dict:
 
 # Permanent non-trading holds (operator-confirmed). These are NEVER reported as a
 # NO-STOP defect and contribute 0 to the progressive-exposure risk budget. Source of
-# truth: jie_wiki/wiki/companies/materialise.md ("Holding classification - PERMANENT
+# truth: jie_wiki/wiki/trading/companies/materialise.md ("Holding classification - PERMANENT
 # HOLD"). Override with HOLD_EXEMPT_TICKERS (comma-separated) without a code change.
 HOLD_EXEMPT = {
     t.strip().upper()

@@ -1253,7 +1253,7 @@ export default function JournalEditorClient({ trade }: { trade: Trade }) {
           <textarea
             className={`${fieldClass} font-mono`}
             onChange={(e) => setWikiRefs(e.target.value)}
-            placeholder={"wiki/trader-styles.md\nwiki/qullamaggie-breakouts-episodic-pivots.md"}
+            placeholder={"wiki/trading/traders/trader-styles.md\nwiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md"}
             rows={3}
             value={wikiRefs}
           />

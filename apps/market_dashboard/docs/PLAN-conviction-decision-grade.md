@@ -17,9 +17,9 @@ history stays legible.
 ## What changed (premise of the re-plan)
 
 The 2026-06-15 wiki overhaul already did ~40% of the original R3:
-- **Conviction Score** is the headline: Setup/40 + Entry/30 + Theme/20 + Sentiment/10; **GO ≥ 75 / WATCH 50–74 / PASS < 50** (`wiki/trader-styles.md`).
+- **Conviction Score** is the headline: Setup/40 + Entry/30 + Theme/20 + Sentiment/10; **GO ≥ 75 / WATCH 50–74 / PASS < 50** (`wiki/trading/traders/trader-styles.md`).
 - The **7 personas are no longer averaged** — they feed the Setup score + act as a "style fingerprint."
-- **Per-setup entry triggers** are now defined (`wiki/entry-methods.md`).
+- **Per-setup entry triggers** are now defined (`wiki/trading/concepts/entry-methods.md`).
 - The deterministic screener scorer (`src/server/screener-scanner.ts`) is already Conviction-aligned.
 
 **Runtime gaps found:**
@@ -57,7 +57,7 @@ Run the proposed trigger rules + GO≥75 gate over existing A-list/journal histo
 
 **R3.1 — Gate + storage.** A-list REC bar → GO≥75; schema migration to store Setup/Entry/Theme/Sentiment + champion persona on `AListCandidate`.
 
-**R3.2 — Trigger engine (shared, market-wide).** Per-setup state machine (`wiki/entry-methods.md`):
+**R3.2 — Trigger engine (shared, market-wide).** Per-setup state machine (`wiki/trading/concepts/entry-methods.md`):
 - `BO-CB/BO-VCP`: ARMED → TRIGGERED on day-2+ higher-low then pivot break on volume expansion; INVALIDATED on breakdown / no higher-low.
 - `EP-FRESH`: ARMED → TRIGGERED on opening-range-high break; INVALIDATED if it can't hold the range (ONTO case).
 - `PB-21EMA/POST-GAP-VCP`: WATCH → TRIGGERED on 8/10-EMA reclaim with volume expansion; INVALIDATED on high-volume pullback / close below 21-EMA.
@@ -93,7 +93,7 @@ Driven by the operator audit ("page uninformative; MFE/MAE never update; closed 
 
 - **P1 — tracker fix (SHIPPED).** `track-positions` timed out at 60s on ~88 candidates → 0 rows. Now bounded-parallel + per-fetch timeout + Yahoo→Stooq fallback + maxDuration 300. MFE/MAE/stops populate.
 - **P3 — A-list redesign (SHIPPED).** Active vs Closed/Review boards; performance scoreboard (win-rate, avg MFE/MAE R, MFE-capture by setup); serializer surfaces running MFE/MAE + `effectiveStop` (logged or ATR-floor); HELD = broker-truth (price-path stop no longer retires a held position).
-- **P3.5 — setup-conditional RVOL gate + pullback lane (this change).** Root cause of "GO list ≠ pro buys": a **universal `RVOL ≥ 1.5×`** gate + a `setup -= 6` low-RVOL penalty excluded/penalised the pullback lane the pros trade — contradicting `wiki/a-list-gate-and-screener.md` (RVOL is setup-conditional: breakout/EP ≥150% surge, pullback ≤100% contraction). Fix: `screener-scanner` rewards pullback contraction (no universal penalty) + widens `is_pullback`; `a-list-extractor` gates RVOL by setup class and admits pullbacks at the WATCH band (armed → GO on the trigger). **Remaining in P3.5:** split "off-book" from the A/B/C entry grade (so ONTO +1.88R isn't mislabelled C); `skills:sync` to propagate the doctrine to LLM-scorer knowledge.
+- **P3.5 — setup-conditional RVOL gate + pullback lane (this change).** Root cause of "GO list ≠ pro buys": a **universal `RVOL ≥ 1.5×`** gate + a `setup -= 6` low-RVOL penalty excluded/penalised the pullback lane the pros trade — contradicting `wiki/trading/routines/a-list-gate-and-screener.md` (RVOL is setup-conditional: breakout/EP ≥150% surge, pullback ≤100% contraction). Fix: `screener-scanner` rewards pullback contraction (no universal penalty) + widens `is_pullback`; `a-list-extractor` gates RVOL by setup class and admits pullbacks at the WATCH band (armed → GO on the trigger). **Remaining in P3.5:** split "off-book" from the A/B/C entry grade (so ONTO +1.88R isn't mislabelled C); `skills:sync` to propagate the doctrine to LLM-scorer knowledge.
 - **P4 — market context** at entry + exit (SPY/QQQ % + breadth + Fear&Greed) so "was it the pick or the tape" is answerable.
 - **P5 — auto-calibrating scoring** (lesson digest → wiki edits + `skills:sync`); calibrates *within* the corrected P3.5 gate.
 - **P2 — OpenD/IBKR bridge push** as the authoritative daily-bar feed (cloud Yahoo/Stooq fallback already carries it unattended).

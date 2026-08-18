@@ -7,7 +7,7 @@
  *   - TWO 1R bases: the stop you logged at entry, AND the wiki ATR-floor stop.
  *   - TWO savings metrics: Realized-vs-full-R, and Soft-tranche-vs-Hard-stop.
  *
- * Wiki sources: jie_wiki/wiki/risk-management.md
+ * Wiki sources: jie_wiki/wiki/trading/risk/risk-management.md
  *   - "Stop distance floor by setup type" (ATR-floor rule)
  *   - "Trimming / Scaling Out" (SRxTrades 8EMA/21EMA tranche model)
  */
@@ -165,7 +165,7 @@ export interface EntryGrade {
 }
 
 /**
- * Grade a (held) entry against the A-list REC bar (wiki/a-list-gate-and-screener.md):
+ * Grade a (held) entry against the A-list REC bar (wiki/trading/routines/a-list-gate-and-screener.md):
  * Conviction >=75 AND verdict GO AND a setup-conditional RVOL (breakout/EP need a
  * >=1.5x surge; a pullback does not). A = cleared the bar; B = near-miss with real
  * merit; C = off-spec. An OFF-BOOK entry (no REC pick existed at your entry) is

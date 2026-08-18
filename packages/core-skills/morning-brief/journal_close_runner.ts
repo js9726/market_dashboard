@@ -149,7 +149,7 @@ ${wiki}
   "entryVerdict": "GOOD|ACCEPTABLE|POOR",
   "evolutionNote": "what this trade teaches",
   "patternNote": "recurring weakness/improvement (note if data limited)",
-  "wikiRefs": ["wiki/trader-styles.md", ...]
+  "wikiRefs": ["wiki/trading/traders/trader-styles.md", ...]
 }
 First char MUST be {, last MUST be }.`;
 

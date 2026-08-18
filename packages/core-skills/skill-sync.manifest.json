@@ -8,18 +8,16 @@
       "description": "Authoring source for trading knowledge.",
       "candidates": [
         "${JIE_WIKI_ROOT}",
-        "${LLM_TRADERS_WIKI_ROOT}",
-        "../jie_wiki",
-        "../llm_traders_wiki",
-        "C:/Users/jiesh/AI codes hub/jie_wiki",
-        "C:/Users/jiesh/AI codes hub/llm_traders_wiki"
+        "../jie_wiki"
       ]
     },
     "globalSkills": {
       "description": "Operator skills that stay global/local, used only as upstream references.",
       "candidates": [
+        "${JIE_WIKI_SKILLS_ROOT}",
+        "../jie_wiki/skills",
         "${CLAUDE_SKILLS_ROOT}",
-        "C:/Users/jiesh/.claude/skills"
+        "${CODEX_SKILLS_ROOT}"
       ]
     }
   },
@@ -35,18 +33,18 @@
           "strategy": "concat-markdown",
           "title": "Agent Moderator Knowledge",
           "sources": [
-            { "root": "wiki", "path": "wiki/trader-styles.md" },
-            { "root": "wiki", "path": "wiki/trader-style-profiles.md" },
-            { "root": "wiki", "path": "wiki/mark-minervini-sepa.md" },
-            { "root": "wiki", "path": "wiki/ted-zhang-institutional-momentum.md" },
-            { "root": "wiki", "path": "wiki/traderlion-early-entry-techniques.md" },
-            { "root": "wiki", "path": "wiki/entry-methods.md" },
-            { "root": "wiki", "path": "wiki/risk-management.md" },
-            { "root": "wiki", "path": "wiki/position-sizing.md" },
-            { "root": "wiki", "path": "wiki/relative-strength.md" },
-            { "root": "wiki", "path": "wiki/lockout-rally.md" },
-            { "root": "wiki", "path": "wiki/fundamental-analysis.md" },
-            { "root": "wiki", "path": "wiki/qullamaggie-breakouts-episodic-pivots.md" }
+            { "root": "wiki", "path": "wiki/trading/traders/trader-styles.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/trader-style-profiles.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/mark-minervini-sepa.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/ted-zhang-institutional-momentum.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/traderlion-early-entry-techniques.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/entry-methods.md" },
+            { "root": "wiki", "path": "wiki/trading/risk/risk-management.md" },
+            { "root": "wiki", "path": "wiki/trading/risk/position-sizing.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/relative-strength.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/lockout-rally.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/fundamental-analysis.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md" }
           ],
           "applicationNotes": [
             "Use this artifact as shared judgment context when routing or reconciling trader-style agents.",
@@ -66,11 +64,11 @@
           "strategy": "concat-markdown",
           "title": "PrimeTrading Methodology",
           "sources": [
-            { "root": "wiki", "path": "wiki/persona-primetrading.md" },
-            { "root": "wiki", "path": "wiki/alex-swing-trading-system.md" },
-            { "root": "wiki", "path": "wiki/alex-scans-traderslab.md" },
-            { "root": "wiki", "path": "wiki/alex-trading-psychology.md" },
-            { "root": "wiki", "path": "wiki/21dma-structure.md" }
+            { "root": "wiki", "path": "wiki/trading/traders/persona-primetrading.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/alex-swing-trading-system.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/alex-scans-traderslab.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/alex-trading-psychology.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/21dma-structure.md" }
           ],
           "applicationNotes": [
             "Use this artifact when scoring whether a trade follows PrimeTrading/Alex 21dma pullback rules.",
@@ -90,15 +88,15 @@
           "strategy": "concat-markdown",
           "title": "Market Scorer Knowledge",
           "sources": [
-            { "root": "wiki", "path": "wiki/trader-styles.md" },
-            { "root": "wiki", "path": "wiki/trader-style-profiles.md" },
-            { "root": "wiki", "path": "wiki/market-timing.md" },
-            { "root": "wiki", "path": "wiki/market-phases.md" },
-            { "root": "wiki", "path": "wiki/lockout-rally.md" },
-            { "root": "wiki", "path": "wiki/relative-strength.md" },
-            { "root": "wiki", "path": "wiki/stock-scanning.md" },
-            { "root": "wiki", "path": "wiki/steve-jacobs-market-dashboard.md" },
-            { "root": "wiki", "path": "wiki/qullamaggie-breakouts-episodic-pivots.md" }
+            { "root": "wiki", "path": "wiki/trading/traders/trader-styles.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/trader-style-profiles.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/market-timing.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/market-phases.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/lockout-rally.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/relative-strength.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/stock-scanning.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/steve-jacobs-market-dashboard.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md" }
           ],
           "applicationNotes": [
             "Use this artifact for daily market verdicts, breadth/phase interpretation, and trader-style consensus.",
@@ -118,19 +116,19 @@
           "strategy": "concat-markdown",
           "title": "Stock Scorer Knowledge",
           "sources": [
-            { "root": "wiki", "path": "wiki/trader-styles.md" },
-            { "root": "wiki", "path": "wiki/trader-style-profiles.md" },
-            { "root": "wiki", "path": "wiki/mark-minervini-sepa.md" },
-            { "root": "wiki", "path": "wiki/ted-zhang-institutional-momentum.md" },
-            { "root": "wiki", "path": "wiki/fundamental-analysis.md" },
-            { "root": "wiki", "path": "wiki/ticker-catalyst-analysis.md" },
-            { "root": "wiki", "path": "wiki/relative-strength.md" },
-            { "root": "wiki", "path": "wiki/lockout-rally.md" },
-            { "root": "wiki", "path": "wiki/qullamaggie-breakouts-episodic-pivots.md" },
-            { "root": "wiki", "path": "wiki/lengyan-cold-eye.md" },
-            { "root": "wiki", "path": "wiki/lengyan-stock-analyses.md" },
-            { "root": "wiki", "path": "wiki/duan-yongping.md" },
-            { "root": "wiki", "path": "wiki/duan-scoring-model.md" }
+            { "root": "wiki", "path": "wiki/trading/traders/trader-styles.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/trader-style-profiles.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/mark-minervini-sepa.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/ted-zhang-institutional-momentum.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/fundamental-analysis.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/ticker-catalyst-analysis.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/relative-strength.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/lockout-rally.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/lengyan-cold-eye.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/lengyan-stock-analyses.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/duan-yongping.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/duan-scoring-model.md" }
           ],
           "applicationNotes": [
             "Use this artifact for ticker-level analysis where fundamentals, catalysts, and relative strength matter.",
@@ -150,17 +148,17 @@
           "strategy": "concat-markdown",
           "title": "Trade Scorer Knowledge",
           "sources": [
-            { "root": "wiki", "path": "wiki/trader-styles.md" },
-            { "root": "wiki", "path": "wiki/trader-style-profiles.md" },
-            { "root": "wiki", "path": "wiki/mark-minervini-sepa.md" },
-            { "root": "wiki", "path": "wiki/ted-zhang-institutional-momentum.md" },
-            { "root": "wiki", "path": "wiki/entry-methods.md" },
-            { "root": "wiki", "path": "wiki/lockout-rally.md" },
-            { "root": "wiki", "path": "wiki/traderlion-early-entry-techniques.md" },
-            { "root": "wiki", "path": "wiki/risk-management.md" },
-            { "root": "wiki", "path": "wiki/position-sizing.md" },
-            { "root": "wiki", "path": "wiki/qullamaggie-breakouts-episodic-pivots.md" },
-            { "root": "wiki", "path": "wiki/trade-journal-workflow.md" }
+            { "root": "wiki", "path": "wiki/trading/traders/trader-styles.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/trader-style-profiles.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/mark-minervini-sepa.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/ted-zhang-institutional-momentum.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/entry-methods.md" },
+            { "root": "wiki", "path": "wiki/trading/concepts/lockout-rally.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/traderlion-early-entry-techniques.md" },
+            { "root": "wiki", "path": "wiki/trading/risk/risk-management.md" },
+            { "root": "wiki", "path": "wiki/trading/risk/position-sizing.md" },
+            { "root": "wiki", "path": "wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md" },
+            { "root": "wiki", "path": "wiki/trading/journal/trade-journal-workflow.md" }
           ],
           "applicationNotes": [
             "Use this artifact when judging an executed or planned trade against style, entry, risk, and journal rules.",
@@ -189,8 +187,8 @@
           "title": "Pro Trader Chart Annotation Knowledge",
           "sources": [
             { "root": "globalSkills", "path": "pro-trader-chart-annotation/SKILL.md" },
-            { "root": "wiki", "path": "wiki/qullamaggie-breakouts-episodic-pivots.md" },
-            { "root": "wiki", "path": "wiki/trade-journal-workflow.md" }
+            { "root": "wiki", "path": "wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md" },
+            { "root": "wiki", "path": "wiki/trading/journal/trade-journal-workflow.md" }
           ],
           "applicationNotes": [
             "Use this when the journal supports manual TradingView screenshot upload/paste.",

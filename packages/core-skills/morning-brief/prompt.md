@@ -161,7 +161,7 @@ WATCHLIST: {watchlist_str}
 
 SCREENER TICKERS TO SCORE: {screener_unscored_str}
 These tickers appeared in today's TV screener run but were NOT auto-scored by the daily pipeline.
-For each: apply the **Conviction Scoring Model** from `wiki/trader-styles.md` (Setup/40 + Entry/30 + Theme/20 + Sentiment/10). Emit each in `screenerScores`
+For each: apply the **Conviction Scoring Model** from `wiki/trading/traders/trader-styles.md` (Setup/40 + Entry/30 + Theme/20 + Sentiment/10). Emit each in `screenerScores`
 with `score` as the Conviction total (0-100 integer), a `verdict` label, and a 1-sentence `note` citing the sub-scores. The 7 personas feed the Setup component — they are NOT averaged.
 Use the screener data already provided in `{live_data_block}` — no extra web search needed for these.
 GO-list catalyst gate: a technically strong screener ticker can be scored, but do NOT label it `GO` unless a source-backed catalyst/theme read is available. For any would-be GO, the note must include catalyst/news, insider/institutional status or "not visible", peer/sector trend, upcoming catalyst/earnings/regulatory risk, and analyst-action status if visible. If those fields are missing, set verdict `WAIT` and write `missing=catalyst brief` in the note.
@@ -185,7 +185,7 @@ SECTIONS — use pre-fetched data where provided; web-search only what is missin
 8. Analyst upgrades/downgrades: web-search for top 3 of each today
 9. Watchlist: use "Watchlist live prices" block for level/changePct; add 1-line setup note per ticker
 10. Mood/posture: synthesise from all data above — state the single most important variable
-11. Screener scores: score every unscored ticker listed in SCREENER TICKERS TO SCORE using the **Conviction Scoring Model** (Setup/40 + Entry/30 + Theme/20 + Sentiment/10; see `wiki/trader-styles.md`). Emit verdict as "GO" (>= 75) / "WAIT" (50-74) / "PASS" (< 50) — never use BUY/HOLD/AVOID here. A score that lacks source-backed catalyst/news, insider/institutional, peer/sector, next-catalyst, and analyst-action evidence must be downgraded to WAIT with `missing=catalyst brief`; medical/biotech/FDA-driven names need the special risk check above before GO.
+11. Screener scores: score every unscored ticker listed in SCREENER TICKERS TO SCORE using the **Conviction Scoring Model** (Setup/40 + Entry/30 + Theme/20 + Sentiment/10; see `wiki/trading/traders/trader-styles.md`). Emit verdict as "GO" (>= 75) / "WAIT" (50-74) / "PASS" (< 50) — never use BUY/HOLD/AVOID here. A score that lacks source-backed catalyst/news, insider/institutional, peer/sector, next-catalyst, and analyst-action evidence must be downgraded to WAIT with `missing=catalyst brief`; medical/biotech/FDA-driven names need the special risk check above before GO.
 12. High-impact news: web-search for the 3–6 most market-moving news items from overnight + pre-market and emit them in `news`. Rank by impact (HIGH > MED), tag the affected `tickers`, and include a real `source` link for each. These feed the daily-journal "high-impact news" widget — only include items you can ground with a live citation; fabricated headlines are dropped.
 
 RULES:

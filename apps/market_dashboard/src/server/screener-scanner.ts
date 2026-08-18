@@ -81,7 +81,7 @@ function algoScore(h: Record<string, unknown>): {
   const high_d = num("high"), low_d = num("low"), close_d = num("close");
   const A = Math.abs(chg_day);
 
-  // P5 calibration (2026-06-26, wiki/a-list-gate-and-screener.md "Calibration log"):
+  // P5 calibration (2026-06-26, wiki/trading/routines/a-list-gate-and-screener.md "Calibration log"):
   // EP-FRESH ran 28% win / +0.11R avg MFE over n=18 — the detector was catching
   // WEAK episodic pivots. Tightened to match the wiki's own EP definition
   // (Qullamaggie: "10%+ gap, huge volume"): chg>10 + rvol>3 (was >8 / >2.5).
@@ -89,7 +89,7 @@ function algoScore(h: Record<string, unknown>): {
   const is_ep = chg_day > 10 && perf_1m < 15 && rvol > 3;
   const is_breakout = chg_day > 3 && chg_day < 20 && perf_1m > 8 && perf_1m < 50 && rvol > 1.5;
   // Pullback = a small move in an uptrend on NON-surging volume. Contraction is
-  // the signal (wiki/a-list-gate-and-screener.md), so there is no low-RVOL floor —
+  // the signal (wiki/trading/routines/a-list-gate-and-screener.md), so there is no low-RVOL floor —
   // the quietest pullbacks are the best ones; a surge would make it a breakout/EP.
   const is_pullback = A < 5 && perf_1m > 5 && rvol < 1.5;
   const is_parabolic = perf_1m > 70 || (chg_day > 25 && perf_1m > 30);
@@ -103,7 +103,7 @@ function algoScore(h: Record<string, unknown>): {
   else if (is_breakout) setup = 30;
   else if (is_pullback) setup = 26;
   else setup = 14;
-  // RVOL is read by setup class (wiki/a-list-gate-and-screener.md). Breakout/EP
+  // RVOL is read by setup class (wiki/trading/routines/a-list-gate-and-screener.md). Breakout/EP
   // want a surge; a pullback wants CONTRACTION — low volume on a pullback is the
   // setup forming, not weakness, so reward the dry-up and only fault a HIGH-volume
   // (potential distribution) pullback. Penalising pullback contraction was the bug
@@ -162,7 +162,7 @@ function algoScore(h: Record<string, unknown>): {
   const raw = Math.round(setup + entry + theme + sentiment);
   const pattern = is_parabolic ? "PARABOLIC" : is_ep ? "EP" : is_breakout ? "BREAKOUT"
     : is_pullback ? "PULLBACK" : is_stage4 ? "STAGE4-BOUNCE" : "UNCLEAR";
-  // Conviction bands (wiki/trader-styles.md): GO >=75, WAIT 50-74, PASS <50.
+  // Conviction bands (wiki/trading/traders/trader-styles.md): GO >=75, WAIT 50-74, PASS <50.
   const verdict = raw >= 75 ? "GO" : raw >= 50 ? "WAIT" : "PASS";
   return {
     score: raw, verdict, pattern,

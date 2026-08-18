@@ -23,10 +23,10 @@ import { marketContextNow } from "@/lib/market-context";
 
 const prisma = new PrismaClient();
 
-// Conviction GO band (wiki/trader-styles.md): GO >= 75. The A-list REC gate was
+// Conviction GO band (wiki/trading/traders/trader-styles.md): GO >= 75. The A-list REC gate was
 // previously hardcoded to 80, silently dropping GO picks scoring 75-79.
 const MIN_SCORE = 75;
-// RVOL is NOT a universal admission floor (wiki/a-list-gate-and-screener.md). It is
+// RVOL is NOT a universal admission floor (wiki/trading/routines/a-list-gate-and-screener.md). It is
 // the SURGE threshold for breakout/EP setups only; pullbacks want contraction and
 // must not be gated on it (the surge is required at the trigger). See rvolPasses().
 const MIN_RVOL_SURGE = 1.5;
@@ -521,7 +521,7 @@ export function extractScreenerCandidates(file: ScoredScreenerFile | null | unde
       const lane = setupLane(setupClass);
       if (!ticker || score == null) continue;
       if (lane === "pullback") {
-        // Pullback lane (wiki/a-list-gate-and-screener.md): admit as WATCH/armed at
+        // Pullback lane (wiki/trading/routines/a-list-gate-and-screener.md): admit as WATCH/armed at
         // the WATCH band; the GO + volume surge are required at the TRIGGER, not at
         // admission, so do NOT gate on the surge here.
         if (score < PULLBACK_MIN_SCORE) continue;
