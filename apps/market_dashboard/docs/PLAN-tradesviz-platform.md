@@ -127,7 +127,7 @@ Where the current UX **beats** TradesViz (protect these): the Market Desk itself
 
 ## D. Distribution & protocol
 
-On approval: each phase gets PLANNED rows on `jie_wiki/wiki/agents/board.md` with the 🄲/🄺 split above; Codex starts at **P0 (commit own tree) → P1 trade-detail/table** while Claude does P0 schema/symbols → P1 IA/routes. Cross-review per protocol at each DONE. Conflicts: any same-file work is sequenced through the board before starting. Scoring/doctrine changes remain wiki-first + `skills:sync`.
+On approval: each phase gets PLANNED rows on `jie_wiki/agent-system/board.md` with the 🄲/🄺 split above; Codex starts at **P0 (commit own tree) → P1 trade-detail/table** while Claude does P0 schema/symbols → P1 IA/routes. Cross-review per protocol at each DONE. Conflicts: any same-file work is sequenced through the board before starting. Scoring/doctrine changes remain wiki-first + `skills:sync`.
 
 ## E. Validation commands (per phase, minimum)
 

@@ -175,14 +175,14 @@ describe("trading journal session module", () => {
     ["2026-08-07", "session-2026-08-07.json"],
     ["2026-08-10", "session-2026-08-10.json"],
   ])("validates the %s approved session", (date, filename) => {
-    const path = resolve(process.cwd(), `../../../jie_wiki/docs/agents/work/ai-managed-trading-journal-v2/${filename}`);
+    const path = resolve(process.cwd(), `../../../jie_wiki/evidence/trading/journal-backfills/ai-managed-trading-journal-v2/${filename}`);
     const input = JSON.parse(readFileSync(path, "utf8"));
     const result = evaluateTradingSession(input);
     expect(result.session.sessionDate).toBe(date);
   });
 
   it("validates the approved rule registry", () => {
-    const path = resolve(process.cwd(), "../../../jie_wiki/docs/agents/work/ai-managed-trading-journal-v2/rules-v2.json");
+    const path = resolve(process.cwd(), "../../../jie_wiki/evidence/trading/journal-backfills/ai-managed-trading-journal-v2/rules-v2.json");
     const payload = JSON.parse(readFileSync(path, "utf8"));
     const parsed = tradingRulesPayloadSchema.parse(payload);
     expect(parsed.rules.filter((rule) => rule.stage === "HARD_SAFETY_RULE")).toHaveLength(10);
