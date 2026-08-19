@@ -235,7 +235,8 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 ## Cross-Agent Task Board (Mandatory for Claude Code AND Codex)
 
 Both agents coordinate through one shared ledger in the sibling wiki repo:
-`../jie_wiki/wiki/agents/board.md` (full rules: `../jie_wiki/wiki/agents/protocol.md`).
+`../jie_wiki/agent-system/board.md` (full rules: `../jie_wiki/agent-system/protocol.md`,
+task records under `../jie_wiki/agent-system/work/<task-id>/`).
 
 - **Session start**: read the board. If the *other* agent has DONE entries marked `pending`, review the oldest one first — evidence-based (open the commit/file/command output; never accept the claim at face value). Mark `ok — <agent> <date>` or `⚠ <finding>`.
 - **Before** any multi-file task, repo commit, or deploy: add a one-line PLANNED row.

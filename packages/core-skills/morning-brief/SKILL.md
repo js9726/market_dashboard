@@ -579,7 +579,7 @@ it through `ingest_to_dashboard.py` (which defaults to provider=claude).
 
 ## Journal v2 contract — the brief MUST comply
 
-Source of truth: `jie_wiki/docs/agents/work/ai-managed-trading-journal-v2/spec.md`
+Source of truth: `jie_wiki/evidence/trading/journal-backfills/ai-managed-trading-journal-v2/spec.md`
 (approved by Jie 2026-08-04). The morning brief feeds the journal, so it uses the same
 vocabulary and the same caps. Divergence here is a defect, not a style choice.
 
