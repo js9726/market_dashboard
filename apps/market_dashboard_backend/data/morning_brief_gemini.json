@@ -2,115 +2,123 @@
   "mood": {
     "label": "CAUTIOUSLY-RISK-OFF",
     "posture": "WAIT",
-    "summary": "Rising geopolitical tensions in the Middle East are pushing bond yields and oil prices higher, creating a risk-off sentiment, particularly pressuring technology and semiconductor stocks."
+    "summary": "Surging long-term bond yields and elevated oil prices are pressuring equities, particularly the tech and semiconductor sectors. A major positive catalyst from Moderna is offset by broad market weakness and geopolitical tension ahead of today's FOMC minutes."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": null,
-    "label": null
+    "score": 54,
+    "label": "Neutral"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.55,
+      "changePct": 0,
       "note": "futures",
-      "citation": null
+      "citation": "Source: TipRanks 05:38 ET"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": -1.17,
+      "changePct": -0.06,
       "note": "futures",
-      "citation": null
+      "citation": "Source: TipRanks 05:38 ET"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": -0.15,
+      "changePct": -0.03,
       "note": "futures",
-      "citation": null
+      "citation": "Source: TipRanks 05:38 ET"
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility Index",
-      "level": 14.55,
-      "changePct": null,
-      "note": "jumped to a two-week high",
-      "citation": null
+      "name": "Volatility",
+      "level": 15.84,
+      "changePct": 4.3,
+      "note": "live",
+      "citation": "Source: Zacks Investment Research"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Yr Treasury Yield",
-      "level": 4.74,
+      "name": "10Y Yield",
+      "level": 4.7,
       "changePct": null,
-      "note": "approaching 20-month highs",
-      "citation": null
+      "note": "live",
+      "citation": "Source: Trading Economics"
     },
     {
       "symbol": "CL=F",
-      "name": "WTI Crude Oil",
-      "level": 84.93,
+      "name": "Crude Oil",
+      "level": 85.7,
       "changePct": null,
-      "note": "rising on US-Iran tensions",
-      "citation": null
+      "note": "live",
+      "citation": "Source: TipRanks 05:38 ET"
     }
   ],
-  "indicesNarrative": "US futures are pointing to a lower open, with the tech-heavy Nasdaq leading losses as rising bond yields and oil prices weigh on sentiment. The 10-year Treasury yield is approaching multi-year highs, and the VIX is climbing, signaling increasing investor caution amid geopolitical uncertainty.",
-  "technicals": null,
-  "technicalsNarrative": "Technical data was not available. Cannot assess entry risk or momentum.",
-  "sectorsThemes": [],
-  "sectorsNarrative": "Semiconductors are showing notable pre-market weakness due to the dual pressures of rising bond yields and geopolitical risk, suggesting a rotation away from high-duration growth sectors.",
-  "industryNarrative": null,
+  "indicesNarrative": "US futures are mixed-to-lower, signaling a continuation of yesterday's risk-off sentiment. The tech-heavy Nasdaq is leading to the downside, pressured by a sharp selloff in semiconductor stocks. Soaring long-term Treasury yields, with the 10-year near 4.7%, and rising oil prices due to Middle East tensions are creating significant headwinds for equities. Market breadth was very poor in the previous session, with decliners outpacing advancers by nearly 2-to-1 on the NYSE, confirming broad-based weakness.",
+  "technicals": {},
+  "technicalsNarrative": "Technical data is unavailable for this brief. Traders should rely on price action and volume analysis until data is restored.",
+  "sectorsThemes": [
+    {
+      "symbol": "XLK",
+      "name": "Technology",
+      "changePct": -1.9,
+      "rs": null,
+      "note": "Led the market lower on a sharp semiconductor selloff."
+    },
+    {
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": 1.8,
+      "rs": null,
+      "note": "The only sector in the green, driven by rising crude oil prices amid geopolitical tensions."
+    },
+    {
+      "symbol": "XLI",
+      "name": "Industrials",
+      "changePct": -1.5,
+      "rs": null,
+      "note": "Sold off with the broader market on concerns about rising borrowing costs."
+    },
+    {
+      "symbol": "XLV",
+      "name": "Health Care",
+      "changePct": null,
+      "rs": null,
+      "note": "In focus today due to major positive news from Moderna."
+    }
+  ],
+  "sectorsNarrative": "A clear risk-off rotation was visible in the previous session, with money flowing out of growth-oriented Technology and into the defensive Energy sector. This rotation is driven by macro fears around inflation and rising rates.",
+  "industryNarrative": "Semiconductors were the weakest industry group, with heavyweights like Nvidia and Broadcom seeing significant selling pressure amid concerns that the AI-driven rally had become overextended. In contrast, oil and gas exploration and production companies outperformed due to the surge in crude prices.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "XOS",
+      "ticker": "MRNA",
       "side": "LONG",
-      "changePct": 129.0,
-      "why": "Announced an agreement with the US Air Force for mobile charging technology.",
-      "traderLens": "Qullamaggie"
+      "changePct": 97.01,
+      "why": "Positive Phase 3 results for its personalized mRNA cancer vaccine co-developed with Merck, meeting primary endpoints for melanoma treatment.",
+      "traderLens": "Qullamaggie-style episodic pivot on game-changing news."
     },
     {
-      "ticker": "DXC",
-      "side": "LONG",
-      "changePct": 4.5,
-      "why": "Positive investor reaction to its multi-year AI turnaround strategy and new partnerships.",
-      "traderLens": "Minervini"
-    },
-    {
-      "ticker": "BBWI",
-      "side": "LONG",
-      "changePct": 3.2,
-      "why": "Upgraded to Buy from Neutral by Citi analysts ahead of its upcoming earnings report.",
-      "traderLens": "Ted Zhang"
-    },
-    {
-      "ticker": "WDC",
+      "ticker": "NVDA",
       "side": "SHORT",
-      "changePct": -5.4,
-      "why": "Part of a broad semiconductor and tech sell-off amid rising bond yields and Middle East tensions.",
-      "traderLens": "Ted Zhang"
+      "changePct": -2.0,
+      "why": "Leading the selloff in semiconductor and AI-related stocks amid concerns of overvaluation and pressure from rising bond yields.",
+      "traderLens": "Potential Stage 3 topping action; watch for failure at key moving averages."
     },
     {
-      "ticker": "SNDK",
+      "ticker": "AVGO",
       "side": "SHORT",
-      "changePct": -4.4,
-      "why": "Chip stocks are under pressure from a risk-off macro environment.",
-      "traderLens": "Ted Zhang"
-    },
-    {
-      "ticker": "MU",
-      "side": "SHORT",
-      "changePct": -4.0,
-      "why": "Profit-taking in the semiconductor sector as rising yields make growth stocks less attractive.",
-      "traderLens": "Ted Zhang"
+      "changePct": null,
+      "why": "Part of the broad selloff in the chip sector, falling in sympathy with other high-flying AI names under pressure from the risk-off macro environment.",
+      "traderLens": "Watch for relative weakness compared to the semiconductor ETF (SMH)."
     }
   ],
   "watchlist": [
@@ -119,247 +127,249 @@
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Watching for reaction to broad semiconductor weakness."
+      "note": "Under pressure with chip sector weakness. Watching for a break of support."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Sensitive to rising yields and risk-off sentiment."
+      "note": "High-beta name sensitive to rising rates and risk-off sentiment."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Mega-cap tech feeling pressure from higher rates."
+      "note": "Watching how this mega-cap leader holds up against broad market selling."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Watching for signs of institutional defense or distribution."
+      "note": "AI-related name, vulnerable to the current sector rotation out of tech."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Consumer discretionary exposure in a cautious market."
+      "note": "Consumer discretionary exposure, could be impacted by inflation concerns."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Facing a 29-state lawsuit over claims its platforms harm youth."
+      "note": "Also exposed to the AI theme and broader tech selloff."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Monitoring behavior amid broad tech pullback."
+      "note": "Another mega-cap tech name to watch for signs of strength or weakness."
     },
     {
       "ticker": "AMD",
       "level": null,
-      "changePct": -3.3,
+      "changePct": null,
       "abc": null,
-      "note": "Pre-market weakness along with other chipmakers."
+      "note": "Key semiconductor stock, moving in tandem with NVDA and the sector."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "High-beta name, sensitive to market shifts."
+      "note": "High-beta AI play that saw significant selling pressure recently."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Growth stock under pressure from rising rates."
+      "note": "Software AI name, watching for support after a recent pullback."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "High-multiple software name to watch in a risk-off tape."
+      "note": "Cybersecurity leader, often shows relative strength during market pullbacks."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "High correlation to Bitcoin, which has been range-bound."
+      "note": "Bitcoin proxy, sensitive to crypto market movements and overall risk sentiment."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is showing risk-off behavior. Not an ideal environment to be buying breakouts; focus on preserving capital."
+      "view": "Market is in a correction. Cash is the preferred position. No new buys."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear rotation out of technology and semiconductors due to macro headwinds. Money flowing to safety or commodities like oil."
+      "view": "Clear rotation out of Technology (XLK) and into Energy (XLE). Follow the institutional flow."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is deteriorating with rising yields and geopolitical risk. This is not an environment for A-grade setups. Best to sit on hands."
+      "view": "Market context is poor with rising yields and weak breadth. Not an environment for A-grade setups."
     },
     {
       "name": "SRxTrades",
-      "view": "Choppy, headline-driven action is likely. Wait for clean pivots and volume confirmation before committing capital; avoid chasing gaps."
+      "view": "Choppy price action and sector weakness. Wait for clear pivots and volume confirmation before entering."
     },
     {
       "name": "Jeff",
-      "view": "Respect hard stops. The macro environment has shifted, and positions can move against you quickly."
+      "view": "Respect hard stops. The market character has shifted, do not fight the tape."
     },
     {
       "name": "Qullamaggie",
-      "view": "Episodic pivots on news (like XOS) can work, but broad market momentum for breakouts is absent. Be highly selective."
+      "view": "Breakouts are failing. Focus on managing existing positions and wait for momentum to return. MRNA is a potential episodic pivot."
     },
     {
       "name": "Composite",
-      "view": "Stay defensive today. The combination of rising yields and geopolitical headlines is a headwind for equities, especially tech. Wait for the tape to stabilize before deploying significant capital."
+      "view": "Stay defensive and patient. The primary headwinds are macro-driven (yields, oil). Wait for the FOMC minutes to provide clarity. Raising cash and tightening stops is prudent."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "HD",
-        "consensus": "EPS $4.73 / Rev $47.24B"
+        "ticker": "TGT",
+        "consensus": "EPS $2.33 / Rev $26.13B"
       },
       {
-        "ticker": "BIDU",
-        "consensus": "EPS $1.39 / Rev $4.71B"
+        "ticker": "LOW",
+        "consensus": null
+      },
+      {
+        "ticker": "ADI",
+        "consensus": null
+      },
+      {
+        "ticker": "TJX",
+        "consensus": "EPS $1.19 / Rev $15.18B"
       }
     ],
     "amc": [
       {
-        "ticker": "KEYS",
-        "consensus": "EPS $2.46 / Rev $1.7B"
-      },
-      {
-        "ticker": "TOL",
-        "consensus": "EPS $2.90 / Rev $2.6B"
+        "ticker": "WOLF",
+        "consensus": null
       }
     ],
     "yesterdayReactions": []
   },
   "calendar": [
     {
-      "time": "08:30 ET",
-      "name": "Housing Starts (Jul)",
-      "consensus": null
-    },
-    {
-      "time": "08:30 ET",
-      "name": "Building Permits (Jul)",
-      "consensus": "1.37M"
-    },
-    {
-      "time": "09:15 ET",
-      "name": "Industrial Production (Jul)",
+      "time": "14:00 ET",
+      "name": "FOMC Meeting Minutes",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "BBWI",
-        "firm": "Citigroup",
-        "rating": "Buy",
-        "pt": 25
-      },
-      {
-        "ticker": "DUOL",
-        "firm": "DA Davidson",
-        "rating": "Buy",
-        "pt": 160
-      },
-      {
-        "ticker": "AMX",
-        "firm": "JPMorgan",
+        "ticker": "HONA",
+        "firm": "Morgan Stanley",
         "rating": "Overweight",
-        "pt": 32
+        "pt": 205
+      },
+      {
+        "ticker": "CIEN",
+        "firm": "Northland Capital Markets",
+        "rating": "Outperform",
+        "pt": 500
+      },
+      {
+        "ticker": "APA",
+        "firm": "Argus Research",
+        "rating": "Buy",
+        "pt": 48
       }
     ],
-    "downgrades": [
-      {
-        "ticker": "ANF",
-        "firm": "Raymond James",
-        "rating": "Market Perform",
-        "pt": null
-      },
-      {
-        "ticker": "EYPT",
-        "firm": "HC Wainwright & Co.",
-        "rating": "Neutral",
-        "pt": null
-      }
-    ]
+    "downgrades": []
   },
-  "alert": "RISK-OFF: Rising yields and Middle East tensions are pressuring tech and growth stocks.",
+  "alert": "FOMC Minutes release at 2 PM ET (2 AM MYT) - expect potential volatility.",
   "news": [
     {
-      "headline": "US stock futures fall as fading Iran peace prospects drive up oil and bond yields",
+      "headline": "Moderna's mRNA cancer vaccine succeeds in late-stage melanoma trial",
+      "impact": "HIGH",
+      "tickers": [
+        "MRNA",
+        "MRK"
+      ],
+      "source": "BioSpace - https://www.biospace.com/article/moderna-stock-nearly-doubles-as-merck-partnered-mrna-cancer-vaccine-meets-phase-3-goal/",
+      "time": "08:30 ET"
+    },
+    {
+      "headline": "Long-term Treasury yields hit highest levels since 2007, pressuring stocks",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
-        "DIA"
+        "TLT"
       ],
-      "source": "MarketScreener - https://www.marketscreener.com/news/latest/US-stock-futures-fall-as-fading-Iran-peace-prospects-drive-up-oil-yields-46587425/",
-      "time": "07:15 ET"
+      "source": "Zacks Investment Research - https://www.zacks.com/stock/news/2303497/stock-market-news-for-aug-19-2026",
+      "time": "Overnight"
     },
     {
-      "headline": "Semiconductor stocks fall broadly in pre-market on surging yields and geopolitical risk",
+      "headline": "Tech and semiconductor stocks lead market selloff",
       "impact": "HIGH",
       "tickers": [
+        "NVDA",
+        "AVGO",
         "SMH",
-        "MU",
-        "WDC",
-        "AMD"
+        "XLK"
       ],
-      "source": "TheStreet - https://www.thestreet.com/investing/stocks/stock-market-today-sp-500-futures-slide-on-growing-iran-tensions",
-      "time": "07:35 ET"
+      "source": "WDRB - https://www.wdrb.com/news/national/how-major-us-stock-indexes-fared-tuesday-8-18-2026/article_7a9e7c5a-45b6-11ef-83e0-375388836f32.html",
+      "time": "Overnight"
     },
     {
-      "headline": "Xos, Inc. shares surge 129% pre-market after signing agreement with US Air Force",
+      "headline": "Oil prices climb for fourth day on Middle East tensions",
       "impact": "MED",
       "tickers": [
-        "XOS"
+        "CL=F",
+        "XLE"
       ],
-      "source": "MarketScreener - https://www.marketscreener.com/quote/stock/XOS-INC-124485577/news/Xos-Inc-Rises-in-Premarket-After-Signing-Agreement-With-US-Air-Force-46587392/",
-      "time": "07:15 ET"
+      "source": "Zacks Investment Research - https://www.zacks.com/stock/news/2303497/stock-market-news-for-aug-19-2026",
+      "time": "Overnight"
     },
     {
-      "headline": "Bath & Body Works (BBWI) upgraded to Buy at Citi ahead of earnings",
+      "headline": "Asian markets fall sharply, led by rout in South Korean and Japanese chip stocks",
       "impact": "MED",
-      "tickers": [
-        "BBWI"
-      ],
-      "source": "TheStreet - https://www.thestreet.com/investing/stocks/stock-market-today-sp-500-futures-slide-on-growing-iran-tensions",
-      "time": "06:51 ET"
+      "tickers": null,
+      "source": "Investing.com - https://www.investing.com/news/stock-market-news/asian-stocks-tumble-as-chip-rout-bond-yields-hammer-south-korea-and-japan-markets-3425862",
+      "time": "Overnight"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TipRanks 05:46 ET — Futures Fall on Rising Middle East Tensions, Oil Prices Climb",
-    "TradingView 06:11 GMT-7 — US 10-Year Yield Rises to 20-Month High",
-    "Reuters 04:50 ET - US stock futures drop as fading Iran peace hopes lift oil, bond yields",
-    "TheStreet 07:35 ET - Stock Market Today (Aug. 18, 2026): S&P 500 futures slide on growing Iran tensions",
-    "MarketScreener 07:15 ET - Xos shares were up more than 129% in Tuesday's premarket activity",
-    "Digrin - Stock Earnings Calendar Aug 18, 2026",
-    "Benzinga - This Duolingo Analyst Turns Bullish; Here Are Top 5 Upgrades For Tuesday",
-    "GuruFocus - ANF Downgraded by Raymond James",
-    "Econoday - 2026 Economic Calendar"
+    "BioSpace - https://www.biospace.com/article/moderna-stock-nearly-doubles-as-merck-partnered-mrna-cancer-vaccine-meets-phase-3-goal/",
+    "Finbold - https://finbold.com/why-moderna-stock-is-rocketing-today/",
+    "WDRB - https://www.wdrb.com/news/national/how-major-us-stock-indexes-fared-tuesday-8-18-2026/article_7a9e7c5a-45b6-11ef-83e0-375388836f32.html",
+    "The Caledonian-Record - https://www.caledonianrecord.com/news/national/how-major-us-stock-indexes-fared-tuesday-8-18-2026/article_c0f3c1d9-0c3c-535e-9960-960241e54a3a.html",
+    "Facebook - https://m.facebook.com/story.php?story_fbid=968832201952132&id=100064760844739",
+    "Zacks Investment Research - https://www.zacks.com/stock/news/2299868/stock-market-news-for-aug-18-2026",
+    "TipRanks - https://www.tipranks.com/news/stock-market-news-today-8-19-26-futures-wobble-as-fomc-minutes-middle-east-tensions-loom",
+    "Finviz - https://finviz.com/news.ashx?v=2&t=MRNA&s=MRK",
+    "TradingKey - https://www.tradingkey.com/en/news/moderna-surges-over-100-pre-market-as-phase-3-cancer-vaccine-trial-with-merck-succeeds-202608190534",
+    "Seoul Economic Daily - https://www.sedaily.com/International/News/2D8F2K7D9Z",
+    "24/7 Wall St. - https://247wallst.com/investing/2026/08/19/here-are-wednesdays-top-wall-street-analyst-research-calls-baidu-ciena-cme-group-dollar-tree-dominion-fabrinet-honeywell-aerospace-klarna-pershing-square-and-more/",
+    "Investing.com - https://www.investing.com/analysis/stock-market-regains-footing-ahead-of-fomc-minutes-200650985",
+    "Benzinga - https://www.benzinga.com/analyst-ratings/upgrades/26/08/39500000/this-ciena-analyst-turns-bullish-here-are-top-5-upgrades-for-wednesday",
+    "MarketBeat - https://www.marketbeat.com/instant-alerts/nyse-all-a-2026-08-19-zacks-research-upgrade-2/",
+    "Trading Economics - https://tradingeconomics.com/united-states/10-year-treasury-yield",
+    "FinHacker.cz - https://finhacker.cz/cnn-fear-and-greed-index-historicka-data-graf/",
+    "Zacks Investment Research - https://www.zacks.com/stock/news/2303497/stock-market-news-for-aug-19-2026",
+    "Benzinga - https://www.benzinga.com/analyst-ratings/analyst-color/26/08/39499878/target-gears-up-for-q2-print-here-are-the-recent-forecast-changes-from-wall-stre",
+    "Benzinga - https://www.benzinga.com/analyst-ratings/analyst-color/26/08/39499909/top-wall-street-forecasters-revamp-tjx-expectations-ahead-of-q2-earnings",
+    "Digrin - https://www.digrin.com/stocks/earnings/2026-08-19",
+    "Thomson Investment Group - https://www.thomsoninvestmentgroup.com/economic-calendar-august-2026"
   ]
 }
