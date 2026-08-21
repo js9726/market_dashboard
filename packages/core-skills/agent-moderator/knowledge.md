@@ -5,8 +5,8 @@
   "target": "agent-moderator/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-18T17:05:54.068Z",
-  "renderHash": "bf3e0bfa62ae47956ad9e177471f13dc6eb1f820569d6e4c1db1bdb9573983ee",
+  "generatedAt": "2026-08-21T09:27:37.492Z",
+  "renderHash": "7bcc494c6dd10d8262583042ef96ba07bf3ee34b55da9718aaa82ac970c74abf",
   "sources": [
     {
       "root": "wiki",
@@ -41,7 +41,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/risk/risk-management.md",
-      "sha256": "e5a141f3ebc05afa749c0bbe442e0616f7594d7480f3325b91acf556ec206138"
+      "sha256": "20a2d1cc541df1f962a89567abc6eea840204f5440dfa06b405e09e87ea7af0d"
     },
     {
       "root": "wiki",
@@ -84,7 +84,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/traders/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
 - wiki:wiki/trading/traders/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
 - wiki:wiki/trading/concepts/entry-methods.md sha256:9c3c5e5a93a5
-- wiki:wiki/trading/risk/risk-management.md sha256:e5a141f3ebc0
+- wiki:wiki/trading/risk/risk-management.md sha256:20a2d1cc541d
 - wiki:wiki/trading/risk/position-sizing.md sha256:51671f829f25
 - wiki:wiki/trading/concepts/relative-strength.md sha256:3c49bdb0cd3c
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:22014c94765d
@@ -1306,7 +1306,9 @@ midweek pattern").
 | Extended / overbought (price stretch plus stalled breadth/leadership) | Stop adding, trim strength |
 | Correction / breakdown | Cut to cash |
 
-(source: Alex's Swing Trading System.md)
+(source: Alex's Swing Trading System.md for the phases and exposure bands; the
+"price stretch plus stalled breadth/leadership" qualifier on the extended row is from
+decisionpoint-market-edge, not from Alex)
 
 ## Qullamaggie Account Risk Limits
 

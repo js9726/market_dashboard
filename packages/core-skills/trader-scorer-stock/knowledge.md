@@ -5,8 +5,8 @@
   "target": "trader-scorer-stock/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-18T16:36:32.750Z",
-  "renderHash": "6dc8192a4966f92cbad0eeddbc7c39314a18cf1b6e8b254238d040017c613af6",
+  "generatedAt": "2026-08-21T09:27:37.503Z",
+  "renderHash": "eab03c061b14192147d8055407b834d393108d88117627d7dd6e7dce48869fbc",
   "sources": [
     {
       "root": "wiki",
@@ -66,7 +66,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/traders/duan-yongping.md",
-      "sha256": "8eb042e59a09337bc35ce87cc2304abb19dff9b5c09b49d73a5075d22f016563"
+      "sha256": "548ef58df59227d450b8928e03526b8549ad8b071c1b778c208cce445ac8a255"
     },
     {
       "root": "wiki",
@@ -94,7 +94,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md sha256:7a2301df36b9
 - wiki:wiki/trading/traders/lengyan-cold-eye.md sha256:2796af9cbbbc
 - wiki:wiki/trading/traders/lengyan-stock-analyses.md sha256:e8cd93d2f551
-- wiki:wiki/trading/traders/duan-yongping.md sha256:8eb042e59a09
+- wiki:wiki/trading/traders/duan-yongping.md sha256:548ef58df592
 - wiki:wiki/trading/concepts/duan-scoring-model.md sha256:cde803f78c20
 
 ## Application Notes
@@ -1565,7 +1565,7 @@ These analyses demonstrate how to apply the A/B/C rating framework from fundamen
 
 **Summary**: Profile of Duan Yongping — Chinese-American value investor, founder of BBK/OPPO/vivo, and ultra-concentrated long-term compounder. Key principle: "buying stocks is buying companies."
 
-**Sources**: duan yongping.md
+**Sources**: `duan yongping.md` — **needs verification**: this filename is cited but no such document exists under `sources/`, in Git history, or in the cold archive. Treat the claims below as unsourced until Jie re-supplies the original.
 
 **Last updated**: 2026-05-05
 
