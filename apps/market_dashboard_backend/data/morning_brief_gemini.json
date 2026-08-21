@@ -2,14 +2,14 @@
   "mood": {
     "label": "CAUTIOUSLY-RISK-ON",
     "posture": "WAIT",
-    "summary": "Futures are mixed as traders weigh easing Treasury yields against rising oil prices from Middle East tensions. A hawkish tone from yesterday's Fed minutes adds to the cautious sentiment."
+    "summary": "US futures are pointing to a higher open, but rising Treasury yields and mixed overnight markets suggest a cautious tone. The tape is digesting recent losses and key retail earnings."
   },
   "breadth": {
-    "up": null,
-    "down": null
+    "up": 931,
+    "down": 1821
   },
   "fearGreed": {
-    "score": 51,
+    "score": 44,
     "label": "Neutral"
   },
   "indices": [
@@ -17,7 +17,7 @@
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.16,
+      "changePct": 0.3,
       "note": "futures",
       "citation": null
     },
@@ -25,7 +25,7 @@
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 0.07,
+      "changePct": 0.46,
       "note": "futures",
       "citation": null
     },
@@ -33,7 +33,7 @@
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": -0.05,
+      "changePct": 0.39,
       "note": "futures",
       "citation": null
     },
@@ -48,83 +48,90 @@
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 15.08,
-      "changePct": -4.80,
-      "note": "prior day close",
+      "level": 16.02,
+      "changePct": null,
+      "note": "live",
       "citation": null
     },
     {
       "symbol": "^TNX",
       "name": "10-Year Yield",
-      "level": 4.66,
-      "changePct": -1.02,
+      "level": 4.69,
+      "changePct": null,
       "note": "live",
       "citation": null
     },
     {
       "symbol": "CL=F",
       "name": "Crude Oil",
-      "level": 87.04,
-      "changePct": 2.3,
+      "level": 86.53,
+      "changePct": -0.4,
       "note": "live",
       "citation": null
     }
   ],
-  "indicesNarrative": "US futures are mixed, with tech showing slight strength while broader indices are flat to down. The key tension is between the US Treasury's increased bond buybacks, which is pushing yields down and supporting equities, and rising crude oil prices due to geopolitical concerns in the Middle East, which could fuel inflation.",
+  "indicesNarrative": "U.S. equity futures are indicating a positive start to the day, attempting to recover from Thursday's broad-based sell-off. The previous session saw the Dow lead losses with a 1.3% drop, while the S&P 500 and Nasdaq fell 0.9% and 1.0% respectively. Rising Treasury yields continue to be a headwind for equities.",
   "technicals": null,
   "technicalsNarrative": null,
   "sectorsThemes": [],
-  "sectorsNarrative": "Healthcare is in focus following the major positive news from Moderna and Merck, suggesting potential for continued momentum in the biotech and pharma spaces.",
+  "sectorsNarrative": "On Thursday, only the Energy and Real Estate sectors finished in positive territory, and just barely. Consumer-focused sectors, particularly consumer staples and discretionary, were the weakest, dragged down by disappointing retail earnings.",
   "industryNarrative": null,
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "GLMD",
+      "ticker": "RFAI",
       "side": "LONG",
-      "changePct": 815.74,
-      "why": "Specific catalyst not immediately available, likely a low-float momentum play.",
+      "changePct": 473.45,
+      "why": "Shareholders approved the company's proposed merger with Nanyang Biologics, an AI-driven drug discovery and biotechnology company.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "YJ",
+      "ticker": "HOWL",
       "side": "LONG",
-      "changePct": 233.9,
-      "why": "Specific catalyst not immediately available, likely a low-float momentum play.",
+      "changePct": 78.15,
+      "why": "Announced a merger agreement with Ambros Therapeutics and a concurrent $150 million private placement.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "MRNA",
+      "ticker": "JUNS",
       "side": "LONG",
-      "changePct": 86.7,
-      "why": "Continued momentum from yesterday's announcement of positive Phase 3 trial results for its personalized cancer vaccine with Merck.",
+      "changePct": 65.57,
+      "why": "A new insider or significant holder filed a Form 3, disclosing their stake in the company, sparking speculation.",
+      "traderLens": "Qullamaggie"
+    },
+    {
+      "ticker": "BKE",
+      "side": "LONG",
+      "changePct": 5.56,
+      "why": "Reported Q2 earnings and revenue that beat analyst expectations.",
       "traderLens": "Minervini"
     },
     {
-      "ticker": "MSTR",
+      "ticker": "ROST",
       "side": "LONG",
-      "changePct": 8.0,
-      "why": "Surging along with Bitcoin, which has reclaimed the $70,000 level.",
-      "traderLens": "Ted Zhang"
+      "changePct": 9,
+      "why": "Reported strong Q2 earnings that beat estimates and raised its full-year guidance.",
+      "traderLens": "Minervini"
     },
     {
-      "ticker": "SKHY",
-      "side": "LONG",
-      "changePct": 5.0,
-      "why": "Reached a tentative wage deal with its union, following a major buyback announcement.",
-      "traderLens": "Ted Zhang"
-    },
-    {
-      "ticker": "PFSA",
+      "ticker": "JZ",
       "side": "SHORT",
-      "changePct": -41.02,
-      "why": "Specific catalyst not immediately available.",
+      "changePct": -37.35,
+      "why": "Continued weakness amid a challenging environment for Chinese ADRs and recent follow-on equity offerings.",
       "traderLens": "Jeff"
     },
     {
-      "ticker": "TSLA",
+      "ticker": "ISPC",
       "side": "SHORT",
-      "changePct": -1.0,
-      "why": "Minor pullback in pre-market after a strong session yesterday.",
+      "changePct": -22.03,
+      "why": "No specific news found, likely continued downward momentum.",
+      "traderLens": "Jeff"
+    },
+    {
+      "ticker": "WMT",
+      "side": "SHORT",
+      "changePct": -9.15,
+      "why": "Disappointing Q2 sales and a soft outlook for Q3 weighed on the stock.",
       "traderLens": "Jeff"
     }
   ],
@@ -133,261 +140,262 @@
       "ticker": "NVDA",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Consolidating ahead of earnings next week. A key market tell."
+      "abc": null,
+      "note": "Watching for reaction to overall market and semi sector strength."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": -1.0,
-      "abc": "B",
-      "note": "Pulling back slightly in pre-market. Watching to see if yesterday's strength holds."
+      "changePct": null,
+      "abc": null,
+      "note": "Monitoring for a potential bounce after recent weakness."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Watching for relative strength or weakness against the broader market."
+      "abc": null,
+      "note": "Looking for stability after underperforming the tech sector recently."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "A leader in the AI space, watching for follow-through strength."
+      "abc": null,
+      "note": "Key tech name to watch for overall market direction."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Watching for a reaction to earnings from competitor Walmart."
+      "abc": null,
+      "note": "Watching to see if it can hold support after recent selling."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "In a period of consolidation, needs a catalyst."
+      "abc": null,
+      "note": "Observing for relative strength or weakness in the communication services sector."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Watching for relative strength in the tech sector."
+      "abc": null,
+      "note": "Another key tech bellwether to gauge market sentiment."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Watching relative strength vs NVDA ahead of NVDA earnings."
+      "abc": null,
+      "note": "Following the semiconductor space for potential rotation."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "High-beta name in the AI space, will be sensitive to market shifts."
+      "abc": null,
+      "note": "High-beta name, will be sensitive to market direction."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Watching for signs of a new leg up after a period of basing."
+      "abc": null,
+      "note": "Monitoring for a potential breakout from its current consolidation."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Cybersecurity theme, watching for sector rotation."
+      "abc": null,
+      "note": "Cybersecurity sector to watch for relative strength."
     },
     {
       "ticker": "MSTR",
       "level": null,
-      "changePct": 8.0,
-      "abc": "A",
-      "note": "Strong pre-market move with Bitcoin. A key momentum name to watch."
+      "changePct": null,
+      "abc": null,
+      "note": "High correlation to Bitcoin, watching for crypto-related volatility."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a choppy state. Be highly selective and wait for A+ setups. The action in MRNA is a good example of an episodic pivot."
+      "view": "Market is in a correction, so cash is the preferred position. Wait for the market to prove itself before deploying capital."
     },
     {
       "name": "Ted Zhang",
-      "view": "Rotation into healthcare/biotech is notable. Crypto-related stocks are also showing strength. Watch for institutional flow into these themes."
+      "view": "Rotation out of consumer-facing stocks is evident. Energy and some tech sub-sectors are showing relative strength."
     },
     {
       "name": "Clement Ang",
-      "view": "The mixed futures and conflicting macro signals (Treasury vs. Oil) suggest a difficult trading environment. It's better to wait for a clearer market direction."
+      "view": "The market is choppy and lacks a clear trend. It's a time to be patient and wait for high-quality setups to emerge."
     },
     {
       "name": "SRxTrades",
-      "view": "Wait for clean pivots and volume confirmation. Chasing pre-market gaps is a low-probability trade today."
+      "view": "Volume on the recent down days has been notable. Wait for a constructive pullback with decreasing volume before considering new long positions."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your rules. With conflicting signals, it's easy to get chopped up. If you take a trade, honor your stop."
+      "view": "Stick to your trading plan and rules. Don't get chopped up in a volatile market. Respect your stops."
     },
     {
       "name": "Qullamaggie",
-      "view": "The large pre-market movers offer potential for episodic pivots, but the overall market chop warrants smaller position sizes."
+      "view": "Some speculative, high-momentum plays are working on an intraday basis, but the broader market is not conducive to holding breakouts overnight."
     },
     {
       "name": "Composite",
-      "view": "Wait for the market to digest the morning's economic data (Jobless Claims). The tape is pulled between lower yields and higher oil. Focus on themes with clear catalysts like biotech (MRNA) and crypto (MSTR), but be nimble."
+      "view": "The market is in a state of flux. While futures are up, overhead resistance and rising yields are concerns. It's a day to be patient and selective. Let the market show its hand before committing significant capital."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "WMT",
-        "consensus": null
+        "ticker": "BJ",
+        "consensus": "EPS $1.17 / Rev $5.94B"
       },
       {
-        "ticker": "BABA",
-        "consensus": null
-      },
-      {
-        "ticker": "DE",
-        "consensus": null
-      },
-      {
-        "ticker": "NTES",
-        "consensus": null
+        "ticker": "BKE",
+        "consensus": "EPS $0.81 / Rev $314.06M"
       }
     ],
     "amc": [
       {
-        "ticker": "WDAY",
-        "consensus": null
-      },
-      {
-        "ticker": "ZM",
-        "consensus": null
-      },
-      {
-        "ticker": "ROST",
-        "consensus": null
+        "ticker": "FLO",
+        "consensus": "EPS $0.23 / Rev $1.2B"
       }
     ],
     "yesterdayReactions": [
       {
-        "ticker": "EL",
+        "ticker": "ROST",
         "result": "beat",
-        "movePct": 16.3
+        "movePct": 9
       },
       {
-        "ticker": "TOL",
-        "result": "beat",
-        "movePct": 4.0
-      },
-      {
-        "ticker": "MRNA",
-        "result": "positive trial data",
-        "movePct": 177.0
+        "ticker": "WMT",
+        "result": "miss",
+        "movePct": -9.15
       }
     ]
   },
   "calendar": [
     {
-      "time": "08:30 ET",
-      "name": "Initial Jobless Claims",
-      "consensus": "210k"
-    },
-    {
-      "time": "08:30 ET",
-      "name": "Philadelphia Fed Manufacturing Index",
+      "time": "09:45 ET",
+      "name": "S&P Global Manufacturing PMI (Aug)",
       "consensus": null
     },
     {
-      "time": "10:00 ET",
-      "name": "Leading Indicators",
+      "time": "09:45 ET",
+      "name": "S&P Global Services PMI (Aug)",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "PGR",
-        "firm": "Keefe, Bruyette & Woods",
+        "ticker": "WMT",
+        "firm": "Freedom Broker",
+        "rating": "Buy",
+        "pt": null
+      },
+      {
+        "ticker": "PSN",
+        "firm": "Baird",
         "rating": "Outperform",
-        "pt": 250
+        "pt": 57
+      },
+      {
+        "ticker": "EFX",
+        "firm": "Rothschild & Co",
+        "rating": "Buy",
+        "pt": 235
       }
     ],
     "downgrades": [
       {
-        "ticker": "LILA",
-        "firm": "Morgan Stanley",
-        "rating": "Underweight",
-        "pt": 7
+        "ticker": "TX",
+        "firm": "HSBC",
+        "rating": "Hold",
+        "pt": 55
+      },
+      {
+        "ticker": "HY",
+        "firm": "S&P Global",
+        "rating": "B-",
+        "pt": null
+      },
+      {
+        "ticker": "APP",
+        "firm": "Piper Sandler",
+        "rating": null,
+        "pt": 325
       }
     ]
   },
   "alert": null,
   "news": [
     {
-      "headline": "Moderna, Merck cancer vaccine shows promise in late-stage trial, stocks soar",
+      "headline": "World shares mixed after Wall Street retreat on rate worries",
       "impact": "HIGH",
-      "tickers": [
-        "MRNA",
-        "MRK",
-        "XLV"
-      ],
-      "source": "CNBC - https://www.cnbc.com/2026/08/19/moderna-merck-cancer-vaccine-shows-promise-in-late-stage-trial.html",
-      "time": "Overnight"
-    },
-    {
-      "headline": "US futures mixed amid escalating Middle East tensions, oil prices jump",
-      "impact": "HIGH",
-      "tickers": [
-        "SPY",
-        "QQQ",
-        "CL=F",
-        "XLE"
-      ],
-      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-8-20-26-futures-mixed-amid-escalating-middle-east-tensions-oil-prices-jump",
-      "time": "Pre-market"
-    },
-    {
-      "headline": "US Treasury to more than double long-term bond buybacks, easing yields",
-      "impact": "HIGH",
-      "tickers": [
-        "SPY",
-        "TLT",
-        "^TNX"
-      ],
-      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-aug-20-2026-dow-futures-flat-after-treasury-announces-bigger-bond-buybacks",
-      "time": "Overnight"
-    },
-    {
-      "headline": "Fed Minutes from July meeting show possibility of further rate hikes",
-      "impact": "MED",
       "tickers": [
         "SPY",
         "QQQ"
       ],
-      "source": "Zacks - https://www.zacks.com/stock/news/2300557/stock-market-news-for-aug-20-2026",
-      "time": "Yesterday AMC"
+      "source": "Associated Press",
+      "time": "08/21/2026"
+    },
+    {
+      "headline": "RF Acquisition Corp II stock soars on shareholder approval of merger with Nanyang Biologics",
+      "impact": "MED",
+      "tickers": [
+        "RFAI"
+      ],
+      "source": "Investing.com",
+      "time": "08/21/2026"
+    },
+    {
+      "headline": "Werewolf Therapeutics to merge with Ambros Therapeutics in all-stock deal",
+      "impact": "MED",
+      "tickers": [
+        "HOWL"
+      ],
+      "source": "GlobeNewswire",
+      "time": "08/21/2026"
+    },
+    {
+      "headline": "Ross Stores stock jumps on strong Q2 earnings and raised guidance",
+      "impact": "MED",
+      "tickers": [
+        "ROST"
+      ],
+      "source": "TIKR.com",
+      "time": "08/21/2026"
+    },
+    {
+      "headline": "Walmart shares fall after Q2 sales miss and soft outlook",
+      "impact": "MED",
+      "tickers": [
+        "WMT"
+      ],
+      "source": "Stansberry Research",
+      "time": "08/20/2026"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TipRanks - https://www.tipranks.com/news/stock-market-news-today-8-20-26-futures-mixed-amid-escalating-middle-east-tensions-oil-prices-jump",
-    "TheStreet - https://www.thestreet.com/markets/stock-market-today-aug-20-2026-dow-futures-flat-after-treasury-announces-bigger-bond-buybacks",
-    "Benzinga - https://www.benzinga.com/analyst-ratings/analyst-color/26/08/38902009/okta-to-rally-more-than-20-here-are-10-top-analyst-forecasts-for-thursday",
-    "Econoday - https://www.econoday.com/calendar.asp",
-    "CNBC - https://www.cnbc.com/2026/08/19/moderna-merck-cancer-vaccine-shows-promise-in-late-stage-trial.html",
-    "Zacks - https://www.zacks.com/stock/news/2300557/stock-market-news-for-aug-20-2026",
-    "CFGI - https://www.google.com/url?q=https://www.google.com/url?q%3Dhttps://alternative.me/crypto/fear-and-greed-index/%26sa%3DU%26ved%3D2ahUKEwj-q-qW-POEAxV3mFYBHTsABoQQFnoECAYQAg%26usg%3DAOvVaw1Z5Y-hJc8JkYq3x-Z6Z2wQ&sa=D&source=grounded&ust=1710449987413000&usg=AOvVaw0_gT7v2xY21y-p-q-s-Q8B",
-    "Investing.com - https://www.investing.com/pre-market/",
-    "Stocktwits - https://stocktwits.com/news/why-are-nasdaq-s-p-500-futures-falling-premarket-nvda-skhy-spcx-tsla-mrna-mstr-purr-wmt-stocks-in-focus"
+    "CNN Fear and Greed Index",
+    "Associated Press",
+    "Investing.com",
+    "GlobeNewswire",
+    "TIKR.com",
+    "Stansberry Research",
+    "Benzinga",
+    "MarketBeat",
+    "StreetInsider",
+    "McClellan Financial Publications"
   ]
 }
