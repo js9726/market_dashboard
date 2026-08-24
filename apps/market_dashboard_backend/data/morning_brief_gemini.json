@@ -1,138 +1,116 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-ON",
+    "label": "CAUTIOUSLY-RISK-OFF",
     "posture": "WAIT",
-    "summary": "US futures are pointing to a higher open, but rising Treasury yields and mixed overnight markets suggest a cautious tone. The tape is digesting recent losses and key retail earnings."
+    "summary": "Global markets are starting the week on the back foot, with investors weighing impending U.S. sanctions on Iran and looking ahead to Nvidia's earnings and the Jackson Hole symposium."
   },
   "breadth": {
-    "up": 931,
-    "down": 1821
+    "up": null,
+    "down": null
   },
   "fearGreed": {
-    "score": 44,
-    "label": "Neutral"
+    "score": 55,
+    "label": "Greed"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": null,
-      "changePct": 0.3,
+      "level": 7680.17,
+      "changePct": -0.03,
       "note": "futures",
-      "citation": null
+      "citation": "Source: Vantage Markets 06:31 GMT+8"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": 0.46,
+      "changePct": -0.7,
       "note": "futures",
-      "citation": null
+      "citation": "Source: TheStreet 06:50 AM EDT"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": 0.39,
+      "changePct": -0.1,
       "note": "futures",
-      "citation": null
-    },
-    {
-      "symbol": "IWM",
-      "name": "Russell 2000",
-      "level": null,
-      "changePct": null,
-      "note": "futures",
-      "citation": null
+      "citation": "Source: TheStreet 06:50 AM EDT"
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 16.02,
+      "level": 15.13,
       "changePct": null,
-      "note": "live",
-      "citation": null
+      "note": "last close",
+      "citation": "Source: Google Finance"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Year Yield",
-      "level": 4.69,
+      "name": "10-Yr Treasury Yield",
+      "level": 4.73,
       "changePct": null,
-      "note": "live",
-      "citation": null
+      "note": "last close",
+      "citation": "Source: Barchart.com"
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil",
-      "level": 86.53,
-      "changePct": -0.4,
+      "name": "Crude Oil (WTI)",
+      "level": 85.52,
+      "changePct": -1.8,
       "note": "live",
-      "citation": null
+      "citation": "Source: ClickOnDetroit"
     }
   ],
-  "indicesNarrative": "U.S. equity futures are indicating a positive start to the day, attempting to recover from Thursday's broad-based sell-off. The previous session saw the Dow lead losses with a 1.3% drop, while the S&P 500 and Nasdaq fell 0.9% and 1.0% respectively. Rising Treasury yields continue to be a headwind for equities.",
+  "indicesNarrative": "U.S. futures are pointing to a weaker open, particularly for the tech-heavy Nasdaq, as investors take a risk-off stance. Overnight, Asian markets saw significant declines, led by South Korea's KOSPI. Elevated bond yields and geopolitical tensions surrounding Iran are key drivers of the cautious sentiment heading into a week packed with central bank commentary and key earnings.",
   "technicals": null,
-  "technicalsNarrative": null,
+  "technicalsNarrative": "Technical data not available. Unable to assess entry risk or momentum.",
   "sectorsThemes": [],
-  "sectorsNarrative": "On Thursday, only the Energy and Real Estate sectors finished in positive territory, and just barely. Consumer-focused sectors, particularly consumer staples and discretionary, were the weakest, dragged down by disappointing retail earnings.",
-  "industryNarrative": null,
+  "sectorsNarrative": "Sector and thematic performance data is not available pre-market.",
+  "industryNarrative": "Industry group performance data is not available pre-market.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "RFAI",
+      "ticker": "PDD",
       "side": "LONG",
-      "changePct": 473.45,
-      "why": "Shareholders approved the company's proposed merger with Nanyang Biologics, an AI-driven drug discovery and biotechnology company.",
+      "changePct": 3.79,
+      "why": "Positive anticipation or reaction to its Q2 earnings report released before market open.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "HOWL",
+      "ticker": "ALK",
       "side": "LONG",
-      "changePct": 78.15,
-      "why": "Announced a merger agreement with Ambros Therapeutics and a concurrent $150 million private placement.",
+      "changePct": 2.08,
+      "why": "No specific catalyst identified in pre-market news.",
+      "traderLens": "Composite"
+    },
+    {
+      "ticker": "PODD",
+      "side": "LONG",
+      "changePct": 1.59,
+      "why": "No specific catalyst identified in pre-market news.",
+      "traderLens": "Composite"
+    },
+    {
+      "ticker": "XPEV",
+      "side": "SHORT",
+      "changePct": -3.53,
+      "why": "Negative anticipation or reaction to its Q2 earnings report released before market open.",
       "traderLens": "Qullamaggie"
     },
     {
-      "ticker": "JUNS",
-      "side": "LONG",
-      "changePct": 65.57,
-      "why": "A new insider or significant holder filed a Form 3, disclosing their stake in the company, sparking speculation.",
-      "traderLens": "Qullamaggie"
-    },
-    {
-      "ticker": "BKE",
-      "side": "LONG",
-      "changePct": 5.56,
-      "why": "Reported Q2 earnings and revenue that beat analyst expectations.",
-      "traderLens": "Minervini"
-    },
-    {
-      "ticker": "ROST",
-      "side": "LONG",
-      "changePct": 9,
-      "why": "Reported strong Q2 earnings that beat estimates and raised its full-year guidance.",
-      "traderLens": "Minervini"
-    },
-    {
-      "ticker": "JZ",
+      "ticker": "WDC",
       "side": "SHORT",
-      "changePct": -37.35,
-      "why": "Continued weakness amid a challenging environment for Chinese ADRs and recent follow-on equity offerings.",
-      "traderLens": "Jeff"
+      "changePct": -3.35,
+      "why": "General weakness in the semiconductor and data storage sector amid concerns over valuations and ahead of Nvidia's pivotal earnings report.",
+      "traderLens": "Ted Zhang"
     },
     {
-      "ticker": "ISPC",
+      "ticker": "STX",
       "side": "SHORT",
-      "changePct": -22.03,
-      "why": "No specific news found, likely continued downward momentum.",
-      "traderLens": "Jeff"
-    },
-    {
-      "ticker": "WMT",
-      "side": "SHORT",
-      "changePct": -9.15,
-      "why": "Disappointing Q2 sales and a soft outlook for Q3 weighed on the stock.",
-      "traderLens": "Jeff"
+      "changePct": -2.96,
+      "why": "General weakness in the semiconductor and data storage sector amid concerns over valuations and ahead of Nvidia's pivotal earnings report.",
+      "traderLens": "Ted Zhang"
     }
   ],
   "watchlist": [
@@ -140,262 +118,221 @@
       "ticker": "NVDA",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching for reaction to overall market and semi sector strength."
+      "abc": "A",
+      "note": "In focus ahead of earnings on Wednesday; a key test for the AI-driven rally."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring for a potential bounce after recent weakness."
+      "abc": "B",
+      "note": "Watching for reaction to broader market weakness and tech sentiment."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Looking for stability after underperforming the tech sector recently."
+      "abc": "B",
+      "note": "Consolidating; a key mega-cap bellwether."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Key tech name to watch for overall market direction."
+      "abc": "B",
+      "note": "Watching for leadership and reaction to AI sentiment post-NVDA earnings."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Watching to see if it can hold support after recent selling."
+      "abc": "C",
+      "note": "Monitoring relative strength versus the broader market."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Observing for relative strength or weakness in the communication services sector."
+      "abc": "C",
+      "note": "A laggard among mega-caps; watching for signs of rotation."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Another key tech bellwether to gauge market sentiment."
+      "abc": "B",
+      "note": "Key player in AI; will be sensitive to NVDA's report."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Following the semiconductor space for potential rotation."
+      "abc": "A",
+      "note": "High beta name in the semiconductor space, will react strongly to NVDA."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "High-beta name, will be sensitive to market direction."
+      "abc": "A",
+      "note": "Another key AI-related name sensitive to the NVDA print."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Monitoring for a potential breakout from its current consolidation."
+      "abc": "C",
+      "note": "High-growth name sensitive to risk appetite."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "Cybersecurity sector to watch for relative strength."
+      "abc": "B",
+      "note": "Cybersecurity leader, reports earnings later this week."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
-      "abc": null,
-      "note": "High correlation to Bitcoin, watching for crypto-related volatility."
+      "abc": "A",
+      "note": "High correlation to cryptocurrency movements; Bitcoin momentum is a key factor."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a correction, so cash is the preferred position. Wait for the market to prove itself before deploying capital."
+      "view": "Market is in a pullback. Not an ideal environment for new long positions. Focus on protecting capital."
     },
     {
       "name": "Ted Zhang",
-      "view": "Rotation out of consumer-facing stocks is evident. Energy and some tech sub-sectors are showing relative strength."
+      "view": "Observing weakness in technology and chip sectors. Money may be rotating to more defensive areas, but it's too early to confirm."
     },
     {
       "name": "Clement Ang",
-      "view": "The market is choppy and lacks a clear trend. It's a time to be patient and wait for high-quality setups to emerge."
+      "view": "Market context is cautious (Grade C). Best to wait for a clearer trend and A-grade setups to emerge."
     },
     {
       "name": "SRxTrades",
-      "view": "Volume on the recent down days has been notable. Wait for a constructive pullback with decreasing volume before considering new long positions."
+      "view": "Choppy price action and lack of follow-through. Wait for clean pivots and volume confirmation before entering."
     },
     {
       "name": "Jeff",
-      "view": "Stick to your trading plan and rules. Don't get chopped up in a volatile market. Respect your stops."
+      "view": "Stick to the rules. If setups don't meet criteria, do not trade. Honor stops on any existing positions."
     },
     {
       "name": "Qullamaggie",
-      "view": "Some speculative, high-momentum plays are working on an intraday basis, but the broader market is not conducive to holding breakouts overnight."
+      "view": "No clear momentum for breakouts. The market is pulling back, so it's a time for patience, not aggression."
     },
     {
       "name": "Composite",
-      "view": "The market is in a state of flux. While futures are up, overhead resistance and rising yields are concerns. It's a day to be patient and selective. Let the market show its hand before committing significant capital."
+      "view": "Stay on the sidelines today. The key events are later in the week (Nvidia earnings, Jackson Hole). The current risk/reward is not favorable for new swing trades."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "BJ",
-        "consensus": "EPS $1.17 / Rev $5.94B"
+        "ticker": "PDD",
+        "consensus": null
       },
       {
-        "ticker": "BKE",
-        "consensus": "EPS $0.81 / Rev $314.06M"
+        "ticker": "XPEV",
+        "consensus": null
       }
     ],
     "amc": [
       {
-        "ticker": "FLO",
-        "consensus": "EPS $0.23 / Rev $1.2B"
+        "ticker": "TUYA",
+        "consensus": "EPS $0.03 / Rev $89.6M"
       }
     ],
-    "yesterdayReactions": [
-      {
-        "ticker": "ROST",
-        "result": "beat",
-        "movePct": 9
-      },
-      {
-        "ticker": "WMT",
-        "result": "miss",
-        "movePct": -9.15
-      }
-    ]
+    "yesterdayReactions": []
   },
   "calendar": [
     {
-      "time": "09:45 ET",
-      "name": "S&P Global Manufacturing PMI (Aug)",
-      "consensus": null
-    },
-    {
-      "time": "09:45 ET",
-      "name": "S&P Global Services PMI (Aug)",
+      "time": "08:30 ET",
+      "name": "Chicago Fed National Activity Index (Jul)",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "WMT",
-        "firm": "Freedom Broker",
+        "ticker": "LBRX",
+        "firm": "HC Wainwright & Co.",
         "rating": "Buy",
-        "pt": null
-      },
-      {
-        "ticker": "PSN",
-        "firm": "Baird",
-        "rating": "Outperform",
-        "pt": 57
-      },
-      {
-        "ticker": "EFX",
-        "firm": "Rothschild & Co",
-        "rating": "Buy",
-        "pt": 235
+        "pt": 60
       }
     ],
     "downgrades": [
       {
-        "ticker": "TX",
-        "firm": "HSBC",
-        "rating": "Hold",
-        "pt": 55
+        "ticker": "CMG",
+        "firm": "Baird",
+        "rating": "Neutral",
+        "pt": 40
       },
       {
-        "ticker": "HY",
-        "firm": "S&P Global",
-        "rating": "B-",
-        "pt": null
-      },
-      {
-        "ticker": "APP",
-        "firm": "Piper Sandler",
-        "rating": null,
-        "pt": 325
+        "ticker": "KLAR",
+        "firm": "UBS Group",
+        "rating": "Neutral",
+        "pt": 16
       }
     ]
   },
-  "alert": null,
+  "alert": "Key Risk Events Ahead: NVDA earnings (Wed) & Fed Chair speech at Jackson Hole (Fri).",
   "news": [
     {
-      "headline": "World shares mixed after Wall Street retreat on rate worries",
+      "headline": "Stock futures slide as investors brace for U.S. sanctions on Iran, Jackson Hole symposium",
       "impact": "HIGH",
       "tickers": [
         "SPY",
+        "QQQ",
+        "DIA"
+      ],
+      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-aug-24-2026-dow-futures-slide-on-iran-sanctions-us-canada-tariff-threats",
+      "time": "06:50 ET"
+    },
+    {
+      "headline": "World shares mostly lower as bond market pressure persists",
+      "impact": "HIGH",
+      "tickers": null,
+      "source": "Associated Press - https://www.clickondetroit.com/news/world/2026/08/24/world-shares-decline-as-bond-market-pressure-persists-and-irans-rial-sinks-against-the-dollar/",
+      "time": "08:34 ET"
+    },
+    {
+      "headline": "Nvidia earnings loom as a major test for the AI-driven market rally",
+      "impact": "HIGH",
+      "tickers": [
+        "NVDA",
+        "SMH",
         "QQQ"
       ],
-      "source": "Associated Press",
-      "time": "08/21/2026"
+      "source": "Vantage Markets - https://www.vantagemarkets.com/en-au/news/daily-trading-sp-500-analysis-24-august-2026-averages-converge-ahead-of-jackson-hole/",
+      "time": "06:31 GMT+8"
     },
     {
-      "headline": "RF Acquisition Corp II stock soars on shareholder approval of merger with Nanyang Biologics",
+      "headline": "PDD and XPeng report earnings before the bell",
       "impact": "MED",
       "tickers": [
-        "RFAI"
+        "PDD",
+        "XPEV"
       ],
-      "source": "Investing.com",
-      "time": "08/21/2026"
-    },
-    {
-      "headline": "Werewolf Therapeutics to merge with Ambros Therapeutics in all-stock deal",
-      "impact": "MED",
-      "tickers": [
-        "HOWL"
-      ],
-      "source": "GlobeNewswire",
-      "time": "08/21/2026"
-    },
-    {
-      "headline": "Ross Stores stock jumps on strong Q2 earnings and raised guidance",
-      "impact": "MED",
-      "tickers": [
-        "ROST"
-      ],
-      "source": "TIKR.com",
-      "time": "08/21/2026"
-    },
-    {
-      "headline": "Walmart shares fall after Q2 sales miss and soft outlook",
-      "impact": "MED",
-      "tickers": [
-        "WMT"
-      ],
-      "source": "Stansberry Research",
-      "time": "08/20/2026"
+      "source": "Facebook - https://www.facebook.com/Benzinga/posts/premarket-movers-august-24-2026-gainers-pdd-379-alk-208-podd-159-losers-xpev-3/10161585808985633/",
+      "time": "Pre-market"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "CNN Fear and Greed Index",
-    "Associated Press",
-    "Investing.com",
-    "GlobeNewswire",
-    "TIKR.com",
-    "Stansberry Research",
-    "Benzinga",
-    "MarketBeat",
-    "StreetInsider",
-    "McClellan Financial Publications"
+    "Vantage Markets 06:31 GMT+8 — https://www.vantagemarkets.com/en-au/news/daily-trading-sp-500-analysis-24-august-2026-averages-converge-ahead-of-jackson-hole/",
+    "TheStreet 06:50 AM EDT — https://www.thestreet.com/markets/stock-market-today-aug-24-2026-dow-futures-slide-on-iran-sanctions-us-canada-tariff-threats",
+    "Associated Press / ClickOnDetroit — https://www.clickondetroit.com/news/world/2026/08/24/world-shares-decline-as-bond-market-pressure-persists-and-irans-rial-sinks-against-the-dollar/",
+    "FinHacker.cz — https://finhacker.cz/fear-and-greed-index-historical-data-chart/",
+    "Barchart.com — https://www.barchart.com/futures/quotes/CLV26",
+    "Facebook / Benzinga — https://www.facebook.com/Benzinga/posts/premarket-movers-august-24-2026-gainers-pdd-379-alk-208-podd-159-losers-xpev-3/10161585808985633/",
+    "Financhle Earnings Calendar — https://financhle.com/earnings/2026/8/24",
+    "Benzinga — https://www.benzinga.com/analyst-ratings/analyst-color/26/08/38288282/analog-devices-to-rally-around-81-here-are-10-top-analyst-forecasts-for-monday",
+    "MarketBeat — https://www.marketbeat.com/instant-alerts/nyse-klar-a-buy-or-sell-right-now-2026-08-2-3/",
+    "Investing.com — https://www.investing.com/economic-calendar/"
   ]
 }
