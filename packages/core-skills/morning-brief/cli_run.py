@@ -92,6 +92,22 @@ def _push(structured_json: object, provider: str) -> dict:
 
 # ── prompt loading ────────────────────────────────────────────────────────────
 ROOT = Path(__file__).parent
+PREFLIGHT_RECEIPT = ROOT / "preflight_receipt.json"
+
+
+def _load_preflight_receipt() -> dict | None:
+    try:
+        return json.loads(PREFLIGHT_RECEIPT.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _require_publication_preflight(receipt: dict | None) -> None:
+    from preflight import validate_receipt_for_publication
+    ok, reason = validate_receipt_for_publication(receipt or {})
+    if not ok:
+        print(f"[cli_run] PUBLICATION BLOCKED: {reason}. Run preflight.py again.", file=sys.stderr)
+        raise SystemExit(2)
 
 
 def _fetch_fear_and_greed() -> tuple[int | None, str | None]:
@@ -372,6 +388,7 @@ def _build_live_block(
     breadth: dict | None = None,
     snapshot: dict | None = None,
     events: list[dict] | None = None,
+    broker_protection: dict | None = None,
 ) -> str:
     lines: list[str] = []
 
@@ -431,6 +448,24 @@ def _build_live_block(
     if events:
         lines.append(_format_events_section(events))
 
+    broker = broker_protection or {
+        "feed_state": "ORDER-FEED-UNVERIFIED",
+        "new_risk_block": True,
+        "unprotected_tickers": [],
+        "queued_tickers": [],
+    }
+    lines.append("  BROKER PROTECTION (preflight receipt; broker orders only, never journal intent):")
+    lines.append(
+        f"    scope={broker.get('broker_scope', 'NONE')}  "
+        f"feed_state={broker.get('feed_state', 'ORDER-FEED-UNVERIFIED')}  "
+        f"new_risk_block={bool(broker.get('new_risk_block', True))}"
+    )
+    lines.append(f"    counts={broker.get('counts') or {}}")
+    lines.append(f"    unprotected_tickers={broker.get('unprotected_tickers') or []}")
+    lines.append(f"    queued_tickers={broker.get('queued_tickers') or []}")
+    if not broker.get("order_feed_verified"):
+        lines.append("    ORDER FEED UNVERIFIED — never state that any holding is protected.")
+
     # ── Watchlist live prices ─────────────────────────────────────────────────
     if live_prices:
         source = "OpenD (real-time)" if any(d.get("rvol") for d in live_prices.values()) else "yfinance"
@@ -472,6 +507,7 @@ def _build_prompt(
     snapshot: dict | None = None,
     events: list[dict] | None = None,
     screener_unscored: list[str] | None = None,
+    broker_protection: dict | None = None,
 ) -> str:
     template = (ROOT / "prompt.md").read_text(encoding="utf-8")
     live_block = _build_live_block(
@@ -480,6 +516,7 @@ def _build_prompt(
         breadth=breadth,
         snapshot=snapshot,
         events=events,
+        broker_protection=broker_protection,
     )
     unscored_str = (
         ", ".join(screener_unscored) if screener_unscored
@@ -788,6 +825,14 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    preflight_receipt = _load_preflight_receipt()
+    if args.post:
+        _require_publication_preflight(preflight_receipt)
+    broker_protection = (
+        ((preflight_receipt or {}).get("checks") or {}).get("broker_protection")
+        or {"feed_state": "ORDER-FEED-UNVERIFIED", "new_risk_block": True}
+    )
+
     tv_tickers = _parse_tickers(args.tv_watchlist) if args.tv_watchlist else None
     watchlist = _build_watchlist(args.watchlist, tv_tickers=tv_tickers)
 
@@ -847,6 +892,7 @@ def main() -> None:
         snapshot=snapshot,
         events=events,
         screener_unscored=screener_unscored,
+        broker_protection=broker_protection,
     )
 
     print(f"[cli_run] provider={args.provider}  date={date_str}  watchlist={watchlist}", file=sys.stderr)

@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from datetime import date, datetime, timedelta
@@ -53,6 +54,7 @@ WIKI_CANDIDATES = [
 HERE = Path(__file__).parent
 RECEIPT = HERE / "preflight_receipt.json"
 MIN_INDUSTRIES = 100
+PREFLIGHT_MAX_AGE_MINUTES = 15
 
 
 def _wiki(override: str | None) -> Path | None:
@@ -205,13 +207,132 @@ def check_empty_go(wiki: Path | None) -> dict:
     }
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--json", action="store_true")
-    ap.add_argument("--wiki")
-    a = ap.parse_args()
+def resolve_broker_mode(requested: str = "auto") -> str:
+    if requested != "auto":
+        return requested
+    if any(os.environ.get(name) for name in ("CI", "GITHUB_ACTIONS", "VERCEL")):
+        return "unavailable"
+    return "local"
 
-    wiki = _wiki(a.wiki)
+
+def check_broker_protection(mode: str = "auto") -> dict:
+    """Verify local protection or make non-local unavailability explicit.
+
+    The receipt intentionally carries tickers and aggregate quantities only. Account and
+    order identifiers never enter this boundary.
+    """
+    resolved = resolve_broker_mode(mode)
+    if resolved == "unavailable":
+        return {
+            "ok": False,
+            "hard": False,
+            "mode": "unavailable",
+            "broker_scope": "NONE",
+            "feed_state": "ORDER-FEED-UNVERIFIED",
+            "order_feed_verified": False,
+            "publication_allowed": True,
+            "new_risk_block": True,
+            "unprotected_tickers": [],
+            "queued_tickers": [],
+            "detail": (
+                "CI/SaaS has no local broker feed: protection is UNVERIFIED. "
+                "Publish only with an explicit unverified book; never claim a holding is protected."
+            ),
+        }
+
+    try:
+        from holdings_review import fetch_broker_snapshot, reconcile_protection
+        snapshot = fetch_broker_snapshot()
+    except Exception as exc:
+        return {
+            "ok": False, "hard": True, "mode": "local",
+            "broker_scope": "MOOMOO_US",
+            "feed_state": "ORDER-FEED-UNVERIFIED", "order_feed_verified": False,
+            "publication_allowed": False, "new_risk_block": True,
+            "unprotected_tickers": [], "queued_tickers": [],
+            "detail": f"local broker protection check raised: {exc}",
+        }
+
+    positions = snapshot.get("positions")
+    orders = snapshot.get("orders")
+    if positions is None or orders is None:
+        return {
+            "ok": False, "hard": True, "mode": "local",
+            "broker_scope": "MOOMOO_US",
+            "feed_state": "ORDER-FEED-UNVERIFIED", "order_feed_verified": False,
+            "publication_allowed": False, "new_risk_block": True,
+            "unprotected_tickers": [], "queued_tickers": [],
+            "detail": "local position/order feed unavailable; live brief publication is blocked",
+        }
+
+    reconciled = [
+        {"ticker": row["ticker"], **reconcile_protection(row, orders)}
+        for row in positions
+    ]
+    blocked_states = {"UNPROTECTED", "PARTIALLY-PROTECTED"}
+    unprotected = sorted(
+        row["ticker"] for row in reconciled if row["protection_state"] in blocked_states
+    )
+    queued = sorted(
+        row["ticker"] for row in reconciled if row["protection_state"] == "PROTECTED-QUEUED"
+    )
+    counts = {
+        state: sum(1 for row in reconciled if row["protection_state"] == state)
+        for state in (
+            "PROTECTED-WORKING", "PROTECTED-QUEUED", "PARTIALLY-PROTECTED",
+            "UNPROTECTED", "HOLD-EXEMPT",
+        )
+    }
+    risk_block = bool(unprotected)
+    detail = f"verified {len(reconciled)} live holdings; protection counts={counts}"
+    if unprotected:
+        detail += f"; new risk blocked by {', '.join(unprotected)}"
+    if queued:
+        detail += f"; queued protection {', '.join(queued)}"
+    return {
+        "ok": not risk_block,
+        "hard": False,
+        "mode": "local",
+        "broker_scope": "MOOMOO_US",
+        "feed_state": "VERIFIED",
+        "order_feed_verified": True,
+        "publication_allowed": True,
+        "new_risk_block": risk_block,
+        "unprotected_tickers": unprotected,
+        "queued_tickers": queued,
+        "counts": counts,
+        "detail": detail,
+    }
+
+
+def validate_receipt_for_publication(
+    receipt: dict, *, now: datetime | None = None,
+    max_age_minutes: int = PREFLIGHT_MAX_AGE_MINUTES,
+) -> tuple[bool, str]:
+    if not receipt or receipt.get("status") == "FAIL":
+        return False, "preflight status is FAIL or missing"
+    broker = (receipt.get("checks") or {}).get("broker_protection") or {}
+    if not broker.get("publication_allowed"):
+        return False, "broker order feed did not authorize publication"
+    try:
+        generated = datetime.fromisoformat(str(receipt["generated_at"]))
+    except (KeyError, TypeError, ValueError):
+        return False, "preflight generated_at is invalid"
+    now = now or datetime.now()
+    if generated.tzinfo is None and now.tzinfo is not None:
+        generated = generated.replace(tzinfo=now.tzinfo)
+    elif generated.tzinfo is not None and now.tzinfo is None:
+        now = now.replace(tzinfo=generated.tzinfo)
+    if now - generated > timedelta(minutes=max_age_minutes) or generated > now + timedelta(minutes=1):
+        return False, f"preflight receipt is older than {max_age_minutes} minutes"
+    hashed = {key: value for key, value in receipt.items() if key != "receipt_hash"}
+    expected = hashlib.sha256(json.dumps(hashed, sort_keys=True, default=str).encode()).hexdigest()[:16]
+    if receipt.get("receipt_hash") != expected:
+        return False, "preflight receipt hash is invalid"
+    return True, "publication gate passed"
+
+
+def run_preflight(wiki: Path | None, broker_mode: str = "auto") -> dict:
     focus = check_focus_list(wiki)
     checks = {
         "focus_list": focus,
@@ -219,10 +340,10 @@ def main() -> int:
         "themes": check_themes(),
         "universe": check_universe(focus),
         "empty_go": check_empty_go(wiki),
+        "broker_protection": check_broker_protection(broker_mode),
     }
-    hard_fail = [k for k, v in checks.items() if v.get("hard") and not v.get("ok")]
-    warn = [k for k, v in checks.items() if not v.get("hard") and not v.get("ok")]
-
+    hard_fail = [key for key, value in checks.items() if value.get("hard") and not value.get("ok")]
+    warn = [key for key, value in checks.items() if not value.get("hard") and not value.get("ok")]
     receipt = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "session_date": date.today().isoformat(),
@@ -235,6 +356,21 @@ def main() -> int:
         json.dumps(receipt, sort_keys=True, default=str).encode()
     ).hexdigest()[:16]
     RECEIPT.write_text(json.dumps(receipt, indent=2, default=str), encoding="utf-8")
+    return receipt
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--json", action="store_true")
+    ap.add_argument("--wiki")
+    ap.add_argument("--broker-mode", choices=("auto", "local", "unavailable"), default="auto")
+    a = ap.parse_args()
+
+    wiki = _wiki(a.wiki)
+    receipt = run_preflight(wiki, a.broker_mode)
+    checks = receipt["checks"]
+    hard_fail = receipt["hard_failures"]
+    warn = receipt["warnings"]
 
     if a.json:
         print(json.dumps(receipt, indent=2, default=str))
