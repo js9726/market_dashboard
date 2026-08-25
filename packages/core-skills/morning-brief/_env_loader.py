@@ -9,6 +9,7 @@ Search order (later files only fill keys still missing):
   2. {project_root}/apps/market_dashboard/.env.local   ← your main secrets file
   3. {project_root}/apps/market_dashboard/.env
   4. %LOCALAPPDATA%/Jie/secrets/market-dashboard.env   ← portable fallback
+  5. Public production URL default (VERCEL_INGEST_URL only)
 
 Already-set shell environment variables are NEVER overwritten —
 so if you have a real env var set, it always wins over the file.
@@ -22,6 +23,9 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+
+
+DEFAULT_VERCEL_INGEST_URL = "https://market-dashboard-ivory.vercel.app"
 
 
 def _parse_dotenv(path: Path) -> dict[str, str]:
@@ -104,5 +108,12 @@ def load_env(verbose: bool = False) -> int:
             print(f"[env] loaded {len(pairs)} vars from {path}", file=sys.stderr)
         # Continue to merge values from later candidates that are not already set —
         # so root .env can fill in keys missing from apps/.env.local
+
+    # The deployed dashboard URL is public configuration, not a secret. Keep it as a
+    # final default so shell/project/personal overrides still win while standalone
+    # worktrees and durable skill installations remain publishable.
+    if not os.environ.get("VERCEL_INGEST_URL", "").strip():
+        os.environ["VERCEL_INGEST_URL"] = DEFAULT_VERCEL_INGEST_URL
+        loaded += 1
 
     return loaded

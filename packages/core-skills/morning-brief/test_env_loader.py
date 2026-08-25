@@ -10,6 +10,30 @@ import _env_loader as loader
 
 
 class EnvLoaderTests(unittest.TestCase):
+    def test_public_ingest_url_defaults_without_a_project_checkout(self):
+        with mock.patch.dict(os.environ, {"LOCALAPPDATA": ""}, clear=True), mock.patch.object(
+            loader, "_find_project_root", return_value=None,
+        ):
+            loaded = loader.load_env()
+
+            self.assertEqual(
+                os.environ["VERCEL_INGEST_URL"],
+                loader.DEFAULT_VERCEL_INGEST_URL,
+            )
+            self.assertEqual(loaded, 1)
+
+    def test_explicit_ingest_url_wins_over_public_default(self):
+        explicit = "https://dashboard.example.test"
+        with mock.patch.dict(
+            os.environ,
+            {"LOCALAPPDATA": "", "VERCEL_INGEST_URL": explicit},
+            clear=True,
+        ), mock.patch.object(loader, "_find_project_root", return_value=None):
+            loaded = loader.load_env()
+
+            self.assertEqual(os.environ["VERCEL_INGEST_URL"], explicit)
+            self.assertEqual(loaded, 0)
+
     def test_personal_store_fills_keys_missing_from_project_env(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

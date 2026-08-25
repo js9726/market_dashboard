@@ -59,8 +59,19 @@ def _stored_provider(provider: str) -> str:
 def _push(structured_json: object, provider: str) -> dict:
     base = os.environ.get("VERCEL_INGEST_URL", "").rstrip("/")
     key = os.environ.get("BRIEF_INGEST_KEY", "")
-    if not base or not key:
-        print("VERCEL_INGEST_URL and BRIEF_INGEST_KEY must be set for --post.", file=sys.stderr)
+    missing = [
+        name
+        for name, value in (
+            ("VERCEL_INGEST_URL", base),
+            ("BRIEF_INGEST_KEY", key),
+        )
+        if not value
+    ]
+    if missing:
+        print(
+            f"Missing required environment variable(s) for --post: {', '.join(missing)}.",
+            file=sys.stderr,
+        )
         sys.exit(2)
     url = f"{base}/api/morning-verdict/ingest"
     payload_str = json.dumps(structured_json)
