@@ -76,9 +76,17 @@ def _hash(payload: str) -> str:
 def _push(structured_json: object, provider: str, generated_by: str) -> dict:
     base = os.environ.get("VERCEL_INGEST_URL", "").rstrip("/")
     key = os.environ.get("BRIEF_INGEST_KEY", "")
-    if not base or not key:
+    missing = [
+        name
+        for name, value in (
+            ("VERCEL_INGEST_URL", base),
+            ("BRIEF_INGEST_KEY", key),
+        )
+        if not value
+    ]
+    if missing:
         print(
-            "ERROR: VERCEL_INGEST_URL and BRIEF_INGEST_KEY must be set.",
+            f"ERROR: Missing required environment variable(s): {', '.join(missing)}.",
             file=sys.stderr,
         )
         sys.exit(2)

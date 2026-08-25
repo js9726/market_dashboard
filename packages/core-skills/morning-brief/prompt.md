@@ -8,6 +8,8 @@ Rules:
   • sectorsThemes[].changePct / rs MUST come from the "Sector ETFs" block below where available.
   • watchlist[].level / changePct MUST come from the "Watchlist live prices" block below where available.
   • fearGreed.score / fearGreed.label MUST come from the Fear & Greed line below if provided.
+  • Broker protection comes ONLY from the BROKER PROTECTION block. A planned/journal stop
+    is intent, never proof of a live protective order.
 
 {live_data_block}
 
@@ -185,6 +187,11 @@ SECTIONS — use pre-fetched data where provided; web-search only what is missin
 8. Analyst upgrades/downgrades: web-search for top 3 of each today
 9. Watchlist: use "Watchlist live prices" block for level/changePct; add 1-line setup note per ticker
 10. Mood/posture: synthesise from all data above — state the single most important variable
+   - If BROKER PROTECTION says `new_risk_block=True`, posture cannot be `GO`. Use `WAIT`,
+     `PASS`, or `RAISE-THE-BAR`; state the book risk in mood.summary, Composite traderLens,
+     and alert.
+   - `PROTECTED-QUEUED` is full queued coverage, not broker-working coverage. Say queued.
+   - `ORDER-FEED-UNVERIFIED` means you must never state that any holding is protected.
 11. Screener scores: score every unscored ticker listed in SCREENER TICKERS TO SCORE using the **Conviction Scoring Model** (Setup/40 + Entry/30 + Theme/20 + Sentiment/10; see `wiki/trading/traders/trader-styles.md`). Emit verdict as "GO" (>= 75) / "WAIT" (50-74) / "PASS" (< 50) — never use BUY/HOLD/AVOID here. A score that lacks source-backed catalyst/news, insider/institutional, peer/sector, next-catalyst, and analyst-action evidence must be downgraded to WAIT with `missing=catalyst brief`; medical/biotech/FDA-driven names need the special risk check above before GO.
 12. High-impact news: web-search for the 3–6 most market-moving news items from overnight + pre-market and emit them in `news`. Rank by impact (HIGH > MED), tag the affected `tickers`, and include a real `source` link for each. These feed the daily-journal "high-impact news" widget — only include items you can ground with a live citation; fabricated headlines are dropped.
 
