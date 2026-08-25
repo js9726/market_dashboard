@@ -172,6 +172,24 @@ def fetch_screener(screener_cfg: dict, columns: list) -> list:
     return []
 
 
+def filter_screener_instruments(screener_id: str, hits: list) -> list:
+    """Fail closed on instrument type for screens intended for common shares."""
+    if screener_id != "vcp-200ma":
+        return hits
+
+    common_hits = []
+    for hit in hits:
+        type_specs = hit.get("typespecs") or []
+        if isinstance(type_specs, str):
+            type_specs = [type_specs]
+        if "common" in type_specs:
+            common_hits.append(hit)
+    removed = len(hits) - len(common_hits)
+    if removed:
+        print(f"[tv:{screener_id}] excluded {removed} non-common instrument(s)")
+    return common_hits
+
+
 # --------------------------------------------------------------------------
 # 4-Stage scoring engine (wiki-derived, Python-deterministic)
 # --------------------------------------------------------------------------
@@ -712,6 +730,7 @@ def main():
     for sc in config["screeners"]:
         print(f"[tv] fetching {sc['id']}…")
         hits = fetch_screener(sc, columns)
+        hits = filter_screener_instruments(sc["id"], hits)
         print(f"[tv] {sc['id']}: {len(hits)} hits")
         total_hits += len(hits)
 

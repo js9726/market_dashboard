@@ -87,6 +87,7 @@
           {"left": "ATRP",                       "operation": "in_range", "right": [0, 5]},
           {"left": "relative_volume_10d_calc",   "operation": "egreater", "right": 1},
           {"left": "market_cap_basic",           "operation": "egreater", "right": 1000000000},
+          {"left": "typespecs",                  "operation": "has",      "right": ["common"]},
           {"left": "exchange",                   "operation": "in_range", "right": ["AMEX", "NASDAQ", "NYSE"]}
         ],
         "options": {"lang": "en"},
@@ -121,6 +122,6 @@
   "columns_to_fetch": [
     "name", "open", "high", "low", "close", "change", "volume",
     "relative_volume_10d_calc", "market_cap_basic", "sector", "industry",
-    "Perf.W", "Perf.1M", "premarket_change", "ATRP"
+    "Perf.W", "Perf.1M", "premarket_change", "ATRP", "type", "typespecs"
   ]
 }
