@@ -237,8 +237,10 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 Resolve and invoke the canonical `jie_wiki/scripts/agent_control.py`; read the full
 protocol in `jie_wiki/agent-system/protocol.md`. Its single wiki-owned runtime store
 coordinates exact path claims across this repo and all local wiki worktrees. If that
-script is not present in the primary wiki checkout, fail closed and tell Jie; an
-unmerged feature worktree is not the live workspace contract.
+script is not present in the primary wiki checkout, fail closed and tell Jie. For an
+explicitly approved unmerged control-plane/dependent task only, `JIE_WIKI_ROOT` may point
+to a feature worktree of the same canonical wiki Git repository; the hook verifies its
+common directory. This override does not make the feature branch the live contract.
 
 - At session start, set `JIE_AGENT_ACTOR` to the actual harness identity, render the
   wiki-local views, read any durable task/handoff, and verify branch, dirty state,
