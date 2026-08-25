@@ -4,10 +4,11 @@ _env_loader.py
 Auto-loads environment variables from .env / .env.local files.
 No external libraries required — pure stdlib.
 
-Search order (stops at first file found):
+Search order (later files only fill keys still missing):
   1. {skill_dir}/.env              — keys local to this skill only
   2. {project_root}/apps/market_dashboard/.env.local   ← your main secrets file
   3. {project_root}/apps/market_dashboard/.env
+  4. %LOCALAPPDATA%/Jie/secrets/market-dashboard.env   ← portable fallback
 
 Already-set shell environment variables are NEVER overwritten —
 so if you have a real env var set, it always wins over the file.
@@ -83,6 +84,9 @@ def load_env(verbose: bool = False) -> int:
             project_root / "apps" / "market_dashboard" / ".env",
             project_root / ".env",  # ← root .env (where VERCEL_INGEST_URL + provider API keys actually live)
         ]
+    local_app_data = os.environ.get("LOCALAPPDATA", "").strip()
+    if local_app_data:
+        candidates.append(Path(local_app_data) / "Jie" / "secrets" / "market-dashboard.env")
 
     loaded = 0
     for path in candidates:
