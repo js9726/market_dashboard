@@ -23,7 +23,7 @@ Env (all optional; safe defaults):
   OPEND_HOST            default 127.0.0.1
   OPEND_PORT            default 11111
   OPEND_SECURITY_FIRM   default FUTUMY   (moomoo SecurityFirm enum name)
-  OPEND_ACC_ID          default unset -> first REAL US account (acc_index 0)
+  OPEND_ACC_ID          default unset -> unique matching account from get_acc_list()
   OPEND_TRD_ENV         default REAL
 
 Usage:
@@ -132,6 +132,51 @@ def _order_rows(df) -> list[dict]:
     return rows
 
 
+def _resolve_account_id(ctx, ret_ok: object, trd_env: object) -> tuple[int | None, str | None]:
+    """Resolve exactly one account without exposing its identifier.
+
+    Moomoo documents ``acc_index`` as mutable when accounts are added or closed, so the
+    snapshot must always query by an ``acc_id`` obtained from ``get_acc_list()``. An
+    optional OPEND_ACC_ID narrows the list; it never bypasses verification.
+    """
+    configured = os.environ.get("OPEND_ACC_ID", "").strip()
+    configured_id = None
+    if configured:
+        try:
+            configured_id = int(configured)
+        except ValueError:
+            return None, "OPEND_ACC_ID must be a positive integer"
+        if configured_id <= 0:
+            return None, "OPEND_ACC_ID must be a positive integer"
+
+    try:
+        account_ret, account_df = ctx.get_acc_list()
+    except Exception:
+        return None, "account list query failed"
+    if account_ret != ret_ok:
+        return None, "account list query failed"
+
+    target_env = _enum_name(trd_env)
+    matches = set()
+    for _, raw in account_df.iterrows():
+        if _enum_name(raw.get("trd_env")) != target_env:
+            continue
+        try:
+            candidate = int(raw.get("acc_id"))
+        except (TypeError, ValueError):
+            continue
+        if candidate <= 0:
+            continue
+        if configured_id is None or candidate == configured_id:
+            matches.add(candidate)
+
+    if len(matches) != 1:
+        if configured_id is not None:
+            return None, "configured account was not uniquely verified for the trading environment"
+        return None, "trading environment did not resolve to exactly one account"
+    return next(iter(matches)), None
+
+
 def fetch_broker_snapshot() -> dict:
     """Fetch positions and orders through one read-only trade context.
 
@@ -159,11 +204,12 @@ def fetch_broker_snapshot() -> dict:
     except Exception as exc:
         print(f"[holdings] could not open read-only trade context: {exc}", file=sys.stderr)
         return {"positions": None, "orders": None, "error": "trade context unavailable"}
-    kwargs = dict(trd_env=trd_env, refresh_cache=True)
-    acc_id = os.environ.get("OPEND_ACC_ID")
-    if acc_id:
-        kwargs["acc_id"] = int(acc_id)
     try:
+        acc_id, account_error = _resolve_account_id(ctx, RET_OK, trd_env)
+        if account_error:
+            print(f"[holdings] broker account unverified: {account_error}", file=sys.stderr)
+            return {"positions": None, "orders": None, "error": "broker account unverified"}
+        kwargs = dict(trd_env=trd_env, acc_id=acc_id, refresh_cache=True)
         pos_ret, pos_df = ctx.position_list_query(**kwargs)
         order_ret, order_df = ctx.order_list_query(**kwargs)
     except Exception as exc:

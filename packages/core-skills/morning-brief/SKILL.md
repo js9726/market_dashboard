@@ -218,8 +218,8 @@ extended winner to trim. Source of truth = **live broker positions**, not the sh
 ```powershell
 cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
 # Journaled stops provide plan/R context only. They NEVER prove a broker order exists.
-# OPEND_ACC_ID comes from env — never hardcode the account id.
-$env:OPEND_ACC_ID="<your live US acc id>"
+# OPEND_ACC_ID is optional. If set, it narrows get_acc_list() and is never logged.
+# If unset, exactly one REAL US account must resolve or the run fails closed.
 python holdings_review.py --stops '{"VRT":326.48,"HUT":93.91,"TENB":22.99}'
 ```
 
@@ -230,6 +230,9 @@ count. Normal sell limits and cancelled/failed/deleted orders do not. Coverage u
 remaining quantity (`qty - dealt_qty`) against the live position. `aux_price` is the
 trigger and `price` is the stop-limit price. Planned R remains
 `(last-entry)/(entry-planned_stop)` and is labelled plan math.
+Moomoo account selection always calls `get_acc_list()` and passes the uniquely verified
+`acc_id` to both read queries. Never fall back to `acc_index`: Moomoo documents that its
+ordering can change when accounts are added or closed.
 
 - **Sweep BOTH brokers (2026-07-09).** `holdings_review.py` covers moomoo only. Jie also
   holds positions at IBKR (account identifier intentionally omitted; e.g. RBRK; ONTO previously), which a moomoo-only

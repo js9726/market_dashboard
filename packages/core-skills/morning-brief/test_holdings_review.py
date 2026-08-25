@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 import types
 import unittest
@@ -102,6 +103,13 @@ class BrokerSnapshotTests(unittest.TestCase):
             def __init__(self, **kwargs):
                 calls.append(("open", kwargs))
 
+            def get_acc_list(self):
+                calls.append(("accounts", {}))
+                return 0, FakeFrame([
+                    {"acc_id": 987654321, "trd_env": "REAL"},
+                    {"acc_id": 123456789, "trd_env": "SIMULATE"},
+                ])
+
             def position_list_query(self, **kwargs):
                 calls.append(("positions", kwargs))
                 return 0, FakeFrame([{
@@ -130,16 +138,91 @@ class BrokerSnapshotTests(unittest.TestCase):
 
         with mock.patch.object(hr, "_port_alive", return_value=True), mock.patch.dict(
             sys.modules, {"moomoo": moomoo}, clear=False,
-        ):
+        ), mock.patch.dict(os.environ, {"OPEND_ACC_ID": ""}, clear=False):
             snapshot = hr.fetch_broker_snapshot()
 
-        self.assertEqual([name for name, _ in calls], ["open", "positions", "orders", "close"])
-        for name, kwargs in calls[1:3]:
+        self.assertEqual(
+            [name for name, _ in calls], ["open", "accounts", "positions", "orders", "close"],
+        )
+        for name, kwargs in calls[2:4]:
             self.assertTrue(kwargs["refresh_cache"], name)
+            self.assertEqual(kwargs["acc_id"], 987654321, name)
+            self.assertNotIn("acc_index", kwargs, name)
         encoded = repr(snapshot)
         self.assertNotIn("private-account", encoded)
         self.assertNotIn("private-order", encoded)
+        self.assertNotIn("987654321", encoded)
         self.assertEqual(snapshot["orders"][0]["trigger_price"], 268.22)
+
+    def test_ambiguous_real_accounts_fail_closed_before_snapshot_queries(self):
+        calls = []
+
+        class Context:
+            def __init__(self, **kwargs):
+                calls.append("open")
+
+            def get_acc_list(self):
+                calls.append("accounts")
+                return 0, FakeFrame([
+                    {"acc_id": 111111111, "trd_env": "REAL"},
+                    {"acc_id": 222222222, "trd_env": "REAL"},
+                ])
+
+            def position_list_query(self, **kwargs):
+                raise AssertionError("positions must not be queried for an ambiguous account")
+
+            def order_list_query(self, **kwargs):
+                raise AssertionError("orders must not be queried for an ambiguous account")
+
+            def close(self):
+                calls.append("close")
+
+        moomoo = types.ModuleType("moomoo")
+        moomoo.OpenSecTradeContext = Context
+        moomoo.TrdMarket = types.SimpleNamespace(US="US")
+        moomoo.SecurityFirm = types.SimpleNamespace(FUTUMY="FUTUMY")
+        moomoo.TrdEnv = types.SimpleNamespace(REAL="REAL")
+        moomoo.RET_OK = 0
+
+        with mock.patch.object(hr, "_port_alive", return_value=True), mock.patch.dict(
+            sys.modules, {"moomoo": moomoo}, clear=False,
+        ), mock.patch.dict(os.environ, {"OPEND_ACC_ID": ""}, clear=False):
+            snapshot = hr.fetch_broker_snapshot()
+
+        self.assertEqual(calls, ["open", "accounts", "close"])
+        self.assertIsNone(snapshot["positions"])
+        self.assertIsNone(snapshot["orders"])
+        self.assertEqual(snapshot["error"], "broker account unverified")
+        encoded = repr(snapshot)
+        self.assertNotIn("111111111", encoded)
+        self.assertNotIn("222222222", encoded)
+
+    def test_configured_account_must_be_positive_integer(self):
+        class Context:
+            def __init__(self, **kwargs):
+                pass
+
+            def get_acc_list(self):
+                raise AssertionError("invalid configuration must fail before account query")
+
+            def close(self):
+                pass
+
+        moomoo = types.ModuleType("moomoo")
+        moomoo.OpenSecTradeContext = Context
+        moomoo.TrdMarket = types.SimpleNamespace(US="US")
+        moomoo.SecurityFirm = types.SimpleNamespace(FUTUMY="FUTUMY")
+        moomoo.TrdEnv = types.SimpleNamespace(REAL="REAL")
+        moomoo.RET_OK = 0
+
+        with mock.patch.object(hr, "_port_alive", return_value=True), mock.patch.dict(
+            sys.modules, {"moomoo": moomoo}, clear=False,
+        ), mock.patch.dict(os.environ, {"OPEND_ACC_ID": "not-an-integer"}, clear=False):
+            snapshot = hr.fetch_broker_snapshot()
+
+        self.assertEqual(snapshot["error"], "broker account unverified")
+        self.assertIsNone(snapshot["positions"])
+        self.assertIsNone(snapshot["orders"])
 
 
 if __name__ == "__main__":
