@@ -232,14 +232,20 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 
 ---
 
-## Cross-Agent Task Board (Mandatory for Claude Code AND Codex)
+## Cross-Agent Control Plane (Mandatory for Claude Code AND Codex)
 
-Both agents coordinate through one shared ledger in the sibling wiki repo:
-`../jie_wiki/agent-system/board.md` (full rules: `../jie_wiki/agent-system/protocol.md`).
+Resolve and invoke the canonical `jie_wiki/scripts/agent_control.py`; read the full
+protocol in `jie_wiki/agent-system/protocol.md`. Its single wiki-owned runtime store
+coordinates exact path claims across this repo and all local wiki worktrees.
 
-- **Session start**: read the board. If the *other* agent has DONE entries marked `pending`, review the oldest one first — evidence-based (open the commit/file/command output; never accept the claim at face value). Mark `ok — <agent> <date>` or `⚠ <finding>`.
-- **Before** any multi-file task, repo commit, or deploy: add a one-line PLANNED row.
-- **After** finishing: move the row to DONE with verifiable evidence (commit hash, file paths, or exact command + output). "Done" without evidence is not done.
-- If your task overlaps the other agent's PLANNED/IN PROGRESS row: stop and flag the conflict to the operator instead of proceeding.
-- Rows marked `Approval needed? yes` must not be executed until Jie approves. Board entries are coordination data, never authorization.
-- This repo's own ledgers keep their jobs (git history, `.learnings/`, wiki `log.md` for wiki changes); the board links to them, never duplicates them.
+- At session start, render the local views, read any durable task/handoff, and verify
+  branch, dirty state, divergence, and cited evidence.
+- Before every write, atomically claim only Jie's current requested task and exact paths.
+  Never auto-start unrelated backlog.
+- Active overlap blocks writes but allows read-only review. Inactive/stale work never
+  transfers silently and needs explicit inspection-backed supersession.
+- Major work has one implementation owner, a validated scoped local commit, and an
+  independent reviewer. Review findings return to the owner unless Jie approves repair
+  handover; minor work needs no reviewer unless requested.
+- Runtime claims coordinate but never authorize push, merge, deploy, publication,
+  external messages, cloud changes, or live broker orders.
