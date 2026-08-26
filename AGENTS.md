@@ -10,9 +10,9 @@ in chat. Morning briefs must land in `MorningBriefCache` via
 `/api/trades/import` and/or `/api/journal/entries/ingest`; ad-hoc ticker
 analyses must land as `WikiTradeVerdict(intent="analysis")` via the
 trade-analyser `submit_verdict.py` / `sync:wiki -- --post` path. Provider API
-keys are `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, and
-`ANTHROPIC_API_KEY`; Claude subscription runs use the Claude SDK/CLI path and
-still post the same schema. If a provider returns chat text that cannot be
+keys are `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`, and `OPENAI_API_KEY`. Claude is
+subscription-only: its runners actively ignore Anthropic API credentials and
+still post the same schema. Provider failures never silently reroute. If a provider returns chat text that cannot be
 persisted in one of those schemas, say it is not dashboard-ingested yet.
 
 **Freshness is a hard gate:** for market data, never fix only the UI. Verify the
@@ -42,7 +42,7 @@ rows for the same ticker/broker open holding.
 | Layer | Path | Stack |
 |---|---|---|
 | Data Pipeline | `apps/market_dashboard_backend/scripts/` | Python, yfinance, Finviz |
-| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | Gemini 2.5 Pro + GPT-4o + Codex (web search, HTML out) |
+| Morning Brief | `apps/market_dashboard_backend/scripts/morning_brief.py` | DeepSeek V4 Flash + Gemini 3.7 Flash (search-grounded JSON); Claude/Codex use subscription runners |
 | Frontend | `apps/market_dashboard/` | Next.js 15.5, TypeScript, Tailwind, Recharts |
 | AI Agents | `apps/market_dashboard/agents/` | Fundamental (yahoo-finance2 + DeepSeek), Technical |
 | Runtime Skills | `packages/core-skills/` | LLM prompts + dual TS/Python handlers |
@@ -54,7 +54,7 @@ rows for the same ticker/broker open holding.
 
 ```
 build_data.py → data/snapshot.json + data/charts/*.png
-morning_brief.py → data/morning_brief_{gemini,openai,Codex}.html + data/morning_brief_meta.json
+morning_brief.py → data/morning_brief_{deepseek,gemini,openai}.json + data/morning_brief_meta.json
 sync step → public/market-dashboard/  →  Vercel serves static files
 ```
 
@@ -66,7 +66,7 @@ sync step → public/market-dashboard/  →  Vercel serves static files
 # Python (from apps/market_dashboard_backend/)
 pip install -r requirements.txt
 python scripts/build_data.py --out-dir data
-python scripts/morning_brief.py --out-dir data        # needs ≥1 of GEMINI/OPENAI/ANTHROPIC keys
+python scripts/morning_brief.py --out-dir data        # defaults to DeepSeek + Gemini API lanes
 
 # Frontend (from apps/market_dashboard/)
 npm install
@@ -165,15 +165,15 @@ Define success criteria. Loop until verified.
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `GEMINI_API_KEY` | Yes (≥1 brief key) | Morning brief — Gemini 2.5 Pro + Search Grounding |
-| `OPENAI_API_KEY` | Optional | Morning brief — GPT-4o + web_search_preview |
-| `ANTHROPIC_API_KEY` | Optional | Morning brief — Codex Sonnet 4.6 + web search |
+| `GEMINI_API_KEY` | Optional | Explicit Gemini 3.7 Flash lane + Search Grounding |
+| `OPENAI_API_KEY` | Optional | Explicit OpenAI analysis lane; not a Codex subscription fallback |
+| `CLAUDE_CODE_OAUTH_TOKEN` | For cloud Claude runs | Claude Code subscription auth; Anthropic API credentials are prohibited |
 | `GOOGLE_CLIENT_ID` / `_SECRET` | Yes | Google OAuth (NextAuth v5) |
 | `AUTH_SECRET` | Yes | NextAuth v5 session signing |
 | `DATABASE_URL` | Yes | Postgres (Prisma) |
 | `OWNER_EMAIL` | Yes | Auto-promoted to `owner` role |
 | `NEXTAUTH_URL` | Yes (prod) | Base URL for internal API calls |
-| `DEEPSEEK_API_KEY` | Optional | AI stock analysis tab |
+| `DEEPSEEK_API_KEY` | Yes for default API lane | DeepSeek V4 Flash analysis, screener scoring, and brief generation |
 | `SCREENER_INGEST_KEY` | Optional | Dedicated bearer key for final daily-screener ingest; falls back to `BRIEF_INGEST_KEY` |
 | `TELEGRAM_GO_BOT_TOKEN` | For Telegram | Dedicated trading-notification bot token |
 | `TELEGRAM_GO_CHAT_ID` | For Telegram | Private chat/channel target for the final GO list |
@@ -198,7 +198,7 @@ Never commit `.env.local`. Never log keys. Never hardcode secrets.
 | Workflow loops forever | missing `[skip ci]` in commit message |
 | Morning brief tab errors | `morning_brief_meta.json` not in `public/market-dashboard/` — run brief then `sync:market` |
 | Brief provider button greyed | API key missing or `generated: false` in meta |
-| OpenAI / Codex brief fails | `pip install openai>=1.70.0` / `anthropic>=0.49.0` |
+| Claude/Codex refresh unavailable | Check subscription dispatch/runner status; no paid API fallback is permitted |
 
 ---
 

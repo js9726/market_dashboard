@@ -10,7 +10,12 @@
  */
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { ALL_PROVIDERS, bucketOf, type BriefProvider } from "@/lib/brief/bucket";
+import {
+  ALL_PROVIDERS,
+  bucketOf,
+  isApiBriefProvider,
+  type BriefProvider,
+} from "@/lib/brief/bucket";
 import { regenAndStore, readBucket } from "@/server/brief-cache";
 import {
   dispatchBriefRefresh,
@@ -23,11 +28,6 @@ export const dynamic = "force-dynamic";
 
 const FIVE_MIN_MS = 5 * 60 * 1000;
 const lastRerunAt = new Map<BriefProvider, number>();
-
-// Providers whose on-demand refresh runs the wiki-grounded CI workflow instead
-// of the serverless condensed-prompt API call: Claude on the subscription,
-// Codex/OpenAI via the wiki morning_brief.py. DeepSeek/Gemini stay instant.
-const DISPATCH_PROVIDERS = new Set<BriefProvider>(["claude", "openai"]);
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -56,16 +56,29 @@ export async function POST(req: Request) {
   }
   lastRerunAt.set(p, now);
 
-  // Subscription/wiki providers → dispatch the CI workflow (async; lands in a
-  // few minutes). Falls through to the serverless path if the dispatch token
-  // isn't configured, so the buttons still work without GH_DISPATCH_TOKEN.
-  if (DISPATCH_PROVIDERS.has(p) && isDispatchConfigured()) {
-    // Codex prefers the self-hosted SUBSCRIPTION runner when the operator PC is
-    // online; otherwise it falls back to the cloud OpenAI-API workflow.
-    const useSelfHostedCodex = p === "openai" && (await isCodexRunnerOnline());
-    const dispatched = useSelfHostedCodex
+  // Claude and Codex are subscription-only lanes. They must never fall through
+  // to a metered serverless API when dispatch or the local runner is absent.
+  if (p === "claude" || p === "openai") {
+    if (!isDispatchConfigured()) {
+      lastRerunAt.delete(p);
+      return NextResponse.json(
+        { error: `${p === "claude" ? "Claude" : "Codex"} subscription dispatch is not configured; no API fallback was used` },
+        { status: 503 },
+      );
+    }
+
+    const codexOnline = p === "openai" ? await isCodexRunnerOnline() : false;
+    if (p === "openai" && !codexOnline) {
+      lastRerunAt.delete(p);
+      return NextResponse.json(
+        { error: "Codex subscription runner is offline; no OpenAI API fallback was used" },
+        { status: 503 },
+      );
+    }
+
+    const dispatched = p === "openai"
       ? await dispatchCodexSelfHosted()
-      : await dispatchBriefRefresh(p);
+      : await dispatchBriefRefresh("claude");
     if (!dispatched.ok) {
       lastRerunAt.delete(p); // dispatch failed — let the user retry immediately
       return NextResponse.json(
@@ -73,14 +86,18 @@ export async function POST(req: Request) {
         { status: 502 },
       );
     }
-    const lane =
-      p === "openai" ? (useSelfHostedCodex ? "Codex (subscription)" : "Codex (OpenAI API)") : "Claude";
+    const lane = p === "openai" ? "Codex (subscription)" : "Claude (subscription)";
     return NextResponse.json({
       ok: true,
       dispatched: true,
       provider: p,
       message: `${lane} refresh queued — the wiki brief runs in CI and lands in a few minutes.`,
     });
+  }
+
+  if (!isApiBriefProvider(p)) {
+    lastRerunAt.delete(p);
+    return NextResponse.json({ error: "Provider has no permitted execution lane" }, { status: 503 });
   }
 
   const bucket = bucketOf();

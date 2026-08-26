@@ -69,12 +69,11 @@ type VerdictHistoryItem = {
   createdAt: string;
 };
 
-type Providers = { deepseek: boolean; gemini: boolean; openai: boolean; anthropic: boolean };
+type Providers = { deepseek: boolean; gemini: boolean; openai: boolean; claudeSubscriptionOnly: boolean };
 const PROVIDER_LABELS: Record<string, string> = {
   deepseek: "DeepSeek",
-  gemini: "Gemini 2.5 Pro",
+  gemini: "Gemini 3.7 Flash",
   openai: "Codex",
-  anthropic: "Claude Sonnet",
 };
 
 // ─── Shared helpers ────────────────────────────────────────────────────────────
@@ -130,7 +129,7 @@ function ProviderBar({
         <div className="h-7 w-48 animate-pulse rounded bg-[var(--bg-raised)]" />
       ) : (
         <div className="flex gap-2">
-          {(["deepseek", "gemini", "openai", "anthropic"] as const).map((p) => {
+          {(["deepseek", "gemini", "openai"] as const).map((p) => {
             const available = providers[p];
             const active = selected === p;
             return (
@@ -296,10 +295,10 @@ function StockAnalysisModal({ ticker, onClose }: { ticker: string; onClose: () =
       .then((r) => r.json())
       .then((data: Providers) => {
         setProviders(data);
-        const first = (["deepseek", "gemini", "openai", "anthropic"] as const).find((p) => data[p]);
+        const first = (["deepseek", "gemini", "openai"] as const).find((p) => data[p]);
         if (first) setSelectedProvider(first);
       })
-      .catch(() => setProviders({ deepseek: false, gemini: false, openai: false, anthropic: false }));
+      .catch(() => setProviders({ deepseek: false, gemini: false, openai: false, claudeSubscriptionOnly: true }));
   }, []);
 
   function runAnalysis() {
@@ -794,10 +793,10 @@ function TradeReviewModal({ trade, onClose, onVerdictSaved }: { trade: Trade; on
       .then((r) => r.json())
       .then((data: Providers) => {
         setProviders(data);
-        const first = (["deepseek", "gemini", "openai", "anthropic"] as const).find((p) => data[p]);
+        const first = (["deepseek", "gemini", "openai"] as const).find((p) => data[p]);
         if (first) setSelectedProvider(first);
       })
-      .catch(() => setProviders({ deepseek: false, gemini: false, openai: false, anthropic: false }));
+      .catch(() => setProviders({ deepseek: false, gemini: false, openai: false, claudeSubscriptionOnly: true }));
 
     fetch(`/api/journal/trades/${trade.id}/verdict-history`)
       .then((r) => r.json())

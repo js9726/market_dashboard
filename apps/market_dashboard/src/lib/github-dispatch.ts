@@ -5,12 +5,12 @@
  * path with a condensed inline prompt (no wiki). For the subscription/wiki
  * providers we instead dispatch the GitHub Actions workflow
  * (refresh_brief_provider.yml), which runs the SAME wiki-grounded brief as the
- * daily pre-open job — Claude on the subscription, Codex/OpenAI via the wiki
- * morning_brief.py. Async: the brief lands when CI finishes and pushes to
+ * daily pre-open job — Claude and Codex on their subscription runners. Async:
+ * the brief lands when CI finishes and pushes to
  * /api/morning-verdict/ingest.
  *
  * Needs GH_DISPATCH_TOKEN (fine-grained PAT, Actions: read+write on the repo)
- * in the Vercel env. Absent → callers fall back to the serverless path.
+ * in the Vercel env. Absent → callers fail closed; there is no metered fallback.
  */
 
 const DEFAULT_REPO = "js9726/market_dashboard";
@@ -76,8 +76,7 @@ export async function dispatchCodexSelfHosted(): Promise<DispatchResult> {
  * True iff a self-hosted runner labelled `codex` is currently online — i.e. the
  * operator PC is up and can run the subscription Codex brief. Needs the token
  * to read runners (fine-grained: Administration:read, or classic repo scope).
- * On any error/permission denial returns false, so the caller safely falls back
- * to the cloud OpenAI-API path.
+ * On any error/permission denial returns false, so the caller fails closed.
  */
 export async function isCodexRunnerOnline(): Promise<boolean> {
   const token = process.env.GH_DISPATCH_TOKEN;

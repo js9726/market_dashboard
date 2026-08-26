@@ -12,7 +12,7 @@
  * workflow already posted), unless that row is an error row.
  */
 import { NextResponse } from "next/server";
-import { INTRADAY_PROVIDERS, bucketOf, type BriefProvider } from "@/lib/brief/bucket";
+import { INTRADAY_PROVIDERS, bucketOf } from "@/lib/brief/bucket";
 import { readLatestRow, regenAndStore } from "@/server/brief-cache";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   const results: Record<string, string> = {};
 
   await Promise.all(
-    INTRADAY_PROVIDERS.map(async (provider: BriefProvider) => {
+    INTRADAY_PROVIDERS.map(async (provider) => {
       try {
         const latest = await readLatestRow(provider);
         const ageMs = latest ? Date.now() - latest.generatedAt.getTime() : Infinity;

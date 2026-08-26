@@ -8,9 +8,8 @@
 import { generateObject, NoObjectGeneratedError } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { createAnthropic } from "@ai-sdk/anthropic";
 import type { LanguageModel } from "ai";
-import type { BriefProvider } from "@/lib/brief/bucket";
+import type { ApiBriefProvider } from "@/lib/brief/bucket";
 import type { ComposedSnapshot } from "@/lib/brief/snapshot";
 import { structuredBriefSchema } from "@/lib/brief/structured-schema";
 import { buildTraderLensBlock } from "@/lib/brief/trader-profiles";
@@ -24,14 +23,12 @@ export interface ProviderResult {
   tokensOut: number | null;
 }
 
-const MODEL_IDS: Record<BriefProvider, string> = {
+const MODEL_IDS: Record<ApiBriefProvider, string> = {
   deepseek: "deepseek-v4-flash",
-  gemini: "gemini-2.5-pro",
-  openai: "gpt-4o",
-  claude: "claude-sonnet-4-6",
+  gemini: "gemini-3.7-flash",
 };
 
-function modelFor(p: BriefProvider): LanguageModel {
+function modelFor(p: ApiBriefProvider): LanguageModel {
   switch (p) {
     case "deepseek":
       if (!process.env.DEEPSEEK_API_KEY) throw new Error("DEEPSEEK_API_KEY missing");
@@ -42,12 +39,6 @@ function modelFor(p: BriefProvider): LanguageModel {
     case "gemini":
       if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY missing");
       return createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY })(MODEL_IDS.gemini);
-    case "openai":
-      if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY missing");
-      return createOpenAI({ apiKey: process.env.OPENAI_API_KEY })(MODEL_IDS.openai);
-    case "claude":
-      if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY missing");
-      return createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY })(MODEL_IDS.claude);
   }
 }
 
@@ -121,7 +112,7 @@ function userPromptFor(snapshot: ComposedSnapshot, dateStr: string, watchlist: s
 }
 
 export async function runProvider(
-  provider: BriefProvider,
+  provider: ApiBriefProvider,
   snapshot: ComposedSnapshot,
   watchlist: string[],
 ): Promise<ProviderResult> {
@@ -132,12 +123,6 @@ export async function runProvider(
     day: "numeric",
   });
 
-  // The Anthropic AI-SDK provider does NOT support json-mode structured output
-  // ("'json-mode object generation' functionality not supported") — it routes
-  // structured output through a tool call. DeepSeek/Gemini/OpenAI use json-mode.
-  // Forcing mode:"json" for all four bricked the on-demand Claude refresh.
-  const mode = provider === "claude" ? "tool" : "json";
-
   let object: unknown;
   let usage: { promptTokens?: number; completionTokens?: number } | undefined;
   try {
@@ -146,7 +131,7 @@ export async function runProvider(
       schema: structuredBriefSchema,
       schemaName: "StructuredBrief",
       schemaDescription: "JSON fields rendered directly into the Conviction Desk UI.",
-      mode,
+      mode: "json",
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPromptFor(snapshot, dateStr, watchlist) }],
       // 5000 truncated DeepSeek's verbose JSON mid-object ("No object generated:

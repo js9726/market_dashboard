@@ -1,5 +1,6 @@
 import { getFinalancialMetrics } from './tools/api';
 import { callLLM } from '../../src/utils/llm-router';
+import { isMeteredLLMProviderConfigured } from '../../src/lib/ai/provider-policy';
 import type { AgentMessage, AgentState } from '../../src/types/agent';
 
 interface SignalReasoning {
@@ -88,7 +89,7 @@ export async function fundamentalsAgent(state: AgentState) {
         }
       };
 
-      const hasAnyProvider = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
+      const hasAnyProvider = isMeteredLLMProviderConfigured("deepseek");
       if (hasAnyProvider) {
         try {
           const metricsPrompt = `
@@ -132,7 +133,7 @@ export async function fundamentalsAgent(state: AgentState) {
             }
           };
         } catch (error) {
-          console.log("Gemini analysis unavailable, using default analysis");
+          console.log("DeepSeek analysis unavailable, using deterministic analysis");
         }
       }
 

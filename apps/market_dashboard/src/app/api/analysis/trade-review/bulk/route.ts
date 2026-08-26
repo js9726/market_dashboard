@@ -60,8 +60,8 @@ export async function POST(request: Request) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!canSeePersonalBook(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    if (!process.env.DEEPSEEK_API_KEY && !process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY && !process.env.GEMINI_API_KEY) {
-      return NextResponse.json({ error: "No AI provider is configured" }, { status: 503 });
+    if (!process.env.DEEPSEEK_API_KEY) {
+      return NextResponse.json({ error: "DEEPSEEK_API_KEY is required for bulk review; no provider fallback is permitted" }, { status: 503 });
     }
 
     const userId = scopeUserId(session)!;

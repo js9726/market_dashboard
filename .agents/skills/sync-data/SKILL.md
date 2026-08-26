@@ -20,7 +20,8 @@ Run the full data refresh pipeline and verify each step. Treat any non-zero exit
    ```bash
    python scripts/morning_brief.py --out-dir data
    ```
-   Confirm at least one `data/morning_brief_*.html` exists.
+   Confirm at least one `data/morning_brief_*.json` exists. This command runs
+   DeepSeek/Gemini API lanes only; Codex remains subscription-only.
 
 3. **NaN sanity check (LRN-001)**
    ```bash
@@ -33,7 +34,7 @@ Run the full data refresh pipeline and verify each step. Treat any non-zero exit
    cd "apps/market_dashboard"
    npm run sync:market
    ```
-   Confirm `public/market-dashboard/snapshot.json` and `public/market-dashboard/morning_brief_*.html` are present and match backend timestamps.
+   Confirm `public/market-dashboard/snapshot.json` is present and matches the backend timestamp. Live briefs are Postgres-backed.
 
 5. **JSON parse validation**
    ```bash
@@ -47,7 +48,7 @@ Print a summary table:
 ```
 Step                  Status   Notes
 build_data.py         ✓        snapshot 234KB, 18 charts
-morning_brief.py      ✓        gemini, Codex (openai skipped — no key)
+morning_brief.py      ✓        deepseek, gemini
 NaN check             ✓        0 occurrences
 sync:market           ✓        files copied
 JSON parse            ✓        valid

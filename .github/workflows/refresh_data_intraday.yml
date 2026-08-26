@@ -7,8 +7,8 @@ name: Refresh Market Data (Intraday Light)
 #
 # Skipped vs the daily heavy run (intentional):
 #   - breadth_scan.py      ~5 min, daily metric only — full-universe scan
-#   - morning_brief.py     ~$1-2/run × 4 LLM providers, daily-only by design
-#   - trader_verdict.py    ~$0.30/run, daily-only by design
+#   - morning_brief.py     paid API generation, daily-only by design
+#   - trader_verdict.py    paid API generation, daily-only by design
 #
 # Off-peak minutes (:03/:33) — WK-4 in ROADMAP.md.
 #
