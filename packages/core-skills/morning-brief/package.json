@@ -10,11 +10,11 @@
     "brief:codex": "node codex_brief_runner.mjs",
     "brief:codex:dry": "node codex_brief_runner.mjs --dry-run",
     "journal": "tsx journal_close_runner.ts",
-    "journal:dry": "tsx journal_close_runner.ts --dry-run"
+    "journal:dry": "tsx journal_close_runner.ts --dry-run",
+    "test": "tsx --test *.test.ts"
   },
   "dependencies": {
-    "@anthropic-ai/claude-agent-sdk": "^0.3.156",
-    "@anthropic-ai/sdk": "^0.93.0"
+    "@anthropic-ai/claude-agent-sdk": "^0.3.156"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
