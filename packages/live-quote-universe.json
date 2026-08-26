@@ -1,0 +1,21 @@
+{
+  "changeBasis": "regular-session-vs-previous-close",
+  "indices": ["SPY", "QQQ", "IWM", "DIA", "VIX"],
+  "sectors": [
+    { "symbol": "XLK", "label": "Technology" },
+    { "symbol": "XLC", "label": "Comm. Svcs" },
+    { "symbol": "XLY", "label": "Cons. Disc." },
+    { "symbol": "XLF", "label": "Financials" },
+    { "symbol": "XLV", "label": "Healthcare" },
+    { "symbol": "XLI", "label": "Industrials" },
+    { "symbol": "XLE", "label": "Energy" },
+    { "symbol": "XLP", "label": "Cons. Staples" },
+    { "symbol": "XLU", "label": "Utilities" },
+    { "symbol": "XLB", "label": "Materials" },
+    { "symbol": "XLRE", "label": "Real Estate" }
+  ],
+  "defaultWatchlist": [
+    "NVDA", "TSLA", "AAPL", "MSFT", "AMZN", "META",
+    "GOOGL", "AMD", "SMCI", "PLTR", "CRWD", "MSTR"
+  ]
+}

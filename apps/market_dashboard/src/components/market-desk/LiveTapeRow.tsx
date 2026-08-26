@@ -3,32 +3,29 @@
 import { useLiveQuotes, type LiveQuoteRow } from "@/hooks/useLiveQuotes";
 import FreshnessBadge from "./FreshnessBadge";
 import { liveQuoteThresholdsForNow } from "@/lib/freshness";
+import {
+  LIVE_QUOTE_DEFAULT_WATCHLIST,
+  LIVE_QUOTE_SECTORS,
+  requiredLiveQuoteSymbols,
+} from "@/lib/live-quote-universe";
 
-const SECTORS: Array<{ symbol: string; label: string }> = [
-  { symbol: "XLK", label: "Technology" },
-  { symbol: "XLC", label: "Comm. Svcs" },
-  { symbol: "XLY", label: "Cons. Disc." },
-  { symbol: "XLF", label: "Financials" },
-  { symbol: "XLV", label: "Healthcare" },
-  { symbol: "XLI", label: "Industrials" },
-  { symbol: "XLE", label: "Energy" },
-  { symbol: "XLP", label: "Cons. Staples" },
-  { symbol: "XLU", label: "Utilities" },
-  { symbol: "XLB", label: "Materials" },
-  { symbol: "XLRE", label: "Real Estate" },
-];
-
-const WATCHLIST = [
-  "NVDA", "TSLA", "AAPL", "MSFT", "AMZN", "META",
-  "GOOGL", "AMD", "SMCI", "PLTR", "CRWD", "MSTR",
-];
-
-function sourceBadge(activeSource: string | null, activeAt: string | null) {
-  if (!activeSource) return <span className="t-caption">No live source</span>;
+function sourceBadge(
+  activeSource: string | null,
+  activeAt: string | null,
+  missingCount: number,
+  loading: boolean,
+) {
+  if (loading) return <span className="t-caption">Loading live source…</span>;
+  if (!activeSource) return <span className="t-caption">No fresh live source</span>;
   return (
     <span className="inline-flex items-center gap-2">
       <span className="t-caption">{activeSource}</span>
       <FreshnessBadge timestamp={activeAt} thresholds={liveQuoteThresholdsForNow()} />
+      {missingCount > 0 ? (
+        <span className="t-caption text-[var(--loss-fg)]">
+          {missingCount} required stale/unavailable
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -47,12 +44,15 @@ function fmtPct(v: number | null): string {
 
 export default function LiveTapeRow() {
   const { bySymbol, activeSource, activeSourceAt, loading, error } = useLiveQuotes();
+  const missingRequired = loading
+    ? 0
+    : requiredLiveQuoteSymbols().filter((symbol) => !bySymbol.has(symbol)).length;
 
   return (
     <section className="space-y-3">
       <div className="market-section-head">
         <p className="t-overline">Live Tape</p>
-        {sourceBadge(activeSource, activeSourceAt)}
+        {sourceBadge(activeSource, activeSourceAt, missingRequired, loading)}
       </div>
       {error ? <p className="t-caption text-[var(--loss-fg)]">Live feed error: {error}</p> : null}
 
@@ -73,9 +73,9 @@ function SectorGrid({
 }) {
   return (
     <div className="rounded-xl border border-[var(--line)] bg-[var(--bg-surface)] p-4">
-      <p className="t-overline text-[var(--fg-3)]">Sectors</p>
+      <p className="t-overline text-[var(--fg-3)]">Sectors · Session change</p>
       <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
-        {SECTORS.map((s) => {
+        {LIVE_QUOTE_SECTORS.map((s) => {
           const q = bySymbol.get(s.symbol);
           const changePct = q?.changePct ?? null;
           return (
@@ -102,9 +102,9 @@ function WatchlistGrid({
 }) {
   return (
     <div className="rounded-xl border border-[var(--line)] bg-[var(--bg-surface)] p-4">
-      <p className="t-overline text-[var(--fg-3)]">Watchlist</p>
+      <p className="t-overline text-[var(--fg-3)]">Watchlist · Session change</p>
       <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
-        {WATCHLIST.map((sym) => {
+        {LIVE_QUOTE_DEFAULT_WATCHLIST.map((sym) => {
           const q = bySymbol.get(sym);
           const changePct = q?.changePct ?? null;
           return (

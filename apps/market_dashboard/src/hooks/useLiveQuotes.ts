@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { selectFreshLiveQuotes } from "@/lib/live-quote-freshness";
 
 export interface LiveQuoteRow {
   symbol: string;
@@ -72,8 +73,8 @@ export function useLiveQuotes(intervalMs = 30_000) {
     };
   }, [intervalMs]);
 
-  const bySymbol = new Map<string, LiveQuoteRow>();
-  if (data) for (const q of data.quotes) bySymbol.set(q.symbol, q);
+  const freshRows = data?.quotes.filter((quote) => !quote.stale) ?? [];
+  const { bySymbol } = selectFreshLiveQuotes(freshRows);
 
   return {
     data,
