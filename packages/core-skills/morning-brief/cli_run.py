@@ -3,8 +3,8 @@ cli_run.py
 ==========
 End-to-end CLI morning-brief runner.
 
-Generates a StructuredBrief using an AI provider (DeepSeek / Gemini / OpenAI /
-Claude) then optionally POSTs the result to the dashboard's Postgres cache.
+Generates a StructuredBrief using a metered API provider (DeepSeek / Gemini /
+OpenAI) then optionally POSTs the result to the dashboard's Postgres cache.
 
 Reads the prompt from `prompt.md` (same directory).  Feeds in the trader-style
 framework, date, and watchlist. If `--post` is set it pipes the output to
@@ -20,7 +20,9 @@ Required env vars per provider:
     deepseek  → DEEPSEEK_API_KEY
     gemini    → GEMINI_API_KEY
     openai    → OPENAI_API_KEY
-    claude    → ANTHROPIC_API_KEY
+
+Claude is intentionally absent: use claude_sdk_runner.ts under the Claude Code
+subscription for the Claude tab.
 
 For --post, also set:
     VERCEL_INGEST_URL
@@ -42,6 +44,7 @@ from pathlib import Path
 
 # Load .env / .env.local before anything touches os.environ
 from _env_loader import load_env as _load_env
+from deepseek_api import call_deepseek_json
 _load_env()
 
 # ── same as ingest_to_dashboard.py (inline to keep CLI standalone) ───────────
@@ -546,33 +549,11 @@ def _build_prompt(
 
 def _call_deepseek(prompt: str, *, search: bool = False) -> str:
     """
-    Calls DeepSeek chat completions.
+    Calls the official DeepSeek Responses API.
 
-    model: deepseek-v4-flash (previously deepseek-chat).
-    search=True adds search_options to enable web grounding (beta).
+    model: deepseek-v4-flash. search=True enables the official web_search tool.
     """
-    api_key = os.environ.get("DEEPSEEK_API_KEY", "")
-    if not api_key:
-        print("DEEPSEEK_API_KEY not set.", file=sys.stderr)
-        sys.exit(2)
-    payload: dict = {
-        "model": "deepseek-v4-flash",
-        "messages": [{"role": "user", "content": prompt}],
-        "response_format": {"type": "json_object"},
-        "max_tokens": 8000,
-    }
-    if search:
-        payload["search_options"] = {"search_enabled": True}
-    body = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        "https://api.deepseek.com/v1/chat/completions",
-        data=body,
-        method="POST",
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
-    )
-    with urllib.request.urlopen(req, timeout=120) as r:
-        data = json.loads(r.read().decode("utf-8"))
-    return data["choices"][0]["message"]["content"]
+    return call_deepseek_json(prompt, web_search=search, max_output_tokens=8000)
 
 
 def _call_deepseek_search(prompt: str) -> str:
@@ -610,7 +591,7 @@ def _call_gemini(prompt: str) -> str:
     if not api_key:
         print("GEMINI_API_KEY not set.", file=sys.stderr)
         sys.exit(2)
-    model = "gemini-2.5-pro"
+    model = "gemini-3.7-flash"
     url = (
         f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
         f"?key={api_key}"
@@ -620,7 +601,7 @@ def _call_gemini(prompt: str) -> str:
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {
                 "responseMimeType": "application/json",
-                # 16 000 gives Gemini 2.5 Pro plenty of headroom for a full
+                # 16 000 gives Gemini enough headroom for a full
                 # StructuredBrief (typical output ~3-5k tokens). 6 000 was
                 # cutting responses mid-JSON on large watchlists.
                 "maxOutputTokens": 16000,
@@ -649,40 +630,11 @@ def _call_gemini(prompt: str) -> str:
     return candidate["content"]["parts"][0]["text"]
 
 
-def _call_claude(prompt: str) -> str:
-    """Calls Claude via the Anthropic Messages API (no streaming)."""
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not api_key:
-        print("ANTHROPIC_API_KEY not set.", file=sys.stderr)
-        sys.exit(2)
-    body = json.dumps(
-        {
-            "model": "claude-opus-4-5",
-            "max_tokens": 6000,
-            "messages": [{"role": "user", "content": prompt}],
-        }
-    ).encode("utf-8")
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=body,
-        method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=120) as r:
-        data = json.loads(r.read().decode("utf-8"))
-    return data["content"][0]["text"]
-
-
 CALLERS = {
     "deepseek": _call_deepseek,          # deepseek-v4-flash, no search
     "deepseek-search": _call_deepseek_search,  # deepseek-v4-flash + web search (preferred for cron)
     "openai": _call_openai,
     "gemini": _call_gemini,
-    "claude": _call_claude,
 }
 
 def _fetch_dashboard_watchlist() -> list[str]:

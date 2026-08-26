@@ -29,6 +29,7 @@ import { query } from "@anthropic-ai/claude-agent-sdk";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { enforceClaudeSubscriptionOnly } from "./claude_subscription_auth.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MODEL = process.env.CLAUDE_MODEL; // undefined => Claude Code default model
@@ -76,27 +77,35 @@ async function fetchClosedTrades(): Promise<ClosedTrade[]> {
 }
 
 /**
- * DeepSeek fallback (OpenAI-compatible API). Used when Claude is unavailable
- * (credit balance, rate limit) OR when JOURNAL_PROVIDER=deepseek. Honors the
- * goal's "Claude AND DeepSeek / any available AI provider" requirement and
- * keeps the journaler working when one provider's balance runs out.
+ * DeepSeek fallback. It is used only when JOURNAL_PROVIDER=deepseek or the
+ * explicit JOURNAL_ALLOW_DEEPSEEK_FALLBACK=true switch is set.
  */
 async function deepseekJson(system: string, user: string): Promise<string> {
   const key = process.env.DEEPSEEK_API_KEY;
   if (!key) throw new Error("DEEPSEEK_API_KEY not set (Claude failed and no fallback)");
-  const res = await fetch("https://api.deepseek.com/chat/completions", {
+  const res = await fetch("https://api.deepseek.com/responses", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      model: "deepseek-chat",
-      messages: [{ role: "system", content: system }, { role: "user", content: user }],
-      max_tokens: 2000,
-      response_format: { type: "json_object" },
+      model: "deepseek-v4-flash",
+      instructions: system,
+      input: user,
+      max_output_tokens: 2000,
+      text: { format: { type: "json_object" } },
     }),
   });
   if (!res.ok) throw new Error(`DeepSeek HTTP ${res.status}: ${(await res.text()).slice(0, 160)}`);
-  const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-  return json.choices?.[0]?.message?.content ?? "";
+  const json = (await res.json()) as {
+    status?: string;
+    output?: { type?: string; content?: { type?: string; text?: string }[] }[];
+  };
+  if (json.status && json.status !== "completed") throw new Error(`DeepSeek status=${json.status}`);
+  return (json.output ?? [])
+    .filter((item) => item.type === "message")
+    .flatMap((item) => item.content ?? [])
+    .filter((content) => content.type === "output_text")
+    .map((content) => content.text ?? "")
+    .join("");
 }
 
 /**
@@ -105,6 +114,7 @@ async function deepseekJson(system: string, user: string): Promise<string> {
  * Anthropic API token. Pure system+user → JSON; no tools, single turn.
  */
 async function claudeCodeJson(system: string, user: string): Promise<string> {
+  enforceClaudeSubscriptionOnly();
   let out = "";
   const response = query({
     prompt: user,
@@ -166,6 +176,7 @@ First char MUST be {, last MUST be }.`;
 Score it. Be honest about entry quality vs the plan and the outcome.`;
 
   const forceDeepseek = (process.env.JOURNAL_PROVIDER ?? "").toLowerCase() === "deepseek";
+  const allowDeepseekFallback = (process.env.JOURNAL_ALLOW_DEEPSEEK_FALLBACK ?? "").toLowerCase() === "true";
   let text = "";
   let usedProvider = "claude";
 
@@ -175,7 +186,8 @@ Score it. Be honest about entry quality vs the plan and the outcome.`;
       // (CLAUDE_CODE_OAUTH_TOKEN / logged-in CLI), NOT a metered API token.
       text = await claudeCodeJson(system, user);
     } catch (e) {
-      // Claude unavailable (subscription rate limit / not logged in) → DeepSeek.
+      if (!allowDeepseekFallback) throw e;
+      // Explicitly authorised fallback: Claude subscription unavailable → DeepSeek API.
       console.error(`[journal] Claude Code failed for ${t.ticker} (${e instanceof Error ? e.message.slice(0, 80) : e}); trying DeepSeek...`);
       text = await deepseekJson(system, user);
       usedProvider = "deepseek";
@@ -202,9 +214,8 @@ async function ingest(entry: object): Promise<void> {
 }
 
 async function main() {
-  // No ANTHROPIC_API_KEY required — Claude runs via the Agent SDK under the
-  // Claude Code subscription. DeepSeek is the fallback if the subscription is
-  // unavailable. Only requirement: at least one of {subscription, DeepSeek key}.
+  // Claude runs through the subscription and metered Anthropic credentials are
+  // deleted before query(). DeepSeek fallback requires the explicit switch.
   if (!DRY_RUN && (!BASE || !KEY)) throw new Error("VERCEL_INGEST_URL + BRIEF_INGEST_KEY required");
 
   const trades = await fetchClosedTrades();

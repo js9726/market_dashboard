@@ -12,11 +12,11 @@
  *     skill (prompt.md + wiki + tools), and runs the skill's full PATH A
  *     workflow — including the Step 4 push to the dashboard ingest endpoint.
  *
- * Auth precedence (the whole point — subscription over API billing):
+ * Auth precedence (subscription only):
  *   1. CLAUDE_CODE_OAUTH_TOKEN  → Claude Code subscription (Max/Pro). Preferred.
  *      Generate once with `claude setup-token`; store as a GH secret for CI.
  *   2. Logged-in Claude Code CLI (local runs) — uses ~/.claude credentials.
- *   3. ANTHROPIC_API_KEY — fallback ONLY. Logs a warning (this is metered).
+ * Ambient Anthropic API credentials are deleted before query() is called.
  *
  * Usage:
  *   npm run brief         # generate + push (skill does the push in Step 4)
@@ -33,6 +33,7 @@ import { query } from "@anthropic-ai/claude-agent-sdk";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { enforceClaudeSubscriptionOnly } from "./claude_subscription_auth.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DRY_RUN = process.argv.includes("--dry-run");
@@ -42,14 +43,6 @@ const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 
 function log(msg: string) {
   process.stderr.write(`[brief-sdk] ${msg}\n`);
-}
-
-function checkAuth(): "subscription" | "api" | "cli-login" {
-  if (process.env.CLAUDE_CODE_OAUTH_TOKEN) return "subscription";
-  // The SDK will use the logged-in CLI creds if present; we can't easily probe
-  // that here, so treat "no oauth token but no api key" as cli-login.
-  if (!process.env.ANTHROPIC_API_KEY) return "cli-login";
-  return "api";
 }
 
 /**
@@ -86,8 +79,11 @@ function buildDirective(): string {
 }
 
 async function run(): Promise<number> {
-  const auth = checkAuth();
-  log(`auth mode: ${auth}${auth === "api" ? " (WARNING: metered API billing — set CLAUDE_CODE_OAUTH_TOKEN for subscription)" : ""}`);
+  const auth = enforceClaudeSubscriptionOnly();
+  log(`auth mode: ${auth.mode} (subscription-only)`);
+  if (auth.clearedMeteredCredentials.length) {
+    log(`ignored metered Anthropic credential(s): ${auth.clearedMeteredCredentials.join(", ")}`);
+  }
   log(`dry_run: ${DRY_RUN} | repo_root: ${REPO_ROOT} | model: ${MODEL ?? "(default)"}`);
 
   let resultText = "";

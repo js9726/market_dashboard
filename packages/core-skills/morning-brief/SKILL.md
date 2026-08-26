@@ -29,15 +29,21 @@ PATH A: Claude CLI itself generates the brief (populates the "Claude" tab)
    Step 4  Pipe the JSON through ingest_to_dashboard.py
            → lands on the Claude tab (provider="claude")
 
-PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/Codex tabs)
+PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini tabs)
    Reads watchlist from dashboard DB + screener json
-   Calls the chosen provider's API (DeepSeek / Gemini / OpenAI / Anthropic)
+   Calls exactly one chosen API (DeepSeek or Gemini); never silently falls back
    Pushes to dashboard as that provider
+
+PATH C: Dashboard refresh buttons
+   DeepSeek/Gemini run their exact API lane
+   Claude/Codex dispatch their subscription runner and fail closed if unavailable
+
+PATH D: codex_brief_runner.mjs (Codex subscription, populates Codex tab)
 ```
 
 ---
 
-## PATH A — Claude CLI (run this in Claude CLI / Codex CLI)
+## PATH A — Claude CLI (Claude Code subscription)
 
 > **The push to the dashboard is MANDATORY — always run Step 4.**
 > The brief is useless sitting in memory. Step 4 is what puts it live for viewers.
@@ -514,15 +520,16 @@ python ingest_to_dashboard.py brief_output.json
 
 Dashboard viewers see the updated **Claude** chip within ~60 seconds (the poll interval).
 
-If you only need to refresh DeepSeek/Gemini/Codex instead, jump to PATH B.
+If you only need to refresh DeepSeek/Gemini, jump to PATH B. For Codex, use PATH D.
 
 ---
 
-## PATH B — `cli_run.py` (refreshes DeepSeek / Gemini / Codex tabs)
+## PATH B — `cli_run.py` (refreshes DeepSeek / Gemini API tabs)
 
-Use this for the **non-Claude** provider tabs. Each invocation calls one provider's
-API and pushes the result tagged as that provider. The Claude tab is NOT refreshed
-by this path — use PATH A for that.
+Use this for the approved paid API lanes. Each invocation calls exactly one
+provider and pushes the result under that provider. A missing key or failed call
+stops that run; it never spends through a different vendor. Claude and Codex are
+subscription-only and are not available through this command.
 
 ```bash
 cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
@@ -532,9 +539,6 @@ python cli_run.py --provider deepseek --post
 
 # Gemini — pre-market run, Search Grounding gives richer citations
 python cli_run.py --provider gemini --post --tv-watchlist "NVDA,TSLA,AAPL,..."
-
-# Codex tab (stored as provider=openai) — pre-market, web_search_preview tool
-python cli_run.py --provider openai --post
 
 # Override watchlist with specific tickers
 python cli_run.py --provider deepseek --post --watchlist "NVDA,TSLA,AAPL,COIN"
@@ -553,8 +557,15 @@ Watchlist resolution order:
 
 Log in as owner → Conviction Desk → click **"Refresh DeepSeek"** (or Gemini/Codex/Claude).
 
-The server reads your watchlist from the DB and regenerates. Same result as Path B but
-triggered from the browser. Other viewers see the update within 60 seconds.
+DeepSeek/Gemini use their exact paid API lane. Claude/Codex dispatch their
+subscription runner. If dispatch is unavailable or the Codex computer is offline,
+the button reports that condition and does not fall back to a paid API.
+
+## PATH D — Codex subscription runner
+
+Run `node codex_brief_runner.mjs` (or `npm run brief:codex`) on the operator
+computer. It uses the logged-in Codex subscription, writes provider=`openai` for
+the existing Codex tab identity, and never reads `OPENAI_API_KEY`.
 
 ---
 
@@ -584,11 +595,10 @@ python scripts/tv_screener_fetch.py --out-dir data
 cd ../../apps/market_dashboard
 npm run sync:market
 
-# 4. Refresh the non-Claude provider tabs via PATH B
+# 4. Refresh the approved API tabs via PATH B
 cd ../../packages/core-skills/morning-brief
 python cli_run.py --provider gemini --post
 python cli_run.py --provider deepseek --post
-python cli_run.py --provider openai --post   # Codex tab; optional, requires OPENAI_API_KEY
 ```
 
 Then run Claude CLI to refresh the **Claude** tab via PATH A:
@@ -597,6 +607,8 @@ run morning brief
 ```
 Claude CLI uses its own WebSearch tool, emits a StructuredBrief JSON, and pipes
 it through `ingest_to_dashboard.py` (which defaults to provider=claude).
+
+To refresh Codex too, run `npm run brief:codex` on the logged-in operator computer.
 
 ---
 
