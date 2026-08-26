@@ -65,6 +65,15 @@ def _load_env():
 
 _load_env()
 
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_MORNING_BRIEF_DIR = os.path.normpath(
+    os.path.join(_HERE, "..", "..", "..", "packages", "core-skills", "morning-brief")
+)
+if _MORNING_BRIEF_DIR not in sys.path:
+    sys.path.insert(0, _MORNING_BRIEF_DIR)
+
+from deepseek_api import DEEPSEEK_MODEL_ID  # noqa: E402
+
 
 SCANNER_URL = "https://scanner.tradingview.com/america/scan"
 
@@ -474,7 +483,7 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
     )
 
     payload = {
-        "model": "deepseek-chat",
+        "model": DEEPSEEK_MODEL_ID,
         "messages": [
             {
                 "role": "system",

@@ -247,20 +247,22 @@ brief_snapshots: id, bucket_at, provider, structured_json, generated_by
 
 ---
 
-## Cost Estimate (target <$5/day)
+## Provider Cost Policy (reconciled 2026-08-26)
 
-| Component | Provider | Daily |
+Per-run guesses below were removed because they hid provider and token changes.
+Use measured token receipts instead. Current public list prices must be checked
+again before a model upgrade.
+
+| Component | Provider | Policy |
 |---|---|---|
-| Pre-open brief | Claude Agent SDK (Sonnet) | $1.50 |
-| Pre-open brief | DeepSeek | $0.30 |
-| Pre-open brief | Gemini 2.5 Pro | $0.80 |
-| A-list scoring (3 candidates × 7 trader-styles) | Claude API | $0.60 |
-| Post-close journal (avg 3 trades × full analysis) | Claude API | $0.90 |
-| Day-14 rescore (2 rolling avg) | Claude API | $0.20 |
-| TV screener scoring (top 10 × 5 screeners) | DeepSeek | $0.50 |
-| **Total** | | **~$4.80/day** |
+| Claude morning brief/journal | Claude Code subscription | No Anthropic API fallback; ambient API credentials are ignored |
+| Codex morning brief | Codex subscription on self-hosted runner | Fail closed while the runner is offline |
+| Default API analysis/brief/scoring | DeepSeek V4 Flash | Official API list price: $0.0028/M cached input, $0.14/M uncached input, $0.28/M output at reconciliation time |
+| Independent grounded/multimodal lane | Gemini 3.7 Flash | Explicit selection only; measure token and search-tool charges |
+| OpenAI API | Legacy explicit analysis lane | Never used as an automatic Codex fallback |
 
-OpenAI ON-DEMAND only (manual trigger if you want fourth opinion).
+All provider switches are explicit. A failed provider call does not silently
+spend through another vendor.
 
 ---
 
@@ -269,8 +271,8 @@ OpenAI ON-DEMAND only (manual trigger if you want fourth opinion).
 | Failure | Graceful behaviour |
 |---|---|
 | PC off → no OpenD enrichment | Cloud uses yfinance EOD fallback; banner "no live data" |
-| Claude SDK quota | Fall back to Anthropic API (same prompt) |
-| DeepSeek down | 2 providers instead of 3; tab badge "stale" |
+| Claude subscription unavailable | Claude tab stays stale with an explicit error; no API fallback |
+| DeepSeek down | DeepSeek lane records the failure; no cross-provider reroute |
 | Gemini grounding rate-limit | Brief still ships; "no overnight news" note |
 | TV screener API blocked | Cached screener + staleness warning |
 | Breadth yfinance rate-limited | Stooq fallback (script already does this) |

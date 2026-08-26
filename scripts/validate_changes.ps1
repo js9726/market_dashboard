@@ -503,6 +503,54 @@ Step "Workflow split into daily heavy + intraday light (WK-1)" {
     }
 }
 
+# Provider routing contract: prevent the exact 2026-08-26 partial-upgrade failure.
+Step "AI provider policy is current, explicit, and subscription-safe" {
+    $policy = Join-Path $app "src/lib/ai/provider-policy.ts"
+    $deepseek = Join-Path $repo "packages/core-skills/morning-brief/deepseek_api.py"
+    $authGuard = Join-Path $repo "packages/core-skills/morning-brief/claude_subscription_auth.ts"
+    foreach ($file in @($policy, $deepseek, $authGuard)) {
+        if (-not (Test-Path $file)) { throw "Missing provider contract: $file" }
+    }
+    if (-not (Select-String -Path $policy -Pattern 'DEFAULT_METERED_LLM_PROVIDER.*deepseek')) {
+        throw "DeepSeek is not the explicit default metered provider"
+    }
+    if (-not (Select-String -Path $deepseek -Pattern 'DEEPSEEK_MODEL_ID = "deepseek-v4-flash"')) {
+        throw "DeepSeek contract is not pinned to deepseek-v4-flash"
+    }
+    if (-not (Select-String -Path $deepseek -Pattern 'DEEPSEEK_RESPONSES_URL = "https://api.deepseek.com/responses"')) {
+        throw "DeepSeek web-search contract is not using the official Responses API"
+    }
+    foreach ($name in @('ANTHROPIC_API_KEY','ANTHROPIC_AUTH_TOKEN','ANTHROPIC_BASE_URL')) {
+        if (-not (Select-String -Path $authGuard -Pattern ([regex]::Escape($name)))) {
+            throw "Claude subscription guard does not clear $name"
+        }
+    }
+
+    $scanRoots = @(
+        (Join-Path $repo ".github/workflows"),
+        (Join-Path $repo "apps/market_dashboard/src"),
+        (Join-Path $repo "apps/market_dashboard/agents"),
+        (Join-Path $repo "apps/market_dashboard_backend/scripts"),
+        (Join-Path $repo "packages/core-skills/morning-brief")
+    )
+    $scanFiles = Get-ChildItem -Path $scanRoots -Recurse -File |
+        Where-Object {
+            $_.Extension -in @('.ts','.tsx','.js','.mjs','.py','.yml','.yaml') -and
+            $_.Name -notmatch '\.test\.' -and
+            $_.FullName -notmatch '[\\/]node_modules[\\/]'
+        }
+    $legacy = $scanFiles | Select-String -Pattern 'deepseek-(chat|reasoner)'
+    if ($legacy) { throw "Retired DeepSeek alias remains: $($legacy.Path):$($legacy.LineNumber)" }
+    foreach ($pattern in @('@ai-sdk/anthropic','api\.anthropic\.com','\bimport\s+anthropic\b')) {
+        $direct = $scanFiles | Select-String -Pattern $pattern
+        if ($direct) { throw "Direct Anthropic API path remains: $($direct.Path):$($direct.LineNumber)" }
+    }
+    $nextConfig = Join-Path $app "next.config.js"
+    if (Select-String -Path $nextConfig -Pattern '(DEEPSEEK|GEMINI|OPENAI|ANTHROPIC)_API_KEY') {
+        throw "Provider API key is exposed through next.config.js client env"
+    }
+}
+
 Write-Host ""
 if ($script:failures.Count -gt 0) {
     Write-Host ("FAILED: " + $script:failures.Count + " check(s) -- " + ($script:failures -join '; ')) -ForegroundColor Red

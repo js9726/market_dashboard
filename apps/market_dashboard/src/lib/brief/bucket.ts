@@ -12,10 +12,15 @@
 export const BUCKET_MS = 15 * 60 * 1000;
 
 export type BriefProvider = "deepseek" | "gemini" | "openai" | "claude";
+export type ApiBriefProvider = "deepseek" | "gemini";
 
 export const ALL_PROVIDERS: BriefProvider[] = ["deepseek", "gemini", "openai", "claude"];
-export const INTRADAY_PROVIDERS: BriefProvider[] = ["deepseek", "gemini"];
+export const INTRADAY_PROVIDERS: ApiBriefProvider[] = ["deepseek", "gemini"];
 export const PREMARKET_PROVIDERS: BriefProvider[] = ["deepseek", "gemini", "openai", "claude"];
+
+export function isApiBriefProvider(provider: BriefProvider): provider is ApiBriefProvider {
+  return provider === "deepseek" || provider === "gemini";
+}
 
 /** floor(date, 15 min) in UTC. */
 export function bucketOf(date: Date = new Date()): Date {

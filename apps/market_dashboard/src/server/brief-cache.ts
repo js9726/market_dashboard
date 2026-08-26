@@ -18,6 +18,7 @@ import {
   INTRADAY_PROVIDERS,
   bucketOf,
   isIntradayWindow,
+  type ApiBriefProvider,
   type BriefProvider,
 } from "@/lib/brief/bucket";
 import { composeSnapshot, hashSnapshot } from "@/lib/brief/snapshot";
@@ -78,7 +79,7 @@ export async function readLatestRow(provider: BriefProvider) {
  */
 export async function regenAndStore(opts: {
   bucket: Date;
-  provider: BriefProvider;
+  provider: ApiBriefProvider;
   generatedBy: string;
   watchlist?: string[];
 }): Promise<void> {

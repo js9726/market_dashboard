@@ -329,9 +329,8 @@ ${renderDeepDiveGrounding(deepDiveGrounding)}`;
     };
     const prompt = buildStockPrompt({ stockContext, display });
 
-    // tier:"fast" keeps the request well inside Vercel's function timeout:
-    //   deepseek-chat  → primary (fast + cheap)
-    //   gemini-2.0-flash → fallback (2-4 s vs 10-20 s for 2.5-pro)
+    // tier:"fast" keeps the request well inside Vercel's function timeout.
+    // The requested provider is exact; failures never reroute to another vendor.
     const llmMeta: { providerUsed?: string; modelUsed?: string; note?: string } = {};
     const raw = await callLLM(prompt, stockAnalystSystem, { maxTokens: 3800, provider, tier: "fast" }, llmMeta);
 

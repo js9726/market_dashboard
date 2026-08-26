@@ -98,7 +98,7 @@ market_dashboard/
     market_dashboard_backend/
       scripts/
         build_data.py          yfinance, Finviz, breadth, charts, snapshot JSON
-        morning_brief.py       Gemini/OpenAI/Claude morning brief generation
+        morning_brief.py       DeepSeek/Gemini API morning brief generation
         trader_verdict.py      Daily trader-persona market verdict
       data/                    Generated local output
 
@@ -133,7 +133,7 @@ Python data pipeline
     -> data/charts/*.png
 
   morning_brief.py
-    -> data/morning_brief_<provider>.html
+    -> data/morning_brief_<provider>.json
     -> data/morning_brief_meta.json
 
   trader_verdict.py
@@ -206,9 +206,9 @@ http://localhost:3000
 | Variable | Purpose |
 |---|---|
 | `DEEPSEEK_API_KEY` | Default/low-cost stock and trade analysis provider |
-| `ANTHROPIC_API_KEY` | Claude provider for analysis and morning brief |
-| `OPENAI_API_KEY` | OpenAI provider for analysis and morning brief |
-| `GEMINI_API_KEY` | Gemini provider for morning brief and analysis |
+| `OPENAI_API_KEY` | Explicit OpenAI analysis API lane; never a Codex subscription fallback |
+| `GEMINI_API_KEY` | Explicit Gemini 3.7 Flash brief and analysis lane |
+| `CLAUDE_CODE_OAUTH_TOKEN` | Claude Code subscription runner; Anthropic API credentials are not permitted |
 
 Legacy `APP_PASSWORD`, `DASHBOARD_PASSWORD`, and `AUTH_TOKEN` are not part of the current auth design.
 
