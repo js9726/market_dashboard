@@ -1,15 +1,15 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-OFF",
-    "posture": "WAIT",
-    "summary": "All eyes are on the July PCE inflation data at 08:30 ET and NVIDIA's earnings after the bell; the market is in a holding pattern until these major catalysts are released."
+    "label": "CAUTIOUSLY-RISK-ON",
+    "posture": "GO",
+    "summary": "Massive earnings beats from Nvidia and key software players are igniting a strong risk-on rally within the tech sector, but leadership is narrow. The play is to focus on the clear momentum in AI and software while the rest of the market digests macro uncertainty ahead of Jackson Hole."
   },
   "breadth": {
-    "up": 1,
-    "down": 1
+    "up": 1262,
+    "down": 1458
   },
   "fearGreed": {
-    "score": 55,
+    "score": 54,
     "label": "Neutral"
   },
   "indices": [
@@ -17,383 +17,405 @@
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.07,
+      "changePct": 0.5,
       "note": "futures",
-      "citation": "Source: TipRanks 05:27 ET"
+      "citation": "Source: Goodreturns 08/27/2026"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": -0.2,
+      "changePct": 0.9,
       "note": "futures",
-      "citation": "Source: TipRanks 05:27 ET"
+      "citation": "Source: Goodreturns 08/27/2026"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": 0.07,
+      "changePct": 0.33,
       "note": "futures",
-      "citation": "Source: TipRanks 05:27 ET"
+      "citation": "Source: Goodreturns 08/27/2026"
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility Index",
-      "level": 15.45,
-      "changePct": -2.52,
+      "name": "Volatility",
+      "level": 15.21,
+      "changePct": null,
       "note": "live",
-      "citation": "Source: Zacks Investment Research"
+      "citation": "Source: Markets Insider 08/27/26"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Yr Treasury Yield",
-      "level": 4.63,
+      "name": "10Y Yield",
+      "level": 4.66,
       "changePct": null,
       "note": "live",
-      "citation": "Source: Zacks Investment Research"
+      "citation": "Source: TipRanks 08/27/2026"
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil (WTI)",
-      "level": 80.46,
-      "changePct": -1.47,
-      "note": "futures",
-      "citation": "Source: TipRanks 05:27 ET"
+      "name": "Crude Oil",
+      "level": 82.54,
+      "changePct": null,
+      "note": "live",
+      "citation": "Source: TipRanks 08/27/2026"
     }
   ],
-  "indicesNarrative": "US futures are mixed and pointing to a quiet open as traders await key economic data. [2] The market is bracing for the July PCE inflation report this morning and highly anticipated earnings from AI-bellwether Nvidia after the close, which will likely set the market's direction. [4, 7] Falling oil prices and an easing in Treasury yields provided support in the previous session. [3]",
-  "technicals": null,
-  "technicalsNarrative": "Technical data was not available at the time of generation. Entries should be considered with caution pending analysis of price action relative to key moving averages and momentum indicators.",
+  "indicesNarrative": "US futures are pointing to a gap-up open, driven by a powerful rally in the tech sector after Nvidia's stellar earnings report and bullish guidance. The Nasdaq is set to dramatically outperform the Dow, highlighting a narrow, theme-driven market leadership centered on AI.",
+  "technicals": {
+    "SPY": null,
+    "QQQ": null,
+    "DIA": null
+  },
+  "technicalsNarrative": "Technical data was not available at the time of generation.",
   "sectorsThemes": [
     {
       "symbol": "XLK",
       "name": "Technology",
-      "changePct": 0.9,
-      "rs": null,
-      "note": "Rebounded yesterday ahead of NVDA earnings."
-    },
-    {
-      "symbol": "XLC",
-      "name": "Communication Services",
-      "changePct": 0.8,
-      "rs": null,
-      "note": "Also showed strength in the previous session."
-    },
-    {
-      "symbol": "XLE",
-      "name": "Energy",
       "changePct": null,
       "rs": null,
-      "note": "Under pressure as crude oil prices fall sharply."
+      "note": "Expected to lead significantly at the open on strong semiconductor and software earnings."
+    },
+    {
+      "symbol": "XLI",
+      "name": "Industrials",
+      "changePct": 1.07,
+      "rs": null,
+      "note": "Was the top-performing sector in the previous session."
+    },
+    {
+      "symbol": "XLV",
+      "name": "Health Care",
+      "changePct": -1.0,
+      "rs": null,
+      "note": "Was the worst-performing sector in the previous session."
+    },
+    {
+      "symbol": "IGV",
+      "name": "Software",
+      "changePct": null,
+      "rs": null,
+      "note": "Major tailwind from strong earnings at Salesforce, CrowdStrike, and Okta."
     }
   ],
-  "sectorsNarrative": "Technology and Communication Services led a rebound in yesterday's session as chip stocks recovered ahead of Nvidia's report. [3] Energy stocks may face headwinds as oil prices continue to decline on geopolitical de-escalation hopes. [2]",
-  "industryNarrative": "Semiconductors showed renewed strength yesterday, reversing earlier losses as the focus shifted to Nvidia's upcoming results. Software is a mixed picture, with some names like Intuit facing pressure on guidance while others are watched for AI-related revenue growth.",
+  "sectorsNarrative": "A clear rotation into Technology is expected today, fueled by exceptional earnings from AI-related companies. Yesterday saw leadership from Industrials while Health Care lagged, indicating a market that is still selective outside of the dominant tech theme.",
+  "industryNarrative": "Semiconductors and Enterprise Software are the standout industry groups. The AI investment cycle has been re-validated, driving significant fund flows into these areas, while other parts of the market remain cautious.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "PLAB",
+      "ticker": "CRM",
       "side": "LONG",
-      "changePct": 16.51,
-      "why": "Reported Q3 earnings and revenue that significantly beat analyst expectations.",
-      "traderLens": "Qullamaggie"
+      "changePct": 22.58,
+      "why": "Salesforce reported a strong quarter, citing AI as a major contributor, and beat profit expectations.",
+      "traderLens": "Qullamaggie - Episodic pivot on earnings beat."
     },
     {
-      "ticker": "YYGH",
+      "ticker": "OKTA",
       "side": "LONG",
-      "changePct": 89.57,
-      "why": "High pre-market volume on low-float stock; specific catalyst not immediately clear.",
-      "traderLens": "Qullamaggie"
+      "changePct": 17.4,
+      "why": "Posted a strong Q2 earnings report and raised its full-year guidance.",
+      "traderLens": "Qullamaggie - Episodic pivot on earnings beat and guidance raise."
     },
     {
-      "ticker": "DAIC",
+      "ticker": "CRWD",
       "side": "LONG",
-      "changePct": 59.79,
-      "why": "High pre-market volume; specific catalyst not immediately clear.",
-      "traderLens": "Qullamaggie"
+      "changePct": 8.9,
+      "why": "The cybersecurity firm beat Q2 estimates and raised its full-year outlook.",
+      "traderLens": "Momentum breakout on strong fundamentals."
     },
     {
-      "ticker": "RDIB",
+      "ticker": "NVDA",
       "side": "LONG",
-      "changePct": 40.21,
-      "why": "High pre-market volume; specific catalyst not immediately clear.",
-      "traderLens": "Qullamaggie"
+      "changePct": 7.4,
+      "why": "Delivered a massive Q2 earnings and revenue beat and issued significantly strong guidance for the next quarter.",
+      "traderLens": "Minervini - Market leader confirming Stage 2 strength."
     },
     {
-      "ticker": "BHVN",
+      "ticker": "DG",
       "side": "LONG",
-      "changePct": 7.0,
-      "why": "Stock surged on news of a deal with SK Biopharmaceuticals.",
-      "traderLens": "Minervini"
+      "changePct": 6.5,
+      "why": "The discount retailer reported better-than-expected quarterly profit.",
+      "traderLens": "Value/turnaround play on earnings surprise."
     },
     {
-      "ticker": "INTU",
+      "ticker": "HPQ",
       "side": "SHORT",
-      "changePct": -12.0,
-      "why": "Posted weak forward guidance for FY2027, citing pricing pressure on TurboTax, leading to analyst downgrades.",
-      "traderLens": "Jeff"
+      "changePct": -9.0,
+      "why": "Stock fell despite reporting quarterly profit above analyst expectations, suggesting a weak outlook or sell-the-news reaction.",
+      "traderLens": "Post-earnings weakness, potential for downside continuation."
     },
     {
-      "ticker": "GRML",
+      "ticker": "MRNA",
       "side": "SHORT",
-      "changePct": -37.28,
-      "why": "Significant pre-market decline; specific catalyst not immediately clear.",
-      "traderLens": "Jeff"
+      "changePct": -4.6,
+      "why": "Stock declined after the vaccine maker announced plans for a $2 billion sale of convertible bonds.",
+      "traderLens": "Catalyst-driven weakness, potential for further downside."
     },
     {
-      "ticker": "NCPL",
+      "ticker": "BBY",
       "side": "SHORT",
-      "changePct": -22.41,
-      "why": "Significant pre-market decline; specific catalyst not immediately clear.",
-      "traderLens": "Jeff"
+      "changePct": -4.2,
+      "why": "Stock fell even though the retailer exceeded Wall Street estimates for both quarterly revenue and profit.",
+      "traderLens": "Post-earnings fade, negative market reaction to results."
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
       "level": null,
-      "changePct": 0.3,
+      "changePct": 7.4,
       "abc": "A",
-      "note": "Reports after market close. The key event for the entire market today."
+      "note": "Market leader, confirming strength with blowout earnings."
+    },
+    {
+      "ticker": "CRWD",
+      "level": null,
+      "changePct": 8.9,
+      "abc": "A",
+      "note": "Leading cybersecurity name, gapping up on earnings and raised guidance."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": null,
+      "changePct": 0.14,
       "abc": "B",
-      "note": "Fell 4% yesterday after news of Cybertruck price hikes."
+      "note": "Trading flat pre-market, lagging the broader tech rally."
     },
     {
       "ticker": "AAPL",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Watching for movement with the broader tech sector."
+      "note": "Expected to open higher with broad tech strength."
     },
     {
       "ticker": "MSFT",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Key player in AI, will react to NVDA's report and guidance."
+      "abc": "A",
+      "note": "Key AI player, likely benefiting from Nvidia's results."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Cloud segment performance is sensitive to AI capital spending trends."
+      "note": "Expected to open higher with broad tech strength."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Another major investor in AI infrastructure, sensitive to NVDA results."
+      "note": "Expected to participate in the tech rally."
     },
     {
       "ticker": "GOOGL",
       "level": null,
       "changePct": null,
       "abc": "B",
-      "note": "Cloud segment performance is sensitive to AI capital spending trends."
+      "note": "Key AI player, likely benefiting from Nvidia's results."
     },
     {
       "ticker": "AMD",
       "level": null,
       "changePct": null,
-      "abc": "B",
-      "note": "Key competitor to NVDA, will be highly reactive to their results and commentary."
+      "abc": "A",
+      "note": "Semiconductor peer, should see a sympathy move with NVDA."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
       "abc": "A",
-      "note": "Showed significant relative strength yesterday, surging 9.35% against its industry."
+      "note": "Direct AI beneficiary, likely to see strong follow-through."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
-      "abc": "C",
-      "note": "Watching for momentum in software names."
-    },
-    {
-      "ticker": "CRWD",
-      "level": null,
-      "changePct": null,
       "abc": "B",
-      "note": "Reports earnings after the close today."
+      "note": "Software/AI name, should benefit from positive sector sentiment."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": "C",
-      "note": "Moves with Bitcoin; recently raised capital via stock sale."
+      "note": "High-beta name tied to crypto, may see speculative interest."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a holding pattern. Not an ideal environment for new breakouts until key data is released. Focus on managing existing positions."
+      "view": "Market is two-tiered. Focus only on leaders like NVDA in confirmed Stage 2 uptrends. Ignore the chop elsewhere."
     },
     {
       "name": "Ted Zhang",
-      "view": "Rotation back into tech yesterday was tentative. NVDA's report will determine if institutional flow commits to the sector or rotates out."
+      "view": "Strong institutional flows are chasing AI and software post-earnings. This is the rotation to follow today."
     },
     {
       "name": "Clement Ang",
-      "view": "This is a C/D-grade environment until PCE and NVDA are out of the way. No new entries. The risk of a gap down on bad news is elevated."
+      "view": "The context supports A-grade setups in tech. NVDA, CRM, CRWD are providing the catalyst. It's a 'go' day for these specific themes."
     },
     {
       "name": "SRxTrades",
-      "view": "Pre-market action is dominated by earnings reactions. PLAB shows a clean gap up on volume, while INTU shows a clean gap down. Wait for setups to form after the open."
+      "view": "Look for clean pivots on the earnings gappers (CRM, CRWD). Wait for the open to establish a range; don't chase the initial print."
     },
     {
       "name": "Jeff",
-      "view": "Today is about discipline. Do not trade based on predictions about PCE or NVDA. React to the price action, don't anticipate it. Stick to your stops."
+      "view": "If you play the earnings gaps, respect your stops. A gap-up can easily reverse."
     },
     {
       "name": "Qullamaggie",
-      "view": "The main catalyst is NVDA AMC. A strong beat and raise could ignite momentum across the semiconductor and AI space. An earnings miss could kill the recent rally."
+      "view": "Multiple episodic pivots are setting up in software (CRM, CRWD, OKTA). This is the kind of momentum day to be aggressive in."
     },
     {
       "name": "Composite",
-      "view": "Stay on the sidelines until after the PCE data at 8:30 ET. The reaction to that number will set the morning tone. Do not initiate new swing positions before NVDA reports. The risk of an overnight gap against you is too high."
+      "view": "Focus firepower on the AI/software theme. The market is providing clear signals of leadership. Be aggressive in names like NVDA, CRM, and CRWD, but manage risk as the broader market is not participating equally."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "PLAB",
-        "consensus": "EPS $0.40 / Rev $208.75M"
+        "ticker": "DG",
+        "consensus": null
+      },
+      {
+        "ticker": "BBY",
+        "consensus": null
+      },
+      {
+        "ticker": "BURL",
+        "consensus": null
       }
     ],
     "amc": [
       {
-        "ticker": "NVDA",
-        "consensus": "EPS $2.09 / Rev $92.2B"
+        "ticker": "MRVL",
+        "consensus": "EPS $0.93 / Rev $2.71B"
       },
       {
-        "ticker": "CRM",
-        "consensus": "..."
+        "ticker": "ADSK",
+        "consensus": null
       },
       {
-        "ticker": "CRWD",
-        "consensus": "..."
-      },
-      {
-        "ticker": "SNPS",
-        "consensus": "..."
-      },
-      {
-        "ticker": "HPQ",
-        "consensus": "..."
+        "ticker": "WDAY",
+        "consensus": null
       }
     ],
     "yesterdayReactions": [
       {
-        "ticker": "INTU",
-        "result": "Beat, but weak guidance",
-        "movePct": -12.0
+        "ticker": "NVDA",
+        "result": "beat",
+        "movePct": 7.4
+      },
+      {
+        "ticker": "CRM",
+        "result": "beat",
+        "movePct": 22.58
+      },
+      {
+        "ticker": "CRWD",
+        "result": "beat",
+        "movePct": 8.9
       }
     ]
   },
   "calendar": [
     {
       "time": "08:30 ET",
-      "name": "PCE Price Index YoY (Jul)",
-      "consensus": "3.6%"
+      "name": "Initial Jobless Claims",
+      "consensus": "208K"
     },
     {
-      "time": "08:30 ET",
-      "name": "PCE Price Index MoM (Jul)",
-      "consensus": "0.1%"
+      "time": "All Day",
+      "name": "Jackson Hole Economic Symposium Begins",
+      "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [],
-    "downgrades": [
-      {
-        "ticker": "INTU",
-        "firm": "Barclays",
-        "rating": "Price Target Cut",
-        "pt": 408
-      },
-      {
-        "ticker": "EIX",
-        "firm": "Argus Research",
-        "rating": "Hold",
-        "pt": null
-      }
-    ]
+    "downgrades": []
   },
-  "alert": "Pivotal Day: PCE Inflation data at 08:30 ET and NVDA earnings after close will drive market action.",
+  "alert": "STRONG TECH LEADERSHIP: NVDA, CRM, CRWD gapping up on blowout earnings, confirming AI theme.",
   "news": [
     {
-      "headline": "Stock futures are mixed as investors brace for crucial PCE inflation data and Nvidia's highly-anticipated earnings report.",
+      "headline": "Nvidia's blowout earnings and forecast reignite AI stock rally",
       "impact": "HIGH",
       "tickers": [
-        "SPY",
+        "NVDA",
         "QQQ",
-        "NVDA"
+        "SMH",
+        "AMD",
+        "MSFT"
       ],
-      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-aug-26-2026-nasdaq-futures-edge-lower-ahead-of-pce-nvidia-earnings",
-      "time": "06:51 ET"
+      "source": "Investing.com - https://www.investing.com/news/stock-market-news/premarket-movers-nvidia-salesforce-and-crowdstrike-rally-on-earnings-3625361",
+      "time": "06:02 ET"
     },
     {
-      "headline": "Intuit (INTU) shares plunge pre-market after company issues weak forward guidance for fiscal 2027, citing pricing pressures.",
+      "headline": "Salesforce, CrowdStrike, and Okta surge pre-market after strong earnings reports, boosting software sector",
+      "impact": "HIGH",
+      "tickers": [
+        "CRM",
+        "CRWD",
+        "OKTA",
+        "IGV"
+      ],
+      "source": "TheStreet - https://www.thestreet.com/markets/stock-market-today-aug-27-2026-tech-rallies-after-nvidia-earnings",
+      "time": "Premarket"
+    },
+    {
+      "headline": "Asian markets mixed as Nvidia boost tempered by caution ahead of Jackson Hole",
       "impact": "MED",
       "tickers": [
-        "INTU"
+        "EWJ",
+        "EWY",
+        "MCHI"
       ],
-      "source": "GuruFocus - https://www.gurufocus.com/news/2689530/intu-maintains-overweight-rating--price-target-lowered-to-408",
-      "time": "06:38 ET"
+      "source": "Daily Journal - https://www.djournal.com/news/national/asian-stocks-are-mixed-after-wall-street-losses-following-economic-updates/article_01f6a54a-7141-5b2b-8a8b-18a7c1d76e73.html",
+      "time": "Overnight"
     },
     {
-      "headline": "Photronics (PLAB) soars in pre-market after reporting Q3 earnings and revenue that beat analyst expectations.",
-      "impact": "MED",
-      "tickers": [
-        "PLAB"
-      ],
-      "source": "MarketBeat - https://www.marketbeat.com/instant-alerts/nasdaq-plab-earnings-date-2026-08-2-3/",
-      "time": "07:00 ET"
-    },
-    {
-      "headline": "Crude oil prices extend losses on signs of easing Middle East tensions and hopes the Strait of Hormuz could reopen.",
-      "impact": "MED",
-      "tickers": [
-        "XLE",
-        "CL=F"
-      ],
-      "source": "TipRanks - https://www.tipranks.com/news/stock-market-news-today-8-26-2026-futures-mixed-ahead-of-nvidia-results-inflation-data",
-      "time": "05:27 ET"
-    },
-    {
-      "headline": "10-Year Treasury yield holds steady around 4.63% after easing in the previous session.",
+      "headline": "European markets open mixed, with chip stocks gaining while broader indices lag",
       "impact": "LOW",
       "tickers": [
-        "TLT",
-        "^TNX"
+        "FEZ",
+        "DAX"
       ],
-      "source": "Zacks Investment Research - https://www.zacks.com/stock-news/2300897/stock-market-news-for-aug-26-2026",
-      "time": "08:15 ET"
+      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/202608273634/european-midday-briefing-chip-stocks-rise-as-focus-turns-to-jackson-hole",
+      "time": "05:09 ET"
+    },
+    {
+      "headline": "US Initial Jobless Claims data due at 8:30 ET, consensus 208K",
+      "impact": "MED",
+      "tickers": [
+        "SPY",
+        "DIA"
+      ],
+      "source": "Investing.com - https://www.investing.com/news/economy/initial-jobless-claims-headline-thursdays-economic-calendar-3625345",
+      "time": "08:30 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TipRanks 05:27 ET - https://www.tipranks.com/news/stock-market-news-today-8-26-2026-futures-mixed-ahead-of-nvidia-results-inflation-data",
-    "TheStreet 06:51 ET - https://www.thestreet.com/markets/stock-market-today-aug-26-2026-nasdaq-futures-edge-lower-ahead-of-pce-nvidia-earnings",
-    "Zacks Investment Research - https://www.zacks.com/stock-news/2300897/stock-market-news-for-aug-26-2026",
-    "Motley Fool - https://www.fool.com/investing/2026/08/26/the-stock-market-faces-a-critical-test-on-wednesd/",
-    "MarketBeat - https://www.marketbeat.com/instant-alerts/nasdaq-plab-earnings-date-2026-08-2-3/",
-    "GuruFocus - https://www.gurufocus.com/news/2689530/intu-maintains-overweight-rating--price-target-lowered-to-408",
-    "Investing.com - https://www.investing.com/news/stock-market-news/premarket-movers-nvidia-in-focus-intuit-slides-and-semtech-surges-3324567",
-    "Stocktwits - https://stocktwits.com/news/why-are-nasdaq-sp-500-futures-rising-premarket-nvda-tsla-be-grrr-nvts-nbis-sls-mstr-stocks-in-focus",
-    "MEXC Crypto Pulse - https://www.mexc.com/learn/article/20999000523277"
+    "TipRanks 08/26/26 - https://www.tipranks.com/news/sp-500-top-stock-gainers-today-8-26-26",
+    "Goodreturns 08/27/2026 - https://www.goodreturns.in/news/us-market-futures-jump-on-august-27-despite-dow-jones-nasdaq-s-p-500-falling-overnight-thursday-outlook-1352912.html",
+    "TipRanks 08/27/2026 - https://www.tipranks.com/news/stock-market-news-today-8-27-2026-nasdaq-futures-rise-on-nvidias-strong-results",
+    "Markets Insider 08/27/26 - https://markets.insider.com/indices/vix",
+    "aiStockSelection 08/25/2026 - https://aistockselection.com/fear-and-greed-index/",
+    "McClellan Financial Publications 08/26/2026 - https://www.mcoscillator.com/market_breadth_data/",
+    "Daily Journal - https://www.djournal.com/news/national/asian-stocks-are-mixed-after-wall-street-losses-following-economic-updates/article_01f6a54a-7141-5b2b-8a8b-18a7c1d76e73.html",
+    "Morningstar - https://www.morningstar.com/news/dow-jones/202608273634/european-midday-briefing-chip-stocks-rise-as-focus-turns-to-jackson-hole",
+    "Investing.com - https://www.investing.com/news/stock-market-news/premarket-movers-nvidia-salesforce-and-crowdstrike-rally-on-earnings-3625361",
+    "TheStreet - https://www.thestreet.com/markets/stock-market-today-aug-27-2026-tech-rallies-after-nvidia-earnings",
+    "Smartkarma - https://smartkarma.com/insights/us-market-movers-today-27-august-2026",
+    "Nasdaq - https://www.nasdaq.com/market-activity/earnings",
+    "Wall Street Horizon - https://www.wallstreethorizon.com/earnings-calendar",
+    "Kiplinger - https://www.kiplinger.com/investing/stocks/earnings-calendar-and-analysis-for-this-week",
+    "Investing.com - https://www.investing.com/news/economy/initial-jobless-claims-headline-thursdays-economic-calendar-3625345",
+    "Public.com - https://public.com/stocks/tsla/pre-market"
   ]
 }
