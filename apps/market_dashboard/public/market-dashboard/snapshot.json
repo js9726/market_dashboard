@@ -1,48 +1,48 @@
 {
-  "built_at": "2026-08-29T00:00:36.533659Z",
+  "built_at": "2026-08-31T19:26:17.501857Z",
   "groups": {
     "Indices": [
       {
         "ticker": "QQQE",
-        "daily": -0.91,
-        "intra": -0.51,
-        "5d": -0.39,
-        "20d": 4.44,
-        "atr_pct": 1.0,
-        "dist_sma50_atr": 1.68,
+        "daily": -1.35,
+        "intra": -0.11,
+        "5d": -0.83,
+        "20d": null,
+        "atr_pct": 1.1,
+        "dist_sma50_atr": 1.21,
         "rs": 0.0,
         "rs_chart": "data/charts/QQQE.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.98,
-        "off_52w_high_pct": -1.94
+        "rvol": 0.61,
+        "off_52w_high_pct": -2.37
       },
       {
         "ticker": "MGK",
-        "daily": -0.4,
-        "intra": -0.46,
-        "5d": 1.32,
-        "20d": 4.39,
+        "daily": -0.8,
+        "intra": -0.16,
+        "5d": 0.91,
+        "20d": null,
         "atr_pct": 1.5,
-        "dist_sma50_atr": 1.67,
-        "rs": 95.0,
+        "dist_sma50_atr": 1.41,
+        "rs": 100.0,
         "rs_chart": "data/charts/MGK.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.75,
-        "off_52w_high_pct": -2.01
+        "rvol": 0.66,
+        "off_52w_high_pct": -2.4
       },
       {
         "ticker": "QQQ",
-        "daily": -0.65,
-        "intra": -0.46,
-        "5d": 0.42,
-        "20d": 4.13,
+        "daily": -0.85,
+        "intra": -0.02,
+        "5d": 0.22,
+        "20d": null,
         "atr_pct": 1.5,
-        "dist_sma50_atr": 0.42,
-        "rs": 0.0,
+        "dist_sma50_atr": 0.29,
+        "rs": 25.0,
         "rs_chart": "data/charts/QQQ.png",
         "long": [
           "TQQQ"
@@ -51,17 +51,17 @@
           "SQQQ"
         ],
         "abc": "A",
-        "rvol": 0.99,
-        "off_52w_high_pct": -3.88
+        "rvol": 0.68,
+        "off_52w_high_pct": -4.07
       },
       {
         "ticker": "IBIT",
-        "daily": -3.07,
-        "intra": -2.15,
-        "5d": 0.5,
-        "20d": 23.18,
-        "atr_pct": 2.8,
-        "dist_sma50_atr": 6.57,
+        "daily": -1.14,
+        "intra": 1.39,
+        "5d": 2.51,
+        "20d": null,
+        "atr_pct": 2.7,
+        "dist_sma50_atr": 7.74,
         "rs": 80.0,
         "rs_chart": "data/charts/IBIT.png",
         "long": [
@@ -73,33 +73,33 @@
           "BITI"
         ],
         "abc": "A",
-        "rvol": 1.42,
-        "off_52w_high_pct": -38.42
+        "rvol": 0.71,
+        "off_52w_high_pct": -37.19
       },
       {
         "ticker": "RSP",
-        "daily": -0.34,
-        "intra": -0.52,
-        "5d": -0.44,
-        "20d": 2.64,
+        "daily": -0.9,
+        "intra": -0.14,
+        "5d": -1.0,
+        "20d": null,
         "atr_pct": 0.8,
-        "dist_sma50_atr": 2.54,
-        "rs": 5.0,
+        "dist_sma50_atr": 1.8,
+        "rs": 0.0,
         "rs_chart": "data/charts/RSP.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.86,
-        "off_52w_high_pct": -0.93
+        "rvol": 0.64,
+        "off_52w_high_pct": -1.49
       },
       {
         "ticker": "MDY",
-        "daily": -1.15,
-        "intra": -1.23,
-        "5d": -1.29,
-        "20d": 0.62,
+        "daily": -1.75,
+        "intra": -0.55,
+        "5d": -1.89,
+        "20d": null,
         "atr_pct": 1.1,
-        "dist_sma50_atr": -0.7,
+        "dist_sma50_atr": -1.22,
         "rs": 0.0,
         "rs_chart": "data/charts/MDY.png",
         "long": [
@@ -107,17 +107,17 @@
         ],
         "short": [],
         "abc": "B",
-        "rvol": 0.8,
-        "off_52w_high_pct": -3.68
+        "rvol": 0.3,
+        "off_52w_high_pct": -4.26
       },
       {
         "ticker": "IWM",
-        "daily": -1.35,
-        "intra": -1.32,
-        "5d": -1.4,
-        "20d": 1.56,
-        "atr_pct": 1.1,
-        "dist_sma50_atr": -0.47,
+        "daily": -2.1,
+        "intra": -0.54,
+        "5d": -2.15,
+        "20d": null,
+        "atr_pct": 1.2,
+        "dist_sma50_atr": -1.06,
         "rs": 0.0,
         "rs_chart": "data/charts/IWM.png",
         "long": [
@@ -126,19 +126,19 @@
         "short": [
           "TZA"
         ],
-        "abc": "A",
-        "rvol": 1.1,
-        "off_52w_high_pct": -3.06
+        "abc": "B",
+        "rvol": 0.91,
+        "off_52w_high_pct": -3.8
       },
       {
         "ticker": "TLT",
-        "daily": -0.3,
-        "intra": -0.2,
-        "5d": 1.01,
-        "20d": 1.17,
+        "daily": -0.85,
+        "intra": -0.05,
+        "5d": 0.46,
+        "20d": null,
         "atr_pct": 0.8,
-        "dist_sma50_atr": -1.11,
-        "rs": 5.0,
+        "dist_sma50_atr": -1.74,
+        "rs": 0.0,
         "rs_chart": "data/charts/TLT.png",
         "long": [
           "TMF"
@@ -146,19 +146,19 @@
         "short": [
           "TMV"
         ],
-        "abc": "B",
-        "rvol": 1.04,
-        "off_52w_high_pct": -6.65
+        "abc": "C",
+        "rvol": 0.69,
+        "off_52w_high_pct": -7.17
       },
       {
         "ticker": "SPY",
-        "daily": -0.23,
-        "intra": -0.31,
-        "5d": 0.47,
-        "20d": 2.99,
+        "daily": -0.61,
+        "intra": -0.12,
+        "5d": 0.09,
+        "20d": null,
         "atr_pct": 0.8,
-        "dist_sma50_atr": 2.48,
-        "rs": 22.0,
+        "dist_sma50_atr": 2.02,
+        "rs": 90.0,
         "rs_chart": "data/charts/SPY.png",
         "long": [
           "SPXL",
@@ -169,54 +169,54 @@
           "SH"
         ],
         "abc": "A",
-        "rvol": 0.89,
-        "off_52w_high_pct": -1.1
+        "rvol": 0.48,
+        "off_52w_high_pct": -1.48
       },
       {
         "ticker": "ETHA",
-        "daily": -2.65,
-        "intra": -2.6,
-        "5d": 0.71,
-        "20d": 30.56,
-        "atr_pct": 3.2,
-        "dist_sma50_atr": 8.57,
-        "rs": 75.0,
+        "daily": -0.61,
+        "intra": 1.43,
+        "5d": 2.82,
+        "20d": null,
+        "atr_pct": 3.0,
+        "dist_sma50_atr": 10.08,
+        "rs": 85.0,
         "rs_chart": "data/charts/ETHA.png",
         "long": [
           "ETHU"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.4,
-        "off_52w_high_pct": -48.67
+        "rvol": 0.64,
+        "off_52w_high_pct": -47.6
       },
       {
         "ticker": "DIA",
-        "daily": -0.03,
-        "intra": -0.27,
-        "5d": 0.53,
-        "20d": 2.13,
-        "atr_pct": 0.8,
-        "dist_sma50_atr": 1.83,
-        "rs": 5.0,
+        "daily": -0.65,
+        "intra": -0.34,
+        "5d": -0.09,
+        "20d": null,
+        "atr_pct": 0.9,
+        "dist_sma50_atr": 1.07,
+        "rs": 0.0,
         "rs_chart": "data/charts/DIA.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.77,
-        "off_52w_high_pct": -1.35
+        "rvol": 0.36,
+        "off_52w_high_pct": -1.95
       }
     ],
     "Sel Sectors": [
       {
         "ticker": "XLK",
-        "daily": -1.55,
-        "intra": -1.27,
-        "5d": 1.3,
-        "20d": 5.9,
+        "daily": -1.34,
+        "intra": 0.16,
+        "5d": 1.51,
+        "20d": null,
         "atr_pct": 2.2,
-        "dist_sma50_atr": 0.72,
-        "rs": 30.0,
+        "dist_sma50_atr": 0.81,
+        "rs": 40.0,
         "rs_chart": "data/charts/XLK.png",
         "long": [
           "TECL"
@@ -225,17 +225,17 @@
           "TECS"
         ],
         "abc": "A",
-        "rvol": 0.92,
-        "off_52w_high_pct": -6.2
+        "rvol": 0.46,
+        "off_52w_high_pct": -6.01
       },
       {
         "ticker": "XLI",
-        "daily": -0.93,
-        "intra": -1.28,
-        "5d": -1.73,
-        "20d": -1.5,
-        "atr_pct": 1.4,
-        "dist_sma50_atr": -1.83,
+        "daily": -1.99,
+        "intra": -0.48,
+        "5d": -2.77,
+        "20d": null,
+        "atr_pct": 1.5,
+        "dist_sma50_atr": -2.43,
         "rs": 0.0,
         "rs_chart": "data/charts/XLI.png",
         "long": [
@@ -243,35 +243,35 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 1.37,
-        "off_52w_high_pct": -5.02
+        "rvol": 0.88,
+        "off_52w_high_pct": -6.04
       },
       {
         "ticker": "XLC",
-        "daily": 1.42,
-        "intra": 1.0,
-        "5d": 1.43,
-        "20d": 4.39,
+        "daily": 0.19,
+        "intra": -0.76,
+        "5d": 0.2,
+        "20d": null,
         "atr_pct": 1.5,
-        "dist_sma50_atr": 1.76,
-        "rs": 100.0,
+        "dist_sma50_atr": 0.97,
+        "rs": 95.0,
         "rs_chart": "data/charts/XLC.png",
         "long": [
           "LTL"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.85,
-        "off_52w_high_pct": -5.36
+        "rvol": 0.46,
+        "off_52w_high_pct": -6.51
       },
       {
         "ticker": "XLF",
-        "daily": 0.38,
-        "intra": 0.21,
-        "5d": 1.08,
-        "20d": 2.04,
+        "daily": -0.16,
+        "intra": -0.13,
+        "5d": 0.53,
+        "20d": null,
         "atr_pct": 1.0,
-        "dist_sma50_atr": 2.82,
+        "dist_sma50_atr": 2.37,
         "rs": 5.0,
         "rs_chart": "data/charts/XLF.png",
         "long": [
@@ -281,17 +281,17 @@
           "FAZ"
         ],
         "abc": "A",
-        "rvol": 0.9,
-        "off_52w_high_pct": -0.36
+        "rvol": 0.67,
+        "off_52w_high_pct": -0.9
       },
       {
         "ticker": "XLU",
-        "daily": -1.04,
-        "intra": -1.41,
-        "5d": -0.09,
-        "20d": -3.65,
-        "atr_pct": 1.5,
-        "dist_sma50_atr": -2.86,
+        "daily": -2.07,
+        "intra": 0.68,
+        "5d": -1.13,
+        "20d": null,
+        "atr_pct": 1.6,
+        "dist_sma50_atr": -3.28,
         "rs": 5.0,
         "rs_chart": "data/charts/XLU.png",
         "long": [
@@ -299,17 +299,17 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 1.03,
-        "off_52w_high_pct": -9.27
+        "rvol": 1.35,
+        "off_52w_high_pct": -10.22
       },
       {
         "ticker": "XLY",
-        "daily": 1.15,
-        "intra": 0.43,
-        "5d": -0.69,
-        "20d": 0.96,
+        "daily": 0.53,
+        "intra": -0.06,
+        "5d": -1.29,
+        "20d": null,
         "atr_pct": 1.4,
-        "dist_sma50_atr": 0.63,
+        "dist_sma50_atr": 0.2,
         "rs": 30.0,
         "rs_chart": "data/charts/XLY.png",
         "long": [
@@ -319,17 +319,17 @@
           "SCC"
         ],
         "abc": "A",
-        "rvol": 0.74,
-        "off_52w_high_pct": -5.49
+        "rvol": 0.57,
+        "off_52w_high_pct": -6.07
       },
       {
         "ticker": "XLRE",
-        "daily": -0.4,
-        "intra": -0.9,
-        "5d": -1.33,
-        "20d": -1.31,
+        "daily": -0.95,
+        "intra": -0.15,
+        "5d": -1.87,
+        "20d": null,
         "atr_pct": 1.2,
-        "dist_sma50_atr": -0.74,
+        "dist_sma50_atr": -1.15,
         "rs": 15.0,
         "rs_chart": "data/charts/XLRE.png",
         "long": [
@@ -339,17 +339,17 @@
           "DRV"
         ],
         "abc": "B",
-        "rvol": 0.73,
-        "off_52w_high_pct": -3.33
+        "rvol": 0.91,
+        "off_52w_high_pct": -3.86
       },
       {
         "ticker": "XLP",
-        "daily": 0.43,
-        "intra": -0.06,
-        "5d": -0.63,
-        "20d": 0.47,
+        "daily": -0.14,
+        "intra": -0.46,
+        "5d": -1.2,
+        "20d": null,
         "atr_pct": 1.4,
-        "dist_sma50_atr": 0.5,
+        "dist_sma50_atr": 0.09,
         "rs": 40.0,
         "rs_chart": "data/charts/XLP.png",
         "long": [
@@ -359,18 +359,18 @@
           "SZK"
         ],
         "abc": "A",
-        "rvol": 0.74,
-        "off_52w_high_pct": -3.87
+        "rvol": 0.5,
+        "off_52w_high_pct": -4.42
       },
       {
         "ticker": "XLB",
-        "daily": -0.09,
-        "intra": -0.89,
-        "5d": -0.67,
-        "20d": 5.45,
-        "atr_pct": 1.6,
-        "dist_sma50_atr": 1.83,
-        "rs": 5.0,
+        "daily": -1.21,
+        "intra": -1.08,
+        "5d": -1.78,
+        "20d": null,
+        "atr_pct": 1.5,
+        "dist_sma50_atr": 1.12,
+        "rs": 0.0,
         "rs_chart": "data/charts/XLB.png",
         "long": [
           "UYM"
@@ -379,18 +379,18 @@
           "SMN"
         ],
         "abc": "A",
-        "rvol": 1.24,
-        "off_52w_high_pct": -0.91
+        "rvol": 0.85,
+        "off_52w_high_pct": -2.02
       },
       {
         "ticker": "XLE",
-        "daily": 0.63,
-        "intra": 0.53,
-        "5d": -1.51,
-        "20d": 5.26,
-        "atr_pct": 1.9,
-        "dist_sma50_atr": 4.2,
-        "rs": 95.0,
+        "daily": 2.43,
+        "intra": 0.01,
+        "5d": 0.26,
+        "20d": null,
+        "atr_pct": 2.0,
+        "dist_sma50_atr": 4.86,
+        "rs": 100.0,
         "rs_chart": "data/charts/XLE.png",
         "long": [
           "ERX"
@@ -399,133 +399,133 @@
           "ERY"
         ],
         "abc": "A",
-        "rvol": 0.79,
-        "off_52w_high_pct": -1.68
+        "rvol": 0.8,
+        "off_52w_high_pct": 0.0
       },
       {
         "ticker": "XLV",
-        "daily": -0.24,
-        "intra": -0.16,
-        "5d": -1.98,
-        "20d": 5.3,
+        "daily": -0.51,
+        "intra": 0.27,
+        "5d": -2.24,
+        "20d": null,
         "atr_pct": 1.6,
-        "dist_sma50_atr": 2.92,
-        "rs": 45.0,
+        "dist_sma50_atr": 2.65,
+        "rs": 55.0,
         "rs_chart": "data/charts/XLV.png",
         "long": [
           "CURE"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.55,
-        "off_52w_high_pct": -2.57
+        "rvol": 0.6,
+        "off_52w_high_pct": -2.83
       }
     ],
     "Industries": [
       {
         "ticker": "TAN",
-        "daily": -2.19,
-        "intra": -2.37,
-        "5d": -1.36,
-        "20d": -1.38,
-        "atr_pct": 3.1,
-        "dist_sma50_atr": -2.75,
+        "daily": -4.53,
+        "intra": -1.48,
+        "5d": -3.72,
+        "20d": null,
+        "atr_pct": 3.3,
+        "dist_sma50_atr": -3.22,
         "rs": 60.0,
         "rs_chart": "data/charts/TAN.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.54,
-        "off_52w_high_pct": -34.19
+        "rvol": 0.88,
+        "off_52w_high_pct": -35.77
       },
       {
         "ticker": "KCE",
-        "daily": -0.26,
-        "intra": -0.62,
-        "5d": 1.04,
-        "20d": 7.09,
+        "daily": -0.35,
+        "intra": 0.28,
+        "5d": 0.95,
+        "20d": null,
         "atr_pct": 1.3,
-        "dist_sma50_atr": 5.54,
-        "rs": 35.0,
+        "dist_sma50_atr": 5.38,
+        "rs": 55.0,
         "rs_chart": "data/charts/KCE.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.63,
-        "off_52w_high_pct": -0.26
+        "rvol": 1.01,
+        "off_52w_high_pct": -0.35
       },
       {
         "ticker": "IBUY",
-        "daily": 0.41,
-        "intra": -0.22,
-        "5d": -0.26,
-        "20d": 3.06,
-        "atr_pct": 1.3,
-        "dist_sma50_atr": 2.18,
-        "rs": 10.0,
+        "daily": -1.09,
+        "intra": -1.2,
+        "5d": -1.75,
+        "20d": null,
+        "atr_pct": 1.4,
+        "dist_sma50_atr": 1.0,
+        "rs": 5.0,
         "rs_chart": "data/charts/IBUY.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.46,
-        "off_52w_high_pct": -6.43
+        "rvol": 0.34,
+        "off_52w_high_pct": -7.83
       },
       {
         "ticker": "QQQE",
-        "daily": -0.91,
-        "intra": -0.51,
-        "5d": -0.39,
-        "20d": 4.44,
-        "atr_pct": 1.0,
-        "dist_sma50_atr": 1.68,
+        "daily": -1.35,
+        "intra": -0.11,
+        "5d": -0.83,
+        "20d": null,
+        "atr_pct": 1.1,
+        "dist_sma50_atr": 1.21,
         "rs": 0.0,
         "rs_chart": "data/charts/QQQE.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.98,
-        "off_52w_high_pct": -1.94
+        "rvol": 0.61,
+        "off_52w_high_pct": -2.37
       },
       {
         "ticker": "JETS",
-        "daily": -0.58,
-        "intra": -1.29,
-        "5d": -1.32,
-        "20d": -6.71,
-        "atr_pct": 2.3,
-        "dist_sma50_atr": -3.01,
+        "daily": -2.78,
+        "intra": -1.14,
+        "5d": -3.5,
+        "20d": null,
+        "atr_pct": 2.5,
+        "dist_sma50_atr": -3.62,
         "rs": 0.0,
         "rs_chart": "data/charts/JETS.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.7,
-        "off_52w_high_pct": -12.97
+        "rvol": 1.23,
+        "off_52w_high_pct": -14.9
       },
       {
         "ticker": "IBB",
-        "daily": -2.72,
-        "intra": -2.05,
-        "5d": -2.16,
-        "20d": 12.09,
-        "atr_pct": 2.0,
-        "dist_sma50_atr": 3.64,
-        "rs": 40.0,
+        "daily": -3.09,
+        "intra": 0.45,
+        "5d": -2.52,
+        "20d": null,
+        "atr_pct": 2.1,
+        "dist_sma50_atr": 3.3,
+        "rs": 50.0,
         "rs_chart": "data/charts/IBB.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.88,
-        "off_52w_high_pct": -3.69
+        "rvol": 0.53,
+        "off_52w_high_pct": -4.05
       },
       {
         "ticker": "SMH",
-        "daily": -3.47,
-        "intra": -2.71,
-        "5d": -1.3,
-        "20d": 2.33,
+        "daily": -3.13,
+        "intra": 0.13,
+        "5d": -0.95,
+        "20d": null,
         "atr_pct": 3.4,
-        "dist_sma50_atr": -1.48,
+        "dist_sma50_atr": -1.39,
         "rs": 0.0,
         "rs_chart": "data/charts/SMH.png",
         "long": [
@@ -535,49 +535,49 @@
           "SOXS"
         ],
         "abc": "C",
-        "rvol": 0.84,
-        "off_52w_high_pct": -17.31
+        "rvol": 0.42,
+        "off_52w_high_pct": -17.02
       },
       {
         "ticker": "CIBR",
-        "daily": -2.21,
-        "intra": -2.09,
-        "5d": 3.91,
-        "20d": 7.33,
-        "atr_pct": 2.9,
-        "dist_sma50_atr": 2.19,
-        "rs": 55.0,
+        "daily": -0.63,
+        "intra": 1.6,
+        "5d": 5.59,
+        "20d": null,
+        "atr_pct": 2.8,
+        "dist_sma50_atr": 2.88,
+        "rs": 60.0,
         "rs_chart": "data/charts/CIBR.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.97,
-        "off_52w_high_pct": -3.56
+        "rvol": 0.95,
+        "off_52w_high_pct": -2.0
       },
       {
         "ticker": "UTES",
-        "daily": -1.3,
-        "intra": -1.61,
-        "5d": -0.34,
-        "20d": -4.89,
+        "daily": -1.31,
+        "intra": 0.37,
+        "5d": -0.35,
+        "20d": null,
         "atr_pct": 1.8,
-        "dist_sma50_atr": -3.81,
+        "dist_sma50_atr": -3.8,
         "rs": 0.0,
         "rs_chart": "data/charts/UTES.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 1.12,
-        "off_52w_high_pct": -14.68
+        "rvol": 0.57,
+        "off_52w_high_pct": -14.69
       },
       {
         "ticker": "ROBO",
-        "daily": -1.89,
-        "intra": -1.74,
-        "5d": -0.65,
-        "20d": 1.75,
+        "daily": -2.18,
+        "intra": -0.48,
+        "5d": -0.95,
+        "20d": null,
         "atr_pct": 1.9,
-        "dist_sma50_atr": -0.78,
+        "dist_sma50_atr": -0.93,
         "rs": 5.0,
         "rs_chart": "data/charts/ROBO.png",
         "long": [
@@ -585,51 +585,51 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 0.87,
-        "off_52w_high_pct": -10.74
+        "rvol": 0.37,
+        "off_52w_high_pct": -11.0
       },
       {
         "ticker": "IGV",
-        "daily": -0.74,
-        "intra": -0.28,
-        "5d": 5.93,
-        "20d": 15.78,
+        "daily": 0.01,
+        "intra": 1.49,
+        "5d": 6.74,
+        "20d": null,
         "atr_pct": 2.6,
-        "dist_sma50_atr": 5.41,
-        "rs": 95.0,
+        "dist_sma50_atr": 5.83,
+        "rs": 100.0,
         "rs_chart": "data/charts/IGV.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.35,
-        "off_52w_high_pct": -7.02
+        "rvol": 0.48,
+        "off_52w_high_pct": -6.31
       },
       {
         "ticker": "WCLD",
-        "daily": -0.39,
-        "intra": -0.23,
-        "5d": 5.51,
-        "20d": 20.96,
+        "daily": 0.14,
+        "intra": 1.2,
+        "5d": 6.07,
+        "20d": null,
         "atr_pct": 3.1,
-        "dist_sma50_atr": 6.45,
-        "rs": 95.0,
+        "dist_sma50_atr": 6.72,
+        "rs": 100.0,
         "rs_chart": "data/charts/WCLD.png",
         "long": [
           "CLDL"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.72,
-        "off_52w_high_pct": -0.39
+        "rvol": 0.54,
+        "off_52w_high_pct": 0.0
       },
       {
         "ticker": "ITA",
-        "daily": -0.61,
-        "intra": -1.03,
-        "5d": -1.9,
-        "20d": -2.85,
-        "atr_pct": 1.9,
-        "dist_sma50_atr": -1.8,
+        "daily": -2.34,
+        "intra": -0.88,
+        "5d": -3.61,
+        "20d": null,
+        "atr_pct": 2.0,
+        "dist_sma50_atr": -2.5,
         "rs": 0.0,
         "rs_chart": "data/charts/ITA.png",
         "long": [
@@ -637,99 +637,99 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 1.2,
-        "off_52w_high_pct": -8.06
+        "rvol": 0.85,
+        "off_52w_high_pct": -9.65
       },
       {
         "ticker": "PAVE",
-        "daily": -1.34,
-        "intra": -1.5,
-        "5d": -1.92,
-        "20d": -1.86,
-        "atr_pct": 1.7,
-        "dist_sma50_atr": -2.02,
+        "daily": -2.4,
+        "intra": -0.62,
+        "5d": -2.97,
+        "20d": null,
+        "atr_pct": 1.8,
+        "dist_sma50_atr": -2.54,
         "rs": 0.0,
         "rs_chart": "data/charts/PAVE.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 1.0,
-        "off_52w_high_pct": -7.64
+        "rvol": 0.82,
+        "off_52w_high_pct": -8.63
       },
       {
         "ticker": "BLOK",
-        "daily": -4.38,
-        "intra": -3.24,
-        "5d": -1.4,
-        "20d": 4.74,
+        "daily": -3.94,
+        "intra": 0.45,
+        "5d": -0.95,
+        "20d": null,
         "atr_pct": 3.2,
-        "dist_sma50_atr": 0.22,
-        "rs": 30.0,
+        "dist_sma50_atr": 0.36,
+        "rs": 55.0,
         "rs_chart": "data/charts/BLOK.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 2.27,
-        "off_52w_high_pct": -15.54
+        "rvol": 1.11,
+        "off_52w_high_pct": -15.16
       },
       {
         "ticker": "AIQ",
-        "daily": -0.5,
-        "intra": -0.28,
-        "5d": 1.25,
-        "20d": 9.05,
+        "daily": -0.44,
+        "intra": 0.18,
+        "5d": 1.3,
+        "20d": null,
         "atr_pct": 2.0,
-        "dist_sma50_atr": 1.59,
-        "rs": 55.0,
+        "dist_sma50_atr": 1.66,
+        "rs": 75.0,
         "rs_chart": "data/charts/AIQ.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.58,
-        "off_52w_high_pct": -8.44
+        "rvol": 0.51,
+        "off_52w_high_pct": -8.39
       },
       {
         "ticker": "IYZ",
-        "daily": -0.78,
-        "intra": -0.83,
-        "5d": 0.02,
-        "20d": 4.64,
+        "daily": -0.52,
+        "intra": 0.5,
+        "5d": 0.29,
+        "20d": null,
         "atr_pct": 1.7,
-        "dist_sma50_atr": 1.49,
-        "rs": 75.0,
+        "dist_sma50_atr": 1.65,
+        "rs": 90.0,
         "rs_chart": "data/charts/IYZ.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.59,
-        "off_52w_high_pct": -5.98
+        "rvol": 0.18,
+        "off_52w_high_pct": -5.73
       },
       {
         "ticker": "PEJ",
-        "daily": 0.06,
-        "intra": -0.39,
-        "5d": -1.56,
-        "20d": 0.04,
-        "atr_pct": 1.2,
-        "dist_sma50_atr": 0.12,
-        "rs": 5.0,
+        "daily": -2.21,
+        "intra": -2.01,
+        "5d": -3.8,
+        "20d": null,
+        "atr_pct": 1.4,
+        "dist_sma50_atr": -1.55,
+        "rs": 0.0,
         "rs_chart": "data/charts/PEJ.png",
         "long": [
           "OOTO"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.21,
-        "off_52w_high_pct": -3.09
+        "rvol": 0.64,
+        "off_52w_high_pct": -5.29
       },
       {
         "ticker": "FDN",
-        "daily": 0.2,
-        "intra": 0.42,
-        "5d": 2.69,
-        "20d": 7.14,
+        "daily": -0.34,
+        "intra": 0.07,
+        "5d": 2.14,
+        "20d": null,
         "atr_pct": 1.6,
-        "dist_sma50_atr": 4.22,
+        "dist_sma50_atr": 3.95,
         "rs": 100.0,
         "rs_chart": "data/charts/FDN.png",
         "long": [
@@ -739,34 +739,34 @@
           "WEBS"
         ],
         "abc": "A",
-        "rvol": 0.4,
-        "off_52w_high_pct": -0.28
+        "rvol": 0.35,
+        "off_52w_high_pct": -0.82
       },
       {
         "ticker": "KBE",
-        "daily": 0.06,
-        "intra": -0.26,
-        "5d": -0.41,
-        "20d": -1.71,
+        "daily": -0.86,
+        "intra": -0.67,
+        "5d": -1.32,
+        "20d": null,
         "atr_pct": 1.3,
-        "dist_sma50_atr": -0.83,
+        "dist_sma50_atr": -1.48,
         "rs": 15.0,
         "rs_chart": "data/charts/KBE.png",
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.69,
-        "off_52w_high_pct": -4.48
+        "rvol": 0.47,
+        "off_52w_high_pct": -5.36
       },
       {
         "ticker": "UNG",
-        "daily": -0.96,
-        "intra": -0.58,
-        "5d": 3.4,
-        "20d": 2.68,
+        "daily": 0.72,
+        "intra": 0.82,
+        "5d": 5.16,
+        "20d": null,
         "atr_pct": 2.6,
-        "dist_sma50_atr": -0.88,
-        "rs": 35.0,
+        "dist_sma50_atr": -0.26,
+        "rs": 90.0,
         "rs_chart": "data/charts/UNG.png",
         "long": [
           "BOIL"
@@ -775,69 +775,69 @@
           "KOLD"
         ],
         "abc": "B",
-        "rvol": 0.87,
-        "off_52w_high_pct": -38.88
+        "rvol": 0.89,
+        "off_52w_high_pct": -37.84
       },
       {
         "ticker": "BOAT",
-        "daily": 0.04,
-        "intra": -0.41,
-        "5d": -1.43,
-        "20d": 11.17,
+        "daily": -0.47,
+        "intra": -1.14,
+        "5d": -1.93,
+        "20d": null,
         "atr_pct": 2.1,
-        "dist_sma50_atr": 6.34,
-        "rs": 75.0,
+        "dist_sma50_atr": 6.14,
+        "rs": 85.0,
         "rs_chart": "data/charts/BOAT.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.54,
-        "off_52w_high_pct": -2.41
+        "rvol": 0.43,
+        "off_52w_high_pct": -2.91
       },
       {
         "ticker": "KWEB",
-        "daily": 0.84,
-        "intra": -0.27,
-        "5d": -1.28,
-        "20d": -7.62,
+        "daily": -0.77,
+        "intra": -1.37,
+        "5d": -2.85,
+        "20d": null,
         "atr_pct": 1.9,
-        "dist_sma50_atr": -0.53,
-        "rs": 40.0,
+        "dist_sma50_atr": -1.34,
+        "rs": 35.0,
         "rs_chart": "data/charts/KWEB.png",
         "long": [
           "CWEB"
         ],
         "short": [],
         "abc": "B",
-        "rvol": 0.58,
-        "off_52w_high_pct": -34.97
+        "rvol": 0.43,
+        "off_52w_high_pct": -36.01
       },
       {
         "ticker": "KRE",
-        "daily": -0.07,
-        "intra": -0.3,
-        "5d": -0.75,
-        "20d": -2.31,
-        "atr_pct": 1.4,
-        "dist_sma50_atr": -1.12,
-        "rs": 15.0,
+        "daily": -1.09,
+        "intra": -0.82,
+        "5d": -1.76,
+        "20d": null,
+        "atr_pct": 1.5,
+        "dist_sma50_atr": -1.77,
+        "rs": 10.0,
         "rs_chart": "data/charts/KRE.png",
         "long": [
           "DPST"
         ],
         "short": [],
         "abc": "C",
-        "rvol": 1.21,
-        "off_52w_high_pct": -4.66
+        "rvol": 0.65,
+        "off_52w_high_pct": -5.63
       },
       {
         "ticker": "IBIT",
-        "daily": -3.07,
-        "intra": -2.15,
-        "5d": 0.5,
-        "20d": 23.18,
-        "atr_pct": 2.8,
-        "dist_sma50_atr": 6.57,
+        "daily": -1.13,
+        "intra": 1.4,
+        "5d": 2.52,
+        "20d": null,
+        "atr_pct": 2.7,
+        "dist_sma50_atr": 7.75,
         "rs": 80.0,
         "rs_chart": "data/charts/IBIT.png",
         "long": [
@@ -849,17 +849,17 @@
           "BITI"
         ],
         "abc": "A",
-        "rvol": 1.42,
-        "off_52w_high_pct": -38.42
+        "rvol": 0.71,
+        "off_52w_high_pct": -37.19
       },
       {
         "ticker": "XRT",
-        "daily": 0.35,
-        "intra": -0.28,
-        "5d": -0.93,
-        "20d": -3.22,
+        "daily": -0.5,
+        "intra": -0.77,
+        "5d": -1.77,
+        "20d": null,
         "atr_pct": 1.7,
-        "dist_sma50_atr": -1.05,
+        "dist_sma50_atr": -1.52,
         "rs": 15.0,
         "rs_chart": "data/charts/XRT.png",
         "long": [
@@ -867,85 +867,85 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 0.62,
-        "off_52w_high_pct": -5.91
+        "rvol": 0.56,
+        "off_52w_high_pct": -6.7
       },
       {
         "ticker": "IHI",
-        "daily": 1.04,
-        "intra": 0.95,
-        "5d": -1.74,
-        "20d": 5.1,
+        "daily": 0.53,
+        "intra": 0.33,
+        "5d": -2.24,
+        "20d": null,
         "atr_pct": 1.8,
-        "dist_sma50_atr": 2.82,
-        "rs": 55.0,
+        "dist_sma50_atr": 2.51,
+        "rs": 65.0,
         "rs_chart": "data/charts/IHI.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.71,
-        "off_52w_high_pct": -14.11
+        "rvol": 0.58,
+        "off_52w_high_pct": -14.55
       },
       {
         "ticker": "DRIV",
-        "daily": -0.67,
-        "intra": -1.12,
-        "5d": -0.99,
-        "20d": 3.51,
+        "daily": -1.07,
+        "intra": -0.26,
+        "5d": -1.39,
+        "20d": null,
         "atr_pct": 2.1,
-        "dist_sma50_atr": -1.31,
-        "rs": 5.0,
+        "dist_sma50_atr": -1.51,
+        "rs": 35.0,
         "rs_chart": "data/charts/DRIV.png",
         "long": [
           "EVAV"
         ],
         "short": [],
         "abc": "C",
-        "rvol": 0.29,
-        "off_52w_high_pct": -18.53
+        "rvol": 0.39,
+        "off_52w_high_pct": -18.86
       },
       {
         "ticker": "MSOS",
-        "daily": 3.31,
-        "intra": 3.74,
-        "5d": 0.6,
-        "20d": 17.97,
-        "atr_pct": 4.4,
-        "dist_sma50_atr": 2.17,
-        "rs": 90.0,
+        "daily": 2.68,
+        "intra": -1.2,
+        "5d": -0.01,
+        "20d": null,
+        "atr_pct": 4.3,
+        "dist_sma50_atr": 2.08,
+        "rs": 95.0,
         "rs_chart": "data/charts/MSOS.png",
         "long": [
           "MSOX"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 2.13,
-        "off_52w_high_pct": -25.41
+        "rvol": 0.77,
+        "off_52w_high_pct": -25.87
       },
       {
         "ticker": "SOCL",
-        "daily": 1.12,
-        "intra": -1.0,
-        "5d": 0.4,
-        "20d": -0.57,
+        "daily": -0.65,
+        "intra": -1.68,
+        "5d": -1.36,
+        "20d": null,
         "atr_pct": 1.8,
-        "dist_sma50_atr": -0.25,
-        "rs": 50.0,
+        "dist_sma50_atr": -1.18,
+        "rs": 45.0,
         "rs_chart": "data/charts/SOCL.png",
         "long": [],
         "short": [],
-        "abc": "B",
-        "rvol": 12.1,
-        "off_52w_high_pct": -27.51
+        "abc": "C",
+        "rvol": 0.75,
+        "off_52w_high_pct": -28.78
       },
       {
         "ticker": "XLU",
-        "daily": -1.04,
-        "intra": -1.41,
-        "5d": -0.09,
-        "20d": -3.65,
-        "atr_pct": 1.5,
-        "dist_sma50_atr": -2.86,
+        "daily": -2.07,
+        "intra": 0.68,
+        "5d": -1.13,
+        "20d": null,
+        "atr_pct": 1.6,
+        "dist_sma50_atr": -3.28,
         "rs": 5.0,
         "rs_chart": "data/charts/XLU.png",
         "long": [
@@ -953,50 +953,50 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 1.03,
-        "off_52w_high_pct": -9.27
+        "rvol": 1.35,
+        "off_52w_high_pct": -10.22
       },
       {
         "ticker": "ARKF",
-        "daily": -1.98,
-        "intra": -1.58,
-        "5d": 0.83,
-        "20d": 16.27,
-        "atr_pct": 2.3,
-        "dist_sma50_atr": 4.37,
-        "rs": 75.0,
+        "daily": -1.46,
+        "intra": 0.97,
+        "5d": 1.37,
+        "20d": null,
+        "atr_pct": 2.4,
+        "dist_sma50_atr": 4.5,
+        "rs": 85.0,
         "rs_chart": "data/charts/ARKF.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.47,
-        "off_52w_high_pct": -21.56
+        "rvol": 0.84,
+        "off_52w_high_pct": -21.14
       },
       {
         "ticker": "SLX",
-        "daily": -0.95,
-        "intra": -1.32,
-        "5d": 1.39,
-        "20d": 3.04,
+        "daily": -1.15,
+        "intra": -0.49,
+        "5d": 1.18,
+        "20d": null,
         "atr_pct": 1.6,
-        "dist_sma50_atr": 2.83,
-        "rs": 40.0,
+        "dist_sma50_atr": 2.69,
+        "rs": 50.0,
         "rs_chart": "data/charts/SLX.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.47,
-        "off_52w_high_pct": -4.3
+        "rvol": 0.26,
+        "off_52w_high_pct": -4.49
       },
       {
         "ticker": "ARKK",
-        "daily": -3.19,
-        "intra": -2.44,
-        "5d": -1.88,
-        "20d": 18.74,
+        "daily": -2.48,
+        "intra": 1.63,
+        "5d": -1.16,
+        "20d": null,
         "atr_pct": 2.9,
-        "dist_sma50_atr": 2.47,
-        "rs": 55.0,
+        "dist_sma50_atr": 2.71,
+        "rs": 70.0,
         "rs_chart": "data/charts/ARKK.png",
         "long": [
           "TARK"
@@ -1005,17 +1005,17 @@
           "SARK"
         ],
         "abc": "A",
-        "rvol": 1.02,
-        "off_52w_high_pct": -8.58
+        "rvol": 0.5,
+        "off_52w_high_pct": -7.91
       },
       {
         "ticker": "XTN",
-        "daily": -0.41,
-        "intra": -0.61,
-        "5d": -1.45,
-        "20d": -2.2,
+        "daily": -1.26,
+        "intra": -0.31,
+        "5d": -2.29,
+        "20d": null,
         "atr_pct": 1.6,
-        "dist_sma50_atr": -3.29,
+        "dist_sma50_atr": -3.76,
         "rs": 30.0,
         "rs_chart": "data/charts/XTN.png",
         "long": [
@@ -1023,49 +1023,49 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 0.67,
-        "off_52w_high_pct": -9.46
+        "rvol": 2.02,
+        "off_52w_high_pct": -10.24
       },
       {
         "ticker": "XME",
-        "daily": -3.46,
-        "intra": -3.67,
-        "5d": -0.5,
-        "20d": 17.97,
-        "atr_pct": 3.2,
-        "dist_sma50_atr": 2.79,
-        "rs": 65.0,
+        "daily": -4.12,
+        "intra": -0.97,
+        "5d": -1.18,
+        "20d": null,
+        "atr_pct": 3.3,
+        "dist_sma50_atr": 2.55,
+        "rs": 70.0,
         "rs_chart": "data/charts/XME.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.74,
-        "off_52w_high_pct": -10.55
+        "rvol": 0.32,
+        "off_52w_high_pct": -11.16
       },
       {
         "ticker": "KIE",
-        "daily": 0.41,
-        "intra": 0.16,
-        "5d": 0.79,
-        "20d": -0.51,
+        "daily": -0.59,
+        "intra": -0.62,
+        "5d": -0.21,
+        "20d": null,
         "atr_pct": 1.4,
-        "dist_sma50_atr": 0.73,
-        "rs": 10.0,
+        "dist_sma50_atr": 0.02,
+        "rs": 5.0,
         "rs_chart": "data/charts/KIE.png",
         "long": [],
         "short": [],
-        "abc": "A",
-        "rvol": 0.77,
-        "off_52w_high_pct": -3.82
+        "abc": "B",
+        "rvol": 0.9,
+        "off_52w_high_pct": -4.78
       },
       {
         "ticker": "GLD",
-        "daily": -3.24,
-        "intra": -3.16,
-        "5d": -3.42,
-        "20d": 10.05,
-        "atr_pct": 1.9,
-        "dist_sma50_atr": 3.04,
+        "daily": -3.64,
+        "intra": -0.13,
+        "5d": -3.81,
+        "20d": null,
+        "atr_pct": 2.0,
+        "dist_sma50_atr": 2.8,
         "rs": 70.0,
         "rs_chart": "data/charts/GLD.png",
         "long": [
@@ -1075,49 +1075,49 @@
           "GLL"
         ],
         "abc": "A",
-        "rvol": 2.26,
-        "off_52w_high_pct": -17.55
+        "rvol": 0.6,
+        "off_52w_high_pct": -17.88
       },
       {
         "ticker": "GXC",
-        "daily": 0.35,
-        "intra": 0.07,
-        "5d": -0.27,
-        "20d": -0.24,
+        "daily": -0.09,
+        "intra": -0.32,
+        "5d": -0.71,
+        "20d": null,
         "atr_pct": 0.9,
-        "dist_sma50_atr": 2.11,
+        "dist_sma50_atr": 1.62,
         "rs": 80.0,
         "rs_chart": "data/charts/GXC.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 3.73,
-        "off_52w_high_pct": -12.69
+        "rvol": 0.46,
+        "off_52w_high_pct": -13.07
       },
       {
         "ticker": "SCHH",
-        "daily": -0.46,
-        "intra": -0.96,
-        "5d": -1.25,
-        "20d": -2.22,
-        "atr_pct": 1.1,
-        "dist_sma50_atr": -1.27,
+        "daily": -1.01,
+        "intra": -0.21,
+        "5d": -1.79,
+        "20d": null,
+        "atr_pct": 1.2,
+        "dist_sma50_atr": -1.66,
         "rs": 15.0,
         "rs_chart": "data/charts/SCHH.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.89,
-        "off_52w_high_pct": -4.51
+        "rvol": 0.94,
+        "off_52w_high_pct": -5.03
       },
       {
         "ticker": "GDX",
-        "daily": -3.9,
-        "intra": -4.4,
-        "5d": -3.09,
-        "20d": 34.48,
-        "atr_pct": 3.7,
-        "dist_sma50_atr": 5.71,
+        "daily": -5.09,
+        "intra": -0.87,
+        "5d": -4.3,
+        "20d": null,
+        "atr_pct": 3.8,
+        "dist_sma50_atr": 5.17,
         "rs": 65.0,
         "rs_chart": "data/charts/GDX.png",
         "long": [
@@ -1129,33 +1129,33 @@
           "GDXD"
         ],
         "abc": "A",
-        "rvol": 1.6,
-        "off_52w_high_pct": -13.98
+        "rvol": 0.5,
+        "off_52w_high_pct": -15.05
       },
       {
         "ticker": "IPAY",
-        "daily": -1.22,
-        "intra": -0.79,
-        "5d": -0.9,
-        "20d": 3.62,
-        "atr_pct": 1.7,
-        "dist_sma50_atr": 2.9,
+        "daily": -2.04,
+        "intra": -0.39,
+        "5d": -1.72,
+        "20d": null,
+        "atr_pct": 1.8,
+        "dist_sma50_atr": 2.26,
         "rs": 40.0,
         "rs_chart": "data/charts/IPAY.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.38,
-        "off_52w_high_pct": -13.56
+        "rvol": 0.77,
+        "off_52w_high_pct": -14.28
       },
       {
         "ticker": "IWM",
-        "daily": -1.35,
-        "intra": -1.32,
-        "5d": -1.4,
-        "20d": 1.56,
-        "atr_pct": 1.1,
-        "dist_sma50_atr": -0.47,
+        "daily": -2.11,
+        "intra": -0.55,
+        "5d": -2.16,
+        "20d": null,
+        "atr_pct": 1.2,
+        "dist_sma50_atr": -1.06,
         "rs": 0.0,
         "rs_chart": "data/charts/IWM.png",
         "long": [
@@ -1164,19 +1164,19 @@
         "short": [
           "TZA"
         ],
-        "abc": "A",
-        "rvol": 1.1,
-        "off_52w_high_pct": -3.06
+        "abc": "B",
+        "rvol": 0.91,
+        "off_52w_high_pct": -3.81
       },
       {
         "ticker": "XOP",
-        "daily": 0.25,
-        "intra": 0.26,
-        "5d": -1.9,
-        "20d": 4.81,
-        "atr_pct": 2.3,
-        "dist_sma50_atr": 4.09,
-        "rs": 90.0,
+        "daily": 1.5,
+        "intra": -0.8,
+        "5d": -0.68,
+        "20d": null,
+        "atr_pct": 2.4,
+        "dist_sma50_atr": 4.51,
+        "rs": 95.0,
         "rs_chart": "data/charts/XOP.png",
         "long": [
           "GUSH"
@@ -1185,33 +1185,33 @@
           "DRIP"
         ],
         "abc": "A",
-        "rvol": 0.53,
-        "off_52w_high_pct": -1.9
+        "rvol": 0.51,
+        "off_52w_high_pct": -0.68
       },
       {
         "ticker": "VNQ",
-        "daily": -0.42,
-        "intra": -0.88,
-        "5d": -1.28,
-        "20d": -1.73,
-        "atr_pct": 1.1,
-        "dist_sma50_atr": -0.91,
+        "daily": -1.03,
+        "intra": -0.28,
+        "5d": -1.88,
+        "20d": null,
+        "atr_pct": 1.2,
+        "dist_sma50_atr": -1.37,
         "rs": 15.0,
         "rs_chart": "data/charts/VNQ.png",
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.73,
-        "off_52w_high_pct": -3.68
+        "rvol": 0.8,
+        "off_52w_high_pct": -4.26
       },
       {
         "ticker": "FXI",
-        "daily": 0.77,
-        "intra": -0.03,
-        "5d": -0.98,
-        "20d": -2.71,
+        "daily": 0.5,
+        "intra": -0.69,
+        "5d": -1.24,
+        "20d": null,
         "atr_pct": 1.2,
-        "dist_sma50_atr": 2.49,
+        "dist_sma50_atr": 2.24,
         "rs": 90.0,
         "rs_chart": "data/charts/FXI.png",
         "long": [
@@ -1221,97 +1221,97 @@
           "YANG"
         ],
         "abc": "A",
-        "rvol": 0.92,
-        "off_52w_high_pct": -13.38
+        "rvol": 0.41,
+        "off_52w_high_pct": -13.61
       },
       {
         "ticker": "DBA",
-        "daily": 1.28,
-        "intra": 0.62,
-        "5d": 3.07,
-        "20d": 6.11,
+        "daily": 1.8,
+        "intra": 0.86,
+        "5d": 3.6,
+        "20d": null,
         "atr_pct": 1.0,
-        "dist_sma50_atr": 5.52,
-        "rs": 85.0,
+        "dist_sma50_atr": 5.86,
+        "rs": 95.0,
         "rs_chart": "data/charts/DBA.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 3.5,
+        "rvol": 1.92,
         "off_52w_high_pct": 0.0
       },
       {
         "ticker": "ICLN",
-        "daily": -1.96,
-        "intra": -1.91,
-        "5d": -0.63,
-        "20d": -0.4,
-        "atr_pct": 2.4,
-        "dist_sma50_atr": -2.58,
-        "rs": 45.0,
+        "daily": -3.03,
+        "intra": -0.92,
+        "5d": -1.71,
+        "20d": null,
+        "atr_pct": 2.5,
+        "dist_sma50_atr": -2.9,
+        "rs": 55.0,
         "rs_chart": "data/charts/ICLN.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.87,
-        "off_52w_high_pct": -26.2
+        "rvol": 0.62,
+        "off_52w_high_pct": -27.0
       },
       {
         "ticker": "SILJ",
-        "daily": -4.37,
-        "intra": -5.4,
-        "5d": -0.69,
-        "20d": 31.63,
-        "atr_pct": 4.1,
-        "dist_sma50_atr": 4.05,
+        "daily": -5.76,
+        "intra": -1.51,
+        "5d": -2.13,
+        "20d": null,
+        "atr_pct": 4.2,
+        "dist_sma50_atr": 3.59,
         "rs": 65.0,
         "rs_chart": "data/charts/SILJ.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.81,
-        "off_52w_high_pct": -21.32
+        "rvol": 0.54,
+        "off_52w_high_pct": -22.46
       },
       {
         "ticker": "REZ",
-        "daily": -0.27,
-        "intra": -0.81,
-        "5d": -1.51,
-        "20d": -1.53,
+        "daily": -0.99,
+        "intra": -0.25,
+        "5d": -2.22,
+        "20d": null,
         "atr_pct": 1.3,
-        "dist_sma50_atr": -0.89,
-        "rs": 30.0,
+        "dist_sma50_atr": -1.35,
+        "rs": 25.0,
         "rs_chart": "data/charts/REZ.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 0.59,
-        "off_52w_high_pct": -4.71
+        "rvol": 3.3,
+        "off_52w_high_pct": -5.4
       },
       {
         "ticker": "LIT",
-        "daily": -1.37,
-        "intra": -1.85,
-        "5d": -0.7,
-        "20d": 9.9,
-        "atr_pct": 1.9,
-        "dist_sma50_atr": 1.8,
+        "daily": -1.36,
+        "intra": -0.86,
+        "5d": -0.69,
+        "20d": null,
+        "atr_pct": 1.8,
+        "dist_sma50_atr": 1.85,
         "rs": 55.0,
         "rs_chart": "data/charts/LIT.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.46,
-        "off_52w_high_pct": -16.62
+        "rvol": 0.71,
+        "off_52w_high_pct": -16.6
       },
       {
         "ticker": "SLV",
-        "daily": -4.38,
-        "intra": -6.12,
-        "5d": -4.3,
-        "20d": 14.63,
-        "atr_pct": 3.3,
-        "dist_sma50_atr": 2.38,
+        "daily": -4.41,
+        "intra": -0.65,
+        "5d": -4.34,
+        "20d": null,
+        "atr_pct": 3.1,
+        "dist_sma50_atr": 2.5,
         "rs": 70.0,
         "rs_chart": "data/charts/SLV.png",
         "long": [
@@ -1321,68 +1321,68 @@
           "ZSL"
         ],
         "abc": "A",
-        "rvol": 2.22,
-        "off_52w_high_pct": -43.16
+        "rvol": 0.76,
+        "off_52w_high_pct": -43.18
       },
       {
         "ticker": "XHB",
-        "daily": 0.08,
-        "intra": -0.31,
-        "5d": -1.78,
-        "20d": 0.88,
-        "atr_pct": 2.2,
-        "dist_sma50_atr": -1.69,
-        "rs": 5.0,
+        "daily": -1.56,
+        "intra": -0.71,
+        "5d": -3.39,
+        "20d": null,
+        "atr_pct": 2.3,
+        "dist_sma50_atr": -2.36,
+        "rs": 0.0,
         "rs_chart": "data/charts/XHB.png",
         "long": [
           "NAIL"
         ],
         "short": [],
         "abc": "C",
-        "rvol": 0.81,
-        "off_52w_high_pct": -13.42
+        "rvol": 0.42,
+        "off_52w_high_pct": -14.84
       },
       {
         "ticker": "XHE",
-        "daily": -0.15,
-        "intra": -0.33,
-        "5d": -1.79,
-        "20d": 6.04,
+        "daily": -0.26,
+        "intra": 0.51,
+        "5d": -1.9,
+        "20d": null,
         "atr_pct": 1.6,
-        "dist_sma50_atr": 3.71,
-        "rs": 45.0,
+        "dist_sma50_atr": 3.52,
+        "rs": 60.0,
         "rs_chart": "data/charts/XHE.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.25,
-        "off_52w_high_pct": -2.02
+        "rvol": 0.51,
+        "off_52w_high_pct": -2.13
       },
       {
         "ticker": "PBJ",
-        "daily": 0.77,
-        "intra": 0.04,
-        "5d": -0.86,
-        "20d": 1.01,
-        "atr_pct": 1.0,
-        "dist_sma50_atr": 0.5,
-        "rs": 90.0,
+        "daily": -0.56,
+        "intra": -1.18,
+        "5d": -2.18,
+        "20d": null,
+        "atr_pct": 1.1,
+        "dist_sma50_atr": -0.73,
+        "rs": 65.0,
         "rs_chart": "data/charts/PBJ.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.16,
-        "off_52w_high_pct": -4.86
+        "rvol": 0.07,
+        "off_52w_high_pct": -6.13
       },
       {
         "ticker": "USO",
-        "daily": -0.24,
-        "intra": 1.23,
-        "5d": -3.67,
-        "20d": 0.41,
-        "atr_pct": 3.2,
-        "dist_sma50_atr": 2.24,
-        "rs": 90.0,
+        "daily": 2.58,
+        "intra": 0.26,
+        "5d": -0.95,
+        "20d": null,
+        "atr_pct": 3.3,
+        "dist_sma50_atr": 3.13,
+        "rs": 100.0,
         "rs_chart": "data/charts/USO.png",
         "long": [
           "UCO"
@@ -1391,49 +1391,49 @@
           "SCO"
         ],
         "abc": "A",
-        "rvol": 0.42,
-        "off_52w_high_pct": -15.21
+        "rvol": 0.71,
+        "off_52w_high_pct": -12.81
       },
       {
         "ticker": "DBC",
-        "daily": -0.23,
-        "intra": -0.48,
-        "5d": -1.5,
-        "20d": 4.55,
+        "daily": 1.22,
+        "intra": 0.27,
+        "5d": -0.08,
+        "20d": null,
         "atr_pct": 1.4,
-        "dist_sma50_atr": 4.77,
-        "rs": 90.0,
+        "dist_sma50_atr": 5.72,
+        "rs": 100.0,
         "rs_chart": "data/charts/DBC.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.1,
-        "off_52w_high_pct": -2.84
+        "rvol": 0.48,
+        "off_52w_high_pct": -1.44
       },
       {
         "ticker": "FCG",
-        "daily": -0.52,
-        "intra": -0.65,
-        "5d": -2.29,
-        "20d": 4.87,
-        "atr_pct": 2.2,
-        "dist_sma50_atr": 3.51,
-        "rs": 85.0,
+        "daily": 0.42,
+        "intra": -1.02,
+        "5d": -1.37,
+        "20d": null,
+        "atr_pct": 2.3,
+        "dist_sma50_atr": 3.9,
+        "rs": 95.0,
         "rs_chart": "data/charts/FCG.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.57,
-        "off_52w_high_pct": -5.45
+        "rvol": 0.99,
+        "off_52w_high_pct": -4.56
       },
       {
         "ticker": "XBI",
-        "daily": -3.48,
-        "intra": -2.6,
-        "5d": -2.02,
-        "20d": 10.46,
-        "atr_pct": 2.7,
-        "dist_sma50_atr": 1.41,
+        "daily": -4.16,
+        "intra": 0.15,
+        "5d": -2.71,
+        "20d": null,
+        "atr_pct": 2.8,
+        "dist_sma50_atr": 1.1,
         "rs": 10.0,
         "rs_chart": "data/charts/XBI.png",
         "long": [
@@ -1443,99 +1443,99 @@
           "LABD"
         ],
         "abc": "A",
-        "rvol": 1.18,
-        "off_52w_high_pct": -4.23
+        "rvol": 0.58,
+        "off_52w_high_pct": -4.9
       },
       {
         "ticker": "ARKG",
-        "daily": -4.47,
-        "intra": -3.58,
-        "5d": -3.66,
-        "20d": 23.55,
-        "atr_pct": 3.7,
-        "dist_sma50_atr": 3.6,
+        "daily": -6.0,
+        "intra": -0.64,
+        "5d": -5.2,
+        "20d": null,
+        "atr_pct": 4.0,
+        "dist_sma50_atr": 2.91,
         "rs": 20.0,
         "rs_chart": "data/charts/ARKG.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.29,
-        "off_52w_high_pct": -4.83
+        "rvol": 0.63,
+        "off_52w_high_pct": -6.35
       },
       {
         "ticker": "CPER",
-        "daily": -0.78,
-        "intra": -1.1,
-        "5d": -0.8,
-        "20d": 0.28,
+        "daily": -0.09,
+        "intra": -0.79,
+        "5d": -0.12,
+        "20d": null,
         "atr_pct": 1.4,
-        "dist_sma50_atr": 1.46,
-        "rs": 15.0,
+        "dist_sma50_atr": 2.0,
+        "rs": 45.0,
         "rs_chart": "data/charts/CPER.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.95,
-        "off_52w_high_pct": -2.89
+        "rvol": 1.07,
+        "off_52w_high_pct": -2.22
       },
       {
         "ticker": "XES",
-        "daily": -0.31,
-        "intra": -0.13,
-        "5d": -1.01,
-        "20d": 7.66,
+        "daily": 1.42,
+        "intra": -0.0,
+        "5d": 0.71,
+        "20d": null,
         "atr_pct": 2.6,
-        "dist_sma50_atr": 1.85,
-        "rs": 65.0,
+        "dist_sma50_atr": 2.52,
+        "rs": 90.0,
         "rs_chart": "data/charts/XES.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.72,
-        "off_52w_high_pct": -10.17
+        "rvol": 0.7,
+        "off_52w_high_pct": -8.61
       },
       {
         "ticker": "OIH",
-        "daily": 0.81,
-        "intra": 0.93,
-        "5d": 0.72,
-        "20d": 8.71,
-        "atr_pct": 2.5,
-        "dist_sma50_atr": 2.91,
-        "rs": 95.0,
+        "daily": 3.24,
+        "intra": 0.57,
+        "5d": 3.15,
+        "20d": null,
+        "atr_pct": 2.7,
+        "dist_sma50_atr": 3.72,
+        "rs": 100.0,
         "rs_chart": "data/charts/OIH.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.21,
-        "off_52w_high_pct": -7.84
+        "rvol": 1.16,
+        "off_52w_high_pct": -5.62
       },
       {
         "ticker": "PPH",
-        "daily": -0.39,
-        "intra": 0.03,
-        "5d": -2.58,
-        "20d": 2.92,
-        "atr_pct": 1.7,
-        "dist_sma50_atr": 1.65,
-        "rs": 35.0,
+        "daily": -0.67,
+        "intra": -0.09,
+        "5d": -2.86,
+        "20d": null,
+        "atr_pct": 1.8,
+        "dist_sma50_atr": 1.43,
+        "rs": 50.0,
         "rs_chart": "data/charts/PPH.png",
         "long": [
           "PILL"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.04,
-        "off_52w_high_pct": -3.61
+        "rvol": 0.52,
+        "off_52w_high_pct": -3.88
       },
       {
         "ticker": "FNGS",
-        "daily": 0.67,
-        "intra": 0.32,
-        "5d": 2.29,
-        "20d": 8.98,
-        "atr_pct": 1.5,
-        "dist_sma50_atr": 4.35,
+        "daily": 0.39,
+        "intra": -0.16,
+        "5d": 2.0,
+        "20d": null,
+        "atr_pct": 1.4,
+        "dist_sma50_atr": 4.36,
         "rs": 100.0,
         "rs_chart": "data/charts/FNGS.png",
         "long": [
@@ -1545,309 +1545,309 @@
           "FNGD"
         ],
         "abc": "A",
-        "rvol": 2.24,
-        "off_52w_high_pct": -0.31
+        "rvol": 1.25,
+        "off_52w_high_pct": -0.6
       },
       {
         "ticker": "URA",
-        "daily": -5.79,
-        "intra": -5.75,
-        "5d": -1.09,
-        "20d": 16.64,
-        "atr_pct": 3.8,
-        "dist_sma50_atr": 1.49,
-        "rs": 50.0,
+        "daily": -6.14,
+        "intra": -0.46,
+        "5d": -1.45,
+        "20d": null,
+        "atr_pct": 3.9,
+        "dist_sma50_atr": 1.38,
+        "rs": 65.0,
         "rs_chart": "data/charts/URA.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.86,
-        "off_52w_high_pct": -26.27
+        "rvol": 0.45,
+        "off_52w_high_pct": -26.55
       },
       {
         "ticker": "WGMI",
-        "daily": -8.09,
-        "intra": -6.34,
-        "5d": -6.63,
-        "20d": -17.02,
-        "atr_pct": 8.6,
-        "dist_sma50_atr": -2.3,
+        "daily": -8.42,
+        "intra": -0.28,
+        "5d": -6.95,
+        "20d": null,
+        "atr_pct": 8.7,
+        "dist_sma50_atr": -2.29,
         "rs": 0.0,
         "rs_chart": "data/charts/WGMI.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 1.96,
-        "off_52w_high_pct": -40.78
+        "rvol": 0.45,
+        "off_52w_high_pct": -40.98
       },
       {
         "ticker": "REMX",
-        "daily": -2.31,
-        "intra": -2.62,
-        "5d": -4.12,
-        "20d": 17.36,
-        "atr_pct": 3.1,
-        "dist_sma50_atr": -0.21,
-        "rs": 30.0,
+        "daily": -2.6,
+        "intra": -1.55,
+        "5d": -4.41,
+        "20d": null,
+        "atr_pct": 3.0,
+        "dist_sma50_atr": -0.31,
+        "rs": 35.0,
         "rs_chart": "data/charts/REMX.png",
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.91,
-        "off_52w_high_pct": -29.32
+        "rvol": 0.45,
+        "off_52w_high_pct": -29.53
       }
     ],
     "Countries": [
       {
         "ticker": "EZA",
-        "daily": -1.17,
-        "intra": -2.33,
-        "5d": -2.47,
-        "20d": 11.16,
+        "daily": -1.5,
+        "intra": -0.7,
+        "5d": -2.79,
+        "20d": null,
         "atr_pct": 2.0,
-        "dist_sma50_atr": 3.91,
+        "dist_sma50_atr": 3.8,
         "rs": 55.0,
         "rs_chart": "data/charts/EZA.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.64,
-        "off_52w_high_pct": -11.43
+        "rvol": 1.24,
+        "off_52w_high_pct": -11.72
       },
       {
         "ticker": "ARGT",
-        "daily": -0.37,
-        "intra": -0.87,
-        "5d": 1.07,
-        "20d": -1.42,
+        "daily": 0.76,
+        "intra": 0.86,
+        "5d": 2.22,
+        "20d": null,
         "atr_pct": 1.9,
-        "dist_sma50_atr": 0.38,
-        "rs": 15.0,
+        "dist_sma50_atr": 0.99,
+        "rs": 50.0,
         "rs_chart": "data/charts/ARGT.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.59,
-        "off_52w_high_pct": -8.55
+        "rvol": 0.43,
+        "off_52w_high_pct": -7.51
       },
       {
         "ticker": "EWA",
-        "daily": -0.37,
-        "intra": -0.89,
-        "5d": -0.46,
-        "20d": 2.25,
-        "atr_pct": 1.1,
-        "dist_sma50_atr": 2.86,
-        "rs": 10.0,
+        "daily": -0.38,
+        "intra": -0.28,
+        "5d": -0.48,
+        "20d": null,
+        "atr_pct": 1.0,
+        "dist_sma50_atr": 3.04,
+        "rs": 25.0,
         "rs_chart": "data/charts/EWA.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 2.05,
-        "off_52w_high_pct": -1.41
+        "rvol": 1.01,
+        "off_52w_high_pct": -1.43
       },
       {
         "ticker": "THD",
-        "daily": -1.95,
-        "intra": -0.89,
-        "5d": -3.3,
-        "20d": -1.03,
+        "daily": -1.94,
+        "intra": -0.34,
+        "5d": -3.29,
+        "20d": null,
         "atr_pct": 1.0,
-        "dist_sma50_atr": -0.22,
+        "dist_sma50_atr": -0.21,
         "rs": 0.0,
         "rs_chart": "data/charts/THD.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.63,
-        "off_52w_high_pct": -3.3
+        "rvol": 0.74,
+        "off_52w_high_pct": -3.29
       },
       {
         "ticker": "EIDO",
-        "daily": 0.16,
-        "intra": -0.55,
-        "5d": -0.86,
-        "20d": 2.34,
-        "atr_pct": 1.4,
-        "dist_sma50_atr": 2.16,
-        "rs": 50.0,
+        "daily": 0.75,
+        "intra": -0.74,
+        "5d": -0.27,
+        "20d": null,
+        "atr_pct": 1.5,
+        "dist_sma50_atr": 2.51,
+        "rs": 60.0,
         "rs_chart": "data/charts/EIDO.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.48,
-        "off_52w_high_pct": -32.89
+        "rvol": 0.46,
+        "off_52w_high_pct": -32.49
       },
       {
         "ticker": "EWC",
-        "daily": -0.85,
-        "intra": -1.07,
-        "5d": -1.01,
-        "20d": 3.94,
+        "daily": -1.4,
+        "intra": -0.68,
+        "5d": -1.56,
+        "20d": null,
         "atr_pct": 1.0,
-        "dist_sma50_atr": 3.25,
+        "dist_sma50_atr": 2.67,
         "rs": 25.0,
         "rs_chart": "data/charts/EWC.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.64,
-        "off_52w_high_pct": -1.45
+        "rvol": 0.47,
+        "off_52w_high_pct": -2.0
       },
       {
         "ticker": "GREK",
-        "daily": -0.34,
-        "intra": -0.46,
-        "5d": 0.9,
-        "20d": 6.3,
+        "daily": -0.5,
+        "intra": -0.9,
+        "5d": 0.73,
+        "20d": null,
         "atr_pct": 1.3,
-        "dist_sma50_atr": 5.98,
-        "rs": 5.0,
+        "dist_sma50_atr": 5.83,
+        "rs": 10.0,
         "rs_chart": "data/charts/GREK.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.43,
-        "off_52w_high_pct": -0.34
+        "rvol": 0.83,
+        "off_52w_high_pct": -0.5
       },
       {
         "ticker": "EWP",
-        "daily": -0.1,
-        "intra": -0.68,
-        "5d": -0.91,
-        "20d": 1.42,
+        "daily": -0.14,
+        "intra": -0.53,
+        "5d": -0.95,
+        "20d": null,
         "atr_pct": 1.0,
-        "dist_sma50_atr": 2.61,
+        "dist_sma50_atr": 2.59,
         "rs": 0.0,
         "rs_chart": "data/charts/EWP.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.3,
-        "off_52w_high_pct": -1.39
+        "rvol": 0.25,
+        "off_52w_high_pct": -1.44
       },
       {
         "ticker": "EWG",
-        "daily": 0.02,
-        "intra": -0.47,
-        "5d": 0.88,
-        "20d": 4.06,
+        "daily": -0.82,
+        "intra": -0.46,
+        "5d": 0.03,
+        "20d": null,
         "atr_pct": 0.9,
-        "dist_sma50_atr": 5.79,
+        "dist_sma50_atr": 4.67,
         "rs": 85.0,
         "rs_chart": "data/charts/EWG.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.17,
-        "off_52w_high_pct": 0.0
+        "rvol": 1.58,
+        "off_52w_high_pct": -0.82
       },
       {
         "ticker": "EWL",
-        "daily": -0.63,
-        "intra": -0.89,
-        "5d": -1.63,
-        "20d": 0.24,
+        "daily": -1.46,
+        "intra": -0.68,
+        "5d": -2.45,
+        "20d": null,
         "atr_pct": 1.1,
-        "dist_sma50_atr": 0.23,
+        "dist_sma50_atr": -0.53,
         "rs": 0.0,
         "rs_chart": "data/charts/EWL.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.38,
-        "off_52w_high_pct": -2.15
+        "rvol": 0.35,
+        "off_52w_high_pct": -2.97
       },
       {
         "ticker": "EUFN",
-        "daily": 0.33,
-        "intra": -0.31,
-        "5d": 0.24,
-        "20d": 1.56,
+        "daily": 0.15,
+        "intra": -0.11,
+        "5d": 0.06,
+        "20d": null,
         "atr_pct": 1.0,
-        "dist_sma50_atr": 3.54,
-        "rs": 0.0,
+        "dist_sma50_atr": 3.34,
+        "rs": 5.0,
         "rs_chart": "data/charts/EUFN.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.42,
-        "off_52w_high_pct": -0.68
+        "rvol": 0.78,
+        "off_52w_high_pct": -0.86
       },
       {
         "ticker": "EWY",
-        "daily": -1.07,
-        "intra": -0.97,
-        "5d": 1.04,
-        "20d": 14.7,
-        "atr_pct": 4.1,
-        "dist_sma50_atr": 0.43,
-        "rs": 30.0,
+        "daily": -1.42,
+        "intra": -0.82,
+        "5d": 0.68,
+        "20d": null,
+        "atr_pct": 4.0,
+        "dist_sma50_atr": 0.35,
+        "rs": 40.0,
         "rs_chart": "data/charts/EWY.png",
         "long": [
           "KORU"
         ],
         "short": [],
         "abc": "B",
-        "rvol": 0.65,
-        "off_52w_high_pct": -17.79
+        "rvol": 0.47,
+        "off_52w_high_pct": -18.08
       },
       {
         "ticker": "IEUR",
-        "daily": -0.32,
-        "intra": -0.52,
-        "5d": -0.7,
-        "20d": 1.53,
+        "daily": -0.91,
+        "intra": -0.62,
+        "5d": -1.29,
+        "20d": null,
         "atr_pct": 0.8,
-        "dist_sma50_atr": 2.61,
+        "dist_sma50_atr": 1.84,
         "rs": 0.0,
         "rs_chart": "data/charts/IEUR.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.06,
-        "off_52w_high_pct": -1.16
+        "rvol": 0.27,
+        "off_52w_high_pct": -1.74
       },
       {
         "ticker": "EFA",
-        "daily": -0.28,
-        "intra": -0.74,
-        "5d": -0.48,
-        "20d": 2.03,
-        "atr_pct": 0.9,
-        "dist_sma50_atr": 2.47,
+        "daily": -0.61,
+        "intra": -0.63,
+        "5d": -0.81,
+        "20d": null,
+        "atr_pct": 0.8,
+        "dist_sma50_atr": 2.15,
         "rs": 0.0,
         "rs_chart": "data/charts/EFA.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.5,
-        "off_52w_high_pct": -1.0
+        "rvol": 0.6,
+        "off_52w_high_pct": -1.33
       },
       {
         "ticker": "ACWI",
-        "daily": -0.27,
-        "intra": -0.54,
-        "5d": 0.17,
-        "20d": 2.98,
+        "daily": -0.65,
+        "intra": -0.39,
+        "5d": -0.21,
+        "20d": null,
         "atr_pct": 0.9,
-        "dist_sma50_atr": 2.38,
+        "dist_sma50_atr": 1.95,
         "rs": 0.0,
         "rs_chart": "data/charts/ACWI.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.71,
-        "off_52w_high_pct": -0.86
+        "rvol": 0.86,
+        "off_52w_high_pct": -1.23
       },
       {
         "ticker": "IEV",
-        "daily": -0.41,
-        "intra": -0.65,
-        "5d": -0.78,
-        "20d": 1.32,
+        "daily": -0.93,
+        "intra": -0.64,
+        "5d": -1.29,
+        "20d": null,
         "atr_pct": 0.8,
-        "dist_sma50_atr": 2.52,
+        "dist_sma50_atr": 1.8,
         "rs": 0.0,
         "rs_chart": "data/charts/IEV.png",
         "long": [
@@ -1855,49 +1855,49 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.39,
-        "off_52w_high_pct": -1.32
+        "rvol": 0.32,
+        "off_52w_high_pct": -1.84
       },
       {
         "ticker": "EWQ",
-        "daily": 0.15,
-        "intra": -0.39,
-        "5d": -1.7,
-        "20d": -0.75,
+        "daily": -0.73,
+        "intra": -0.98,
+        "5d": -2.56,
+        "20d": null,
         "atr_pct": 0.9,
-        "dist_sma50_atr": 0.36,
+        "dist_sma50_atr": -0.56,
         "rs": 5.0,
         "rs_chart": "data/charts/EWQ.png",
         "long": [],
         "short": [],
         "abc": "B",
-        "rvol": 0.88,
-        "off_52w_high_pct": -3.55
+        "rvol": 0.48,
+        "off_52w_high_pct": -4.39
       },
       {
         "ticker": "EWI",
-        "daily": 0.08,
-        "intra": -0.46,
-        "5d": -1.08,
-        "20d": 1.02,
+        "daily": 0.06,
+        "intra": -0.54,
+        "5d": -1.1,
+        "20d": null,
         "atr_pct": 0.8,
-        "dist_sma50_atr": 1.8,
+        "dist_sma50_atr": 1.77,
         "rs": 5.0,
         "rs_chart": "data/charts/EWI.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.28,
-        "off_52w_high_pct": -1.77
+        "rvol": 0.76,
+        "off_52w_high_pct": -1.79
       },
       {
         "ticker": "EWJ",
-        "daily": 0.03,
-        "intra": -0.79,
-        "5d": 0.72,
-        "20d": 3.77,
+        "daily": -0.11,
+        "intra": -0.75,
+        "5d": 0.58,
+        "20d": null,
         "atr_pct": 1.3,
-        "dist_sma50_atr": 1.49,
+        "dist_sma50_atr": 1.43,
         "rs": 0.0,
         "rs_chart": "data/charts/EWJ.png",
         "long": [
@@ -1905,67 +1905,67 @@
         ],
         "short": [],
         "abc": "A",
-        "rvol": 3.45,
-        "off_52w_high_pct": -2.64
+        "rvol": 0.65,
+        "off_52w_high_pct": -2.78
       },
       {
         "ticker": "EWW",
-        "daily": -0.88,
-        "intra": -0.62,
-        "5d": -1.16,
-        "20d": -0.43,
+        "daily": -0.67,
+        "intra": 0.12,
+        "5d": -0.95,
+        "20d": null,
         "atr_pct": 1.7,
-        "dist_sma50_atr": 0.46,
-        "rs": 5.0,
+        "dist_sma50_atr": 0.59,
+        "rs": 20.0,
         "rs_chart": "data/charts/EWW.png",
         "long": [
           "MEXX"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.58,
-        "off_52w_high_pct": -4.46
+        "rvol": 0.71,
+        "off_52w_high_pct": -4.26
       },
       {
         "ticker": "ECH",
-        "daily": -0.87,
-        "intra": -0.92,
-        "5d": -1.09,
-        "20d": 4.22,
-        "atr_pct": 1.8,
-        "dist_sma50_atr": 1.33,
-        "rs": 5.0,
+        "daily": -2.2,
+        "intra": -1.32,
+        "5d": -2.41,
+        "20d": null,
+        "atr_pct": 1.9,
+        "dist_sma50_atr": 0.56,
+        "rs": 0.0,
         "rs_chart": "data/charts/ECH.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.86,
-        "off_52w_high_pct": -12.1
+        "rvol": 0.48,
+        "off_52w_high_pct": -13.28
       },
       {
         "ticker": "EWD",
-        "daily": -0.43,
-        "intra": -0.56,
-        "5d": 0.09,
-        "20d": 2.54,
+        "daily": -1.06,
+        "intra": -0.39,
+        "5d": -0.54,
+        "20d": null,
         "atr_pct": 1.1,
-        "dist_sma50_atr": 4.08,
-        "rs": 80.0,
+        "dist_sma50_atr": 3.47,
+        "rs": 75.0,
         "rs_chart": "data/charts/EWD.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.24,
-        "off_52w_high_pct": -1.23
+        "rvol": 0.1,
+        "off_52w_high_pct": -1.86
       },
       {
         "ticker": "ASHR",
-        "daily": -0.78,
-        "intra": -0.55,
-        "5d": -0.58,
-        "20d": 0.26,
-        "atr_pct": 1.2,
-        "dist_sma50_atr": -1.65,
+        "daily": -0.59,
+        "intra": -0.42,
+        "5d": -0.39,
+        "20d": null,
+        "atr_pct": 1.1,
+        "dist_sma50_atr": -1.53,
         "rs": 0.0,
         "rs_chart": "data/charts/ASHR.png",
         "long": [
@@ -1973,67 +1973,67 @@
         ],
         "short": [],
         "abc": "C",
-        "rvol": 1.14,
-        "off_52w_high_pct": -8.07
+        "rvol": 0.56,
+        "off_52w_high_pct": -7.9
       },
       {
         "ticker": "EWS",
-        "daily": -0.15,
-        "intra": -0.21,
-        "5d": 0.47,
-        "20d": 5.11,
+        "daily": 0.52,
+        "intra": -0.34,
+        "5d": 1.14,
+        "20d": null,
         "atr_pct": 1.0,
-        "dist_sma50_atr": 6.17,
-        "rs": 25.0,
+        "dist_sma50_atr": 6.9,
+        "rs": 35.0,
         "rs_chart": "data/charts/EWS.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.35,
-        "off_52w_high_pct": -0.91
+        "rvol": 0.36,
+        "off_52w_high_pct": -0.25
       },
       {
         "ticker": "KSA",
-        "daily": -0.1,
-        "intra": -0.25,
-        "5d": 2.48,
-        "20d": 6.22,
-        "atr_pct": 0.7,
-        "dist_sma50_atr": 6.0,
-        "rs": 90.0,
+        "daily": -1.23,
+        "intra": -0.35,
+        "5d": 1.32,
+        "20d": null,
+        "atr_pct": 0.8,
+        "dist_sma50_atr": 3.91,
+        "rs": 80.0,
         "rs_chart": "data/charts/KSA.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.8,
-        "off_52w_high_pct": -1.89
+        "rvol": 1.38,
+        "off_52w_high_pct": -3.01
       },
       {
         "ticker": "INDA",
-        "daily": 0.06,
-        "intra": -0.3,
-        "5d": -0.16,
-        "20d": -0.48,
+        "daily": 0.25,
+        "intra": -0.43,
+        "5d": 0.03,
+        "20d": null,
         "atr_pct": 0.8,
-        "dist_sma50_atr": 0.4,
-        "rs": 0.0,
+        "dist_sma50_atr": 0.65,
+        "rs": 5.0,
         "rs_chart": "data/charts/INDA.png",
         "long": [
           "INDL"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 0.83,
-        "off_52w_high_pct": -10.36
+        "rvol": 0.96,
+        "off_52w_high_pct": -10.19
       },
       {
         "ticker": "EEM",
-        "daily": -0.7,
-        "intra": -0.83,
-        "5d": 0.03,
-        "20d": 4.76,
+        "daily": -1.01,
+        "intra": -0.53,
+        "5d": -0.28,
+        "20d": null,
         "atr_pct": 1.7,
-        "dist_sma50_atr": 1.07,
+        "dist_sma50_atr": 0.9,
         "rs": 25.0,
         "rs_chart": "data/charts/EEM.png",
         "long": [
@@ -2043,1256 +2043,1263 @@
           "EDZ"
         ],
         "abc": "A",
-        "rvol": 0.63,
-        "off_52w_high_pct": -5.72
+        "rvol": 0.77,
+        "off_52w_high_pct": -6.01
       },
       {
         "ticker": "EWZ",
-        "daily": -0.59,
-        "intra": -0.39,
-        "5d": 1.4,
-        "20d": -3.0,
+        "daily": 0.88,
+        "intra": -0.29,
+        "5d": 2.9,
+        "20d": null,
         "atr_pct": 1.9,
-        "dist_sma50_atr": 0.66,
-        "rs": 80.0,
+        "dist_sma50_atr": 1.48,
+        "rs": 90.0,
         "rs_chart": "data/charts/EWZ.png",
         "long": [
           "BRZU"
         ],
         "short": [],
         "abc": "A",
-        "rvol": 1.15,
-        "off_52w_high_pct": -14.0
+        "rvol": 0.87,
+        "off_52w_high_pct": -12.73
       },
       {
         "ticker": "TUR",
-        "daily": 0.84,
-        "intra": 0.22,
-        "5d": 0.32,
-        "20d": 7.38,
+        "daily": -0.59,
+        "intra": 0.25,
+        "5d": -1.1,
+        "20d": null,
         "atr_pct": 1.1,
-        "dist_sma50_atr": 3.56,
-        "rs": 50.0,
+        "dist_sma50_atr": 2.25,
+        "rs": 20.0,
         "rs_chart": "data/charts/TUR.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 1.0,
-        "off_52w_high_pct": -5.41
+        "rvol": 2.27,
+        "off_52w_high_pct": -6.76
       },
       {
         "ticker": "EWH",
-        "daily": -0.09,
-        "intra": -0.43,
-        "5d": -1.76,
-        "20d": -0.61,
+        "daily": -0.26,
+        "intra": -0.48,
+        "5d": -1.93,
+        "20d": null,
         "atr_pct": 1.0,
-        "dist_sma50_atr": 3.3,
+        "dist_sma50_atr": 3.2,
         "rs": 75.0,
         "rs_chart": "data/charts/EWH.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.74,
-        "off_52w_high_pct": -5.05
+        "rvol": 0.44,
+        "off_52w_high_pct": -5.21
       },
       {
         "ticker": "EWT",
-        "daily": -0.67,
-        "intra": -1.51,
-        "5d": 3.45,
-        "20d": 11.76,
-        "atr_pct": 2.2,
-        "dist_sma50_atr": 2.16,
-        "rs": 20.0,
+        "daily": -0.71,
+        "intra": -0.49,
+        "5d": 3.41,
+        "20d": null,
+        "atr_pct": 2.1,
+        "dist_sma50_atr": 2.21,
+        "rs": 50.0,
         "rs_chart": "data/charts/EWT.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.81,
-        "off_52w_high_pct": -3.25
+        "rvol": 0.98,
+        "off_52w_high_pct": -3.29
       },
       {
         "ticker": "MCHI",
-        "daily": 0.6,
-        "intra": -0.02,
-        "5d": -0.77,
-        "20d": -1.02,
+        "daily": -0.17,
+        "intra": -0.7,
+        "5d": -1.54,
+        "20d": null,
         "atr_pct": 1.1,
-        "dist_sma50_atr": 2.17,
+        "dist_sma50_atr": 1.49,
         "rs": 80.0,
         "rs_chart": "data/charts/MCHI.png",
         "long": [],
         "short": [],
         "abc": "A",
-        "rvol": 0.82,
-        "off_52w_high_pct": -15.99
+        "rvol": 0.7,
+        "off_52w_high_pct": -16.64
       }
     ]
   },
   "column_ranges": {
     "Indices": {
       "daily": [
-        -3.07,
-        -0.03
+        -2.1,
+        -0.61
       ],
       "intra": [
-        -2.6,
-        -0.2
+        -0.55,
+        1.43
       ],
       "5d": [
-        -1.4,
-        1.32
+        -2.15,
+        2.82
       ],
       "20d": [
-        0.62,
-        30.56
+        -30,
+        30
       ]
     },
     "Sel Sectors": {
       "daily": [
-        -1.55,
-        1.42
+        -2.07,
+        2.43
       ],
       "intra": [
-        -1.41,
-        1.0
+        -1.08,
+        0.68
       ],
       "5d": [
-        -1.98,
-        1.43
+        -2.77,
+        1.51
       ],
       "20d": [
-        -3.65,
-        5.9
+        -30,
+        30
       ]
     },
     "Industries": {
       "daily": [
-        -8.09,
-        3.31
+        -8.42,
+        3.24
       ],
       "intra": [
-        -6.34,
-        3.74
+        -2.01,
+        1.63
       ],
       "5d": [
-        -6.63,
-        5.93
+        -6.95,
+        6.74
       ],
       "20d": [
-        -17.02,
-        34.48
+        -30,
+        30
       ]
     },
     "Countries": {
       "daily": [
-        -1.95,
-        0.84
+        -2.2,
+        0.88
       ],
       "intra": [
-        -2.33,
-        0.22
+        -1.32,
+        0.86
       ],
       "5d": [
-        -3.3,
-        3.45
+        -3.29,
+        3.41
       ],
       "20d": [
-        -3.0,
-        14.7
+        -30,
+        30
       ]
     }
   },
   "industry_performance": {
     "top5": [
       {
-        "industry": "Gambling",
-        "perf_1d": "4.13%",
-        "perf_1w": "-1.30%",
-        "perf_1m": "2.60%",
-        "perf_3m": "4.54%"
+        "industry": "Auto Manufacturers",
+        "perf_1d": "3.75%",
+        "perf_1w": "3.61%",
+        "perf_1m": "12.52%",
+        "perf_3m": "-8.58%"
       },
       {
-        "industry": "Internet Retail",
-        "perf_1d": "3.46%",
-        "perf_1w": "2.41%",
-        "perf_1m": "10.71%",
-        "perf_3m": "0.32%"
+        "industry": "Oil & Gas Equipment & Services",
+        "perf_1d": "2.85%",
+        "perf_1w": "5.54%",
+        "perf_1m": "9.75%",
+        "perf_3m": "2.11%"
       },
       {
-        "industry": "Farm Products",
-        "perf_1d": "2.39%",
-        "perf_1w": "0.12%",
-        "perf_1m": "1.01%",
-        "perf_3m": "-2.33%"
+        "industry": "Coking Coal",
+        "perf_1d": "2.25%",
+        "perf_1w": "5.65%",
+        "perf_1m": "44.53%",
+        "perf_3m": "3.08%"
       },
       {
-        "industry": "Broadcasting",
-        "perf_1d": "2.06%",
-        "perf_1w": "-1.10%",
-        "perf_1m": "2.24%",
-        "perf_3m": "3.91%"
+        "industry": "Oil & Gas Integrated",
+        "perf_1d": "2.07%",
+        "perf_1w": "-0.87%",
+        "perf_1m": "1.72%",
+        "perf_3m": "6.48%"
       },
       {
-        "industry": "Footwear & Accessories",
-        "perf_1d": "1.96%",
-        "perf_1w": "-2.78%",
-        "perf_1m": "-8.91%",
-        "perf_3m": "-15.77%"
+        "industry": "Oil & Gas Refining & Marketing",
+        "perf_1d": "1.61%",
+        "perf_1w": "3.27%",
+        "perf_1m": "13.44%",
+        "perf_3m": "38.66%"
       }
     ],
     "bottom5": [
       {
-        "industry": "Gold",
-        "perf_1d": "-3.65%",
-        "perf_1w": "-3.14%",
-        "perf_1m": "31.82%",
-        "perf_3m": "11.24%"
+        "industry": "Resorts & Casinos",
+        "perf_1d": "-2.82%",
+        "perf_1w": "-6.28%",
+        "perf_1m": "-8.44%",
+        "perf_3m": "-12.87%"
       },
       {
-        "industry": "Electrical Equipment & Parts",
-        "perf_1d": "-3.76%",
-        "perf_1w": "-1.09%",
-        "perf_1m": "3.98%",
-        "perf_3m": "-20.48%"
+        "industry": "Internet Retail",
+        "perf_1d": "-2.83%",
+        "perf_1w": "-1.50%",
+        "perf_1m": "-4.00%",
+        "perf_3m": "-0.22%"
       },
       {
-        "industry": "Semiconductor Equipment & Materials",
-        "perf_1d": "-3.96%",
-        "perf_1w": "-4.75%",
-        "perf_1m": "-1.08%",
-        "perf_3m": "-1.94%"
+        "industry": "Travel Services",
+        "perf_1d": "-3.00%",
+        "perf_1w": "-5.88%",
+        "perf_1m": "-1.92%",
+        "perf_3m": "8.76%"
       },
       {
-        "industry": "Silver",
-        "perf_1d": "-4.64%",
-        "perf_1w": "1.04%",
-        "perf_1m": "34.32%",
-        "perf_3m": "7.01%"
+        "industry": "Insurance Brokers",
+        "perf_1d": "-3.44%",
+        "perf_1w": "-4.77%",
+        "perf_1m": "-0.20%",
+        "perf_3m": "17.71%"
       },
       {
-        "industry": "Uranium",
-        "perf_1d": "-6.65%",
-        "perf_1w": "-2.89%",
-        "perf_1m": "14.30%",
-        "perf_3m": "-10.66%"
+        "industry": "Textile Manufacturing",
+        "perf_1d": "-4.85%",
+        "perf_1w": "-10.97%",
+        "perf_1m": "-24.93%",
+        "perf_3m": "-11.39%"
       }
     ],
     "all": [
       {
-        "industry": "Gambling",
-        "perf_1d": "4.13%",
-        "perf_1w": "-1.30%",
-        "perf_1m": "2.60%",
-        "perf_3m": "4.54%"
-      },
-      {
-        "industry": "Internet Retail",
-        "perf_1d": "3.46%",
-        "perf_1w": "2.41%",
-        "perf_1m": "10.71%",
-        "perf_3m": "0.32%"
-      },
-      {
-        "industry": "Farm Products",
-        "perf_1d": "2.39%",
-        "perf_1w": "0.12%",
-        "perf_1m": "1.01%",
-        "perf_3m": "-2.33%"
-      },
-      {
-        "industry": "Broadcasting",
-        "perf_1d": "2.06%",
-        "perf_1w": "-1.10%",
-        "perf_1m": "2.24%",
-        "perf_3m": "3.91%"
-      },
-      {
-        "industry": "Footwear & Accessories",
-        "perf_1d": "1.96%",
-        "perf_1w": "-2.78%",
-        "perf_1m": "-8.91%",
-        "perf_3m": "-15.77%"
-      },
-      {
-        "industry": "Insurance Brokers",
-        "perf_1d": "1.74%",
-        "perf_1w": "0.44%",
-        "perf_1m": "2.18%",
-        "perf_3m": "23.91%"
-      },
-      {
-        "industry": "Consumer Electronics",
-        "perf_1d": "1.67%",
-        "perf_1w": "3.36%",
-        "perf_1m": "-3.75%",
-        "perf_3m": "2.74%"
-      },
-      {
-        "industry": "Oil & Gas Refining & Marketing",
-        "perf_1d": "1.64%",
-        "perf_1w": "1.02%",
-        "perf_1m": "12.08%",
-        "perf_3m": "40.38%"
-      },
-      {
-        "industry": "Internet Content & Information",
-        "perf_1d": "1.55%",
-        "perf_1w": "1.56%",
-        "perf_1m": "4.03%",
-        "perf_3m": "-8.48%"
-      },
-      {
-        "industry": "Luxury Goods",
-        "perf_1d": "1.50%",
-        "perf_1w": "-2.80%",
-        "perf_1m": "-16.65%",
-        "perf_3m": "-12.92%"
-      },
-      {
-        "industry": "Packaged Foods",
-        "perf_1d": "1.41%",
-        "perf_1w": "0.02%",
-        "perf_1m": "1.50%",
-        "perf_3m": "10.96%"
-      },
-      {
-        "industry": "Restaurants",
-        "perf_1d": "1.38%",
-        "perf_1w": "-1.36%",
-        "perf_1m": "-0.27%",
-        "perf_3m": "3.57%"
-      },
-      {
-        "industry": "Grocery Stores",
-        "perf_1d": "1.37%",
-        "perf_1w": "-0.11%",
-        "perf_1m": "-0.15%",
-        "perf_3m": "-6.90%"
-      },
-      {
-        "industry": "Real Estate Services",
-        "perf_1d": "1.36%",
-        "perf_1w": "-1.32%",
-        "perf_1m": "2.50%",
-        "perf_3m": "13.42%"
-      },
-      {
-        "industry": "Entertainment",
-        "perf_1d": "1.26%",
-        "perf_1w": "1.04%",
-        "perf_1m": "9.96%",
-        "perf_3m": "1.57%"
-      },
-      {
-        "industry": "Telecom Services",
-        "perf_1d": "1.26%",
-        "perf_1w": "0.35%",
-        "perf_1m": "5.24%",
-        "perf_3m": "-0.91%"
-      },
-      {
-        "industry": "Staffing & Employment Services",
-        "perf_1d": "1.23%",
-        "perf_1w": "0.96%",
-        "perf_1m": "8.25%",
-        "perf_3m": "45.53%"
-      },
-      {
-        "industry": "Advertising Agencies",
-        "perf_1d": "1.21%",
-        "perf_1w": "2.62%",
-        "perf_1m": "-13.66%",
-        "perf_3m": "-35.90%"
-      },
-      {
-        "industry": "Utilities - Regulated Water",
-        "perf_1d": "1.10%",
-        "perf_1w": "2.85%",
-        "perf_1m": "-1.61%",
-        "perf_3m": "4.82%"
-      },
-      {
-        "industry": "Residential Construction",
-        "perf_1d": "1.09%",
-        "perf_1w": "-0.47%",
-        "perf_1m": "1.54%",
-        "perf_3m": "4.88%"
-      },
-      {
-        "industry": "Consulting Services",
-        "perf_1d": "0.99%",
-        "perf_1w": "0.75%",
-        "perf_1m": "2.71%",
-        "perf_3m": "10.97%"
+        "industry": "Auto Manufacturers",
+        "perf_1d": "3.75%",
+        "perf_1w": "3.61%",
+        "perf_1m": "12.52%",
+        "perf_3m": "-8.58%"
       },
       {
         "industry": "Oil & Gas Equipment & Services",
-        "perf_1d": "0.95%",
-        "perf_1w": "1.62%",
-        "perf_1m": "8.65%",
-        "perf_3m": "-0.40%"
+        "perf_1d": "2.85%",
+        "perf_1w": "5.54%",
+        "perf_1m": "9.75%",
+        "perf_3m": "2.11%"
       },
       {
-        "industry": "Waste Management",
-        "perf_1d": "0.95%",
-        "perf_1w": "-0.69%",
-        "perf_1m": "0.44%",
-        "perf_3m": "9.11%"
-      },
-      {
-        "industry": "Agricultural Inputs",
-        "perf_1d": "0.88%",
-        "perf_1w": "-0.42%",
-        "perf_1m": "-1.50%",
-        "perf_3m": "5.21%"
-      },
-      {
-        "industry": "Banks - Diversified",
-        "perf_1d": "0.87%",
-        "perf_1w": "1.45%",
-        "perf_1m": "0.81%",
-        "perf_3m": "14.84%"
-      },
-      {
-        "industry": "Travel Services",
-        "perf_1d": "0.82%",
-        "perf_1w": "-1.82%",
-        "perf_1m": "0.91%",
-        "perf_3m": "13.34%"
-      },
-      {
-        "industry": "Beverages - Non-Alcoholic",
-        "perf_1d": "0.79%",
-        "perf_1w": "-1.27%",
-        "perf_1m": "0.41%",
-        "perf_3m": "7.83%"
-      },
-      {
-        "industry": "Beverages - Wineries & Distilleries",
-        "perf_1d": "0.79%",
-        "perf_1w": "-2.22%",
-        "perf_1m": "2.27%",
-        "perf_3m": "10.24%"
-      },
-      {
-        "industry": "Medical Devices",
-        "perf_1d": "0.78%",
-        "perf_1w": "-2.42%",
-        "perf_1m": "3.28%",
-        "perf_3m": "15.55%"
-      },
-      {
-        "industry": "Financial Conglomerates",
-        "perf_1d": "0.72%",
-        "perf_1w": "1.75%",
-        "perf_1m": "-0.20%",
-        "perf_3m": "5.42%"
-      },
-      {
-        "industry": "Leisure",
-        "perf_1d": "0.64%",
-        "perf_1w": "-2.23%",
-        "perf_1m": "-7.33%",
-        "perf_3m": "-0.41%"
-      },
-      {
-        "industry": "Tobacco",
-        "perf_1d": "0.64%",
-        "perf_1w": "1.85%",
-        "perf_1m": "-1.98%",
-        "perf_3m": "1.63%"
-      },
-      {
-        "industry": "Business Equipment & Supplies",
-        "perf_1d": "0.61%",
-        "perf_1w": "1.09%",
-        "perf_1m": "-2.91%",
-        "perf_3m": "0.76%"
-      },
-      {
-        "industry": "Medical Instruments & Supplies",
-        "perf_1d": "0.58%",
-        "perf_1w": "-1.19%",
-        "perf_1m": "4.50%",
-        "perf_3m": "6.43%"
-      },
-      {
-        "industry": "Specialty Chemicals",
-        "perf_1d": "0.58%",
-        "perf_1w": "0.08%",
-        "perf_1m": "0.88%",
-        "perf_3m": "2.09%"
-      },
-      {
-        "industry": "Beverages - Brewers",
-        "perf_1d": "0.53%",
-        "perf_1w": "0.21%",
-        "perf_1m": "-6.12%",
-        "perf_3m": "-2.31%"
-      },
-      {
-        "industry": "Electronic Gaming & Multimedia",
-        "perf_1d": "0.50%",
-        "perf_1w": "-2.68%",
-        "perf_1m": "-9.24%",
-        "perf_3m": "-2.67%"
-      },
-      {
-        "industry": "Home Improvement Retail",
-        "perf_1d": "0.50%",
-        "perf_1w": "-2.17%",
-        "perf_1m": "-0.99%",
-        "perf_3m": "2.19%"
-      },
-      {
-        "industry": "Discount Stores",
-        "perf_1d": "0.49%",
-        "perf_1w": "-0.63%",
-        "perf_1m": "-4.22%",
-        "perf_3m": "-5.65%"
-      },
-      {
-        "industry": "Financial Data & Stock Exchanges",
-        "perf_1d": "0.48%",
-        "perf_1w": "1.80%",
-        "perf_1m": "5.88%",
-        "perf_3m": "6.28%"
-      },
-      {
-        "industry": "Apparel Manufacturing",
-        "perf_1d": "0.47%",
-        "perf_1w": "-3.86%",
-        "perf_1m": "-6.07%",
-        "perf_3m": "-7.76%"
-      },
-      {
-        "industry": "Apparel Retail",
-        "perf_1d": "0.45%",
-        "perf_1w": "-3.04%",
-        "perf_1m": "-11.15%",
-        "perf_3m": "-6.39%"
-      },
-      {
-        "industry": "Personal Services",
-        "perf_1d": "0.45%",
-        "perf_1w": "-0.44%",
-        "perf_1m": "0.78%",
-        "perf_3m": "-0.79%"
-      },
-      {
-        "industry": "Resorts & Casinos",
-        "perf_1d": "0.42%",
-        "perf_1w": "-3.92%",
-        "perf_1m": "-7.17%",
-        "perf_3m": "-5.28%"
-      },
-      {
-        "industry": "Software - Application",
-        "perf_1d": "0.41%",
-        "perf_1w": "4.22%",
-        "perf_1m": "17.54%",
-        "perf_3m": "17.84%"
-      },
-      {
-        "industry": "Insurance - Property & Casualty",
-        "perf_1d": "0.39%",
-        "perf_1w": "0.60%",
-        "perf_1m": "-1.04%",
-        "perf_3m": "14.88%"
-      },
-      {
-        "industry": "REIT - Hotel & Motel",
-        "perf_1d": "0.36%",
-        "perf_1w": "-1.46%",
-        "perf_1m": "-5.37%",
-        "perf_3m": "8.34%"
-      },
-      {
-        "industry": "Furnishings, Fixtures & Appliances",
-        "perf_1d": "0.27%",
-        "perf_1w": "1.26%",
-        "perf_1m": "6.62%",
-        "perf_3m": "20.22%"
-      },
-      {
-        "industry": "Insurance - Diversified",
-        "perf_1d": "0.26%",
-        "perf_1w": "1.73%",
-        "perf_1m": "-1.18%",
-        "perf_3m": "6.56%"
-      },
-      {
-        "industry": "Software - Infrastructure",
-        "perf_1d": "0.24%",
-        "perf_1w": "5.34%",
-        "perf_1m": "15.75%",
-        "perf_3m": "8.97%"
-      },
-      {
-        "industry": "Building Materials",
-        "perf_1d": "0.23%",
-        "perf_1w": "-0.70%",
-        "perf_1m": "-1.66%",
-        "perf_3m": "-8.46%"
-      },
-      {
-        "industry": "Banks - Regional",
-        "perf_1d": "0.22%",
-        "perf_1w": "0.21%",
-        "perf_1m": "-1.61%",
-        "perf_3m": "9.28%"
-      },
-      {
-        "industry": "Household & Personal Products",
-        "perf_1d": "0.21%",
-        "perf_1w": "0.13%",
-        "perf_1m": "0.86%",
-        "perf_3m": "6.07%"
-      },
-      {
-        "industry": "Specialty Business Services",
-        "perf_1d": "0.21%",
-        "perf_1w": "-0.20%",
-        "perf_1m": "-0.02%",
-        "perf_3m": "7.56%"
-      },
-      {
-        "industry": "Chemicals",
-        "perf_1d": "0.20%",
-        "perf_1w": "-5.13%",
-        "perf_1m": "-2.56%",
-        "perf_3m": "-14.73%"
-      },
-      {
-        "industry": "REIT - Diversified",
-        "perf_1d": "0.20%",
-        "perf_1w": "-1.64%",
-        "perf_1m": "-2.73%",
-        "perf_3m": "-5.93%"
-      },
-      {
-        "industry": "Marine Shipping",
-        "perf_1d": "0.19%",
-        "perf_1w": "0.16%",
-        "perf_1m": "6.67%",
-        "perf_3m": "14.17%"
-      },
-      {
-        "industry": "REIT - Residential",
-        "perf_1d": "0.19%",
-        "perf_1w": "-1.59%",
-        "perf_1m": "-1.63%",
-        "perf_3m": "1.43%"
+        "industry": "Coking Coal",
+        "perf_1d": "2.25%",
+        "perf_1w": "5.65%",
+        "perf_1m": "44.53%",
+        "perf_3m": "3.08%"
       },
       {
         "industry": "Oil & Gas Integrated",
-        "perf_1d": "0.16%",
-        "perf_1w": "-3.89%",
-        "perf_1m": "0.32%",
-        "perf_3m": "6.75%"
-      },
-      {
-        "industry": "Medical Distribution",
-        "perf_1d": "0.12%",
-        "perf_1w": "2.71%",
-        "perf_1m": "3.18%",
-        "perf_3m": "19.59%"
-      },
-      {
-        "industry": "Insurance - Specialty",
-        "perf_1d": "0.10%",
-        "perf_1w": "0.90%",
-        "perf_1m": "-2.87%",
-        "perf_3m": "11.71%"
-      },
-      {
-        "industry": "Publishing",
-        "perf_1d": "0.10%",
-        "perf_1w": "2.96%",
-        "perf_1m": "-7.30%",
-        "perf_3m": "0.80%"
-      },
-      {
-        "industry": "Auto Parts",
-        "perf_1d": "0.07%",
-        "perf_1w": "-2.67%",
-        "perf_1m": "-1.50%",
-        "perf_3m": "-4.70%"
-      },
-      {
-        "industry": "REIT - Retail",
-        "perf_1d": "0.02%",
-        "perf_1w": "-1.05%",
-        "perf_1m": "-5.80%",
-        "perf_3m": "1.17%"
-      },
-      {
-        "industry": "Insurance - Reinsurance",
-        "perf_1d": "-0.00%",
-        "perf_1w": "1.71%",
-        "perf_1m": "2.20%",
-        "perf_3m": "18.34%"
-      },
-      {
-        "industry": "Recreational Vehicles",
-        "perf_1d": "-0.04%",
-        "perf_1w": "-2.98%",
-        "perf_1m": "-0.36%",
-        "perf_3m": "-2.78%"
-      },
-      {
-        "industry": "Education & Training Services",
-        "perf_1d": "-0.09%",
-        "perf_1w": "2.34%",
-        "perf_1m": "0.30%",
-        "perf_3m": "6.15%"
-      },
-      {
-        "industry": "Oil & Gas Midstream",
-        "perf_1d": "-0.09%",
-        "perf_1w": "0.83%",
-        "perf_1m": "1.27%",
-        "perf_3m": "5.93%"
-      },
-      {
-        "industry": "Shell Companies",
-        "perf_1d": "-0.11%",
-        "perf_1w": "-0.16%",
-        "perf_1m": "-1.09%",
-        "perf_3m": "-3.94%"
-      },
-      {
-        "industry": "Auto & Truck Dealerships",
-        "perf_1d": "-0.15%",
-        "perf_1w": "2.13%",
-        "perf_1m": "3.66%",
+        "perf_1d": "2.07%",
+        "perf_1w": "-0.87%",
+        "perf_1m": "1.72%",
         "perf_3m": "6.48%"
       },
       {
+        "industry": "Oil & Gas Refining & Marketing",
+        "perf_1d": "1.61%",
+        "perf_1w": "3.27%",
+        "perf_1m": "13.44%",
+        "perf_3m": "38.66%"
+      },
+      {
+        "industry": "Agricultural Inputs",
+        "perf_1d": "1.51%",
+        "perf_1w": "1.13%",
+        "perf_1m": "6.88%",
+        "perf_3m": "7.00%"
+      },
+      {
+        "industry": "Health Information Services",
+        "perf_1d": "1.38%",
+        "perf_1w": "4.26%",
+        "perf_1m": "25.06%",
+        "perf_3m": "30.23%"
+      },
+      {
+        "industry": "Business Equipment & Supplies",
+        "perf_1d": "1.25%",
+        "perf_1w": "3.11%",
+        "perf_1m": "2.01%",
+        "perf_3m": "3.29%"
+      },
+      {
+        "industry": "Oil & Gas E&P",
+        "perf_1d": "1.20%",
+        "perf_1w": "-1.04%",
+        "perf_1m": "4.12%",
+        "perf_3m": "6.40%"
+      },
+      {
+        "industry": "Trucking",
+        "perf_1d": "1.11%",
+        "perf_1w": "-0.05%",
+        "perf_1m": "-2.92%",
+        "perf_3m": "-13.78%"
+      },
+      {
+        "industry": "Oil & Gas Midstream",
+        "perf_1d": "1.08%",
+        "perf_1w": "1.95%",
+        "perf_1m": "2.02%",
+        "perf_3m": "6.53%"
+      },
+      {
+        "industry": "Thermal Coal",
+        "perf_1d": "1.03%",
+        "perf_1w": "4.24%",
+        "perf_1m": "20.16%",
+        "perf_3m": "4.99%"
+      },
+      {
+        "industry": "Department Stores",
+        "perf_1d": "0.93%",
+        "perf_1w": "-3.20%",
+        "perf_1m": "-1.46%",
+        "perf_3m": "6.06%"
+      },
+      {
         "industry": "Oil & Gas Drilling",
-        "perf_1d": "-0.17%",
-        "perf_1w": "-1.42%",
-        "perf_1m": "15.27%",
-        "perf_3m": "-5.65%"
+        "perf_1d": "0.91%",
+        "perf_1w": "1.84%",
+        "perf_1m": "11.63%",
+        "perf_3m": "-5.48%"
       },
       {
-        "industry": "REIT - Mortgage",
-        "perf_1d": "-0.20%",
-        "perf_1w": "-1.03%",
-        "perf_1m": "-0.29%",
-        "perf_3m": "-0.96%"
+        "industry": "Discount Stores",
+        "perf_1d": "0.79%",
+        "perf_1w": "-2.39%",
+        "perf_1m": "-3.43%",
+        "perf_3m": "-3.87%"
       },
       {
-        "industry": "Integrated Freight & Logistics",
-        "perf_1d": "-0.23%",
-        "perf_1w": "1.31%",
-        "perf_1m": "2.11%",
-        "perf_3m": "-2.59%"
+        "industry": "Semiconductors",
+        "perf_1d": "0.56%",
+        "perf_1w": "3.40%",
+        "perf_1m": "5.04%",
+        "perf_3m": "-9.40%"
       },
       {
-        "industry": "Aerospace & Defense",
-        "perf_1d": "-0.24%",
-        "perf_1w": "-0.18%",
-        "perf_1m": "5.95%",
-        "perf_3m": "-8.25%"
+        "industry": "Farm & Heavy Construction Machinery",
+        "perf_1d": "0.51%",
+        "perf_1w": "-1.38%",
+        "perf_1m": "0.86%",
+        "perf_3m": "1.74%"
       },
       {
-        "industry": "Asset Management",
-        "perf_1d": "-0.25%",
-        "perf_1w": "0.68%",
-        "perf_1m": "6.79%",
-        "perf_3m": "10.35%"
-      },
-      {
-        "industry": "Railroads",
-        "perf_1d": "-0.25%",
-        "perf_1w": "-1.21%",
-        "perf_1m": "3.64%",
-        "perf_3m": "12.06%"
+        "industry": "Communication Equipment",
+        "perf_1d": "0.47%",
+        "perf_1w": "1.23%",
+        "perf_1m": "2.30%",
+        "perf_3m": "-11.22%"
       },
       {
         "industry": "Information Technology Services",
+        "perf_1d": "0.30%",
+        "perf_1w": "1.71%",
+        "perf_1m": "6.30%",
+        "perf_3m": "-12.76%"
+      },
+      {
+        "industry": "Marine Shipping",
+        "perf_1d": "0.23%",
+        "perf_1w": "0.17%",
+        "perf_1m": "7.01%",
+        "perf_3m": "11.38%"
+      },
+      {
+        "industry": "Asset Management",
+        "perf_1d": "0.21%",
+        "perf_1w": "0.31%",
+        "perf_1m": "6.72%",
+        "perf_3m": "11.22%"
+      },
+      {
+        "industry": "Electronic Components",
+        "perf_1d": "0.21%",
+        "perf_1w": "1.73%",
+        "perf_1m": "-0.60%",
+        "perf_3m": "-11.34%"
+      },
+      {
+        "industry": "Medical Instruments & Supplies",
+        "perf_1d": "0.15%",
+        "perf_1w": "-0.54%",
+        "perf_1m": "4.85%",
+        "perf_3m": "8.83%"
+      },
+      {
+        "industry": "Utilities - Regulated Water",
+        "perf_1d": "0.11%",
+        "perf_1w": "0.58%",
+        "perf_1m": "-0.37%",
+        "perf_3m": "6.54%"
+      },
+      {
+        "industry": "Software - Infrastructure",
+        "perf_1d": "0.05%",
+        "perf_1w": "5.65%",
+        "perf_1m": "13.15%",
+        "perf_3m": "4.49%"
+      },
+      {
+        "industry": "Pollution & Treatment Controls",
+        "perf_1d": "0.04%",
+        "perf_1w": "-1.20%",
+        "perf_1m": "2.43%",
+        "perf_3m": "5.56%"
+      },
+      {
+        "industry": "Household & Personal Products",
+        "perf_1d": "0.00%",
+        "perf_1w": "-1.47%",
+        "perf_1m": "1.34%",
+        "perf_3m": "7.93%"
+      },
+      {
+        "industry": "REIT - Specialty",
+        "perf_1d": "-0.02%",
+        "perf_1w": "-1.44%",
+        "perf_1m": "-0.42%",
+        "perf_3m": "-4.47%"
+      },
+      {
+        "industry": "Utilities - Regulated Gas",
+        "perf_1d": "-0.02%",
+        "perf_1w": "-0.67%",
+        "perf_1m": "-3.69%",
+        "perf_3m": "-1.70%"
+      },
+      {
+        "industry": "Electronics & Computer Distribution",
+        "perf_1d": "-0.04%",
+        "perf_1w": "3.47%",
+        "perf_1m": "-0.23%",
+        "perf_3m": "-0.62%"
+      },
+      {
+        "industry": "Real Estate - Diversified",
+        "perf_1d": "-0.04%",
+        "perf_1w": "-3.74%",
+        "perf_1m": "2.70%",
+        "perf_3m": "2.82%"
+      },
+      {
+        "industry": "Telecom Services",
+        "perf_1d": "-0.11%",
+        "perf_1w": "-0.26%",
+        "perf_1m": "5.03%",
+        "perf_3m": "-1.02%"
+      },
+      {
+        "industry": "Capital Markets",
+        "perf_1d": "-0.12%",
+        "perf_1w": "-0.30%",
+        "perf_1m": "4.14%",
+        "perf_3m": "3.15%"
+      },
+      {
+        "industry": "Shell Companies",
+        "perf_1d": "-0.15%",
+        "perf_1w": "-0.27%",
+        "perf_1m": "-1.15%",
+        "perf_3m": "-0.93%"
+      },
+      {
+        "industry": "Pharmaceutical Retailers",
+        "perf_1d": "-0.17%",
+        "perf_1w": "2.67%",
+        "perf_1m": "14.14%",
+        "perf_3m": "0.12%"
+      },
+      {
+        "industry": "Steel",
+        "perf_1d": "-0.21%",
+        "perf_1w": "2.06%",
+        "perf_1m": "0.33%",
+        "perf_3m": "-2.27%"
+      },
+      {
+        "industry": "Chemicals",
+        "perf_1d": "-0.22%",
+        "perf_1w": "-2.45%",
+        "perf_1m": "-0.89%",
+        "perf_3m": "-16.91%"
+      },
+      {
+        "industry": "Insurance - Diversified",
+        "perf_1d": "-0.22%",
+        "perf_1w": "-0.14%",
+        "perf_1m": "-1.63%",
+        "perf_3m": "7.33%"
+      },
+      {
+        "industry": "Medical Distribution",
         "perf_1d": "-0.26%",
-        "perf_1w": "0.61%",
-        "perf_1m": "6.53%",
-        "perf_3m": "-8.24%"
+        "perf_1w": "0.82%",
+        "perf_1m": "3.16%",
+        "perf_3m": "20.64%"
       },
       {
-        "industry": "Credit Services",
-        "perf_1d": "-0.28%",
-        "perf_1w": "1.04%",
-        "perf_1m": "2.30%",
-        "perf_3m": "14.81%"
+        "industry": "Rental & Leasing Services",
+        "perf_1d": "-0.26%",
+        "perf_1w": "-3.79%",
+        "perf_1m": "-2.95%",
+        "perf_3m": "1.30%"
       },
       {
-        "industry": "Insurance - Life",
-        "perf_1d": "-0.28%",
-        "perf_1w": "0.80%",
-        "perf_1m": "-4.43%",
-        "perf_3m": "10.24%"
-      },
-      {
-        "industry": "REIT - Industrial",
+        "industry": "Farm Products",
         "perf_1d": "-0.29%",
-        "perf_1w": "-1.56%",
-        "perf_1m": "-3.43%",
-        "perf_3m": "-0.60%"
+        "perf_1w": "1.68%",
+        "perf_1m": "2.12%",
+        "perf_3m": "-5.14%"
       },
       {
-        "industry": "Packaging & Containers",
+        "industry": "Utilities - Independent Power Producers",
+        "perf_1d": "-0.29%",
+        "perf_1w": "0.33%",
+        "perf_1m": "-2.86%",
+        "perf_3m": "-8.21%"
+      },
+      {
+        "industry": "Utilities - Renewable",
+        "perf_1d": "-0.29%",
+        "perf_1w": "-2.08%",
+        "perf_1m": "-7.58%",
+        "perf_3m": "-28.79%"
+      },
+      {
+        "industry": "Software - Application",
+        "perf_1d": "-0.30%",
+        "perf_1w": "4.06%",
+        "perf_1m": "16.78%",
+        "perf_3m": "9.77%"
+      },
+      {
+        "industry": "Banks - Diversified",
         "perf_1d": "-0.33%",
-        "perf_1w": "-3.12%",
-        "perf_1m": "-0.95%",
-        "perf_3m": "15.94%"
+        "perf_1w": "0.64%",
+        "perf_1m": "0.36%",
+        "perf_3m": "14.80%"
       },
       {
-        "industry": "Real Estate - Development",
-        "perf_1d": "-0.34%",
-        "perf_1w": "-2.78%",
-        "perf_1m": "-0.33%",
-        "perf_3m": "6.08%"
+        "industry": "Engineering & Construction",
+        "perf_1d": "-0.33%",
+        "perf_1w": "-3.91%",
+        "perf_1m": "-8.37%",
+        "perf_3m": "-14.32%"
       },
       {
-        "industry": "Confectioners",
+        "industry": "Lumber & Wood Production",
+        "perf_1d": "-0.35%",
+        "perf_1w": "-3.20%",
+        "perf_1m": "-0.23%",
+        "perf_3m": "2.20%"
+      },
+      {
+        "industry": "Specialty Retail",
+        "perf_1d": "-0.35%",
+        "perf_1w": "-7.33%",
+        "perf_1m": "-6.25%",
+        "perf_3m": "-0.76%"
+      },
+      {
+        "industry": "Scientific & Technical Instruments",
+        "perf_1d": "-0.36%",
+        "perf_1w": "-0.32%",
+        "perf_1m": "-1.88%",
+        "perf_3m": "-5.02%"
+      },
+      {
+        "industry": "Waste Management",
+        "perf_1d": "-0.36%",
+        "perf_1w": "-1.74%",
+        "perf_1m": "0.11%",
+        "perf_3m": "8.12%"
+      },
+      {
+        "industry": "Biotechnology",
         "perf_1d": "-0.37%",
-        "perf_1w": "-3.36%",
-        "perf_1m": "-0.52%",
-        "perf_3m": "-0.45%"
+        "perf_1w": "-2.22%",
+        "perf_1m": "10.45%",
+        "perf_3m": "20.13%"
+      },
+      {
+        "industry": "Packaged Foods",
+        "perf_1d": "-0.37%",
+        "perf_1w": "-1.13%",
+        "perf_1m": "2.91%",
+        "perf_3m": "11.26%"
+      },
+      {
+        "industry": "Grocery Stores",
+        "perf_1d": "-0.38%",
+        "perf_1w": "-2.85%",
+        "perf_1m": "-0.45%",
+        "perf_3m": "-6.11%"
+      },
+      {
+        "industry": "REIT - Healthcare Facilities",
+        "perf_1d": "-0.38%",
+        "perf_1w": "-1.55%",
+        "perf_1m": "-1.29%",
+        "perf_3m": "14.33%"
+      },
+      {
+        "industry": "Financial Conglomerates",
+        "perf_1d": "-0.39%",
+        "perf_1w": "1.51%",
+        "perf_1m": "-0.00%",
+        "perf_3m": "4.52%"
       },
       {
         "industry": "Drug Manufacturers - General",
         "perf_1d": "-0.40%",
-        "perf_1w": "-3.17%",
-        "perf_1m": "2.80%",
-        "perf_3m": "9.94%"
-      },
-      {
-        "industry": "Lumber & Wood Production",
-        "perf_1d": "-0.40%",
-        "perf_1w": "-3.44%",
-        "perf_1m": "1.12%",
-        "perf_3m": "0.97%"
-      },
-      {
-        "industry": "Healthcare Plans",
-        "perf_1d": "-0.45%",
-        "perf_1w": "0.28%",
-        "perf_1m": "-4.78%",
-        "perf_3m": "4.29%"
-      },
-      {
-        "industry": "Security & Protection Services",
-        "perf_1d": "-0.45%",
-        "perf_1w": "-0.90%",
-        "perf_1m": "2.36%",
-        "perf_3m": "17.01%"
-      },
-      {
-        "industry": "Food Distribution",
-        "perf_1d": "-0.49%",
-        "perf_1w": "-2.52%",
-        "perf_1m": "-2.61%",
-        "perf_3m": "12.66%"
-      },
-      {
-        "industry": "Oil & Gas E&P",
-        "perf_1d": "-0.52%",
-        "perf_1w": "-3.59%",
-        "perf_1m": "4.60%",
-        "perf_3m": "7.25%"
-      },
-      {
-        "industry": "Medical Care Facilities",
-        "perf_1d": "-0.63%",
-        "perf_1w": "-2.20%",
-        "perf_1m": "0.87%",
-        "perf_3m": "14.50%"
-      },
-      {
-        "industry": "Thermal Coal",
-        "perf_1d": "-0.64%",
-        "perf_1w": "4.14%",
-        "perf_1m": "17.79%",
-        "perf_3m": "8.70%"
-      },
-      {
-        "industry": "Pollution & Treatment Controls",
-        "perf_1d": "-0.65%",
-        "perf_1w": "-1.15%",
-        "perf_1m": "2.29%",
-        "perf_3m": "7.02%"
-      },
-      {
-        "industry": "Paper & Paper Products",
-        "perf_1d": "-0.68%",
-        "perf_1w": "0.92%",
-        "perf_1m": "4.21%",
-        "perf_3m": "7.10%"
-      },
-      {
-        "industry": "Utilities - Diversified",
-        "perf_1d": "-0.69%",
-        "perf_1w": "0.66%",
-        "perf_1m": "-6.08%",
-        "perf_3m": "-3.94%"
-      },
-      {
-        "industry": "Utilities - Regulated Gas",
-        "perf_1d": "-0.69%",
-        "perf_1w": "-0.01%",
-        "perf_1m": "-4.44%",
-        "perf_3m": "-3.68%"
-      },
-      {
-        "industry": "Lodging",
-        "perf_1d": "-0.73%",
-        "perf_1w": "-1.19%",
-        "perf_1m": "-2.12%",
-        "perf_3m": "-2.72%"
-      },
-      {
-        "industry": "Rental & Leasing Services",
-        "perf_1d": "-0.76%",
-        "perf_1w": "-4.11%",
-        "perf_1m": "-2.85%",
-        "perf_3m": "0.47%"
-      },
-      {
-        "industry": "Airlines",
-        "perf_1d": "-0.80%",
-        "perf_1w": "-1.57%",
-        "perf_1m": "-9.93%",
-        "perf_3m": "-5.36%"
-      },
-      {
-        "industry": "REIT - Healthcare Facilities",
-        "perf_1d": "-0.80%",
-        "perf_1w": "-0.84%",
-        "perf_1m": "-1.03%",
-        "perf_3m": "10.86%"
-      },
-      {
-        "industry": "Steel",
-        "perf_1d": "-0.82%",
-        "perf_1w": "2.58%",
-        "perf_1m": "0.67%",
-        "perf_3m": "-1.52%"
-      },
-      {
-        "industry": "Capital Markets",
-        "perf_1d": "-0.83%",
-        "perf_1w": "-0.44%",
-        "perf_1m": "4.08%",
-        "perf_3m": "4.47%"
-      },
-      {
-        "industry": "Aluminum",
-        "perf_1d": "-0.92%",
-        "perf_1w": "-0.46%",
-        "perf_1m": "5.75%",
-        "perf_3m": "-30.41%"
-      },
-      {
-        "industry": "Farm & Heavy Construction Machinery",
-        "perf_1d": "-0.93%",
-        "perf_1w": "-3.07%",
-        "perf_1m": "0.31%",
-        "perf_3m": "0.29%"
-      },
-      {
-        "industry": "Drug Manufacturers - Specialty & Generic",
-        "perf_1d": "-0.97%",
-        "perf_1w": "-0.83%",
-        "perf_1m": "-0.31%",
-        "perf_3m": "3.06%"
-      },
-      {
-        "industry": "REIT - Office",
-        "perf_1d": "-0.98%",
-        "perf_1w": "-0.50%",
-        "perf_1m": "-3.60%",
-        "perf_3m": "11.25%"
-      },
-      {
-        "industry": "Building Products & Equipment",
-        "perf_1d": "-1.01%",
-        "perf_1w": "-2.06%",
-        "perf_1m": "-1.29%",
-        "perf_3m": "-3.04%"
-      },
-      {
-        "industry": "Auto Manufacturers",
-        "perf_1d": "-1.02%",
-        "perf_1w": "-3.53%",
-        "perf_1m": "8.57%",
-        "perf_3m": "-15.31%"
-      },
-      {
-        "industry": "Utilities - Regulated Electric",
-        "perf_1d": "-1.03%",
-        "perf_1w": "-0.42%",
-        "perf_1m": "-4.81%",
-        "perf_3m": "-3.40%"
-      },
-      {
-        "industry": "Specialty Retail",
-        "perf_1d": "-1.08%",
-        "perf_1w": "-5.83%",
-        "perf_1m": "-6.64%",
-        "perf_3m": "-1.89%"
-      },
-      {
-        "industry": "Coking Coal",
-        "perf_1d": "-1.17%",
-        "perf_1w": "3.45%",
-        "perf_1m": "38.14%",
-        "perf_3m": "10.84%"
-      },
-      {
-        "industry": "Trucking",
-        "perf_1d": "-1.26%",
-        "perf_1w": "-4.14%",
-        "perf_1m": "-3.85%",
-        "perf_3m": "-12.77%"
-      },
-      {
-        "industry": "Diagnostics & Research",
-        "perf_1d": "-1.33%",
-        "perf_1w": "-1.11%",
-        "perf_1m": "8.36%",
-        "perf_3m": "23.90%"
-      },
-      {
-        "industry": "REIT - Specialty",
-        "perf_1d": "-1.41%",
-        "perf_1w": "-1.41%",
-        "perf_1m": "-1.71%",
-        "perf_3m": "-5.62%"
-      },
-      {
-        "industry": "Tools & Accessories",
-        "perf_1d": "-1.47%",
-        "perf_1w": "-0.99%",
-        "perf_1m": "-1.40%",
-        "perf_3m": "3.82%"
-      },
-      {
-        "industry": "Textile Manufacturing",
-        "perf_1d": "-1.59%",
-        "perf_1w": "-7.85%",
-        "perf_1m": "-20.56%",
-        "perf_3m": "-7.74%"
-      },
-      {
-        "industry": "Conglomerates",
-        "perf_1d": "-1.71%",
-        "perf_1w": "-1.44%",
-        "perf_1m": "-5.24%",
-        "perf_3m": "-1.80%"
-      },
-      {
-        "industry": "Pharmaceutical Retailers",
-        "perf_1d": "-1.74%",
-        "perf_1w": "3.11%",
-        "perf_1m": "13.14%",
-        "perf_3m": "-0.39%"
-      },
-      {
-        "industry": "Other Industrial Metals & Mining",
-        "perf_1d": "-1.75%",
-        "perf_1w": "-1.59%",
-        "perf_1m": "9.45%",
-        "perf_3m": "-0.65%"
-      },
-      {
-        "industry": "Computer Hardware",
-        "perf_1d": "-1.92%",
-        "perf_1w": "-1.48%",
-        "perf_1m": "6.07%",
-        "perf_3m": "-3.30%"
-      },
-      {
-        "industry": "Industrial Distribution",
-        "perf_1d": "-2.05%",
-        "perf_1w": "-2.35%",
-        "perf_1m": "0.55%",
-        "perf_3m": "1.69%"
-      },
-      {
-        "industry": "Metal Fabrication",
-        "perf_1d": "-2.05%",
-        "perf_1w": "-0.49%",
-        "perf_1m": "1.05%",
-        "perf_3m": "3.52%"
-      },
-      {
-        "industry": "Department Stores",
-        "perf_1d": "-2.07%",
-        "perf_1w": "-1.40%",
-        "perf_1m": "-3.89%",
-        "perf_3m": "5.28%"
-      },
-      {
-        "industry": "Airports & Air Services",
-        "perf_1d": "-2.11%",
-        "perf_1w": "-2.65%",
-        "perf_1m": "-5.95%",
-        "perf_3m": "-19.33%"
-      },
-      {
-        "industry": "Health Information Services",
-        "perf_1d": "-2.23%",
-        "perf_1w": "1.79%",
-        "perf_1m": "19.88%",
-        "perf_3m": "34.26%"
-      },
-      {
-        "industry": "Electronics & Computer Distribution",
-        "perf_1d": "-2.27%",
-        "perf_1w": "0.62%",
-        "perf_1m": "1.37%",
-        "perf_3m": "2.34%"
-      },
-      {
-        "industry": "Utilities - Independent Power Producers",
-        "perf_1d": "-2.32%",
-        "perf_1w": "0.03%",
-        "perf_1m": "-2.96%",
-        "perf_3m": "-12.48%"
-      },
-      {
-        "industry": "Specialty Industrial Machinery",
-        "perf_1d": "-2.43%",
-        "perf_1w": "-2.87%",
-        "perf_1m": "-2.59%",
-        "perf_3m": "-0.81%"
-      },
-      {
-        "industry": "Scientific & Technical Instruments",
-        "perf_1d": "-2.59%",
-        "perf_1w": "-2.09%",
-        "perf_1m": "-0.01%",
-        "perf_3m": "-5.02%"
-      },
-      {
-        "industry": "Copper",
-        "perf_1d": "-2.76%",
-        "perf_1w": "-1.68%",
-        "perf_1m": "17.07%",
-        "perf_3m": "11.64%"
-      },
-      {
-        "industry": "Mortgage Finance",
-        "perf_1d": "-2.76%",
-        "perf_1w": "-1.01%",
-        "perf_1m": "1.89%",
-        "perf_3m": "-7.30%"
-      },
-      {
-        "industry": "Communication Equipment",
-        "perf_1d": "-2.78%",
-        "perf_1w": "-1.20%",
-        "perf_1m": "3.80%",
-        "perf_3m": "-9.86%"
-      },
-      {
-        "industry": "Electronic Components",
-        "perf_1d": "-2.83%",
-        "perf_1w": "-0.39%",
-        "perf_1m": "-0.31%",
-        "perf_3m": "-12.19%"
-      },
-      {
-        "industry": "Semiconductors",
-        "perf_1d": "-2.91%",
-        "perf_1w": "-0.33%",
-        "perf_1m": "4.72%",
-        "perf_3m": "-6.57%"
-      },
-      {
-        "industry": "Biotechnology",
-        "perf_1d": "-2.98%",
-        "perf_1w": "-2.67%",
-        "perf_1m": "8.66%",
-        "perf_3m": "18.14%"
-      },
-      {
-        "industry": "Engineering & Construction",
-        "perf_1d": "-3.25%",
-        "perf_1w": "-5.85%",
-        "perf_1m": "-7.48%",
-        "perf_3m": "-15.42%"
-      },
-      {
-        "industry": "Utilities - Renewable",
-        "perf_1d": "-3.30%",
-        "perf_1w": "-4.26%",
-        "perf_1m": "-6.99%",
-        "perf_3m": "-28.39%"
-      },
-      {
-        "industry": "Other Precious Metals & Mining",
-        "perf_1d": "-3.57%",
-        "perf_1w": "-1.96%",
-        "perf_1m": "24.88%",
-        "perf_3m": "2.87%"
-      },
-      {
-        "industry": "Solar",
-        "perf_1d": "-3.58%",
-        "perf_1w": "-3.24%",
-        "perf_1m": "-6.36%",
-        "perf_3m": "-41.08%"
-      },
-      {
-        "industry": "Gold",
-        "perf_1d": "-3.65%",
-        "perf_1w": "-3.14%",
-        "perf_1m": "31.82%",
-        "perf_3m": "11.24%"
-      },
-      {
-        "industry": "Electrical Equipment & Parts",
-        "perf_1d": "-3.76%",
-        "perf_1w": "-1.09%",
-        "perf_1m": "3.98%",
-        "perf_3m": "-20.48%"
+        "perf_1w": "-3.45%",
+        "perf_1m": "3.38%",
+        "perf_3m": "12.02%"
       },
       {
         "industry": "Semiconductor Equipment & Materials",
-        "perf_1d": "-3.96%",
-        "perf_1w": "-4.75%",
-        "perf_1m": "-1.08%",
-        "perf_3m": "-1.94%"
+        "perf_1d": "-0.40%",
+        "perf_1w": "-3.59%",
+        "perf_1m": "-1.30%",
+        "perf_3m": "-2.90%"
       },
       {
-        "industry": "Silver",
-        "perf_1d": "-4.64%",
-        "perf_1w": "1.04%",
-        "perf_1m": "34.32%",
-        "perf_3m": "7.01%"
+        "industry": "Drug Manufacturers - Specialty & Generic",
+        "perf_1d": "-0.41%",
+        "perf_1w": "-1.40%",
+        "perf_1m": "0.76%",
+        "perf_3m": "4.61%"
+      },
+      {
+        "industry": "Staffing & Employment Services",
+        "perf_1d": "-0.41%",
+        "perf_1w": "0.87%",
+        "perf_1m": "9.83%",
+        "perf_3m": "38.45%"
+      },
+      {
+        "industry": "REIT - Residential",
+        "perf_1d": "-0.42%",
+        "perf_1w": "-3.45%",
+        "perf_1m": "-1.50%",
+        "perf_3m": "1.37%"
+      },
+      {
+        "industry": "Auto Parts",
+        "perf_1d": "-0.48%",
+        "perf_1w": "-1.99%",
+        "perf_1m": "-2.11%",
+        "perf_3m": "-5.49%"
+      },
+      {
+        "industry": "Computer Hardware",
+        "perf_1d": "-0.48%",
+        "perf_1w": "2.45%",
+        "perf_1m": "4.63%",
+        "perf_3m": "-8.29%"
+      },
+      {
+        "industry": "Industrial Distribution",
+        "perf_1d": "-0.48%",
+        "perf_1w": "-2.05%",
+        "perf_1m": "-1.49%",
+        "perf_3m": "1.73%"
+      },
+      {
+        "industry": "Consulting Services",
+        "perf_1d": "-0.49%",
+        "perf_1w": "-0.20%",
+        "perf_1m": "4.19%",
+        "perf_3m": "5.44%"
+      },
+      {
+        "industry": "Integrated Freight & Logistics",
+        "perf_1d": "-0.50%",
+        "perf_1w": "0.70%",
+        "perf_1m": "1.62%",
+        "perf_3m": "-4.18%"
+      },
+      {
+        "industry": "Insurance - Property & Casualty",
+        "perf_1d": "-0.51%",
+        "perf_1w": "-1.64%",
+        "perf_1m": "-1.20%",
+        "perf_3m": "14.31%"
+      },
+      {
+        "industry": "Entertainment",
+        "perf_1d": "-0.52%",
+        "perf_1w": "-0.62%",
+        "perf_1m": "10.70%",
+        "perf_3m": "0.38%"
+      },
+      {
+        "industry": "Furnishings, Fixtures & Appliances",
+        "perf_1d": "-0.53%",
+        "perf_1w": "0.54%",
+        "perf_1m": "6.44%",
+        "perf_3m": "20.73%"
+      },
+      {
+        "industry": "Restaurants",
+        "perf_1d": "-0.53%",
+        "perf_1w": "-2.82%",
+        "perf_1m": "-0.43%",
+        "perf_3m": "4.66%"
+      },
+      {
+        "industry": "Electrical Equipment & Parts",
+        "perf_1d": "-0.54%",
+        "perf_1w": "-0.21%",
+        "perf_1m": "0.98%",
+        "perf_3m": "-21.00%"
+      },
+      {
+        "industry": "REIT - Mortgage",
+        "perf_1d": "-0.55%",
+        "perf_1w": "-1.83%",
+        "perf_1m": "0.45%",
+        "perf_3m": "0.05%"
+      },
+      {
+        "industry": "Banks - Regional",
+        "perf_1d": "-0.58%",
+        "perf_1w": "-0.60%",
+        "perf_1m": "-2.10%",
+        "perf_3m": "10.15%"
+      },
+      {
+        "industry": "Financial Data & Stock Exchanges",
+        "perf_1d": "-0.58%",
+        "perf_1w": "0.30%",
+        "perf_1m": "6.56%",
+        "perf_3m": "6.78%"
+      },
+      {
+        "industry": "Insurance - Reinsurance",
+        "perf_1d": "-0.58%",
+        "perf_1w": "-0.36%",
+        "perf_1m": "1.69%",
+        "perf_3m": "18.53%"
+      },
+      {
+        "industry": "REIT - Diversified",
+        "perf_1d": "-0.58%",
+        "perf_1w": "-2.99%",
+        "perf_1m": "-3.14%",
+        "perf_3m": "-4.93%"
+      },
+      {
+        "industry": "Healthcare Plans",
+        "perf_1d": "-0.60%",
+        "perf_1w": "-1.87%",
+        "perf_1m": "-4.07%",
+        "perf_3m": "3.00%"
+      },
+      {
+        "industry": "Broadcasting",
+        "perf_1d": "-0.62%",
+        "perf_1w": "-1.58%",
+        "perf_1m": "2.08%",
+        "perf_3m": "-0.14%"
+      },
+      {
+        "industry": "Credit Services",
+        "perf_1d": "-0.66%",
+        "perf_1w": "-1.68%",
+        "perf_1m": "2.07%",
+        "perf_3m": "14.76%"
+      },
+      {
+        "industry": "Medical Devices",
+        "perf_1d": "-0.72%",
+        "perf_1w": "-2.52%",
+        "perf_1m": "3.45%",
+        "perf_3m": "14.43%"
+      },
+      {
+        "industry": "Insurance - Life",
+        "perf_1d": "-0.73%",
+        "perf_1w": "-1.29%",
+        "perf_1m": "-4.52%",
+        "perf_3m": "10.09%"
+      },
+      {
+        "industry": "Medical Care Facilities",
+        "perf_1d": "-0.76%",
+        "perf_1w": "-2.96%",
+        "perf_1m": "-0.46%",
+        "perf_3m": "15.85%"
+      },
+      {
+        "industry": "Specialty Business Services",
+        "perf_1d": "-0.78%",
+        "perf_1w": "-1.58%",
+        "perf_1m": "0.34%",
+        "perf_3m": "4.32%"
+      },
+      {
+        "industry": "Confectioners",
+        "perf_1d": "-0.80%",
+        "perf_1w": "-4.86%",
+        "perf_1m": "-0.10%",
+        "perf_3m": "-0.07%"
+      },
+      {
+        "industry": "REIT - Retail",
+        "perf_1d": "-0.80%",
+        "perf_1w": "-2.77%",
+        "perf_1m": "-6.14%",
+        "perf_3m": "2.19%"
+      },
+      {
+        "industry": "Diagnostics & Research",
+        "perf_1d": "-0.82%",
+        "perf_1w": "-1.17%",
+        "perf_1m": "7.95%",
+        "perf_3m": "23.38%"
+      },
+      {
+        "industry": "Specialty Chemicals",
+        "perf_1d": "-0.82%",
+        "perf_1w": "-0.78%",
+        "perf_1m": "2.57%",
+        "perf_3m": "2.17%"
+      },
+      {
+        "industry": "Other Industrial Metals & Mining",
+        "perf_1d": "-0.87%",
+        "perf_1w": "-2.54%",
+        "perf_1m": "9.66%",
+        "perf_3m": "-3.75%"
+      },
+      {
+        "industry": "Aerospace & Defense",
+        "perf_1d": "-0.88%",
+        "perf_1w": "0.55%",
+        "perf_1m": "5.60%",
+        "perf_3m": "-6.58%"
+      },
+      {
+        "industry": "REIT - Industrial",
+        "perf_1d": "-0.91%",
+        "perf_1w": "-3.11%",
+        "perf_1m": "-4.03%",
+        "perf_3m": "1.35%"
+      },
+      {
+        "industry": "Home Improvement Retail",
+        "perf_1d": "-0.92%",
+        "perf_1w": "-3.57%",
+        "perf_1m": "-1.38%",
+        "perf_3m": "3.66%"
+      },
+      {
+        "industry": "Utilities - Regulated Electric",
+        "perf_1d": "-0.95%",
+        "perf_1w": "-2.42%",
+        "perf_1m": "-5.02%",
+        "perf_3m": "-1.69%"
+      },
+      {
+        "industry": "Auto & Truck Dealerships",
+        "perf_1d": "-0.96%",
+        "perf_1w": "-0.14%",
+        "perf_1m": "3.35%",
+        "perf_3m": "6.81%"
+      },
+      {
+        "industry": "Metal Fabrication",
+        "perf_1d": "-0.98%",
+        "perf_1w": "-0.70%",
+        "perf_1m": "-1.63%",
+        "perf_3m": "1.34%"
+      },
+      {
+        "industry": "Beverages - Brewers",
+        "perf_1d": "-1.02%",
+        "perf_1w": "-1.61%",
+        "perf_1m": "-7.30%",
+        "perf_3m": "-3.16%"
+      },
+      {
+        "industry": "Building Products & Equipment",
+        "perf_1d": "-1.12%",
+        "perf_1w": "-2.65%",
+        "perf_1m": "-3.94%",
+        "perf_3m": "-3.84%"
+      },
+      {
+        "industry": "Tobacco",
+        "perf_1d": "-1.16%",
+        "perf_1w": "-1.19%",
+        "perf_1m": "-2.52%",
+        "perf_3m": "2.51%"
+      },
+      {
+        "industry": "Consumer Electronics",
+        "perf_1d": "-1.18%",
+        "perf_1w": "1.78%",
+        "perf_1m": "2.38%",
+        "perf_3m": "3.25%"
+      },
+      {
+        "industry": "Publishing",
+        "perf_1d": "-1.19%",
+        "perf_1w": "-0.59%",
+        "perf_1m": "-6.79%",
+        "perf_3m": "-2.68%"
       },
       {
         "industry": "Uranium",
-        "perf_1d": "-6.65%",
-        "perf_1w": "-2.89%",
-        "perf_1m": "14.30%",
-        "perf_3m": "-10.66%"
+        "perf_1d": "-1.19%",
+        "perf_1w": "-3.51%",
+        "perf_1m": "15.24%",
+        "perf_3m": "-11.47%"
+      },
+      {
+        "industry": "Beverages - Non-Alcoholic",
+        "perf_1d": "-1.20%",
+        "perf_1w": "-3.64%",
+        "perf_1m": "0.19%",
+        "perf_3m": "7.31%"
+      },
+      {
+        "industry": "Footwear & Accessories",
+        "perf_1d": "-1.20%",
+        "perf_1w": "-3.94%",
+        "perf_1m": "-8.46%",
+        "perf_3m": "-15.85%"
+      },
+      {
+        "industry": "Paper & Paper Products",
+        "perf_1d": "-1.24%",
+        "perf_1w": "-3.05%",
+        "perf_1m": "2.16%",
+        "perf_3m": "6.43%"
+      },
+      {
+        "industry": "Recreational Vehicles",
+        "perf_1d": "-1.24%",
+        "perf_1w": "-4.10%",
+        "perf_1m": "-0.50%",
+        "perf_3m": "-2.71%"
+      },
+      {
+        "industry": "Specialty Industrial Machinery",
+        "perf_1d": "-1.25%",
+        "perf_1w": "-3.22%",
+        "perf_1m": "-5.25%",
+        "perf_3m": "-0.88%"
+      },
+      {
+        "industry": "Copper",
+        "perf_1d": "-1.29%",
+        "perf_1w": "-3.06%",
+        "perf_1m": "17.30%",
+        "perf_3m": "7.94%"
+      },
+      {
+        "industry": "Personal Services",
+        "perf_1d": "-1.29%",
+        "perf_1w": "-2.50%",
+        "perf_1m": "0.14%",
+        "perf_3m": "-0.54%"
+      },
+      {
+        "industry": "Education & Training Services",
+        "perf_1d": "-1.31%",
+        "perf_1w": "0.78%",
+        "perf_1m": "-0.75%",
+        "perf_3m": "1.12%"
+      },
+      {
+        "industry": "Real Estate - Development",
+        "perf_1d": "-1.31%",
+        "perf_1w": "-1.78%",
+        "perf_1m": "0.50%",
+        "perf_3m": "10.16%"
+      },
+      {
+        "industry": "Tools & Accessories",
+        "perf_1d": "-1.34%",
+        "perf_1w": "-1.57%",
+        "perf_1m": "-3.11%",
+        "perf_3m": "3.82%"
+      },
+      {
+        "industry": "Airports & Air Services",
+        "perf_1d": "-1.35%",
+        "perf_1w": "-2.04%",
+        "perf_1m": "-6.31%",
+        "perf_3m": "-20.17%"
+      },
+      {
+        "industry": "Insurance - Specialty",
+        "perf_1d": "-1.37%",
+        "perf_1w": "-1.21%",
+        "perf_1m": "-3.75%",
+        "perf_3m": "11.14%"
+      },
+      {
+        "industry": "Gold",
+        "perf_1d": "-1.39%",
+        "perf_1w": "-5.19%",
+        "perf_1m": "34.21%",
+        "perf_3m": "12.70%"
+      },
+      {
+        "industry": "Security & Protection Services",
+        "perf_1d": "-1.39%",
+        "perf_1w": "-2.47%",
+        "perf_1m": "-0.99%",
+        "perf_3m": "15.49%"
+      },
+      {
+        "industry": "Electronic Gaming & Multimedia",
+        "perf_1d": "-1.40%",
+        "perf_1w": "-1.38%",
+        "perf_1m": "-5.59%",
+        "perf_3m": "-4.45%"
+      },
+      {
+        "industry": "Apparel Retail",
+        "perf_1d": "-1.43%",
+        "perf_1w": "-5.08%",
+        "perf_1m": "-11.57%",
+        "perf_3m": "-6.08%"
+      },
+      {
+        "industry": "REIT - Office",
+        "perf_1d": "-1.44%",
+        "perf_1w": "-3.67%",
+        "perf_1m": "-3.39%",
+        "perf_3m": "10.98%"
+      },
+      {
+        "industry": "Advertising Agencies",
+        "perf_1d": "-1.46%",
+        "perf_1w": "2.17%",
+        "perf_1m": "-13.53%",
+        "perf_3m": "-37.52%"
+      },
+      {
+        "industry": "Beverages - Wineries & Distilleries",
+        "perf_1d": "-1.47%",
+        "perf_1w": "-5.00%",
+        "perf_1m": "1.69%",
+        "perf_3m": "12.04%"
+      },
+      {
+        "industry": "Silver",
+        "perf_1d": "-1.48%",
+        "perf_1w": "-0.29%",
+        "perf_1m": "37.45%",
+        "perf_3m": "6.61%"
+      },
+      {
+        "industry": "Building Materials",
+        "perf_1d": "-1.51%",
+        "perf_1w": "-2.04%",
+        "perf_1m": "-1.87%",
+        "perf_3m": "-8.76%"
+      },
+      {
+        "industry": "Conglomerates",
+        "perf_1d": "-1.55%",
+        "perf_1w": "-2.71%",
+        "perf_1m": "-6.68%",
+        "perf_3m": "-2.76%"
+      },
+      {
+        "industry": "Aluminum",
+        "perf_1d": "-1.66%",
+        "perf_1w": "1.05%",
+        "perf_1m": "4.19%",
+        "perf_3m": "-31.39%"
+      },
+      {
+        "industry": "Apparel Manufacturing",
+        "perf_1d": "-1.69%",
+        "perf_1w": "-5.05%",
+        "perf_1m": "-7.26%",
+        "perf_3m": "-8.27%"
+      },
+      {
+        "industry": "Utilities - Diversified",
+        "perf_1d": "-1.69%",
+        "perf_1w": "-2.12%",
+        "perf_1m": "-6.52%",
+        "perf_3m": "-4.27%"
+      },
+      {
+        "industry": "Residential Construction",
+        "perf_1d": "-1.70%",
+        "perf_1w": "-2.65%",
+        "perf_1m": "1.71%",
+        "perf_3m": "2.92%"
+      },
+      {
+        "industry": "Railroads",
+        "perf_1d": "-1.77%",
+        "perf_1w": "-2.62%",
+        "perf_1m": "1.35%",
+        "perf_3m": "9.93%"
+      },
+      {
+        "industry": "Leisure",
+        "perf_1d": "-1.84%",
+        "perf_1w": "-3.55%",
+        "perf_1m": "-8.49%",
+        "perf_3m": "-1.56%"
+      },
+      {
+        "industry": "Luxury Goods",
+        "perf_1d": "-1.84%",
+        "perf_1w": "-6.00%",
+        "perf_1m": "-17.93%",
+        "perf_3m": "-11.17%"
+      },
+      {
+        "industry": "Food Distribution",
+        "perf_1d": "-1.93%",
+        "perf_1w": "-4.42%",
+        "perf_1m": "-4.87%",
+        "perf_3m": "12.07%"
+      },
+      {
+        "industry": "Airlines",
+        "perf_1d": "-1.94%",
+        "perf_1w": "-4.18%",
+        "perf_1m": "-10.23%",
+        "perf_3m": "-5.30%"
+      },
+      {
+        "industry": "Internet Content & Information",
+        "perf_1d": "-1.98%",
+        "perf_1w": "-1.47%",
+        "perf_1m": "-3.35%",
+        "perf_3m": "-8.58%"
+      },
+      {
+        "industry": "Other Precious Metals & Mining",
+        "perf_1d": "-1.98%",
+        "perf_1w": "-3.86%",
+        "perf_1m": "27.09%",
+        "perf_3m": "3.58%"
+      },
+      {
+        "industry": "Lodging",
+        "perf_1d": "-2.18%",
+        "perf_1w": "-4.19%",
+        "perf_1m": "-3.78%",
+        "perf_3m": "-5.47%"
+      },
+      {
+        "industry": "Packaging & Containers",
+        "perf_1d": "-2.18%",
+        "perf_1w": "-4.40%",
+        "perf_1m": "-1.11%",
+        "perf_3m": "14.30%"
+      },
+      {
+        "industry": "REIT - Hotel & Motel",
+        "perf_1d": "-2.30%",
+        "perf_1w": "-4.07%",
+        "perf_1m": "-7.91%",
+        "perf_3m": "4.88%"
+      },
+      {
+        "industry": "Solar",
+        "perf_1d": "-2.55%",
+        "perf_1w": "-3.42%",
+        "perf_1m": "-7.97%",
+        "perf_3m": "-40.21%"
+      },
+      {
+        "industry": "Gambling",
+        "perf_1d": "-2.63%",
+        "perf_1w": "-3.96%",
+        "perf_1m": "-0.82%",
+        "perf_3m": "-3.69%"
+      },
+      {
+        "industry": "Mortgage Finance",
+        "perf_1d": "-2.63%",
+        "perf_1w": "-4.52%",
+        "perf_1m": "1.49%",
+        "perf_3m": "-7.71%"
+      },
+      {
+        "industry": "Real Estate Services",
+        "perf_1d": "-2.73%",
+        "perf_1w": "-3.89%",
+        "perf_1m": "1.17%",
+        "perf_3m": "8.55%"
+      },
+      {
+        "industry": "Resorts & Casinos",
+        "perf_1d": "-2.82%",
+        "perf_1w": "-6.28%",
+        "perf_1m": "-8.44%",
+        "perf_3m": "-12.87%"
+      },
+      {
+        "industry": "Internet Retail",
+        "perf_1d": "-2.83%",
+        "perf_1w": "-1.50%",
+        "perf_1m": "-4.00%",
+        "perf_3m": "-0.22%"
+      },
+      {
+        "industry": "Travel Services",
+        "perf_1d": "-3.00%",
+        "perf_1w": "-5.88%",
+        "perf_1m": "-1.92%",
+        "perf_3m": "8.76%"
+      },
+      {
+        "industry": "Insurance Brokers",
+        "perf_1d": "-3.44%",
+        "perf_1w": "-4.77%",
+        "perf_1m": "-0.20%",
+        "perf_3m": "17.71%"
+      },
+      {
+        "industry": "Textile Manufacturing",
+        "perf_1d": "-4.85%",
+        "perf_1w": "-10.97%",
+        "perf_1m": "-24.93%",
+        "perf_3m": "-11.39%"
       }
     ]
   },
   "breadth": {
-    "above_200sma_pct": 77.2,
-    "near_52w_high_pct": 60.8,
+    "above_200sma_pct": 74.7,
+    "near_52w_high_pct": 57.0,
     "tickers_sampled": 79
   },
   "fear_greed": {
-    "value": 54.4,
+    "value": 49.5,
     "label": "neutral",
     "status": "ok",
     "source": "cnn",
-    "as_of": "2026-08-28T23:43:26+00:00"
+    "as_of": "2026-08-31T19:19:03+00:00"
   }
 }

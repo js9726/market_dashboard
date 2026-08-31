@@ -1,421 +1,458 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-ON",
+    "label": "RISK-OFF",
     "posture": "WAIT",
-    "summary": "Markets are mixed and cautious ahead of Fed Chair Warsh's key speech at the Jackson Hole symposium. An AI-fueled rally shows signs of pausing, creating a choppy, wait-and-see environment."
+    "summary": "Geopolitical tensions in the Middle East are spiking oil prices and Treasury yields, putting pressure on equity futures to start the week. The focus is on inflation and potential Fed hawkishness."
   },
   "breadth": {
-    "up": 1983,
-    "down": 2745
+    "up": null,
+    "down": null
   },
   "fearGreed": {
-    "score": 58,
-    "label": "Greed"
+    "score": 54,
+    "label": "Neutral"
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500",
-      "level": 7747,
-      "changePct": 0.1,
+      "level": null,
+      "changePct": -0.45,
       "note": "futures",
       "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
-      "level": 29634,
-      "changePct": -0.21,
+      "level": null,
+      "changePct": -0.38,
       "note": "futures",
       "citation": null
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
-      "level": 53690,
-      "changePct": 0.18,
+      "level": null,
+      "changePct": -0.6,
       "note": "futures",
       "citation": null
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
-      "level": 3014.34,
-      "changePct": 0.28,
-      "note": "live",
+      "level": null,
+      "changePct": -1.39,
+      "note": "futures",
       "citation": null
     },
     {
       "symbol": "^VIX",
-      "name": "Volatility",
-      "level": 14.53,
-      "changePct": 0.14,
+      "name": "Volatility Index",
+      "level": 15.38,
+      "changePct": 6.58,
       "note": "live",
       "citation": null
     },
     {
       "symbol": "^TNX",
-      "name": "10Y Yield",
-      "level": 4.722,
-      "changePct": 1.07,
+      "name": "10-Yr Treasury Yield",
+      "level": 4.76,
+      "changePct": 0.85,
       "note": "live",
       "citation": null
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil",
-      "level": 83,
-      "changePct": 0,
-      "note": "live",
+      "name": "Crude Oil (WTI)",
+      "level": 86.04,
+      "changePct": 3.17,
+      "note": "futures",
       "citation": null
     }
   ],
-  "indicesNarrative": "US futures are mixed as the market pauses after a tech-led rally. All eyes are on Fed Chair Kevin Warsh's speech at Jackson Hole for future monetary policy signals. The Nasdaq is showing some pre-market weakness as the AI-fueled momentum cools, while the Dow is slightly positive.",
-  "technicals": null,
-  "technicalsNarrative": "Technical data not available. Cannot assess entry risk or momentum indicators.",
+  "indicesNarrative": "Futures are broadly lower, with small caps (IWM) showing the most weakness. A spike in the VIX and the 10-year yield to 4.76% reflects a flight to safety and renewed inflation fears driven by surging oil prices.",
+  "technicals": {
+    "SPY": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    },
+    "QQQ": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    },
+    "DIA": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": null,
+      "curving_down": null,
+      "bear_cross_imminent": null,
+      "overbought": null,
+      "oversold": null,
+      "entry_risk": "UNKNOWN"
+    }
+  },
+  "technicalsNarrative": "Technical data was not available for generation. Risk posture should be defensive given the risk-off sentiment from macro catalysts.",
   "sectorsThemes": [
+    {
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": 0.9,
+      "rs": null,
+      "note": "Leading pre-market on surging crude oil prices due to US-Iran tensions."
+    },
     {
       "symbol": "XLK",
       "name": "Technology",
       "changePct": null,
       "rs": null,
-      "note": "Led the market higher yesterday on strong earnings from Nvidia and software names, but futures indicate a pause today."
+      "note": "Was a top performer last week but facing pressure from rising yields."
     },
     {
-      "symbol": "SMH",
-      "name": "Semiconductors",
+      "symbol": "XLC",
+      "name": "Communication Services",
       "changePct": null,
       "rs": null,
-      "note": "Chip stocks are pulling back in pre-market after a strong rally driven by Nvidia's blockbuster forecast."
+      "note": "Also a leader last week, now facing headwinds from risk-off sentiment."
     },
     {
-      "symbol": "XLY",
-      "name": "Consumer Discretionary",
-      "changePct": -0.7,
+      "symbol": "XLU",
+      "name": "Utilities",
+      "changePct": null,
       "rs": null,
-      "note": "Was one of the worst-performing sectors in the previous session."
-    },
-    {
-      "symbol": "XLV",
-      "name": "Healthcare",
-      "changePct": -1,
-      "rs": null,
-      "note": "Led declines in the prior session."
+      "note": "Under pressure from wildfire liability concerns hitting major components PCG and EIX."
     }
   ],
-  "sectorsNarrative": "Technology was the only sector to advance yesterday, driven by strong AI-related earnings. However, pre-market action suggests a rotation away from tech today, with defensives like utilities showing relative weakness recently, indicating some risk appetite remains.",
-  "industryNarrative": "Semiconductors and Software were the clear leaders yesterday following blowout earnings from Nvidia and strong results from Salesforce and Crowdstrike. However, some chip names like Marvell are seeing pre-market weakness on outlook concerns, suggesting investors are becoming more selective.",
+  "sectorsNarrative": "A clear rotation is underway this morning, with money flowing into Energy (XLE) as a geopolitical hedge and out of rate-sensitive sectors like Technology and Utilities.",
+  "industryNarrative": "Within Technology, AI-related names and semiconductors showed strength last week, but are likely to pull back with the broader market today. The standout weakness is in California utilities due to legislative news regarding wildfire liabilities.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "GAP",
+      "ticker": "RDHL",
       "side": "LONG",
-      "changePct": 17.4,
-      "why": "Raised its annual profit forecast and named a new CEO for Old Navy.",
-      "traderLens": "Qullamaggie"
+      "changePct": 102.72,
+      "why": "Announced divestment of its Talicia business for $18M upfront cash plus milestones, improving liquidity.",
+      "traderLens": "Episodic pivot setup (Qullamaggie) on high-volume news catalyst."
     },
     {
-      "ticker": "AFRM",
+      "ticker": "SAIC",
       "side": "LONG",
-      "changePct": 12,
-      "why": "Reported Q2 revenues and guidance that beat Wall Street estimates.",
-      "traderLens": "Momentum"
+      "changePct": 6.85,
+      "why": "Reported a significant Q2 earnings and revenue beat and raised full-year guidance.",
+      "traderLens": "Positive earnings reaction, potential for momentum continuation."
     },
     {
-      "ticker": "PYPL",
-      "side": "SHORT",
-      "changePct": -14.4,
-      "why": "A consortium of Advent and Stripe reportedly abandoned their takeover pursuit of the company.",
-      "traderLens": "News Catalyst"
+      "ticker": "TSLA",
+      "side": "LONG",
+      "changePct": 5.2,
+      "why": "Reported a price cut on its Model 3, seen as a move to drive volume.",
+      "traderLens": "Catalyst-driven move, attracting momentum traders."
     },
     {
-      "ticker": "MRVL",
+      "ticker": "FNGR",
       "side": "SHORT",
-      "changePct": -8.0,
-      "why": "Despite beating Q2 estimates, the stock fell as its outlook failed to meet very high investor expectations for AI-related growth.",
-      "traderLens": "Post-earnings fade"
+      "changePct": -32.9,
+      "why": "Giving back a portion of Friday's +100% surge, which was based on a pivot to AI data centers. Classic speculative volatility.",
+      "traderLens": "Mean reversion play after an unsustainable parabolic move."
     },
     {
-      "ticker": "ULTA",
+      "ticker": "EIX",
       "side": "SHORT",
-      "changePct": -1.1,
-      "why": "The cosmetics retailer reported a drop in comparable sales growth for the second quarter.",
-      "traderLens": "Fundamental Weakness"
+      "changePct": -22.8,
+      "why": "Slumping on reports about potential California wildfire legislation that could increase utility liabilities.",
+      "traderLens": "Negative news catalyst driving breakdown."
+    },
+    {
+      "ticker": "PCG",
+      "side": "SHORT",
+      "changePct": -19.9,
+      "why": "Also falling sharply due to the same California wildfire legislation concerns and analyst downgrades.",
+      "traderLens": "Negative news catalyst driving breakdown."
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
       "level": null,
-      "changePct": -0.2,
-      "abc": "A",
-      "note": "Slipping slightly in pre-market after a massive earnings-driven rally. Watching to see if it can hold recent gains."
+      "changePct": -0.4,
+      "abc": null,
+      "note": "Pulling back with broad market on macro fears."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": null,
-      "abc": null,
-      "note": "No major specific news. Will likely trade with the broader market and tech sentiment."
+      "changePct": 5.2,
+      "abc": "A",
+      "note": "Showing relative strength on company-specific news (Model 3 price cut)."
     },
     {
       "ticker": "AAPL",
       "level": null,
-      "changePct": null,
+      "changePct": -0.4,
       "abc": null,
-      "note": "No major news; will be influenced by overall market direction."
+      "note": "Drifting lower with index futures."
     },
     {
       "ticker": "MSFT",
       "level": null,
-      "changePct": null,
+      "changePct": -0.4,
       "abc": null,
-      "note": "Caught a tailwind from the AI theme yesterday. Watching for continuation."
+      "note": "Drifting lower with index futures."
     },
     {
       "ticker": "AMZN",
       "level": null,
-      "changePct": null,
+      "changePct": -0.4,
       "abc": null,
-      "note": "General market sentiment will be the primary driver."
+      "note": "Drifting lower with index futures."
     },
     {
       "ticker": "META",
       "level": null,
-      "changePct": null,
+      "changePct": -0.4,
       "abc": null,
-      "note": "No specific catalyst. Follows broad market and tech trends."
+      "note": "Drifting lower with index futures."
     },
     {
       "ticker": "GOOGL",
       "level": null,
-      "changePct": null,
+      "changePct": -0.4,
       "abc": null,
-      "note": "Marvell's post-earnings drop related to its Google AI chip deal could create some noise."
+      "note": "Drifting lower with index futures."
     },
     {
       "ticker": "AMD",
       "level": null,
-      "changePct": null,
+      "changePct": -0.5,
       "abc": null,
-      "note": "Trading in sympathy with the broader semiconductor sector, which is pulling back pre-market."
+      "note": "Semis pulling back with Nasdaq."
     },
     {
       "ticker": "SMCI",
       "level": null,
-      "changePct": null,
+      "changePct": -0.5,
       "abc": null,
-      "note": "A key AI-related name, will be sensitive to any shifts in the AI narrative."
+      "note": "High-beta name pulling back in risk-off tape."
     },
     {
       "ticker": "PLTR",
       "level": null,
-      "changePct": null,
+      "changePct": -0.5,
       "abc": null,
-      "note": "Another AI-linked stock; watching for sector momentum."
+      "note": "High-beta name pulling back in risk-off tape."
     },
     {
       "ticker": "CRWD",
       "level": null,
-      "changePct": null,
+      "changePct": -0.5,
       "abc": null,
-      "note": "Rallied yesterday after strong results. Monitoring for follow-through."
+      "note": "Cybersecurity pulling back with tech."
     },
     {
       "ticker": "MSTR",
       "level": null,
-      "changePct": null,
+      "changePct": -0.5,
       "abc": null,
-      "note": "Sensitive to cryptocurrency price movements; Bitcoin pulled back from recent highs."
+      "note": "Crypto-proxy likely down with risk assets."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is in a confirmed uptrend but showing signs of chop. Caution is warranted; focus only on A+ setups."
+      "view": "Market is under pressure. Not an ideal environment to be buying breakouts. Focus on protecting capital."
     },
     {
       "name": "Ted Zhang",
-      "view": "Rotation out of recent tech leaders may be starting. Watch for strength in other sectors if tech continues to pause."
+      "view": "Clear rotation into Energy. Money is flowing out of tech and other rate-sensitive sectors."
     },
     {
       "name": "Clement Ang",
-      "view": "The mixed futures and pre-market action ahead of a major catalyst (Warsh's speech) suggests sitting on hands until a clearer direction emerges."
+      "view": "This is a C/D-grade market environment due to geopolitical risk. Best to sit on hands or be very selective with small size."
     },
     {
       "name": "SRxTrades",
-      "view": "Volume was below average yesterday, and breadth was weak despite the headline index gains. This is not a high-conviction environment to be aggressive."
+      "view": "No clean pivots to enter. Chasing energy is risky, and shorting tech into potential support is also tricky. Patience is key."
     },
     {
       "name": "Jeff",
-      "view": "Stick to the plan. Do not initiate new positions based on FOMO from yesterday's AI rally. Wait for proper entries and honor stops."
+      "view": "Respect hard stops. The increased volatility can lead to wider ranges and quicker losses if not managed."
     },
     {
       "name": "Qullamaggie",
-      "view": "The momentum from yesterday is fading pre-market. Wait for the open to see if buyers step back in with volume before chasing any breakouts."
+      "view": "The only real momentum is in news-driven episodic pivots like RDHL. The broad market is not conducive for breakouts."
     },
     {
       "name": "Composite",
-      "view": "Wait for the market to digest Fed Chair Warsh's speech. The tape is mixed and key tech names are pulling back. It's a day to observe and wait for higher-quality setups to emerge rather than forcing trades."
+      "view": "Wait and observe. The tape is risk-off. Monitor energy stocks for potential flags and see if tech finds support. Do not force trades today."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "BRP Inc. (DOO.TO)",
-        "consensus": "Rev $1.4B"
+        "ticker": "SAIC",
+        "consensus": "EPS $2.31 / Rev $1.76B"
       },
       {
-        "ticker": "Laurentian Bank of Canada (LRCDF)",
-        "consensus": "EPS $0.44 / Rev $174.3M"
+        "ticker": "BLRX",
+        "consensus": "N/A"
       }
     ],
-    "amc": [
-      {
-        "ticker": "BW LPG Limited (BWLP)",
-        "consensus": "EPS $1.25 / Rev $328.3M"
-      }
-    ],
+    "amc": [],
     "yesterdayReactions": [
       {
-        "ticker": "NVDA",
-        "result": "Beat estimates and provided strong guidance",
-        "movePct": null
-      },
-      {
-        "ticker": "CRM",
-        "result": "Beat estimates",
-        "movePct": 22.6
-      },
-      {
-        "ticker": "CRWD",
-        "result": "Beat estimates",
-        "movePct": 20
+        "ticker": "SAIC",
+        "result": "beat by 30%",
+        "movePct": 6.85
       }
     ]
   },
   "calendar": [
     {
-      "time": "09:45 ET",
-      "name": "Chicago PMI (Aug)",
-      "consensus": null
-    },
-    {
-      "time": "10:00 ET",
-      "name": "University of Michigan Consumer Sentiment (Aug F)",
-      "consensus": null
-    },
-    {
-      "time": "All Day",
-      "name": "Fed Chair Warsh Speaks at Jackson Hole Symposium",
+      "time": "10:30 ET",
+      "name": "Dallas Fed Manufacturing Survey",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "NVDA",
-        "firm": "Seeking Alpha",
-        "rating": "Bullish",
-        "pt": null
-      },
-      {
-        "ticker": "ZM",
-        "firm": "Seeking Alpha",
-        "rating": "Buy",
-        "pt": null
-      },
-      {
-        "ticker": "PBR",
-        "firm": "Bradesco BBI",
+        "ticker": "DE",
+        "firm": "Baird",
         "rating": "Outperform",
-        "pt": 20
+        "pt": 800
+      },
+      {
+        "ticker": "AGCO",
+        "firm": "Baird",
+        "rating": "Outperform",
+        "pt": 150
       }
     ],
     "downgrades": [
       {
-        "ticker": "DLTR",
-        "firm": "IWA Research",
-        "rating": "Hold",
+        "ticker": "PCG",
+        "firm": "Mizuho/BMO",
+        "rating": "Neutral/Market Perform",
         "pt": null
       },
       {
-        "ticker": "SOFI",
-        "firm": "Seeking Alpha",
-        "rating": "Hold",
+        "ticker": "EIX",
+        "firm": "Mizuho",
+        "rating": null,
         "pt": null
-      },
-      {
-        "ticker": "WDAY",
-        "firm": "Capital One",
-        "rating": "Equalweight",
-        "pt": 219
       }
     ]
   },
-  "alert": "All eyes on Fed Chair Kevin Warsh's Jackson Hole speech today for monetary policy clues.",
+  "alert": "RISK-OFF: US-Iran tensions spike Oil prices, pressuring equities.",
   "news": [
     {
-      "headline": "US stock futures are mixed as traders await Fed Chair Warsh's key speech at the Jackson Hole economic symposium.",
+      "headline": "Stocks fall, oil prices surge after U.S. launches first military strike in a month against Iran",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
-        "DIA"
+        "CL=F",
+        "XLE"
       ],
-      "source": "TradingKey",
-      "time": "Pre-market"
+      "source": "Pittsburgh Post-Gazette",
+      "time": "Aug 31, 2026"
     },
     {
-      "headline": "PayPal shares plunge over 14% in pre-market after a report that a buyout consortium abandoned its acquisition plans.",
+      "headline": "10-Year Treasury Yield Rises to 4.76% on Inflation Concerns",
       "impact": "HIGH",
       "tickers": [
-        "PYPL"
+        "^TNX",
+        "TLT",
+        "QQQ"
       ],
-      "source": "Reuters",
-      "time": "Pre-market"
+      "source": "Trading Economics",
+      "time": "Aug 31, 2026"
     },
     {
-      "headline": "Marvell Technology drops over 8% pre-market as its strong results and outlook failed to meet elevated investor expectations for AI growth.",
+      "headline": "SAIC stock rises 7% premarket on strong Q2 earnings beat and raised guidance",
       "impact": "MED",
       "tickers": [
-        "MRVL",
-        "GOOGL",
-        "SMH"
+        "SAIC"
       ],
-      "source": "TradingKey",
-      "time": "Pre-market"
+      "source": "Investing.com",
+      "time": "Aug 31, 2026"
     },
     {
-      "headline": "Gap shares jump 17% pre-market after raising its annual profit forecast and appointing a new CEO for its Old Navy brand.",
+      "headline": "Redhill Biopharma (RDHL) stock soars over 100% after divesting Talicia business for $18M",
       "impact": "MED",
       "tickers": [
-        "GPS"
+        "RDHL"
       ],
-      "source": "Reuters",
-      "time": "Pre-market"
+      "source": "Benzinga",
+      "time": "Aug 31, 2026"
     },
     {
-      "headline": "Asian markets were mixed overnight, while European markets traded higher, showing a cautious global sentiment.",
-      "impact": "LOW",
-      "tickers": null,
-      "source": "STL.News",
-      "time": "Overnight"
+      "headline": "California utility stocks PG&E, Edison Int'l plunge on wildfire liability legislation fears",
+      "impact": "MED",
+      "tickers": [
+        "PCG",
+        "EIX"
+      ],
+      "source": "BNN Bloomberg",
+      "time": "Aug 31, 2026"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "TradingKey",
-    "Reuters",
-    "STL.News",
-    "Seeking Alpha",
-    "Daily Trade Alert",
-    "Scotiabank",
-    "Digrin",
-    "Zacks Investment Research",
-    "Barchart.com",
-    "FinHacker.cz",
-    "TheStreet Pro"
+    "Zacks Investment Research - Stock Market News for Aug 31, 2026",
+    "TheStreet - Stock Market Today (Aug. 31, 2026): Russell 2000, S&P 500 fall to start week",
+    "Pittsburgh Post-Gazette - Oil prices rise and stocks fall after U.S. hits Iranian sites",
+    "The Motley Fool - Market Indexes Slip to Close Out a Winning, Turbulent August",
+    "BNN Bloomberg - Oil prices rise and stocks fall after U.S. hits Iranian sites",
+    "Benzinga - Redhill Biopharma Stock Doubles In One Session — Here's Why",
+    "Benzinga - What's Going On With FingerMotion Stock On Monday?",
+    "Investing.com - SAIC stock rises 7% on strong earnings beat and raised guidance",
+    "Trading Economics - US 10 Year Treasury Note Yield",
+    "24/7 Wall St. - Here Are Monday's Top Wall Street Analyst Research Calls"
   ]
 }
