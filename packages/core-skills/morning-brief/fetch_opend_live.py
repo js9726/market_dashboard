@@ -100,8 +100,15 @@ def _opend_exe_path() -> Path | None:
     """Best-effort lookup for the moomoo_OpenD.exe GUI launcher (Windows only)."""
     if os.name != "nt":
         return None
+    # %APPDATA%\moomoo_OpenD is the real install the moomoo updater maintains.
+    # It MUST stay first.
+    #
+    # Do NOT re-add %LOCALAPPDATA%\Packages\Claude_*\LocalCache\Roaming\moomoo_OpenD.
+    # That path is an MSIX/AppContainer redirect snapshot, frozen at whatever build
+    # OpenD was when it last ran inside the Claude sandbox. The updater never writes
+    # there, so launching it silently pins OpenD to an old version forever.
     candidates = [
-        Path(os.environ.get("LOCALAPPDATA", "")) / "Packages" / "Claude_pzs8sxrjxfjjc" / "LocalCache" / "Roaming" / "moomoo_OpenD" / "moomoo_OpenD.exe",
+        Path(os.environ.get("APPDATA", "")) / "moomoo_OpenD" / "moomoo_OpenD.exe",
         Path(r"C:\Program Files\moomoo OpenD\moomoo_OpenD.exe"),
         Path(r"C:\Program Files (x86)\moomoo OpenD\moomoo_OpenD.exe"),
         Path(os.environ.get("USERPROFILE", "")) / "Desktop" / "moomoo OpenD" / "moomoo_OpenD.exe",
