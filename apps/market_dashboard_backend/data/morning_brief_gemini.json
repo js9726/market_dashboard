@@ -2,14 +2,14 @@
   "mood": {
     "label": "RISK-OFF",
     "posture": "WAIT",
-    "summary": "Geopolitical tensions in the Middle East are spiking oil prices and Treasury yields, putting pressure on equity futures to start the week. The focus is on inflation and potential Fed hawkishness."
+    "summary": "Surging global bond yields and escalating US-Iran tensions are pushing oil prices higher and equities lower. Tech and growth stocks are under significant pressure as the 10-year Treasury yield approaches multi-year highs."
   },
   "breadth": {
-    "up": null,
-    "down": null
+    "up": 966,
+    "down": 1781
   },
   "fearGreed": {
-    "score": 54,
+    "score": 50,
     "label": "Neutral"
   },
   "indices": [
@@ -17,442 +17,393 @@
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.45,
+      "changePct": -0.67,
       "note": "futures",
-      "citation": null
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": -0.38,
+      "changePct": -1.3,
       "note": "futures",
-      "citation": null
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": -0.6,
+      "changePct": -0.51,
       "note": "futures",
-      "citation": null
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
       "level": null,
-      "changePct": -1.39,
+      "changePct": -0.63,
       "note": "futures",
-      "citation": null
+      "citation": "Source: Investing.com"
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 15.38,
-      "changePct": 6.58,
+      "level": 15.95,
+      "changePct": 6.9,
       "note": "live",
-      "citation": null
+      "citation": "Source: Charles Schwab"
     },
     {
       "symbol": "^TNX",
       "name": "10-Yr Treasury Yield",
-      "level": 4.76,
-      "changePct": 0.85,
+      "level": 4.78,
+      "changePct": 0.63,
       "note": "live",
-      "citation": null
+      "citation": "Source: Charles Schwab"
     },
     {
       "symbol": "CL=F",
-      "name": "Crude Oil (WTI)",
-      "level": 86.04,
-      "changePct": 3.17,
+      "name": "WTI Crude Oil",
+      "level": 88.03,
+      "changePct": 2.27,
       "note": "futures",
-      "citation": null
+      "citation": "Source: BNN Bloomberg"
     }
   ],
-  "indicesNarrative": "Futures are broadly lower, with small caps (IWM) showing the most weakness. A spike in the VIX and the 10-year yield to 4.76% reflects a flight to safety and renewed inflation fears driven by surging oil prices.",
-  "technicals": {
-    "SPY": {
-      "close": null,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": null,
-      "ma200": null,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": null,
-      "bear_cross_imminent": null,
-      "overbought": null,
-      "oversold": null,
-      "entry_risk": "UNKNOWN"
-    },
-    "QQQ": {
-      "close": null,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": null,
-      "ma200": null,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": null,
-      "bear_cross_imminent": null,
-      "overbought": null,
-      "oversold": null,
-      "entry_risk": "UNKNOWN"
-    },
-    "DIA": {
-      "close": null,
-      "atr14": null,
-      "atr_pct": null,
-      "ema21": null,
-      "ema50": null,
-      "ma200": null,
-      "dist_21_atr": null,
-      "dist_50_atr": null,
-      "dist_200_atr": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "macd_hist": null,
-      "macd_dir": null,
-      "curving_down": null,
-      "bear_cross_imminent": null,
-      "overbought": null,
-      "oversold": null,
-      "entry_risk": "UNKNOWN"
-    }
-  },
-  "technicalsNarrative": "Technical data was not available for generation. Risk posture should be defensive given the risk-off sentiment from macro catalysts.",
+  "indicesNarrative": "Futures indicate a sharply lower open across all major indices, with the tech-heavy Nasdaq leading losses. The sell-off is driven by a flight from risk assets as the 10-year Treasury yield hits its highest level since January 2025 and oil prices surge on geopolitical news, stoking inflation fears.",
+  "technicals": null,
+  "technicalsNarrative": "Technical data was not available at the time of generation. Entries should be approached with extreme caution in a risk-off environment with elevated volatility.",
   "sectorsThemes": [
     {
       "symbol": "XLE",
       "name": "Energy",
-      "changePct": 0.9,
+      "changePct": 1.81,
       "rs": null,
-      "note": "Leading pre-market on surging crude oil prices due to US-Iran tensions."
+      "note": "Leading yesterday on rising crude prices and geopolitical tension."
     },
     {
       "symbol": "XLK",
       "name": "Technology",
-      "changePct": null,
+      "changePct": 0.21,
       "rs": null,
-      "note": "Was a top performer last week but facing pressure from rising yields."
+      "note": "Positive yesterday but facing heavy selling pressure in pre-market due to rising yields."
     },
     {
-      "symbol": "XLC",
-      "name": "Communication Services",
-      "changePct": null,
+      "symbol": "XLB",
+      "name": "Materials",
+      "changePct": -1.12,
       "rs": null,
-      "note": "Also a leader last week, now facing headwinds from risk-off sentiment."
+      "note": "Lagged yesterday, showing weakness in cyclical sectors."
     },
     {
-      "symbol": "XLU",
-      "name": "Utilities",
-      "changePct": null,
+      "symbol": "XLF",
+      "name": "Financials",
+      "changePct": -0.6,
       "rs": null,
-      "note": "Under pressure from wildfire liability concerns hitting major components PCG and EIX."
+      "note": "Under pressure as yield curve dynamics and recession fears persist."
     }
   ],
-  "sectorsNarrative": "A clear rotation is underway this morning, with money flowing into Energy (XLE) as a geopolitical hedge and out of rate-sensitive sectors like Technology and Utilities.",
-  "industryNarrative": "Within Technology, AI-related names and semiconductors showed strength last week, but are likely to pull back with the broader market today. The standout weakness is in California utilities due to legislative news regarding wildfire liabilities.",
+  "sectorsNarrative": "A clear rotation out of growth and cyclical sectors into energy is evident. Technology, a leader yesterday, is poised to give back gains as rising rates pressure valuations.",
+  "industryNarrative": "Semiconductor stocks are showing significant pre-market weakness after a mixed session yesterday, pressured by rising yields and some profit-taking. Oil and gas exploration and production companies are the standout strength, directly benefiting from the surge in crude prices.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "RDHL",
+      "ticker": "FOX",
       "side": "LONG",
-      "changePct": 102.72,
-      "why": "Announced divestment of its Talicia business for $18M upfront cash plus milestones, improving liquidity.",
-      "traderLens": "Episodic pivot setup (Qullamaggie) on high-volume news catalyst."
+      "changePct": 5.7,
+      "why": "Continued momentum from strong Q4 fiscal results and upcoming dividend milestones.",
+      "traderLens": "Momentum"
     },
     {
-      "ticker": "SAIC",
-      "side": "LONG",
-      "changePct": 6.85,
-      "why": "Reported a significant Q2 earnings and revenue beat and raised full-year guidance.",
-      "traderLens": "Positive earnings reaction, potential for momentum continuation."
-    },
-    {
-      "ticker": "TSLA",
+      "ticker": "WAT",
       "side": "LONG",
       "changePct": 5.2,
-      "why": "Reported a price cut on its Model 3, seen as a move to drive volume.",
-      "traderLens": "Catalyst-driven move, attracting momentum traders."
+      "why": "Morgan Stanley highlights the company as best-positioned among life-science diagnostics peers following China's new pricing framework.",
+      "traderLens": "Catalyst"
     },
     {
-      "ticker": "FNGR",
-      "side": "SHORT",
-      "changePct": -32.9,
-      "why": "Giving back a portion of Friday's +100% surge, which was based on a pivot to AI data centers. Classic speculative volatility.",
-      "traderLens": "Mean reversion play after an unsustainable parabolic move."
+      "ticker": "AAPL",
+      "side": "LONG",
+      "changePct": 2.6,
+      "why": "Positive analyst price target updates and anticipation for the upcoming iPhone launch event.",
+      "traderLens": "Catalyst"
     },
     {
-      "ticker": "EIX",
+      "ticker": "LITE",
       "side": "SHORT",
-      "changePct": -22.8,
-      "why": "Slumping on reports about potential California wildfire legislation that could increase utility liabilities.",
-      "traderLens": "Negative news catalyst driving breakdown."
+      "changePct": -6.4,
+      "why": "Profit-taking and broad sympathy selling across the semiconductor and photonics sector.",
+      "traderLens": "Mean Reversion"
     },
     {
-      "ticker": "PCG",
+      "ticker": "ALAB",
       "side": "SHORT",
-      "changePct": -19.9,
-      "why": "Also falling sharply due to the same California wildfire legislation concerns and analyst downgrades.",
-      "traderLens": "Negative news catalyst driving breakdown."
+      "changePct": -6.1,
+      "why": "Broader semiconductor sell-off and profit-taking after a strong run.",
+      "traderLens": "Mean Reversion"
+    },
+    {
+      "ticker": "TER",
+      "side": "SHORT",
+      "changePct": -5.4,
+      "why": "Weakness across the semiconductor sector and profit-taking after reaching record highs.",
+      "traderLens": "Mean Reversion"
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
       "level": null,
-      "changePct": -0.4,
+      "changePct": -2.0,
       "abc": null,
-      "note": "Pulling back with broad market on macro fears."
+      "note": "Down pre-market with other tech and semi stocks on rising yields."
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": 5.2,
-      "abc": "A",
-      "note": "Showing relative strength on company-specific news (Model 3 price cut)."
+      "changePct": null,
+      "abc": null,
+      "note": "In focus after outperforming EV peers in August, but faces macro headwinds today."
     },
     {
       "ticker": "AAPL",
       "level": null,
-      "changePct": -0.4,
+      "changePct": 2.6,
       "abc": null,
-      "note": "Drifting lower with index futures."
+      "note": "Showing relative strength pre-market on analyst upgrades ahead of launch event."
     },
     {
       "ticker": "MSFT",
       "level": null,
-      "changePct": -0.4,
+      "changePct": -1.0,
       "abc": null,
-      "note": "Drifting lower with index futures."
+      "note": "Lower with broad tech sell-off despite a PT raise from BofA."
     },
     {
       "ticker": "AMZN",
       "level": null,
-      "changePct": -0.4,
+      "changePct": null,
       "abc": null,
-      "note": "Drifting lower with index futures."
+      "note": "Likely to face pressure from risk-off sentiment and rising yields."
     },
     {
       "ticker": "META",
       "level": null,
-      "changePct": -0.4,
+      "changePct": null,
       "abc": null,
-      "note": "Drifting lower with index futures."
+      "note": "Vulnerable to broad market weakness and concerns over ad spending in a slowdown."
     },
     {
       "ticker": "GOOGL",
       "level": null,
-      "changePct": -0.4,
+      "changePct": -0.6,
       "abc": null,
-      "note": "Drifting lower with index futures."
+      "note": "Trading lower with other megacap tech stocks."
     },
     {
       "ticker": "AMD",
       "level": null,
-      "changePct": -0.5,
+      "changePct": -2.0,
       "abc": null,
-      "note": "Semis pulling back with Nasdaq."
+      "note": "Part of the broad pre-market weakness in the semiconductor industry."
     },
     {
       "ticker": "SMCI",
       "level": null,
-      "changePct": -0.5,
+      "changePct": null,
       "abc": null,
-      "note": "High-beta name pulling back in risk-off tape."
+      "note": "High-beta name susceptible to sharp moves in a risk-off tape."
     },
     {
       "ticker": "PLTR",
       "level": null,
-      "changePct": -0.5,
+      "changePct": null,
       "abc": null,
-      "note": "High-beta name pulling back in risk-off tape."
+      "note": "High-growth name likely to be pressured by rising rates."
     },
     {
       "ticker": "CRWD",
       "level": null,
-      "changePct": -0.5,
+      "changePct": null,
       "abc": null,
-      "note": "Cybersecurity pulling back with tech."
+      "note": "Reports earnings after the close; price action will be driven by results and guidance."
     },
     {
       "ticker": "MSTR",
       "level": null,
-      "changePct": -0.5,
+      "changePct": null,
       "abc": null,
-      "note": "Crypto-proxy likely down with risk assets."
+      "note": "High correlation to Bitcoin; likely to be volatile with broad market risk-off sentiment."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is under pressure. Not an ideal environment to be buying breakouts. Focus on protecting capital."
+      "view": "Market is hostile. Not a time to be buying breakouts. Focus on capital preservation."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear rotation into Energy. Money is flowing out of tech and other rate-sensitive sectors."
+      "view": "Clear institutional rotation into Energy (XLE) and out of rate-sensitive growth sectors."
     },
     {
       "name": "Clement Ang",
-      "view": "This is a C/D-grade market environment due to geopolitical risk. Best to sit on hands or be very selective with small size."
+      "view": "Market context is poor. A-grade setups are unlikely to work. Best to sit on hands."
     },
     {
       "name": "SRxTrades",
-      "view": "No clean pivots to enter. Chasing energy is risky, and shorting tech into potential support is also tricky. Patience is key."
+      "view": "No clean pivots to enter. Wait for volatility to subside and clear signals to emerge."
     },
     {
       "name": "Jeff",
-      "view": "Respect hard stops. The increased volatility can lead to wider ranges and quicker losses if not managed."
+      "view": "Respect hard stops. The market is showing clear signs of weakness; do not fight the tape."
     },
     {
       "name": "Qullamaggie",
-      "view": "The only real momentum is in news-driven episodic pivots like RDHL. The broad market is not conducive for breakouts."
+      "view": "Breakouts are likely to fail in this environment. Not an ideal market for EPs."
     },
     {
       "name": "Composite",
-      "view": "Wait and observe. The tape is risk-off. Monitor energy stocks for potential flags and see if tech finds support. Do not force trades today."
+      "view": "Stay on the sidelines. The combination of surging yields and geopolitical risk is a toxic mix for equities. Wait for a calmer tape before deploying capital."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "SAIC",
-        "consensus": "EPS $2.31 / Rev $1.76B"
+        "ticker": "NIO",
+        "consensus": "EPS est. -$0.07 / Rev est. $4.9B"
       },
       {
-        "ticker": "BLRX",
-        "consensus": "N/A"
+        "ticker": "MDT",
+        "consensus": "EPS est. $1.39 / Rev est. $9.5B"
       }
     ],
-    "amc": [],
-    "yesterdayReactions": [
+    "amc": [
       {
-        "ticker": "SAIC",
-        "result": "beat by 30%",
-        "movePct": 6.85
+        "ticker": "CRWD",
+        "consensus": "EPS est. $0.29 / Rev est. $1.4B"
+      },
+      {
+        "ticker": "DELL",
+        "consensus": "EPS est. $4.89"
+      },
+      {
+        "ticker": "PANW",
+        "consensus": "EPS est. $0.9763 / Rev est. $3.35B"
       }
-    ]
+    ],
+    "yesterdayReactions": []
   },
   "calendar": [
     {
-      "time": "10:30 ET",
-      "name": "Dallas Fed Manufacturing Survey",
+      "time": "10:00 ET",
+      "name": "ISM Manufacturing Index",
+      "consensus": null
+    },
+    {
+      "time": "10:00 ET",
+      "name": "JOLTS Job Openings",
+      "consensus": null
+    },
+    {
+      "time": "10:00 ET",
+      "name": "Construction Spending",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "DE",
-        "firm": "Baird",
-        "rating": "Outperform",
-        "pt": 800
+        "ticker": "MSFT",
+        "firm": "B of A Securities",
+        "rating": "Buy",
+        "pt": 600
       },
       {
-        "ticker": "AGCO",
-        "firm": "Baird",
-        "rating": "Outperform",
-        "pt": 150
+        "ticker": "RKT LN",
+        "firm": "JPMorgan",
+        "rating": "Overweight",
+        "pt": null
+      },
+      {
+        "ticker": "DRX LN",
+        "firm": "Goldman Sachs",
+        "rating": "Buy",
+        "pt": null
       }
     ],
-    "downgrades": [
-      {
-        "ticker": "PCG",
-        "firm": "Mizuho/BMO",
-        "rating": "Neutral/Market Perform",
-        "pt": null
-      },
-      {
-        "ticker": "EIX",
-        "firm": "Mizuho",
-        "rating": null,
-        "pt": null
-      }
-    ]
+    "downgrades": []
   },
-  "alert": "RISK-OFF: US-Iran tensions spike Oil prices, pressuring equities.",
+  "alert": "RISK-OFF: Surging Yields and Oil Prices Pressure Equities.",
   "news": [
     {
-      "headline": "Stocks fall, oil prices surge after U.S. launches first military strike in a month against Iran",
+      "headline": "U.S. Stock Futures Fall as Surging Bond Yields, Oil Prices Rattle Investors",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
-        "CL=F",
-        "XLE"
+        "DIA"
       ],
-      "source": "Pittsburgh Post-Gazette",
-      "time": "Aug 31, 2026"
+      "source": "Zacks.com - https://www.zacks.com/stock/news/2338437/pre-market-futures-lower-to-start-september",
+      "time": "08:00 ET"
     },
     {
-      "headline": "10-Year Treasury Yield Rises to 4.76% on Inflation Concerns",
+      "headline": "Crude Oil Surges and Global Bond Yields Soar on Renewed U.S.-Iran Hostilities",
       "impact": "HIGH",
       "tickers": [
-        "^TNX",
-        "TLT",
-        "QQQ"
+        "CL=F",
+        "XLE",
+        "^TNX"
       ],
-      "source": "Trading Economics",
-      "time": "Aug 31, 2026"
+      "source": "Charles Schwab - https://www.schwab.com/learn/story/crude-yields-flex-muscle-bruising-stocks-early",
+      "time": "09:11 ET"
     },
     {
-      "headline": "SAIC stock rises 7% premarket on strong Q2 earnings beat and raised guidance",
-      "impact": "MED",
+      "headline": "Tech Stocks Lead Declines in Pre-Market as 10-Year Treasury Yield Hits 20-Month High",
+      "impact": "HIGH",
       "tickers": [
-        "SAIC"
+        "XLK",
+        "NVDA",
+        "AMD",
+        "MSFT"
       ],
-      "source": "Investing.com",
-      "time": "Aug 31, 2026"
+      "source": "CNBC TV18 - https://www.tradingview.com/news/cnbctv/c8f4d1e96094b:0-us-stock-market-dow-falls-over-350-points-nasdaq-drops-over-1-as-bond-yields-oil-prices-rise/",
+      "time": "07:41 ET"
     },
     {
-      "headline": "Redhill Biopharma (RDHL) stock soars over 100% after divesting Talicia business for $18M",
+      "headline": "Key Economic Data on Tap: ISM Manufacturing and JOLTS Job Openings",
       "impact": "MED",
-      "tickers": [
-        "RDHL"
-      ],
-      "source": "Benzinga",
-      "time": "Aug 31, 2026"
+      "tickers": null,
+      "source": "Econoday - https://econoday.com/economic-calendar/united-states",
+      "time": "10:00 ET"
     },
     {
-      "headline": "California utility stocks PG&E, Edison Int'l plunge on wildfire liability legislation fears",
+      "headline": "Microsoft PT Raised to $600 at BofA Securities",
       "impact": "MED",
       "tickers": [
-        "PCG",
-        "EIX"
+        "MSFT"
       ],
-      "source": "BNN Bloomberg",
-      "time": "Aug 31, 2026"
+      "source": "GuruFocus - https://www.gurufocus.com/news/2338441/msft-maintained-by-b-of-a-securities--price-target-raised-to-600",
+      "time": "07:00 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Zacks Investment Research - Stock Market News for Aug 31, 2026",
-    "TheStreet - Stock Market Today (Aug. 31, 2026): Russell 2000, S&P 500 fall to start week",
-    "Pittsburgh Post-Gazette - Oil prices rise and stocks fall after U.S. hits Iranian sites",
-    "The Motley Fool - Market Indexes Slip to Close Out a Winning, Turbulent August",
-    "BNN Bloomberg - Oil prices rise and stocks fall after U.S. hits Iranian sites",
-    "Benzinga - Redhill Biopharma Stock Doubles In One Session — Here's Why",
-    "Benzinga - What's Going On With FingerMotion Stock On Monday?",
-    "Investing.com - SAIC stock rises 7% on strong earnings beat and raised guidance",
-    "Trading Economics - US 10 Year Treasury Note Yield",
-    "24/7 Wall St. - Here Are Monday's Top Wall Street Analyst Research Calls"
+    "CNBC TV18, 07:41 ET — https://www.tradingview.com/news/cnbctv/c8f4d1e96094b:0-us-stock-market-dow-falls-over-350-points-nasdaq-drops-over-1-as-bond-yields-oil-prices-rise/",
+    "Facebook, S&P 500 sector performance for the week of August 31, 2026",
+    "Investing.com, S&P 500 sector performance: Energy leads with +42% YTD gain in 2026",
+    "Zacks Investment Research, Stock Market News for Aug 31, 2026",
+    "Barchart.com, Stock Market News for Aug 31, 2026",
+    "Stock Market Today (Sept. 1, 2026): Dow, S&P 500 fall as U.S. strikes Iranian targets",
+    "Bogart Wealth, Market Week: August 31, 2026",
+    "BNN Bloomberg, S&P/TSX composite down nearly 400 points, U.S. stock markets also lower",
+    "Zacks.com, Pre-Market Futures Lower to Start September - September 1, 2026",
+    "Investing.com, Pre-market Movers",
+    "Charles Schwab, Crude, Yields Flex Muscle, Bruising Stocks Early",
+    "TradingView, Top Pre-Market Losers — USA",
+    "Newsquawk, European Equity pre-Market Summary - 1st September 2026",
+    "MarketBeat, Today's Premarket Stock Movers",
+    "StockAnalysis.com, Stock Indexes - Sep 1, 2026",
+    "GuruFocus, MSFT Maintained by B of A Securities -- Price Target Raised to $600"
   ]
 }
