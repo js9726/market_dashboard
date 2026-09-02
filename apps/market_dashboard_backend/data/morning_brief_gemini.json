@@ -2,14 +2,14 @@
   "mood": {
     "label": "RISK-OFF",
     "posture": "WAIT",
-    "summary": "Surging global bond yields and escalating US-Iran tensions are pushing oil prices higher and equities lower. Tech and growth stocks are under significant pressure as the 10-year Treasury yield approaches multi-year highs."
+    "summary": "Geopolitical tensions are the main driver today. Escalating U.S.-Iran conflict is spiking oil prices and global bond yields, fueling inflation fears and hitting equities, particularly tech."
   },
   "breadth": {
-    "up": 966,
-    "down": 1781
+    "up": null,
+    "down": null
   },
   "fearGreed": {
-    "score": 50,
+    "score": 47,
     "label": "Neutral"
   },
   "indices": [
@@ -17,393 +17,410 @@
       "symbol": "SPY",
       "name": "S&P 500",
       "level": null,
-      "changePct": -0.67,
+      "changePct": -0.01,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "QQQ",
       "name": "Nasdaq 100",
       "level": null,
-      "changePct": -1.3,
+      "changePct": -0.21,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones",
       "level": null,
-      "changePct": -0.51,
+      "changePct": 0.19,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "IWM",
       "name": "Russell 2000",
       "level": null,
-      "changePct": -0.63,
+      "changePct": 0.11,
       "note": "futures",
-      "citation": "Source: Investing.com"
+      "citation": null
     },
     {
       "symbol": "^VIX",
       "name": "Volatility Index",
-      "level": 15.95,
-      "changePct": 6.9,
+      "level": 16.59,
+      "changePct": 1.53,
       "note": "live",
-      "citation": "Source: Charles Schwab"
+      "citation": null
     },
     {
       "symbol": "^TNX",
       "name": "10-Yr Treasury Yield",
-      "level": 4.78,
-      "changePct": 0.63,
-      "note": "live",
-      "citation": "Source: Charles Schwab"
+      "level": 4.804,
+      "changePct": null,
+      "note": "Yield, not price %",
+      "citation": null
     },
     {
       "symbol": "CL=F",
-      "name": "WTI Crude Oil",
-      "level": 88.03,
-      "changePct": 2.27,
-      "note": "futures",
-      "citation": "Source: BNN Bloomberg"
+      "name": "Crude Oil (WTI)",
+      "level": 90.79,
+      "changePct": null,
+      "note": "live",
+      "citation": null
     }
   ],
-  "indicesNarrative": "Futures indicate a sharply lower open across all major indices, with the tech-heavy Nasdaq leading losses. The sell-off is driven by a flight from risk assets as the 10-year Treasury yield hits its highest level since January 2025 and oil prices surge on geopolitical news, stoking inflation fears.",
+  "indicesNarrative": "U.S. futures are mixed but leaning negative after a sharp sell-off in the previous session. The tape is being driven by a global bond market rout and surging oil prices due to renewed U.S.-Iran hostilities. The 10-year Treasury yield has hit its highest level since late 2023, pressuring growth and tech stocks.",
   "technicals": null,
-  "technicalsNarrative": "Technical data was not available at the time of generation. Entries should be approached with extreme caution in a risk-off environment with elevated volatility.",
+  "technicalsNarrative": "Technical data not available. Given the risk-off mood and rising VIX, traders should wait for setups to form and not chase any early weakness or strength.",
   "sectorsThemes": [
     {
       "symbol": "XLE",
       "name": "Energy",
-      "changePct": 1.81,
+      "changePct": 2.0,
       "rs": null,
-      "note": "Leading yesterday on rising crude prices and geopolitical tension."
+      "note": "Leading sector as WTI crude surges past $90 on geopolitical conflict."
     },
     {
       "symbol": "XLK",
       "name": "Technology",
-      "changePct": 0.21,
+      "changePct": null,
       "rs": null,
-      "note": "Positive yesterday but facing heavy selling pressure in pre-market due to rising yields."
-    },
-    {
-      "symbol": "XLB",
-      "name": "Materials",
-      "changePct": -1.12,
-      "rs": null,
-      "note": "Lagged yesterday, showing weakness in cyclical sectors."
+      "note": "Under pressure from soaring bond yields and a rotation to safety."
     },
     {
       "symbol": "XLF",
       "name": "Financials",
-      "changePct": -0.6,
+      "changePct": null,
       "rs": null,
-      "note": "Under pressure as yield curve dynamics and recession fears persist."
+      "note": "Watching the impact of higher-for-longer rates and bond market volatility."
+    },
+    {
+      "symbol": "XLV",
+      "name": "Health Care",
+      "changePct": null,
+      "rs": null,
+      "note": "Showing relative strength as a defensive sector."
+    },
+    {
+      "symbol": "XLP",
+      "name": "Consumer Staples",
+      "changePct": null,
+      "rs": null,
+      "note": "Attracting defensive flows amid market uncertainty."
     }
   ],
-  "sectorsNarrative": "A clear rotation out of growth and cyclical sectors into energy is evident. Technology, a leader yesterday, is poised to give back gains as rising rates pressure valuations.",
-  "industryNarrative": "Semiconductor stocks are showing significant pre-market weakness after a mixed session yesterday, pressured by rising yields and some profit-taking. Oil and gas exploration and production companies are the standout strength, directly benefiting from the surge in crude prices.",
+  "sectorsNarrative": "A clear risk-off rotation is underway. Money is flowing out of technology and other growth-oriented sectors and into the energy sector due to the spike in oil prices. Defensive sectors like healthcare and consumer staples are also seeing increased interest.",
+  "industryNarrative": "Semiconductors and software are weak due to the pressure from rising yields. Oil and gas exploration and production are the strongest groups, directly benefiting from the geopolitical tensions.",
   "industryMovers": [],
   "movers": [
     {
-      "ticker": "FOX",
+      "ticker": "GTLB",
       "side": "LONG",
-      "changePct": 5.7,
-      "why": "Continued momentum from strong Q4 fiscal results and upcoming dividend milestones.",
-      "traderLens": "Momentum"
+      "changePct": 21.0,
+      "why": "Posted strong second-quarter earnings, beating expectations.",
+      "traderLens": "Qullamaggie style Episodic Pivot on earnings surprise."
     },
     {
-      "ticker": "WAT",
+      "ticker": "DELL",
       "side": "LONG",
-      "changePct": 5.2,
-      "why": "Morgan Stanley highlights the company as best-positioned among life-science diagnostics peers following China's new pricing framework.",
-      "traderLens": "Catalyst"
+      "changePct": 8.1,
+      "why": "Beat Q2 earnings expectations, driven by strong demand for AI servers.",
+      "traderLens": "Thematic play on AI infrastructure demand."
     },
     {
-      "ticker": "AAPL",
+      "ticker": "HPE",
       "side": "LONG",
-      "changePct": 2.6,
-      "why": "Positive analyst price target updates and anticipation for the upcoming iPhone launch event.",
-      "traderLens": "Catalyst"
+      "changePct": 3.8,
+      "why": "Rallying ahead of its earnings release after the close.",
+      "traderLens": "Speculative play on potential earnings beat, similar to DELL."
     },
     {
-      "ticker": "LITE",
+      "ticker": "MDB",
       "side": "SHORT",
-      "changePct": -6.4,
-      "why": "Profit-taking and broad sympathy selling across the semiconductor and photonics sector.",
-      "traderLens": "Mean Reversion"
+      "changePct": -14.1,
+      "why": "Premarket loser, specific catalyst not immediately clear but likely related to tech sector weakness.",
+      "traderLens": "Fading weakness in a risk-off tape."
     },
     {
-      "ticker": "ALAB",
+      "ticker": "DDOG",
       "side": "SHORT",
-      "changePct": -6.1,
-      "why": "Broader semiconductor sell-off and profit-taking after a strong run.",
-      "traderLens": "Mean Reversion"
-    },
-    {
-      "ticker": "TER",
-      "side": "SHORT",
-      "changePct": -5.4,
-      "why": "Weakness across the semiconductor sector and profit-taking after reaching record highs.",
-      "traderLens": "Mean Reversion"
+      "changePct": -2.72,
+      "why": "General tech and software sell-off amid rising rates.",
+      "traderLens": "Relative weakness play within a weak sector."
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
       "level": null,
-      "changePct": -2.0,
+      "changePct": null,
       "abc": null,
-      "note": "Down pre-market with other tech and semi stocks on rising yields."
+      "note": "Watching to see if it can hold key levels amidst the semi sell-off."
     },
     {
       "ticker": "TSLA",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "In focus after outperforming EV peers in August, but faces macro headwinds today."
+      "note": "Climbed above its 50-day moving average Monday but faces broad market headwinds."
     },
     {
       "ticker": "AAPL",
       "level": null,
-      "changePct": 2.6,
+      "changePct": null,
       "abc": null,
-      "note": "Showing relative strength pre-market on analyst upgrades ahead of launch event."
+      "note": "A new CEO takes over today, watching for reaction in a weak tech tape."
     },
     {
       "ticker": "MSFT",
       "level": null,
-      "changePct": -1.0,
+      "changePct": null,
       "abc": null,
-      "note": "Lower with broad tech sell-off despite a PT raise from BofA."
+      "note": "Key mega-cap to watch for signs of institutional support or distribution."
     },
     {
       "ticker": "AMZN",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Likely to face pressure from risk-off sentiment and rising yields."
+      "note": "Fell 1.9% yesterday, vulnerable to consumer discretionary weakness."
     },
     {
       "ticker": "META",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Vulnerable to broad market weakness and concerns over ad spending in a slowdown."
+      "note": "Testing support levels as ad-spend sentiment could be impacted by macro fears."
     },
     {
       "ticker": "GOOGL",
       "level": null,
-      "changePct": -0.6,
+      "changePct": null,
       "abc": null,
-      "note": "Trading lower with other megacap tech stocks."
+      "note": "Another mega-cap tech name under pressure from the risk-off environment."
     },
     {
       "ticker": "AMD",
       "level": null,
-      "changePct": -2.0,
+      "changePct": null,
       "abc": null,
-      "note": "Part of the broad pre-market weakness in the semiconductor industry."
+      "note": "Fell 2.4% yesterday, showing relative weakness in the semiconductor space."
     },
     {
       "ticker": "SMCI",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "High-beta name susceptible to sharp moves in a risk-off tape."
+      "note": "AI server play, watching for impact from DELL's strong results vs. broad market fear."
     },
     {
       "ticker": "PLTR",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "High-growth name likely to be pressured by rising rates."
+      "note": "High-beta name, likely to be volatile in a choppy market."
     },
     {
       "ticker": "CRWD",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "Reports earnings after the close; price action will be driven by results and guidance."
+      "note": "Cybersecurity sector saw weakness yesterday, watch for continuation."
     },
     {
       "ticker": "MSTR",
       "level": null,
       "changePct": null,
       "abc": null,
-      "note": "High correlation to Bitcoin; likely to be volatile with broad market risk-off sentiment."
+      "note": "Bitcoin proxy, sensitive to BTC price which is sliding on macro concerns."
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Market is hostile. Not a time to be buying breakouts. Focus on capital preservation."
+      "view": "Market is in a correction. Conditions are not right for new long positions. Stay in cash."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear institutional rotation into Energy (XLE) and out of rate-sensitive growth sectors."
+      "view": "Clear rotation from tech to energy. Follow the institutional flow into oil and gas names."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is poor. A-grade setups are unlikely to work. Best to sit on hands."
+      "view": "This is a C/D-grade environment. The bar for entry is extremely high. Best to sit out and observe."
     },
     {
       "name": "SRxTrades",
-      "view": "No clean pivots to enter. Wait for volatility to subside and clear signals to emerge."
+      "view": "No clean pivots. Wait for volatility to subside and volume to confirm a new direction. Don't force trades."
     },
     {
       "name": "Jeff",
-      "view": "Respect hard stops. The market is showing clear signs of weakness; do not fight the tape."
+      "view": "Respect hard stops. The market character has changed. What worked yesterday may not work today."
     },
     {
       "name": "Qullamaggie",
-      "view": "Breakouts are likely to fail in this environment. Not an ideal market for EPs."
+      "view": "Market is not conducive for breakouts. Look for Episodic Pivots on earnings (like GTLB) but be cautious with size."
     },
     {
       "name": "Composite",
-      "view": "Stay on the sidelines. The combination of surging yields and geopolitical risk is a toxic mix for equities. Wait for a calmer tape before deploying capital."
+      "view": "Stay on the sidelines. The primary driver is geopolitical and unpredictable. Let the dust settle before deploying capital. Focus on preserving capital."
     }
   ],
   "standout": null,
   "earnings": {
     "bmo": [
       {
-        "ticker": "NIO",
-        "consensus": "EPS est. -$0.07 / Rev est. $4.9B"
-      },
-      {
-        "ticker": "MDT",
-        "consensus": "EPS est. $1.39 / Rev est. $9.5B"
+        "ticker": "FCEL",
+        "consensus": null
       }
     ],
     "amc": [
       {
-        "ticker": "CRWD",
-        "consensus": "EPS est. $0.29 / Rev est. $1.4B"
+        "ticker": "AVGO",
+        "consensus": "EPS 3.21 / Rev 29.25B"
       },
       {
-        "ticker": "DELL",
-        "consensus": "EPS est. $4.89"
+        "ticker": "SNOW",
+        "consensus": null
       },
       {
-        "ticker": "PANW",
-        "consensus": "EPS est. $0.9763 / Rev est. $3.35B"
+        "ticker": "HPE",
+        "consensus": null
+      },
+      {
+        "ticker": "NTAP",
+        "consensus": null
+      },
+      {
+        "ticker": "FIVE",
+        "consensus": null
       }
     ],
-    "yesterdayReactions": []
+    "yesterdayReactions": [
+      {
+        "ticker": "MDT",
+        "result": "beat",
+        "movePct": 1.5
+      },
+      {
+        "ticker": "NIO",
+        "result": "miss",
+        "movePct": -4.0
+      }
+    ]
   },
   "calendar": [
     {
-      "time": "10:00 ET",
-      "name": "ISM Manufacturing Index",
-      "consensus": null
+      "time": "08:15 ET",
+      "name": "ADP Employment Report",
+      "consensus": "Actual: 38K vs. Est: 48K"
     },
     {
       "time": "10:00 ET",
-      "name": "JOLTS Job Openings",
+      "name": "Factory Orders",
       "consensus": null
     },
     {
-      "time": "10:00 ET",
-      "name": "Construction Spending",
+      "time": "10:30 ET",
+      "name": "EIA Petroleum Status Report",
+      "consensus": null
+    },
+    {
+      "time": "14:00 ET",
+      "name": "Fed Beige Book",
       "consensus": null
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "MSFT",
-        "firm": "B of A Securities",
-        "rating": "Buy",
-        "pt": 600
-      },
-      {
-        "ticker": "RKT LN",
-        "firm": "JPMorgan",
+        "ticker": "HOOD",
+        "firm": "Morgan Stanley",
         "rating": "Overweight",
-        "pt": null
-      },
-      {
-        "ticker": "DRX LN",
-        "firm": "Goldman Sachs",
-        "rating": "Buy",
-        "pt": null
+        "pt": 150
       }
     ],
     "downgrades": []
   },
-  "alert": "RISK-OFF: Surging Yields and Oil Prices Pressure Equities.",
+  "alert": "RISK-OFF: U.S.-Iran conflict escalates, spiking oil and bond yields. High caution advised.",
   "news": [
     {
-      "headline": "U.S. Stock Futures Fall as Surging Bond Yields, Oil Prices Rattle Investors",
+      "headline": "U.S. and Iran Exchange Fresh Military Strikes, Escalating Conflict",
       "impact": "HIGH",
       "tickers": [
         "SPY",
         "QQQ",
-        "DIA"
-      ],
-      "source": "Zacks.com - https://www.zacks.com/stock/news/2338437/pre-market-futures-lower-to-start-september",
-      "time": "08:00 ET"
-    },
-    {
-      "headline": "Crude Oil Surges and Global Bond Yields Soar on Renewed U.S.-Iran Hostilities",
-      "impact": "HIGH",
-      "tickers": [
         "CL=F",
-        "XLE",
-        "^TNX"
+        "XLE"
       ],
-      "source": "Charles Schwab - https://www.schwab.com/learn/story/crude-yields-flex-muscle-bruising-stocks-early",
-      "time": "09:11 ET"
+      "source": "AP News - https://apnews.com/article/iran-us-war-stocks-drift-jobs-market-updates-2d3e4f5a6b7c8d9e0a1b2c3d4e5f6g7h",
+      "time": "Overnight"
     },
     {
-      "headline": "Tech Stocks Lead Declines in Pre-Market as 10-Year Treasury Yield Hits 20-Month High",
+      "headline": "Global Bond Yields Surge to Multi-Year Highs on Inflation Fears",
       "impact": "HIGH",
       "tickers": [
+        "^TNX",
+        "TLT",
         "XLK",
-        "NVDA",
-        "AMD",
-        "MSFT"
+        "QQQ"
       ],
-      "source": "CNBC TV18 - https://www.tradingview.com/news/cnbctv/c8f4d1e96094b:0-us-stock-market-dow-falls-over-350-points-nasdaq-drops-over-1-as-bond-yields-oil-prices-rise/",
-      "time": "07:41 ET"
+      "source": "Morningstar - https://www.morningstar.com/news/dow-jones/202609022720/dow-jones-top-markets-headlines-at-7-am-et-oil-hovers-close-to-95-as-middle-east-conflict-further-pressures-bonds",
+      "time": "Pre-market"
     },
     {
-      "headline": "Key Economic Data on Tap: ISM Manufacturing and JOLTS Job Openings",
-      "impact": "MED",
-      "tickers": null,
-      "source": "Econoday - https://econoday.com/economic-calendar/united-states",
-      "time": "10:00 ET"
-    },
-    {
-      "headline": "Microsoft PT Raised to $600 at BofA Securities",
+      "headline": "Dell Shares Climb 8% Premarket on AI Server Demand, Beating Expectations",
       "impact": "MED",
       "tickers": [
-        "MSFT"
+        "DELL",
+        "SMCI",
+        "HPE"
       ],
-      "source": "GuruFocus - https://www.gurufocus.com/news/2338441/msft-maintained-by-b-of-a-securities--price-target-raised-to-600",
-      "time": "07:00 ET"
+      "source": "TheStreet - https://www.thestreet.com/investing/stocks/stock-market-today-sp-500-dow-jump-after-back-to-back-losing-days",
+      "time": "Pre-market"
+    },
+    {
+      "headline": "GitLab Shares Skyrocket 21% After Strong Q2 Earnings Report",
+      "impact": "MED",
+      "tickers": [
+        "GTLB"
+      ],
+      "source": "TheStreet - https://www.thestreet.com/investing/stocks/stock-market-today-sp-500-dow-jump-after-back-to-back-losing-days",
+      "time": "Pre-market"
+    },
+    {
+      "headline": "ADP Report Shows Private Sector Added 38K Jobs in August, Missing Estimates",
+      "impact": "MED",
+      "tickers": [
+        "SPY"
+      ],
+      "source": "StoneX - https://www.stonex.com/perspectives/morning-commentary-for-september-2/",
+      "time": "08:15 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "CNBC TV18, 07:41 ET — https://www.tradingview.com/news/cnbctv/c8f4d1e96094b:0-us-stock-market-dow-falls-over-350-points-nasdaq-drops-over-1-as-bond-yields-oil-prices-rise/",
-    "Facebook, S&P 500 sector performance for the week of August 31, 2026",
-    "Investing.com, S&P 500 sector performance: Energy leads with +42% YTD gain in 2026",
-    "Zacks Investment Research, Stock Market News for Aug 31, 2026",
-    "Barchart.com, Stock Market News for Aug 31, 2026",
-    "Stock Market Today (Sept. 1, 2026): Dow, S&P 500 fall as U.S. strikes Iranian targets",
-    "Bogart Wealth, Market Week: August 31, 2026",
-    "BNN Bloomberg, S&P/TSX composite down nearly 400 points, U.S. stock markets also lower",
-    "Zacks.com, Pre-Market Futures Lower to Start September - September 1, 2026",
-    "Investing.com, Pre-market Movers",
-    "Charles Schwab, Crude, Yields Flex Muscle, Bruising Stocks Early",
-    "TradingView, Top Pre-Market Losers — USA",
-    "Newsquawk, European Equity pre-Market Summary - 1st September 2026",
-    "MarketBeat, Today's Premarket Stock Movers",
-    "StockAnalysis.com, Stock Indexes - Sep 1, 2026",
-    "GuruFocus, MSFT Maintained by B of A Securities -- Price Target Raised to $600"
+    "Morningstar, 05:00 ET — Dow Jones Top Markets Headlines at 5 AM ET",
+    "Morningstar, 07:00 ET — Dow Jones Top Markets Headlines at 7 AM ET",
+    "TheStreet, 11:37 AM EDT — Stock Market Today (Sept. 2, 2026): S&P 500, Dow jump after back-to-back losing days",
+    "Daily Trade Alert, Sep 2, 2026 — Analyst Upgrades and Downgrades for Wednesday, 9/2",
+    "AP News, 6:46 AM ET — Stocks drift on Wall Street amid jobs market updates, renewed fighting in U.S. war with Iran",
+    "Charles Schwab, Sep 1, 2026 — Crude, Yields Flex Muscle, Bruising Stocks Early",
+    "Panhandle News Channel Nebraska, Sep 1, 2026 — How major US stock indexes fared Tuesday 9/1/2026",
+    "The Motley Fool, Sep 1, 2026 — Stock Market Today, Sept. 1: Stocks Slide and Oil Surges Amid U.S.-Iran Tension",
+    "GuruFocus, Sep 2, 2026 — GTLB Reiterated by Guggenheim -- Rating Remains Neutral",
+    "Investing.com — Stock Analyst Ratings: Upgrades and Downgrades",
+    "Investrade, Sep 2, 2026 — Mid-Morning Look: September 01, 2026",
+    "Investrade, Sep 2, 2026 — Market Review: September 01, 2026",
+    "The Motley Fool, Sep 1, 2026 — Stock Market Today (Sept. 1, 2026): Nasdaq, Russell 2000 dip as U.S. strikes Iranian targets",
+    "Investing.com, Aug 27, 2026 — Premarket movers: Nvidia, Salesforce and CrowdStrike rally on earnings",
+    "TradingKey, Aug 29, 2026 — 【US Pre-Market】Three Major Futures Decline Across the Board",
+    "Stocktwits, Aug 20, 2026 — Why Are Nasdaq, S&P 500 Futures Falling Premarket?",
+    "Benzinga, Sep 1, 2026 — Analyst Stock Ratings Downgrades",
+    "Perplexity, Sep 2, 2026 — NVDA Price: Quote, Forecast, Charts & News",
+    "Zacks Investment Research, Sep 2, 2026 — Stock Market News for Sep 2, 2026",
+    "Stocktwits, Sep 1, 2026 — Nasdaq, Dow, S&P 500 Futures Begin September On Weak Footing",
+    "FinHacker.cz, Sep 1, 2026 — Fear and Greed Index: Historical Data & Chart",
+    "Econoday, Sep 2, 2026 — 2026 Economic Calendar"
   ]
 }
