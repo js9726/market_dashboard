@@ -1,20 +1,20 @@
 {
-  "built_at": "2026-09-10T16:58:50.586769+00:00",
+  "built_at": "2026-09-11T17:01:12.235149+00:00",
   "providers": {
+    "deepseek": {
+      "available": true,
+      "generated": true,
+      "label": "DeepSeek V4 Flash"
+    },
     "gemini": {
       "available": true,
       "generated": true,
-      "label": "Gemini 2.5 Pro"
+      "label": "Gemini 3.7 Flash"
     },
     "openai": {
       "available": false,
       "generated": false,
       "label": "Codex"
-    },
-    "claude": {
-      "available": false,
-      "generated": false,
-      "label": "Claude claude-sonnet-4-6"
     }
   }
 }
