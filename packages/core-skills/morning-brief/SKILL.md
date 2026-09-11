@@ -13,6 +13,25 @@ description: >
 
 # Morning Brief Skill
 
+## Journal artifact and invocation scope
+
+`morning brief` means the latest market condition and sentiment at the current
+session time. A bare request runs the market read and broker book; named tickers
+or dated focus charts add ticker analysis and persisted verdicts.
+
+Every run produces an HTML journal artifact from its persisted records and measured
+inputs. Save the working copy at
+`jie_wiki/evidence/trading/daily-runs/<YYYY-MM-DD>/desk.html`; freeze it at session
+close as `jie_wiki/wiki/trading/journal/<YYYY-MM-DD>.html`. Later corrections must
+be visible. Each ticker dossier includes a peer basket and seven-persona verdict
+read-back. Market-only artifacts omit dossiers. Book state must come from broker
+reconciliation; derived A-list or fill history alone cannot establish a holding.
+
+The authoring contract is
+`jie_wiki/skills/tradingview-daily-screener/references/journal-artifact.md`.
+Read it for the full section, receipt, peer-basket and correction requirements.
+These local journal requirements do not replace dashboard schema ingestion.
+
 Generates today's market brief using live web data + the TV watchlist and screener results,
 then pushes it to the dashboard so Jie and his viewers see it in real time.
 
