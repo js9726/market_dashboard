@@ -40,6 +40,11 @@ try:
 except ImportError:
     pass
 
+# ONE implementation of the extension measure, shared with the index technicals
+# tool. Importing it is the point: two hand-rolled copies drifted apart once
+# already (see _history below) and the divergence was invisible for weeks.
+from compute_index_technicals import ema, extension_atr
+
 # theme -> (proxy ETFs, constituents). Health is deliberately INDICATOR-only.
 THEMES: dict[str, tuple[list[str], list[str]]] = {
     "Cybersecurity":   (["CIBR", "HACK"], ["CRWD", "PANW", "ZS", "OKTA", "NET", "FTNT", "S", "CYBR", "TENB", "RBRK"]),
@@ -54,48 +59,134 @@ BENCH = "SPY"
 INDICATOR_ONLY = {"Health (IND.)"}
 
 
-def _metrics(ctx, ticker: str, start: str, end: str) -> dict | None:
-    from moomoo import KLType, AuType
-    try:
+# Bars needed before a name is priceable at all (ATR(14) + EMA(21) seed).
+MIN_BARS = 25
+# Explicit SESSION anchors. The old code used `c.iloc[0]` for the 3M return, which
+# silently meant "however long the calendar window happens to be" - about five
+# months, not three (Codex audit, 2026-08-12).
+SESSIONS_1W, SESSIONS_1M, SESSIONS_3M = 5, 21, 63
+# Fail-closed freshness (CLAUDE.md: trading analysis stops on stale data). Wide
+# enough for a weekend plus a market holiday, tight enough to catch a dead feed.
+MAX_STALE_DAYS = 5
+
+
+class StaleBars(RuntimeError):
+    """Raised when the newest bar OpenD returned is too old to trade on."""
+
+    def __init__(self, ticker: str, bar_date: str, age_days: int):
+        super().__init__(
+            f"{ticker}: newest daily bar is {bar_date} ({age_days} days old, "
+            f"limit {MAX_STALE_DAYS})"
+        )
+        self.ticker, self.bar_date, self.age_days = ticker, bar_date, age_days
+
+
+def _history(ctx, ticker: str, start: str, end: str) -> list[dict] | None:
+    """
+    The FULL daily history for [start, end], following OpenD's forward pagination.
+
+    Returns bar records (same shape as compute_index_technicals.fetch_klines), not
+    a DataFrame, so the rest of this module stays plain-list like its sibling.
+
+    `max_count` caps one PAGE, and page 1 holds the OLDEST bars in the window. The
+    previous code passed `max_count=90` into a ~105-bar window, never read the
+    returned `page_req_key`, and then treated `.iloc[-1]` as "today" - so every
+    metric was really computed three weeks in the past. On 2026-09-10 that put
+    MDB/RBRK/ZS/TOST in the full-size green zone (+1.35 to +2.09 ATR, their
+    2026-08-19 values) while all four were actually BELOW their 21EMA.
+    """
+    from moomoo import KLType, AuType, RET_OK
+
+    bars: list[dict] = []
+    key = None
+    while True:
         ret = ctx.request_history_kline(
             "US." + ticker, start=start, end=end,
-            ktype=KLType.K_DAY, autype=AuType.QFQ, max_count=90,
+            ktype=KLType.K_DAY, autype=AuType.QFQ,
+            max_count=1000, page_req_key=key,
         )
+        if ret[0] != RET_OK:
+            return None
+        df = ret[1]
+        if df is not None and len(df):
+            bars.extend(df.to_dict("records"))
+        key = ret[2] if len(ret) > 2 else None
+        if not key:
+            break
+    return bars or None
+
+
+def _metrics(ctx, ticker: str, start: str, end: str, today: date) -> dict | None:
+    try:
+        bars = _history(ctx, ticker, start, end)
     except Exception:
         return None
-    if ret[0] != 0:
+    if bars is None or len(bars) < MIN_BARS:
         return None
-    df = ret[1]
-    if df is None or len(df) < 25:
+
+    closes = [float(b["close"]) for b in bars]
+    highs = [float(b["high"]) for b in bars]
+    lows = [float(b["low"]) for b in bars]
+
+    as_of = str(bars[-1]["time_key"])[:10]
+    try:
+        age = (today - date.fromisoformat(as_of)).days
+    except ValueError:
         return None
-    c = df["close"]
-    ema21 = c.ewm(span=21).mean()
-    tr = ((df["high"] - df["low"])
-          .combine((df["high"] - c.shift()).abs(), max)
-          .combine((df["low"] - c.shift()).abs(), max))
-    atr = tr.rolling(14).mean().iloc[-1]
-    if atr != atr or not atr:
-        return None
-    last = c.iloc[-1]
+    if age > MAX_STALE_DAYS:
+        raise StaleBars(ticker, as_of, age)
+
+    def back(n: int) -> float | None:
+        """Return over n completed sessions, or None when history is too short."""
+        if len(closes) <= n:
+            return None
+        return round((closes[-1] / closes[-1 - n] - 1) * 100, 2)
+
+    ext = extension_atr(highs, lows, closes, 21, 14)
+    e21 = ema(closes, 21)
+    rising = None
+    if len(e21) > 6 and e21[-1] is not None and e21[-6] is not None:
+        rising = bool(e21[-1] > e21[-6])
+
     return {
         "ticker": ticker,
-        "last": round(float(last), 2),
-        "w1": round(float(last / c.iloc[-6] - 1) * 100, 2),
-        "m1": round(float(last / c.iloc[-22] - 1) * 100, 2),
-        "m3": round(float(last / c.iloc[0] - 1) * 100, 2),
-        "ext_atr": round(float((last - ema21.iloc[-1]) / atr), 2),
-        "ema21_rising": bool(ema21.iloc[-1] > ema21.iloc[-6]),
+        "as_of": as_of,
+        "last": round(closes[-1], 2),
+        "w1": back(SESSIONS_1W),
+        "m1": back(SESSIONS_1M),
+        "m3": back(SESSIONS_3M),
+        # SIGNED. Negative = below the 21EMA, which is never the green zone.
+        "ext_atr": round(ext, 2) if ext is not None else None,
+        "ema21_rising": rising,
     }
 
 
 def zone(ext: float | None) -> str:
+    """
+    Size gate from the operator's 216-trade record. `ext` is SIGNED, so anything
+    below the 21EMA lands in HALF-SIZE - never GREEN.
+    """
     if ext is None:
         return "n/a"
     if ext > 2.5:
         return "BLOCKED"
-    if ext < 0.5:
+    if ext < 0.5:          # includes every negative reading (price under the 21EMA)
         return "HALF-SIZE"
     return "GREEN"
+
+
+def _rel(a: float | None, b: float | None) -> float | None:
+    """Relative return vs the benchmark; None if either leg is unknown."""
+    return None if (a is None or b is None) else round(a - b, 2)
+
+
+def _by_m1(r: dict) -> float:
+    """Sort key: unknown 1M return sinks to the bottom instead of raising."""
+    return -(r["m1"] if r["m1"] is not None else -1e9)
+
+
+def _pct(v: float | None) -> str:
+    return f"{v:>+8.2f}%" if v is not None else f"{'n/a':>9s}"
 
 
 def main() -> int:
@@ -111,7 +202,17 @@ def main() -> int:
     ctx = OpenQuoteContext(host="127.0.0.1", port=11111)
     s, e = start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
 
-    bench = _metrics(ctx, BENCH, s, e)
+    def _fail_stale(exc: StaleBars) -> int:
+        ctx.close()
+        print(f"FAIL-CLOSED (stale feed): {exc}", file=sys.stderr)
+        print("  Producer: moomoo OpenD daily klines on 127.0.0.1:11111.", file=sys.stderr)
+        print("  Repair the feed and re-run. Do not report a theme read.", file=sys.stderr)
+        return 2
+
+    try:
+        bench = _metrics(ctx, BENCH, s, e, end)
+    except StaleBars as exc:
+        return _fail_stale(exc)
     if not bench:
         ctx.close()
         print("FAIL-CLOSED: could not price the benchmark. Do not report a theme read.",
@@ -119,33 +220,44 @@ def main() -> int:
         return 2
 
     out: list[dict] = []
-    for theme, (proxies, names) in THEMES.items():
-        rows = [m for m in (_metrics(ctx, t, s, e) for t in proxies + names) if m]
-        if not rows:
-            continue
-        prox = [r for r in rows if r["ticker"] in proxies]
-        head = prox[0] if prox else rows[0]
-        rel_1m = head["m1"] - bench["m1"]
-        rel_3m = head["m3"] - bench["m3"]
-        leading = rel_1m > 0 and rel_3m > 0 and head["ema21_rising"]
-        tradeable = [r for r in rows if r["ticker"] not in proxies and zone(r["ext_atr"]) == "GREEN"]
-        out.append({
-            "theme": theme,
-            "proxy": head["ticker"],
-            "rel_1m": round(rel_1m, 2),
-            "rel_3m": round(rel_3m, 2),
-            "status": ("INDICATOR" if theme in INDICATOR_ONLY
-                       else "LEADING" if leading else "LAGGING"),
-            "tradeable_green": sorted(
-                ({"ticker": r["ticker"], "ext_atr": r["ext_atr"], "m1": r["m1"]}
-                 for r in tradeable), key=lambda r: -r["m1"]),
-            "all_extended": bool(rows) and not tradeable,
-            "names": sorted(rows, key=lambda r: -r["m1"]),
-        })
+    try:
+        for theme, (proxies, names) in THEMES.items():
+            rows = [m for m in (_metrics(ctx, t, s, e, end) for t in proxies + names) if m]
+            if not rows:
+                continue
+            prox = [r for r in rows if r["ticker"] in proxies]
+            head = prox[0] if prox else rows[0]
+            rel_1m = _rel(head["m1"], bench["m1"])
+            rel_3m = _rel(head["m3"], bench["m3"])
+            # Fail-closed: an unknown relative return is not evidence of leadership.
+            leading = bool(rel_1m is not None and rel_1m > 0
+                           and rel_3m is not None and rel_3m > 0
+                           and head["ema21_rising"])
+            tradeable = [r for r in rows
+                         if r["ticker"] not in proxies and zone(r["ext_atr"]) == "GREEN"]
+            out.append({
+                "theme": theme,
+                "proxy": head["ticker"],
+                "as_of": head["as_of"],
+                "rel_1m": rel_1m,
+                "rel_3m": rel_3m,
+                "status": ("INDICATOR" if theme in INDICATOR_ONLY
+                           else "LEADING" if leading else "LAGGING"),
+                "tradeable_green": sorted(
+                    ({"ticker": r["ticker"], "ext_atr": r["ext_atr"], "m1": r["m1"]}
+                     for r in tradeable), key=_by_m1),
+                "all_extended": bool(rows) and not tradeable,
+                "names": sorted(rows, key=_by_m1),
+            })
+    except StaleBars as exc:
+        return _fail_stale(exc)
     ctx.close()
-    out.sort(key=lambda t: (t["status"] != "LEADING", -t["rel_1m"]))
+    out.sort(key=lambda t: (t["status"] != "LEADING",
+                            -(t["rel_1m"] if t["rel_1m"] is not None else -1e9)))
 
-    payload = {"benchmark": {"ticker": BENCH, **{k: bench[k] for k in ("m1", "m3")}},
+    payload = {"as_of": bench["as_of"],
+               "benchmark": {"ticker": BENCH,
+                             **{k: bench[k] for k in ("as_of", "m1", "m3")}},
                "themes": out}
 
     if a.book:
@@ -195,12 +307,13 @@ def main() -> int:
         print(json.dumps(payload, indent=2))
         return 0
 
-    print(f"\n  THEME RADAR  |  benchmark {BENCH}: 1M {bench['m1']:+.2f}%  3M {bench['m3']:+.2f}%\n")
+    print(f"\n  THEME RADAR  |  session {bench['as_of']}  |  benchmark {BENCH}: "
+          f"1M {_pct(bench['m1']).strip()}  3M {_pct(bench['m3']).strip()}\n")
     print(f"  {'theme':18s}{'proxy':7s}{'rel 1M':>9s}{'rel 3M':>9s}  {'status':10s} tradeable (0.5-2.5 ATR)")
     print("  " + "-" * 92)
     for t in out:
         g = ", ".join(f"{x['ticker']}({x['ext_atr']})" for x in t["tradeable_green"][:5]) or "— none in zone —"
-        print(f"  {t['theme']:18s}{t['proxy']:7s}{t['rel_1m']:>+8.2f}%{t['rel_3m']:>+8.2f}%  {t['status']:10s} {g}")
+        print(f"  {t['theme']:18s}{t['proxy']:7s}{_pct(t['rel_1m'])}{_pct(t['rel_3m'])}  {t['status']:10s} {g}")
     print()
     for t in out:
         if t["status"] == "LEADING" and t["all_extended"]:

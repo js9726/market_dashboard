@@ -103,6 +103,31 @@ def macd_calc(closes, fast=12, slow=26, signal=9):
     return line, sig, hist
 
 
+def extension_atr(highs, lows, closes, ema_period=21, atr_period=14):
+    """
+    Distance from the EMA in ATR units - the operator's "extension" measure.
+
+    SIGNED: a negative result means price is BELOW the EMA. Callers gate position
+    size on this (<0.5 ATR half size, 0.5-2.5 green, >2.5 blocked), so dropping the
+    sign promotes a name trading under its 21EMA into the full-size green zone.
+
+    This is the SINGLE SOURCE OF TRUTH for the measure. `analyze()` below and
+    `theme_radar.py` both call it, so the two tools cannot drift apart in either
+    the moving-average flavour (SMA-seeded EMA, not pandas `ewm(adjust=True)`) or
+    the ATR flavour (EMA of true range, not a simple rolling mean).
+
+    Returns None when there are too few bars, or when ATR/EMA are unavailable.
+    """
+    need = max(ema_period, atr_period) + 1
+    if not closes or len(closes) < need:
+        return None
+    atr_now = atr(highs, lows, closes, atr_period)[-1]
+    ema_now = ema(closes, ema_period)[-1]
+    if not atr_now or ema_now is None:
+        return None
+    return (closes[-1] - ema_now) / atr_now
+
+
 def classify_risk(dist_21_atr):
     if dist_21_atr is None:
         return "UNKNOWN"
@@ -176,7 +201,8 @@ def analyze(ticker: str, n: int = 100) -> dict | None:
     hist_prev = mh[-2] if len(mh) > 1 else 0
 
     dist_8_atr = (last_close - e8_now) / atr_now if (atr_now and e8_now) else None
-    dist_21_atr = (last_close - e21_now) / atr_now if (atr_now and e21_now) else None
+    # shared with theme_radar.py - keep this the only 21EMA-extension expression
+    dist_21_atr = extension_atr(highs, lows, closes, 21, 14)
     dist_50_atr = (last_close - e50_now) / atr_now if (atr_now and e50_now) else None
     dist_200_atr = (last_close - ma200_now) / atr_now if (atr_now and ma200_now) else None
 
