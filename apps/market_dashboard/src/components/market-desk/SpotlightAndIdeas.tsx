@@ -202,7 +202,7 @@ function IdeaRow({ mover, isStandout }: { mover: BriefMover; isStandout: boolean
           <span className="idea-row__ticker">{mover.ticker}</span>
           {mover.changePct != null ? (
             <span className={`t-caption t-mono ${changeClass}`}>
-              {mover.changePct >= 0 ? "+" : ""}{mover.changePct.toFixed(2)}%
+              {mover.changePct >= 0 ? "+" : ""}{mover.changePct.toFixed(2)}% session
             </span>
           ) : null}
           {isStandout ? (

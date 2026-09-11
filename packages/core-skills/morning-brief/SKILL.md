@@ -29,15 +29,21 @@ PATH A: Claude CLI itself generates the brief (populates the "Claude" tab)
    Step 4  Pipe the JSON through ingest_to_dashboard.py
            → lands on the Claude tab (provider="claude")
 
-PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/Codex tabs)
+PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini tabs)
    Reads watchlist from dashboard DB + screener json
-   Calls the chosen provider's API (DeepSeek / Gemini / OpenAI / Anthropic)
+   Calls exactly one chosen API (DeepSeek or Gemini); never silently falls back
    Pushes to dashboard as that provider
+
+PATH C: Dashboard refresh buttons
+   DeepSeek/Gemini run their exact API lane
+   Claude/Codex dispatch their subscription runner and fail closed if unavailable
+
+PATH D: codex_brief_runner.mjs (Codex subscription, populates Codex tab)
 ```
 
 ---
 
-## PATH A — Claude CLI (run this in Claude CLI / Codex CLI)
+## PATH A — Claude CLI (Claude Code subscription)
 
 > **The push to the dashboard is MANDATORY — always run Step 4.**
 > The brief is useless sitting in memory. Step 4 is what puts it live for viewers.
@@ -45,7 +51,7 @@ PATH B: python cli_run.py (API-driven, populates DeepSeek/Gemini/Codex tabs)
 ### Step 0.0-PRE — RUN PREFLIGHT. NO RECEIPT, NO BRIEF.
 
 ```bash
-python preflight.py    # exit 0 = proceed, exit 1 = BLOCKED
+python preflight.py --broker-mode local    # operator PC; exit 1 = publication BLOCKED
 ```
 
 Everything below used to be prose, and prose is advice an agent skips under time
@@ -63,8 +69,11 @@ It enforces, in code:
 | `themes` | yes | Finviz returns >100 industries. Fewer = **scraper broken, not a flat market** |
 | `universe` | yes | Every focus ticker actually reached the classified universe, and flags `UNCLASSIFIED` liquid names |
 | `empty_go` | warn | Counts consecutive empty GO lists. **3+ forces the brief to say it may be a broken gate**, name the leading theme, and list green-zone names |
+| `broker_protection` | yes if local feed unavailable; warn if verified unprotected | Uses one read-only OpenD trade context for positions + active orders. A failed order query blocks local publication. `UNPROTECTED`/`PARTIALLY-PROTECTED` blocks new risk, not the warning brief. |
 
 Quote the receipt hash in the brief. A brief without one is unverified by definition.
+In CI/GitHub/SaaS use `--broker-mode unavailable`: the brief may publish only with
+`ORDER-FEED-UNVERIFIED` stated explicitly and may never claim a holding is protected.
 
 **The agent does the clustering, not Jie.** He should never be asked to bucket names by
 theme — that is the job this pipeline exists to do, and asking him to do it by eye
@@ -214,15 +223,22 @@ extended winner to trim. Source of truth = **live broker positions**, not the sh
 
 ```powershell
 cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
-# Pass journaled stops so R + stop-status are exact (read them from the T.Journal sheet
-# or the dashboard trades). OPEND_ACC_ID comes from env — never hardcode the account id.
-$env:OPEND_ACC_ID="<your live US acc id>"
+# Journaled stops provide plan/R context only. They NEVER prove a broker order exists.
+# OPEND_ACC_ID is optional. If set, it narrows get_acc_list() and is never logged.
+# If unset, exactly one REAL US account must resolve or the run fails closed.
 python holdings_review.py --stops '{"VRT":326.48,"HUT":93.91,"TENB":22.99}'
 ```
 
-Output is urgency-sorted: `CUT` (regular-session stop broken) → `CUT-ON-OPEN`
-(after-hours below stop — decide on the open, don't chase the thin AH print) → `WARN`
-(within 0.3 ATR of stop, or below 8EMA) → `OK`. R is `(last−entry)/(entry−stop)`.
+The broker-protection state is one of `PROTECTED-WORKING`, `PROTECTED-QUEUED`,
+`PARTIALLY-PROTECTED`, `UNPROTECTED`, `ORDER-FEED-UNVERIFIED`, or `HOLD-EXEMPT`.
+Only active sell `STOP`, `STOP_LIMIT`, `TRAILING_STOP`, or `TRAILING_STOP_LIMIT` orders
+count. Normal sell limits and cancelled/failed/deleted orders do not. Coverage uses
+remaining quantity (`qty - dealt_qty`) against the live position. `aux_price` is the
+trigger and `price` is the stop-limit price. Planned R remains
+`(last-entry)/(entry-planned_stop)` and is labelled plan math.
+Moomoo account selection always calls `get_acc_list()` and passes the uniquely verified
+`acc_id` to both read queries. Never fall back to `acc_index`: Moomoo documents that its
+ordering can change when accounts are added or closed.
 
 - **Sweep BOTH brokers (2026-07-09).** `holdings_review.py` covers moomoo only. Jie also
   holds positions at IBKR (account identifier intentionally omitted; e.g. RBRK; ONTO previously), which a moomoo-only
@@ -230,8 +246,8 @@ Output is urgency-sorted: `CUT` (regular-session stop broken) → `CUT-ON-OPEN`
   `cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\dashboard-bridge"; & ".venv\Scripts\python.exe" ibkr_bridge.py`
   (no `--post` = dry run; needs TWS at 127.0.0.1:7496). If TWS is down, fail-closed:
   report the IBKR book as UNVERIFIED — never state "no other positions".
-- **Skip this step in CI / GitHub Actions / SaaS** — there is no broker there. It is for
-  manual operator runs only (OpenD on `127.0.0.1:11111`).
+- **CI / GitHub Actions / SaaS has no broker.** Do not skip the state: run preflight in
+  `unavailable` mode and surface `ORDER-FEED-UNVERIFIED`; never infer protection.
 - If any holding is `CUT` / `CUT-ON-OPEN` / `WARN`, or you want the full per-holding
   **HOLD / TRIM / CUT** call with the overnight news catalyst and wiki citations, run the
   **trade-analyser skill → Mode C (Open-Holdings Daily/Overnight Review)**, which adds the
@@ -504,15 +520,16 @@ python ingest_to_dashboard.py brief_output.json
 
 Dashboard viewers see the updated **Claude** chip within ~60 seconds (the poll interval).
 
-If you only need to refresh DeepSeek/Gemini/Codex instead, jump to PATH B.
+If you only need to refresh DeepSeek/Gemini, jump to PATH B. For Codex, use PATH D.
 
 ---
 
-## PATH B — `cli_run.py` (refreshes DeepSeek / Gemini / Codex tabs)
+## PATH B — `cli_run.py` (refreshes DeepSeek / Gemini API tabs)
 
-Use this for the **non-Claude** provider tabs. Each invocation calls one provider's
-API and pushes the result tagged as that provider. The Claude tab is NOT refreshed
-by this path — use PATH A for that.
+Use this for the approved paid API lanes. Each invocation calls exactly one
+provider and pushes the result under that provider. A missing key or failed call
+stops that run; it never spends through a different vendor. Claude and Codex are
+subscription-only and are not available through this command.
 
 ```bash
 cd "C:\Users\jiesh\AI codes hub\market_dashboard\packages\core-skills\morning-brief"
@@ -522,9 +539,6 @@ python cli_run.py --provider deepseek --post
 
 # Gemini — pre-market run, Search Grounding gives richer citations
 python cli_run.py --provider gemini --post --tv-watchlist "NVDA,TSLA,AAPL,..."
-
-# Codex tab (stored as provider=openai) — pre-market, web_search_preview tool
-python cli_run.py --provider openai --post
 
 # Override watchlist with specific tickers
 python cli_run.py --provider deepseek --post --watchlist "NVDA,TSLA,AAPL,COIN"
@@ -543,8 +557,15 @@ Watchlist resolution order:
 
 Log in as owner → Conviction Desk → click **"Refresh DeepSeek"** (or Gemini/Codex/Claude).
 
-The server reads your watchlist from the DB and regenerates. Same result as Path B but
-triggered from the browser. Other viewers see the update within 60 seconds.
+DeepSeek/Gemini use their exact paid API lane. Claude/Codex dispatch their
+subscription runner. If dispatch is unavailable or the Codex computer is offline,
+the button reports that condition and does not fall back to a paid API.
+
+## PATH D — Codex subscription runner
+
+Run `node codex_brief_runner.mjs` (or `npm run brief:codex`) on the operator
+computer. It uses the logged-in Codex subscription, writes provider=`openai` for
+the existing Codex tab identity, and never reads `OPENAI_API_KEY`.
 
 ---
 
@@ -574,11 +595,10 @@ python scripts/tv_screener_fetch.py --out-dir data
 cd ../../apps/market_dashboard
 npm run sync:market
 
-# 4. Refresh the non-Claude provider tabs via PATH B
+# 4. Refresh the approved API tabs via PATH B
 cd ../../packages/core-skills/morning-brief
 python cli_run.py --provider gemini --post
 python cli_run.py --provider deepseek --post
-python cli_run.py --provider openai --post   # Codex tab; optional, requires OPENAI_API_KEY
 ```
 
 Then run Claude CLI to refresh the **Claude** tab via PATH A:
@@ -587,6 +607,8 @@ run morning brief
 ```
 Claude CLI uses its own WebSearch tool, emits a StructuredBrief JSON, and pipes
 it through `ingest_to_dashboard.py` (which defaults to provider=claude).
+
+To refresh Codex too, run `npm run brief:codex` on the logged-in operator computer.
 
 ---
 
@@ -633,10 +655,15 @@ session; the other validates later. One owner GO is sufficient. A factual error 
 failure blocks it — a judgment difference alone is recorded as `JUDGMENT_DIFFERS` and does
 NOT cancel the owner's GO.
 
-**UNPROTECTED positions.** Any live position without an active broker-side stop is marked
-`UNPROTECTED` and blocks new live risk — except holdings explicitly classified `HOLD-EXEMPT`
-in the wiki (currently MTLS; see `jie_wiki/wiki/trading/companies/materialise.md`). Do not report a
-HOLD-EXEMPT position as a stop defect and do not count it against the risk budget.
+**Broker protection.** Any live position without full remaining active protective-order
+quantity is `UNPROTECTED` or `PARTIALLY-PROTECTED` and blocks new live risk — except
+`HOLD-EXEMPT` holdings (currently MTLS; see
+`jie_wiki/wiki/trading/companies/materialise.md`). A queued full-quantity stop is
+`PROTECTED-QUEUED`, never mislabeled broker-working. A journal/planned stop cannot change
+any of these states. An unavailable local order feed blocks publication; CI/SaaS renders
+`ORDER-FEED-UNVERIFIED` and never makes a protected claim. The OpenD check covers the
+moomoo US book only; the separate IBKR dry run remains required before describing the
+whole book.
 
 ## Files
 
@@ -647,7 +674,7 @@ HOLD-EXEMPT position as a stop defect and do not count it against the risk budge
 | `handler.ts` | TypeScript version — used by Next.js server routes |
 | `cli_run.py` | End-to-end CLI runner (generate + push) |
 | `compute_index_technicals.py` | Daily-bar EMA8/21/50 + ATR + extension + entry-risk (get_cur_kline; reused by holdings_review) |
-| `holdings_review.py` | **Step 0.7** — live broker holdings sweep: quotes + after-hours + stop-status + R per position (operator-local) |
+| `holdings_review.py` | **Step 0.7** — one-snapshot live positions + protective-order reconciliation, separate planned-stop R, quotes and after-hours review (operator-local) |
 | `ingest_to_dashboard.py` | Standalone push — reads JSON file → POST to ingest API |
 | `_env_loader.py` | Auto-loads `.env.local` so no shell profile setup needed |
 | `schema.json` | JSON-schema for skill inputs |

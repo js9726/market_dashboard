@@ -253,7 +253,7 @@ These were flagged by the initial audit but verified as non-issues:
 
 - **B2** — `build_data.py:268,299,306` does not need explicit `.item()`. `sanitize_json` already calls `.item()` on numpy scalars internally ([build_data.py:191](../../market_dashboard_backend/scripts/build_data.py#L191)).
 - **B4** — `breadth_scan.py:132,144` — `datetime.timezone.utc` works correctly. `import datetime` at [line 44](../../market_dashboard_backend/scripts/breadth_scan.py#L44) makes the full `datetime.timezone.utc` path available; not "by accident".
-- **B6** — `morning_brief.py` OpenAI/Claude blocks don't need `resp.raise_for_status()`. They use SDK clients (`openai.OpenAI.responses.create`, `anthropic.Anthropic.beta.messages.create`) which raise on HTTP errors automatically — only Gemini uses raw `requests.post` and it already has the check.
+- **B6 (resolved 2026-08-26)** — The direct Claude API block was removed. Claude is subscription-only; DeepSeek/Gemini remain explicit API lanes and failures do not cross providers.
 - **B10** — `trader_verdict.py:466,473` — `_source` field is not dead; it's read at [line 481](../../market_dashboard_backend/scripts/trader_verdict.py#L481) to print provenance.
 - **B12** - The old `live_quote_daemon.py` env-loader concern is obsolete; live quotes now flow through `packages/dashboard-bridge`.
 - **LRN-005** — `journal/sync/route.ts` no longer has a cookie-race; current code captures `userId` + `connectionId` synchronously at [lines 98-99](../../src/app/api/journal/sync/route.ts#L98) before `after()`.

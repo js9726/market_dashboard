@@ -18,16 +18,15 @@ import {
   INTRADAY_PROVIDERS,
   bucketOf,
   isIntradayWindow,
+  type ApiBriefProvider,
   type BriefProvider,
 } from "@/lib/brief/bucket";
 import { composeSnapshot, hashSnapshot } from "@/lib/brief/snapshot";
+import { LIVE_QUOTE_DEFAULT_WATCHLIST } from "@/lib/live-quote-universe";
 import { runProvider } from "./brief-providers";
 
 /** Fallback used only when the DB watchlist is empty and no OWNER_EMAIL is set. */
-export const DEFAULT_WATCHLIST = [
-  "NVDA", "TSLA", "AAPL", "MSFT", "AMZN", "META",
-  "GOOGL", "AMD", "SMCI", "PLTR", "CRWD", "MSTR",
-];
+export const DEFAULT_WATCHLIST = [...LIVE_QUOTE_DEFAULT_WATCHLIST];
 
 /**
  * Fetch the owner's personal watchlist from Postgres.
@@ -78,7 +77,7 @@ export async function readLatestRow(provider: BriefProvider) {
  */
 export async function regenAndStore(opts: {
   bucket: Date;
-  provider: BriefProvider;
+  provider: ApiBriefProvider;
   generatedBy: string;
   watchlist?: string[];
 }): Promise<void> {

@@ -10,6 +10,7 @@ import FreshnessBadge from "./FreshnessBadge";
 import { BRIEF_THRESHOLDS, liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { selectBriefProvider } from "@/lib/brief/provider-selection";
 import { asText } from "@/lib/brief/as-text";
+import { resolveStandoutState } from "@/lib/brief/standout-state";
 
 const INDICES = [
   { symbol: "SPX", fallbackSymbol: "SPY" },
@@ -21,7 +22,7 @@ const INDICES = [
 
 const PROVIDER_LABEL: Record<BriefProviderName, string> = {
   deepseek: "DeepSeek",
-  gemini: "Gemini 2.5",
+  gemini: "Gemini 3.7",
   openai: "Codex",
   claude: "Claude",
 };
@@ -117,6 +118,9 @@ export default function MorningBriefHero({ isOwner = false }: MorningBriefHeroPr
   const effectiveProvider = selectedBrief?.provider ?? null;
   const entry = selectedBrief?.entry ?? null;
   const briefView = asBriefView(entry?.structured ?? entry?.verdict);
+  const hasCompletedBrief = Boolean(
+    entry && !entry.error && (entry.structured != null || entry.verdict != null),
+  );
   const briefSummary =
     briefView.moodLabel && briefView.moodSummary && briefView.moodLabel !== briefView.moodSummary
       ? `${briefView.moodLabel}: ${briefView.moodSummary}`
@@ -175,7 +179,7 @@ export default function MorningBriefHero({ isOwner = false }: MorningBriefHeroPr
           briefIndices={briefView.structured?.indices ?? null}
         />
         <TradersCard verdict={briefView} />
-        <StandoutCard verdict={briefView} />
+        <StandoutCard verdict={briefView} hasCompletedBrief={hasCompletedBrief} />
       </div>
 
       <div className="border-t border-[var(--line)] px-5 py-3 flex flex-wrap items-center justify-between gap-2">
@@ -341,17 +345,26 @@ function TradersCard({ verdict }: { verdict: BriefView }) {
   );
 }
 
-function StandoutCard({ verdict }: { verdict: BriefView }) {
-  const standout = verdict.standout;
-  if (!standout?.ticker) {
+function StandoutCard({
+  verdict,
+  hasCompletedBrief,
+}: {
+  verdict: BriefView;
+  hasCompletedBrief: boolean;
+}) {
+  const state = resolveStandoutState(hasCompletedBrief, verdict.standout);
+  if (state.status !== "selected") {
     return (
       <div className="conviction-brief__card conviction-brief__card--standout">
         <p className="t-overline">Today&apos;s Standout</p>
-        <p className="t-caption mt-3">Awaiting verdict...</p>
+        <p className="t-caption mt-3">
+          {state.status === "loading" ? "Awaiting verdict..." : "No standout qualified for this brief."}
+        </p>
       </div>
     );
   }
 
+  const { standout } = state;
   const isLong = (standout.side ?? "LONG").toUpperCase() === "LONG";
   const bg = isLong ? "var(--gain-bg)" : "var(--loss-bg)";
   const fg = isLong ? "var(--gain-fg)" : "var(--loss-fg)";

@@ -14,8 +14,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { liveQuoteThresholdsForNow } from "@/lib/freshness";
 import { getLiveIndexQuotes } from "@/lib/live-index-quotes";
+import { isLiveQuoteFresh } from "@/lib/live-quote-freshness";
 
 export const dynamic = "force-dynamic";
 
@@ -68,14 +68,15 @@ export async function GET() {
   }
 
   const rows = Array.from(bySymbol.values()).sort((a, b) => a.symbol.localeCompare(b.symbol));
-  const now = Date.now();
-  const staleMs = liveQuoteThresholdsForNow(new Date(now)).staleSec * 1000;
+  const now = new Date();
+  const freshness = new Map(rows.map((row) => [row.symbol, isLiveQuoteFresh(row.observedAt, now)]));
 
   // Determine the freshest source actively writing (moomoo wins if recent;
   // else yahoo). Helpful for the UI to badge "moomoo live" vs "yahoo delayed".
   let freshestSource: string | null = null;
   let freshestAt = 0;
   for (const r of rows) {
+    if (!freshness.get(r.symbol)) continue;
     const t = r.observedAt.getTime();
     if (t > freshestAt) {
       freshestAt = t;
@@ -94,7 +95,7 @@ export async function GET() {
         volume: r.volume,
         source: r.source,
         observedAt: r.observedAt.toISOString(),
-        stale: now - r.observedAt.getTime() > staleMs,
+        stale: !freshness.get(r.symbol),
       })),
     },
     { headers: { "Cache-Control": "private, max-age=15" } },

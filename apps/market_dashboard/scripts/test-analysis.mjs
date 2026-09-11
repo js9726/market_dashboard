@@ -89,7 +89,7 @@ try {
   console.log('');
   console.log('--- Technical Agent ---');
   if (!tech) {
-    console.log('  ⚠ Technical agent data absent (GEMINI_API_KEY gate or fetch failed)');
+    console.log('  ⚠ Technical agent data absent (DEEPSEEK_API_KEY gate or fetch failed)');
   } else {
     check(
       'price > 0',

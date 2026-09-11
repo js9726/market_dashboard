@@ -64,7 +64,7 @@ Severity: 🟢 solid · 🟡 partial · 🔴 missing.
 6. Owner-showcase not yet whitelist-projected (client-beta P1 未 built) — REC lane serialization currently reuses full `serializeCandidate`; fields like `savings.saveRealizedUsd` are $-denominated (leak-adjacent; REC rows are hypothetical-R so tolerable, but the whitelist must land before "Jie entered ✓" ships).
 7. Test smoke account (`beta-tester@dashboard.test`) visible in admin list — fine, but document it.
 
-## C. Phased plan (approval gates; each phase = board rows + acceptance + validation)
+## C. Phased plan (approval gates; each phase = runtime claim + acceptance + validation)
 
 **Workstream key:** 🄲 = Codex, 🄺 = Claude, split rows note both. Sequence: P0 → (P1 ∥ P1.5) → P2 → P3 → (P4 ∥ P5 polish). Every phase validated per `wiki/projects/dashboard-validation-loop.md` (build → deploy → minted-member browser/API probe → fix), and schema/scoring doctrine stays wiki-first.
 
@@ -127,7 +127,11 @@ Where the current UX **beats** TradesViz (protect these): the Market Desk itself
 
 ## D. Distribution & protocol
 
-On approval: each phase gets PLANNED rows on `jie_wiki/agent-system/board.md` with the 🄲/🄺 split above; Codex starts at **P0 (commit own tree) → P1 trade-detail/table** while Claude does P0 schema/symbols → P1 IA/routes. Cross-review per protocol at each DONE. Conflicts: any same-file work is sequenced through the board before starting. Scoring/doctrine changes remain wiki-first + `skills:sync`.
+On approval: each phase receives an atomic claim plus durable task/handoff when major or
+multi-session, with the 🄲/🄺 split above. Codex starts at **P0 (commit own tree) → P1
+trade-detail/table** while Claude does P0 schema/symbols → P1 IA/routes. Cross-review per
+protocol follows each scoped local commit. Same-file work is sequenced through atomic
+claims before starting. Scoring/doctrine changes remain wiki-first + `skills:sync`.
 
 ## E. Validation commands (per phase, minimum)
 

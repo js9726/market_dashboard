@@ -17,6 +17,12 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { getLiveIndexQuotes } from "@/lib/live-index-quotes";
+import { selectFreshLiveQuotes } from "@/lib/live-quote-freshness";
+import {
+  LIVE_QUOTE_INDEX_SYMBOLS,
+  LIVE_QUOTE_SECTORS,
+  requiredLiveQuoteSymbols,
+} from "@/lib/live-quote-universe";
 import type { BreadthSnapshot, MarketBreadth } from "@/types/breadth";
 import type { TvScreenerHit, TvScreenersFile } from "@/types/tv-screener";
 
@@ -57,8 +63,7 @@ const PUBLIC_SNAPSHOT_PATH = path.join(PUBLIC_MARKET_DATA_DIR, "snapshot.json");
 const PUBLIC_TV_SCREENERS_PATH = path.join(PUBLIC_MARKET_DATA_DIR, "tv_screeners.json");
 const PUBLIC_BREADTH_PATH = path.join(PUBLIC_MARKET_DATA_DIR, "breadth.json");
 
-const INDEX_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "VIX"];
-const SECTOR_SYMBOLS = ["XLK", "XLF", "XLE", "XLV", "XLI", "XLY", "XLP", "XLU", "XLB", "XLRE", "XLC"];
+const SECTOR_SYMBOLS = LIVE_QUOTE_SECTORS.map((sector) => sector.symbol);
 
 interface LiveOverlayRow {
   symbol: string;
@@ -313,27 +318,18 @@ export async function composeSnapshot(watchlist: string[]): Promise<ComposedSnap
       ? String((baseline as { built_at: unknown }).built_at)
       : null) ?? null;
 
-  const allSymbols = Array.from(
-    new Set(INDEX_SYMBOLS.concat(SECTOR_SYMBOLS).concat(watchlist)),
-  );
+  const allSymbols = requiredLiveQuoteSymbols(watchlist);
   const liveRows = await prisma.liveQuote.findMany({
     where: { symbol: { in: allSymbols } },
   });
-  const liveBySymbol = new Map<string, LiveOverlayRow>(liveRows.map((r) => [r.symbol, r]));
   const liveIndexRows = await getLiveIndexQuotes().catch(() => []);
-  for (const row of liveIndexRows) {
-    if (row.symbol === "VIX") liveBySymbol.set(row.symbol, row);
-  }
+  const candidates: LiveOverlayRow[] = [
+    ...liveRows,
+    ...liveIndexRows.filter((row) => row.symbol === "VIX"),
+  ];
+  const { bySymbol: liveBySymbol, latestObservedAt: liveAsOf } = selectFreshLiveQuotes(candidates);
 
-  let liveAsOf: Date | null = null;
-  for (const r of liveRows) {
-    if (!liveAsOf || r.observedAt > liveAsOf) liveAsOf = r.observedAt;
-  }
-  for (const r of liveIndexRows) {
-    if (!liveAsOf || r.observedAt > liveAsOf) liveAsOf = r.observedAt;
-  }
-
-  const pickGroup = (symbols: string[]) =>
+  const pickGroup = (symbols: readonly string[]) =>
     Object.fromEntries(
       symbols
         .map((s): [string, { price: number; changePct: number | null; source: string }] | null => {
@@ -351,7 +347,7 @@ export async function composeSnapshot(watchlist: string[]): Promise<ComposedSnap
         .filter((x): x is [string, { price: number; changePct: number | null; source: string }] => x !== null),
     );
 
-  const indices = pickGroup(INDEX_SYMBOLS);
+  const indices = pickGroup(LIVE_QUOTE_INDEX_SYMBOLS);
 
   return {
     builtAt: new Date().toISOString(),

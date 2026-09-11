@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-type Provider = "deepseek" | "gemini" | "openai" | "claude";
+type Provider = "deepseek" | "gemini";
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -17,7 +17,7 @@ loadEnvFile(path.join(process.cwd(), ".env.local"));
 loadEnvFile(path.join(process.cwd(), ".env"));
 
 const provider = (process.argv[2] ?? "deepseek") as Provider;
-if (!["deepseek", "gemini", "openai", "claude"].includes(provider)) {
+if (!["deepseek", "gemini"].includes(provider)) {
   throw new Error(`Unsupported provider: ${provider}`);
 }
 

@@ -8,7 +8,8 @@ name: Refresh Brief (single provider, on-demand)
 # path with a condensed inline prompt (no wiki). This workflow runs the SAME
 # wiki-grounded brief as the daily pre-open job, one provider at a time:
 #   - claude  → claude_sdk_runner (Claude Code SUBSCRIPTION, loads the wiki skill)
-#   - deepseek/gemini/openai → morning_brief.py (provider API)
+#   - deepseek/gemini → morning_brief.py (explicit provider API)
+# Codex uses refresh_codex_selfhosted.yml and never falls back to OpenAI API.
 #
 # It refreshes the underlying data first so an on-demand refresh isn't computed
 # off a stale snapshot. Each provider step pushes to /api/morning-verdict/ingest.
@@ -20,7 +21,7 @@ on:
         description: "Provider to refresh"
         required: true
         type: choice
-        options: [claude, openai, deepseek, gemini]
+        options: [claude, deepseek, gemini]
 
 concurrency:
   group: refresh-brief-${{ github.event.inputs.provider }}
@@ -100,8 +101,8 @@ jobs:
           BRIEF_DATA_DIR: ${{ github.workspace }}/apps/market_dashboard_backend/data
           WIKI_DIR:       ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
 
-      # ── DeepSeek / Gemini / OpenAI(Codex) — provider API via morning_brief.py ─
-      - name: Generate brief (deepseek / gemini / openai)
+      # ── DeepSeek / Gemini — explicit provider API via morning_brief.py ───────
+      - name: Generate brief (deepseek / gemini)
         if: ${{ github.event.inputs.provider != 'claude' }}
         run: |
           python scripts/morning_brief.py --out-dir data \
@@ -112,6 +113,5 @@ jobs:
         env:
           DEEPSEEK_API_KEY:  ${{ secrets.DEEPSEEK_API_KEY }}
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY:    ${{ secrets.OPENAI_API_KEY }}
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}

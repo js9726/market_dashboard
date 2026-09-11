@@ -21,7 +21,7 @@ REM   Action:  Start this .bat file
 REM   Settings: "If task fails, restart every 5 min, attempt up to 3 times"
 REM ============================================================================
 
-set REPO_ROOT=C:\Users\jiesh\AI codes hub\market_dashboard
+for %%I in ("%~dp0\..\..\..") do set "REPO_ROOT=%%~fI"
 set BACKEND=%REPO_ROOT%\apps\market_dashboard_backend
 set FRONTEND=%REPO_ROOT%\apps\market_dashboard
 set WIKI=%JIE_WIKI_ROOT%
@@ -37,47 +37,47 @@ echo ============================================================ >> "%LOG%"
 REM Step 1: market data snapshot. This must run before sync:market or VIX,
 REM indices, RVOL, Theme Radar, and Rotation can remain stale locally.
 echo. >> "%LOG%"
-echo [step 1/6] build_data snapshot >> "%LOG%"
+echo [step 1/7] build_data snapshot >> "%LOG%"
 cd /d "%BACKEND%"
 python scripts\build_data.py --out-dir data >> "%LOG%" 2>&1
 if errorlevel 1 (
-  echo [step 1/6] FAILED >> "%LOG%"
+  echo [step 1/7] FAILED >> "%LOG%"
   goto :error
 )
 
 REM Step 2: TV screener fetch + DeepSeek score.
 echo. >> "%LOG%"
-echo [step 2/6] tv_screener_fetch >> "%LOG%"
+echo [step 2/7] tv_screener_fetch >> "%LOG%"
 cd /d "%BACKEND%"
 python scripts\tv_screener_fetch.py --out-dir data --score --score-top 8 >> "%LOG%" 2>&1
 if errorlevel 1 (
-  echo [step 2/6] FAILED >> "%LOG%"
+  echo [step 2/7] FAILED >> "%LOG%"
   goto :error
 )
 
 REM Step 3: Push scored screener picks to the dashboard history.
 echo. >> "%LOG%"
-echo [step 3/6] push_screener_picks >> "%LOG%"
+echo [step 3/7] push_screener_picks >> "%LOG%"
 cd /d "%WIKI%"
 python scripts\push_screener_picks.py --post --journal-user JS --min-score 60 >> "%LOG%" 2>&1
 python scripts\push_screener_picks.py --post --journal-user XX --min-score 60 >> "%LOG%" 2>&1
 
 REM Step 4: breadth scan via TradingView screener API.
 echo. >> "%LOG%"
-echo [step 4/6] breadth_scan_tv >> "%LOG%"
+echo [step 4/7] breadth_scan_tv >> "%LOG%"
 cd /d "%BACKEND%"
 python scripts\breadth_scan_tv.py --out-dir data >> "%LOG%" 2>&1
 if errorlevel 1 (
-  echo [step 4/6] FAILED - continuing anyway >> "%LOG%"
+  echo [step 4/7] FAILED - continuing anyway >> "%LOG%"
 )
 
 REM Step 5: sync generated data into the Next.js public folder.
 echo. >> "%LOG%"
-echo [step 5/6] sync to public folder >> "%LOG%"
+echo [step 5/7] sync to public folder >> "%LOG%"
 cd /d "%FRONTEND%"
 call npm run sync:market >> "%LOG%" 2>&1
 if errorlevel 1 (
-  echo [step 5/6] FAILED >> "%LOG%"
+  echo [step 5/7] FAILED >> "%LOG%"
   goto :error
 )
 

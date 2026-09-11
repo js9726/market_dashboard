@@ -4,12 +4,12 @@ Reads snapshot.json, feeds market context to an AI, and outputs trader_verdict.j
 Runs after build_data.py. No web search needed — all data is in snapshot.json.
 
 Usage:
-  python scripts/trader_verdict.py [--out-dir data] [--providers gemini,claude,openai]
+  python scripts/trader_verdict.py [--out-dir data] [--providers deepseek,gemini,openai]
 
 Outputs:
   <out-dir>/trader_verdict.json
 
-Requires at least one of: GEMINI_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY
+Requires at least one of: DEEPSEEK_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY
 """
 from __future__ import print_function
 import argparse
@@ -59,7 +59,14 @@ _SHARED_DIR = os.path.normpath(
 if _SHARED_DIR not in sys.path:
     sys.path.insert(0, _SHARED_DIR)
 
+_MORNING_BRIEF_DIR = os.path.normpath(
+    os.path.join(_HERE, "..", "..", "..", "packages", "core-skills", "morning-brief")
+)
+if _MORNING_BRIEF_DIR not in sys.path:
+    sys.path.insert(0, _MORNING_BRIEF_DIR)
+
 from prompt_loader import load_trader_profiles  # noqa: E402
+from deepseek_api import call_deepseek_json  # noqa: E402
 
 TRADER_PROFILES = [
     {"handle": p["handle"], "name": p["name"], "style": p["styleLong"]}
@@ -254,7 +261,7 @@ def _call_gemini(prompt: str) -> dict | None:
         return None
 
     import requests as req
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent"
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"temperature": 0.2, "maxOutputTokens": 2048},
@@ -279,33 +286,19 @@ def _call_gemini(prompt: str) -> dict | None:
     return None
 
 
-def _call_claude(prompt: str) -> dict | None:
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        print("[Claude] ANTHROPIC_API_KEY not set — skipping.")
+def _call_deepseek(prompt: str) -> dict | None:
+    if not os.environ.get("DEEPSEEK_API_KEY"):
+        print("[DeepSeek] DEEPSEEK_API_KEY not set — skipping.")
         return None
-
-    try:
-        import anthropic
-    except ImportError:
-        print("[Claude] anthropic not installed — run: pip install anthropic")
-        return None
-
-    client = anthropic.Anthropic(api_key=api_key)
     for attempt in range(3):
         try:
-            response = client.messages.create(
-                model="claude-sonnet-4-6",
-                max_tokens=2048,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            text = response.content[0].text
+            text = call_deepseek_json(prompt, max_output_tokens=2048)
             raw  = extract_json(text)
             return validate_verdict(json.loads(raw))
         except (ValueError, KeyError) as e:
-            print(f"[Claude] Validation error (attempt {attempt + 1}): {e}")
+            print(f"[DeepSeek] Validation error (attempt {attempt + 1}): {e}")
         except Exception as e:
-            print(f"[Claude] Error (attempt {attempt + 1}): {e}")
+            print(f"[DeepSeek] Error (attempt {attempt + 1}): {type(e).__name__}")
         if attempt < 2:
             time.sleep(2 ** attempt)
     return None
@@ -424,8 +417,8 @@ def merge_user_data(new_data: dict, existing_path: str) -> dict:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir",  default="data", help="Output directory (same as build_data --out-dir)")
-    parser.add_argument("--providers", default="gemini,claude,openai",
-                        help="Comma-separated AI providers to try in order (default: gemini,claude,openai)")
+    parser.add_argument("--providers", default="deepseek,gemini,openai",
+                        help="Comma-separated AI providers to try in order (default: deepseek,gemini,openai)")
     args = parser.parse_args()
 
     out_dir  = args.out_dir
@@ -451,8 +444,8 @@ def main():
 
     # Try each enabled provider in order, stop at first success
     PROVIDERS = {
+        "deepseek": _call_deepseek,
         "gemini": _call_gemini,
-        "claude": _call_claude,
         "openai": _call_openai,
     }
 

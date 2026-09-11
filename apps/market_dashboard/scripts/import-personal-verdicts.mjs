@@ -167,7 +167,7 @@ async function main() {
             tradeId: trade.id,
             ticker: ticker.toUpperCase(),
             tradeDate: trade.tradeDate,
-            model: content.model || "deepseek-chat",
+            model: content.model || "deepseek-v4-flash",
             provider: PROVIDER_TAG,
             style: "trader-debate",
             kind: "day-0",

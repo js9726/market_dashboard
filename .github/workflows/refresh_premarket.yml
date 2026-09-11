@@ -12,8 +12,8 @@ name: Refresh Pre-Open Brief (Daily 27min Before Market Open)
 #   1. Skip if not a US trading day (pandas_market_calendars)
 #   2. build_data.py        → snapshot, indices, sector ETFs
 #   3. tv_screener_fetch.py → 5 screeners, DeepSeek-scored top 10
-#   4. morning_brief.py     → Claude + DeepSeek + Gemini (OpenAI skipped per
-#                             $5/day cost cap; on-demand only via /refresh button)
+#   4. morning_brief.py     → DeepSeek + Gemini API briefs
+#      claude_sdk_runner.ts → Claude Code subscription brief
 #   5. Sync data to public folder
 #   6. Sanitise JSON (NaN → null)
 #   7. Commit + push (with -X theirs rebase retry on race)
@@ -23,8 +23,7 @@ name: Refresh Pre-Open Brief (Daily 27min Before Market Open)
 # Concurrency: lock prevents overlap; new run waits + skips if old still
 # finishing (matches the cancel-in-progress=false pattern used by the old split jobs).
 #
-# Cost target: ~$3.50/run (1.50 Claude + 0.30 DeepSeek + 0.80 Gemini +
-#               0.30 A-list scoring + 0.50 screener scoring).
+# Claude is subscription-only. API costs come from DeepSeek/Gemini calls.
 
 on:
   schedule:
@@ -140,7 +139,6 @@ jobs:
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
 
       # ── Step 4b: Claude SDK runner (Node — Phase 3c MVP) ────────────────
-      # Direct Anthropic SDK with manual wiki context loading from the
       # Drives the morning-brief SKILL via the Claude Agent SDK under the
       # Claude Code SUBSCRIPTION (CLAUDE_CODE_OAUTH_TOKEN) — not a metered
       # Anthropic API token. Generate the token once with `claude setup-token`

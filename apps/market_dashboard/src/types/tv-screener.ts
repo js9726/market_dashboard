@@ -24,6 +24,9 @@ export interface TvScreenerHit {
   "Perf.W"?: number | null;
   "Perf.1M"?: number | null;
   "ATR.percent"?: number | null;
+  /** TradingView security classification used to keep VCP candidates common-stock only. */
+  type?: string | null;
+  typespecs?: string[] | null;
 
   // Populated by the algorithmic scorer (always) or upgraded by DeepSeek (when --score is used).
   score?: number | null;

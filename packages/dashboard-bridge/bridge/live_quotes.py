@@ -4,8 +4,8 @@ Live-quote pusher for the local dashboard-bridge daemon.
 Pulls real-time quotes from moomoo OpenD for the union of:
   - tickers in the user's current positions (so /dashboard/portfolio shows
     fresh P/L for the user's actual book — fixes the TENB-stale issue)
-  - configurable extras from sync.live_quote_extras (defaults: SPY/QQQ/IWM/DIA/VIX
-    so dashboard always has a fresh index and VIX reference)
+  - the product-level universe in packages/live-quote-universe.json
+  - configurable extras from sync.live_quote_extras
 
 Pushes to /api/live-quotes/ingest with source="moomoo". Failure modes are
 non-fatal: a network error or OpenD hiccup logs a warning but doesn't break
@@ -14,7 +14,10 @@ the main positions/fills/equity sync loop.
 from __future__ import annotations
 
 import datetime
+import json
 import logging
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Sequence
 
 import requests
@@ -23,6 +26,7 @@ from moomoo import OpenQuoteContext, RET_OK
 from .config import Config
 
 log = logging.getLogger(__name__)
+UNIVERSE_PATH = Path(__file__).resolve().parents[2] / "live-quote-universe.json"
 
 
 def _futu_code(ticker: str) -> str:
@@ -39,6 +43,48 @@ def _plain_symbol(futu_code: str) -> str:
 
 def _is_vix(ticker: str) -> bool:
     return ticker.upper().replace("US.", "") in {"VIX", "^VIX"}
+
+
+@lru_cache(maxsize=1)
+def required_live_quote_symbols() -> tuple[str, ...]:
+    """Load and validate the dashboard's product-level quote contract."""
+    try:
+        manifest = json.loads(UNIVERSE_PATH.read_text(encoding="utf-8"))
+        raw_symbols = list(manifest["indices"])
+        raw_symbols.extend(row["symbol"] for row in manifest["sectors"])
+        raw_symbols.extend(manifest["defaultWatchlist"])
+    except (OSError, KeyError, TypeError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"Invalid live quote universe at {UNIVERSE_PATH}: {exc}") from exc
+
+    symbols: list[str] = []
+    seen: set[str] = set()
+    for raw in raw_symbols:
+        symbol = str(raw).strip().upper()
+        if not symbol:
+            raise RuntimeError(f"Blank symbol in live quote universe at {UNIVERSE_PATH}")
+        if symbol not in seen:
+            seen.add(symbol)
+            symbols.append(symbol)
+    return tuple(symbols)
+
+
+def build_quote_universe(
+    position_tickers: Sequence[str],
+    configured_extras: Sequence[str],
+) -> tuple[list[str], bool]:
+    """Return OpenD codes plus whether the Yahoo VIX adapter is required."""
+    universe: list[str] = []
+    seen: set[str] = set()
+    wants_vix = False
+    for ticker in list(position_tickers) + list(configured_extras) + list(required_live_quote_symbols()):
+        if _is_vix(ticker):
+            wants_vix = True
+            continue
+        code = _futu_code(ticker)
+        if code not in seen:
+            seen.add(code)
+            universe.append(code)
+    return universe, wants_vix
 
 
 def _fetch_yahoo_vix() -> dict[str, Any] | None:
@@ -90,20 +136,10 @@ def fetch_live_quotes(
     position_tickers: Sequence[str],
 ) -> list[dict[str, Any]]:
     """
-    Pull get_market_snapshot for position tickers + configured extras.
+    Pull get_market_snapshot for positions + product universe + configured extras.
     Returns list of quote dicts ready for /api/live-quotes/ingest.
     """
-    universe: list[str] = []
-    seen: set[str] = set()
-    wants_vix = False
-    for t in list(position_tickers) + list(cfg.sync.live_quote_extras):
-        if _is_vix(t):
-            wants_vix = True
-            continue
-        code = _futu_code(t)
-        if code not in seen:
-            seen.add(code)
-            universe.append(code)
+    universe, wants_vix = build_quote_universe(position_tickers, cfg.sync.live_quote_extras)
 
     if not universe:
         vix = _fetch_yahoo_vix() if wants_vix else None

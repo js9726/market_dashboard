@@ -49,7 +49,7 @@ async function fetchOne(cfg: ScreenerCfg): Promise<Record<string, unknown>[]> {
       return [];
     }
     const json = (await res.json()) as { data?: { s: string; d: unknown[] }[] };
-    return (json.data ?? []).map((row) => {
+    const hits: Record<string, unknown>[] = (json.data ?? []).map((row) => {
       const sym = row.s ?? "";
       const ticker = sym.includes(":") ? sym.split(":")[1] : sym;
       const exchange = sym.includes(":") ? sym.split(":")[0] : null;
@@ -57,6 +57,11 @@ async function fetchOne(cfg: ScreenerCfg): Promise<Record<string, unknown>[]> {
       COLUMNS.forEach((col, i) => { mapped[col] = row.d?.[i] ?? null; });
       const score = algoScore(mapped);
       return { ...mapped, ...score };
+    });
+    if (cfg.id !== "vcp-200ma") return hits;
+    return hits.filter((hit) => {
+      const typeSpecs = hit["typespecs"];
+      return Array.isArray(typeSpecs) && typeSpecs.includes("common");
     });
   } catch (e) {
     console.error(`[screener:${cfg.id}] fetch failed:`, e);

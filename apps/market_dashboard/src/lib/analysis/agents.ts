@@ -225,7 +225,7 @@ export function runNewsAgentStub(ticker: string): AgentReport {
     confidence: 0,
     headline: `News agent: ${ticker} — web-search integration pending (Feature 4b).`,
     details: [
-      "Will scrape headline sentiment via the Anthropic web-search beta + Gemini grounding.",
+      "Will use DeepSeek Responses web search plus Gemini grounding as an independent check.",
       "Outputs: catalyst classification, sentiment score, breaking-news flag.",
     ],
   };

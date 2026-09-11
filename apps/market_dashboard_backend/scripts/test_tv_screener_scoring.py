@@ -11,6 +11,7 @@ from tv_screener_fetch import (
     session_volume_fraction,
     effective_rvol,
     annotate_intraday_rvol,
+    filter_screener_instruments,
 )
 
 try:
@@ -155,12 +156,24 @@ def test_closed_market_path_byte_identical():
            _compute_stages(closed[0]) == _compute_stages(dict(raw_hit)))
 
 
+def test_vcp_keeps_only_common_stock_instruments():
+    hits = [
+        {"ticker": "SKE", "typespecs": ["common"]},
+        {"ticker": "SHO/PI", "typespecs": ["preferred"]},
+        {"ticker": "EQNR", "type": "dr", "typespecs": []},
+        {"ticker": "UNKNOWN", "typespecs": None},
+    ]
+    filtered = filter_screener_instruments("vcp-200ma", hits)
+    _check("VCP retains only common shares", [hit["ticker"] for hit in filtered] == ["SKE"])
+    _check("other screeners remain unchanged", filter_screener_instruments("top-gainer", hits) is hits)
+
+
 if __name__ == "__main__":
     for fn in [test_keys_and_caps, test_clean_ep_is_go, test_parabolic_is_pass,
                test_low_volume_breakout_not_go, test_sentiment_override, test_verdict_bands_via_algo,
                test_session_volume_fraction_bounds, test_effective_rvol_one_sided,
                test_intraday_understated_rvol_not_setup8, test_intraday_high_rvol_ep_mover,
-               test_closed_market_path_byte_identical]:
+               test_closed_market_path_byte_identical, test_vcp_keeps_only_common_stock_instruments]:
         print(fn.__name__)
         fn()
     print("\nALL TESTS PASSED")

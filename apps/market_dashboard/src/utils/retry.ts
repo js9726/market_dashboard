@@ -1,6 +1,6 @@
 /**
  * Retries an async function with exponential backoff on 529 (overloaded) errors.
- * Handles both Anthropic and OpenAI-compatible API overload responses.
+ * Handles provider overload and rate-limit responses without changing provider.
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
