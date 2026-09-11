@@ -21,6 +21,8 @@ export interface HeldSyncResult {
   linked: number;
   skipped: number;
   duplicatesRemoved: number;
+  expired: number;
+  unresolved: number;
   tickers: string[];
 }
 
@@ -120,8 +122,8 @@ export async function syncHeldPositions(userId: string): Promise<HeldSyncResult>
       orderBy: { pickDate: "asc" },
     });
     const existingHeld =
-      activeHeld.find((row) => sameUtcDay(row.entryFillAt ?? row.pickDate, entryAt)) ??
       activeHeld.find((row) => row.heldPositionId === p.id) ??
+      activeHeld.find((row) => row.heldPositionId == null && sameUtcDay(row.entryFillAt ?? row.pickDate, entryAt)) ??
       null;
 
     // Match a REC pick within the window → on-book. REC = not-yet-held candidate.
@@ -174,6 +176,16 @@ export async function syncHeldPositions(userId: string): Promise<HeldSyncResult>
       canonicalId = rec.id;
       linked++;
     } else {
+      // The legacy key cannot represent two accounts (or re-entries) for one
+      // ticker/day. Do not overwrite another position or a historical lifecycle.
+      const occupied = await prisma.aListCandidate.findUnique({
+        where: { userId_pickDate_ticker: { userId, pickDate: entryDate, ticker } },
+      });
+      if (occupied && (occupied.status !== "ACTIVE" ||
+          (occupied.heldPositionId != null && occupied.heldPositionId !== p.id))) {
+        skipped++;
+        continue;
+      }
       // Off-book: new HELD row keyed by entry date.
       const row = await prisma.aListCandidate.upsert({
         where: { userId_pickDate_ticker: { userId, pickDate: entryDate, ticker } },
@@ -199,6 +211,7 @@ export async function syncHeldPositions(userId: string): Promise<HeldSyncResult>
       if (duplicate.id === canonicalId) continue;
       const duplicateEntry = duplicate.entryFillAt ?? duplicate.pickDate;
       const safeGeneratedDuplicate =
+        duplicate.heldPositionId === p.id &&
         duplicate.source === "HELD" &&
         duplicate.onBook !== true &&
         duplicate.day14ComputedAt == null &&
@@ -213,5 +226,35 @@ export async function syncHeldPositions(userId: string): Promise<HeldSyncResult>
     tickers.push(ticker);
   }
 
-  return { created, linked, skipped, duplicatesRemoved, tickers };
+  // Retire dangling links immediately; waiting for the price-tracking cron
+  // leaves exited holdings visible as ACTIVE. Exact IDs isolate accounts,
+  // including paper accounts, without interpreting an incomplete fill ledger.
+  const remaining = await prisma.aListCandidate.findMany({
+    where: { userId, isHeld: true, status: "ACTIVE" },
+    select: { id: true, heldPositionId: true },
+  });
+  const linkedIds = remaining.flatMap((row) => row.heldPositionId ? [row.heldPositionId] : []);
+  const extant = linkedIds.length ? await prisma.position.findMany({
+    where: { id: { in: linkedIds }, brokerAccount: { userId } },
+    select: { id: true },
+  }) : [];
+  const extantIds = new Set(extant.map((position) => position.id));
+  let expired = 0;
+  let unresolved = 0;
+  for (const row of remaining) {
+    if (row.heldPositionId == null) {
+      unresolved++;
+      continue;
+    }
+    if (extantIds.has(row.heldPositionId)) continue;
+    // A missing stored reference is not a fresh broker exit report. Preserve
+    // history and do not invent an exit price, realized P&L, or stop-out reason.
+    const result = await prisma.aListCandidate.updateMany({
+      where: { id: row.id, userId, status: "ACTIVE", heldPositionId: row.heldPositionId },
+      data: { status: "EXPIRED" },
+    });
+    expired += result.count;
+  }
+
+  return { created, linked, skipped, duplicatesRemoved, expired, unresolved, tickers };
 }
