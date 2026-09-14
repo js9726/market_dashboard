@@ -91,6 +91,14 @@ It enforces, in code:
 | `broker_protection` | yes if local feed unavailable; warn if verified unprotected | Uses one read-only OpenD trade context for positions + active orders. A failed order query blocks local publication. `UNPROTECTED`/`PARTIALLY-PROTECTED` blocks new risk, not the warning brief. |
 
 Quote the receipt hash in the brief. A brief without one is unverified by definition.
+
+**A preflight PASS or WARN answers ONE question: may a partial market report be published.**
+It does not establish chart readiness, IBKR verification, completion of manual research, or
+whether any candidate is eligible for GO. Those live in `completion_checks.CheckLedger`, which
+tracks `publish_partial_report`, `workflow_complete`, `candidate_go_eligible` and
+`new_portfolio_risk` separately, with every check recorded as `completed` / `failed` /
+`not_attempted` / `not_applicable` plus timestamp and evidence. Record checks there as you go
+and render the ledger into the brief's gap section. `not_attempted` is not `no activity found`.
 In CI/GitHub/SaaS use `--broker-mode unavailable`: the brief may publish only with
 `ORDER-FEED-UNVERIFIED` stated explicitly and may never claim a holding is protected.
 
@@ -130,6 +138,15 @@ report.
 
 If Chrome MCP cannot reach TradingView, say so explicitly in the brief and cap every affected
 ticker at `WATCH`. Do not silently continue on klines alone.
+
+**Charts: use the server-side snapshot route, not a local screenshot.** A screenshot of the
+chart returns a blank canvas whenever the Chrome window is not composited - `requestAnimationFrame`
+is suspended, so TradingView never sizes its canvases, while the DOM legend and the live price
+keep working and make it look like a load failure. Use
+`TradingViewApi.takeScreenshot()` plus `fetch_tv_snapshot.py`, per
+`jie_wiki/skills/tradingview-daily-screener/references/chart-capture.md`. That route also
+recovers `RS Rating`, which has no OpenD equivalent and which earlier runs wrongly recorded as
+permanently unavailable.
 
 ### Step 0 — Fetch live prices from moomoo OpenD (preferred over yfinance)
 
@@ -227,6 +244,11 @@ that local path. Include this compact read in the market narrative:
 
 `DP CONFIRMATION: <CONFIRMS|DIVERGES|UNAVAILABLE> | trend=<...> | participation=<...> | condition=<...> | asof=<date>`
 
+Collect these images with `python fetch_market_internals.py --run-dir <dated run folder>`,
+then OPEN each PNG and read it. Image-only is not unavailable; the DecisionPoint gallery and the
+$NYMO/$NYSI charts are plain PNGs over HTTP. Record each chart's own as-of date: the free
+McClellan series are END-OF-DAY and show the PREVIOUS session while the market is open.
+
 This is a confirmation lane, not a new regime label or execution feed. Treat 20/50/200 as
 slower structural evidence than 8/21/50, and treat overbought/sentiment extremes as warnings
 rather than automatic sell signals. The free gallery is S&P 500-only. Daily readings are
@@ -259,6 +281,12 @@ Moomoo account selection always calls `get_acc_list()` and passes the uniquely v
 `acc_id` to both read queries. Never fall back to `acc_index`: Moomoo documents that its
 ordering can change when accounts are added or closed.
 
+- **IBKR endpoint diagnosis.** `ibkr_bridge.py` now probes the configured host/port before
+  connecting and exits 2 with a named cause: `not_running` (no listener on 7496/7497/4001/4002)
+  or `wrong_port` (something is listening elsewhere). It connects `readonly=True` and never
+  changes an API setting. A refusal means the IBKR book is **UNVERIFIED** - never empty, never
+  unprotected, unknown. Starting and logging into TWS/Gateway is Jie's action; nothing else can
+  substitute for it.
 - **Sweep BOTH brokers (2026-07-09).** `holdings_review.py` covers moomoo only. Jie also
   holds positions at IBKR (account identifier intentionally omitted; e.g. RBRK; ONTO previously), which a moomoo-only
   sweep silently misses. Also run the read-only IBKR dry run:
@@ -496,8 +524,10 @@ external provider APIs and is used in PATH B; do NOT use it in this step.
    - `{date_str}` — today's date in Malaysia time (MYT = UTC+8).
    - `{watchlist_str}` — `$FULL_WATCHLIST` from Steps 1–2.
    - `{live_data_block}` — **use OpenD output from Step 0 if available** (read `opend_live.json`
-     or the stdout from `fetch_opend_live.py`). If Step 0 was skipped, fetch CNN Fear & Greed
-     (`https://production.dataviz.cnn.io/index/fearandgreed/graphdata`) and call yfinance as
+     or the stdout from `fetch_opend_live.py`). If Step 0 was skipped, call the EXISTING helper `build_data.fetch_cnn_fear_greed()` (or
+     `cli_run._fetch_fear_and_greed()`) - never hand-roll the request. CNN returns
+     HTTP 418 to a bare User-Agent; both helpers already send the Referer/Origin
+     header set that passes the bot check and call yfinance as
      fallback, OR leave a brief "unavailable" stub. Do not hold up Step 3 on data fetching —
      the WebSearch in Step 4 will fill any gaps.
 4. **Use your WebSearch tool** to research the sections enumerated in `prompt.md`

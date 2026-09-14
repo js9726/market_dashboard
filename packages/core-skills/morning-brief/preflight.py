@@ -29,6 +29,13 @@ Checks
   5. empty_go     — count consecutive empty GO lists in recent daily reports. 3+ forces
                     an explicit "this may be a broken gate" statement in the brief.
 
+What this does NOT check
+------------------------
+Chart readiness, IBKR verification, DecisionPoint / MCO / MCSI reads, insider research,
+or whether any candidate is eligible for GO. A PASS or WARN here is permission to
+publish a partial report, nothing more. completion_checks.py owns the other three gates:
+workflow_complete, candidate_go_eligible and new_portfolio_risk.
+
 Usage
 -----
     python preflight.py                 # human output, exit 1 on hard failure
@@ -351,6 +358,24 @@ def run_preflight(wiki: Path | None, broker_mode: str = "auto") -> dict:
         "hard_failures": hard_fail,
         "warnings": warn,
         "checks": checks,
+        # A preflight status answers exactly one question. On 2026-09-14 a WARN was
+        # read as though the whole daily workflow had passed, when no chart had been
+        # captured, IBKR was unreachable and no manual research had been done. Say so
+        # in the receipt itself so the limit travels with it.
+        "scope": {
+            "answers": "publish_partial_report",
+            "does_not_answer": [
+                "workflow_complete",
+                "candidate_go_eligible",
+                "new_portfolio_risk",
+            ],
+            "note": (
+                "Preflight establishes only that a partial market report may be "
+                "published. It does NOT establish chart readiness, IBKR verification, "
+                "completion of manual research, or eligibility of any candidate for GO. "
+                "Track those in completion_checks.CheckLedger."
+            ),
+        },
     }
     receipt["receipt_hash"] = hashlib.sha256(
         json.dumps(receipt, sort_keys=True, default=str).encode()
@@ -384,6 +409,9 @@ def main() -> int:
             print(f"  BLOCKED — do not generate a brief. Fix: {', '.join(hard_fail)}\n")
         elif warn:
             print("  Proceed, but the brief MUST carry the warnings above.\n")
+        print("  SCOPE: this answers publish_partial_report ONLY. It does not establish")
+        print("         chart readiness, IBKR verification, manual-research completion, or")
+        print("         GO eligibility. Record those in completion_checks.CheckLedger.\n")
     return 1 if hard_fail else 0
 
 

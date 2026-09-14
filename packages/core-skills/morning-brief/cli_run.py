@@ -147,14 +147,35 @@ def _fetch_fear_and_greed() -> tuple[int | None, str | None]:
     req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=10) as r:
-            data = json.loads(r.read().decode("utf-8"))
+            # Inspect the envelope BEFORE parsing. A bot-check rejection is an HTML
+            # body with a 4xx status; json.loads() on it raises a JSONDecodeError
+            # that says nothing about why, which is how 2026-09-14 recorded an
+            # "endpoint returned non-JSON" gap for what was really a 418 caused by
+            # a hand-rolled request missing the Referer/Origin headers below.
+            status = getattr(r, "status", None) or r.getcode()
+            ctype = (r.headers.get("Content-Type") or "").lower()
+            body = r.read().decode("utf-8", "replace")
+        if status != 200:
+            raise RuntimeError(f"HTTP {status} from CNN dataviz (bot check or outage)")
+        if "json" not in ctype:
+            raise RuntimeError(
+                f"content-type {ctype!r} is not JSON; CNN served a non-API response"
+            )
+        data = json.loads(body)
         fg = data.get("fear_and_greed", {})
         score = fg.get("score")
         label = fg.get("rating")
-        if score is not None:
-            return round(float(score)), str(label) if label else None
+        if score is None:
+            raise RuntimeError("CNN payload carried no fear_and_greed.score")
+        return round(float(score)), str(label) if label else None
+    except urllib.error.HTTPError as e:
+        print(
+            f"[cli_run] Fear & Greed unavailable: HTTP {e.code} "
+            f"({'bot check - do NOT hand-roll a request, use this helper' if e.code == 418 else e.reason})",
+            file=sys.stderr,
+        )
     except Exception as e:
-        print(f"[cli_run] Fear & Greed fetch failed ({e})", file=sys.stderr)
+        print(f"[cli_run] Fear & Greed unavailable: {type(e).__name__}: {e}", file=sys.stderr)
     return None, None
 
 

@@ -543,6 +543,75 @@ def _attach_ibkr(cfg, ibkr_cfg: IBKRConfig) -> None:
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
+
+# Known IBKR API endpoints, so a refusal can name what the operator needs to start.
+_IBKR_PORTS = {
+    7496: "TWS (live)",
+    7497: "TWS (paper)",
+    4001: "IB Gateway (live)",
+    4002: "IB Gateway (paper)",
+}
+
+
+def diagnose_ibkr_endpoint(host: str, port: int, timeout: float = 2.0) -> dict:
+    """Probe the configured API endpoint and say exactly what is wrong.
+
+    A bare ``ConnectionRefusedError`` traceback (what the 2026-09-14 run produced)
+    does not distinguish "TWS is not running" from "TWS is running with the API
+    disabled" from "wrong port configured". Those need different actions from the
+    operator, so name which one it is.
+
+    Read-only: this opens a TCP socket and closes it. It never logs in, never
+    changes an API setting, and never infers anything about the book. A refused
+    probe means the book is UNVERIFIED, never empty.
+    """
+    import socket
+
+    def _open(p: int) -> bool:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        try:
+            return sock.connect_ex((host, p)) == 0
+        except OSError:
+            return False
+        finally:
+            sock.close()
+
+    expected = _IBKR_PORTS.get(port, f"port {port}")
+    if _open(port):
+        return {"ok": True, "host": host, "port": port, "expected": expected,
+                "detail": f"{expected} is listening on {host}:{port}"}
+
+    alternatives = [p for p in _IBKR_PORTS if p != port and _open(p)]
+    if alternatives:
+        names = ", ".join(f"{p} ({_IBKR_PORTS[p]})" for p in alternatives)
+        return {
+            "ok": False, "host": host, "port": port, "expected": expected,
+            "reason": "wrong_port",
+            "detail": (
+                f"Nothing on {host}:{port} ({expected}), but {names} is listening. "
+                f"Either point [ibkr].port at it, or start {expected}."
+            ),
+            "action": f"Set [ibkr].port to one of: {names}",
+        }
+    return {
+        "ok": False, "host": host, "port": port, "expected": expected,
+        "reason": "not_running",
+        "detail": (
+            f"No IBKR API listener on {host} at any of "
+            f"{', '.join(str(p) for p in sorted(_IBKR_PORTS))}. "
+            f"{expected} is not running, or its API is not enabled."
+        ),
+        "action": (
+            f"Jie: start {expected} and log in, then enable "
+            "Configure > API > Settings > 'Enable ActiveX and Socket Clients' "
+            f"with socket port {port}. Read-only API is sufficient; this bridge "
+            "connects with readonly=True. Until then the IBKR book is UNVERIFIED "
+            "- it is NOT empty."
+        ),
+    }
+
+
 def main() -> None:
     setup_logging()
 
@@ -580,6 +649,14 @@ def main() -> None:
     args = ap.parse_args()
 
     cfg, ibkr_cfg = _load_config_with_ibkr()
+
+    probe = diagnose_ibkr_endpoint(ibkr_cfg.host, ibkr_cfg.port)
+    if not probe["ok"]:
+        log.error("IBKR endpoint unreachable: %s", probe["detail"])
+        log.error("ACTION: %s", probe["action"])
+        log.error("IBKR book state: UNVERIFIED (not empty, not unprotected - unknown).")
+        sys.exit(2)
+    log.info("IBKR endpoint OK: %s", probe["detail"])
 
     if args.flex:
         _flex_backfill(cfg, ibkr_cfg, post=args.post, out=args.out)

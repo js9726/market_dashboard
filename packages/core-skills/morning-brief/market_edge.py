@@ -3,7 +3,9 @@ market_edge.py — "where are my stats right now?"
 
 Answers the ⑦ Market Edge checklist for Jie, splitting every signal into:
   AUTO   — this script measures it live and gives you the answer
-  MANUAL — no free API; prints the exact URL to look at, and what to look for
+  MANUAL — no free API, but image-only is NOT unavailable. Use
+           fetch_market_internals.py to collect the PNGs into the run folder,
+           then read them. Running THIS script completes none of these reads.
 
 Run before ticking the checklist:
 
@@ -159,7 +161,12 @@ def main() -> int:
     for r in auto:
         print(f"   {r['value']:>6s}  {r['signal'][:44]:46s} {r['detail'][:40]}")
     print()
-    print("  MANUAL — no free API. Open the link, read the one thing named.")
+    print("  MANUAL — no free API, but these ARE collectable. Running this script does")
+    print("  NOT complete these reads. Collect the images first:")
+    print("      python fetch_market_internals.py --run-dir <dated run folder>")
+    print("  then open each saved PNG and record its own as-of date and raw level.")
+    print("  Free McClellan data is END-OF-DAY: during a live session it shows the")
+    print("  PREVIOUS session. Never quote a sigma value - nothing computes one.")
     print("  " + "-" * 92)
     for r in manual:
         print(f"   {r['signal'][:44]:46s} {r['source']}")

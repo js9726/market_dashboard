@@ -72,8 +72,12 @@ _MORNING_BRIEF_DIR = os.path.normpath(
 if _MORNING_BRIEF_DIR not in sys.path:
     sys.path.insert(0, _MORNING_BRIEF_DIR)
 
-from deepseek_api import DEEPSEEK_MODEL_ID  # noqa: E402
+from deepseek_api import DEEPSEEK_MODEL_ID, call_deepseek_json  # noqa: E402
 
+
+# A reasoning model spends max_output_tokens on reasoning before it emits content.
+# 250 (the pre-2026-09-14 value) produced empty content for every ticker.
+_AI_MAX_OUTPUT_TOKENS = 8000
 
 SCANNER_URL = "https://scanner.tradingview.com/america/scan"
 
@@ -448,19 +452,116 @@ def _compute_stages(hit: dict, market_sentiment: float = 6.0) -> dict:
     }
 
 
-def _deepseek_score(ticker: str, hit: dict) -> dict | None:
-    """
-    Call DeepSeek to add sector/industry context and write the thesis.
-    The 4-stage sub-scores are pre-computed in Python — DeepSeek cannot
-    override them, only adjust the composite score by ±5 per stage based
-    on sector context it knows and we do not.
-    """
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
-    if not api_key:
-        return None
+# Conviction sub-score denominators. A model that returns a stage outside its own
+# denominator is malformed, not merely opinionated.
+_STAGE_MAX = {"setup": 40, "entry": 30, "theme": 20, "sentiment": 10}
 
+# The prompt tells the model it may move the composite by at most this much. Enforce it
+# here rather than trusting the model to obey its own instructions.
+_MAX_COMPOSITE_ADJUST = 5
+
+
+def _algorithmic_result(stages: dict, raw: int, ai_status: str) -> dict:
+    """The deterministic score, explicitly labelled as NOT AI-scored.
+
+    Every failure path returns this. ``score_source`` is ``algorithmic`` and
+    ``ai_status`` records why AI scoring did not happen, so a failed upgrade can
+    never be counted or displayed as a DeepSeek score.
+    """
+    return {
+        "score": raw,
+        "verdict": "GO" if raw >= 75 else "WAIT" if raw >= 50 else "PASS",
+        "thesis": f"{stages['pattern']} setup; algorithmic score only.",
+        "stages": {k: stages[k] for k in ("setup", "entry", "theme", "sentiment")},
+        "pattern": stages["pattern"],
+        "score_source": "algorithmic",
+        "ai_status": ai_status,
+    }
+
+
+def _validate_ai_score(parsed, stages: dict, raw: int) -> tuple[dict | None, str]:
+    """Validate a model response against the schema and the stage bounds.
+
+    Returns ``(result, "ok")`` or ``(None, reason)``. Anything we cannot fully
+    validate is rejected — a partially-trusted score is worse than an honest
+    algorithmic one because it is indistinguishable from a good one downstream.
+    """
+    if not isinstance(parsed, dict):
+        return None, f"invalid_response:not_an_object:{type(parsed).__name__}"
+
+    score = parsed.get("score")
+    if isinstance(score, bool) or not isinstance(score, (int, float)):
+        return None, "invalid_response:score_not_numeric"
+    score = int(round(score))
+    if not 0 <= score <= 100:
+        return None, f"invalid_response:score_out_of_bounds:{score}"
+    if abs(score - raw) > _MAX_COMPOSITE_ADJUST:
+        # The model exceeded the adjustment budget it was given. Clamp rather than
+        # discard: the deterministic score stays authoritative either way.
+        score = max(raw - _MAX_COMPOSITE_ADJUST, min(raw + _MAX_COMPOSITE_ADJUST, score))
+
+    verdict = parsed.get("verdict")
+    if verdict not in ("GO", "WAIT", "PASS"):
+        return None, f"invalid_response:bad_verdict:{verdict!r}"
+    # The band must agree with the number it is supposed to describe.
+    expected = "GO" if score >= 75 else "WAIT" if score >= 50 else "PASS"
+    if verdict != expected:
+        verdict = expected
+
+    thesis = parsed.get("thesis")
+    if not isinstance(thesis, str) or not thesis.strip():
+        return None, "invalid_response:empty_thesis"
+
+    out_stages = {}
+    raw_stages = parsed.get("stages") if isinstance(parsed.get("stages"), dict) else {}
+    for key, cap in _STAGE_MAX.items():
+        value = raw_stages.get(key, stages[key])
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return None, f"invalid_response:stage_not_numeric:{key}"
+        value = int(round(value))
+        if not 0 <= value <= cap:
+            return None, f"invalid_response:stage_out_of_bounds:{key}={value}/{cap}"
+        out_stages[key] = value
+
+    return {
+        "score": score,
+        "verdict": verdict,
+        "thesis": thesis.strip(),
+        "stages": out_stages,
+        "pattern": stages["pattern"],
+        "score_source": "deepseek",
+        "ai_status": "ok",
+    }, "ok"
+
+
+def _deepseek_score(ticker: str, hit: dict) -> dict:
+    """
+    Score one hit, preferring DeepSeek for sector/industry context and the thesis.
+
+    The 4-stage sub-scores are pre-computed in Python — DeepSeek cannot override
+    them, only adjust the composite by ±5 total based on sector context it knows
+    and we do not.
+
+    ALWAYS returns a usable result. The caller must read ``score_source`` rather
+    than assume: a failed AI call returns the deterministic score labelled
+    ``algorithmic`` with ``ai_status`` naming the exact failure. Before
+    2026-09-14 this function returned an unlabelled fallback dict and the caller
+    stamped every one of them ``deepseek``, which put 35 falsely-attributed rows
+    into the 2026-09-14 screener file.
+
+    Transport is the shared ``deepseek_api.call_deepseek_json`` boundary. The old
+    bespoke Chat Completions call with ``max_tokens=250`` could not work with a
+    reasoning model: DeepSeek spent the whole budget on reasoning tokens and
+    returned ``content: ""`` with ``finish_reason: "length"`` (verified 2026-09-14
+    at both 250 and 1200 tokens), so every ticker failed JSON parsing. The shared
+    boundary uses the Responses endpoint with ``json_object`` format, which
+    terminates reasoning and returns parseable content.
+    """
     stages = _compute_stages(hit)
-    raw    = stages["raw"]   # deterministic baseline 0-100
+    raw = stages["raw"]
+
+    if not os.environ.get("DEEPSEEK_API_KEY"):
+        return _algorithmic_result(stages, raw, "no_key")
 
     # Build a compact stage block for the LLM
     stage_block = (
@@ -500,85 +601,69 @@ def _deepseek_score(ticker: str, hit: dict) -> dict | None:
         if premarket_chg != 0 else "Premarket: no data"
     )
 
-    payload = {
-        "model": DEEPSEEK_MODEL_ID,
-        "messages": [
-            {
-                "role": "system",
-                "content": (
-                    "You are a disciplined momentum trader scoring setups using a 4-stage framework "
-                    "(Minervini SEPA + Qullamaggie EP/Breakout + Alex 21dma pullback + SRxTrades/Jeff volume rules).\n\n"
-                    "The Conviction sub-scores (Setup/40, Entry/30, Theme/20, Sentiment/10) were computed in Python using wiki rules. Your job:\n"
-                    "1. Review the stage scores and adjust the composite ±5 TOTAL based on sector "
-                    "context, industry tailwind/headwind, or contradictions you know about.\n"
-                    "2. Translate the composite into GO (>=75) / WAIT (50-74) / PASS (<50).\n"
-                    "3. Write a 1-sentence thesis (max 25 words) naming the setup type and the key risk.\n\n"
-                    'Output ONLY this JSON (no markdown): '
-                    '{"score":<int 0-100>,"verdict":"GO"|"WAIT"|"PASS","thesis":"<text>","stages":{'
-                    '"setup":<int>,"entry":<int>,"theme":<int>,"sentiment":<int>}}'
-                ),
-            },
-            {
-                "role": "user",
-                "content": (
-                    f"Ticker: {ticker}\n"
-                    f"Sector: {hit.get('sector', 'N/A')} | Industry: {hit.get('industry', 'N/A')}\n"
-                    f"Price: ${close_d:.2f} | Today: {chg_day:+.1f}% | "
-                    f"1W: {perf_1w:+.1f}% | 1M: {perf_1m:+.1f}%\n"
-                    f"RVOL: {rvol:.2f}"
-                    + (
-                        f" (session-adjusted from {float(hit.get('rvol_raw') or 0):.2f} cumulative-so-far TV RVOL)"
-                        if hit.get("rvol_adjusted") else ""
-                    )
-                    + f" | MCap: ${(hit.get('market_cap_basic') or 0)/1e9:.1f}B\n"
-                    f"{candle_line}\n"
-                    f"{premarket_line}\n\n"
-                    f"{stage_block}\n"
-                    "Does the sector/industry context change any stage score? "
-                    "Adjust composite (±5 max total) and write thesis."
-                ),
-            },
-        ],
-        "max_tokens": 250,
-        "temperature": 0.0,
-    }
-    req = urllib.request.Request(
-        "https://api.deepseek.com/v1/chat/completions",
-        data=json.dumps(payload).encode("utf-8"),
-        method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        },
+    instructions = (
+        "You are a disciplined momentum trader scoring setups using a 4-stage framework "
+        "(Minervini SEPA + Qullamaggie EP/Breakout + Alex 21dma pullback + SRxTrades/Jeff volume rules).\n\n"
+        "The Conviction sub-scores (Setup/40, Entry/30, Theme/20, Sentiment/10) were computed in "
+        "Python using wiki rules. Your job:\n"
+        "1. Review the stage scores and adjust the composite by at most +/-5 TOTAL based on sector "
+        "context, industry tailwind/headwind, or contradictions you know about.\n"
+        "2. Translate the composite into GO (>=75) / WAIT (50-74) / PASS (<50).\n"
+        "3. Write a 1-sentence thesis (max 25 words) naming the setup type and the key risk.\n\n"
+        'Output ONLY this JSON (no markdown): '
+        '{"score":<int 0-100>,"verdict":"GO"|"WAIT"|"PASS","thesis":"<text>","stages":{'
+        '"setup":<int>,"entry":<int>,"theme":<int>,"sentiment":<int>}}'
     )
+    prompt = (
+        f"Ticker: {ticker}\n"
+        f"Sector: {hit.get('sector', 'N/A')} | Industry: {hit.get('industry', 'N/A')}\n"
+        f"Price: ${close_d:.2f} | Today: {chg_day:+.1f}% | "
+        f"1W: {perf_1w:+.1f}% | 1M: {perf_1m:+.1f}%\n"
+        f"RVOL: {rvol:.2f}"
+        + (
+            f" (session-adjusted from {float(hit.get('rvol_raw') or 0):.2f} cumulative-so-far TV RVOL)"
+            if hit.get("rvol_adjusted") else ""
+        )
+        + f" | MCap: ${(hit.get('market_cap_basic') or 0)/1e9:.1f}B\n"
+        f"{candle_line}\n"
+        f"{premarket_line}\n\n"
+        f"{stage_block}\n"
+        "Does the sector/industry context change any stage score? "
+        "Adjust composite (+/-5 max total) and write thesis."
+    )
+
     try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            data = json.loads(r.read().decode("utf-8"))
-        text = data["choices"][0]["message"]["content"].strip()
-        if text.startswith("```"):
-            lines = text.splitlines()
-            text = "\n".join(ln for ln in lines if not ln.strip().startswith("```"))
-        result = json.loads(text)
-        # Merge stages from Python computation (authoritative) with LLM output
-        result["stages"] = {
-            "setup":     result.get("stages", {}).get("setup",     stages["setup"]),
-            "entry":     result.get("stages", {}).get("entry",     stages["entry"]),
-            "theme":     result.get("stages", {}).get("theme",     stages["theme"]),
-            "sentiment": result.get("stages", {}).get("sentiment", stages["sentiment"]),
-        }
-        result["pattern"] = stages["pattern"]
-        return result
-    except Exception as e:
-        print(f"[tv:score] {ticker}: {e}")
-        # Fall back to Python-only score without thesis
-        verdict = "GO" if raw >= 75 else "WAIT" if raw >= 50 else "PASS"
-        return {
-            "score":   raw,
-            "verdict": verdict,
-            "thesis":  f"{stages['pattern']} setup; scored without LLM context.",
-            "stages":  {k: stages[k] for k in ("setup","entry","theme","sentiment")},
-            "pattern": stages["pattern"],
-        }
+        text = call_deepseek_json(
+            prompt,
+            instructions=instructions,
+            max_output_tokens=_AI_MAX_OUTPUT_TOKENS,
+        )
+    except Exception as exc:  # transport, auth, status, or empty-output failure
+        reason = f"api_error:{type(exc).__name__}"
+        print(f"[tv:score] {ticker}: AI scoring failed ({reason}) -> algorithmic. {exc}")
+        return _algorithmic_result(stages, raw, reason)
+
+    text = (text or "").strip()
+    if text.startswith("```"):
+        text = "\n".join(
+            ln for ln in text.splitlines() if not ln.strip().startswith("```")
+        ).strip()
+    if not text:
+        print(f"[tv:score] {ticker}: AI returned empty content -> algorithmic.")
+        return _algorithmic_result(stages, raw, "invalid_response:empty_content")
+
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError as exc:
+        print(f"[tv:score] {ticker}: AI response was not JSON -> algorithmic. {exc}")
+        return _algorithmic_result(stages, raw, "invalid_response:not_json")
+
+    result, reason = _validate_ai_score(parsed, stages, raw)
+    if result is None:
+        print(f"[tv:score] {ticker}: AI response rejected ({reason}) -> algorithmic.")
+        return _algorithmic_result(stages, raw, reason)
+    return result
+
 
 
 def algo_score_all(hits: list) -> None:
@@ -608,21 +693,34 @@ def algo_score_all(hits: list) -> None:
 
 def score_top(hits: list, n: int) -> None:
     """
-    Mutate hits[:n] — upgrades algorithmic scores to DeepSeek AI scores.
+    Mutate hits[:n] — attempts to upgrade algorithmic scores to DeepSeek AI scores.
     algo_score_all() must have already run so every hit has a baseline score.
-    DeepSeek can adjust the composite ±5 per stage and add a real thesis.
-    Sets score_source="deepseek" on hits it successfully upgrades.
+    DeepSeek can adjust the composite ±5 total and add a real thesis.
+
+    Provenance comes from _deepseek_score, never from the fact that a call was
+    attempted. A hit whose AI call failed keeps score_source="algorithmic" and
+    carries ai_status explaining why. Returns a per-status tally so the caller can
+    report real success accounting instead of assuming every attempt worked.
     """
+    tally: dict = {}
     for hit in hits[:n]:
         result = _deepseek_score(hit["ticker"], hit)
-        if result:
-            hit["score"]        = result.get("score")
-            hit["verdict"]      = result.get("verdict")
-            hit["thesis"]       = result.get("thesis")
-            hit["stages"]       = result.get("stages")   # {setup, entry, theme, sentiment}
-            hit["pattern"]      = result.get("pattern")  # EP / BREAKOUT / PULLBACK / PARABOLIC / …
-            hit["score_source"] = "deepseek"
+        hit["score"]        = result.get("score")
+        hit["verdict"]      = result.get("verdict")
+        hit["thesis"]       = result.get("thesis")
+        hit["stages"]       = result.get("stages")   # {setup, entry, theme, sentiment}
+        hit["pattern"]      = result.get("pattern")  # EP / BREAKOUT / PULLBACK / PARABOLIC / …
+        hit["score_source"] = result.get("score_source", "algorithmic")
+        hit["ai_status"]    = result.get("ai_status", "unknown")
+        tally[hit["ai_status"]] = tally.get(hit["ai_status"], 0) + 1
         time.sleep(0.6)  # polite — DeepSeek rate limit
+
+    ok = tally.get("ok", 0)
+    total = sum(tally.values())
+    if total:
+        detail = ", ".join(f"{k}={v}" for k, v in sorted(tally.items()))
+        print(f"[tv:score] AI scored {ok}/{total} ({detail})")
+    return tally
 
 
 # --------------------------------------------------------------------------
