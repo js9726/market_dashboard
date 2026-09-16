@@ -5,8 +5,8 @@
   "target": "trader-scorer-trade/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-24T06:27:31.980Z",
-  "renderHash": "ed69123aeeda1c92d036a83405166d70c7e2286fa9827e2de17d4d5f63d57206",
+  "generatedAt": "2026-09-16T15:30:50.561Z",
+  "renderHash": "1048673157651e56d67f7f5d1390be8d19201ce9e205480f7aab712bb2010922",
   "sources": [
     {
       "root": "wiki",
@@ -31,7 +31,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/entry-methods.md",
-      "sha256": "9c3c5e5a93a5abca241442e177e067b838f1376b328f00b7aaf89790a2433c19"
+      "sha256": "792b352286b3bc49bd749390508ccf4e25f41aee28335830c45bbd1bacc21ccf"
     },
     {
       "root": "wiki",
@@ -77,7 +77,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/traders/trader-style-profiles.md sha256:112aef7d75a4
 - wiki:wiki/trading/traders/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/trading/traders/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
-- wiki:wiki/trading/concepts/entry-methods.md sha256:9c3c5e5a93a5
+- wiki:wiki/trading/concepts/entry-methods.md sha256:792b352286b3
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/trading/traders/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
 - wiki:wiki/trading/risk/risk-management.md sha256:16f2da308b4c
@@ -629,7 +629,7 @@ Score risk lower when:
 
 **Sources**: Alex's Swing Trading System.md, The blueprint to consistently making $10km+ in trading.md, The Complete Traders' Guide.md, 3 Early Entry Techniques To Improve Win Rate.md, user-provided tight-area entry setup image, user-provided priming-pattern image, user-provided post-gap volatility contraction image, TraderLion Moglen case studies (TEM ORB, W range breakout — live scrape 2026-07-02, URLs in traderlion-early-entry-techniques), GFS 2026-07-01 trade calibration (OpenD klines), Julian Komar post-earnings second-opportunity post (2026-07-16; raw clipping filename begins `(2) Julian Komar`; [source post](https://x.com/BlogJulianKomar/status/2077732241535349246)), Sean Trades lockout-rally post (2026-04-16; raw clipping filename begins `(2) Sean trades`; [source post](https://x.com/SRxTrades/status/2044536242319380640))
 
-**Last updated**: 2026-07-18
+**Last updated**: 2026-09-16
 
 ---
 
@@ -829,6 +829,32 @@ This is the same family as Launch Pad / Power-of-3 in traderlion-early-entry-tec
 - Reclaim on **≤ ~1× RVOL** → *unconfirmed*: permitted only as a **half-size early entry** with the LoD stop, and the daily close must confirm (close back inside the wedge / below the MAs = exit, −0.5R, no debate).
 - **RVOL ≥ 1.5× on the reclaim close** (or the subsequent pivot break) → confirmed: full size / add.
 - Re-check at ~15:30 ET before carrying the trigger overnight (mid-morning strength is provisional — ALAB 2026-07-02, failed-bounce tape 2026-07-07).
+
+**Rule 4 - measure RVOL over the same window as the gate.** The 1.5x is a **full-day**
+figure. A relative-volume reading taken during the session is *cumulative-so-far divided by a
+full-day average*, so it is not comparable to it. At 10:30 ET only ~22% of a normal session's
+volume has traded, so an ordinary stock reads ~22%, not 100%. Project before judging:
+
+```
+projected_full_day_rvol = cumulative_rvol / session_volume_fraction
+```
+
+`session_volume_fraction` follows the **U-shaped** intraday curve, not clock time - the opening
+30 minutes alone carry ~13% of the day, so at 10:30 the curve reads 0.22 where the clock says
+0.15. Using clock time understates the projection by ~43% at 10:30 and ~69% at 10:00.
+
+- A **completed** session needs no projection: the raw ratio already is the full-day figure.
+- **Before ~10:00 ET the projection is unstable** (curve/clock runs 1.69x-3.12x) and a
+  gap-and-die name front-loads its whole day. Treat volume as *unestablished*, not as passing
+  or failing.
+- The projection is **one-sided** - it can only raise the number, so it can promote a candidate
+  but never demote one. Never let it be the sole evidence of participation; cross-check
+  absolute share volume against the 20-day average.
+
+Worked (2026-09-16, session fraction 0.228 at 10:33 ET): NTAP 7% -> **0.31x** (fail), MPC 16%
+-> 0.70x (fail), TEAM 14% -> 0.61x (fail); OKTA 101% at 11:24 on 2026-09-15 -> **2.84x** (pass).
+Quoting the raw figures against the gate made three of those look far worse than measured and
+one materially better once corrected. Origin: Jie's challenge, 2026-09-16.
 
 **Worked example (HPE 2026-07-09).** June-1 EP (record Q2 post-Juniper, ~558% volume) → 5-week falling wedge −26% off the high → 3-point trigger day: MA-cluster break at ~$47, RS line turning (RS 98), wedge break; LoD stop $45.64 (−3.8%), first supply ~$50.5, prior high zone ~$56 → ~2–4R. Initial analysis PASSed it on the algo Stage-4 label + "extended above 10EMA" + a −15.5% swing-low stop — all three now corrected by the rules above. The one legitimate caution was volume (~1× at trigger time) → half-size early entry, volume decides the add.
 

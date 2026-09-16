@@ -5,8 +5,8 @@
   "target": "trader-scorer-stock/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-24T06:27:31.975Z",
-  "renderHash": "08762c04e66fa72f252e3bb565fd34b4dd64f462021755f8731d99354705977e",
+  "generatedAt": "2026-09-16T15:30:50.554Z",
+  "renderHash": "242803822cb868d05281fc7d4b3a848e979df6ee309f29130725a74095b49e24",
   "sources": [
     {
       "root": "wiki",
@@ -41,7 +41,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/relative-strength.md",
-      "sha256": "3c49bdb0cd3cdc5f7685333b6342d31b70df691eb987c3ec722f3fd7aaac1b78"
+      "sha256": "c6b7dbbef2eba13405674e5785074d1eeb71257cc5d02e9ad0448bee504b451d"
     },
     {
       "root": "wiki",
@@ -89,7 +89,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/traders/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
 - wiki:wiki/trading/concepts/fundamental-analysis.md sha256:857839e81082
 - wiki:wiki/trading/concepts/ticker-catalyst-analysis.md sha256:f59eb15854de
-- wiki:wiki/trading/concepts/relative-strength.md sha256:3c49bdb0cd3c
+- wiki:wiki/trading/concepts/relative-strength.md sha256:c6b7dbbef2eb
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md sha256:7a2301df36b9
 - wiki:wiki/trading/traders/lengyan-cold-eye.md sha256:2796af9cbbbc
@@ -930,7 +930,7 @@ Use the catalyst form before the technical verdict, then let the existing techni
 
 **Sources**: Alex's scans (TradersLab).md, Alex's Swing Trading System.md, Post by @SteveDJacobs on X.md, The Complete Traders' Guide.md, Trading termsconcepts GLOSSARY.md, Post by @martinlukkt on X.md, `(2) Martin Luk on X $QCOM...lockout rally.md` (duplicate capture of the same 2026-07-17 post), `(2) Sean trades on X A lot of you have probably seen the words lockout rally...hig.md`
 
-**Last updated**: 2026-07-18
+**Last updated**: 2026-09-16
 
 ---
 
@@ -982,6 +982,31 @@ The durable lesson is **leadership rotation, not historical repetition**:
 The exact 2,900% return remains attributed to Martin Luk's post: OpenD returned no QCOM bars for the requested 1998–2000 window in the 2026-07-17 verification run. Qualcomm's own records do confirm exceptional 1999 repricing and two stock splits that year—a 2-for-1 in May and a 4-for-1 in December—but those facts do not validate a precise breakout-to-peak percentage. ([Qualcomm split history](https://investor.qualcomm.com/stock-info/dividend-split-history/default.aspx))
 
 Martin Luk does not formally define "lockout rally" in his source, but Sean Trades supplies the missing execution definition: a fast advance with few proper pullbacks that leaves sidelined buyers waiting for an entry. The durable opportunity is either capital rotation into lagging groups or a time correction in established leaders while moving averages catch up. In both cases, RS qualifies the candidate; it does not replace the setup, pivot, extension, or risk gates. See lockout-rally. (source: Sean Trades lockout-rally post)
+
+## Check RS Against The Peer Basket, Not Just The Index
+
+A name can beat the index and still be the weakest thing in its own group, or lead a group that
+is being sold. Index-relative strength alone cannot tell those apart - the peer basket can.
+
+Two readings decide it:
+
+- **Trailing five sessions against direct competitors.** Not a sector ETF; the screener's own
+  `industry` field plus known competitors.
+- **Behaviour on the group's up day.** A candidate that goes sideways while its peers rally is
+  failing the relative-strength test *at the moment the test is being run*, whatever its longer
+  ratings say.
+
+**Worked example (NTAP 2026-09-16).** Structurally excellent - 0.17 ATR off a rising 21EMA, a
+2.1% stop, RS Rating 93.6. But one-month relative strength was **-4.28% vs SPY**, its storage
+peers were broken (WDC -46.7% off its 52-week high, STX -30.8%, both below their 50-day), and on
+the day those peers ran **+3.41% and +2.53%**, NTAP managed **+0.06%**. The money in its sector
+had gone to the AI-server builders instead (DELL +20.7%, HPQ +16.0% rel 1M). A high RS Rating
+from an earlier run is a *historical* claim; the basket is the current one.
+
+**Contrast (DT 2026-09-16).** Same session, opposite reading: DT led its own basket over five
+sessions (+8.83% vs NOW +7.22%, MDB +7.64%, DDOG +4.87%, ESTC -1.11%) and beat SPY on 1M, 3M and
+6M simultaneously. That persistence across all three windows *plus* basket leadership is what
+distinguishes a leader from a name with a good chart.
 
 ## Related pages
 

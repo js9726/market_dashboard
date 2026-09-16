@@ -5,8 +5,8 @@
   "target": "agent-moderator/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-24T06:27:31.961Z",
-  "renderHash": "861981d117f4f6dda774d83b466a190dbc2f982a8b7b85a280f2dc57f81f2725",
+  "generatedAt": "2026-09-16T15:30:50.538Z",
+  "renderHash": "5796aa240f1ea9167cfc4552c3b963f7185d64a74b33949fa019de2578c2ea17",
   "sources": [
     {
       "root": "wiki",
@@ -36,7 +36,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/entry-methods.md",
-      "sha256": "9c3c5e5a93a5abca241442e177e067b838f1376b328f00b7aaf89790a2433c19"
+      "sha256": "792b352286b3bc49bd749390508ccf4e25f41aee28335830c45bbd1bacc21ccf"
     },
     {
       "root": "wiki",
@@ -51,7 +51,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/relative-strength.md",
-      "sha256": "3c49bdb0cd3cdc5f7685333b6342d31b70df691eb987c3ec722f3fd7aaac1b78"
+      "sha256": "c6b7dbbef2eba13405674e5785074d1eeb71257cc5d02e9ad0448bee504b451d"
     },
     {
       "root": "wiki",
@@ -83,10 +83,10 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/traders/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/trading/traders/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
 - wiki:wiki/trading/traders/traderlion-early-entry-techniques.md sha256:d5825c16fcaf
-- wiki:wiki/trading/concepts/entry-methods.md sha256:9c3c5e5a93a5
+- wiki:wiki/trading/concepts/entry-methods.md sha256:792b352286b3
 - wiki:wiki/trading/risk/risk-management.md sha256:16f2da308b4c
 - wiki:wiki/trading/risk/position-sizing.md sha256:51671f829f25
-- wiki:wiki/trading/concepts/relative-strength.md sha256:3c49bdb0cd3c
+- wiki:wiki/trading/concepts/relative-strength.md sha256:c6b7dbbef2eb
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:22014c94765d
 - wiki:wiki/trading/concepts/fundamental-analysis.md sha256:857839e81082
 - wiki:wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md sha256:7a2301df36b9
@@ -758,7 +758,7 @@ Penalize:
 
 **Sources**: Alex's Swing Trading System.md, The blueprint to consistently making $10km+ in trading.md, The Complete Traders' Guide.md, 3 Early Entry Techniques To Improve Win Rate.md, user-provided tight-area entry setup image, user-provided priming-pattern image, user-provided post-gap volatility contraction image, TraderLion Moglen case studies (TEM ORB, W range breakout — live scrape 2026-07-02, URLs in traderlion-early-entry-techniques), GFS 2026-07-01 trade calibration (OpenD klines), Julian Komar post-earnings second-opportunity post (2026-07-16; raw clipping filename begins `(2) Julian Komar`; [source post](https://x.com/BlogJulianKomar/status/2077732241535349246)), Sean Trades lockout-rally post (2026-04-16; raw clipping filename begins `(2) Sean trades`; [source post](https://x.com/SRxTrades/status/2044536242319380640))
 
-**Last updated**: 2026-07-18
+**Last updated**: 2026-09-16
 
 ---
 
@@ -958,6 +958,32 @@ This is the same family as Launch Pad / Power-of-3 in traderlion-early-entry-tec
 - Reclaim on **≤ ~1× RVOL** → *unconfirmed*: permitted only as a **half-size early entry** with the LoD stop, and the daily close must confirm (close back inside the wedge / below the MAs = exit, −0.5R, no debate).
 - **RVOL ≥ 1.5× on the reclaim close** (or the subsequent pivot break) → confirmed: full size / add.
 - Re-check at ~15:30 ET before carrying the trigger overnight (mid-morning strength is provisional — ALAB 2026-07-02, failed-bounce tape 2026-07-07).
+
+**Rule 4 - measure RVOL over the same window as the gate.** The 1.5x is a **full-day**
+figure. A relative-volume reading taken during the session is *cumulative-so-far divided by a
+full-day average*, so it is not comparable to it. At 10:30 ET only ~22% of a normal session's
+volume has traded, so an ordinary stock reads ~22%, not 100%. Project before judging:
+
+```
+projected_full_day_rvol = cumulative_rvol / session_volume_fraction
+```
+
+`session_volume_fraction` follows the **U-shaped** intraday curve, not clock time - the opening
+30 minutes alone carry ~13% of the day, so at 10:30 the curve reads 0.22 where the clock says
+0.15. Using clock time understates the projection by ~43% at 10:30 and ~69% at 10:00.
+
+- A **completed** session needs no projection: the raw ratio already is the full-day figure.
+- **Before ~10:00 ET the projection is unstable** (curve/clock runs 1.69x-3.12x) and a
+  gap-and-die name front-loads its whole day. Treat volume as *unestablished*, not as passing
+  or failing.
+- The projection is **one-sided** - it can only raise the number, so it can promote a candidate
+  but never demote one. Never let it be the sole evidence of participation; cross-check
+  absolute share volume against the 20-day average.
+
+Worked (2026-09-16, session fraction 0.228 at 10:33 ET): NTAP 7% -> **0.31x** (fail), MPC 16%
+-> 0.70x (fail), TEAM 14% -> 0.61x (fail); OKTA 101% at 11:24 on 2026-09-15 -> **2.84x** (pass).
+Quoting the raw figures against the gate made three of those look far worse than measured and
+one materially better once corrected. Origin: Jie's challenge, 2026-09-16.
 
 **Worked example (HPE 2026-07-09).** June-1 EP (record Q2 post-Juniper, ~558% volume) → 5-week falling wedge −26% off the high → 3-point trigger day: MA-cluster break at ~$47, RS line turning (RS 98), wedge break; LoD stop $45.64 (−3.8%), first supply ~$50.5, prior high zone ~$56 → ~2–4R. Initial analysis PASSed it on the algo Stage-4 label + "extended above 10EMA" + a −15.5% swing-low stop — all three now corrected by the rules above. The one legitimate caution was volume (~1× at trigger time) → half-size early entry, volume decides the add.
 
@@ -1438,7 +1464,7 @@ If the formula produces a position that is too large for the account cap or the 
 
 **Sources**: Alex's scans (TradersLab).md, Alex's Swing Trading System.md, Post by @SteveDJacobs on X.md, The Complete Traders' Guide.md, Trading termsconcepts GLOSSARY.md, Post by @martinlukkt on X.md, `(2) Martin Luk on X $QCOM...lockout rally.md` (duplicate capture of the same 2026-07-17 post), `(2) Sean trades on X A lot of you have probably seen the words lockout rally...hig.md`
 
-**Last updated**: 2026-07-18
+**Last updated**: 2026-09-16
 
 ---
 
@@ -1490,6 +1516,31 @@ The durable lesson is **leadership rotation, not historical repetition**:
 The exact 2,900% return remains attributed to Martin Luk's post: OpenD returned no QCOM bars for the requested 1998–2000 window in the 2026-07-17 verification run. Qualcomm's own records do confirm exceptional 1999 repricing and two stock splits that year—a 2-for-1 in May and a 4-for-1 in December—but those facts do not validate a precise breakout-to-peak percentage. ([Qualcomm split history](https://investor.qualcomm.com/stock-info/dividend-split-history/default.aspx))
 
 Martin Luk does not formally define "lockout rally" in his source, but Sean Trades supplies the missing execution definition: a fast advance with few proper pullbacks that leaves sidelined buyers waiting for an entry. The durable opportunity is either capital rotation into lagging groups or a time correction in established leaders while moving averages catch up. In both cases, RS qualifies the candidate; it does not replace the setup, pivot, extension, or risk gates. See lockout-rally. (source: Sean Trades lockout-rally post)
+
+## Check RS Against The Peer Basket, Not Just The Index
+
+A name can beat the index and still be the weakest thing in its own group, or lead a group that
+is being sold. Index-relative strength alone cannot tell those apart - the peer basket can.
+
+Two readings decide it:
+
+- **Trailing five sessions against direct competitors.** Not a sector ETF; the screener's own
+  `industry` field plus known competitors.
+- **Behaviour on the group's up day.** A candidate that goes sideways while its peers rally is
+  failing the relative-strength test *at the moment the test is being run*, whatever its longer
+  ratings say.
+
+**Worked example (NTAP 2026-09-16).** Structurally excellent - 0.17 ATR off a rising 21EMA, a
+2.1% stop, RS Rating 93.6. But one-month relative strength was **-4.28% vs SPY**, its storage
+peers were broken (WDC -46.7% off its 52-week high, STX -30.8%, both below their 50-day), and on
+the day those peers ran **+3.41% and +2.53%**, NTAP managed **+0.06%**. The money in its sector
+had gone to the AI-server builders instead (DELL +20.7%, HPQ +16.0% rel 1M). A high RS Rating
+from an earlier run is a *historical* claim; the basket is the current one.
+
+**Contrast (DT 2026-09-16).** Same session, opposite reading: DT led its own basket over five
+sessions (+8.83% vs NOW +7.22%, MDB +7.64%, DDOG +4.87%, ESTC -1.11%) and beat SPY on 1M, 3M and
+6M simultaneously. That persistence across all three windows *plus* basket leadership is what
+distinguishes a leader from a name with a good chart.
 
 ## Related pages
 

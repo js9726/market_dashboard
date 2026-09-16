@@ -5,8 +5,8 @@
   "target": "trader-scorer-market/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-08-24T06:27:31.970Z",
-  "renderHash": "4213acc4bbb3bd7ee4c0aee8e12732d02d8b0d6fbd6122ddb629cec9fe09989a",
+  "generatedAt": "2026-09-16T15:30:50.549Z",
+  "renderHash": "7d39758a72a6af03c052c7d831f1cf5e8da6fb00a1fec8cf80f1fe9674c48274",
   "sources": [
     {
       "root": "wiki",
@@ -21,7 +21,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/market-timing.md",
-      "sha256": "1a931bdcbe441a469efb7c44a45f4bfed54897084026f5556fc7aa003906adcb"
+      "sha256": "568e2d6e0ec0c1934e008d96d88b5cb25ae4848c3c38f9470e7918ad1b076427"
     },
     {
       "root": "wiki",
@@ -36,7 +36,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/relative-strength.md",
-      "sha256": "3c49bdb0cd3cdc5f7685333b6342d31b70df691eb987c3ec722f3fd7aaac1b78"
+      "sha256": "c6b7dbbef2eba13405674e5785074d1eeb71257cc5d02e9ad0448bee504b451d"
     },
     {
       "root": "wiki",
@@ -65,10 +65,10 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 ## Sources
 - wiki:wiki/trading/traders/trader-styles.md sha256:64ab3e1b48cc
 - wiki:wiki/trading/traders/trader-style-profiles.md sha256:112aef7d75a4
-- wiki:wiki/trading/concepts/market-timing.md sha256:1a931bdcbe44
+- wiki:wiki/trading/concepts/market-timing.md sha256:568e2d6e0ec0
 - wiki:wiki/trading/concepts/market-phases.md sha256:806ba3fb3189
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:22014c94765d
-- wiki:wiki/trading/concepts/relative-strength.md sha256:3c49bdb0cd3c
+- wiki:wiki/trading/concepts/relative-strength.md sha256:c6b7dbbef2eb
 - wiki:wiki/trading/concepts/stock-scanning.md sha256:73fb529748da
 - wiki:wiki/trading/traders/steve-jacobs-market-dashboard.md sha256:5b6b3c1e7a52
 - wiki:wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md sha256:7a2301df36b9
@@ -457,7 +457,7 @@ Use this routing when analysing a candidate:
 
 **Sources**: Alex's Swing Trading System.md, Alex's Trading Psychology Reflections.md, The blueprint to consistently making $10km+ in trading.md, Post by @SteveDJacobs on X.md, Post by @Clement_Ang17 on X.md, [StockCharts DecisionPoint Chart Gallery](https://stockcharts.com/freecharts/dpgallery.html)
 
-**Last updated**: 2026-08-19
+**Last updated**: 2026-09-16
 
 ---
 
@@ -543,6 +543,33 @@ During low-opportunity environments, the correct action is **not** to force trad
 - Review past trade analysis (PTA)
 - Analyze prior year's best performers
 (source: Alex's Trading Psychology Reflections.md)
+
+## Rotation Is Not Leadership
+
+A group that leads for exactly one session and gives it back on the next is being repriced, not
+led. Three tells separate the two, all observable the same day:
+
+1. **Does the move survive day two?** A genuine leadership change extends or holds. A repricing
+   fades. Demand the second day before treating a group's move as a trend.
+2. **Which names inside the group moved most?** If the biggest percentage gainers are the group's
+   *worst* one-month performers, sitting below **falling** 21-day lines, that is short-covering
+   and narrative repricing. Real leadership shows the strongest names extending while the weak
+   ones lag - the opposite ordering.
+3. **What did breadth do while it happened?** A group adding 7-16% *while* advance/decline
+   internals deteriorate is narrowing, not broadening.
+
+**Worked example (2026-09-14 to 09-16).** Three rotations in three sessions, each reversing the
+last: cybersecurity/software +7% to +16.5% on Monday, energy +3% to +3.7% on Tuesday,
+semiconductors on Wednesday - with XOP then -3.26% on 4.0x volume the day after it led. On
+Monday the biggest movers were the group's laggards (ZS +16.5% but -43% off its 52-week high;
+RBRK, SAIL, S, PANW all with negative one-month relative strength under falling 21EMAs) while
+the genuine persistent-RS names moved least. Across all three sessions S&P 20-day breadth made
+five consecutive new lows: 27.6% -> 24.9% -> 23.5% -> 22.5% -> 21.7%, with the indices green on
+the final day.
+
+The practical rule: **in rotational chop, the extension gate does the work.** Both leaders that
+ran past 2.5 ATR on sub-1.5x volume during that stretch - VLO and MPC - reversed within a
+session and traded below the close that tempted the chase.
 
 ## Related pages
 
@@ -741,7 +768,7 @@ A lockout-rally candidate cannot become `GO` unless it passes the normal GO gate
 
 **Sources**: Alex's scans (TradersLab).md, Alex's Swing Trading System.md, Post by @SteveDJacobs on X.md, The Complete Traders' Guide.md, Trading termsconcepts GLOSSARY.md, Post by @martinlukkt on X.md, `(2) Martin Luk on X $QCOM...lockout rally.md` (duplicate capture of the same 2026-07-17 post), `(2) Sean trades on X A lot of you have probably seen the words lockout rally...hig.md`
 
-**Last updated**: 2026-07-18
+**Last updated**: 2026-09-16
 
 ---
 
@@ -793,6 +820,31 @@ The durable lesson is **leadership rotation, not historical repetition**:
 The exact 2,900% return remains attributed to Martin Luk's post: OpenD returned no QCOM bars for the requested 1998–2000 window in the 2026-07-17 verification run. Qualcomm's own records do confirm exceptional 1999 repricing and two stock splits that year—a 2-for-1 in May and a 4-for-1 in December—but those facts do not validate a precise breakout-to-peak percentage. ([Qualcomm split history](https://investor.qualcomm.com/stock-info/dividend-split-history/default.aspx))
 
 Martin Luk does not formally define "lockout rally" in his source, but Sean Trades supplies the missing execution definition: a fast advance with few proper pullbacks that leaves sidelined buyers waiting for an entry. The durable opportunity is either capital rotation into lagging groups or a time correction in established leaders while moving averages catch up. In both cases, RS qualifies the candidate; it does not replace the setup, pivot, extension, or risk gates. See lockout-rally. (source: Sean Trades lockout-rally post)
+
+## Check RS Against The Peer Basket, Not Just The Index
+
+A name can beat the index and still be the weakest thing in its own group, or lead a group that
+is being sold. Index-relative strength alone cannot tell those apart - the peer basket can.
+
+Two readings decide it:
+
+- **Trailing five sessions against direct competitors.** Not a sector ETF; the screener's own
+  `industry` field plus known competitors.
+- **Behaviour on the group's up day.** A candidate that goes sideways while its peers rally is
+  failing the relative-strength test *at the moment the test is being run*, whatever its longer
+  ratings say.
+
+**Worked example (NTAP 2026-09-16).** Structurally excellent - 0.17 ATR off a rising 21EMA, a
+2.1% stop, RS Rating 93.6. But one-month relative strength was **-4.28% vs SPY**, its storage
+peers were broken (WDC -46.7% off its 52-week high, STX -30.8%, both below their 50-day), and on
+the day those peers ran **+3.41% and +2.53%**, NTAP managed **+0.06%**. The money in its sector
+had gone to the AI-server builders instead (DELL +20.7%, HPQ +16.0% rel 1M). A high RS Rating
+from an earlier run is a *historical* claim; the basket is the current one.
+
+**Contrast (DT 2026-09-16).** Same session, opposite reading: DT led its own basket over five
+sessions (+8.83% vs NOW +7.22%, MDB +7.64%, DDOG +4.87%, ESTC -1.11%) and beat SPY on 1M, 3M and
+6M simultaneously. That persistence across all three windows *plus* basket leadership is what
+distinguishes a leader from a name with a good chart.
 
 ## Related pages
 
