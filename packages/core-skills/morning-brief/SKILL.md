@@ -172,6 +172,8 @@ The script reads these extra fields for each ticker:
 - `after_price` / `after_chg` — after-hours price and change % (after 4:00 PM ET)
 - `rvol` — relative volume vs 10-day average (key entry filter)
 
+**Mid-session RVOL is not the full-day gate.** TradingView's `Rel. Vol` and any cumulative-so-far reading must be divided by the empirical intraday volume fraction before being compared to the 1.5x expansion requirement (at 10:30 ET that fraction is ~0.22, not the 0.15 clock time would suggest). Use the screener's `rvol_effective`. A completed session needs no projection. Before ~10:00 ET treat volume as unestablished. See `jie_wiki/skills/tradingview-daily-screener/references/rvol-normalization.md`.
+
 Enrich the `$FULL_WATCHLIST` with the OpenD tickers if you have them, then proceed to Step 0.5.
 
 ### Step 0.5 — Compute index technicals (ATR / RSI / MACD / extension) — MANDATORY
