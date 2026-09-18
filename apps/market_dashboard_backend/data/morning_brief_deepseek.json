@@ -1,1 +1,102 @@
-{"mood":{"label":null,"posture":"WAIT","summary":"Live market data is unavailable at generation time because no web-search tool is accessible in this environment. Treat all levels as unverified and avoid new risk until data is confirmed."},"breadth":{"up":null,"down":null},"fearGreed":{"score":null,"label":null},"indices":[{"symbol":"SPY","name":"S&P 500","level":null,"changePct":null,"note":"data unavailable","citation":"No live web access"},{"symbol":"QQQ","name":"Nasdaq 100","level":null,"changePct":null,"note":"data unavailable","citation":"No live web access"},{"symbol":"DIA","name":"Dow Jones","level":null,"changePct":null,"note":"data unavailable","citation":"No live web access"},{"symbol":"IWM","name":"Russell 2000","level":null,"changePct":null,"note":"data unavailable","citation":"No live web access"},{"symbol":"^VIX","name":"Volatility Index","level":null,"changePct":null,"note":"data unavailable","citation":"No live web access"},{"symbol":"^TNX","name":"10Y Treasury Yield","level":null,"changePct":null,"note":"data unavailable","citation":"No live web access"},{"symbol":"CL=F","name":"Crude Oil","level":null,"changePct":null,"note":"data unavailable","citation":"No live web access"}],"indicesNarrative":"No index data available to interpret leadership, breadth, or macro drivers.","technicals":{"SPY":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":null,"curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"QQQ":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":null,"curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"DIA":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":null,"curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"}},"technicalsNarrative":"No index technical data available. Entry-risk badges cannot be computed; default to caution and verify before acting.","sectorsThemes":[{"symbol":"XLK","name":"Technology","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"SMH","name":"Semiconductors","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLC","name":"Communication Services","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLY","name":"Consumer Discretionary","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLF","name":"Financials","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLV","name":"Health Care","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLI","name":"Industrials","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLE","name":"Energy","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLP","name":"Consumer Staples","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLU","name":"Utilities","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLB","name":"Materials","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"XLRE","name":"Real Estate","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"CIBR","name":"Cybersecurity","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"IGV","name":"Software","changePct":null,"rs":null,"note":"data unavailable"},{"symbol":"IBB","name":"Biotechnology","changePct":null,"rs":null,"note":"data unavailable"}],"sectorsNarrative":"No live sector data available to assess rotation.","industryNarrative":"No live industry-group data available.","industryMovers":[],"movers":[],"watchlist":[{"ticker":"NVDA","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"TSLA","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"AAPL","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"MSFT","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"AMZN","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"META","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"GOOGL","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"AMD","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"SMCI","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"PLTR","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"CRWD","level":null,"changePct":null,"abc":null,"note":"data unavailable"},{"ticker":"MSTR","level":null,"changePct":null,"abc":null,"note":"data unavailable"}],"traderLens":[{"name":"Minervini","view":"No live data to assess stage or VCP. Stay in cash until market structure is confirmed."},{"name":"Ted Zhang","view":"No sector rotation data. Cannot identify institutional flow today."},{"name":"Clement Ang","view":"Market context unavailable; no A-grade setups can be confirmed. Sit out."},{"name":"SRxTrades","view":"No volume or pivot data. Never chase; wait for clean confirmation."},{"name":"Jeff","view":"Hard stops only. If no data, no trade — protect capital first."},{"name":"Qullamaggie","view":"No momentum or EP data. Avoid blind breakouts."},{"name":"Composite","view":"Data feed is unavailable. Do not initiate new risk; verify all levels manually before acting."}],"standout":{"ticker":null,"side":null,"score":null,"sector":null,"rs":null,"grade":null,"thesis":null,"entry":null,"stop":null,"target":null,"rrr":null,"tags":[]},"earnings":{"bmo":[],"amc":[],"yesterdayReactions":[]},"calendar":[],"ratings":{"upgrades":[],"downgrades":[]},"alert":"Live data unavailable — verify all levels before trading.","news":[],"screenerScores":{},"citations":["No live web access in this environment; all market data unavailable at generation time."]}
+{
+  "mood": {
+    "label": "CHOPPY",
+    "posture": "WAIT",
+    "summary": "No live market data feed was reachable during this generation window (no pre-fetched blocks supplied and web search unavailable), so no index, breadth, sector, or screener figure could be verified. Do not act on this brief — refresh after the data pipeline reconnects."
+  },
+  "breadth": {
+    "up": null,
+    "down": null
+  },
+  "fearGreed": {
+    "score": null,
+    "label": null
+  },
+  "indices": [
+    { "symbol": "SPY", "name": "S&P 500", "level": null, "changePct": null, "note": "unavailable — no live feed", "citation": "data unavailable at generation time" },
+    { "symbol": "QQQ", "name": "Nasdaq 100", "level": null, "changePct": null, "note": "unavailable — no live feed", "citation": "data unavailable at generation time" },
+    { "symbol": "DIA", "name": "Dow Jones", "level": null, "changePct": null, "note": "unavailable — no live feed", "citation": "data unavailable at generation time" },
+    { "symbol": "IWM", "name": "Russell 2000", "level": null, "changePct": null, "note": "unavailable — no live feed", "citation": "data unavailable at generation time" },
+    { "symbol": "^VIX", "name": "CBOE Volatility Index", "level": null, "changePct": null, "note": "unavailable — no live feed", "citation": "data unavailable at generation time" },
+    { "symbol": "^TNX", "name": "US 10Y Yield", "level": null, "changePct": null, "note": "unavailable — no live feed", "citation": "data unavailable at generation time" },
+    { "symbol": "CL=F", "name": "WTI Crude", "level": null, "changePct": null, "note": "unavailable — no live feed", "citation": "data unavailable at generation time" }
+  ],
+  "indicesNarrative": "Index levels, futures direction, VIX, 10Y yield and crude could not be sourced this run, so leadership, breadth and the driver of the tape cannot be characterised. Treat any directional assumption as unverified until the feed is restored.",
+  "technicals": {},
+  "technicalsNarrative": "No index_technicals.json block was supplied (Step 0.5 output missing) and no live source was reachable, so per-index ATR, EMA, RSI, MACD and entry-risk badges cannot be computed. No index can be labelled FAIR/AT-MA or EXTREME-EXTENDED today.",
+  "sectorsThemes": [
+    { "symbol": "XLK", "name": "Technology", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "SMH", "name": "Semiconductors", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLC", "name": "Communication Services", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLY", "name": "Consumer Discretionary", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLF", "name": "Financials", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLV", "name": "Health Care", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLI", "name": "Industrials", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLE", "name": "Energy", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLP", "name": "Consumer Staples", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLU", "name": "Utilities", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLB", "name": "Materials", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "XLRE", "name": "Real Estate", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "CIBR", "name": "Cybersecurity", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "IGV", "name": "Software", "changePct": null, "rs": null, "note": "no data" },
+    { "symbol": "IBB", "name": "Biotech", "changePct": null, "rs": null, "note": "no data" }
+  ],
+  "sectorsNarrative": "Sector change and relative-strength values were not supplied and could not be sourced, so no rotation story can be told. Do not infer leadership from this brief.",
+  "industryNarrative": "Industry-group performance, breadth and week-over-week deltas were unavailable; strongest and weakest groups cannot be identified.",
+  "industryMovers": [],
+  "movers": [],
+  "watchlist": [
+    { "ticker": "NVDA", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "TSLA", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "AAPL", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "MSFT", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "AMZN", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "META", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "GOOGL", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "AMD", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "SMCI", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "PLTR", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "CRWD", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" },
+    { "ticker": "MSTR", "level": null, "changePct": null, "abc": null, "note": "no live price feed — recheck after pipeline restore" }
+  ],
+  "traderLens": [
+    { "name": "Minervini", "view": "No verified market-structure or Stage data available — cannot confirm a Stage 2 confirmed-uptrend environment. Sit out until indices can be assessed." },
+    { "name": "Ted Zhang", "view": "Sector relative-strength block missing, so institutional rotation cannot be read. No rotation play can be justified today." },
+    { "name": "Clement Ang", "view": "Market context is unverified, therefore no setup can be graded A. Rule is context first — with no context, the answer is no trade." },
+    { "name": "SRxTrades", "view": "Without live level and volume data there is no clean pivot to buy. No chase, no entry." },
+    { "name": "Jeff", "view": "Discipline over activity: do not open new risk on unverified data. If holding positions, honour existing hard stops; never average down." },
+    { "name": "Qullamaggie", "view": "Breakout quality cannot be assessed with no RVOL, ORH level or price data. No EP or momentum trigger is valid today." },
+    { "name": "Composite", "view": "Do nothing in size today. This brief is ungrounded — no breadth, no index technicals, no sector RS, no watchlist prices. Restore the feed, re-run the pipeline, and only then evaluate A-grade setups. If a book-risk flag exists, keep posture WAIT/RAISE-THE-BAR and confirm every protective order is working at the broker, not merely planned." }
+  ],
+  "standout": {
+    "ticker": null,
+    "side": null,
+    "score": null,
+    "sector": null,
+    "rs": null,
+    "grade": null,
+    "thesis": "No standout can be identified — required price, RS and catalyst inputs were unavailable at generation time.",
+    "entry": null,
+    "stop": null,
+    "target": null,
+    "rrr": null,
+    "tags": []
+  },
+  "earnings": {
+    "bmo": [],
+    "amc": [],
+    "yesterdayReactions": []
+  },
+  "calendar": [],
+  "ratings": {
+    "upgrades": [],
+    "downgrades": []
+  },
+  "alert": "UNGROUNDED BRIEF — live data feed unreachable this run (no indices, breadth, sector RS, watchlist prices, earnings, ratings or news sourced). Do not trade off this page; re-run after the feed is restored.",
+  "news": [],
+  "screenerScores": {},
+  "citations": [
+    "data unavailable at generation time — no pre-fetched data blocks were supplied (indices, breadth, sector ETFs, watchlist prices, events, index_technicals.json, broker protection all absent)",
+    "data unavailable at generation time — web search was not reachable during this session, so overnight Asia/Europe recap, pre-market movers, earnings, macro calendar, ratings and headlines could not be grounded; per grounding rules those sections are returned empty rather than fabricated"
+  ]
+}
