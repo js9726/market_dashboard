@@ -99,6 +99,15 @@ tracks `publish_partial_report`, `workflow_complete`, `candidate_go_eligible` an
 `new_portfolio_risk` separately, with every check recorded as `completed` / `failed` /
 `not_attempted` / `not_applicable` plus timestamp and evidence. Record checks there as you go
 and render the ledger into the brief's gap section. `not_attempted` is not `no activity found`.
+One of those checks is `carry_forward_reviewed`, and it restricts `workflow_complete`. A
+ticker that failed only a gate which re-rolls every session - volume, low-of-day distance,
+extension above the 21EMA - is a pending candidate, not a rejection, and must be re-scored
+in the next run; so must every live broker position. Run
+`carry_forward.py` from the tradingview-daily-screener skill BEFORE scoring and record the
+result. NTAP is why: it failed the volume gate four sessions running, was quietly dropped
+from the next run's universe, and cleared the gate at 1.89x on the very session that run
+was built on. A ticker that is never scored produces no finding, so nothing catches it.
+
 In CI/GitHub/SaaS use `--broker-mode unavailable`: the brief may publish only with
 `ORDER-FEED-UNVERIFIED` stated explicitly and may never claim a holding is protected.
 

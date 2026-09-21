@@ -8,6 +8,7 @@ import unittest
 from completion_checks import (
     CheckLedger, COMPLETED, FAILED, NOT_ATTEMPTED, NOT_APPLICABLE,
     PUBLISH_PARTIAL, WORKFLOW_COMPLETE, GO_ELIGIBLE, NEW_RISK,
+    CHECK_REGISTRY,
 )
 
 
@@ -178,6 +179,36 @@ class TestRendering(unittest.TestCase):
             back = CheckLedger.load(p)
         self.assertEqual(back["session_date"], "2026-09-14")
         self.assertEqual(back["counts"][COMPLETED], 1)
+
+
+class TestCarryForwardCheck(unittest.TestCase):
+    """A run that silently drops a recently-scored ticker must not read as complete."""
+
+    def test_check_is_registered_against_workflow_complete(self):
+        self.assertIn("carry_forward_reviewed", CHECK_REGISTRY)
+        self.assertIn(WORKFLOW_COMPLETE, CHECK_REGISTRY["carry_forward_reviewed"]["gates"])
+
+    def test_not_attempted_blocks_workflow_complete(self):
+        ledger = CheckLedger("2026-09-21")
+        ledger.record("carry_forward_reviewed", "not_attempted")
+        gate = ledger.gate(WORKFLOW_COMPLETE)
+        self.assertFalse(gate["allowed"])
+        self.assertIn("carry_forward_reviewed", [b["check"] for b in gate["blockers"]])
+
+    def test_failed_blocks_and_keeps_the_reason(self):
+        ledger = CheckLedger("2026-09-21")
+        ledger.record("carry_forward_reviewed", "failed",
+                      reason="NTAP scored 2026-09-17, failed only volume, absent from universe")
+        gate = ledger.gate(WORKFLOW_COMPLETE)
+        self.assertFalse(gate["allowed"])
+        self.assertIn("NTAP", gate["blockers"][0]["reason"])
+
+    def test_completed_does_not_block(self):
+        ledger = CheckLedger("2026-09-21")
+        ledger.record("carry_forward_reviewed", "completed",
+                      evidence="carry_forward.py exit 0; 16 verdicts reviewed, 9 carried forward")
+        self.assertNotIn("carry_forward_reviewed",
+                         [b["check"] for b in ledger.gate(WORKFLOW_COMPLETE)["blockers"]])
 
 
 if __name__ == "__main__":

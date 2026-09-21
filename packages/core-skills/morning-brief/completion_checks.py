@@ -98,6 +98,10 @@ CHECK_REGISTRY: dict[str, dict] = {
         "gates": (WORKFLOW_COMPLETE,),
         "label": "Pop-up trend radar sweep",
     },
+    "carry_forward_reviewed": {
+        "gates": (WORKFLOW_COMPLETE,),
+        "label": "Recently-verdicted tickers carried forward",
+    },
     "fear_greed": {
         "gates": (),
         "label": "CNN Fear & Greed",
