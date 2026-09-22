@@ -703,7 +703,7 @@ traction, portfolio, and event caps.**
 | Risk-On | up to 3.0% |
 | Extended | 0 new |
 
-Conviction 75–84 -> max 0.5%; 85–89 -> 0.75%; 90–100 -> 1.0%.
+Conviction 70-84 -> max 0.5%; 85-89 -> 0.75%; 90-100 -> 1.0%. A PROBE (65-69) takes **half the GO allocation, 0.25%**. Bands recalibrated 2026-09-22 - the old GO >= 75 fired once in 46 verdicts while 16 of 18 calls went up; see wiki/trading/traders/trader-styles.md. The regime cap above and the 7-8% single-name stop cap both bind before the band does.
 
 **GO lifecycle.** An early scan produces `PRELIMINARY FOCUS` only. An execution GO needs a
 refresh within 60 minutes before the open or during the session, and deterministic gates

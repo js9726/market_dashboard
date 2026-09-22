@@ -116,11 +116,13 @@ function scoreTone(
  *   DeepSeek daily run  → already GO / WAIT / PASS
  *   Manual Score button → STRONG BUY / BUY / HOLD / AVOID / STRONG AVOID
  *   Morning brief       → BUY / HOLD / AVOID (or GO / WAIT / PASS)
+ *   PROBE is a half-size GO (conviction 65-69), added 2026-09-22.
  */
 function normalizeVerdict(v: string | null | undefined): string | null {
   if (!v) return null;
   const u = v.toUpperCase().replace(/[-_]/g, " ");
   if (u === "GO" || u === "STRONG BUY" || u === "BUY")       return "GO";
+  if (u === "PROBE")                                          return "PROBE";
   if (u === "WAIT" || u === "HOLD")                           return "WAIT";
   if (u === "PASS" || u === "AVOID" || u === "STRONG AVOID") return "PASS";
   return v; // return as-is if unknown (future-proof)

@@ -96,7 +96,7 @@ export interface ConvictionAnalysis {
   theme: number;
   sentiment: number;
   conviction: number;
-  verdict: "GO" | "WATCH" | "PASS";
+  verdict: "GO" | "PROBE" | "WATCH" | "PASS";
   moderator: "ENTER" | "WAIT" | "PASS";
   champion: string | null;
   reasoning: { setup: string; entry: string; theme: string; sentiment: string; moderator: string };
@@ -119,11 +119,12 @@ LOCATION IS PART OF ENTRY — READ THE NUMBERS GIVEN, DO NOT ASSUME:
 - Do NOT cite "R:R >= 2" as evidence FOR an entry. R:R is an OUTCOME of structure; a wider stop mechanically mints a bigger target and can make any trade look 2R. Judge the stop and the location, not the ratio.
 - High RVOL and high RS do NOT offset bad location. A leader bought 3xATR extended is still a bad trade.
 
-BANDS: conviction = setup+entry+theme+sentiment. GO >= 75, WATCH 50-74, PASS < 50.
+BANDS: conviction = setup+entry+theme+sentiment. GO >= 70 (full size), PROBE 65-69 (half size), WATCH 50-64 (armed, no position), PASS < 50. Recalibrated 2026-09-22: the old GO >= 75 fired once in 46 verdicts while 16 of 18 calls went up.
 
 MODERATOR (ENTER/WAIT/PASS) must respect the trigger state given:
-- triggerState TRIGGERED + conviction >= 75 + location OK -> ENTER.
-- triggerState ARMED / forming, or conviction 50-74, or extended-but-strong (put it on the pullback list) -> WAIT.
+- triggerState TRIGGERED + conviction >= 70 + location OK -> ENTER.
+- triggerState ARMED / forming + conviction 65-69 + location OK -> ENTER at HALF SIZE (a PROBE: structure and location without the volume trigger).
+- triggerState ARMED / forming with conviction 50-64, or extended-but-strong (put it on the pullback list) -> WAIT.
 - triggerState INVALIDATED / NEEDS-PIVOT, or conviction < 50, or extended/illiquid -> PASS.
 
 "champion" must be the REAL @handle of the trader whose style this setup matches (@markminervini, @Qullamaggie, @Clement_Ang17, @jfsrev, @TedHZhang, @SRxTrades, @PrimeTrading_). Never emit the literal placeholder "@handle". Only name a champion whose actual rules this trade satisfies — Minervini does not buy extended, Qullamaggie does not buy without an EP/breakout.
@@ -235,9 +236,9 @@ export async function runConvictionAnalysis(input: ConvictionInput): Promise<Con
   }
 
   const conviction = setup + entry + theme + sentiment;
-  const verdict = conviction >= 75 ? "GO" : conviction >= 50 ? "WATCH" : "PASS";
+  const verdict = conviction >= 70 ? "GO" : conviction >= 65 ? "PROBE" : conviction >= 50 ? "WATCH" : "PASS";
   const mod = String(obj.moderator ?? "").toUpperCase();
-  const moderator = mod === "ENTER" || mod === "WAIT" || mod === "PASS" ? (mod as ConvictionAnalysis["moderator"]) : verdict === "GO" ? "ENTER" : verdict === "WATCH" ? "WAIT" : "PASS";
+  const moderator = mod === "ENTER" || mod === "WAIT" || mod === "PASS" ? (mod as ConvictionAnalysis["moderator"]) : verdict === "GO" || verdict === "PROBE" ? "ENTER" : verdict === "WATCH" ? "WAIT" : "PASS";
   const reasoning = (obj.reasoning ?? {}) as Record<string, unknown>;
   const str = (v: unknown) => (typeof v === "string" ? v : "");
 
