@@ -8,6 +8,7 @@
 import { describe, it, expect } from "vitest";
 import { classifyConviction, evaluateHardGates, type GateResult } from "@/server/conviction-analysis";
 import { isDailyBarComplete } from "@/lib/market-clock";
+import { classifyEntryRisk } from "@/server/indicators";
 
 const SCORES = [64, 65, 69, 70, 74, 75];
 
@@ -102,6 +103,17 @@ describe("isDailyBarComplete", () => {
   // 2026-09-22 was a Tuesday.
   const at = (iso: string) => new Date(iso);
 
+  it("does not confuse overnight CLOSED with a completed current bar", () => {
+    expect(isDailyBarComplete("2026-09-22", at("2026-09-22T06:00:00Z"))).toBe(false);
+    expect(isDailyBarComplete("2026-09-22", at("2026-09-22T12:00:00Z"))).toBe(false);
+  });
+  it("rejects impossible dates and weekends and follows winter ET", () => {
+    expect(isDailyBarComplete("2026-02-30", at("2026-09-22T20:30:00Z"))).toBe(false);
+    expect(isDailyBarComplete("2026-09-20", at("2026-09-22T20:30:00Z"))).toBe(false);
+    expect(isDailyBarComplete("2026-12-22", at("2026-12-22T20:30:00Z"))).toBe(false);
+    expect(isDailyBarComplete("2026-12-22", at("2026-12-22T21:00:00Z"))).toBe(true);
+  });
+
   it("a prior session's bar is complete", () => {
     expect(isDailyBarComplete("2026-09-21", at("2026-09-22T15:05:00Z"))).toBe(true);
   });
@@ -144,7 +156,15 @@ describe("evaluateHardGates — structural vetoes (re-review finding 3)", () => 
   });
 
   it("admits DT's real 2026-09-22 location", () => {
-    expect(evaluateHardGates({ ...base, extension: ext(2.24) }).ok).toBe(true);
+    expect(evaluateHardGates({ ...base, extension: { ...ext(2.24), entryRisk: classifyEntryRisk(2.24) } }).ok).toBe(true);
+  });
+
+  it("rejects non-finite measurements instead of letting comparisons fail open", () => {
+    expect(evaluateHardGates({ ...base, extension: ext(NaN) }).ok).toBe(false);
+    expect(evaluateHardGates({ ...base, extension: ext(1.8, NaN) }).ok).toBe(false);
+    expect(classifyConviction(NaN, "TRIGGERED", undefined, true).sizePct).toBe(0);
+    expect(classifyConviction(Infinity, "TRIGGERED", undefined, true).sizePct).toBe(0);
+    expect(classifyConviction(80, "INVALIDATED", undefined, false).verdict).toBe("PASS");
   });
 
   it("applies the combined veto: wide base AND >= 1.5 ATR", () => {

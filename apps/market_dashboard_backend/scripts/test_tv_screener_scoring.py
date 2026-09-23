@@ -12,6 +12,8 @@ from tv_screener_fetch import (
     effective_rvol,
     annotate_intraday_rvol,
     filter_screener_instruments,
+    regular_session_open,
+    screener_daily_bar_complete,
 )
 
 try:
@@ -41,13 +43,13 @@ def test_keys_and_caps():
     _check("raw <= 100", s["raw"] <= 100)
 
 
-def test_clean_ep_is_go():
+def test_clean_ep_scores_strongly():
     s = _compute_stages({"change": 20, "Perf.1M": 12, "Perf.W": 12,
                          "relative_volume_10d_calc": 6.3, "market_cap_basic": 21e9,
                          "high": 150, "low": 125, "close": 144})
     _check("EP pattern", s["pattern"] == "EP")
     _check("EP setup strong (>=35)", s["setup"] >= 35)
-    _check("EP is GO (raw>=75)", s["raw"] >= 75)
+    _check("clean EP raw score >=75 (not a trigger verdict)", s["raw"] >= 75)
 
 
 def test_parabolic_is_pass():
@@ -64,7 +66,7 @@ def test_low_volume_breakout_not_go():
                          "relative_volume_10d_calc": 0.6, "market_cap_basic": 1e9,
                          "high": 100, "low": 95, "close": 99})
     _check("weak-volume setup penalised (<30)", s["setup"] < 30)
-    _check("weak-volume not GO (raw<75)", s["raw"] < 75)
+    _check("weak-volume raw score below75", s["raw"] < 75)
 
 
 def test_sentiment_override():
@@ -105,6 +107,21 @@ def test_verdict_bands_via_algo():
     _check("band_for WAIT at 64 closed", band_for(64, True) == "WAIT")
     _check("band_for never returns GO", band_for(100, True) != "GO")
     _check("algo stages use new keys", set(hits[0]["stages"]) == {"setup", "entry", "theme", "sentiment"})
+
+
+def test_fetch_completed_bar_finality_is_et_and_fail_closed():
+    before_close = datetime.datetime(2026, 1, 15, 20, 59, tzinfo=datetime.timezone.utc)
+    after_close = datetime.datetime(2026, 1, 15, 21, 1, tzinfo=datetime.timezone.utc)
+    overnight = datetime.datetime(2026, 1, 15, 7, 0, tzinfo=datetime.timezone.utc)
+    weekend = datetime.datetime(2026, 1, 17, 22, 0, tzinfo=datetime.timezone.utc)
+    _check("winter 15:59 ET is regular session", regular_session_open(before_close))
+    _check("winter 15:59 ET bar is incomplete", not screener_daily_bar_complete(before_close, before_close))
+    _check("winter 16:01 ET bar is complete", screener_daily_bar_complete(after_close, after_close))
+    _check("crossing close remains incomplete", not screener_daily_bar_complete(before_close, after_close))
+    _check("overnight is not proof of today's close", not screener_daily_bar_complete(overnight, overnight))
+    _check("weekend fetch has no source bar date", not screener_daily_bar_complete(weekend, weekend))
+    _check("naive clock fails closed", not screener_daily_bar_complete(
+        datetime.datetime(2026, 1, 15, 17, 0), after_close))
 
 
 def test_session_volume_fraction_bounds():
@@ -190,8 +207,9 @@ def test_vcp_keeps_only_common_stock_instruments():
 
 
 if __name__ == "__main__":
-    for fn in [test_keys_and_caps, test_clean_ep_is_go, test_parabolic_is_pass,
+    for fn in [test_keys_and_caps, test_clean_ep_scores_strongly, test_parabolic_is_pass,
                test_low_volume_breakout_not_go, test_sentiment_override, test_verdict_bands_via_algo,
+               test_fetch_completed_bar_finality_is_et_and_fail_closed,
                test_session_volume_fraction_bounds, test_effective_rvol_one_sided,
                test_intraday_understated_rvol_not_setup8, test_intraday_high_rvol_ep_mover,
                test_closed_market_path_byte_identical, test_vcp_keeps_only_common_stock_instruments]:

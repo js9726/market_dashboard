@@ -17,6 +17,7 @@
  *   { fetched_at, market_was_open, screeners: [{ id, name, tv_url, hits[] }] }
  */
 import config from "./tv-screeners.config.json";
+import { etDateString, isDailyBarComplete, isUSMarketOpen } from "@/lib/market-clock";
 
 const SCANNER_URL = "https://scanner.tradingview.com/america/scan";
 
@@ -29,8 +30,33 @@ interface ScreenerCfg {
 const COLUMNS: string[] = (config as { columns_to_fetch: string[] }).columns_to_fetch;
 const SCREENERS: ScreenerCfg[] = (config as { screeners: ScreenerCfg[] }).screeners;
 
-async function fetchOne(cfg: ScreenerCfg): Promise<Record<string, unknown>[]> {
+interface FetchResult {
+  hits: Record<string, unknown>[];
+  marketWasOpen: boolean;
+}
+
+function scannerBarFinality(startedAt: Date, observedAt: Date): {
+  barComplete: boolean;
+  basis: "fetch-started-and-completed-after-regular-close" | "source-bar-date-unavailable";
+} {
+  // TradingView does not return a per-row daily-bar timestamp. Its daily fields
+  // can only be treated as the current session's completed snapshot once a
+  // weekday regular close has actually passed. Overnight, premarket, intraday,
+  // and weekend fetches stay fail-closed because the source bar date is unknown.
+  const startedDate = etDateString(startedAt);
+  const observedDate = etDateString(observedAt);
+  const barComplete = startedDate === observedDate
+    && isDailyBarComplete(startedDate, startedAt)
+    && isDailyBarComplete(observedDate, observedAt);
+  return {
+    barComplete,
+    basis: barComplete ? "fetch-started-and-completed-after-regular-close" : "source-bar-date-unavailable",
+  };
+}
+
+async function fetchOne(cfg: ScreenerCfg): Promise<FetchResult> {
   const body = { ...cfg.query, columns: COLUMNS };
+  const startedAt = new Date();
   try {
     const res = await fetch(SCANNER_URL, {
       method: "POST",
@@ -46,26 +72,35 @@ async function fetchOne(cfg: ScreenerCfg): Promise<Record<string, unknown>[]> {
     });
     if (!res.ok) {
       console.error(`[screener:${cfg.id}] HTTP ${res.status}`);
-      return [];
+      const observedAt = new Date();
+      return { hits: [], marketWasOpen: isUSMarketOpen(observedAt) };
     }
     const json = (await res.json()) as { data?: { s: string; d: unknown[] }[] };
+    const observedAt = new Date();
+    const finality = scannerBarFinality(startedAt, observedAt);
     const hits: Record<string, unknown>[] = (json.data ?? []).map((row) => {
       const sym = row.s ?? "";
       const ticker = sym.includes(":") ? sym.split(":")[1] : sym;
       const exchange = sym.includes(":") ? sym.split(":")[0] : null;
       const mapped: Record<string, unknown> = { ticker, exchange };
       COLUMNS.forEach((col, i) => { mapped[col] = row.d?.[i] ?? null; });
-      const score = algoScore(mapped);
-      return { ...mapped, ...score };
+      const score = algoScore(mapped, finality.barComplete);
+      return {
+        ...mapped,
+        ...score,
+        bar_finality_as_of: observedAt.toISOString(),
+        bar_finality_basis: finality.basis,
+      };
     });
-    if (cfg.id !== "vcp-200ma") return hits;
-    return hits.filter((hit) => {
+    const filtered = cfg.id !== "vcp-200ma" ? hits : hits.filter((hit) => {
       const typeSpecs = hit["typespecs"];
       return Array.isArray(typeSpecs) && typeSpecs.includes("common");
     });
+    return { hits: filtered, marketWasOpen: isUSMarketOpen(observedAt) };
   } catch (e) {
     console.error(`[screener:${cfg.id}] fetch failed:`, e);
-    return [];
+    const observedAt = new Date();
+    return { hits: [], marketWasOpen: isUSMarketOpen(observedAt) };
   }
 }
 
@@ -76,8 +111,8 @@ async function fetchOne(cfg: ScreenerCfg): Promise<Record<string, unknown>[]> {
  * to end. It was private, so a change to the verdict vocabulary here could silently
  * break every consumer downstream and no test would notice.
  */
-export function algoScore(h: Record<string, unknown>): {
-  score: number; verdict: string; pattern: string;
+export function algoScore(h: Record<string, unknown>, barComplete = false): {
+  score: number; verdict: string; pattern: string; bar_complete: boolean;
   stages: { setup: number; entry: number; theme: number; sentiment: number };
 } {
   const num = (k: string): number => {
@@ -175,12 +210,12 @@ export function algoScore(h: Record<string, unknown>): {
     : is_pullback ? "PULLBACK" : is_stage4 ? "STAGE4-BOUNCE" : "UNCLEAR";
   // Conviction bands (wiki/trading/traders/trader-styles.md, recalibrated 2026-09-22).
   // This is the deterministic pre-score and it has no trigger state, so it can never
-  // assert a GO on its own: >=70 is reported as ARMED-70 for the LLM scorer to resolve
-  // against the lane, and 65-69 as PROBE. Only conviction-analysis.ts, which sees the
-  // trigger, may emit GO.
-  const verdict = raw >= 65 ? "PROBE" : raw >= 50 ? "WAIT" : "PASS";
+  // assert a GO on its own: >=65 is PROBE. Only conviction-analysis.ts, which sees
+  // the trigger, may emit GO.
+  const isBarComplete = barComplete === true;
+  const verdict = raw < 50 ? "PASS" : !isBarComplete ? "WATCH" : raw >= 65 ? "PROBE" : "WAIT";
   return {
-    score: raw, verdict, pattern,
+    score: raw, verdict, pattern, bar_complete: isBarComplete,
     stages: { setup: Math.round(setup), entry: Math.round(entry), theme: Math.round(theme), sentiment: Math.round(sentiment) },
   };
 }
@@ -192,26 +227,16 @@ export interface ScreenerFile {
   screeners: { id: string; name: string; tv_url?: string; hits: Record<string, unknown>[] }[];
 }
 
-/** US regular session: 13:30–20:00 UTC, Mon–Fri (approx, ignores holidays). */
-function marketOpenNow(): boolean {
-  const now = new Date();
-  const day = now.getUTCDay();
-  if (day === 0 || day === 6) return false;
-  const mins = now.getUTCHours() * 60 + now.getUTCMinutes();
-  return mins >= 13 * 60 + 30 && mins <= 20 * 60;
-}
-
 export async function fetchScreeners(): Promise<{ file: ScreenerFile; durationMs: number }> {
   const started = Date.now();
-  const results = await Promise.all(
-    SCREENERS.map(async (cfg) => ({
-      id: cfg.id, name: cfg.name, tv_url: cfg.tv_url,
-      hits: await fetchOne(cfg),
-    })),
-  );
+  const fetched = await Promise.all(SCREENERS.map((cfg) => fetchOne(cfg)));
+  const results = SCREENERS.map((cfg, index) => ({
+    id: cfg.id, name: cfg.name, tv_url: cfg.tv_url,
+    hits: fetched[index].hits,
+  }));
   const file: ScreenerFile = {
     fetched_at: new Date().toISOString(),
-    market_was_open: marketOpenNow(),
+    market_was_open: fetched.some((result) => result.marketWasOpen),
     score_source: "algo-tv-scanner",
     screeners: results,
   };

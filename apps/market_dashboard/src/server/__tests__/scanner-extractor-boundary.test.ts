@@ -8,8 +8,8 @@
  *
  * These tests run the REAL algoScore output through the REAL extractor.
  */
-import { describe, it, expect } from "vitest";
-import { algoScore } from "@/server/screener-scanner";
+import { afterEach, describe, it, expect, vi } from "vitest";
+import { algoScore, fetchScreeners } from "@/server/screener-scanner";
 import { extractScreenerCandidates } from "@/server/a-list-extractor";
 
 /** A raw screener row shaped as the scanner maps it, tuned to a given pattern. */
@@ -28,16 +28,77 @@ function fileOf(...hits: Record<string, unknown>[]) {
 /** Scanner output, exactly as fetchScreeners would place it on the hit. */
 function scanned(over: Record<string, unknown> = {}) {
   const h = rawHit(over);
-  return { ...h, ...algoScore(h) };
+  return { ...h, ...algoScore(h, true) };
 }
 
 describe("scanner -> extractor boundary", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
   it("the scanner never labels anything GO (it has no trigger state)", () => {
     for (const perf of [-30, 0, 10, 25, 60]) {
-      const s = algoScore(rawHit({ "Perf.1M": perf }));
+      const s = algoScore(rawHit({ "Perf.1M": perf }), true);
       expect(s.verdict).not.toBe("GO");
       expect(["PROBE", "WAIT", "PASS"]).toContain(s.verdict);
     }
+  });
+
+  it("defaults unknown bar finality to WATCH for an otherwise sized band", () => {
+    const h = rawHit();
+    const unknown = algoScore(h);
+    const completed = algoScore(h, true);
+    expect(completed.verdict).toBe("PROBE");
+    expect(unknown.score).toBe(completed.score);
+    expect(unknown.verdict).toBe("WATCH");
+    expect(unknown.bar_complete).toBe(false);
+  });
+
+  it("uses the fetch-completed ET clock and stays fail-closed before the winter close", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: [{ s: "NASDAQ:TEST", d: [] }] }),
+    } as Response);
+
+    vi.setSystemTime(new Date("2026-01-15T07:00:00Z")); // 02:00 ET: closed, but today's bar has not started
+    const overnight = await fetchScreeners();
+    const overnightHit = overnight.file.screeners.flatMap((s) => s.hits)[0];
+    expect(overnight.file.market_was_open).toBe(false);
+    expect(overnightHit.bar_complete).toBe(false);
+
+    vi.setSystemTime(new Date("2026-01-15T20:59:00Z")); // 15:59 ET (EST)
+    const before = await fetchScreeners();
+    const beforeHit = before.file.screeners.flatMap((s) => s.hits)[0];
+    expect(before.file.market_was_open).toBe(true);
+    expect(beforeHit.bar_complete).toBe(false);
+    expect(beforeHit.bar_finality_basis).toBe("source-bar-date-unavailable");
+
+    vi.setSystemTime(new Date("2026-01-15T21:01:00Z")); // 16:01 ET (EST)
+    const after = await fetchScreeners();
+    const afterHit = after.file.screeners.flatMap((s) => s.hits)[0];
+    expect(after.file.market_was_open).toBe(false);
+    expect(afterHit.bar_complete).toBe(true);
+    expect(afterHit.bar_finality_basis).toBe("fetch-started-and-completed-after-regular-close");
+  });
+
+  it("does not approve a request that crosses the 16:00 ET close", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-15T20:59:59Z"));
+    let calls = 0;
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () => {
+      if (calls++ === 0) vi.setSystemTime(new Date("2026-01-15T21:00:01Z"));
+      return {
+        ok: true,
+        json: async () => ({ data: [{ s: "NASDAQ:TEST", d: [] }] }),
+      } as Response;
+    });
+
+    const result = await fetchScreeners();
+    const crossingHit = result.file.screeners[0].hits[0];
+    expect(crossingHit.bar_complete).toBe(false);
+    expect(crossingHit.bar_finality_basis).toBe("source-bar-date-unavailable");
   });
 
   it("a high-scoring BREAKOUT survives the extractor", () => {

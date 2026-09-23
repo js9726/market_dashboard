@@ -35,16 +35,13 @@ import { simulateTranches } from "@/lib/alist-tranche-sim";
 import { runConvictionAnalysis, type ConvictionInput } from "@/server/conviction-analysis";
 import { marketContextNow } from "@/lib/market-context";
 import { isDailyBarComplete } from "@/lib/market-clock";
+import { completedDailyPath, shouldQueueConviction } from "@/server/conviction-queue";
 
 // Cap LLM Conviction analyses per cron run so a day with many triggers can't
 // blow the function budget; the rest get picked up next run. 8 x ~15s worst
 // case still leaves headroom in the 300s budget after the candidate scan, and
 // clears a typical backlog in days rather than weeks.
 const MAX_ANALYSES_PER_RUN = 8;
-// Lowest score worth spending an LLM call on for an ARMED (untriggered) pick.
-// Matches the PROBE band floor in wiki/trading/traders/trader-styles.md; below it
-// the best attainable band is WATCH, which needs no verdict.
-const PROBE_QUEUE_MIN_SCORE = 65;
 // How many candidates to price-fetch concurrently. Keeps the whole run inside
 // the function budget while bounding parallel pressure on the price feeds.
 const FETCH_CONCURRENCY = 8;
@@ -215,8 +212,8 @@ interface CandResult {
   ticker: string;
   processed: boolean;
   error?: string;
-  /** triggeredAtMs orders the analysis queue oldest-first so it drains. */
-  triggered?: { candId: string; triggeredAtMs: number; input: ConvictionInput };
+  /** Never analysed first, then oldest analysis, so daily refreshes cannot starve backlog. */
+  triggered?: { candId: string; analysisPriorityMs: number; input: ConvictionInput };
 }
 
 /** Process one candidate: fetch the path, append daily tracks, derive savings +
@@ -239,7 +236,9 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
     let trancheSimJson: Prisma.InputJsonValue | null = null;
     let day0RvolFix: number | null = null;
 
-    const candles = await fetchDailyCandles(cand.ticker);
+    // A request begun before the close can return a partial snapshot after it.
+    const candleRequestedAt = new Date();
+    const candles = completedDailyPath(await fetchDailyCandles(cand.ticker), candleRequestedAt);
     if (candles.length === 0) return { ticker: cand.ticker, processed: false, error: "no price feed (Yahoo + Stooq both unavailable)" };
 
     const closes = candles.map((c) => c.close);
@@ -341,18 +340,14 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
       }
       trig = trig ?? evaluateTrigger(cand.setupClassification, triggerPath, cand.entryZone?.toNumber() ?? null);
 
-      // Only advance / record changes — never regress a fired trigger to ARMED.
-      // NEEDS-PIVOT is terminal too: a breakout with nothing to break out of can
-      // never legitimately fire (2026-07-16 VCTR false-GO).
-      const terminalNow = trig.state === "TRIGGERED" || trig.state === "INVALIDATED" || trig.state === "NEEDS-PIVOT";
-      const prevTerminal = prev === "TRIGGERED" || prev === "INVALIDATED" || prev === "NEEDS-PIVOT";
-      if (!prevTerminal || terminalNow) {
-        triggerUpdate = {
-          triggerState: trig.state,
-          triggerStateAt: trig.date ? new Date(`${trig.date}T00:00:00.000Z`) : (prev !== trig.state ? new Date() : cand.triggerStateAt),
-          triggerReason: trig.reason,
-        };
-      }
+      // Rebuild from the completed path. A legacy intraday TRIGGERED latch must
+      // not survive when its completed bars only support ARMED. evaluateTrigger
+      // already returns the first historical terminal event in this full path.
+      triggerUpdate = {
+        triggerState: trig.state,
+        triggerStateAt: trig.date ? new Date(`${trig.date}T00:00:00.000Z`) : null,
+        triggerReason: trig.reason,
+      };
 
       // Declutter: a REC whose trigger died (window expired or thesis broken)
       // is no longer an entry candidate — retire the row so the Active board
@@ -373,17 +368,10 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
         }
       }
 
-      // Queue the LLM Conviction verdict for picks that don't have one yet —
-      // includes the backlog (earlier flips cut off by the per-run cap), which
-      // drains MAX_ANALYSES_PER_RUN per day.
-      //
-      // ARMED is queued too, since 2026-09-23. The band table gives a >= 70 ARMED
-      // pick a half-size PROBE (trader-styles.md), but this caller only ever
-      // queued TRIGGERED, so that branch of classifyConviction was unreachable in
-      // production — the PROBE band existed on paper and could never be produced.
-      const armedProbeEligible =
-        effState === "ARMED" && (cand.day0Score ?? 0) >= PROBE_QUEUE_MIN_SCORE;
-      if ((effState === "TRIGGERED" || armedProbeEligible) && cand.agentConvictionAt == null) {
+      // One analysis per completed bar/trigger state. An earlier ARMED PROBE must
+      // not prevent a later TRIGGERED review, or freeze yesterday's measurements.
+      if (shouldQueueConviction({ triggerState: effState, day0Score: cand.day0Score,
+        barDate: candles[lastIdx].date, previous: cand.agentConviction })) {
         // Location facts — the inputs whose absence let VCTR score Entry 27/30
         // while sitting +2.82xATR above its 21EMA (2026-07-16). Fail-closed:
         // when these cannot be computed the hard gate PASSes the candidate.
@@ -402,7 +390,7 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
         const baseHi = baseWindow.length ? Math.max(...baseWindow.map((b) => b.high)) : null;
         const baseLo = baseWindow.length ? Math.min(...baseWindow.map((b) => b.low)) : null;
         const base10dPct =
-          baseHi != null && baseLo != null && baseLo > 0 ? ((baseHi - baseLo) / baseLo) * 100 : null;
+          baseWindow.length === 10 && baseHi != null && baseLo != null && baseLo > 0 ? ((baseHi - baseLo) / baseLo) * 100 : null;
 
         // Bar finality. A daily bar for today is still being written until the
         // regular session ends, and no band above WATCH may be issued from it.
@@ -411,7 +399,7 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
 
         triggered = {
           candId: cand.id,
-          triggeredAtMs: (triggerUpdate.triggerStateAt ?? cand.triggerStateAt)?.getTime() ?? 0,
+          analysisPriorityMs: cand.agentConvictionAt?.getTime() ?? 0,
           input: {
             ticker: cand.ticker,
             setup: cand.setupClassification,
@@ -561,16 +549,13 @@ export async function GET(req: Request) {
   const errors = results.filter((r) => r.error).map((r) => `${r.ticker}: ${r.error}`);
   const newlyTriggered = results.flatMap((r) => (r.triggered ? [r.triggered] : []));
 
-  // ── Multi-agent Conviction verdict on freshly-TRIGGERED picks (R4) ────────
-  // Runs only on the trigger flip, bounded per run, never fails the cron.
+  // ── Conviction verdict on completed-bar changes (R4) ────────────────────
+  // Bounded per run; pending candidates stay eligible on the next run.
   let analyzed = 0;
   if (process.env.LLM_DISABLED !== "1") {
-    // Drain OLDEST-triggered first. The queue is every TRIGGERED row still
-    // lacking a verdict (see processCandidate), so ordering it newest-first —
-    // as the candidate scan does — let a few permanently-failing rows sit at
-    // the head and starve the rest: the same 5 were retried every run while 28
-    // others never got a turn, and the loop looked idle rather than broken.
-    const queue = [...newlyTriggered].sort((a, b) => a.triggeredAtMs - b.triggeredAtMs);
+    // Never analysed first, then oldest analysis. Ordering by original trigger
+    // date would let the same old picks consume every day's refresh budget.
+    const queue = [...newlyTriggered].sort((a, b) => a.analysisPriorityMs - b.analysisPriorityMs);
     for (const item of queue.slice(0, MAX_ANALYSES_PER_RUN)) {
       try {
         const verdict = await runConvictionAnalysis(item.input);
@@ -584,7 +569,8 @@ export async function GET(req: Request) {
         await prisma.aListCandidate.update({
           where: { id: item.candId },
           data: {
-            agentConviction: verdict as unknown as Prisma.InputJsonValue,
+            agentConviction: { ...verdict, barDate: item.input.barDate,
+              barComplete: item.input.barComplete, triggerState: item.input.triggerState } as unknown as Prisma.InputJsonValue,
             agentVerdict: verdict.moderator,
             agentConvictionAt: new Date(),
           },

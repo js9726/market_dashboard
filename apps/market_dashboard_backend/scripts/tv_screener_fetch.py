@@ -81,6 +81,54 @@ _AI_MAX_OUTPUT_TOKENS = 8000
 
 SCANNER_URL = "https://scanner.tradingview.com/america/scan"
 
+
+def _eastern_timezone():
+    try:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo("America/New_York")
+    except Exception:  # pragma: no cover - older Python fallback
+        import pytz
+        return pytz.timezone("America/New_York")
+
+
+def screener_daily_bar_complete(
+    fetch_started_at: datetime.datetime,
+    fetch_completed_at: datetime.datetime,
+) -> bool:
+    """Whether TV's timestamp-less daily fields can be treated as a closed bar.
+
+    TradingView does not return a per-row bar date here. The only supported
+    positive evidence is a weekday fetch started and completed at/after 16:00 ET, when
+    the endpoint's current-session daily snapshot is closed. Overnight,
+    premarket, intraday, weekend, and naive timestamps fail closed.
+    """
+    if (
+        not isinstance(fetch_started_at, datetime.datetime)
+        or fetch_started_at.tzinfo is None
+        or not isinstance(fetch_completed_at, datetime.datetime)
+        or fetch_completed_at.tzinfo is None
+    ):
+        return False
+    started_et = fetch_started_at.astimezone(_eastern_timezone())
+    now_et = fetch_completed_at.astimezone(_eastern_timezone())
+    return (
+        started_et.date() == now_et.date()
+        and started_et.weekday() < 5
+        and started_et.time() >= datetime.time(16, 0)
+        and now_et.time() >= datetime.time(16, 0)
+    )
+
+
+def regular_session_open(fetch_completed_at: datetime.datetime) -> bool:
+    """NYSE regular-session approximation evaluated on the post-fetch clock."""
+    if not isinstance(fetch_completed_at, datetime.datetime) or fetch_completed_at.tzinfo is None:
+        return False
+    now_et = fetch_completed_at.astimezone(_eastern_timezone())
+    return (
+        now_et.weekday() < 5
+        and datetime.time(9, 30) <= now_et.time() < datetime.time(16, 0)
+    )
+
 def _build_headers() -> dict:
     """
     Build request headers for the TradingView scanner.
@@ -481,7 +529,7 @@ def band_for(score, bar_complete: bool = False) -> str:
         return "PASS"
     if score < 50:
         return "PASS"
-    if not bar_complete:
+    if bar_complete is not True:
         return UNFINISHED_BAR_CEILING
     return "PROBE" if score >= 65 else "WAIT"
 
@@ -496,7 +544,7 @@ def _algorithmic_result(stages: dict, raw: int, ai_status: str, bar_complete: bo
     return {
         "score": raw,
         "verdict": band_for(raw, bar_complete),
-        "bar_complete": bool(bar_complete),
+        "bar_complete": bar_complete is True,
         "thesis": f"{stages['pattern']} setup; algorithmic score only.",
         "stages": {k: stages[k] for k in ("setup", "entry", "theme", "sentiment")},
         "pattern": stages["pattern"],
@@ -552,6 +600,7 @@ def _validate_ai_score(parsed, stages: dict, raw: int, bar_complete: bool = Fals
     return {
         "score": score,
         "verdict": verdict,
+        "bar_complete": bar_complete is True,
         "thesis": thesis.strip(),
         "stages": out_stages,
         "pattern": stages["pattern"],
@@ -702,7 +751,7 @@ def algo_score_all(hits: list, bar_complete: bool = False) -> None:
         stages = _compute_stages(hit)
         hit["score"]         = stages["raw"]
         hit["verdict"]       = band_for(stages["raw"], bar_complete)
-        hit["bar_complete"]  = bool(bar_complete)
+        hit["bar_complete"]  = bar_complete is True
         hit["thesis"]       = f"{stages['pattern']} setup; algorithmic score only."
         hit["stages"]       = {
             "setup":     stages["setup"],
@@ -735,7 +784,7 @@ def score_top(hits: list, n: int, bar_complete: bool = False) -> None:
         hit["pattern"]      = result.get("pattern")  # EP / BREAKOUT / PULLBACK / PARABOLIC / …
         hit["score_source"] = result.get("score_source", "algorithmic")
         hit["ai_status"]    = result.get("ai_status", "unknown")
-        hit["bar_complete"] = bool(bar_complete)
+        hit["bar_complete"] = bar_complete is True
         tally[hit["ai_status"]] = tally.get(hit["ai_status"], 0) + 1
         time.sleep(0.6)  # polite — DeepSeek rate limit
 
@@ -840,34 +889,30 @@ def main():
     screeners_out = []
     total_hits = 0
 
-    # Determine if the US equity market was open when this fetch ran.
-    # NYSE regular session: Mon-Fri 09:30-16:00 ET.
-    try:
-        import zoneinfo
-        _et = zoneinfo.ZoneInfo("America/New_York")
-    except Exception:
-        import pytz  # fallback for older Python/CI images
-        _et = pytz.timezone("America/New_York")
-    _now_et = datetime.datetime.now(_et)
-    _market_was_open = (
-        _now_et.weekday() < 5
-        and datetime.time(9, 30) <= _now_et.time() <= datetime.time(16, 0)
-    )
-    # Fraction of the session's volume expected to have traded by now. 1.0 when
-    # the market is closed → intraday RVOL correction is a no-op on that path.
-    _session_frac = session_volume_fraction(_now_et)
-    # Bar finality. While the regular session is open the daily bar is still being
-    # written, so no band above WATCH may be issued from it
-    # (wiki/trading/traders/trader-styles.md, unfinished-bar veto).
-    _bar_complete = not _market_was_open
-    if not _bar_complete:
-        print("[tv] regular session OPEN - bands capped at WATCH (unfinished-bar veto)")
+    _et = _eastern_timezone()
+    _market_was_open = False
+    _session_frac = 1.0
 
     deepseek_scored_at = None  # set below only when DeepSeek runs
 
     for sc in config["screeners"]:
         print(f"[tv] fetching {sc['id']}…")
+        _fetch_started = datetime.datetime.now(datetime.timezone.utc)
         hits = fetch_screener(sc, columns)
+        # Evaluate freshness only after this network fetch finishes. A pre-fetch
+        # clock can cross 09:30/16:00 ET while the request is in flight and assign
+        # the wrong finality to the returned daily fields.
+        _fetch_completed = datetime.datetime.now(datetime.timezone.utc)
+        _fetch_completed_et = _fetch_completed.astimezone(_et)
+        _fetch_market_open = regular_session_open(_fetch_completed)
+        _market_was_open = _market_was_open or _fetch_market_open
+        _session_frac = session_volume_fraction(_fetch_completed_et)
+        _bar_complete = screener_daily_bar_complete(_fetch_started, _fetch_completed)
+        _bar_finality_basis = (
+            "fetch-started-and-completed-after-regular-close"
+            if _bar_complete else
+            "source-bar-date-unavailable"
+        )
         hits = filter_screener_instruments(sc["id"], hits)
         print(f"[tv] {sc['id']}: {len(hits)} hits")
         total_hits += len(hits)
@@ -883,6 +928,11 @@ def main():
             if args.score:
                 print(f"[tv] upgrading top {args.score_top} of {sc['id']} to DeepSeek AI scores…")
                 score_top(hits, args.score_top, _bar_complete)
+
+            for hit in hits:
+                hit["bar_finality_as_of"] = _fetch_completed.isoformat()
+                hit["bar_finality_basis"] = _bar_finality_basis
+                hit["session_volume_fraction"] = round(_session_frac, 3)
 
         screeners_out.append({
             "id": sc["id"],

@@ -88,8 +88,8 @@ export interface GateResult {
  * 2026-09-23: raised 2 -> 2.5 on Jie's decision that the wiki's 2.5 ATR structural veto
  * (trader-styles.md) is authoritative. The code had been stricter than the doctrine since
  * 2026-07-16 and silently rejected names the doctrine admits — DT closed at +2.24 ATR on
- * 2026-09-22 and would have been auto-failed here. The `entryRisk` classification below is
- * a separate gate and still applies.
+ * 2026-09-22 and would have been auto-failed here. The legacy `entryRisk` display
+ * classification is derived from this same number and is not a second veto.
  *
  * The comparison is `>=`, matching the wiki's ">= 2.5 ATR is blocked outright". It was `>`
  * until 2026-09-23, so exactly 2.5 passed a veto written to exclude it.
@@ -114,10 +114,10 @@ export function evaluateHardGates(input: ConvictionInput): GateResult {
 
   // 2. Extension / location.
   const ext = input.extension;
-  if (!ext || ext.dist21Atr == null)
+  if (!ext || ext.dist21Atr == null || !Number.isFinite(ext.dist21Atr))
     return { ok: false, code: "EXTENDED-GATE-FAIL", reason: "EXTENDED-GATE-FAIL: location unknown (no dist-from-21EMA) — fail-closed" };
-  if (ext.entryRisk === "EXTENDED" || ext.entryRisk === "EXTREME-EXTENDED")
-    return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: entry_risk ${ext.entryRisk} (${ext.dist21Atr.toFixed(2)}xATR above the 21EMA)` };
+  // entryRisk is a display label derived from this same distance, with an older
+  // 2 ATR threshold. It cannot override the approved numeric 2.5 ATR veto.
   if (ext.dist21Atr >= EXTENSION_ATR_LIMIT)
     return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: ${ext.dist21Atr.toFixed(2)}xATR above the 21EMA meets or exceeds the ${EXTENSION_ATR_LIMIT}xATR veto` };
 
@@ -125,7 +125,7 @@ export function evaluateHardGates(input: ConvictionInput): GateResult {
   // alone vetoes here, which is why it needs its own check rather than falling
   // out of the single-ATR limit above.
   if (ext.dist21Atr >= COMBINED_VETO_ATR) {
-    if (ext.base10dPct == null)
+    if (ext.base10dPct == null || !Number.isFinite(ext.base10dPct) || ext.base10dPct < 0)
       return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: ${ext.dist21Atr.toFixed(2)}xATR extension with an UNKNOWN 10-day base width — the combined veto cannot be evaluated, fail-closed` };
     if (ext.base10dPct > BASE_WIDTH_VETO_PCT)
       return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: combined veto — ${ext.base10dPct.toFixed(1)}% 10-day base (> ${BASE_WIDTH_VETO_PCT}%) at ${ext.dist21Atr.toFixed(2)}xATR (>= ${COMBINED_VETO_ATR})` };
@@ -158,6 +158,10 @@ export function classifyConviction(
     return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `hard pre-gate failed (${gate.code}) — no band` };
 
   const state = (triggerState ?? "").toUpperCase().trim();
+  if (!Number.isFinite(conviction) || conviction < 0 || conviction > 100)
+    return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: "invalid conviction score — no size" };
+  if (["INVALIDATED", "EXPIRED", "NEEDS-PIVOT"].includes(state))
+    return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `trigger ${state} — no band at any score` };
 
   // Unfinished-bar veto. Fail-closed: only an explicit `true` lifts the WATCH
   // ceiling, so a caller that never sets it can never issue size.
@@ -171,12 +175,9 @@ export function classifyConviction(
   }
   const triggered = state === "TRIGGERED";
   const armed = state === "ARMED";
-  const dead = state === "INVALIDATED" || state === "EXPIRED" || state === "NEEDS-PIVOT";
 
   if (conviction < 50)
     return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `conviction ${conviction} < 50` };
-  if (dead)
-    return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `trigger ${state} — no band at any score` };
   if (conviction < 65)
     return { verdict: "WATCH", moderator: "WAIT", sizePct: 0, classification: `conviction ${conviction} in 50-64 — armed, no position` };
   if (!triggered && !armed)
@@ -332,7 +333,7 @@ export async function runConvictionAnalysis(input: ConvictionInput): Promise<Con
   const sentiment = clampInt(obj.sentiment, 10);
 
   // Deterministic Entry cap on approaching-extended location. The gate above
-  // rejects >2xATR outright; between 1.5x and 2x the LLM may still over-score a
+  // rejects >=2.5xATR outright; between 1.5x and 2.5x the LLM may still over-score a
   // chase, so cap it rather than trust the prose.
   const d21 = input.extension?.dist21Atr ?? null;
   const reasoningNotes: string[] = [];

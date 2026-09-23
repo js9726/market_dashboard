@@ -53,12 +53,17 @@ export function etDateString(now: Date = new Date()): string {
  * Fail-closed: a missing or unparseable date is NOT complete.
  */
 export function isDailyBarComplete(barDate: string | null | undefined, now: Date = new Date()): boolean {
-  if (!barDate || !/^\d{4}-\d{2}-\d{2}$/.test(barDate)) return false;
+  if (!barDate || !/^\d{4}-\d{2}-\d{2}$/.test(barDate) || !Number.isFinite(now.getTime())) return false;
+  const parsed = new Date(`${barDate}T00:00:00Z`);
+  if (!Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== barDate) return false;
+  if (parsed.getUTCDay() === 0 || parsed.getUTCDay() === 6) return false;
   const today = etDateString(now);
   if (barDate < today) return true;
   if (barDate > today) return false; // a future-dated bar is not evidence of anything
-  const session = usMarketSession(now);
-  return session === "AFTER_HOURS" || session === "CLOSED";
+  // CLOSED also includes 00:00-04:00, before today's bar even starts.
+  // Conservatively wait until the normal close on early-close sessions too.
+  const et = toEt(now);
+  return et.getHours() * 60 + et.getMinutes() >= 16 * 60;
 }
 
 /** Short ET date label for when a quote was observed, e.g. "May 29". */

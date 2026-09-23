@@ -150,9 +150,11 @@ def test_unfinished_bar_caps_the_ai_path_too():
     res, _ = _run(_good_payload(baseline), bar_complete=False)
     _check("open bar caps the AI band at WATCH", res["verdict"] == "WATCH")
     _check("score still recorded", isinstance(res["score"], int))
+    _check("AI result records incomplete finality", res["bar_complete"] is False)
 
     res_closed, _ = _run(_good_payload(baseline), bar_complete=True)
     _check("closed bar is not capped", res_closed["verdict"] != "WATCH")
+    _check("AI result records completed finality", res_closed["bar_complete"] is True)
 
     algo, _ = _run("", bar_complete=False)
     _check("algorithmic fallback is capped too", algo["verdict"] == "WATCH")
