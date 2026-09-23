@@ -5,8 +5,8 @@
   "target": "trader-scorer-stock/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-09-23T15:11:34.648Z",
-  "renderHash": "e8715008937543ef115c32ee44ca36fb7d633be0f8d05ffb8ba2e3978b127661",
+  "generatedAt": "2026-09-23T16:10:46.133Z",
+  "renderHash": "cb4b96a0572d7e0c39c599fc08531d0907f3b0b495b5cf7a707f58d8cc4a9bd6",
   "sources": [
     {
       "root": "wiki",
@@ -36,7 +36,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/ticker-catalyst-analysis.md",
-      "sha256": "f59eb15854de9d58ad1f62d284f96eb199d347137bd28a7fab1589436fea3793"
+      "sha256": "bdfdee0962cb984da45a3b896844a031876ab057dcfe9180610b9586be7fa942"
     },
     {
       "root": "wiki",
@@ -88,7 +88,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/traders/mark-minervini-sepa.md sha256:93960f0a87e6
 - wiki:wiki/trading/traders/ted-zhang-institutional-momentum.md sha256:8b33970a7a94
 - wiki:wiki/trading/concepts/fundamental-analysis.md sha256:857839e81082
-- wiki:wiki/trading/concepts/ticker-catalyst-analysis.md sha256:f59eb15854de
+- wiki:wiki/trading/concepts/ticker-catalyst-analysis.md sha256:bdfdee0962cb
 - wiki:wiki/trading/concepts/relative-strength.md sha256:61cfc5e13943
 - wiki:wiki/trading/concepts/lockout-rally.md sha256:82466eac5462
 - wiki:wiki/trading/traders/qullamaggie-breakouts-episodic-pivots.md sha256:7a2301df36b9
@@ -971,11 +971,11 @@ For Asian stocks (冷眼's original context), use exchange filings (SSE, SZSE, T
 
 # Ticker Catalyst Analysis
 
-**Summary**: Mandatory form for ad-hoc ticker analysis and any GO-list candidate that is being promoted as actionable. It explains the company simply, then focuses on news, catalysts, themes, insider/institutional activity, peer movement, and analyst actions that can cause a large future move.
+**Summary**: Mandatory form for ad-hoc ticker analysis and actionable GO-list candidates. Lead with the latest source-backed major event, then explain the business, upcoming catalysts, fundamentals, peers and evidence gaps.
 
 **Sources**: Operator directive, 2026-06-25; operator clarification, 2026-07-10; Qullamaggie EP notes (`https://qullamaggie.com/how-to-master-a-setup-episodic-pivots/`); Qullamaggie biotech notes (`https://qullamaggie.net/trade-ipo-and-biotechs-profitably/`); Jeff Sun guide (`https://jfsrev.substack.com/p/my-trading-tools-process-routine`); PrimeTrading scan rules (`https://traderslab.gitbook.io/primetrading`).
 
-**Last updated**: 2026-07-10
+**Last updated**: 2026-09-24
 
 ---
 
@@ -985,7 +985,7 @@ Use this form whenever the operator asks to "analyse [TICKER]" or asks what a co
 
 The output is not a generic company profile. It is a catalyst-first trading brief:
 
-1. Explain the business clearly enough to understand the ticker quickly.
+1. Lead with the latest source-backed major event, then explain the business clearly.
 2. Identify the narrative, upcoming events, and news that can move price.
 3. Tie the catalyst story back to fundamentals, peers, sector trend, and the existing technical tradeability gates.
 4. Persist the analysis to the dashboard when the operator asks for dashboard-visible work.
@@ -994,6 +994,7 @@ The output is not a generic company profile. It is a catalyst-first trading brie
 
 Do not let an ad-hoc ticker analysis or GO-list promotion skip this page's fields. The output is incomplete until it includes:
 
+- Dated latest-major-event lead, own-company versus external driver, and next-event distance (or explicit source gaps).
 - ELI12 business explanation.
 - Professional summary with competitors.
 - Theme / catalysts / significant fundamentals table.
@@ -1007,6 +1008,32 @@ Do not let an ad-hoc ticker analysis or GO-list promotion skip this page's field
 If a run lacks source budget or access for these fields, the ticker can remain WATCH or "needs catalyst brief," but it must not be called a full GO or full analysis.
 
 ## Required Output Form
+
+### 0. Latest Major Event — Lead Before Scoring
+
+Open each ticker's evidence with:
+
+`YYYY-MM-DD | event type | what happened and the decisive number, if verified |
+observed stock reaction and measurement window, or UNKNOWN | direct source link`
+
+Use the event date, distinguishing it from the article's publication date. When the
+latest major event is external (a peer result, sector or macro catalyst), identify
+both that event and the ticker's latest own-company event. Explain the apparent price
+driver as a sourced claim or inference; do not assert causation from timing alone.
+
+State `No material event found in the reviewed 90-day window` only after reviewing
+sources covering that dated period; name the sources and cutoff. Empty feeds, failed
+requests or incomplete coverage mean `UNKNOWN — insufficient event coverage`, not
+proof that nothing happened. If the latest own-company event cannot be established,
+say so explicitly rather than substituting a peer's event.
+
+Alongside the lead, give the next verified scheduled catalyst, its date and distance
+in calendar days/weeks from the stated analysis date. Mark estimated dates as estimates;
+if no date is verified, report UNKNOWN. Keep the full next-30-day section below.
+
+This presentation contract applies to chat, written reports and persisted analyses.
+It does not override chart, freshness, technical or risk gates. (source: operator
+September9 catalyst-first directive; September10 review R2, repaired September24)
 
 ### 1. ELI12 Business Explanation
 
