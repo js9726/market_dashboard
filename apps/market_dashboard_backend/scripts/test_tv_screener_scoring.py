@@ -80,12 +80,30 @@ def test_verdict_bands_via_algo():
     from tv_screener_fetch import algo_score_all
     hits = [{"ticker": "EP", "change": 20, "Perf.1M": 12, "relative_volume_10d_calc": 6.3,
              "market_cap_basic": 21e9, "high": 150, "low": 125, "close": 144}]
-    algo_score_all(hits)
     # Recalibrated 2026-09-23: this stage has no lane-trigger state, so it never
-    # emits GO. PROBE >= 65 / WAIT 50-64 / PASS < 50.
+    # emits GO. On a CLOSED bar: PROBE >= 65 / WAIT 50-64 / PASS < 50.
+    algo_score_all(hits, bar_complete=True)
     _check("algo sets verdict", hits[0]["verdict"] in ("PROBE", "WAIT", "PASS"))
     _check("algo never asserts GO without a trigger", hits[0]["verdict"] != "GO")
     _check("algo PROBE threshold (>=65)", (hits[0]["verdict"] == "PROBE") == (hits[0]["score"] >= 65))
+    _check("algo records bar finality", hits[0]["bar_complete"] is True)
+
+    # Unfinished-bar veto: the same hit, scored while the session is open, is
+    # capped at WATCH. The default is fail-closed, so omitting the flag caps too.
+    open_hits = [dict(hits[0])]
+    algo_score_all(open_hits, bar_complete=False)
+    _check("open session caps the band at WATCH", open_hits[0]["verdict"] == "WATCH")
+    _check("score itself is unchanged by the cap", open_hits[0]["score"] == hits[0]["score"])
+    default_hits = [dict(hits[0])]
+    algo_score_all(default_hits)
+    _check("bar_complete defaults fail-closed", default_hits[0]["verdict"] == "WATCH")
+
+    from tv_screener_fetch import band_for
+    _check("band_for PASS below 50 even on an open bar", band_for(40, False) == "PASS")
+    _check("band_for caps 99 at WATCH on an open bar", band_for(99, False) == "WATCH")
+    _check("band_for PROBE at 65 closed", band_for(65, True) == "PROBE")
+    _check("band_for WAIT at 64 closed", band_for(64, True) == "WAIT")
+    _check("band_for never returns GO", band_for(100, True) != "GO")
     _check("algo stages use new keys", set(hits[0]["stages"]) == {"setup", "entry", "theme", "sentiment"})
 
 

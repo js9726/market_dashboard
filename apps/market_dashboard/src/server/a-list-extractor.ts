@@ -38,6 +38,20 @@ const PULLBACK_MIN_SCORE = 65;
 // PROBE is a real half-size position (trader-styles.md, 2026-09-22), so it admits to the
 // A-list exactly as a GO does. Size is carried on the verdict, not on admission.
 const ACCEPTABLE_VERDICTS = new Set(["GO", "PROBE"]);
+// Each band admits at its OWN floor. A single MIN_SCORE floored PROBE at 70 and made the
+// 65-69 PROBE band unreachable through admission while doctrine sized it at 0.25%.
+const PROBE_MIN_SCORE = 65;
+function bandFloor(verdict: string): number {
+  return verdict === "PROBE" ? PROBE_MIN_SCORE : MIN_SCORE;
+}
+/**
+ * Candidate identity as persisted on day 0. Preserve the band the scorer actually
+ * assigned: collapsing PROBE to WAIT here discarded the half-size position entirely
+ * and made every downstream PROBE consumer unreachable.
+ */
+function day0VerdictOf(verdict: string): string {
+  return verdict === "GO" ? "GO" : verdict === "PROBE" ? "PROBE" : "WAIT";
+}
 
 type SetupLane = "breakout" | "pullback" | "unknown";
 function setupLane(setup: string | null | undefined): SetupLane {
@@ -134,10 +148,11 @@ export function extractCandidates(brief: BriefAnyShape | null): ExtractedCandida
 
   const meetsFilter = (score: number | null, verdict: string | null, rvol: number | null, setup?: string | null): boolean => {
     const lane = setupLane(setup);
-    // Pullbacks admit at the WATCH band (armed); breakout/EP/unknown require the GO line.
-    const minScore = lane === "pullback" ? PULLBACK_MIN_SCORE : MIN_SCORE;
-    if (score == null || score < minScore) return false;
+    // Pullbacks admit at the WATCH band (armed); breakout/EP/unknown admit at the
+    // floor of whichever band the scorer assigned.
     const v = (verdict ?? "").toUpperCase();
+    const minScore = lane === "pullback" ? PULLBACK_MIN_SCORE : bandFloor(v);
+    if (score == null || score < minScore) return false;
     if (lane === "pullback") {
       if (v !== "GO" && v !== "PROBE" && v !== "WAIT" && v !== "WATCH") return false;
     } else if (!ACCEPTABLE_VERDICTS.has(v)) {
@@ -531,9 +546,12 @@ export function extractScreenerCandidates(file: ScoredScreenerFile | null | unde
         if (score < PULLBACK_MIN_SCORE) continue;
         if (verdict !== "GO" && verdict !== "PROBE" && verdict !== "WAIT" && verdict !== "WATCH") continue;
       } else {
-        // Breakout / EP / unknown: require GO + a volume surge.
-        if (score < MIN_SCORE) continue;
-        if (verdict !== "GO") continue;
+        // Breakout / EP / unknown: require a sized band (GO or PROBE) + a volume surge.
+        // This branch demanded a literal "GO" until 2026-09-23. screener-scanner had
+        // stopped emitting GO at all (it has no trigger state and so cannot assert one),
+        // which meant EVERY breakout and EP candidate was silently dropped here.
+        if (!ACCEPTABLE_VERDICTS.has(verdict)) continue;
+        if (score < bandFloor(verdict)) continue;
         if (rvol == null || rvol < MIN_RVOL_SURGE) continue;
       }
       // Conviction sub-scores from the algo scorer (screener-scanner algoScore).
@@ -541,7 +559,7 @@ export function extractScreenerCandidates(file: ScoredScreenerFile | null | unde
       const cand: ExtractedCandidate = {
         ticker,
         day0Score: score,
-        day0Verdict: verdict === "GO" ? "GO" : "WAIT",
+        day0Verdict: day0VerdictOf(verdict),
         day0Rvol: rvol,
         setupClassification: setupClass,
         screenSource: asStr(sc.id),

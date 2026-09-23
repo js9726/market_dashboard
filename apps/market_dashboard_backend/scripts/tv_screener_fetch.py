@@ -463,7 +463,30 @@ _STAGE_MAX = {"setup": 40, "entry": 30, "theme": 20, "sentiment": 10}
 _MAX_COMPOSITE_ADJUST = 5
 
 
-def _algorithmic_result(stages: dict, raw: int, ai_status: str) -> dict:
+# The highest band an unfinished bar may be given (wiki/trading/traders/trader-styles.md).
+# An intraday print is not a close: its high is not the high and its close strength does
+# not exist yet. VLO printed 387.58 at 11:05 ET on 2026-09-22 and closed at 377.14.
+UNFINISHED_BAR_CEILING = "WATCH"
+
+
+def band_for(score, bar_complete: bool = False) -> str:
+    """The band a score earns, capped when the bar it came from is unfinished.
+
+    This stage has no lane-trigger state, so it never emits GO at any score - a GO
+    needs a completed trigger and only conviction-analysis.ts can establish one.
+
+    `bar_complete` is fail-closed: the default caps every band at WATCH.
+    """
+    if score is None:
+        return "PASS"
+    if score < 50:
+        return "PASS"
+    if not bar_complete:
+        return UNFINISHED_BAR_CEILING
+    return "PROBE" if score >= 65 else "WAIT"
+
+
+def _algorithmic_result(stages: dict, raw: int, ai_status: str, bar_complete: bool = False) -> dict:
     """The deterministic score, explicitly labelled as NOT AI-scored.
 
     Every failure path returns this. ``score_source`` is ``algorithmic`` and
@@ -472,7 +495,8 @@ def _algorithmic_result(stages: dict, raw: int, ai_status: str) -> dict:
     """
     return {
         "score": raw,
-        "verdict": "PROBE" if raw >= 65 else "WAIT" if raw >= 50 else "PASS",
+        "verdict": band_for(raw, bar_complete),
+        "bar_complete": bool(bar_complete),
         "thesis": f"{stages['pattern']} setup; algorithmic score only.",
         "stages": {k: stages[k] for k in ("setup", "entry", "theme", "sentiment")},
         "pattern": stages["pattern"],
@@ -481,7 +505,7 @@ def _algorithmic_result(stages: dict, raw: int, ai_status: str) -> dict:
     }
 
 
-def _validate_ai_score(parsed, stages: dict, raw: int) -> tuple[dict | None, str]:
+def _validate_ai_score(parsed, stages: dict, raw: int, bar_complete: bool = False) -> tuple[dict | None, str]:
     """Validate a model response against the schema and the stage bounds.
 
     Returns ``(result, "ok")`` or ``(None, reason)``. Anything we cannot fully
@@ -503,10 +527,10 @@ def _validate_ai_score(parsed, stages: dict, raw: int) -> tuple[dict | None, str
         score = max(raw - _MAX_COMPOSITE_ADJUST, min(raw + _MAX_COMPOSITE_ADJUST, score))
 
     verdict = parsed.get("verdict")
-    if verdict not in ("GO", "PROBE", "WAIT", "PASS"):
+    if verdict not in ("GO", "PROBE", "WATCH", "WAIT", "PASS"):
         return None, f"invalid_response:bad_verdict:{verdict!r}"
     # The band must agree with the number it is supposed to describe.
-    expected = "PROBE" if score >= 65 else "WAIT" if score >= 50 else "PASS"
+    expected = band_for(score, bar_complete)
     if verdict != expected:
         verdict = expected
 
@@ -536,7 +560,7 @@ def _validate_ai_score(parsed, stages: dict, raw: int) -> tuple[dict | None, str
     }, "ok"
 
 
-def _deepseek_score(ticker: str, hit: dict) -> dict:
+def _deepseek_score(ticker: str, hit: dict, bar_complete: bool = False) -> dict:
     """
     Score one hit, preferring DeepSeek for sector/industry context and the thesis.
 
@@ -563,7 +587,7 @@ def _deepseek_score(ticker: str, hit: dict) -> dict:
     raw = stages["raw"]
 
     if not os.environ.get("DEEPSEEK_API_KEY"):
-        return _algorithmic_result(stages, raw, "no_key")
+        return _algorithmic_result(stages, raw, "no_key", bar_complete)
 
     # Build a compact stage block for the LLM
     stage_block = (
@@ -643,7 +667,7 @@ def _deepseek_score(ticker: str, hit: dict) -> dict:
     except Exception as exc:  # transport, auth, status, or empty-output failure
         reason = f"api_error:{type(exc).__name__}"
         print(f"[tv:score] {ticker}: AI scoring failed ({reason}) -> algorithmic. {exc}")
-        return _algorithmic_result(stages, raw, reason)
+        return _algorithmic_result(stages, raw, reason, bar_complete)
 
     text = (text or "").strip()
     if text.startswith("```"):
@@ -652,23 +676,23 @@ def _deepseek_score(ticker: str, hit: dict) -> dict:
         ).strip()
     if not text:
         print(f"[tv:score] {ticker}: AI returned empty content -> algorithmic.")
-        return _algorithmic_result(stages, raw, "invalid_response:empty_content")
+        return _algorithmic_result(stages, raw, "invalid_response:empty_content", bar_complete)
 
     try:
         parsed = json.loads(text)
     except json.JSONDecodeError as exc:
         print(f"[tv:score] {ticker}: AI response was not JSON -> algorithmic. {exc}")
-        return _algorithmic_result(stages, raw, "invalid_response:not_json")
+        return _algorithmic_result(stages, raw, "invalid_response:not_json", bar_complete)
 
-    result, reason = _validate_ai_score(parsed, stages, raw)
+    result, reason = _validate_ai_score(parsed, stages, raw, bar_complete)
     if result is None:
         print(f"[tv:score] {ticker}: AI response rejected ({reason}) -> algorithmic.")
-        return _algorithmic_result(stages, raw, reason)
+        return _algorithmic_result(stages, raw, reason, bar_complete)
     return result
 
 
 
-def algo_score_all(hits: list) -> None:
+def algo_score_all(hits: list, bar_complete: bool = False) -> None:
     """
     Mutate ALL hits with deterministic 4-stage scores (free, no API call).
     Sets score_source="algorithmic" so the dashboard can show a confidence badge.
@@ -676,12 +700,9 @@ def algo_score_all(hits: list) -> None:
     """
     for hit in hits:
         stages = _compute_stages(hit)
-        hit["score"]        = stages["raw"]
-        hit["verdict"]      = (
-            "PROBE" if stages["raw"] >= 65 else
-            "WAIT"  if stages["raw"] >= 50 else
-            "PASS"
-        )
+        hit["score"]         = stages["raw"]
+        hit["verdict"]       = band_for(stages["raw"], bar_complete)
+        hit["bar_complete"]  = bool(bar_complete)
         hit["thesis"]       = f"{stages['pattern']} setup; algorithmic score only."
         hit["stages"]       = {
             "setup":     stages["setup"],
@@ -693,7 +714,7 @@ def algo_score_all(hits: list) -> None:
         hit["score_source"] = "algorithmic"
 
 
-def score_top(hits: list, n: int) -> None:
+def score_top(hits: list, n: int, bar_complete: bool = False) -> None:
     """
     Mutate hits[:n] — attempts to upgrade algorithmic scores to DeepSeek AI scores.
     algo_score_all() must have already run so every hit has a baseline score.
@@ -706,7 +727,7 @@ def score_top(hits: list, n: int) -> None:
     """
     tally: dict = {}
     for hit in hits[:n]:
-        result = _deepseek_score(hit["ticker"], hit)
+        result = _deepseek_score(hit["ticker"], hit, bar_complete)
         hit["score"]        = result.get("score")
         hit["verdict"]      = result.get("verdict")
         hit["thesis"]       = result.get("thesis")
@@ -714,6 +735,7 @@ def score_top(hits: list, n: int) -> None:
         hit["pattern"]      = result.get("pattern")  # EP / BREAKOUT / PULLBACK / PARABOLIC / …
         hit["score_source"] = result.get("score_source", "algorithmic")
         hit["ai_status"]    = result.get("ai_status", "unknown")
+        hit["bar_complete"] = bool(bar_complete)
         tally[hit["ai_status"]] = tally.get(hit["ai_status"], 0) + 1
         time.sleep(0.6)  # polite — DeepSeek rate limit
 
@@ -834,6 +856,12 @@ def main():
     # Fraction of the session's volume expected to have traded by now. 1.0 when
     # the market is closed → intraday RVOL correction is a no-op on that path.
     _session_frac = session_volume_fraction(_now_et)
+    # Bar finality. While the regular session is open the daily bar is still being
+    # written, so no band above WATCH may be issued from it
+    # (wiki/trading/traders/trader-styles.md, unfinished-bar veto).
+    _bar_complete = not _market_was_open
+    if not _bar_complete:
+        print("[tv] regular session OPEN - bands capped at WATCH (unfinished-bar veto)")
 
     deepseek_scored_at = None  # set below only when DeepSeek runs
 
@@ -850,11 +878,11 @@ def main():
             annotate_intraday_rvol(hits, _session_frac)
             # Always apply free algorithmic scoring — never skip this step.
             # This ensures intraday refreshes always have scores even without --score.
-            algo_score_all(hits)
+            algo_score_all(hits, _bar_complete)
 
             if args.score:
                 print(f"[tv] upgrading top {args.score_top} of {sc['id']} to DeepSeek AI scores…")
-                score_top(hits, args.score_top)
+                score_top(hits, args.score_top, _bar_complete)
 
         screeners_out.append({
             "id": sc["id"],

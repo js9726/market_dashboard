@@ -59,3 +59,29 @@ describe("gradeEntryVsBar", () => {
     expect(gradeEntryVsBar({ ...base, score: 60, verdict: "GO", entryDate: "2026-09-23" }).reasons).toContain("score 60 < 70");
   });
 });
+
+describe("PROBE is gradeable at its own floor (re-review finding 4)", () => {
+  const base = { rvol: 2.0, setup: "BO-CB", entryDate: "2026-09-23" };
+
+  it("a PROBE at 65 and at 69 clears the bar — it did not before", () => {
+    expect(gradeEntryVsBar({ ...base, score: 65, verdict: "PROBE" }).passedBar).toBe(true);
+    expect(gradeEntryVsBar({ ...base, score: 69, verdict: "PROBE" }).passedBar).toBe(true);
+  });
+
+  it("a PROBE below 65 still fails", () => {
+    const g = gradeEntryVsBar({ ...base, score: 64, verdict: "PROBE" });
+    expect(g.passedBar).toBe(false);
+    expect(g.reasons).toContain("score 64 < 65");
+  });
+
+  it("a GO is still held to 70 — the PROBE floor does not leak", () => {
+    expect(gradeEntryVsBar({ ...base, score: 69, verdict: "GO" }).passedBar).toBe(false);
+    expect(gradeEntryVsBar({ ...base, score: 70, verdict: "GO" }).passedBar).toBe(true);
+  });
+
+  it("scoreBarFor reports each band's floor", () => {
+    expect(scoreBarFor("2026-09-23", "PROBE")).toBe(65);
+    expect(scoreBarFor("2026-09-23", "GO")).toBe(70);
+    expect(scoreBarFor("2026-09-19", "PROBE")).toBe(75); // PROBE did not exist yet
+  });
+});

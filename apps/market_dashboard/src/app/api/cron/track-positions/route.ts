@@ -34,12 +34,17 @@ import { evaluateTrigger, preScreenStructure } from "@/lib/alist-triggers";
 import { simulateTranches } from "@/lib/alist-tranche-sim";
 import { runConvictionAnalysis, type ConvictionInput } from "@/server/conviction-analysis";
 import { marketContextNow } from "@/lib/market-context";
+import { isDailyBarComplete } from "@/lib/market-clock";
 
 // Cap LLM Conviction analyses per cron run so a day with many triggers can't
 // blow the function budget; the rest get picked up next run. 8 x ~15s worst
 // case still leaves headroom in the 300s budget after the candidate scan, and
 // clears a typical backlog in days rather than weeks.
 const MAX_ANALYSES_PER_RUN = 8;
+// Lowest score worth spending an LLM call on for an ARMED (untriggered) pick.
+// Matches the PROBE band floor in wiki/trading/traders/trader-styles.md; below it
+// the best attainable band is WATCH, which needs no verdict.
+const PROBE_QUEUE_MIN_SCORE = 65;
 // How many candidates to price-fetch concurrently. Keeps the whole run inside
 // the function budget while bounding parallel pressure on the price feeds.
 const FETCH_CONCURRENCY = 8;
@@ -368,10 +373,17 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
         }
       }
 
-      // Queue the LLM Conviction verdict for TRIGGERED picks that don't have one
-      // yet — includes the backlog (earlier flips cut off by the per-run cap),
-      // which drains MAX_ANALYSES_PER_RUN per day.
-      if (effState === "TRIGGERED" && cand.agentConvictionAt == null) {
+      // Queue the LLM Conviction verdict for picks that don't have one yet —
+      // includes the backlog (earlier flips cut off by the per-run cap), which
+      // drains MAX_ANALYSES_PER_RUN per day.
+      //
+      // ARMED is queued too, since 2026-09-23. The band table gives a >= 70 ARMED
+      // pick a half-size PROBE (trader-styles.md), but this caller only ever
+      // queued TRIGGERED, so that branch of classifyConviction was unreachable in
+      // production — the PROBE band existed on paper and could never be produced.
+      const armedProbeEligible =
+        effState === "ARMED" && (cand.day0Score ?? 0) >= PROBE_QUEUE_MIN_SCORE;
+      if ((effState === "TRIGGERED" || armedProbeEligible) && cand.agentConvictionAt == null) {
         // Location facts — the inputs whose absence let VCTR score Entry 27/30
         // while sitting +2.82xATR above its 21EMA (2026-07-16). Fail-closed:
         // when these cannot be computed the hard gate PASSes the candidate.
@@ -382,6 +394,20 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
         const dist21Atr = atrNow != null && atrNow > 0 && e21Now != null ? (closeNow - e21Now) / atrNow : null;
         const dist50Atr = atrNow != null && atrNow > 0 && e50Now != null ? (closeNow - e50Now) / atrNow : null;
         const pivot = findPivot(candles.slice(0, lastIdx + 1));
+
+        // 10-day base width, for the combined structural veto (base > 18% AND
+        // >= 1.5 ATR). The gate is fail-closed on this inside the risk zone, so
+        // it must be supplied here or every extended name is rejected.
+        const baseWindow = candles.slice(Math.max(0, lastIdx - 9), lastIdx + 1);
+        const baseHi = baseWindow.length ? Math.max(...baseWindow.map((b) => b.high)) : null;
+        const baseLo = baseWindow.length ? Math.min(...baseWindow.map((b) => b.low)) : null;
+        const base10dPct =
+          baseHi != null && baseLo != null && baseLo > 0 ? ((baseHi - baseLo) / baseLo) * 100 : null;
+
+        // Bar finality. A daily bar for today is still being written until the
+        // regular session ends, and no band above WATCH may be issued from it.
+        const barDate = candles[lastIdx].date;
+        const barComplete = isDailyBarComplete(barDate);
 
         triggered = {
           candId: cand.id,
@@ -406,8 +432,11 @@ async function processCandidate(cand: CandidateRow): Promise<CandResult> {
               dist50Atr,
               rsi14: rsi14[lastIdx] ?? null,
               entryRisk: classifyEntryRisk(dist21Atr),
+              base10dPct,
             },
             pivotFound: pivot != null,
+            barComplete,
+            barDate,
           },
         };
       }

@@ -23,6 +23,15 @@ export interface ExtensionInput {
   rsi14: number | null;
   /** compute_index_technicals classification. */
   entryRisk: "EXTREME-EXTENDED" | "EXTENDED" | "FAIR" | "AT-MA" | "OVERSOLD-PB" | "UNKNOWN" | null;
+  /**
+   * 10-day base width as a percentage: (max high - min low) / min low * 100.
+   *
+   * Required for the combined structural veto (base > 18% AND >= 1.5 ATR above
+   * the 21EMA). Without it that veto cannot be evaluated at all, so it is
+   * fail-closed inside the risk zone only: absent AND >= 1.5 ATR rejects.
+   * Below 1.5 ATR the combined veto cannot apply, so absence is harmless.
+   */
+  base10dPct?: number | null;
 }
 
 export interface ConvictionInput {
@@ -49,6 +58,21 @@ export interface ConvictionInput {
   extension?: ExtensionInput;
   /** True when entryZone is a real prior-consolidation high (alist-levels.findPivot). */
   pivotFound?: boolean;
+  /**
+   * Whether the most recent bar these inputs were computed from is CLOSED.
+   *
+   * No band above WATCH may be issued from an unfinished bar
+   * (wiki/trading/traders/trader-styles.md). An intraday print is not a close:
+   * its high is not the high and its close strength does not exist yet. VLO was
+   * scored GO 77 on 2026-09-22 from an 11:05 ET print of 387.58 "at the high"
+   * and closed at 377.14, below the 21EMA, at close strength 0.100.
+   *
+   * Fail-closed: `undefined` is treated as NOT closed. Callers that work from
+   * completed daily candles must say so explicitly.
+   */
+  barComplete?: boolean;
+  /** Date of that bar (YYYY-MM-DD), for the audit trail. */
+  barDate?: string | null;
 }
 
 /** Deterministic pre-gate outcome; overrides the LLM (a-list-gate-and-screener.md). */
@@ -59,15 +83,22 @@ export interface GateResult {
 }
 
 /**
- * Price is "extended" beyond this many ATR above the 21EMA (wiki Lane-2: 0-1x is ideal).
+ * Price is "extended" at or beyond this many ATR above the 21EMA.
  *
  * 2026-09-23: raised 2 -> 2.5 on Jie's decision that the wiki's 2.5 ATR structural veto
  * (trader-styles.md) is authoritative. The code had been stricter than the doctrine since
  * 2026-07-16 and silently rejected names the doctrine admits — DT closed at +2.24 ATR on
  * 2026-09-22 and would have been auto-failed here. The `entryRisk` classification below is
  * a separate gate and still applies.
+ *
+ * The comparison is `>=`, matching the wiki's ">= 2.5 ATR is blocked outright". It was `>`
+ * until 2026-09-23, so exactly 2.5 passed a veto written to exclude it.
  */
 export const EXTENSION_ATR_LIMIT = 2.5;
+
+/** Combined veto: a base wider than this AND >= COMBINED_VETO_ATR extension. */
+export const BASE_WIDTH_VETO_PCT = 18;
+export const COMBINED_VETO_ATR = 1.5;
 
 /**
  * HARD pre-gates, evaluated BEFORE the LLM and overriding it.
@@ -87,8 +118,18 @@ export function evaluateHardGates(input: ConvictionInput): GateResult {
     return { ok: false, code: "EXTENDED-GATE-FAIL", reason: "EXTENDED-GATE-FAIL: location unknown (no dist-from-21EMA) — fail-closed" };
   if (ext.entryRisk === "EXTENDED" || ext.entryRisk === "EXTREME-EXTENDED")
     return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: entry_risk ${ext.entryRisk} (${ext.dist21Atr.toFixed(2)}xATR above the 21EMA)` };
-  if (ext.dist21Atr > EXTENSION_ATR_LIMIT)
-    return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: ${ext.dist21Atr.toFixed(2)}xATR above the 21EMA exceeds the ${EXTENSION_ATR_LIMIT}xATR limit` };
+  if (ext.dist21Atr >= EXTENSION_ATR_LIMIT)
+    return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: ${ext.dist21Atr.toFixed(2)}xATR above the 21EMA meets or exceeds the ${EXTENSION_ATR_LIMIT}xATR veto` };
+
+  // 2b. Combined structural veto: a wide base AND meaningful extension. Neither
+  // alone vetoes here, which is why it needs its own check rather than falling
+  // out of the single-ATR limit above.
+  if (ext.dist21Atr >= COMBINED_VETO_ATR) {
+    if (ext.base10dPct == null)
+      return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: ${ext.dist21Atr.toFixed(2)}xATR extension with an UNKNOWN 10-day base width — the combined veto cannot be evaluated, fail-closed` };
+    if (ext.base10dPct > BASE_WIDTH_VETO_PCT)
+      return { ok: false, code: "EXTENDED-GATE-FAIL", reason: `EXTENDED-GATE-FAIL: combined veto — ${ext.base10dPct.toFixed(1)}% 10-day base (> ${BASE_WIDTH_VETO_PCT}%) at ${ext.dist21Atr.toFixed(2)}xATR (>= ${COMBINED_VETO_ATR})` };
+  }
 
   // 3. Risk ceiling (measured to the pattern stop).
   if (input.entryZone != null) {
@@ -111,11 +152,23 @@ export function classifyConviction(
   conviction: number,
   triggerState: string | null,
   gate?: GateResult,
+  barComplete?: boolean,
 ): { verdict: ConvictionAnalysis["verdict"]; moderator: ConvictionAnalysis["moderator"]; sizePct: number; classification: string } {
   if (gate && !gate.ok)
     return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `hard pre-gate failed (${gate.code}) — no band` };
 
   const state = (triggerState ?? "").toUpperCase().trim();
+
+  // Unfinished-bar veto. Fail-closed: only an explicit `true` lifts the WATCH
+  // ceiling, so a caller that never sets it can never issue size.
+  if (barComplete !== true) {
+    if (conviction < 50)
+      return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `conviction ${conviction} < 50` };
+    return {
+      verdict: "WATCH", moderator: "WAIT", sizePct: 0,
+      classification: `conviction ${conviction} but the bar is not closed (barComplete=${barComplete === undefined ? "unknown" : "false"}) — capped at WATCH, no size`,
+    };
+  }
   const triggered = state === "TRIGGERED";
   const armed = state === "ARMED";
   const dead = state === "INVALIDATED" || state === "EXPIRED" || state === "NEEDS-PIVOT";
@@ -289,8 +342,8 @@ export async function runConvictionAnalysis(input: ConvictionInput): Promise<Con
   }
 
   const conviction = setup + entry + theme + sentiment;
-  const band = classifyConviction(conviction, input.triggerState, gate);
-  const { verdict, sizePct, classification } = band;
+  const band = classifyConviction(conviction, input.triggerState, gate, input.barComplete);
+  const { verdict, classification } = band;
 
   // The LLM may be MORE cautious than the deterministic band, never less. It
   // does not get to promote a WAIT to an ENTER by writing "ENTER" in its JSON.
@@ -300,6 +353,12 @@ export async function runConvictionAnalysis(input: ConvictionInput): Promise<Con
   const moderator = llmMod && RANK[llmMod] < RANK[band.moderator] ? llmMod : band.moderator;
   if (llmMod && RANK[llmMod] > RANK[band.moderator])
     reasoningNotes.push(`[auto] Moderator ${llmMod}->${band.moderator}: ${classification}.`);
+
+  // sizePct is authorised equity risk, so it must follow the FINAL decision. If
+  // the LLM moderated down to WAIT/PASS, the band's 0.50% does not survive it.
+  const sizePct = moderator === "ENTER" ? band.sizePct : 0;
+  if (moderator !== "ENTER" && band.sizePct > 0)
+    reasoningNotes.push(`[auto] Size ${band.sizePct}%->0%: moderator ${moderator} authorises no risk.`);
   const reasoning = (obj.reasoning ?? {}) as Record<string, unknown>;
   const str = (v: unknown) => (typeof v === "string" ? v : "");
 

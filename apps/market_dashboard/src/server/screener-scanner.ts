@@ -69,8 +69,14 @@ async function fetchOne(cfg: ScreenerCfg): Promise<Record<string, unknown>[]> {
   }
 }
 
-/** Faithful TS port of tv_screener_fetch.py _compute_stages (Conviction model). */
-function algoScore(h: Record<string, unknown>): {
+/**
+ * Faithful TS port of tv_screener_fetch.py _compute_stages (Conviction model).
+ *
+ * Exported since 2026-09-23 so the scanner -> extractor boundary can be tested end
+ * to end. It was private, so a change to the verdict vocabulary here could silently
+ * break every consumer downstream and no test would notice.
+ */
+export function algoScore(h: Record<string, unknown>): {
   score: number; verdict: string; pattern: string;
   stages: { setup: number; entry: number; theme: number; sentiment: number };
 } {

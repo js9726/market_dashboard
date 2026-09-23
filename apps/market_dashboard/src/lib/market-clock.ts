@@ -35,6 +35,32 @@ export function marketSessionLabel(now: Date = new Date()): "LIVE" | "CLOSED" {
   return isUSMarketOpen(now) ? "LIVE" : "CLOSED";
 }
 
+/** Today's date in ET as YYYY-MM-DD. */
+export function etDateString(now: Date = new Date()): string {
+  const et = toEt(now);
+  return `${et.getFullYear()}-${String(et.getMonth() + 1).padStart(2, "0")}-${String(et.getDate()).padStart(2, "0")}`;
+}
+
+/**
+ * Whether a DAILY bar dated `barDate` (YYYY-MM-DD) is finished.
+ *
+ * No band above WATCH may be issued from an unfinished bar
+ * (wiki/trading/traders/trader-styles.md). A bar for today is still being
+ * written until the regular session ends: its high is not the high and its
+ * close strength does not exist. VLO on 2026-09-22 printed 387.58 at 11:05 ET
+ * and closed at 377.14.
+ *
+ * Fail-closed: a missing or unparseable date is NOT complete.
+ */
+export function isDailyBarComplete(barDate: string | null | undefined, now: Date = new Date()): boolean {
+  if (!barDate || !/^\d{4}-\d{2}-\d{2}$/.test(barDate)) return false;
+  const today = etDateString(now);
+  if (barDate < today) return true;
+  if (barDate > today) return false; // a future-dated bar is not evidence of anything
+  const session = usMarketSession(now);
+  return session === "AFTER_HOURS" || session === "CLOSED";
+}
+
 /** Short ET date label for when a quote was observed, e.g. "May 29". */
 export function observedLabel(observedAt: string | Date | null | undefined): string | null {
   if (!observedAt) return null;

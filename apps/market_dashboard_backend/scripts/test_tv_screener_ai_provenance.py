@@ -48,7 +48,7 @@ class _FakeAI:
         return self.payload
 
 
-def _run(payload=None, exc=None, with_key=True):
+def _run(payload=None, exc=None, with_key=True, bar_complete=True):
     fake = _FakeAI(payload, exc)
     orig_call, orig_key = tv.call_deepseek_json, os.environ.get("DEEPSEEK_API_KEY")
     tv.call_deepseek_json = fake
@@ -57,7 +57,7 @@ def _run(payload=None, exc=None, with_key=True):
     else:
         os.environ.pop("DEEPSEEK_API_KEY", None)
     try:
-        return tv._deepseek_score("TEST", dict(HIT)), fake
+        return tv._deepseek_score("TEST", dict(HIT), bar_complete), fake
     finally:
         tv.call_deepseek_json = orig_call
         if orig_key is None:
@@ -133,8 +133,30 @@ def test_composite_adjustment_is_clamped():
     }))
     _check("still AI-sourced", res["score_source"] == "deepseek")
     _check("clamped to +/-5 of baseline", abs(res["score"] - baseline) <= tv._MAX_COMPOSITE_ADJUST)
-    _check("verdict matches clamped score",
-           res["verdict"] == ("GO" if res["score"] >= 75 else "WAIT" if res["score"] >= 50 else "PASS"))
+    # Band recalibrated 2026-09-22/23: this stage has no lane-trigger state, so it
+    # never emits GO. On a closed bar, PROBE >= 65 / WAIT 50-64 / PASS < 50.
+    _check("verdict matches clamped score", res["verdict"] == tv.band_for(res["score"], True))
+    _check("no GO from a trigger-free stage", res["verdict"] != "GO")
+
+
+
+def test_unfinished_bar_caps_the_ai_path_too():
+    """The veto must bind on the AI path, not just the algorithmic one.
+
+    A model that returns a confident high score from a live session must not be
+    able to mint a sized band. Re-review finding 2, 2026-09-23.
+    """
+    baseline = tv._compute_stages(dict(HIT))["raw"]
+    res, _ = _run(_good_payload(baseline), bar_complete=False)
+    _check("open bar caps the AI band at WATCH", res["verdict"] == "WATCH")
+    _check("score still recorded", isinstance(res["score"], int))
+
+    res_closed, _ = _run(_good_payload(baseline), bar_complete=True)
+    _check("closed bar is not capped", res_closed["verdict"] != "WATCH")
+
+    algo, _ = _run("", bar_complete=False)
+    _check("algorithmic fallback is capped too", algo["verdict"] == "WATCH")
+    _check("fallback records bar finality", algo["bar_complete"] is False)
 
 
 def test_transport_error_is_algorithmic():

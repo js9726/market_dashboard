@@ -166,10 +166,15 @@ export interface EntryGradeInput {
   entryDate?: string | null;
 }
 
-/** The Conviction score bar, as it stood on `entryDate`. */
+/** The Conviction score bar for a band, as it stood on `entryDate`. */
 export const BAND_RECALIBRATION_DATE = "2026-09-22";
-export function scoreBarFor(entryDate?: string | null): number {
-  return entryDate != null && entryDate < BAND_RECALIBRATION_DATE ? 75 : 70;
+export function scoreBarFor(entryDate?: string | null, verdict?: string | null): number {
+  // Before the recalibration only GO existed and its bar was 75.
+  if (entryDate != null && entryDate < BAND_RECALIBRATION_DATE) return 75;
+  // After it, each band has its own floor: a PROBE is a real half-size position
+  // taken at 65-69, so grading it against the GO bar of 70 marks every PROBE a
+  // failure by construction.
+  return (verdict ?? "").toUpperCase() === "PROBE" ? 65 : 70;
 }
 export interface EntryGrade {
   grade: "A" | "B" | "C" | null; // null = off-book / ungraded (no REC at entry)
@@ -192,9 +197,9 @@ export function gradeEntryVsBar(i: EntryGradeInput): EntryGrade {
     return { grade: null, passedBar: false, reasons: ["off-book — no REC pick at entry"] };
   }
   const reasons: string[] = [];
-  const bar = scoreBarFor(i.entryDate);
-  const scoreOk = i.score != null && i.score >= bar;
   const v = (i.verdict ?? "").toUpperCase();
+  const bar = scoreBarFor(i.entryDate, v);
+  const scoreOk = i.score != null && i.score >= bar;
   const verdictOk = v === "GO" || v === "PROBE";
   // A pullback's volume expansion comes at the trigger, not at entry, so it is
   // not gated on the surge here (consistent with the screener/extractor gate).
