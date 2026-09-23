@@ -3,7 +3,7 @@
  *
  * Replaces the misaligned generic 7-agent pipeline. Scores a TRIGGERED A-list
  * pick on the wiki Conviction model (Setup/40 + Entry/30 + Theme/20 +
- * Sentiment/10; GO>=75) and returns a Moderator ENTER/WAIT/PASS tied to the
+ * Sentiment/10; GO>=70 AND trigger complete) and returns a Moderator tied to the
  * trigger state. The Entry component uses the 4 TraderLion early-entry methods,
  * so a first-pullback-to-rising-MA (the TWLO calibration) scores HIGH on Entry
  * rather than being mis-read as weakness.
@@ -58,8 +58,16 @@ export interface GateResult {
   reason: string;
 }
 
-/** Price is "extended" beyond this many ATR above the 21EMA (wiki Lane-2: 0-1x is ideal). */
-export const EXTENSION_ATR_LIMIT = 2;
+/**
+ * Price is "extended" beyond this many ATR above the 21EMA (wiki Lane-2: 0-1x is ideal).
+ *
+ * 2026-09-23: raised 2 -> 2.5 on Jie's decision that the wiki's 2.5 ATR structural veto
+ * (trader-styles.md) is authoritative. The code had been stricter than the doctrine since
+ * 2026-07-16 and silently rejected names the doctrine admits — DT closed at +2.24 ATR on
+ * 2026-09-22 and would have been auto-failed here. The `entryRisk` classification below is
+ * a separate gate and still applies.
+ */
+export const EXTENSION_ATR_LIMIT = 2.5;
 
 /**
  * HARD pre-gates, evaluated BEFORE the LLM and overriding it.
@@ -90,6 +98,43 @@ export function evaluateHardGates(input: ConvictionInput): GateResult {
   return { ok: true, code: null, reason: "hard gates passed" };
 }
 
+/**
+ * Deterministic band classification (wiki/trading/traders/trader-styles.md, 2026-09-22).
+ *
+ * The score decides HOW MUCH. The lane trigger decides WHETHER it is a GO.
+ * Shipped 2026-09-22 with the score half only — `conviction >= 70` returned GO
+ * regardless of trigger state, which is the opposite of the doctrine it claimed
+ * to implement (review finding R3). Fail-closed: an unknown trigger state can
+ * never authorise size.
+ */
+export function classifyConviction(
+  conviction: number,
+  triggerState: string | null,
+  gate?: GateResult,
+): { verdict: ConvictionAnalysis["verdict"]; moderator: ConvictionAnalysis["moderator"]; sizePct: number; classification: string } {
+  if (gate && !gate.ok)
+    return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `hard pre-gate failed (${gate.code}) — no band` };
+
+  const state = (triggerState ?? "").toUpperCase().trim();
+  const triggered = state === "TRIGGERED";
+  const armed = state === "ARMED";
+  const dead = state === "INVALIDATED" || state === "EXPIRED" || state === "NEEDS-PIVOT";
+
+  if (conviction < 50)
+    return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `conviction ${conviction} < 50` };
+  if (dead)
+    return { verdict: "PASS", moderator: "PASS", sizePct: 0, classification: `trigger ${state} — no band at any score` };
+  if (conviction < 65)
+    return { verdict: "WATCH", moderator: "WAIT", sizePct: 0, classification: `conviction ${conviction} in 50-64 — armed, no position` };
+  if (!triggered && !armed)
+    return { verdict: "WATCH", moderator: "WAIT", sizePct: 0, classification: `conviction ${conviction} but trigger state ${state || "UNKNOWN"} — fail-closed, no size` };
+  if (conviction >= 70 && triggered)
+    return { verdict: "GO", moderator: "ENTER", sizePct: 0.5, classification: `conviction ${conviction} >= 70 AND trigger complete — full size` };
+  if (conviction >= 70)
+    return { verdict: "PROBE", moderator: "ENTER", sizePct: 0.25, classification: `conviction ${conviction} >= 70 but trigger ${state} is incomplete — half size` };
+  return { verdict: "PROBE", moderator: "ENTER", sizePct: 0.25, classification: `conviction ${conviction} in 65-69 — half size` };
+}
+
 export interface ConvictionAnalysis {
   setup: number;
   entry: number;
@@ -98,6 +143,10 @@ export interface ConvictionAnalysis {
   conviction: number;
   verdict: "GO" | "PROBE" | "WATCH" | "PASS";
   moderator: "ENTER" | "WAIT" | "PASS";
+  /** Risk budget this verdict authorises, in % of equity. 0 = nothing executable. */
+  sizePct: number;
+  /** Why the band landed where it did — score AND trigger, not score alone. */
+  classification: string;
   champion: string | null;
   reasoning: { setup: string; entry: string; theme: string; sentiment: string; moderator: string };
   /** Hard pre-gate outcome. `ok:false` means the verdict was forced to PASS. */
@@ -119,17 +168,19 @@ LOCATION IS PART OF ENTRY — READ THE NUMBERS GIVEN, DO NOT ASSUME:
 - Do NOT cite "R:R >= 2" as evidence FOR an entry. R:R is an OUTCOME of structure; a wider stop mechanically mints a bigger target and can make any trade look 2R. Judge the stop and the location, not the ratio.
 - High RVOL and high RS do NOT offset bad location. A leader bought 3xATR extended is still a bad trade.
 
-BANDS: conviction = setup+entry+theme+sentiment. GO >= 70 (full size), PROBE 65-69 (half size), WATCH 50-64 (armed, no position), PASS < 50. Recalibrated 2026-09-22: the old GO >= 75 fired once in 46 verdicts while 16 of 18 calls went up.
+BANDS: conviction = setup+entry+theme+sentiment. The SCORE decides how much; the TRIGGER decides whether it is a GO. Recalibrated 2026-09-22 (the old GO >= 75 fired once in 46 verdicts).
+- >= 70 AND triggerState TRIGGERED -> GO, full size.
+- >= 70 with triggerState ARMED (trigger incomplete) -> PROBE, half size. NOT a GO.
+- 65-69 with triggerState TRIGGERED or ARMED -> PROBE, half size.
+- 50-64 -> WATCH, no position. < 50 -> PASS.
+- triggerState INVALIDATED / EXPIRED / NEEDS-PIVOT -> PASS at ANY score.
+Score alone never produces a GO. Do not write "GO" because the number cleared 70.
 
-MODERATOR (ENTER/WAIT/PASS) must respect the trigger state given:
-- triggerState TRIGGERED + conviction >= 70 + location OK -> ENTER.
-- triggerState ARMED / forming + conviction 65-69 + location OK -> ENTER at HALF SIZE (a PROBE: structure and location without the volume trigger).
-- triggerState ARMED / forming with conviction 50-64, or extended-but-strong (put it on the pullback list) -> WAIT.
-- triggerState INVALIDATED / NEEDS-PIVOT, or conviction < 50, or extended/illiquid -> PASS.
+MODERATOR (ENTER/WAIT/PASS) must follow the band above: GO or PROBE -> ENTER, WATCH -> WAIT, PASS -> PASS. The band is recomputed deterministically after you answer and your moderator is clamped to it, so an optimistic ENTER is discarded — spend the field on the reasoning instead.
 
 "champion" must be the REAL @handle of the trader whose style this setup matches (@markminervini, @Qullamaggie, @Clement_Ang17, @jfsrev, @TedHZhang, @SRxTrades, @PrimeTrading_). Never emit the literal placeholder "@handle". Only name a champion whose actual rules this trade satisfies — Minervini does not buy extended, Qullamaggie does not buy without an EP/breakout.
 
-Return JSON: {"setup":<0-40>,"entry":<0-30>,"theme":<0-20>,"sentiment":<0-10>,"verdict":"GO|WATCH|PASS","moderator":"ENTER|WAIT|PASS","champion":"@realhandle","reasoning":{"setup":"...","entry":"...","theme":"...","sentiment":"...","moderator":"..."}}`;
+Return JSON: {"setup":<0-40>,"entry":<0-30>,"theme":<0-20>,"sentiment":<0-10>,"verdict":"GO|PROBE|WATCH|PASS","moderator":"ENTER|WAIT|PASS","champion":"@realhandle","reasoning":{"setup":"...","entry":"...","theme":"...","sentiment":"...","moderator":"..."}}`;
 
 const VALID_CHAMPIONS = new Set([
   "@markminervini", "@qullamaggie", "@clement_ang17", "@jfsrev", "@tedhzhang", "@srxtrades", "@primetrading_",
@@ -198,7 +249,9 @@ export async function runConvictionAnalysis(input: ConvictionInput): Promise<Con
     console.warn(`[conviction-analysis] ${input.ticker} ${gate.reason} — forced PASS, LLM skipped`);
     return {
       setup: 0, entry: 0, theme: 0, sentiment: 0, conviction: 0,
-      verdict: "PASS", moderator: "PASS", champion: null,
+      verdict: "PASS", moderator: "PASS", sizePct: 0,
+      classification: `hard pre-gate failed (${gate.code}) — no band`,
+      champion: null,
       reasoning: {
         setup: "", entry: gate.reason, theme: "", sentiment: "",
         moderator: `${gate.code}: hard pre-gate failed, so the candidate is PASS regardless of Conviction. ${gate.reason}`,
@@ -236,9 +289,17 @@ export async function runConvictionAnalysis(input: ConvictionInput): Promise<Con
   }
 
   const conviction = setup + entry + theme + sentiment;
-  const verdict = conviction >= 70 ? "GO" : conviction >= 65 ? "PROBE" : conviction >= 50 ? "WATCH" : "PASS";
+  const band = classifyConviction(conviction, input.triggerState, gate);
+  const { verdict, sizePct, classification } = band;
+
+  // The LLM may be MORE cautious than the deterministic band, never less. It
+  // does not get to promote a WAIT to an ENTER by writing "ENTER" in its JSON.
+  const RANK: Record<ConvictionAnalysis["moderator"], number> = { PASS: 0, WAIT: 1, ENTER: 2 };
   const mod = String(obj.moderator ?? "").toUpperCase();
-  const moderator = mod === "ENTER" || mod === "WAIT" || mod === "PASS" ? (mod as ConvictionAnalysis["moderator"]) : verdict === "GO" || verdict === "PROBE" ? "ENTER" : verdict === "WATCH" ? "WAIT" : "PASS";
+  const llmMod = mod === "ENTER" || mod === "WAIT" || mod === "PASS" ? (mod as ConvictionAnalysis["moderator"]) : null;
+  const moderator = llmMod && RANK[llmMod] < RANK[band.moderator] ? llmMod : band.moderator;
+  if (llmMod && RANK[llmMod] > RANK[band.moderator])
+    reasoningNotes.push(`[auto] Moderator ${llmMod}->${band.moderator}: ${classification}.`);
   const reasoning = (obj.reasoning ?? {}) as Record<string, unknown>;
   const str = (v: unknown) => (typeof v === "string" ? v : "");
 
@@ -250,7 +311,7 @@ export async function runConvictionAnalysis(input: ConvictionInput): Promise<Con
     console.warn(`[conviction-analysis] ${input.ticker} dropped invalid champion ${JSON.stringify(rawChampion)}`);
 
   return {
-    setup, entry, theme, sentiment, conviction, verdict, moderator,
+    setup, entry, theme, sentiment, conviction, verdict, moderator, sizePct, classification,
     champion,
     reasoning: {
       setup: str(reasoning.setup),

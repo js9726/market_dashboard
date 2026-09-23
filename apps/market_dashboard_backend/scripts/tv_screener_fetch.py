@@ -344,7 +344,9 @@ def _compute_stages(hit: dict, market_sentiment: float = 6.0) -> dict:
     see wiki/trading/traders/trader-styles.md "Conviction Scoring Model").
 
         Conviction = Setup/40 + Entry/30 + Theme/20 + Sentiment/10  (0-100)
-        GO >= 75, WAIT 50-74, PASS < 50.
+        Recalibrated 2026-09-22: PROBE >= 65, WAIT 50-64, PASS < 50. This stage has
+        no lane-trigger state, so it never emits GO - a GO requires a completed
+        trigger and only conviction-analysis.ts can establish one.
 
     The screener row lacks ADR / true RS Rating / EMA structure, so Setup, Entry
     and Theme are approximated from pattern + RVOL + perf + market cap. Sentiment
@@ -470,7 +472,7 @@ def _algorithmic_result(stages: dict, raw: int, ai_status: str) -> dict:
     """
     return {
         "score": raw,
-        "verdict": "GO" if raw >= 75 else "WAIT" if raw >= 50 else "PASS",
+        "verdict": "PROBE" if raw >= 65 else "WAIT" if raw >= 50 else "PASS",
         "thesis": f"{stages['pattern']} setup; algorithmic score only.",
         "stages": {k: stages[k] for k in ("setup", "entry", "theme", "sentiment")},
         "pattern": stages["pattern"],
@@ -501,10 +503,10 @@ def _validate_ai_score(parsed, stages: dict, raw: int) -> tuple[dict | None, str
         score = max(raw - _MAX_COMPOSITE_ADJUST, min(raw + _MAX_COMPOSITE_ADJUST, score))
 
     verdict = parsed.get("verdict")
-    if verdict not in ("GO", "WAIT", "PASS"):
+    if verdict not in ("GO", "PROBE", "WAIT", "PASS"):
         return None, f"invalid_response:bad_verdict:{verdict!r}"
     # The band must agree with the number it is supposed to describe.
-    expected = "GO" if score >= 75 else "WAIT" if score >= 50 else "PASS"
+    expected = "PROBE" if score >= 65 else "WAIT" if score >= 50 else "PASS"
     if verdict != expected:
         verdict = expected
 
@@ -608,10 +610,10 @@ def _deepseek_score(ticker: str, hit: dict) -> dict:
         "Python using wiki rules. Your job:\n"
         "1. Review the stage scores and adjust the composite by at most +/-5 TOTAL based on sector "
         "context, industry tailwind/headwind, or contradictions you know about.\n"
-        "2. Translate the composite into GO (>=75) / WAIT (50-74) / PASS (<50).\n"
+        "2. Translate the composite into PROBE (>=65) / WAIT (50-64) / PASS (<50). Do NOT emit GO: a GO requires a completed lane trigger, which is not visible at this stage.\n"
         "3. Write a 1-sentence thesis (max 25 words) naming the setup type and the key risk.\n\n"
         'Output ONLY this JSON (no markdown): '
-        '{"score":<int 0-100>,"verdict":"GO"|"WAIT"|"PASS","thesis":"<text>","stages":{'
+        '{"score":<int 0-100>,"verdict":"PROBE"|"WAIT"|"PASS","thesis":"<text>","stages":{'
         '"setup":<int>,"entry":<int>,"theme":<int>,"sentiment":<int>}}'
     )
     prompt = (
@@ -676,8 +678,8 @@ def algo_score_all(hits: list) -> None:
         stages = _compute_stages(hit)
         hit["score"]        = stages["raw"]
         hit["verdict"]      = (
-            "GO"   if stages["raw"] >= 75 else
-            "WAIT" if stages["raw"] >= 50 else
+            "PROBE" if stages["raw"] >= 65 else
+            "WAIT"  if stages["raw"] >= 50 else
             "PASS"
         )
         hit["thesis"]       = f"{stages['pattern']} setup; algorithmic score only."
@@ -756,7 +758,8 @@ def push_alist_candidates(screeners_out: list) -> None:
             if rvol_src is None:
                 rvol_src = hit.get("relative_volume_10d_calc")
             rvol = float(rvol_src) if rvol_src is not None else None
-            if not ticker or score < 75 or verdict != "GO" or rvol is None or rvol < 1.5:
+            if (not ticker or score < 70 or verdict not in ("GO", "PROBE")
+                    or rvol is None or rvol < 1.5):
                 continue
             cand = {
                 "ticker": ticker,

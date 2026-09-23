@@ -142,6 +142,10 @@ export async function syncHeldPositions(userId: string): Promise<HeldSyncResult>
       verdict: entryContext?.day0Verdict ?? null,
       rvol: entryContext?.day0Rvol != null ? Number(entryContext.day0Rvol) : null,
       setup: entryContext?.setupClassification ?? null,
+      // Grade against the bar that was live on the entry date. The Conviction score bar
+      // moved 75 -> 70 on 2026-09-22; without this every historical entry is re-graded
+      // against a bar that did not exist when it was taken.
+      entryDate: entryDate.toISOString().slice(0, 10),
     });
     const onBook = Boolean(rec) || existingHeld?.onBook === true;
     const entryGradeJson: Prisma.InputJsonValue = {

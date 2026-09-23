@@ -167,8 +167,12 @@ function algoScore(h: Record<string, unknown>): {
   const raw = Math.round(setup + entry + theme + sentiment);
   const pattern = is_parabolic ? "PARABOLIC" : is_ep ? "EP" : is_breakout ? "BREAKOUT"
     : is_pullback ? "PULLBACK" : is_stage4 ? "STAGE4-BOUNCE" : "UNCLEAR";
-  // Conviction bands (wiki/trading/traders/trader-styles.md): GO >=75, WAIT 50-74, PASS <50.
-  const verdict = raw >= 75 ? "GO" : raw >= 50 ? "WAIT" : "PASS";
+  // Conviction bands (wiki/trading/traders/trader-styles.md, recalibrated 2026-09-22).
+  // This is the deterministic pre-score and it has no trigger state, so it can never
+  // assert a GO on its own: >=70 is reported as ARMED-70 for the LLM scorer to resolve
+  // against the lane, and 65-69 as PROBE. Only conviction-analysis.ts, which sees the
+  // trigger, may emit GO.
+  const verdict = raw >= 65 ? "PROBE" : raw >= 50 ? "WAIT" : "PASS";
   return {
     score: raw, verdict, pattern,
     stages: { setup: Math.round(setup), entry: Math.round(entry), theme: Math.round(theme), sentiment: Math.round(sentiment) },

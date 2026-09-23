@@ -154,19 +154,33 @@ export function rUnit(entry: number, stop: number | null): number | null {
 
 export interface EntryGradeInput {
   score: number | null;
-  verdict: string | null; // "GO" | "WAIT" | "PASS"
+  verdict: string | null; // "GO" | "PROBE" | "WAIT" | "PASS"
   rvol: number | null;
   setup?: string | null; // setup class — RVOL is judged conditionally on it
+  /**
+   * Entry date (YYYY-MM-DD). The score bar moved from 75 to 70 on 2026-09-22, so an
+   * entry is graded against the bar that was live when it was taken. Without this an
+   * upgrade silently re-grades history: entries that scored 70-74 and correctly failed
+   * the bar would retroactively become passes. Omitted => graded at the current bar.
+   */
+  entryDate?: string | null;
+}
+
+/** The Conviction score bar, as it stood on `entryDate`. */
+export const BAND_RECALIBRATION_DATE = "2026-09-22";
+export function scoreBarFor(entryDate?: string | null): number {
+  return entryDate != null && entryDate < BAND_RECALIBRATION_DATE ? 75 : 70;
 }
 export interface EntryGrade {
   grade: "A" | "B" | "C" | null; // null = off-book / ungraded (no REC at entry)
-  passedBar: boolean; // cleared the A-list REC bar (GO>=75 / GO / setup-conditional RVOL)
+  passedBar: boolean; // cleared the A-list REC bar live on the entry date
   reasons: string[];
 }
 
 /**
  * Grade a (held) entry against the A-list REC bar (wiki/trading/routines/a-list-gate-and-screener.md):
- * Conviction >=75 AND verdict GO AND a setup-conditional RVOL (breakout/EP need a
+ * Conviction >= the bar live on the entry date AND verdict GO/PROBE AND a
+ * setup-conditional RVOL (breakout/EP need a
  * >=1.5x surge; a pullback does not). A = cleared the bar; B = near-miss with real
  * merit; C = off-spec. An OFF-BOOK entry (no REC pick existed at your entry) is
  * NOT graded — returning a failing "C" for the mere absence of a pick mislabels a
@@ -178,14 +192,16 @@ export function gradeEntryVsBar(i: EntryGradeInput): EntryGrade {
     return { grade: null, passedBar: false, reasons: ["off-book — no REC pick at entry"] };
   }
   const reasons: string[] = [];
-  const scoreOk = i.score != null && i.score >= 75;
-  const verdictOk = (i.verdict ?? "").toUpperCase() === "GO";
+  const bar = scoreBarFor(i.entryDate);
+  const scoreOk = i.score != null && i.score >= bar;
+  const v = (i.verdict ?? "").toUpperCase();
+  const verdictOk = v === "GO" || v === "PROBE";
   // A pullback's volume expansion comes at the trigger, not at entry, so it is
   // not gated on the surge here (consistent with the screener/extractor gate).
   const isPullback = /(^PB|PULLBACK|MA-|POST-GAP)/.test((i.setup ?? "").toUpperCase());
   const rvolOk = isPullback || (i.rvol != null && i.rvol >= 1.5);
-  if (!scoreOk) reasons.push(`score ${i.score ?? "?"} < 75`);
-  if (!verdictOk) reasons.push(`verdict ${i.verdict ?? "?"} != GO`);
+  if (!scoreOk) reasons.push(`score ${i.score ?? "?"} < ${bar}`);
+  if (!verdictOk) reasons.push(`verdict ${i.verdict ?? "?"} not GO/PROBE`);
   if (!rvolOk) reasons.push(`rvol ${i.rvol ?? "?"} < 1.5x (breakout/EP surge)`);
   const passedBar = scoreOk && verdictOk && rvolOk;
   let grade: "A" | "B" | "C";

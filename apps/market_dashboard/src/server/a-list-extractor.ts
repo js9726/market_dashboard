@@ -23,17 +23,21 @@ import { marketContextNow } from "@/lib/market-context";
 
 const prisma = new PrismaClient();
 
-// Conviction GO band (wiki/trading/traders/trader-styles.md): GO >= 75. The A-list REC gate was
-// previously hardcoded to 80, silently dropping GO picks scoring 75-79.
-const MIN_SCORE = 75;
+// Conviction GO band (wiki/trading/traders/trader-styles.md): GO >= 70 with a completed
+// lane trigger. The A-list REC gate was hardcoded to 80, then 75, each time silently
+// dropping picks the scorer had already banded — 70-74 GOs were scored and discarded here
+// between 2026-09-22 and 2026-09-23 (review finding R2).
+const MIN_SCORE = 70;
 // RVOL is NOT a universal admission floor (wiki/trading/routines/a-list-gate-and-screener.md). It is
 // the SURGE threshold for breakout/EP setups only; pullbacks want contraction and
 // must not be gated on it (the surge is required at the trigger). See rvolPasses().
 const MIN_RVOL_SURGE = 1.5;
 // Pullback candidates enter the A-list as WATCH/armed at the WATCH band — the GO
-// comes on the reclaim trigger — so they admit below GO>=75.
+// comes on the reclaim trigger — so they admit below the GO line.
 const PULLBACK_MIN_SCORE = 65;
-const ACCEPTABLE_VERDICTS = new Set(["GO"]);
+// PROBE is a real half-size position (trader-styles.md, 2026-09-22), so it admits to the
+// A-list exactly as a GO does. Size is carried on the verdict, not on admission.
+const ACCEPTABLE_VERDICTS = new Set(["GO", "PROBE"]);
 
 type SetupLane = "breakout" | "pullback" | "unknown";
 function setupLane(setup: string | null | undefined): SetupLane {
@@ -130,12 +134,12 @@ export function extractCandidates(brief: BriefAnyShape | null): ExtractedCandida
 
   const meetsFilter = (score: number | null, verdict: string | null, rvol: number | null, setup?: string | null): boolean => {
     const lane = setupLane(setup);
-    // Pullbacks admit at the WATCH band (armed); breakout/EP/unknown require GO>=75.
+    // Pullbacks admit at the WATCH band (armed); breakout/EP/unknown require the GO line.
     const minScore = lane === "pullback" ? PULLBACK_MIN_SCORE : MIN_SCORE;
     if (score == null || score < minScore) return false;
     const v = (verdict ?? "").toUpperCase();
     if (lane === "pullback") {
-      if (v !== "GO" && v !== "WAIT" && v !== "WATCH") return false;
+      if (v !== "GO" && v !== "PROBE" && v !== "WAIT" && v !== "WATCH") return false;
     } else if (!ACCEPTABLE_VERDICTS.has(v)) {
       return false;
     }
@@ -525,7 +529,7 @@ export function extractScreenerCandidates(file: ScoredScreenerFile | null | unde
         // the WATCH band; the GO + volume surge are required at the TRIGGER, not at
         // admission, so do NOT gate on the surge here.
         if (score < PULLBACK_MIN_SCORE) continue;
-        if (verdict !== "GO" && verdict !== "WAIT") continue;
+        if (verdict !== "GO" && verdict !== "PROBE" && verdict !== "WAIT" && verdict !== "WATCH") continue;
       } else {
         // Breakout / EP / unknown: require GO + a volume surge.
         if (score < MIN_SCORE) continue;

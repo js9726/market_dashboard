@@ -81,8 +81,11 @@ def test_verdict_bands_via_algo():
     hits = [{"ticker": "EP", "change": 20, "Perf.1M": 12, "relative_volume_10d_calc": 6.3,
              "market_cap_basic": 21e9, "high": 150, "low": 125, "close": 144}]
     algo_score_all(hits)
-    _check("algo sets verdict", hits[0]["verdict"] in ("GO", "WAIT", "PASS"))
-    _check("algo GO threshold (>=75)", (hits[0]["verdict"] == "GO") == (hits[0]["score"] >= 75))
+    # Recalibrated 2026-09-23: this stage has no lane-trigger state, so it never
+    # emits GO. PROBE >= 65 / WAIT 50-64 / PASS < 50.
+    _check("algo sets verdict", hits[0]["verdict"] in ("PROBE", "WAIT", "PASS"))
+    _check("algo never asserts GO without a trigger", hits[0]["verdict"] != "GO")
+    _check("algo PROBE threshold (>=65)", (hits[0]["verdict"] == "PROBE") == (hits[0]["score"] >= 65))
     _check("algo stages use new keys", set(hits[0]["stages"]) == {"setup", "entry", "theme", "sentiment"})
 
 
