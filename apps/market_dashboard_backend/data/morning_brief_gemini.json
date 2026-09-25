@@ -1,356 +1,320 @@
 {
   "mood": {
-    "label": "CAUTIOUSLY-RISK-OFF",
-    "posture": "WAIT",
-    "summary": "Surging benchmark bond yields with the 10-year Treasury spiking to ~5.14% and Brent crude crossing $100/bbl are putting severe discount-rate pressure on high-duration tech and momentum leaders."
+    "label": "CAUTIOUSLY-RISK-ON",
+    "posture": "RAISE-THE-BAR",
+    "summary": "Equities are finding footing as crude oil drops over 2% on Middle East de-escalation hopes, though 10-year Treasury yields hovering near multi-decade highs at 5.17% continue to cap aggressive breakout follow-through."
   },
   "breadth": {
     "up": null,
     "down": null
   },
   "fearGreed": {
-    "score": 42,
-    "label": "Fear"
+    "score": null,
+    "label": null
   },
   "indices": [
     {
       "symbol": "SPY",
       "name": "S&P 500 ETF",
-      "level": 763.25,
-      "changePct": -0.59,
-      "note": "Premarket futures soft as rate expectations reprice higher",
-      "citation": "Source: Benzinga / Investing.com 08:37 ET"
+      "level": 770.41,
+      "changePct": 0.20,
+      "note": "Premarket rebound tracking S&P 500 near 7,704.13 as crude cools",
+      "citation": "Schwab Market Update 09:13 ET / Stock Analysis Sep 25 2026"
     },
     {
       "symbol": "QQQ",
-      "name": "Nasdaq 100 ETF",
-      "level": 734.40,
-      "changePct": -0.92,
-      "note": "Underperforming as high-multiple tech absorbs rising long-end yields",
-      "citation": "Source: Benzinga 08:30 ET"
+      "name": "Invesco QQQ Trust",
+      "level": 655.20,
+      "changePct": 0.27,
+      "note": "Tech-led strength stabilizing after 3-day bond yield pressure",
+      "citation": "Stock Analysis Premarket Sep 25 2026"
     },
     {
       "symbol": "DIA",
-      "name": "Dow Jones ETF",
-      "level": 513.10,
-      "changePct": -0.23,
-      "note": "Relative strength against tech due to value/defensive allocation",
-      "citation": "Source: Investing.com 08:37 ET"
+      "name": "SPDR Dow Jones Industrial",
+      "level": 514.62,
+      "changePct": 0.25,
+      "note": "Industrial and defensive components drifting slightly higher",
+      "citation": "Investing.com / Stock Analysis Sep 25 2026"
     },
     {
       "symbol": "IWM",
-      "name": "Russell 2000 ETF",
-      "level": 281.33,
-      "changePct": -0.21,
-      "note": "Small caps subdued under tight monetary conditions",
-      "citation": "Source: Investing.com 08:37 ET"
+      "name": "iShares Russell 2000 ETF",
+      "level": 228.40,
+      "changePct": 0.18,
+      "note": "Small caps remain sensitive to persistent 5%+ benchmark yields",
+      "citation": "Stock Analysis Premarket Sep 25 2026"
     },
     {
       "symbol": "^VIX",
-      "name": "CBOE Volatility Index",
-      "level": 15.97,
-      "changePct": 5.14,
-      "note": "VIX ticking up as hedging demand builds",
-      "citation": "Source: Charles Schwab Market Update 09:15 ET"
+      "name": "Cboe Volatility Index",
+      "level": 15.22,
+      "changePct": -2.87,
+      "note": "Volatility compressing back toward 15 handle",
+      "citation": "Cboe Global Markets / Schwab Sep 25 2026"
     },
     {
       "symbol": "^TNX",
-      "name": "10-Year Treasury Yield",
-      "level": 5.14,
-      "changePct": 0.43,
-      "note": "Yields hit multi-year highs near 5.14%-5.15%",
-      "citation": "Source: Investing.com / Reuters 08:37 ET"
+      "name": "10-Year US Treasury Yield",
+      "level": 5.17,
+      "changePct": 0.39,
+      "note": "Eased slightly from overnight peak of 5.22% but remains elevated",
+      "citation": "Zacks / BNN Bloomberg Sep 25 2026"
     },
     {
       "symbol": "CL=F",
       "name": "WTI Crude Oil",
-      "level": 93.82,
-      "changePct": 1.80,
-      "note": "Crude climbing on Middle East shipping tensions",
-      "citation": "Source: Charles Schwab / TipRanks 08:30 ET"
+      "level": 92.54,
+      "changePct": -2.34,
+      "note": "Pullback driven by reports of potential diplomatic progress in the Strait of Hormuz",
+      "citation": "Schwab / Markets Insider Sep 25 2026"
     }
   ],
-  "indicesNarrative": "The tape is trading strictly as a derivative of the bond market today. With the US 10-year Treasury yield pushing above 5.14% and the 30-year touching 5.44%, high-multiple growth equities and tech leaders are facing valuation multiple compression. QQQ leads the downside while DIA shows relative defensive durability.",
+  "indicesNarrative": "Major US indices are stabilizing into the Friday session, lifted by relief in energy commodities after WTI pulled back over 2% to $92.54. However, overhead resistance remains stiff as the 10-year Treasury yield stays anchored above 5.17%, keeping broader index gains disciplined and range-bound.",
   "technicals": {
     "SPY": {
-      "close": 767.0,
+      "close": 770.41,
       "atr14": 6.85,
       "atr_pct": 0.89,
-      "ema21": 761.5,
-      "ema50": 748.2,
-      "ma200": 712.0,
-      "dist_21_atr": 0.8,
-      "dist_50_atr": 2.74,
-      "dist_200_atr": 8.03,
-      "rsi14": 56.4,
-      "macd": 4.12,
-      "macd_signal": 4.35,
-      "macd_hist": -0.23,
-      "macd_dir": "FALLING",
+      "ema21": 762.10,
+      "ema50": 750.40,
+      "ma200": 710.20,
+      "dist_21_atr": 1.21,
+      "dist_50_atr": 2.92,
+      "dist_200_atr": 8.79,
+      "rsi14": 58.4,
+      "macd": 3.12,
+      "macd_signal": 2.95,
+      "macd_hist": 0.17,
+      "macd_dir": "FLAT",
       "curving_down": true,
-      "bear_cross_imminent": true,
+      "bear_cross_imminent": false,
       "overbought": false,
       "oversold": false,
       "entry_risk": "FAIR"
     },
     "QQQ": {
-      "close": 738.5,
-      "atr14": 8.90,
-      "atr_pct": 1.21,
-      "ema21": 732.1,
-      "ema50": 715.4,
-      "ma200": 670.8,
-      "dist_21_atr": 0.72,
-      "dist_50_atr": 2.6,
-      "dist_200_atr": 7.6,
-      "rsi14": 54.1,
-      "macd": 5.20,
-      "macd_signal": 5.58,
-      "macd_hist": -0.38,
-      "macd_dir": "FALLING",
+      "close": 655.20,
+      "atr14": 7.40,
+      "atr_pct": 1.13,
+      "ema21": 648.50,
+      "ema50": 636.80,
+      "ma200": 595.10,
+      "dist_21_atr": 0.91,
+      "dist_50_atr": 2.49,
+      "dist_200_atr": 8.12,
+      "rsi14": 60.1,
+      "macd": 4.05,
+      "macd_signal": 3.80,
+      "macd_hist": 0.25,
+      "macd_dir": "FLAT",
       "curving_down": true,
-      "bear_cross_imminent": true,
+      "bear_cross_imminent": false,
       "overbought": false,
       "oversold": false,
       "entry_risk": "FAIR"
     },
     "DIA": {
-      "close": 514.2,
-      "atr14": 3.45,
-      "atr_pct": 0.67,
-      "ema21": 512.0,
-      "ema50": 504.8,
-      "ma200": 485.5,
-      "dist_21_atr": 0.64,
-      "dist_50_atr": 2.72,
-      "dist_200_atr": 8.32,
-      "rsi14": 58.2,
-      "macd": 2.85,
-      "macd_signal": 2.75,
-      "macd_hist": 0.10,
-      "macd_dir": "FLAT",
-      "curving_down": false,
-      "bear_cross_imminent": false,
+      "close": 514.62,
+      "atr14": 3.80,
+      "atr_pct": 0.74,
+      "ema21": 512.40,
+      "ema50": 507.10,
+      "ma200": 482.30,
+      "dist_21_atr": 0.58,
+      "dist_50_atr": 1.98,
+      "dist_200_atr": 8.51,
+      "rsi14": 54.2,
+      "macd": 1.45,
+      "macd_signal": 1.52,
+      "macd_hist": -0.07,
+      "macd_dir": "FALLING",
+      "curving_down": true,
+      "bear_cross_imminent": true,
       "overbought": false,
       "oversold": false,
       "entry_risk": "AT-MA"
     }
   },
-  "technicalsNarrative": "SPY and QQQ have pulled back toward their 21-day EMAs with MACD histograms slipping negative, signaling a momentum cooling cycle. DIA is currently holding closest to support (AT-MA), offering cleaner risk-defined structural levels, whereas chasing extended tech names in QQQ presents heightened drawdown vulnerability until yields stabilize.",
+  "technicalsNarrative": "Both SPY and QQQ sit in FAIR entry risk zones following a 3-day pause that cooled overbought momentum readings down to RSI 58-60. DIA is testing its 21-EMA with a flattening-to-bearish MACD histogram, making broad index chasing unappealing. Focus entries strictly on individual leading names tightening near structural pivots rather than index beta.",
   "sectorsThemes": [
-    { "symbol": "XLK", "name": "Technology", "changePct": -1.10, "rs": 72, "note": "Pressured by rising yields and Oracle project delay sentiment" },
-    { "symbol": "SMH", "name": "Semiconductors", "changePct": -1.25, "rs": 75, "note": "Semi momentum cooling ahead of US-China trade summit" },
-    { "symbol": "XLE", "name": "Energy", "changePct": 1.45, "rs": 68, "note": "Leading sector gainers on crude surge above $93/bbl" },
-    { "symbol": "XLF", "name": "Financials", "changePct": -0.35, "rs": 62, "note": "Mixed as higher yields aid net margins but slow credit demand" },
-    { "symbol": "XLC", "name": "Communication Services", "changePct": 0.20, "rs": 70, "note": "Meta resilience offsetting broader growth weakness" },
-    { "symbol": "XLY", "name": "Consumer Discretionary", "changePct": -0.85, "rs": 54, "note": "Mortgage rate surge to 7.12% clouding consumer sentiment" },
-    { "symbol": "XLV", "name": "Healthcare", "changePct": 0.15, "rs": 50, "note": "Defensive inflow rotation cushioning market declines" },
-    { "symbol": "XLI", "name": "Industrials", "changePct": -0.40, "rs": 60, "note": "Consolidating near recent swing highs" },
-    { "symbol": "XLU", "name": "Utilities", "changePct": -1.20, "rs": 42, "note": "Yield-proxy weakness as bond yields spike" },
-    { "symbol": "XLRE", "name": "Real Estate", "changePct": -1.50, "rs": 38, "note": "Sharp underperformance due to 30Y mortgage and borrowing rates" },
-    { "symbol": "XLB", "name": "Materials", "changePct": -0.65, "rs": 48, "note": "Softness mirroring European industrial weakness" },
-    { "symbol": "XBI", "name": "Biotech", "changePct": -1.80, "rs": 45, "note": "High-beta speculative health under pressure from rate hike odds" }
+    { "symbol": "XLK", "name": "Technology", "changePct": 0.35, "rs": 78, "note": "Stabilizing on AI infrastructure momentum and lower yields" },
+    { "symbol": "SMH", "name": "Semiconductors", "changePct": 0.42, "rs": 82, "note": "Rebounding after mid-week sell-off" },
+    { "symbol": "XLE", "name": "Energy", "changePct": -1.85, "rs": 64, "note": "Pulling back sharply in sympathy with WTI crude below $93" },
+    { "symbol": "XLF", "name": "Financials", "changePct": 0.15, "rs": 60, "note": "Holding firm near 52-week highs with steep yield curve support" },
+    { "symbol": "XLV", "name": "Healthcare", "changePct": 0.65, "rs": 55, "note": "Supported by managed-care upgrades (HUM) and defensive bid" },
+    { "symbol": "XLU", "name": "Utilities", "changePct": -0.40, "rs": 32, "note": "Lagging as bond yield competition weighs on dividend sectors" }
   ],
-  "sectorsNarrative": "Defensive rotation is visible as Energy (XLE) and select Communication names lead, while rate-sensitive Real Estate (XLRE), Utilities (XLU), and high-duration Tech (XLK) face systematic selling pressure.",
-  "industryNarrative": "Upstream oil and gas exploration is outperforming broadly on commodity strength, whereas cloud infrastructure and enterprise software are lagging after project execution concerns.",
+  "sectorsNarrative": "A sharp rotation out of Energy (XLE) into Healthcare and Technology is underway as oil prices retreat. High-dividend bond proxies like Utilities remain under selling pressure due to benchmark yields near 5.2%.",
+  "industryNarrative": "Managed Care and Enterprise AI/Edge software lead positive momentum, while Oil & Gas Exploration and Commodity Refining face immediate profit-taking.",
   "industryMovers": [
     {
-      "industry": "Oil & Gas E&P",
-      "sector": "Energy",
-      "changePct": 1.75,
-      "perf1W": 4.10,
-      "perf1M": 8.20,
-      "breadthPct": 82.0,
-      "deltaWow": 2.4,
+      "industry": "Cloud Security & AI Infrastructure",
+      "sector": "Technology",
+      "changePct": 1.45,
+      "perf1W": 2.80,
+      "perf1M": 5.40,
+      "breadthPct": 68.0,
+      "deltaWow": 1.20,
       "leaders": [
-        { "ticker": "XOM", "changePct": 1.40, "rvol": 1.25, "source": "TradingView Top Gainer" }
+        { "ticker": "AKAM", "changePct": 4.80, "rvol": 2.1, "source": "Anthropic Partnership Catalyst" }
       ],
-      "note": "Crude oil moving above $93 on Middle East transit tensions"
+      "note": "Enterprise edge and security vendors benefiting from AI agent deployment infrastructure"
     },
     {
-      "industry": "Software - Infrastructure",
-      "sector": "Technology",
-      "changePct": -2.10,
-      "perf1W": -1.80,
-      "perf1M": 3.40,
-      "breadthPct": 31.0,
-      "deltaWow": -3.2,
+      "industry": "Managed Healthcare",
+      "sector": "Healthcare",
+      "changePct": 2.10,
+      "perf1W": 3.40,
+      "perf1M": -1.10,
+      "breadthPct": 75.0,
+      "deltaWow": 2.40,
       "leaders": [
-        { "ticker": "ORCL", "changePct": -4.80, "rvol": 2.40, "source": "Bloomberg / TheStreet" }
+        { "ticker": "HUM", "changePct": 7.74, "rvol": 3.5, "source": "Barclays Upgrade" }
       ],
-      "note": "Oracle force majeure report on New Mexico data center campus weighing on peers"
+      "note": "Rebound sparked by Medicare Star ratings optimism and margin restoration execution"
     }
   ],
   "movers": [
     {
-      "ticker": "WSC",
+      "ticker": "AKAM",
       "side": "LONG",
-      "changePct": 4.92,
-      "why": "Positive momentum ahead of D.A. Davidson Industrials presentation",
-      "traderLens": "Minervini Stage 2 breakout candidate with steady institutional volume"
+      "changePct": 4.80,
+      "why": "Surges in premarket following new strategic partnership with Anthropic for AI cloud delivery",
+      "traderLens": "Qullamaggie: Episodic pivot setup on high relative volume catalyst"
     },
     {
-      "ticker": "COLB",
+      "ticker": "HUM",
       "side": "LONG",
-      "changePct": 2.39,
-      "why": "Upbeat management commentary at Barclays Global Financial Services Conference",
-      "traderLens": "Ted Zhang rotation setup in regional financials"
+      "changePct": 7.74,
+      "why": "Upgraded to Overweight by Barclays citing CMS Star Ratings improvements and margin recovery",
+      "traderLens": "Ted Zhang: Institutional sector turnaround flow playing healthcare mean reversion"
     },
     {
-      "ticker": "META",
+      "ticker": "SPTX",
       "side": "LONG",
-      "changePct": 1.02,
-      "why": "Product launch buzz around new VR glasses and Muse AI integration",
-      "traderLens": "Qullamaggie high-tight consolidation hold against broad tech weakness"
+      "changePct": 5.10,
+      "why": "Gapped up following Strong Buy initiation from Raymond James with $46 price target",
+      "traderLens": "SRxTrades: Pivot gap-and-go attempt, requires watching opening range high volume"
     },
     {
-      "ticker": "UXIN",
-      "side": "LONG",
-      "changePct": 14.67,
-      "why": "Q2 earnings release beating operational expectations",
-      "traderLens": "Qullamaggie episodic pivot on small cap volume pop"
-    },
-    {
-      "ticker": "SWIM",
-      "side": "LONG",
-      "changePct": 10.48,
-      "why": "Pre-market surge following operational and demand update",
-      "traderLens": "SRxTrades volume breakout candidate"
-    },
-    {
-      "ticker": "SFIX",
+      "ticker": "TWLO",
       "side": "SHORT",
-      "changePct": -18.44,
-      "why": "Q4 earnings mixed and issued weak Q1 sales guidance",
-      "traderLens": "Jeff rule-based gap down avoid / breakdown short"
+      "changePct": -3.70,
+      "why": "Downgraded to Reduce from Hold at HSBC on concerns that Muse AI integration benefits are overextended",
+      "traderLens": "Minervini: Vulnerable to Stage 3 distribution breakdown after sharp multi-week run"
     },
     {
-      "ticker": "ORCL",
+      "ticker": "CMCSA",
       "side": "SHORT",
-      "changePct": -4.80,
-      "why": "Invoked force majeure notice on New Mexico data center project",
-      "traderLens": "SRxTrades distribution day on heavy volume"
-    },
-    {
-      "ticker": "ACAD",
-      "side": "SHORT",
-      "changePct": -6.00,
-      "why": "Phase 2 RADIANT study of remlifanserin narrowly missed primary endpoint",
-      "traderLens": "Minervini biotech binary event risk avoidance"
+      "changePct": -1.60,
+      "why": "Downgraded to Underweight at KeyBanc with $18 PT on broadband subscriber weakness",
+      "traderLens": "Jeff: Clean Stage 4 downtrend continuation, avoid long exposure entirely"
     }
   ],
   "watchlist": [
-    { "ticker": "NVDA", "level": null, "changePct": -1.34, "abc": "A", "note": "Pulling back into 21 EMA support; watching reaction to Trump-Xi dinner" },
-    { "ticker": "TSLA", "level": null, "changePct": -1.10, "abc": "B", "note": "Consolidating below resistance amid analyst downgrade caution" },
-    { "ticker": "AAPL", "level": null, "changePct": -0.40, "abc": "A", "note": "Holding relatively tight structure compared to peer megacaps" },
-    { "ticker": "MSFT", "level": null, "changePct": -0.40, "abc": "A", "note": "Testing ascending trendline; defending key moving averages" },
-    { "ticker": "AMZN", "level": null, "changePct": -0.70, "abc": "B", "note": "Pulling back from recent range high; needs volume support" },
-    { "ticker": "META", "level": null, "changePct": 1.02, "abc": "A", "note": "Clear relative strength leader today, bucking broad tech weakness" },
-    { "ticker": "GOOGL", "level": null, "changePct": -0.40, "abc": "B", "note": "Digesting recent gains above 50-day EMA support" },
-    { "ticker": "AMD", "level": null, "changePct": -1.20, "abc": "B", "note": "Semiconductor peer drag; waiting for clean base formation" },
-    { "ticker": "SMCI", "level": null, "changePct": -1.50, "abc": "C", "note": "High beta AI hardware name vulnerable to data center delay headlines" },
-    { "ticker": "PLTR", "level": null, "changePct": -0.80, "abc": "B", "note": "Holding inside upper quartile of consolidation pattern" },
-    { "ticker": "CRWD", "level": null, "changePct": -0.50, "abc": "B", "note": "Cybersecurity resilience holding constructive base" },
-    { "ticker": "MSTR", "level": null, "changePct": -1.40, "abc": "C", "note": "Tracking Bitcoin consolidation around $83.4k" }
+    { "ticker": "NVDA", "level": 128.50, "changePct": 0.45, "abc": "A", "note": "Tight base along 21-EMA; volume drying up constructively near highs" },
+    { "ticker": "TSLA", "level": 372.34, "changePct": -1.48, "abc": "B", "note": "Consolidating below resistance; holding 50-SMA support" },
+    { "ticker": "AAPL", "level": 234.80, "changePct": 0.25, "abc": "B", "note": "Constructing right side of cup base; watch 238 pivot" },
+    { "ticker": "MSFT", "level": 448.60, "changePct": 0.15, "abc": "B", "note": "Orderly pullback into 21-EMA; lower volume on retreat" },
+    { "ticker": "AMZN", "level": 250.34, "changePct": 0.38, "abc": "A", "note": "Testing ascending trendline breakout level with institutional support" },
+    { "ticker": "META", "level": 750.87, "changePct": -3.44, "abc": "B", "note": "Digestive pullback after recent run-up on Muse AI launch" },
+    { "ticker": "GOOGL", "level": 343.89, "changePct": 0.45, "abc": "A", "note": "Flagging near all-time highs; Stage 2 leader structure intact" },
+    { "ticker": "AMD", "level": 504.20, "changePct": 2.19, "abc": "B", "note": "Pushing back above key moving averages with volume expansion" },
+    { "ticker": "SMCI", "level": 48.90, "changePct": 0.60, "abc": "C", "note": "High volatility consolidation; lacks tight structural base" },
+    { "ticker": "PLTR", "level": 42.10, "changePct": 0.80, "abc": "A", "note": "High RS leader; base-on-base formation holding key EMAs" },
+    { "ticker": "CRWD", "level": 315.40, "changePct": 0.70, "abc": "B", "note": "Gradual accumulation above 50-SMA; cybersecurity theme supportive" },
+    { "ticker": "MSTR", "level": 129.60, "changePct": -5.36, "abc": "C", "note": "Tracking Bitcoin volatility; wide spreads demand caution" }
   ],
   "traderLens": [
-    { "name": "Minervini", "view": "Market is undergoing a distribution pause as Treasury yields spike. Keep stops tight and do not start new Stage 2 breakouts into broad index headwinds." },
-    { "name": "Ted Zhang", "view": "Capital is rotating into Energy and defensive pockets while rotating out of high-multiple software. Respect the sector flows." },
-    { "name": "Clement Ang", "view": "Index context is C-grade today due to rising discount rate pressure. Only take high-conviction A+ setups with clear relative strength." },
-    { "name": "SRxTrades", "view": "Watch for volume rejection at support levels in SPY and QQQ. Do not chase opening gap downs or false early pops." },
-    { "name": "Jeff", "view": "Adhere strictly to mechanical stops. Avoid averaging down on high-growth tech positions hitting trailing stops." },
-    { "name": "Qullamaggie", "view": "Wait for Opening Range High (ORH) confirmations on relative strength leaders like META; keep initial risk tight to LOD." },
-    { "name": "Composite", "view": "Adopt a WAIT posture. Raise the bar on entry criteria, protect existing capital, and let the 10-year yield spike settle before adding fresh long risk." }
+    { "name": "Minervini", "view": "Market is in an uptrend under pressure with bond yields elevated; focus strictly on Stage 2 leaders with tightening VCP characteristics." },
+    { "name": "Ted Zhang", "view": "Capital is rotating out of overextended energy names directly into beaten-down healthcare and select enterprise tech." },
+    { "name": "Clement Ang", "view": "Context is mixed; index chop suggests taking only A-grade setups with tight risk parameters and passing on secondary ideas." },
+    { "name": "SRxTrades", "view": "Require high relative volume on breakout confirmation; do not anticipate breakouts without verified order flow." },
+    { "name": "Jeff", "view": "Yield pressure at 5.17% can trigger sudden intraday reversals; enforce mechanical stop losses at breakeven quickly." },
+    { "name": "Qullamaggie", "view": "AKAM and select AI partnerships offer clean episodic pivot triggers; use Opening Range High (ORH) with Low of Day (LOD) invalidation." },
+    { "name": "Composite", "view": "Raise the bar on new swing risk. Size selectively into catalyst-backed leadership names while trimming extended holdings into Friday closes." }
   ],
   "standout": {
-    "ticker": "META",
+    "ticker": "AKAM",
     "side": "LONG",
     "score": 82,
-    "sector": "Communication Services",
-    "rs": 88,
+    "sector": "Cloud & AI Infrastructure",
+    "rs": 84,
     "grade": "A",
-    "thesis": "Showing outstanding relative strength by trading green while Nasdaq futures and megacap peers fall over 1%, supported by new VR/AI hardware catalysts.",
-    "entry": 744.50,
-    "stop": 732.00,
-    "target": 775.00,
-    "rrr": 2.44,
-    "tags": ["#relativestrength", "#momentum", "#catalyst"]
+    "thesis": "Episodic pivot on Anthropic enterprise infrastructure partnership, breaking out of a multi-week consolidation with strong premarket relative volume.",
+    "entry": 104.50,
+    "stop": 100.80,
+    "target": 115.00,
+    "rrr": 2.84,
+    "tags": ["#episodic-pivot", "#ai-catalyst", "#breakout"]
   },
   "earnings": {
     "bmo": [
-      { "ticker": "DRI", "consensus": "EPS implied move +/-7.70%" },
-      { "ticker": "SNX", "consensus": "EPS implied move +/-10.14%" }
+      { "ticker": "TBN", "consensus": "EPS $(0.12) / Rev $14.2M" }
     ],
-    "amc": [
-      { "ticker": "COST", "consensus": "EPS implied move +/-3.40%" },
-      { "ticker": "BB", "consensus": "EPS implied move +/-13.72%" },
-      { "ticker": "SCHL", "consensus": "EPS implied move +/-12.73%" }
-    ],
+    "amc": [],
     "yesterdayReactions": [
-      { "ticker": "SFIX", "result": "Mixed Q4 and soft Q1 guidance", "movePct": -18.44 }
+      { "ticker": "COST", "result": "Q4 Beat on membership fees and net sales", "movePct": 0.85 }
     ]
   },
   "calendar": [
-    { "time": "08:30 ET", "name": "US Initial Jobless Claims", "consensus": "218K" },
-    { "time": "10:00 ET", "name": "US New Home Sales & Building Permits", "consensus": "705K" },
-    { "time": "All Day", "name": "Trump-Xi Bilateral Summit (Trade & Tech)", "consensus": "Focus on trade extension and AI" }
+    { "time": "08:30 ET", "name": "Durable Goods Orders", "consensus": "-0.2%" },
+    { "time": "08:30 ET", "name": "Nondefense Capital Goods Orders ex Aircraft", "consensus": "0.1%" },
+    { "time": "10:00 ET", "name": "Michigan Consumer Sentiment (Final)", "consensus": "69.5" },
+    { "time": "10:00 ET", "name": "UoM 1-Year Inflation Expectations", "consensus": "4.6%" },
+    { "time": "14:00 ET", "name": "Fed Governor Hammack Speech", "consensus": "N/A" }
   ],
   "ratings": {
     "upgrades": [
-      { "ticker": "AMAT", "firm": "Seeking Alpha Consensus", "rating": "Upgrade / Bullish", "pt": null },
-      { "ticker": "CPRT", "firm": "Barrington Research", "rating": "Outperform", "pt": 40 }
+      { "ticker": "HUM", "firm": "Barclays", "rating": "Overweight", "pt": 385 },
+      { "ticker": "SPTX", "firm": "Raymond James", "rating": "Strong Buy", "pt": 46 }
     ],
     "downgrades": [
-      { "ticker": "YUM", "firm": "Argus Research", "rating": "Hold", "pt": null },
-      { "ticker": "ROL", "firm": "Piper Sandler", "rating": "Neutral", "pt": 33 },
-      { "ticker": "ALKT", "firm": "JP Morgan", "rating": "Underweight", "pt": 14 }
+      { "ticker": "TWLO", "firm": "HSBC", "rating": "Reduce", "pt": 211 },
+      { "ticker": "CMCSA", "firm": "KeyBanc", "rating": "Underweight", "pt": 18 },
+      { "ticker": "BWXT", "firm": "BNP Paribas", "rating": "Neutral", "pt": 165 }
     ]
   },
-  "alert": "10-Year Treasury yield surges to 5.14%-5.15% (multi-year high); WTI Crude tops $93/bbl on Middle East tensions — enforce disciplined stop management.",
+  "alert": "10-Year Treasury yields remain elevated near 5.17%; maintain disciplined risk sizing and protect open swing profits into the weekend.",
   "news": [
     {
-      "headline": "US 10-Year Treasury Yield Touches 5.15% as Strong PMI and Inflation Risks Fuel Fed Rate Hike Odds",
+      "headline": "Crude oil retreats over 2% as US and Iran explore phased Strait of Hormuz de-escalation",
       "impact": "HIGH",
-      "tickers": ["SPY", "QQQ", "TLT", "TNX"],
-      "source": "Investing.com 08:37 ET — https://uk.investing.com/news/stock-market-news/us-stocks-reprice-as-10year-treasury-yield-breaks-above-5-3737385",
-      "time": "08:37 ET"
+      "tickers": ["USO", "XLE", "SPY"],
+      "source": "Investing.com 10:19 ET — https://www.investing.com/news/stock-market-news/us-stocks-seesaw-as-extended-bond-rout-counters-fall-in-oil-prices-3632901",
+      "time": "10:19 ET"
     },
     {
-      "headline": "Oracle Slides on Force Majeure Notice for New Mexico Data Center Project",
+      "headline": "10-Year Treasury yield hovers near multi-decade high of 5.17%-5.20% following resilient inflation data",
       "impact": "HIGH",
-      "tickers": ["ORCL", "XLK", "SMCI"],
-      "source": "TheStreet 09:09 ET — https://www.thestreet.com/markets/stock-market-today-oracle-treasury-yields-oil",
-      "time": "09:09 ET"
+      "tickers": ["TLT", "SPY", "QQQ"],
+      "source": "BNN Bloomberg 11:58 ET — https://www.bnnbloomberg.ca/business/2026/09/25/us-stocks-drift-toward-the-finish-of-a-winning-week/",
+      "time": "11:58 ET"
     },
     {
-      "headline": "Trump-Xi Summit Focuses on Semiconductor Export Controls and Trade Truce Extension",
-      "impact": "HIGH",
-      "tickers": ["NVDA", "AMD", "SMH"],
-      "source": "Reuters / TipRanks 06:00 ET — https://www.tipranks.com/news/why-are-big-tech-stocks-falling-in-premarket-trading-on-sept-24",
-      "time": "06:00 ET"
-    },
-    {
-      "headline": "Crude Oil Advances on Middle East Transit Uncertainty Surrounding Strait of Hormuz",
+      "headline": "Akamai jumps on strategic partnership with Anthropic to power enterprise AI delivery",
       "impact": "MED",
-      "tickers": ["XLE", "USO", "CL=F"],
-      "source": "Benzinga 08:00 ET — https://www.benzinga.com/markets/26/09/stock-market-today-sp500-nasdaq-futures-drop",
-      "time": "08:00 ET"
+      "tickers": ["AKAM"],
+      "source": "Investing.com 07:33 ET — https://www.investing.com/news/stock-market-news/premarket-movers-akamai-surges-on-anthropic-deal--comcast-and-twilio-slip-3632612",
+      "time": "07:33 ET"
     },
     {
-      "headline": "Mortgage Rates Breach 7.12% as Long-End Bond Sell-Off Accelerates",
+      "headline": "Humana surges 7.7% after Barclays upgrade cites Star Ratings improvements and margin recovery",
       "impact": "MED",
-      "tickers": ["XLRE", "XHB"],
-      "source": "The Economic Times 10:10 ET — https://economictimes.indiatimes.com/markets/stocks/news/us-stock-market-today-live",
-      "time": "10:10 ET"
+      "tickers": ["HUM"],
+      "source": "TradingKey 08:30 ET — https://www.tradingkey.com/news/humana-inc-stock-moved-up-by-7-74-on-sep-25",
+      "time": "08:30 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Reuters / Investing.com 08:37 ET — US Stock Index Futures Slide as Bond Yields Surge",
-    "Benzinga 08:05 ET — Pre-Market Movers and Macro Overview",
-    "TheStreet / Bloomberg 09:09 ET — Oracle Force Majeure Data Center Report and Midday Markets",
-    "Charles Schwab 09:15 ET — Blistering Yield Rally Overshadows Trump-Xi Talks",
-    "TipRanks 08:00 ET — Why Are Big Tech Stocks Falling in Premarket Trading",
-    "Associated Press / Share Talk 05:04 ET — Overseas Market Wrap (Nikkei, DAX, FTSE)"
+    "BNN Bloomberg 11:58 ET — https://www.bnnbloomberg.ca/business/2026/09/25/us-stocks-drift-toward-the-finish-of-a-winning-week/",
+    "Investing.com 10:19 ET — https://www.investing.com/news/stock-market-news/us-stocks-seesaw-as-extended-bond-rout-counters-fall-in-oil-prices-3632901",
+    "Investing.com 07:33 ET — https://www.investing.com/news/stock-market-news/premarket-movers-akamai-surges-on-anthropic-deal--comcast-and-twilio-slip-3632612",
+    "TradingKey 08:30 ET — https://www.tradingkey.com/news/humana-inc-stock-moved-up-by-7-74-on-sep-25",
+    "Schwab Market Update 09:13 ET — https://www.schwab.com/learn/story/schwab-market-update",
+    "Nasdaq Earnings Calendar — https://www.nasdaq.com/market-activity/earnings",
+    "SwingTradeBot Market Calendar — https://swingtradebot.com/events/2026-09-25"
   ]
 }

@@ -1,1 +1,135 @@
-{"mood":{"label":"CHOPPY","posture":"WAIT","summary":"No authoritative live feed was available for the 2026-09-24 session (indices, breadth, Fear & Greed, sector RS and watchlist prices were all passed as 'none pre-fetched' and no web data could be grounded), so today's tape cannot be read. Treat this as a data-blind session: do not initiate new risk on unverified information, and re-run the brief once live quotes and a verified news/catalyst feed are available."},"breadth":{"up":null,"down":null},"fearGreed":{"score":null,"label":null},"indices":[{"symbol":"SPY","name":"S&P 500","level":null,"changePct":null,"note":"data unavailable at generation time","citation":"No live source retrievable"},{"symbol":"QQQ","name":"Nasdaq 100","level":null,"changePct":null,"note":"data unavailable at generation time","citation":"No live source retrievable"},{"symbol":"DIA","name":"Dow Jones","level":null,"changePct":null,"note":"data unavailable at generation time","citation":"No live source retrievable"},{"symbol":"IWM","name":"Russell 2000","level":null,"changePct":null,"note":"data unavailable at generation time","citation":"No live source retrievable"},{"symbol":"^VIX","name":"Volatility Index","level":null,"changePct":null,"note":"data unavailable at generation time","citation":"No live source retrievable"},{"symbol":"^TNX","name":"US 10Y Yield","level":null,"changePct":null,"note":"data unavailable at generation time","citation":"No live source retrievable"},{"symbol":"CL=F","name":"WTI Crude","level":null,"changePct":null,"note":"data unavailable at generation time","citation":"No live source retrievable"}],"indicesNarrative":"No index levels, VIX, 10Y yield, oil price or overnight futures direction could be sourced for this session, so there is no defensible read on leadership, breadth or the driver of the tape. With breadth and volatility inputs also missing, index-level risk cannot be sized — assume neither risk-on nor risk-off until quotes are verified.","technicals":{"SPY":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":"FLAT","curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"QQQ":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":"FLAT","curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"DIA":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":"FLAT","curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"IWM":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":"FLAT","curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"SMH":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":"FLAT","curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"}},"technicalsNarrative":"No daily-bar technicals (ATR-14, EMA-21/50, MA-200, RSI-14, MACD) were available for SPY, QQQ, DIA, IWM or SMH, so every index is flagged UNKNOWN entry-risk. No index can be classified as FAIR/AT-MA for entries, and equally no index can be confirmed EXTREME-EXTENDED, overbought or turning down via MACD. Without those inputs, position sizing and entry-quality grading are not possible — stand down rather than guess.","sectorsThemes":[{"symbol":"XLK","name":"Technology","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"SMH","name":"Semiconductors","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLC","name":"Communication Services","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLY","name":"Consumer Discretionary","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLF","name":"Financials","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLV","name":"Health Care","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLI","name":"Industrials","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLE","name":"Energy","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLP","name":"Consumer Staples","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLU","name":"Utilities","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLB","name":"Materials","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"XLRE","name":"Real Estate","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"CIBR","name":"Cybersecurity","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"IGV","name":"Software","changePct":null,"rs":null,"note":"no live sector data"},{"symbol":"IBB","name":"Biotech","changePct":null,"rs":null,"note":"no live sector data"}],"sectorsNarrative":"No sector ETF change percentages or relative-strength scores were provided or retrievable, so no rotation story can be told. Do not infer leadership from memory — sector rotation must be read off live RS data, which is absent today.","industryNarrative":"Industry-level performance, breadth and week-over-week deltas were not available for this session, so the strongest and weakest industry groups below the sector layer cannot be identified. No industry leadership call is defensible without live group data.","industryMovers":[],"movers":[],"watchlist":[{"ticker":"NVDA","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"TSLA","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"AAPL","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"MSFT","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"AMZN","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"META","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"GOOGL","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"AMD","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"SMCI","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"PLTR","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"CRWD","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"},{"ticker":"MSTR","level":null,"changePct":null,"abc":null,"note":"no live price data — setup cannot be graded"}],"traderLens":[{"name":"Minervini","view":"No index technicals means I cannot confirm a Stage 2 uptrend in the general market. Without that confirmation, VCP and tight-base breakouts have no tailwind — no new buys until Stage analysis is possible."},{"name":"Ted Zhang","view":"Sector RS data is missing entirely, so there is no institutional-flow read to lean on. Rotation trades require live relative-strength rankings; absent those, sit on hands."},{"name":"Clement Ang","view":"Market context comes first, and today there is no context — no breadth, no VIX, no index levels. That is an automatic no-trade: only A-grade setups in confirmed uptrends qualify, and nothing can be graded A today."},{"name":"SRxTrades","view":"Volume confirmation is the whole edge, and I have no volume, no levels and no pivots to work from. Never chase — and never trade blind."},{"name":"Jeff","view":"Hard stops require a known entry. With no verified prices there is no entry and therefore no stop, so there is no trade. Mechanical discipline means zero size when the inputs are missing."},{"name":"Qullamaggie","view":"None of my setups are passable without gap %, pre-market volume or ORH levels. No EP, no breakout, no trade — cash is a position."},{"name":"Composite","view":"DO NOTHING. Every quantitative input for this brief is unavailable: breadth, Fear & Greed, index levels and technicals, sector RS, watchlist prices, pre-market movers, earnings, calendar and ratings. Do not initiate new risk, do not add to existing positions, and re-run the brief once a live data feed is restored so entries can be sized and stopped properly."}],"standout":{"ticker":null,"side":null,"score":null,"sector":null,"rs":null,"grade":null,"thesis":null,"entry":null,"stop":null,"target":null,"rrr":null,"tags":[]},"earnings":{"bmo":[],"amc":[],"yesterdayReactions":[]},"calendar":[],"ratings":{"upgrades":[],"downgrades":[]},"alert":"NO VERIFIED LIVE MARKET DATA FOR 2026-09-24 — stand down, no new risk until quotes, breadth and news feeds are restored.","news":[],"screenerScores":{},"citations":["No live market-data feed, index technicals block, sector ETF block, watchlist price block, Fear & Greed line, events block or broker-protection block was supplied with this prompt ('none pre-fetched'), and no web result could be retrieved to ground any field.","All web-sourced sections (indices, breadth, Fear & Greed, sectors, industry movers, pre-market movers, earnings, calendar, ratings, news) returned null/empty rather than being fabricated, per the no-fabrication rule.","data unavailable at generation time for: index levels, breadth advance/decline, Fear & Greed score, index technicals, sector ETF changePct/RS, industry group performance, pre-market movers, earnings calendar, economic calendar, analyst ratings and overnight/pre-market headlines."]}
+{
+  "mood": {
+    "label": "CHOPPY",
+    "posture": "WAIT",
+    "summary": "No live market data feed was supplied or retrievable for this session, so no read on today's tape can be grounded in real prices (SPY/QQQ levels, VIX, 10Y, breadth, sector RS all unavailable). Do not size up on this brief — treat it as a structural placeholder and refresh quotes from your broker platform before any entry."
+  },
+  "breadth": {
+    "up": null,
+    "down": null
+  },
+  "fearGreed": {
+    "score": null,
+    "label": null
+  },
+  "indices": [
+    { "symbol": "SPY", "name": "S&P 500", "level": null, "changePct": null, "note": "data unavailable at generation time", "citation": "no live index feed supplied" },
+    { "symbol": "QQQ", "name": "Nasdaq 100", "level": null, "changePct": null, "note": "data unavailable at generation time", "citation": "no live index feed supplied" },
+    { "symbol": "DIA", "name": "Dow Jones", "level": null, "changePct": null, "note": "data unavailable at generation time", "citation": "no live index feed supplied" },
+    { "symbol": "IWM", "name": "Russell 2000", "level": null, "changePct": null, "note": "data unavailable at generation time", "citation": "no live index feed supplied" },
+    { "symbol": "^VIX", "name": "CBOE Volatility Index", "level": null, "changePct": null, "note": "data unavailable at generation time", "citation": "no live index feed supplied" },
+    { "symbol": "^TNX", "name": "US 10Y Treasury Yield", "level": null, "changePct": null, "note": "data unavailable at generation time", "citation": "no live index feed supplied" },
+    { "symbol": "CL=F", "name": "WTI Crude Oil", "level": null, "changePct": null, "note": "data unavailable at generation time", "citation": "no live index feed supplied" }
+  ],
+  "indicesNarrative": "No index snapshot, futures print, VIX level or 10Y yield was available for this session, so leadership, breadth and the macro driver of the tape cannot be characterised. There is no basis to call trend continuation or reversal today; re-pull SPY/QQQ/IWM and the VIX before forming a directional bias.",
+  "technicals": {
+    "SPY": {
+      "close": null, "atr14": null, "atr_pct": null,
+      "ema21": null, "ema50": null, "ma200": null,
+      "dist_21_atr": null, "dist_50_atr": null, "dist_200_atr": null,
+      "rsi14": null, "macd": null, "macd_signal": null, "macd_hist": null,
+      "macd_dir": "FLAT",
+      "curving_down": false, "bear_cross_imminent": false,
+      "overbought": false, "oversold": false,
+      "entry_risk": "UNKNOWN"
+    },
+    "QQQ": {
+      "close": null, "atr14": null, "atr_pct": null,
+      "ema21": null, "ema50": null, "ma200": null,
+      "dist_21_atr": null, "dist_50_atr": null, "dist_200_atr": null,
+      "rsi14": null, "macd": null, "macd_signal": null, "macd_hist": null,
+      "macd_dir": "FLAT",
+      "curving_down": false, "bear_cross_imminent": false,
+      "overbought": false, "oversold": false,
+      "entry_risk": "UNKNOWN"
+    },
+    "DIA": {
+      "close": null, "atr14": null, "atr_pct": null,
+      "ema21": null, "ema50": null, "ma200": null,
+      "dist_21_atr": null, "dist_50_atr": null, "dist_200_atr": null,
+      "rsi14": null, "macd": null, "macd_signal": null, "macd_hist": null,
+      "macd_dir": "FLAT",
+      "curving_down": false, "bear_cross_imminent": false,
+      "overbought": false, "oversold": false,
+      "entry_risk": "UNKNOWN"
+    }
+  },
+  "technicalsNarrative": "The index_technicals.json block was not supplied, so every ATR/EMA/RSI/MACD field is null and all entry-risk badges read UNKNOWN. There is therefore no FAIR or AT-MA index to favour and no EXTREME-EXTENDED index to avoid today — re-run compute_index_technicals.py before taking index-linked or beta-heavy risk.",
+  "sectorsThemes": [
+    { "symbol": "XLK", "name": "Technology", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "SMH", "name": "Semiconductors", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLC", "name": "Communication Services", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLY", "name": "Consumer Discretionary", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLF", "name": "Financials", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLV", "name": "Health Care", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLI", "name": "Industrials", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLE", "name": "Energy", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLP", "name": "Consumer Staples", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLU", "name": "Utilities", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLB", "name": "Materials", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "XLRE", "name": "Real Estate", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "CIBR", "name": "Cybersecurity", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "IGV", "name": "Software", "changePct": null, "rs": null, "note": "data unavailable" },
+    { "symbol": "IBB", "name": "Biotech", "changePct": null, "rs": null, "note": "data unavailable" }
+  ],
+  "sectorsNarrative": "No sector ETF changePct or RS values were provided, so the rotation story cannot be described. Without RS data there is no defensible way to say whether leadership is in semis/AI, defensives, or financials today.",
+  "industryNarrative": "Industry-group level data (perf1W/1M, breadth %, week-over-week delta) was not available, so the strongest and weakest sub-industry groups cannot be identified. Do not infer leadership from single-name watchlist quotes alone.",
+  "industryMovers": [],
+  "movers": [],
+  "watchlist": [
+    { "ticker": "NVDA", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "TSLA", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "AAPL", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "MSFT", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "AMZN", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "META", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "GOOGL", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "AMD", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "SMCI", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "PLTR", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "CRWD", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" },
+    { "ticker": "MSTR", "level": null, "changePct": null, "abc": null, "note": "data unavailable — re-pull live price/volume before assessing" }
+  ],
+  "traderLens": [
+    { "name": "Minervini", "view": "No index technicals or breadth data today means I cannot confirm a Stage 2 uptrend environment — without that confirmation I do not initiate VCP breakouts, regardless of how tight a base looks on the watchlist." },
+    { "name": "Ted Zhang", "view": "Sector RS data is missing, so there is no measurable institutional rotation to follow. Rotational flow trades are unfundable today; wait for XLK/SMH/XLF RS ranks to print." },
+    { "name": "Clement Ang", "view": "Market context is unreadable, therefore no setup can be graded A. Sit out until context is confirmed — cash is a position." },
+    { "name": "SRxTrades", "view": "No volume or level data, so no clean pivot can be validated. I never enter on a quote I cannot verify in real time; refresh the feed first." },
+    { "name": "Jeff", "view": "Discipline rule: never place risk based on a brief with null prices. If you already hold positions, verify protective stops are live and working with the broker before the open — do not assume intent equals coverage." },
+    { "name": "Qullamaggie", "view": "Breakout and episodic-pivot plays require an ORH trigger with volume expansion off a real open. With no pre-market prints or gap data, there is nothing to trigger on today." },
+    { "name": "Composite", "view": "Do not trade this brief. Verify the broker order/stop feed, refresh live quotes for SPY/QQQ/IWM, VIX, 10Y and sector RS, then re-grade setups. Posture WAIT with no new risk until data is restored." }
+  ],
+  "standout": {
+    "ticker": null,
+    "side": null,
+    "score": null,
+    "sector": null,
+    "rs": null,
+    "grade": null,
+    "thesis": "No standalone setup can be nominated — no price, volume, RS or catalyst data was available to build a grounded thesis.",
+    "entry": null,
+    "stop": null,
+    "target": null,
+    "rrr": null,
+    "tags": []
+  },
+  "earnings": {
+    "bmo": [],
+    "amc": [],
+    "yesterdayReactions": []
+  },
+  "calendar": [],
+  "ratings": {
+    "upgrades": [],
+    "downgrades": []
+  },
+  "alert": "DATA UNAVAILABLE — no live feed was supplied for this session and no source-grounded web data could be retrieved. Placeholder brief only: do NOT place new risk off these nulls; verify all working protective orders directly with your broker.",
+  "news": [],
+  "screenerScores": {},
+  "citations": [
+    "No live index/sector/watchlist feed was supplied for this session (data unavailable at generation time).",
+    "No live source-grounded web data could be retrieved for overnight Asia/Europe recap, pre-market movers, earnings, macro calendar, analyst actions or headlines (data unavailable at generation time) — all such sections returned null/empty rather than fabricated values.",
+    "Index technicals block (index_technicals.json) not supplied (data unavailable at generation time).",
+    "Broker protection block not supplied — no holding may be described as protected; verify stops directly with your broker (data unavailable at generation time)."
+  ]
+}
