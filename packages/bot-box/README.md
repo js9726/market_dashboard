@@ -79,6 +79,9 @@ host this and cannot run local Qwen TTS.
    ```
    No pairing session is needed. Never paste the token into a Claude chat.
 6. **Start the bot:** `Start-ScheduledTask BotBoxPrivateClaude` (or sign out and in).
+   The first start opens Claude Code's "trust the files in this folder" prompt for
+   `jie_wiki` in the bot console. Answer it yourself, once; nothing, Discord included,
+   starts until it is answered. (The desktop app does not set this flag for the CLI.)
 7. **Test:** DM the bot `status`, then `what does VEEV do`. Run `check-readiness.ps1`; it
    should show this machine as the designated bot box.
 
@@ -98,7 +101,8 @@ message.
 
 | Symptom | Fix |
 |---|---|
-| Bot never replies | Is the console window open? Log: `%LOCALAPPDATA%\Jie\bot-box\logs\`. Is your user ID the one in `access.json`, and do you share a server with the bot? |
+| Bot never replies | Is the console window open? Log: `%USERPROFILE%\.claude\bot-box\logs\`. Is your user ID the one in `access.json`, and do you share a server with the bot? |
+| "not the designated bot box" although you installed | The installer was run from the Claude desktop app with an older kit that kept its marker in AppData (redirected by Windows for packaged apps). Re-run `install-private-bot.ps1`; the marker now lives in `%USERPROFILE%\.claude\bot-box\` |
 | `'bun' is not recognized` | A console opened before Bun was installed. The launcher rebuilds PATH; for other consoles, open a new one |
 | Changed `access.json`, no effect | Static mode reads it at bot start: close the bot console and `Start-ScheduledTask BotBoxPrivateClaude` |
 | Token leaked or reset | Developer Portal > Bot > Reset Token, then `configure-discord.ps1 -UserId <id>` again and restart the bot |

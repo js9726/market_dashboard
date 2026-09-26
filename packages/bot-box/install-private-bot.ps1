@@ -41,7 +41,10 @@ function Say { param([string]$Level, [string]$Text)
     Write-Host ('[{0}] {1}' -f $Level, $Text) -ForegroundColor $color
 }
 
-$markerDir = Join-Path $env:LOCALAPPDATA 'Jie\bot-box'
+# Bot-box state lives under %USERPROFILE%\.claude, not AppData: a script started from the
+# Claude desktop app (an MSIX package) has its AppData writes silently redirected into the
+# package's LocalCache, where the logon task cannot see them.
+$markerDir = Join-Path $env:USERPROFILE '.claude\bot-box'
 $marker = Join-Path $markerDir 'designated-host.txt'
 
 if ($Uninstall) {
@@ -54,6 +57,9 @@ if ($Uninstall) {
     if (Test-Path $marker) { Remove-Item -Path $marker -Force; Say OK 'This machine is no longer the designated bot box' }
     exit 0
 }
+
+# A console opened before a winget install has a stale PATH; rebuild it from the registry.
+$env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
 
 Write-Host ''
 Write-Host '=== 1. Prerequisites ===' -ForegroundColor Cyan

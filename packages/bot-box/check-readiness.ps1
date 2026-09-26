@@ -72,7 +72,8 @@ if ($isLaptop) {
     Show-Row PASS 'Form factor' 'desktop'
     Show-Row INFO 'BIOS power-on after AC loss' 'check manually in BIOS: "Restore on AC power loss" = Power On, so it returns after a power cut'
 }
-$marker = Join-Path $env:LOCALAPPDATA 'Jie\bot-box\designated-host.txt'
+# Not AppData: see install-private-bot.ps1 (MSIX redirection from the Claude desktop app).
+$marker = Join-Path $env:USERPROFILE '.claude\bot-box\designated-host.txt'
 if ((Test-Path $marker) -and ((Get-Content $marker -TotalCount 1).Trim() -eq $env:COMPUTERNAME)) {
     Show-Row PASS 'Bot box designation' 'this machine is the designated bot box'
 } else {
@@ -172,6 +173,16 @@ if ((Test-Path $plugins) -and (Select-String -Path $plugins -Pattern 'discord@cl
     if ($hasToken -and $dcAccess -and $dcAccess.dmPolicy -eq 'allowlist' -and @($dcAccess.allowFrom).Count -eq 1) { Show-Row PASS 'Discord token + allowlist' 'token saved (value not shown), DMs from one user ID' }
     elseif ($hasToken) { Show-Row WARN 'Discord token + allowlist' 'token saved but access is not a one-user allowlist: run configure-discord.ps1 -UserId <id> -SkipToken' }
     else { Show-Row INFO 'Discord token + allowlist' 'not set yet: configure-discord.ps1 -UserId <id>' }
+    $claudeJson = Join-Path $env:USERPROFILE '.claude.json'
+    $wikiPath = (Join-Path $WorkspaceRoot 'jie_wiki') -replace '\\', '/'
+    $trusted = $false
+    if (Test-Path $claudeJson) {
+        foreach ($p in (Get-Content -Raw -Path $claudeJson | ConvertFrom-Json).projects.PSObject.Properties) {
+            if ($p.Name -ieq $wikiPath -and $p.Value.hasTrustDialogAccepted) { $trusted = $true }
+        }
+    }
+    if ($trusted) { Show-Row PASS 'jie_wiki trusted by Claude Code' 'the bot session can start without a prompt' }
+    else { Show-Row WARN 'jie_wiki trusted by Claude Code' 'not yet: the first bot start waits at the trust prompt in its console until you answer it' }
 }
 else { Show-Row INFO 'Discord channel plugin' 'not installed yet (install-private-bot.ps1 guides this)' }
 

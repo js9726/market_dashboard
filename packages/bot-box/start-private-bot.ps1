@@ -10,7 +10,7 @@
   Stop it by closing this window. The logon task (install-private-bot.ps1) starts it
   again at the next sign-in.
 
-  Log: %LOCALAPPDATA%\Jie\bot-box\logs\private-bot-YYYYMMDD.log
+  Log: %USERPROFILE%\.claude\bot-box\logs\private-bot-YYYYMMDD.log
 #>
 [CmdletBinding()]
 param(
@@ -26,7 +26,11 @@ $ErrorActionPreference = 'Continue'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $settingsFile = Join-Path $here 'private-bot.settings.json'
 $promptFile = Join-Path $here 'private-bot-prompt.md'
-$logDir = Join-Path $env:LOCALAPPDATA 'Jie\bot-box\logs'
+# Bot-box state lives under %USERPROFILE%\.claude, not AppData: a script started from the
+# Claude desktop app (an MSIX package) has its AppData writes silently redirected into the
+# package's LocalCache, where the logon task cannot see them.
+$stateDir = Join-Path $env:USERPROFILE '.claude\bot-box'
+$logDir = Join-Path $stateDir 'logs'
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 
 function Write-BotLog {
@@ -39,7 +43,7 @@ function Write-BotLog {
 
 # Only the designated bot box may run the bot: two machines running the same Discord
 # bot token would both answer every message. install-private-bot.ps1 writes the marker.
-$marker = Join-Path $env:LOCALAPPDATA 'Jie\bot-box\designated-host.txt'
+$marker = Join-Path $stateDir 'designated-host.txt'
 $designated = if (Test-Path $marker) { (Get-Content -Path $marker -TotalCount 1).Trim() } else { '' }
 if ($designated -ne $env:COMPUTERNAME) {
     Write-BotLog "This machine ($env:COMPUTERNAME) is not the designated bot box. Run install-private-bot.ps1 here first."
