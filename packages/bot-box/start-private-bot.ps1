@@ -7,8 +7,9 @@
   the dontAsk settings. When it exits it is restarted, with a backoff that grows while
   it keeps failing quickly and resets once it has run for 10 minutes.
 
-  Stop it by closing this window. The logon task (install-private-bot.ps1) starts it
-  again at the next sign-in.
+  Stop it by closing this window. Stop-ScheduledTask ends only this launcher and leaves
+  Claude Code running, so the launcher refuses to start while a bot session exists. The
+  logon task (install-private-bot.ps1) starts it again at the next sign-in.
 
   Log: %USERPROFILE%\.claude\bot-box\logs\private-bot-YYYYMMDD.log
 #>
@@ -73,6 +74,14 @@ while ($true) {
     # PowerShell 5.1 strips embedded double quotes from native-command arguments,
     # so the prompt is passed with single quotes instead.
     $prompt = (Get-Content -Raw -Path $promptFile) -replace '"', "'"
+
+    # Stop-ScheduledTask ends this launcher but not the Claude session it started, so a
+    # restart could leave two bot sessions answering every DM. Never start a second one.
+    $running = @(Get-CimInstance Win32_Process -Filter "Name='claude.exe'" | Where-Object { $_.CommandLine -match '--channels plugin:discord' })
+    if ($running.Count -gt 0) {
+        Write-BotLog ('A bot session is already running (claude.exe pid {0}); not starting another. Close its console window to stop it.' -f (($running | ForEach-Object { $_.ProcessId }) -join ', '))
+        exit 1
+    }
 
     Set-Location $WikiRoot
     $started = Get-Date

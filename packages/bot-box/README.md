@@ -103,6 +103,7 @@ message.
 |---|---|
 | Bot never replies | Is the console window open? Log: `%USERPROFILE%\.claude\bot-box\logs\`. Is your user ID the one in `access.json`, and do you share a server with the bot? |
 | "not the designated bot box" although you installed | The installer was run from the Claude desktop app with an older kit that kept its marker in AppData (redirected by Windows for packaged apps). Re-run `install-private-bot.ps1`; the marker now lives in `%USERPROFILE%\.claude\bot-box\` |
+| Stopping or restarting the bot | Close the bot's console window, then `Start-ScheduledTask BotBoxPrivateClaude`. `Stop-ScheduledTask` ends only the launcher; Claude keeps running, and the launcher refuses to start a second bot session |
 | `'bun' is not recognized` | A console opened before Bun was installed. The launcher rebuilds PATH; for other consoles, open a new one |
 | Changed `access.json`, no effect | Static mode reads it at bot start: close the bot console and `Start-ScheduledTask BotBoxPrivateClaude` |
 | Token leaked or reset | Developer Portal > Bot > Reset Token, then `configure-discord.ps1 -UserId <id>` again and restart the bot |
