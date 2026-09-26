@@ -5,12 +5,13 @@
 .DESCRIPTION
   1. Checks prerequisites (Claude Code >= 2.1.211, Bun, Chrome, the Claude-in-Chrome
      native host).
-  2. Installs the official Discord channel plugin (user scope).
+  2. Installs the official Discord channel plugin (user scope) and disables it for
+     ordinary sessions; the bot's settings file enables it for the bot session only.
   3. Registers the logon task BotBoxPrivateClaude, which runs start-private-bot.ps1 in a
      visible console every time you sign in.
 
-  It never asks for, reads or stores your Discord bot token. You enter the token
-  yourself inside Claude Code (README, step C).
+  It never asks for, reads or stores your Discord bot token. You save the token
+  yourself with configure-discord.ps1 (README, step 5).
 
   -InstallBun   also installs Bun with winget if it is missing
   -Uninstall    removes the logon task only (plugin and token are left alone)
@@ -102,6 +103,15 @@ if ($markets -notmatch 'claude-plugins-official') {
 & claude plugin install discord@claude-plugins-official --scope user
 if ($LASTEXITCODE -eq 0) { Say OK 'discord@claude-plugins-official installed (user scope)' }
 else { Say STOP 'Plugin install failed - see the message above'; exit 1 }
+# An enabled plugin starts its server - and logs in to Discord as the bot - in EVERY
+# Claude Code session. Keep it off for ordinary sessions; private-bot.settings.json turns
+# it on for the bot session only.
+$null = (& claude plugin disable discord@claude-plugins-official --scope user 2>&1)
+$userSettings = Join-Path $env:USERPROFILE '.claude\settings.json'
+$enabled = $null
+if (Test-Path $userSettings) { $enabled = (Get-Content -Raw -Path $userSettings | ConvertFrom-Json).enabledPlugins.'discord@claude-plugins-official' }
+if ($enabled -eq $false) { Say OK 'Plugin disabled for ordinary sessions (enabled only by the bot settings)' }
+else { Say STOP 'Could not disable the plugin for ordinary sessions: run  claude plugin disable discord@claude-plugins-official --scope user'; exit 1 }
 
 Write-Host ''
 Write-Host '=== 3. Logon task ===' -ForegroundColor Cyan
@@ -121,10 +131,10 @@ Say OK "Registered $TaskName (runs start-private-bot.ps1 at every sign-in of $us
 
 Write-Host ''
 Write-Host '=== 4. Your manual steps (the script cannot do these) ===' -ForegroundColor Cyan
-Say TODO 'Discord Developer Portal: New Application -> Bot -> Reset Token (copy it) -> enable MESSAGE CONTENT INTENT'
+Say TODO 'Discord Developer Portal: New Application -> Bot -> Reset Token (copy it) -> enable MESSAGE CONTENT INTENT -> turn OFF Public Bot'
 Say TODO 'OAuth2 -> URL Generator: scope "bot", permissions View Channels, Send Messages, Read Message History, Attach Files, Add Reactions; open the URL and add the bot to a server you are in'
-Say TODO 'In a NORMAL session (not the bot):  claude --channels plugin:discord@claude-plugins-official   then type  /discord:configure <your token>'
-Say TODO 'DM the bot; it replies with a pairing code. In that session:  /discord:access pair <code>   then  /discord:access policy allowlist'
-Say TODO 'Exit that session, then start the bot: sign out and in, or run  Start-ScheduledTask BotBoxPrivateClaude'
+Say TODO 'Discord app: User Settings -> Advanced -> Developer Mode on; right-click your avatar -> Copy User ID'
+Say TODO 'Here:  .\configure-discord.ps1 -UserId <your ID>   and paste the token at the hidden prompt (never paste it into Claude)'
+Say TODO 'Start the bot: sign out and in, or run  Start-ScheduledTask BotBoxPrivateClaude'
 Say TODO 'Test: DM the bot "status". If the reply is denied, run /mcp in the bot session and check the Discord server name matches mcp__plugin_discord_discord in private-bot.settings.json'
 exit 0

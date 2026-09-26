@@ -48,8 +48,14 @@ if ($designated -ne $env:COMPUTERNAME) {
 foreach ($f in @($settingsFile, $promptFile, $WikiRoot, $DashRoot)) {
     if (-not (Test-Path $f)) { Write-BotLog "Missing: $f"; exit 1 }
 }
+# A console opened before Bun was installed has a stale PATH, and the plugin's server
+# then fails with "'bun' is not recognized". Rebuild PATH from the registry.
+$env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
 if (-not (Get-Command claude -ErrorAction SilentlyContinue)) { Write-BotLog 'claude is not on PATH'; exit 1 }
 if (-not (Get-Command bun -ErrorAction SilentlyContinue)) { Write-BotLog 'bun is not on PATH (the Discord channel plugin needs it)'; exit 1 }
+$tokenFile = Join-Path $env:USERPROFILE '.claude\channels\discord\.env'
+$hasToken = $env:DISCORD_BOT_TOKEN -or ((Test-Path $tokenFile) -and (Select-String -Path $tokenFile -Pattern '^DISCORD_BOT_TOKEN=.' -Quiet))
+if (-not $hasToken) { Write-BotLog 'No Discord bot token saved. Run configure-discord.ps1 first.'; exit 1 }
 
 $backoff = 15
 while ($true) {

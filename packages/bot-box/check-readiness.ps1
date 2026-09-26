@@ -19,6 +19,8 @@ param(
 
 $ErrorActionPreference = 'SilentlyContinue'
 $script:Counts = @{ PASS = 0; WARN = 0; FAIL = 0; INFO = 0 }
+# Judge what a fresh sign-in sees: a console opened before a winget install has a stale PATH.
+$env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
 
 function Show-Row {
     param([string]$Level, [string]$Name, [string]$Detail)
@@ -155,7 +157,22 @@ $nmh = Get-ChildItem 'HKCU:\Software\Google\Chrome\NativeMessagingHosts' | Where
 if ($nmh) { Show-Row PASS 'Claude-in-Chrome host' 'registered (claude --chrome has run once)' }
 else { Show-Row WARN 'Claude-in-Chrome host' 'not registered yet: install the Claude extension, then run claude --chrome once' }
 $plugins = Join-Path $env:USERPROFILE '.claude\plugins\installed_plugins.json'
-if ((Test-Path $plugins) -and (Select-String -Path $plugins -Pattern 'discord@claude-plugins-official' -Quiet)) { Show-Row PASS 'Discord channel plugin' 'installed' }
+if ((Test-Path $plugins) -and (Select-String -Path $plugins -Pattern 'discord@claude-plugins-official' -Quiet)) {
+    Show-Row PASS 'Discord channel plugin' 'installed'
+    $userSettings = Join-Path $env:USERPROFILE '.claude\settings.json'
+    $enabled = $null
+    if (Test-Path $userSettings) { $enabled = (Get-Content -Raw -Path $userSettings | ConvertFrom-Json).enabledPlugins.'discord@claude-plugins-official' }
+    if ($enabled -eq $false) { Show-Row PASS 'Plugin off for ordinary sessions' 'only the bot session logs in to Discord' }
+    else { Show-Row FAIL 'Plugin off for ordinary sessions' 'enabled for every session: claude plugin disable discord@claude-plugins-official --scope user' }
+    $dcDir = Join-Path $env:USERPROFILE '.claude\channels\discord'
+    $dcEnv = Join-Path $dcDir '.env'
+    $hasToken = (Test-Path $dcEnv) -and (Select-String -Path $dcEnv -Pattern '^DISCORD_BOT_TOKEN=.' -Quiet)
+    $dcAccess = $null
+    if (Test-Path (Join-Path $dcDir 'access.json')) { $dcAccess = Get-Content -Raw -Path (Join-Path $dcDir 'access.json') | ConvertFrom-Json }
+    if ($hasToken -and $dcAccess -and $dcAccess.dmPolicy -eq 'allowlist' -and @($dcAccess.allowFrom).Count -eq 1) { Show-Row PASS 'Discord token + allowlist' 'token saved (value not shown), DMs from one user ID' }
+    elseif ($hasToken) { Show-Row WARN 'Discord token + allowlist' 'token saved but access is not a one-user allowlist: run configure-discord.ps1 -UserId <id> -SkipToken' }
+    else { Show-Row INFO 'Discord token + allowlist' 'not set yet: configure-discord.ps1 -UserId <id>' }
+}
 else { Show-Row INFO 'Discord channel plugin' 'not installed yet (install-private-bot.ps1 guides this)' }
 
 Write-Host ''
