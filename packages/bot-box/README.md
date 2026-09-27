@@ -21,21 +21,42 @@ host this and cannot run local Qwen TTS.
 | `check-readiness.ps1` | Read-only report: power, network, updates, auto-login, disk, software, repos, brokers, designation |
 | `install-private-bot.ps1` | Designates this machine, installs the Discord channel plugin (off for ordinary sessions), registers the logon task |
 | `configure-discord.ps1` | Saves the bot token from a hidden prompt and limits DMs to your Discord user ID |
-| `start-private-bot.ps1` | Runs the bot in a console and restarts it if it exits (started by the logon task) |
+| `start-private-bot.ps1` | Runs the bot in a console and restarts it if it exits (started by the logon task). `-PreflightOnly` runs every check and the refresh without starting Claude; `-NoPull` never fast-forwards |
+| `lib/BotBoxStartup.psm1` | Launcher safety: one-launcher lock, claim-aware guarded refresh, the freshness notice |
 | `private-bot.settings.json` | Permissions: `dontAsk` mode, an explicit allow-list, deny rules |
 | `private-bot-prompt.md` | Operating rules appended to the bot's system prompt |
-| `tools/measure_tickers.py` | Completed-bar ticker measurements; OpenD (full grade) or Yahoo (public grade) |
+| `tools/measure_tickers.py` | Completed-bar ticker measurements to stdout; OpenD (`broker` grade) or Yahoo (`public` grade), NYSE calendar, fail-closed freshness |
+| `tests/` | Offline regression tests (no network, broker, Claude or Discord); see Tests below |
 
 ## Security model
 
 - **`dontAsk` mode.** Anything not on the allow-list is denied instead of prompting, so an
   unattended session never stalls and never does something unlisted. Deny rules block in
   every mode as a second layer.
-- **Allowed:** reading the repos, web search/fetch, the brief and analysis scripts, the
-  dashboard push, writing under `evidence/` and `outputs/`, Chrome, and the Discord reply tools.
-- **Denied:** git push/commit/reset/checkout, deletes, deploys, builds (Prisma migrations),
-  system changes, the paper trader, reading secret stores and `.env` files, and the claude.ai
-  connectors for IBKR orders, Gmail, Vercel, Google Cloud, BigQuery, Drive, Notion, Calendar.
+- **Read-only against the shared checkouts.** The bot shares `jie_wiki` and `market_dashboard`
+  with Claude and Codex coding sessions, so it never writes to them and needs no claims.
+  Permission rules do not limit files a *program* writes itself, so only programs reviewed
+  as write-free are allowed: `measure_tickers.py`, `lint_wiki.py`, `carry_forward.py`,
+  `breadth_ma.py`, `market_edge.py`, `industry_proxies.py`. `tests/test_settings_policy.py`
+  pins that list.
+- **Allowed:** reading the repos, web search/fetch, the programs above, writing only under
+  `jie_wiki/outputs/bot-box/` (gitignored scratch for report attachments; shell redirects are
+  checked against the same rule), Chrome, and the Discord reply tools.
+- **Not available from the bot (2026-09-27 review, B1/B5):** the morning brief, screener,
+  verdict submission and dashboard pushes. Their scripts write to argument-chosen paths or to
+  tracked files in the shared checkout (`--out`, `--run-dir`, caches, verdict files). They
+  come back only once they write to enforced roots, or through the scheduled brief (step 3).
+- **Denied:** git push/commit/reset/checkout/pull/fetch and `git ... --output`, deletes,
+  deploys, builds (Prisma migrations), system changes, the paper trader, reading secret stores
+  and `.env` files, and the claude.ai connectors for IBKR orders, Gmail, Vercel, Google Cloud,
+  BigQuery, Drive, Notion, Calendar.
+- **Refresh without collisions.** Before each start the launcher fetches both repositories
+  and fast-forwards only when nothing can be lost or collide: no divergence, no merge/rebase
+  in progress, no active agent claim on the repository, no local change on an incoming path.
+  It never resets, stashes or cleans. Otherwise it leaves the checkout as found, logs why and
+  starts the bot in STALE mode, where the bot must say its wiki and skills may be out of date.
+- **One launcher.** The launcher holds an exclusive lock file for its lifetime (the OS
+  releases it if the launcher dies) and also refuses to start beside an orphaned bot session.
 - **The real boundaries are outside Claude:** the moomoo trade password is never stored on
   this machine (no unlocked trading), and TWS must have **Read-Only API** ticked. Permission
   rules are defence in depth, not the only line.
@@ -83,7 +104,8 @@ host this and cannot run local Qwen TTS.
    `jie_wiki` in the bot console. Answer it yourself, once; nothing, Discord included,
    starts until it is answered. (The desktop app does not set this flag for the CLI.)
 7. **Test:** DM the bot `status`, then `what does VEEV do`. Run `check-readiness.ps1`; it
-   should show this machine as the designated bot box.
+   should show this machine as the designated bot box. Then ask it to do something denied
+   (for example run the morning brief) and check it names the denied command and stops.
 
 ## Moving to another PC
 
@@ -97,6 +119,25 @@ message.
 3. On the new PC: `bootstrap-new-pc.ps1` from the migration kit, then `check-readiness.ps1`,
    then steps 1-7 above. Push both repositories first: the bootstrap clones from GitHub.
 
+## Tests
+
+Offline; they never start Claude or Discord, touch the network, the real checkouts or a
+running bot. Run from `market_dashboard/`:
+
+```
+python -m unittest discover -s packages/bot-box/tests -v
+powershell -NoProfile -ExecutionPolicy Bypass -File packages\bot-box\tests\Test-BotBoxStartup.ps1
+```
+
+- `test_measure_tickers.py`: no output option or file writes; stale and misaligned ticker/SPY
+  histories; NaN, infinity, zero and incoherent bars; stops at or above the close and the
+  1.5 ATR boundary; holidays, early closes, finalization and close-crossing requests; short
+  histories that cannot claim a 52-week high.
+- `test_settings_policy.py`: the allow-list holds only reviewed write-free programs.
+- `Test-BotBoxStartup.ps1`: failed fetch and fast-forward, dirty overlap, untracked collision,
+  divergence, merge in progress, active claims, failed claim check, concurrent launchers and
+  lock release, and a launcher-level preflight.
+
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -108,7 +149,9 @@ message.
 | Changed `access.json`, no effect | Static mode reads it at bot start: close the bot console and `Start-ScheduledTask BotBoxPrivateClaude` |
 | Token leaked or reset | Developer Portal > Bot > Reset Token, then `configure-discord.ps1 -UserId <id>` again and restart the bot |
 | Reply denied | Run `/mcp` in the bot session; the Discord server name must match `mcp__plugin_discord_discord` in `private-bot.settings.json` |
-| A command is denied | Expected for anything unlisted. Add an allow rule deliberately, never switch to skip-permissions |
+| A command is denied | Expected for anything unlisted. Add an allow rule deliberately and only for a program that writes no files (extend `tests/test_settings_policy.py`); never switch to skip-permissions |
+| Log says `refresh STALE` | Read the reason on that line. The launcher left the repository as found; fix it in a coding session (or wait for the agent's claim to end), then restart the bot |
+| "Another bot launcher is already running" | A launcher holds `%USERPROFILE%\.claude\bot-box\launcher.lock`. Use its console; the lock is released when that launcher exits |
 | Chrome "EADDRINUSE" / not connected | Only one Claude Code session can use Chrome on Windows. Close Chrome use elsewhere, or run the bot with `-NoChrome` |
 | Chrome tools stop after hours idle | The extension's service worker went idle; restart the bot or use `/chrome` > Reconnect |
 | Hits the subscription limit | The bot pauses until the usage window resets; heavy days (brief + podcast + audit) draw on the same plan |

@@ -11,6 +11,17 @@
   Claude Code running, so the launcher refuses to start while a bot session exists. The
   logon task (install-private-bot.ps1) starts it again at the next sign-in.
 
+  Only one launcher runs at a time: it holds an exclusive lock file for its lifetime
+  (released by the OS if it dies), and it also refuses to start while an orphaned bot
+  session from an earlier launcher is still running.
+
+  Before each start it refreshes both repositories through lib\BotBoxStartup.psm1: fetch,
+  then fast-forward only when nothing can be lost or collide (no divergence, no merge or
+  rebase in progress, no active agent claim on the repository, no local change on an
+  incoming path). It never resets, stashes or cleans. Anything else leaves the checkout as
+  found, logs the reason and starts the bot in STALE mode, where the bot must say its wiki
+  and skills may be out of date.
+
   Log: %USERPROFILE%\.claude\bot-box\logs\private-bot-YYYYMMDD.log
 #>
 [CmdletBinding()]
@@ -20,13 +31,19 @@ param(
     [int]$MaxBackoffSeconds = 300,
     # On Windows only one Claude Code session can drive Chrome at a time. Use -NoChrome
     # when you also want Chrome in your own interactive sessions on this machine.
-    [switch]$NoChrome
+    [switch]$NoChrome,
+    # Fetch and report only; never fast-forward the shared checkouts.
+    [switch]$NoPull,
+    # Run every startup check and the refresh, log the freshness notice, then exit
+    # without starting Claude. Exit 0 = would start, 1 = refused.
+    [switch]$PreflightOnly
 )
 
 $ErrorActionPreference = 'Continue'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $settingsFile = Join-Path $here 'private-bot.settings.json'
 $promptFile = Join-Path $here 'private-bot-prompt.md'
+Import-Module (Join-Path $here 'lib\BotBoxStartup.psm1') -Force
 # Bot-box state lives under %USERPROFILE%\.claude, not AppData: a script started from the
 # Claude desktop app (an MSIX package) has its AppData writes silently redirected into the
 # package's LocalCache, where the logon task cannot see them.
@@ -50,6 +67,13 @@ if ($designated -ne $env:COMPUTERNAME) {
     Write-BotLog "This machine ($env:COMPUTERNAME) is not the designated bot box. Run install-private-bot.ps1 here first."
     exit 1
 }
+# Held until this process exits. A second launcher (a double-clicked logon task, a manual
+# start while the task runs) cannot get it and stops here, before touching anything.
+$launcherLock = Enter-BotLauncherLock -Path (Join-Path $stateDir 'launcher.lock')
+if (-not $launcherLock) {
+    Write-BotLog 'Another bot launcher is already running on this machine (launcher.lock is held); not starting a second one.'
+    exit 1
+}
 foreach ($f in @($settingsFile, $promptFile, $WikiRoot, $DashRoot)) {
     if (-not (Test-Path $f)) { Write-BotLog "Missing: $f"; exit 1 }
 }
@@ -64,23 +88,36 @@ if (-not $hasToken) { Write-BotLog 'No Discord bot token saved. Run configure-di
 
 $backoff = 15
 while ($true) {
-    foreach ($repo in @($WikiRoot, $DashRoot)) {
-        Push-Location $repo
-        $result = (git pull --ff-only 2>&1 | Select-Object -Last 1)
-        Pop-Location
-        Write-BotLog ('git pull --ff-only {0}: {1}' -f (Split-Path $repo -Leaf), $result)
-    }
-
-    # PowerShell 5.1 strips embedded double quotes from native-command arguments,
-    # so the prompt is passed with single quotes instead.
-    $prompt = (Get-Content -Raw -Path $promptFile) -replace '"', "'"
-
-    # Stop-ScheduledTask ends this launcher but not the Claude session it started, so a
-    # restart could leave two bot sessions answering every DM. Never start a second one.
+    # Stop-ScheduledTask ends a launcher but not the Claude session it started, and that
+    # orphan does not hold the launcher lock. Never start a second bot beside it.
     $running = @(Get-CimInstance Win32_Process -Filter "Name='claude.exe'" | Where-Object { $_.CommandLine -match '--channels plugin:discord' })
     if ($running.Count -gt 0) {
         Write-BotLog ('A bot session is already running (claude.exe pid {0}); not starting another. Close its console window to stop it.' -f (($running | ForEach-Object { $_.ProcessId }) -join ', '))
         exit 1
+    }
+
+    # The launcher writes to the shared checkouts only by fast-forwarding, and only when
+    # no agent holds an active claim on that repository (agent-system/atomic-claims.md).
+    $claims = Get-BotActiveClaimRepositories -WikiRoot $WikiRoot
+    if (-not $claims.Ok) { Write-BotLog "WARN claim check failed: $($claims.Error); repositories will not be fast-forwarded" }
+    $fresh = foreach ($repo in @($WikiRoot, $DashRoot)) {
+        $r = Update-BotRepo -Repo $repo -NoPull:$NoPull -ClaimedRepositories $claims.Repositories -ClaimCheckError $claims.Error
+        Write-BotLog ('{0} refresh {1}: {2}' -f $r.Repo, $(if ($r.Fresh) { 'OK' } else { 'STALE' }), $r.Reason)
+        $r
+    }
+    $notice = Get-BotFreshnessNotice -Results @($fresh)
+    if (@($fresh | Where-Object { -not $_.Fresh }).Count -gt 0) {
+        Write-BotLog 'WARN starting in STALE mode: the bot is told its wiki and skills may be out of date'
+    }
+
+    # PowerShell 5.1 strips embedded double quotes from native-command arguments,
+    # so the prompt is passed with single quotes instead.
+    $prompt = ((Get-Content -Raw -Path $promptFile) + $notice) -replace '"', "'"
+
+    if ($PreflightOnly) {
+        Write-BotLog 'Preflight only: all startup checks passed; Claude was not started'
+        Write-Host $notice
+        exit 0
     }
 
     Set-Location $WikiRoot
