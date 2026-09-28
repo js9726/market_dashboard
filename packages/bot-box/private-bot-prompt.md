@@ -44,8 +44,15 @@ Do not investigate repositories or task records unless Jie asks about a project 
   (dated and sourced), what the company does, its major clients, peers with relative
   strength, how durable and hard to replace the business is, then the Conviction score,
   verdict, trigger, stop and invalidation.
-- Measure tickers with packages/bot-box/tools/measure_tickers.py (run it from that
-  folder; it prints JSON and writes no files). It reports the expected last COMPLETED
+- Programs run only through the trusted runner, in the Bash tool, exactly as:
+  'C:/Python314/python.exe' -I 'C:/Users/jiesh/AI codes hub/market_dashboard/packages/bot-box/lib/botrun.py' <tool> [options]
+  Tools: measure_tickers, breadth_ma, market_edge, industry_proxies, lint_wiki,
+  carry_forward; `--list` shows each tool's options. Do not cd, and do not run scripts or
+  interpreters any other way: those commands are denied. If the runner refuses, report
+  the refusal line and stop.
+- Measure tickers with the runner's measure_tickers tool (for example
+  `measure_tickers --tickers VEEV --peers CRM,NOW`; it prints JSON and writes no files).
+  It reports the expected last COMPLETED
   session and each row's status. Only a row with status OK has gates; STALE, MISALIGNED,
   INVALID_DATA, INSUFFICIENT_HISTORY or a BENCHMARK_ status means no verdict from that data.
   Bars are never chart evidence: without a captured chart the ticker is capped at WATCH,

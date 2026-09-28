@@ -1,13 +1,17 @@
-"""Policy regression tests for private-bot.settings.json (review findings B1 and B5).
+"""Policy regression tests for private-bot.settings.json (review findings B1, B5 and B6).
 
 Claude Code's Write/Edit rules do not restrict files a program writes itself, so every
-allow-listed program must be write-free, and the bot may write only to its own
-gitignored scratch folder. These tests pin that policy; widening it must be deliberate.
+program the bot may run must be write-free, and the bot may write only to its own
+gitignored scratch folder. Since B6 the bot runs programs only through lib/botrun.py,
+named by absolute path and run by a fixed interpreter in isolated mode; the runner, not
+the command text, decides what executes (tests/test_botrun.py). These tests pin that
+policy; widening it must be deliberate.
 
     python -m unittest discover -s packages/bot-box/tests -v
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 import unittest
@@ -18,16 +22,25 @@ SETTINGS = json.loads((KIT / "private-bot.settings.json").read_text(encoding="ut
 ALLOW = SETTINGS["permissions"]["allow"]
 DENY = SETTINGS["permissions"]["deny"]
 
-# Every program the bot may run, with why it cannot write files. Reviewed 2026-09-27
+_spec = importlib.util.spec_from_file_location("botrun", KIT / "lib" / "botrun.py")
+BOTRUN = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(BOTRUN)
+
+# Every tool the runner may start, with why it cannot write files. Reviewed 2026-09-27
 # against the scripts' own file writes and output-path flags.
 WRITE_FREE_PROGRAMS = {
-    "Bash(python scripts/lint_wiki.py:*)": "reads the wiki, prints findings",
-    "Bash(python skills/tradingview-daily-screener/scripts/carry_forward.py:*)": "reads verdict files, prints",
-    "Bash(python breadth_ma.py:*)": "network read, prints",
-    "Bash(python market_edge.py:*)": "OpenD/Finviz-cache read, prints",
-    "Bash(python industry_proxies.py:*)": "OpenD read, prints",
-    "Bash(python measure_tickers.py:*)": "stdout only, no output option (tests/test_measure_tickers.py)",
+    "lint_wiki": "reads the wiki, prints findings",
+    "carry_forward": "reads verdict files, prints",
+    "breadth_ma": "network read, prints",
+    "market_edge": "OpenD/Finviz-cache read, prints",
+    "industry_proxies": "OpenD read, prints",
+    "measure_tickers": "stdout only, no output option (tests/test_measure_tickers.py)",
 }
+# The launcher turns the prompt's double quotes into single quotes (PowerShell 5.1), so the
+# same absolute paths are allowed in either quote style and in no other form.
+RUNNER_RULE = re.compile(
+    r"""Bash\((?P<q>["'])(?P<python>[A-Za-z]:/[^"']+/python\.exe)(?P=q) -I """
+    r"""(?P=q)(?P<runner>[A-Za-z]:/[^"']+/lib/botrun\.py)(?P=q) \*\)\Z""")
 # Removed because they write where an argument says or into tracked shared-checkout files.
 WRITERS = [
     "session_guard.py", "submit_verdict.py", "fetch_tv_snapshot.py", "build_desk.py", "preflight.py",
@@ -40,13 +53,44 @@ class SettingsPolicy(unittest.TestCase):
     def test_dont_ask_mode(self):
         self.assertEqual(SETTINGS["permissions"]["defaultMode"], "dontAsk")
 
-    def test_every_allowed_program_is_reviewed_write_free(self):
-        programs = [a for a in ALLOW if a.startswith("Bash(") and not a.startswith("Bash(cd:")]
-        self.assertEqual(sorted(programs), sorted(WRITE_FREE_PROGRAMS))
+    def test_the_only_program_rule_is_the_trusted_runner(self):
+        programs = [a for a in ALLOW if a.startswith(("Bash", "PowerShell"))]
+        self.assertEqual(len(programs), 2, programs)
+        matches = [RUNNER_RULE.match(a) for a in programs]
+        self.assertTrue(all(matches), programs)
+        self.assertEqual(sorted(m["q"] for m in matches), ['"', "'"])
+        self.assertEqual(len({(m["python"], m["runner"]) for m in matches}), 1)
+        self.assertEqual(Path(matches[0]["runner"]).resolve(), (KIT / "lib" / "botrun.py").resolve())
+        self.assertTrue(Path(matches[0]["python"]).is_absolute())
+
+    def test_prompt_shows_the_runner_command_the_rule_allows(self):
+        prompt = (KIT / "private-bot-prompt.md").read_text(encoding="utf-8").replace('"', "'")
+        rule = [a for a in ALLOW if a.startswith("Bash('")][0][len("Bash("):-len(" *)")]
+        self.assertIn(rule + " <tool>", prompt)
+
+    def test_no_cd_or_relative_script_rules(self):
+        for a in ALLOW:
+            self.assertFalse(a.startswith(("Bash(cd", "Bash(python ", "Bash(py ")), a)
+
+    def test_interpreters_shells_and_cd_are_denied(self):
+        for d in ("Bash(cd *)", "Bash(pushd *)", "Bash(python *)", "Bash(python3 *)", "Bash(py *)",
+                  "Bash(pip *)", "Bash(node *)", "Bash(bun *)", "Bash(npx *)", "Bash(bash *)", "Bash(sh *)",
+                  "Bash(cmd *)", "Bash(powershell *)", "Bash(pwsh *)", "Bash(source *)"):
+            self.assertIn(d, DENY)
+        # A deny rule beats every allow rule, so none may cover the runner command itself.
+        for rule in [a for a in ALLOW if a.startswith("Bash(")]:
+            runner = rule[len("Bash("):-len(" *)")]
+            for d in DENY:
+                if d.startswith("Bash(") and d.endswith(" *)"):
+                    self.assertFalse(runner.startswith(d[len("Bash("):-len(" *)")] + " "), d)
+
+    def test_every_runner_tool_is_reviewed_write_free(self):
+        self.assertEqual(sorted(BOTRUN.TOOLS), sorted(WRITE_FREE_PROGRAMS))
 
     def test_no_writer_is_allowed(self):
         for w in WRITERS:
             self.assertFalse([a for a in ALLOW if w in a], w)
+            self.assertFalse([t for t in BOTRUN.TOOLS.values() if t[1].endswith("/" + w)], w)
 
     def test_no_git_allow_rules_and_output_flag_denied(self):
         self.assertFalse([a for a in ALLOW if re.match(r"Bash\(git\b", a)])

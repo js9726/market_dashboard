@@ -23,6 +23,7 @@ host this and cannot run local Qwen TTS.
 | `configure-discord.ps1` | Saves the bot token from a hidden prompt and limits DMs to your Discord user ID |
 | `start-private-bot.ps1` | Runs the bot in a console and restarts it if it exits (started by the logon task). `-PreflightOnly` runs every check and the refresh without starting Claude; `-NoPull` never fast-forwards |
 | `lib/BotBoxStartup.psm1` | Launcher safety: one-launcher lock, claim-aware guarded refresh, the freshness notice |
+| `lib/botrun.py` | The only way the bot runs a program: fixed tool names, committed code only, per-tool argument checks, isolated execution |
 | `private-bot.settings.json` | Permissions: `dontAsk` mode, an explicit allow-list, deny rules |
 | `private-bot-prompt.md` | Operating rules appended to the bot's system prompt |
 | `tools/measure_tickers.py` | Completed-bar ticker measurements to stdout; OpenD (`broker` grade) or Yahoo (`public` grade), NYSE calendar, fail-closed freshness |
@@ -39,6 +40,16 @@ host this and cannot run local Qwen TTS.
   as write-free are allowed: `measure_tickers.py`, `lint_wiki.py`, `carry_forward.py`,
   `breadth_ma.py`, `market_edge.py`, `industry_proxies.py`. `tests/test_settings_policy.py`
   pins that list.
+- **One trusted way to run programs (2026-09-28, B6).** The only program rule is
+  `"C:/Python314/python.exe" -I ".../packages/bot-box/lib/botrun.py" <tool> [options]`.
+  There is no `cd` rule and no relative `python <script>` rule, and `cd`, bare interpreters
+  and shells are denied, because a relative script name could resolve to a same-named file
+  the bot wrote into its scratch folder. The runner, not the command text, decides what
+  runs: tool names map to fixed scripts; each script and every importable file beside it
+  must be committed and unchanged (untracked or ignored code refuses the run); arguments
+  are checked per tool; the tool runs from its own folder with `-E -B`, a fresh bytecode
+  cache and every `PYTHON*` variable removed. The interpreter and runner paths in the rule
+  are this machine's; update both on another PC.
 - **Allowed:** reading the repos, web search/fetch, the programs above, writing only under
   `jie_wiki/outputs/bot-box/` (gitignored scratch for report attachments; shell redirects are
   checked against the same rule), Chrome, and the Discord reply tools.
@@ -133,7 +144,20 @@ powershell -NoProfile -ExecutionPolicy Bypass -File packages\bot-box\tests\Test-
   histories; NaN, infinity, zero and incoherent bars; stops at or above the close and the
   1.5 ATR boundary; holidays, early closes, finalization and close-crossing requests; short
   histories that cannot claim a 52-week high.
-- `test_settings_policy.py`: the allow-list holds only reviewed write-free programs.
+- `test_settings_policy.py`: the only program rule is the trusted runner with absolute
+  paths; no `cd` or relative script rules; `cd`, interpreters and shells denied without any
+  deny covering the runner; the runner's tools are the reviewed write-free set.
+- `test_botrun.py` (B6, disposable Git repositories and a scratch folder of same-named
+  look-alikes): the canonical call runs the committed tool; scratch names and paths are
+  refused; sibling imports come from the tool's folder whatever the cwd; `PYTHONPATH`,
+  `PYTHONSTARTUP` and `PYTHONUSERBASE` cannot inject code; modified, staged, untracked,
+  ignored or sourceless-bytecode code beside a tool refuses the run; a junction-swapped
+  tool folder is refused; per-tool argument schemas hold; data paths are passed absolute.
+- `accept_host_policy.py` (not in the offline suite; needs a signed-in Claude Code and spends
+  a little of the plan): one disposable `claude -p` session with these exact permission rules,
+  the Discord plugin off, in a throwaway folder of scratch look-alikes. Twelve steps; the
+  verdict comes from Claude Code's own permission denials and the filesystem. Run it after
+  any settings change: `python packages/bot-box/tests/accept_host_policy.py --model haiku`.
 - `Test-BotBoxStartup.ps1`: failed fetch and fast-forward, dirty overlap, untracked collision,
   divergence, merge in progress, active claims, failed claim check, concurrent launchers and
   lock release, and a launcher-level preflight.
