@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-09-28T20:02:15.627799Z",
+  "built_at": "2026-09-28T20:14:06.886681Z",
   "groups": {
     "Indices": [
       {
@@ -556,19 +556,19 @@
       },
       {
         "ticker": "UTES",
-        "daily": -0.68,
-        "intra": -0.47,
-        "5d": -2.38,
-        "20d": -5.04,
+        "daily": -0.64,
+        "intra": -0.43,
+        "5d": -2.34,
+        "20d": -5.0,
         "atr_pct": 1.7,
-        "dist_sma50_atr": -4.39,
-        "rs": 10.0,
+        "dist_sma50_atr": -4.37,
+        "rs": 15.0,
         "rs_chart": "data/charts/UTES.png",
         "long": [],
         "short": [],
         "abc": "C",
         "rvol": 0.69,
-        "off_52w_high_pct": -18.98
+        "off_52w_high_pct": -18.94
       },
       {
         "ticker": "ROBO",
@@ -888,12 +888,12 @@
       },
       {
         "ticker": "DRIV",
-        "daily": -1.6,
-        "intra": -1.08,
-        "5d": -3.28,
-        "20d": -4.23,
+        "daily": -1.56,
+        "intra": -1.05,
+        "5d": -3.25,
+        "20d": -4.19,
         "atr_pct": 1.9,
-        "dist_sma50_atr": -1.89,
+        "dist_sma50_atr": -1.88,
         "rs": 65.0,
         "rs_chart": "data/charts/DRIV.png",
         "long": [
@@ -902,7 +902,7 @@
         "short": [],
         "abc": "C",
         "rvol": 0.37,
-        "off_52w_high_pct": -21.98
+        "off_52w_high_pct": -21.95
       },
       {
         "ticker": "MSOS",
@@ -924,12 +924,12 @@
       },
       {
         "ticker": "SOCL",
-        "daily": -1.06,
-        "intra": -0.26,
-        "5d": -3.24,
-        "20d": -3.79,
+        "daily": -1.05,
+        "intra": -0.25,
+        "5d": -3.23,
+        "20d": -3.78,
         "atr_pct": 1.6,
-        "dist_sma50_atr": -2.33,
+        "dist_sma50_atr": -2.32,
         "rs": 5.0,
         "rs_chart": "data/charts/SOCL.png",
         "long": [],
@@ -1134,19 +1134,19 @@
       },
       {
         "ticker": "IPAY",
-        "daily": -1.42,
-        "intra": -0.57,
-        "5d": -1.85,
-        "20d": -8.73,
+        "daily": -1.61,
+        "intra": -0.76,
+        "5d": -2.03,
+        "20d": -8.9,
         "atr_pct": 1.8,
-        "dist_sma50_atr": -3.19,
+        "dist_sma50_atr": -3.28,
         "rs": 0.0,
         "rs_chart": "data/charts/IPAY.png",
         "long": [],
         "short": [],
         "abc": "C",
         "rvol": 0.57,
-        "off_52w_high_pct": -18.76
+        "off_52w_high_pct": -18.92
       },
       {
         "ticker": "IWM",
@@ -1696,19 +1696,19 @@
       },
       {
         "ticker": "GREK",
-        "daily": 1.44,
-        "intra": 0.95,
-        "5d": -0.05,
-        "20d": 0.89,
+        "daily": 1.45,
+        "intra": 0.96,
+        "5d": -0.03,
+        "20d": 0.9,
         "atr_pct": 1.5,
-        "dist_sma50_atr": 2.42,
+        "dist_sma50_atr": 2.43,
         "rs": 75.0,
         "rs_chart": "data/charts/GREK.png",
         "long": [],
         "short": [],
         "abc": "A",
         "rvol": 0.54,
-        "off_52w_high_pct": -1.7
+        "off_52w_high_pct": -1.69
       },
       {
         "ticker": "EWP",
@@ -2188,11 +2188,11 @@
     "Countries": {
       "daily": [
         -2.98,
-        1.44
+        1.45
       ],
       "intra": [
         -2.03,
-        0.95
+        0.96
       ],
       "5d": [
         -6.55,
@@ -2222,10 +2222,10 @@
       },
       {
         "industry": "Lodging",
-        "perf_1d": "1.92%",
-        "perf_1w": "3.94%",
-        "perf_1m": "-1.38%",
-        "perf_3m": "-5.08%"
+        "perf_1d": "1.94%",
+        "perf_1w": "3.96%",
+        "perf_1m": "-1.36%",
+        "perf_3m": "-5.06%"
       },
       {
         "industry": "Coking Coal",
@@ -2236,7 +2236,7 @@
       },
       {
         "industry": "Trucking",
-        "perf_1d": "1.64%",
+        "perf_1d": "1.63%",
         "perf_1w": "-0.81%",
         "perf_1m": "-9.60%",
         "perf_3m": "-18.33%"
@@ -2251,13 +2251,6 @@
         "perf_3m": "-15.71%"
       },
       {
-        "industry": "Gambling",
-        "perf_1d": "-4.84%",
-        "perf_1w": "-7.58%",
-        "perf_1m": "-15.81%",
-        "perf_3m": "-21.28%"
-      },
-      {
         "industry": "Other Precious Metals & Mining",
         "perf_1d": "-4.84%",
         "perf_1w": "-6.66%",
@@ -2265,9 +2258,16 @@
         "perf_3m": "7.37%"
       },
       {
+        "industry": "Gambling",
+        "perf_1d": "-4.85%",
+        "perf_1w": "-7.59%",
+        "perf_1m": "-15.82%",
+        "perf_3m": "-21.29%"
+      },
+      {
         "industry": "Gold",
         "perf_1d": "-5.40%",
-        "perf_1w": "-7.21%",
+        "perf_1w": "-7.22%",
         "perf_1m": "-15.49%",
         "perf_3m": "15.81%"
       },
@@ -2296,10 +2296,10 @@
       },
       {
         "industry": "Lodging",
-        "perf_1d": "1.92%",
-        "perf_1w": "3.94%",
-        "perf_1m": "-1.38%",
-        "perf_3m": "-5.08%"
+        "perf_1d": "1.94%",
+        "perf_1w": "3.96%",
+        "perf_1m": "-1.36%",
+        "perf_3m": "-5.06%"
       },
       {
         "industry": "Coking Coal",
@@ -2310,7 +2310,7 @@
       },
       {
         "industry": "Trucking",
-        "perf_1d": "1.64%",
+        "perf_1d": "1.63%",
         "perf_1w": "-0.81%",
         "perf_1m": "-9.60%",
         "perf_3m": "-18.33%"
@@ -2345,7 +2345,7 @@
       },
       {
         "industry": "REIT - Hotel & Motel",
-        "perf_1d": "0.93%",
+        "perf_1d": "0.92%",
         "perf_1w": "1.85%",
         "perf_1m": "-1.21%",
         "perf_3m": "-5.24%"
@@ -2361,7 +2361,7 @@
         "industry": "Diagnostics & Research",
         "perf_1d": "0.80%",
         "perf_1w": "4.38%",
-        "perf_1m": "6.73%",
+        "perf_1m": "6.74%",
         "perf_3m": "25.56%"
       },
       {
@@ -2375,7 +2375,7 @@
         "industry": "Apparel Manufacturing",
         "perf_1d": "0.72%",
         "perf_1w": "1.18%",
-        "perf_1m": "-6.58%",
+        "perf_1m": "-6.59%",
         "perf_3m": "-11.59%"
       },
       {
@@ -2387,17 +2387,17 @@
       },
       {
         "industry": "Semiconductor Equipment & Materials",
-        "perf_1d": "0.63%",
+        "perf_1d": "0.64%",
         "perf_1w": "3.85%",
         "perf_1m": "1.47%",
         "perf_3m": "-20.50%"
       },
       {
         "industry": "Integrated Freight & Logistics",
-        "perf_1d": "0.60%",
-        "perf_1w": "-1.82%",
+        "perf_1d": "0.59%",
+        "perf_1w": "-1.83%",
         "perf_1m": "-10.29%",
-        "perf_3m": "-12.62%"
+        "perf_3m": "-12.63%"
       },
       {
         "industry": "Discount Stores",
@@ -2410,7 +2410,7 @@
         "industry": "Electronic Gaming & Multimedia",
         "perf_1d": "0.50%",
         "perf_1w": "-3.61%",
-        "perf_1m": "-2.95%",
+        "perf_1m": "-2.94%",
         "perf_3m": "-13.37%"
       },
       {
@@ -2425,7 +2425,7 @@
         "perf_1d": "0.45%",
         "perf_1w": "1.15%",
         "perf_1m": "-2.68%",
-        "perf_3m": "-4.89%"
+        "perf_3m": "-4.90%"
       },
       {
         "industry": "REIT - Healthcare Facilities",
@@ -2435,18 +2435,18 @@
         "perf_3m": "-0.73%"
       },
       {
+        "industry": "Biotechnology",
+        "perf_1d": "0.42%",
+        "perf_1w": "-0.80%",
+        "perf_1m": "-5.85%",
+        "perf_3m": "3.71%"
+      },
+      {
         "industry": "Medical Devices",
         "perf_1d": "0.42%",
         "perf_1w": "-0.79%",
         "perf_1m": "-6.56%",
-        "perf_3m": "2.08%"
-      },
-      {
-        "industry": "Biotechnology",
-        "perf_1d": "0.41%",
-        "perf_1w": "-0.80%",
-        "perf_1m": "-5.86%",
-        "perf_3m": "3.71%"
+        "perf_3m": "2.07%"
       },
       {
         "industry": "Drug Manufacturers - General",
@@ -2458,7 +2458,7 @@
       {
         "industry": "Specialty Retail",
         "perf_1d": "0.34%",
-        "perf_1w": "0.49%",
+        "perf_1w": "0.50%",
         "perf_1m": "-3.60%",
         "perf_3m": "-4.36%"
       },
@@ -2473,7 +2473,7 @@
         "industry": "Food Distribution",
         "perf_1d": "0.28%",
         "perf_1w": "-0.16%",
-        "perf_1m": "-7.14%",
+        "perf_1m": "-7.15%",
         "perf_3m": "-7.51%"
       },
       {
@@ -2501,8 +2501,8 @@
         "industry": "Packaged Foods",
         "perf_1d": "0.08%",
         "perf_1w": "-2.89%",
-        "perf_1m": "-10.32%",
-        "perf_3m": "-6.33%"
+        "perf_1m": "-10.33%",
+        "perf_3m": "-6.34%"
       },
       {
         "industry": "Oil & Gas Midstream",
@@ -2513,9 +2513,9 @@
       },
       {
         "industry": "Marine Shipping",
-        "perf_1d": "0.06%",
-        "perf_1w": "-4.88%",
-        "perf_1m": "0.00%",
+        "perf_1d": "0.05%",
+        "perf_1w": "-4.89%",
+        "perf_1m": "-0.01%",
         "perf_3m": "15.74%"
       },
       {
@@ -2527,9 +2527,9 @@
       },
       {
         "industry": "Airports & Air Services",
-        "perf_1d": "-0.01%",
+        "perf_1d": "-0.00%",
         "perf_1w": "1.13%",
-        "perf_1m": "-3.88%",
+        "perf_1m": "-3.87%",
         "perf_3m": "-17.65%"
       },
       {
@@ -2570,23 +2570,16 @@
       {
         "industry": "Farm & Heavy Construction Machinery",
         "perf_1d": "-0.14%",
-        "perf_1w": "-0.07%",
+        "perf_1w": "-0.08%",
         "perf_1m": "1.67%",
         "perf_3m": "-11.52%"
       },
       {
         "industry": "Publishing",
-        "perf_1d": "-0.15%",
+        "perf_1d": "-0.14%",
         "perf_1w": "-4.12%",
-        "perf_1m": "-5.85%",
+        "perf_1m": "-5.84%",
         "perf_3m": "-5.70%"
-      },
-      {
-        "industry": "Pharmaceutical Retailers",
-        "perf_1d": "-0.21%",
-        "perf_1w": "4.51%",
-        "perf_1m": "4.48%",
-        "perf_3m": "15.88%"
       },
       {
         "industry": "Travel Services",
@@ -2631,18 +2624,18 @@
         "perf_3m": "-10.25%"
       },
       {
-        "industry": "Financial Conglomerates",
-        "perf_1d": "-0.34%",
-        "perf_1w": "-1.77%",
-        "perf_1m": "-0.20%",
-        "perf_3m": "5.88%"
+        "industry": "Pharmaceutical Retailers",
+        "perf_1d": "-0.33%",
+        "perf_1w": "4.39%",
+        "perf_1m": "4.35%",
+        "perf_3m": "15.74%"
       },
       {
-        "industry": "Business Equipment & Supplies",
-        "perf_1d": "-0.36%",
-        "perf_1w": "2.59%",
-        "perf_1m": "-2.51%",
-        "perf_3m": "-2.71%"
+        "industry": "Financial Conglomerates",
+        "perf_1d": "-0.35%",
+        "perf_1w": "-1.78%",
+        "perf_1m": "-0.21%",
+        "perf_3m": "5.87%"
       },
       {
         "industry": "Confectioners",
@@ -2652,16 +2645,23 @@
         "perf_3m": "-2.45%"
       },
       {
+        "industry": "Business Equipment & Supplies",
+        "perf_1d": "-0.39%",
+        "perf_1w": "2.57%",
+        "perf_1m": "-2.54%",
+        "perf_3m": "-2.73%"
+      },
+      {
         "industry": "Leisure",
-        "perf_1d": "-0.38%",
-        "perf_1w": "-0.44%",
-        "perf_1m": "-9.51%",
-        "perf_3m": "-13.43%"
+        "perf_1d": "-0.39%",
+        "perf_1w": "-0.45%",
+        "perf_1m": "-9.52%",
+        "perf_3m": "-13.44%"
       },
       {
         "industry": "Oil & Gas Refining & Marketing",
         "perf_1d": "-0.39%",
-        "perf_1w": "-2.50%",
+        "perf_1w": "-2.49%",
         "perf_1m": "7.97%",
         "perf_3m": "44.32%"
       },
@@ -2676,8 +2676,15 @@
         "industry": "REIT - Specialty",
         "perf_1d": "-0.48%",
         "perf_1w": "-4.80%",
-        "perf_1m": "-7.49%",
-        "perf_3m": "-8.94%"
+        "perf_1m": "-7.48%",
+        "perf_3m": "-8.93%"
+      },
+      {
+        "industry": "Farm Products",
+        "perf_1d": "-0.49%",
+        "perf_1w": "-3.44%",
+        "perf_1m": "-2.28%",
+        "perf_3m": "-1.14%"
       },
       {
         "industry": "Insurance - Diversified",
@@ -2687,18 +2694,11 @@
         "perf_3m": "1.06%"
       },
       {
-        "industry": "Farm Products",
-        "perf_1d": "-0.50%",
-        "perf_1w": "-3.44%",
-        "perf_1m": "-2.28%",
-        "perf_3m": "-1.14%"
-      },
-      {
         "industry": "Broadcasting",
-        "perf_1d": "-0.51%",
-        "perf_1w": "-3.01%",
-        "perf_1m": "-8.03%",
-        "perf_3m": "-4.86%"
+        "perf_1d": "-0.50%",
+        "perf_1w": "-3.00%",
+        "perf_1m": "-8.02%",
+        "perf_3m": "-4.85%"
       },
       {
         "industry": "Tools & Accessories",
@@ -2779,10 +2779,17 @@
       },
       {
         "industry": "Other Industrial Metals & Mining",
-        "perf_1d": "-0.70%",
+        "perf_1d": "-0.69%",
         "perf_1w": "-2.99%",
         "perf_1m": "-12.11%",
         "perf_3m": "-1.79%"
+      },
+      {
+        "industry": "Thermal Coal",
+        "perf_1d": "-0.69%",
+        "perf_1w": "-1.55%",
+        "perf_1m": "-10.24%",
+        "perf_3m": "7.56%"
       },
       {
         "industry": "Oil & Gas E&P",
@@ -2796,14 +2803,7 @@
         "perf_1d": "-0.73%",
         "perf_1w": "-0.47%",
         "perf_1m": "-4.82%",
-        "perf_3m": "-1.69%"
-      },
-      {
-        "industry": "Engineering & Construction",
-        "perf_1d": "-0.73%",
-        "perf_1w": "-1.35%",
-        "perf_1m": "-3.68%",
-        "perf_3m": "-18.02%"
+        "perf_3m": "-1.68%"
       },
       {
         "industry": "Building Materials",
@@ -2813,6 +2813,13 @@
         "perf_3m": "-20.45%"
       },
       {
+        "industry": "Engineering & Construction",
+        "perf_1d": "-0.74%",
+        "perf_1w": "-1.35%",
+        "perf_1m": "-3.68%",
+        "perf_3m": "-18.02%"
+      },
+      {
         "industry": "Specialty Industrial Machinery",
         "perf_1d": "-0.74%",
         "perf_1w": "0.66%",
@@ -2820,17 +2827,10 @@
         "perf_3m": "-7.43%"
       },
       {
-        "industry": "Thermal Coal",
-        "perf_1d": "-0.75%",
-        "perf_1w": "-1.61%",
-        "perf_1m": "-10.30%",
-        "perf_3m": "7.49%"
-      },
-      {
         "industry": "Chemicals",
-        "perf_1d": "-0.77%",
-        "perf_1w": "-0.82%",
-        "perf_1m": "-5.20%",
+        "perf_1d": "-0.78%",
+        "perf_1w": "-0.83%",
+        "perf_1m": "-5.21%",
         "perf_3m": "-2.32%"
       },
       {
@@ -2843,16 +2843,9 @@
       {
         "industry": "Packaging & Containers",
         "perf_1d": "-0.79%",
-        "perf_1w": "-1.06%",
+        "perf_1w": "-1.05%",
         "perf_1m": "-8.49%",
         "perf_3m": "-4.91%"
-      },
-      {
-        "industry": "Security & Protection Services",
-        "perf_1d": "-0.79%",
-        "perf_1w": "0.12%",
-        "perf_1m": "-5.80%",
-        "perf_3m": "4.98%"
       },
       {
         "industry": "Residential Construction",
@@ -2860,6 +2853,13 @@
         "perf_1w": "0.91%",
         "perf_1m": "-5.32%",
         "perf_3m": "-13.35%"
+      },
+      {
+        "industry": "Security & Protection Services",
+        "perf_1d": "-0.80%",
+        "perf_1w": "0.12%",
+        "perf_1m": "-5.81%",
+        "perf_3m": "4.97%"
       },
       {
         "industry": "Communication Equipment",
@@ -2870,9 +2870,9 @@
       },
       {
         "industry": "Textile Manufacturing",
-        "perf_1d": "-0.89%",
-        "perf_1w": "1.87%",
-        "perf_1m": "1.01%",
+        "perf_1d": "-0.88%",
+        "perf_1w": "1.88%",
+        "perf_1m": "1.02%",
         "perf_3m": "-18.64%"
       },
       {
@@ -2920,7 +2920,7 @@
       {
         "industry": "Entertainment",
         "perf_1d": "-0.92%",
-        "perf_1w": "-2.01%",
+        "perf_1w": "-2.00%",
         "perf_1m": "-6.20%",
         "perf_3m": "1.03%"
       },
@@ -2933,10 +2933,10 @@
       },
       {
         "industry": "Staffing & Employment Services",
-        "perf_1d": "-0.93%",
-        "perf_1w": "-3.06%",
-        "perf_1m": "-12.13%",
-        "perf_3m": "15.49%"
+        "perf_1d": "-0.92%",
+        "perf_1w": "-3.05%",
+        "perf_1m": "-12.12%",
+        "perf_3m": "15.50%"
       },
       {
         "industry": "Semiconductors",
@@ -2950,28 +2950,28 @@
         "perf_1d": "-0.98%",
         "perf_1w": "-2.61%",
         "perf_1m": "-6.10%",
-        "perf_3m": "-1.66%"
+        "perf_3m": "-1.65%"
+      },
+      {
+        "industry": "Specialty Business Services",
+        "perf_1d": "-1.00%",
+        "perf_1w": "-0.96%",
+        "perf_1m": "-7.20%",
+        "perf_3m": "2.55%"
       },
       {
         "industry": "Pollution & Treatment Controls",
         "perf_1d": "-1.01%",
         "perf_1w": "0.33%",
         "perf_1m": "-3.59%",
-        "perf_3m": "-1.32%"
+        "perf_3m": "-1.33%"
       },
       {
-        "industry": "Specialty Business Services",
-        "perf_1d": "-1.01%",
-        "perf_1w": "-0.97%",
-        "perf_1m": "-7.21%",
-        "perf_3m": "2.54%"
-      },
-      {
-        "industry": "Recreational Vehicles",
+        "industry": "Real Estate - Development",
         "perf_1d": "-1.02%",
-        "perf_1w": "-1.32%",
-        "perf_1m": "-13.07%",
-        "perf_3m": "-16.43%"
+        "perf_1w": "-0.75%",
+        "perf_1m": "-8.60%",
+        "perf_3m": "-14.95%"
       },
       {
         "industry": "Advertising Agencies",
@@ -2981,11 +2981,11 @@
         "perf_3m": "-29.16%"
       },
       {
-        "industry": "Real Estate - Development",
-        "perf_1d": "-1.03%",
-        "perf_1w": "-0.76%",
-        "perf_1m": "-8.60%",
-        "perf_3m": "-14.96%"
+        "industry": "Recreational Vehicles",
+        "perf_1d": "-1.04%",
+        "perf_1w": "-1.34%",
+        "perf_1m": "-13.09%",
+        "perf_3m": "-16.45%"
       },
       {
         "industry": "Utilities - Independent Power Producers",
@@ -3016,18 +3016,18 @@
         "perf_3m": "2.54%"
       },
       {
+        "industry": "REIT - Mortgage",
+        "perf_1d": "-1.11%",
+        "perf_1w": "-5.37%",
+        "perf_1m": "-12.36%",
+        "perf_3m": "-14.88%"
+      },
+      {
         "industry": "Insurance Brokers",
         "perf_1d": "-1.12%",
         "perf_1w": "-4.01%",
         "perf_1m": "-14.36%",
         "perf_3m": "-2.72%"
-      },
-      {
-        "industry": "REIT - Mortgage",
-        "perf_1d": "-1.13%",
-        "perf_1w": "-5.39%",
-        "perf_1m": "-12.38%",
-        "perf_3m": "-14.90%"
       },
       {
         "industry": "Electronic Components",
@@ -3048,14 +3048,14 @@
         "perf_1d": "-1.26%",
         "perf_1w": "-4.18%",
         "perf_1m": "-2.59%",
-        "perf_3m": "-4.67%"
+        "perf_3m": "-4.66%"
       },
       {
         "industry": "Auto Parts",
         "perf_1d": "-1.28%",
         "perf_1w": "-0.23%",
         "perf_1m": "-4.67%",
-        "perf_3m": "-8.99%"
+        "perf_3m": "-8.98%"
       },
       {
         "industry": "Beverages - Wineries & Distilleries",
@@ -3067,7 +3067,7 @@
       {
         "industry": "Scientific & Technical Instruments",
         "perf_1d": "-1.33%",
-        "perf_1w": "-0.72%",
+        "perf_1w": "-0.73%",
         "perf_1m": "-0.72%",
         "perf_3m": "-7.64%"
       },
@@ -3089,7 +3089,7 @@
         "industry": "Airlines",
         "perf_1d": "-1.37%",
         "perf_1w": "-0.21%",
-        "perf_1m": "1.13%",
+        "perf_1m": "1.14%",
         "perf_3m": "-14.98%"
       },
       {
@@ -3104,11 +3104,11 @@
         "perf_1d": "-1.40%",
         "perf_1w": "-5.30%",
         "perf_1m": "-14.22%",
-        "perf_3m": "-1.52%"
+        "perf_3m": "-1.51%"
       },
       {
         "industry": "Financial Data & Stock Exchanges",
-        "perf_1d": "-1.41%",
+        "perf_1d": "-1.42%",
         "perf_1w": "-3.03%",
         "perf_1m": "-7.91%",
         "perf_3m": "11.27%"
@@ -3138,7 +3138,7 @@
         "industry": "Information Technology Services",
         "perf_1d": "-1.55%",
         "perf_1w": "-4.55%",
-        "perf_1m": "-8.72%",
+        "perf_1m": "-8.71%",
         "perf_3m": "-2.86%"
       },
       {
@@ -3153,7 +3153,7 @@
         "perf_1d": "-1.57%",
         "perf_1w": "-2.30%",
         "perf_1m": "-7.12%",
-        "perf_3m": "-0.78%"
+        "perf_3m": "-0.77%"
       },
       {
         "industry": "Oil & Gas Drilling",
@@ -3220,10 +3220,10 @@
       },
       {
         "industry": "Utilities - Renewable",
-        "perf_1d": "-2.52%",
-        "perf_1w": "-7.11%",
-        "perf_1m": "-12.60%",
-        "perf_3m": "-25.21%"
+        "perf_1d": "-2.49%",
+        "perf_1w": "-7.08%",
+        "perf_1m": "-12.58%",
+        "perf_3m": "-25.19%"
       },
       {
         "industry": "Solar",
@@ -3234,10 +3234,10 @@
       },
       {
         "industry": "Auto Manufacturers",
-        "perf_1d": "-3.38%",
-        "perf_1w": "-4.35%",
-        "perf_1m": "-0.87%",
-        "perf_3m": "-9.41%"
+        "perf_1d": "-3.36%",
+        "perf_1w": "-4.33%",
+        "perf_1m": "-0.85%",
+        "perf_3m": "-9.40%"
       },
       {
         "industry": "Mortgage Finance",
@@ -3261,13 +3261,6 @@
         "perf_3m": "-15.71%"
       },
       {
-        "industry": "Gambling",
-        "perf_1d": "-4.84%",
-        "perf_1w": "-7.58%",
-        "perf_1m": "-15.81%",
-        "perf_3m": "-21.28%"
-      },
-      {
         "industry": "Other Precious Metals & Mining",
         "perf_1d": "-4.84%",
         "perf_1w": "-6.66%",
@@ -3275,9 +3268,16 @@
         "perf_3m": "7.37%"
       },
       {
+        "industry": "Gambling",
+        "perf_1d": "-4.85%",
+        "perf_1w": "-7.59%",
+        "perf_1m": "-15.82%",
+        "perf_3m": "-21.29%"
+      },
+      {
         "industry": "Gold",
         "perf_1d": "-5.40%",
-        "perf_1w": "-7.21%",
+        "perf_1w": "-7.22%",
         "perf_1m": "-15.49%",
         "perf_3m": "15.81%"
       },
@@ -3296,10 +3296,10 @@
     "tickers_sampled": 79
   },
   "fear_greed": {
-    "value": 33.6,
+    "value": 33.9,
     "label": "fear",
     "status": "ok",
     "source": "cnn",
-    "as_of": "2026-09-28T19:55:39+00:00"
+    "as_of": "2026-09-28T20:01:42+00:00"
   }
 }
