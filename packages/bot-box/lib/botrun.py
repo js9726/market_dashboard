@@ -9,25 +9,30 @@ packages. The runner - not the command text - then decides what executes:
 
 - a tool name maps to one fixed script inside the two canonical repositories; paths,
   scratch files and unknown names are refused;
-- the script and every code file in its directory tree (which it may import) must be
-  tracked by Git and identical to HEAD, and no untracked code may sit beside it, so a
-  file the bot wrote - in scratch or anywhere else - never runs or shadows an import;
-- the script and its directory must resolve inside the repository (no links out);
-- arguments are checked against a per-tool schema; no tool has an output option;
-- the child runs as `python -E -B -X pycache_prefix=<fresh temp dir> <script>` from
-  the script's own directory with every PYTHON* variable removed, so the current
-  directory, PYTHONPATH/PYTHONSTARTUP and stale bytecode cannot substitute code.
-  User site packages stay enabled because the tools' libraries (moomoo, pandas,
-  yfinance) are installed there; the bot cannot write to that directory.
+- a tool never runs from the working tree. The runner copies the code files of the
+  tool's directory, as they are in the last commit (HEAD), straight from Git's object
+  store into a fresh temporary folder and runs the tool there. Untracked, ignored,
+  modified or staged files in the checkout - including anything the bot wrote - are
+  never executed or imported, and they cannot make a tool unavailable either. Links in
+  the checkout are never followed; a link committed as tool code is refused;
+- arguments are checked against a per-tool schema; no tool has an output option; a
+  location a tool would otherwise derive from its own path (lint_wiki's wiki root) is
+  added by the runner, never by the bot;
+- the child runs as `python -E -B -X pycache_prefix=<fresh temp dir> <copied script>`
+  from the copy's folder with every PYTHON* variable removed, so the current directory,
+  PYTHONPATH/PYTHONSTARTUP and stale bytecode cannot substitute code. User site
+  packages stay enabled because the tools' libraries (moomoo, pandas, yfinance) are
+  installed there; the bot cannot write to that directory.
 
     python -I lib/botrun.py --list
     python -I lib/botrun.py --check measure_tickers --tickers VEEV   (verify, do not run)
+    python -I lib/botrun.py --check-all        (preflight: every tool's committed code)
 """
 from __future__ import annotations
 
 from datetime import date
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import shutil
 import subprocess
@@ -41,6 +46,7 @@ WIKI_ROOT = DASH_ROOT.parent / "jie_wiki"
 TICKER = r"[A-Z][A-Z0-9.\-]{0,11}"
 TICKERS = re.compile(r"{0}(,{0}){{0,39}}\Z".format(TICKER))
 CODE_SUFFIXES = {".py", ".pyc", ".pyo", ".pyd", ".pth", ".so", ".dll", ".zip", ".egg"}
+REGULAR_FILE_MODES = {"100644", "100755"}
 
 
 class Refused(Exception):
@@ -116,6 +122,9 @@ TOOLS = {
                       {"--verdicts-dir", "--asof", "--universe"}),
 }
 REPEATABLE = {("carry_forward", "--drop")}
+# Arguments the runner appends itself: the copy runs outside the repository, so a tool
+# that would locate data from its own path is told the canonical location instead.
+FIXED_ARGS = {"lint_wiki": ["--wiki-root", str(WIKI_ROOT / "wiki")]}
 
 
 def validate_args(tool, args):
@@ -155,49 +164,60 @@ def validate_args(tool, args):
     return out
 
 
-def _git(repo, *args):
+def _git(repo, *args, stdin=None):
+    """Run git on a canonical repository. GIT_* variables are dropped and replacement
+    objects ignored, so nothing outside the repository can redirect what is read."""
     git = shutil.which("git")
     if git is None:
-        raise Refused("git is not available to verify the tool")
-    return subprocess.run([git, "-C", str(repo), *args], capture_output=True, text=True,
-                          encoding="utf-8", errors="replace")
+        raise Refused("git is not available to read the tool")
+    env = {k: v for k, v in os.environ.items() if not k.upper().startswith("GIT_")}
+    return subprocess.run([git, "--no-replace-objects", "-C", str(repo), *args], input=stdin,
+                          capture_output=True, env=env)
 
 
-def _importable(rel_path, rel_dir, packages):
-    """True if a repository path is code the tool could import from its own directory:
-    a module file directly beside it, or anything inside a package directly beside it."""
-    parts = Path(rel_path).relative_to(rel_dir).parts
-    if "__pycache__" in parts or Path(rel_path).suffix.lower() not in CODE_SUFFIXES:
-        return False
-    return len(parts) == 1 or parts[0] in packages or (len(parts) == 2 and parts[1].startswith("__init__."))
-
-
-def verify_identity(repo, relative):
-    """Refuse unless the script and every importable file beside it are tracked, identical to
-    HEAD and inside the repository. Ignored and untracked files count as untrusted."""
-    repo = Path(repo).resolve()
-    script = repo / relative
-    if not script.is_file():
-        raise Refused("tool script is missing: " + relative)
-    resolved, folder = script.resolve(), script.parent.resolve()
-    if resolved != script.absolute() or folder != script.parent.absolute() or repo not in folder.parents:
-        raise Refused("tool script resolves outside its repository: " + relative)
-    rel_dir = Path(relative).parent.as_posix()
-    if _git(repo, "ls-files", "--error-unmatch", "--", relative).returncode != 0:
-        raise Refused("tool script is not tracked by Git: " + relative)
-    packages = {p.name for p in folder.iterdir() if p.is_dir() and any(
-        (p / ("__init__" + s)).exists() for s in (".py", ".pyc", ".pyd"))}
-    changed = _git(repo, "diff", "--name-only", "HEAD", "--", rel_dir)
-    if changed.returncode != 0:
-        raise Refused("could not compare the tool's directory with the last commit")
-    modified = [p for p in changed.stdout.splitlines() if _importable(p, rel_dir, packages)]
-    if modified:
-        raise Refused("code beside the tool differs from the last commit: " + modified[0])
-    others = _git(repo, "ls-files", "--others", "--", rel_dir).stdout.splitlines()
-    stray = [p for p in others if _importable(p, rel_dir, packages)]
-    if stray:
-        raise Refused("untracked code sits beside the tool and could shadow its imports: " + stray[0])
-    return resolved
+def snapshot(repo, relative, into):
+    """Copy the code files of the tool's directory, as committed at HEAD, from Git's object
+    store into `into`. Returns (commit, copied script, file count). Nothing is read from
+    the working tree, so untracked, ignored, modified or linked files there never run."""
+    head = _git(repo, "rev-parse", "--verify", "HEAD^{commit}")
+    if head.returncode != 0:
+        raise Refused("could not read the last commit of " + Path(repo).name)
+    commit = head.stdout.decode("ascii").strip()
+    rel_dir = PurePosixPath(relative).parent
+    listing = _git(repo, "ls-tree", "-r", "-z", "--full-tree", commit, "--", rel_dir.as_posix() + "/")
+    if listing.returncode != 0:
+        raise Refused("could not list the tool's committed files")
+    entries = []
+    for record in listing.stdout.split(b"\0"):
+        if not record:
+            continue
+        meta, _, raw_path = record.partition(b"\t")
+        mode, _, sha = meta.decode("ascii").split()
+        path = PurePosixPath(raw_path.decode("utf-8"))
+        if path.suffix.lower() not in CODE_SUFFIXES:
+            continue
+        if mode not in REGULAR_FILE_MODES:
+            raise Refused("committed tool code contains a link or submodule: " + path.as_posix())
+        parts = path.relative_to(rel_dir).parts
+        if ".." in parts:
+            raise Refused("committed tool path is not inside its directory: " + path.as_posix())
+        entries.append((parts, sha))
+    script_parts = PurePosixPath(relative).relative_to(rel_dir).parts
+    if script_parts not in [parts for parts, _ in entries]:
+        raise Refused("tool script is not in the last commit: " + relative)
+    batch = _git(repo, "cat-file", "--batch", stdin="".join(sha + "\n" for _, sha in entries).encode("ascii"))
+    data, pos = batch.stdout, 0
+    for parts, sha in entries:
+        end = data.find(b"\n", pos)
+        header = data[pos:end].decode("ascii", "replace").split() if end >= 0 else []
+        if batch.returncode != 0 or len(header) != 3 or header[0] != sha or header[1] != "blob":
+            raise Refused("could not read committed file " + "/".join(parts))
+        size = int(header[2])
+        target = Path(into).joinpath(*parts)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data[end + 1:end + 1 + size])
+        pos = end + 1 + size + 1
+    return commit, Path(into).joinpath(*script_parts), len(entries)
 
 
 def child_environment():
@@ -208,16 +228,33 @@ def run_tool(tool, args, check_only=False):
     if tool not in TOOLS:
         raise Refused("unknown tool {!r}; run --list".format(tool[:60]))
     repo, relative, _, _ = TOOLS[tool]
-    arguments = validate_args(tool, list(args))
-    script = verify_identity(repo, relative)
-    if check_only:
-        print("ok: {} -> {} {}".format(tool, script, " ".join(arguments)))
-        return 0
-    with tempfile.TemporaryDirectory(prefix="botrun-pyc-") as pycache:
-        command = [sys.executable, "-E", "-B", "-X", "pycache_prefix=" + pycache, str(script), *arguments]
+    arguments = validate_args(tool, list(args)) + FIXED_ARGS.get(tool, [])
+    with tempfile.TemporaryDirectory(prefix="botrun-", ignore_cleanup_errors=True) as temp:
+        commit, script, count = snapshot(repo, relative, Path(temp) / "code")
+        if check_only:
+            print("ok: {} -> {} at {} ({} code files) {}".format(
+                tool, relative, commit[:12], count, " ".join(arguments)).rstrip())
+            return 0
+        command = [sys.executable, "-E", "-B", "-X", "pycache_prefix=" + str(Path(temp) / "pycache"),
+                   str(script), *arguments]
         # No tool reads input; an empty stdin means nothing can wait interactively.
         return subprocess.run(command, cwd=script.parent, env=child_environment(),
                               stdin=subprocess.DEVNULL).returncode
+
+
+def check_all():
+    """Preflight: copy every tool's committed code without running anything."""
+    refused = 0
+    for tool in sorted(TOOLS):
+        repo, relative, _, _ = TOOLS[tool]
+        try:
+            with tempfile.TemporaryDirectory(prefix="botrun-", ignore_cleanup_errors=True) as temp:
+                commit, _, count = snapshot(repo, relative, Path(temp) / "code")
+            print("ok       {:<17} {} at {} ({} code files)".format(tool, relative, commit[:12], count))
+        except Refused as refusal:
+            refused += 1
+            print("REFUSED  {:<17} {}".format(tool, refusal))
+    return 2 if refused else 0
 
 
 def main(argv=None):
@@ -230,6 +267,8 @@ def main(argv=None):
             options = " ".join(sorted(schema)) or "(no options)"
             print("{:<17} {}  [{}]".format(name, (repo / relative).as_posix(), options))
         return 0
+    if argv == ["--check-all"]:
+        return check_all()
     check_only = argv[0] == "--check"
     if check_only:
         argv = argv[1:]

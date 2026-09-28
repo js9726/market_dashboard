@@ -23,7 +23,7 @@ host this and cannot run local Qwen TTS.
 | `configure-discord.ps1` | Saves the bot token from a hidden prompt and limits DMs to your Discord user ID |
 | `start-private-bot.ps1` | Runs the bot in a console and restarts it if it exits (started by the logon task). `-PreflightOnly` runs every check and the refresh without starting Claude; `-NoPull` never fast-forwards |
 | `lib/BotBoxStartup.psm1` | Launcher safety: one-launcher lock, claim-aware guarded refresh, the freshness notice |
-| `lib/botrun.py` | The only way the bot runs a program: fixed tool names, committed code only, per-tool argument checks, isolated execution |
+| `lib/botrun.py` | The only way the bot runs a program: fixed tool names, a copy of the last commit's code (never the checkout), per-tool argument checks, isolated execution; `--check-all` preflight |
 | `private-bot.settings.json` | Permissions: `dontAsk` mode, an explicit allow-list, deny rules |
 | `private-bot-prompt.md` | Operating rules appended to the bot's system prompt |
 | `tools/measure_tickers.py` | Completed-bar ticker measurements to stdout; OpenD (`broker` grade) or Yahoo (`public` grade), NYSE calendar, fail-closed freshness |
@@ -45,11 +45,17 @@ host this and cannot run local Qwen TTS.
   There is no `cd` rule and no relative `python <script>` rule, and `cd`, bare interpreters
   and shells are denied, because a relative script name could resolve to a same-named file
   the bot wrote into its scratch folder. The runner, not the command text, decides what
-  runs: tool names map to fixed scripts; each script and every importable file beside it
-  must be committed and unchanged (untracked or ignored code refuses the run); arguments
-  are checked per tool; the tool runs from its own folder with `-E -B`, a fresh bytecode
-  cache and every `PYTHON*` variable removed. The interpreter and runner paths in the rule
-  are this machine's; update both on another PC.
+  runs: tool names map to fixed scripts; arguments are checked per tool. Since 2026-09-28
+  (review of `4ba2a452a`) a tool never runs from the checkout: the runner copies the code
+  files of its folder as they are in the last commit, straight from Git's object store, into
+  a fresh temporary folder and runs it there with `-E -B`, a fresh bytecode cache and every
+  `PYTHON*` variable removed. Untracked, ignored, modified or staged files in the checkout
+  never run or shadow an import, and they no longer make a tool unavailable (14 ignored
+  scratch scripts beside the morning-brief tools had refused three tools). A link committed
+  as tool code is refused. lint_wiki gets the canonical wiki root from the runner.
+  `botrun.py --check-all` is the preflight: it copies every tool's committed code without
+  running anything. The interpreter and runner paths in the rule are this machine's;
+  update both on another PC.
 - **Allowed:** reading the repos, web search/fetch, the programs above, writing only under
   `jie_wiki/outputs/bot-box/` (gitignored scratch for report attachments; shell redirects are
   checked against the same rule), Chrome, and the Discord reply tools.
@@ -148,16 +154,30 @@ powershell -NoProfile -ExecutionPolicy Bypass -File packages\bot-box\tests\Test-
   paths; no `cd` or relative script rules; `cd`, interpreters and shells denied without any
   deny covering the runner; the runner's tools are the reviewed write-free set.
 - `test_botrun.py` (B6, disposable Git repositories and a scratch folder of same-named
-  look-alikes): the canonical call runs the committed tool; scratch names and paths are
-  refused; sibling imports come from the tool's folder whatever the cwd; `PYTHONPATH`,
-  `PYTHONSTARTUP` and `PYTHONUSERBASE` cannot inject code; modified, staged, untracked,
-  ignored or sourceless-bytecode code beside a tool refuses the run; a junction-swapped
-  tool folder is refused; per-tool argument schemas hold; data paths are passed absolute.
+  look-alikes): the canonical call runs a copy of the committed tool; scratch names and
+  paths are refused; sibling imports come from the committed copy whatever the cwd;
+  `PYTHONPATH`, `PYTHONSTARTUP` and `PYTHONUSERBASE` cannot inject code; untracked, ignored
+  or sourceless-bytecode code beside a tool never runs and does not block it; modified or
+  staged code runs the committed version; a junction-swapped tool folder still runs the
+  committed code; a tool missing from the last commit or a committed link is refused;
+  `--check-all` covers every tool without running it; per-tool argument schemas hold; data
+  paths are passed absolute; lint_wiki is given the canonical wiki root.
+- `test_accept_scoring.py` (B7, synthetic Claude Code event streams): the acceptance scorer
+  never passes on incomplete evidence. Skipped, altered, repeated or unplanned calls, a call
+  with no result, an error session, a non-zero CLI exit or a missing final record make the
+  run inconclusive; a wrong host decision, wrong exit status or output, output that only
+  imitates a permission error, a scratch report that was not written or has the wrong
+  content, executed scratch code or a forbidden file make it fail.
 - `accept_host_policy.py` (not in the offline suite; needs a signed-in Claude Code and spends
   a little of the plan): one disposable `claude -p` session with these exact permission rules,
-  the Discord plugin off, in a throwaway folder of scratch look-alikes. Twelve steps; the
-  verdict comes from Claude Code's own permission denials and the filesystem. Run it after
-  any settings change: `python packages/bot-box/tests/accept_host_policy.py --model haiku`.
+  the Discord plugin off, in a throwaway folder of scratch look-alikes. Thirteen steps. The
+  verdict comes only from machine records: each step's exact tool call and tool result in
+  Claude Code's event stream, its permission denials, the session result, the CLI exit code
+  and the filesystem; the model's own summary is never scored. Exit 0 PASS, 1 FAIL, 3
+  INCONCLUSIVE; only PASS is acceptance. Run it after any settings or runner change:
+  `python packages/bot-box/tests/accept_host_policy.py --model haiku --output receipt.json`
+  (also saves the evidence events beside the receipt: tool calls, tool results and the
+  final session record, without the startup inventory of connected services).
 - `Test-BotBoxStartup.ps1`: failed fetch and fast-forward, dirty overlap, untracked collision,
   divergence, merge in progress, active claims, failed claim check, concurrent launchers and
   lock release, and a launcher-level preflight.

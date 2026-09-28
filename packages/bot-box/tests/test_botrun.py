@@ -2,9 +2,15 @@
 
 Two throwaway Git repositories mirror the real layout (market_dashboard and jie_wiki as
 siblings) with a copy of the runner and harmless fake tools that report where they run
-from. A scratch folder holds same-named look-alikes that would drop a marker file if
-they ever executed. Every case runs the runner as a real child process, as the bot
-would; no real tool, token, network, bot login or Claude session is involved.
+from, what sits beside them and what they imported. A scratch folder holds same-named
+look-alikes that would drop a marker file if they ever executed. Every case runs the
+runner as a real child process, as the bot would; no real tool, token, network, bot
+login or Claude session is involved.
+
+The runner executes a copy of each tool's committed code, so these cases prove that
+untracked, ignored, modified, staged or linked files in the checkout never run and never
+make a tool unavailable (review 2026-09-28: 14 ignored scratch scripts beside the
+morning-brief tools had made three real tools refuse).
 
     python -m unittest discover -s packages/bot-box/tests -v
 """
@@ -24,12 +30,18 @@ RUNNER = Path(__file__).resolve().parents[1] / "lib" / "botrun.py"
 RUNNER = Path(os.environ.get("BOTRUN_UNDER_TEST") or RUNNER)
 
 REPORT = '''import json, os, sys
+here = os.path.dirname(os.path.abspath(__file__))
 payload = {"tool": __file__, "cwd": os.getcwd(), "path0": sys.path[0], "argv": sys.argv[1:],
            "pythonpath": os.environ.get("PYTHONPATH"), "ignore_env": sys.flags.ignore_environment,
-           "pycache_prefix": sys.pycache_prefix}
+           "pycache_prefix": sys.pycache_prefix, "folder": sorted(os.listdir(here))}
 '''
 TRUSTED_TOOL = REPORT + "print(json.dumps(payload))\n"
-TRUSTED_EDGE = REPORT + "import finviz_classify\npayload['imported'] = finviz_classify.__file__\nprint(json.dumps(payload))\n"
+# Like the real market_edge.py: puts its own folder first on sys.path, then imports a sibling.
+TRUSTED_EDGE = REPORT + ("sys.path.insert(0, here)\nimport finviz_classify\n"
+                         "payload['imported'] = finviz_classify.__file__\npayload['mark'] = finviz_classify.MARK\n"
+                         "print(json.dumps(payload))\n")
+BRIEF_CODE = ["breadth_ma.py", "finviz_classify.py", "industry_proxies.py", "market_edge.py"]
+ALL_TOOLS = ("measure_tickers", "breadth_ma", "market_edge", "industry_proxies", "lint_wiki", "carry_forward")
 EVIL = "from pathlib import Path\nPath(r'{marker}').write_text('executed')\nprint('EVIL')\n"
 
 
@@ -108,18 +120,44 @@ class BotRunIsolation(unittest.TestCase):
         self.assertNotIn("EVIL", done.stdout)
         self.assertNotExecuted()
 
+    def assertCommittedCopy(self, report, folder):
+        """The tool ran from a temporary copy of committed code, never from a repository."""
+        tool = Path(report["tool"]).resolve()
+        self.assertEqual(Path(report["cwd"]).resolve(), tool.parent)
+        for repo in (self.dash, self.wiki):
+            self.assertNotIn(repo.resolve(), tool.parents, "tool ran from the working tree")
+            self.assertNotIn(str(repo), report["pycache_prefix"] or "")
+        self.assertEqual(report["folder"], folder)
+
+    def run_edge(self, **kwargs):
+        done = self.run_bot("market_edge", "--ticker", "VEEV", **kwargs)
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertNotExecuted()
+        report = json.loads(done.stdout)
+        self.assertCommittedCopy(report, BRIEF_CODE)
+        self.assertEqual(Path(report["imported"]).parent.resolve(), Path(report["tool"]).parent.resolve())
+        self.assertEqual(report["mark"], "trusted")
+        return report
+
     # --- the canonical trusted call stays usable ---------------------------------------
 
-    def test_canonical_measurement_runs_the_trusted_tool_from_a_scratch_cwd(self):
+    def test_canonical_measurement_runs_a_committed_copy_from_a_scratch_cwd(self):
         done = self.run_bot("measure_tickers", "--tickers", "VEEV,CRM", "--source", "yahoo")
         self.assertEqual(done.returncode, 0, done.stderr)
         report = json.loads(done.stdout)
-        self.assertEqual(Path(report["tool"]).resolve(), (self.tools / "measure_tickers.py").resolve())
-        self.assertEqual(Path(report["cwd"]).resolve(), self.tools.resolve())
+        self.assertEqual(Path(report["tool"]).name, "measure_tickers.py")
+        self.assertCommittedCopy(report, ["measure_tickers.py"])
         self.assertEqual(report["argv"], ["--tickers", "VEEV,CRM", "--source", "yahoo"])
         self.assertEqual(report["ignore_env"], 1)
         self.assertTrue(report["pycache_prefix"])
-        self.assertNotIn(str(self.tools), report["pycache_prefix"])
+        self.assertNotExecuted()
+
+    def test_every_tool_passes_the_preflight_without_running(self):
+        done = self.run_bot("--check-all")
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        for tool in ALL_TOOLS:
+            self.assertRegex(done.stdout, r"(?m)^ok +{} ".format(tool))
+        self.assertNotIn('"argv"', done.stdout)     # the fake tools print JSON only when run
         self.assertNotExecuted()
 
     # --- scratch substitution ------------------------------------------------------------
@@ -132,67 +170,65 @@ class BotRunIsolation(unittest.TestCase):
 
     # --- cwd, import and environment shadowing -------------------------------------------
 
-    def test_sibling_import_comes_from_the_trusted_directory_not_the_cwd(self):
-        done = self.run_bot("market_edge", "--ticker", "VEEV")
-        self.assertEqual(done.returncode, 0, done.stderr)
-        report = json.loads(done.stdout)
-        self.assertEqual(Path(report["imported"]).resolve(), (self.brief / "finviz_classify.py").resolve())
-        self.assertNotExecuted()
+    def test_sibling_import_comes_from_the_committed_copy(self):
+        self.run_edge()
 
     def test_python_environment_variables_cannot_inject_code(self):
-        done = self.run_bot("market_edge", "--ticker", "VEEV", env_extra={
+        report = self.run_edge(env_extra={
             "PYTHONPATH": str(self.scratch), "PYTHONSTARTUP": str(self.scratch / "startup.py"),
             "PYTHONUSERBASE": str(self.scratch), "PYTHONINSPECT": "1", "PYTHONSAFEPATH": ""})
-        self.assertEqual(done.returncode, 0, done.stderr)
-        report = json.loads(done.stdout)
         self.assertIsNone(report["pythonpath"])
-        self.assertEqual(Path(report["imported"]).resolve(), (self.brief / "finviz_classify.py").resolve())
-        self.assertNotExecuted()
 
-    def test_untracked_or_ignored_code_beside_a_tool_is_refused(self):
-        cases = [(self.brief / "pandas.py", "untracked code"), (self.brief / "yfinance/__init__.py", "untracked code"),
-                 (self.brief / "finviz_classify.pyc", "untracked code")]
-        for path, fragment in cases:
-            with self.subTest(path=path.name):
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text(EVIL.format(marker=self.marker), encoding="utf-8")
-                self.assertRefused(self.run_bot("market_edge", "--ticker", "VEEV"), fragment)
-                path.unlink()
-        (self.dash / ".gitignore").write_text("packages/core-skills/morning-brief/evil.py\n", encoding="utf-8")
-        (self.brief / "evil.py").write_text("x = 1\n", encoding="utf-8")
-        self.assertRefused(self.run_bot("market_edge", "--ticker", "VEEV"), "evil.py")
+    def test_stray_code_beside_a_tool_never_runs_and_never_blocks_it(self):
+        (self.dash / ".gitignore").write_text("**/morning-brief/_account_check_*.py\n**/morning-brief/evil.py\n",
+                                              encoding="utf-8")
+        evil = EVIL.format(marker=self.marker)
+        for name in ("json.py", "pandas.py", "finviz_classify.pyc", "yfinance/__init__.py",
+                     "_account_check_2026-06-22.py", "evil.py"):
+            path = self.brief / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(evil, encoding="utf-8")
+        self.run_edge()
+        self.assertEqual(self.run_bot("--check-all").returncode, 0)
 
-    def test_data_files_beside_a_tool_may_change(self):
-        (self.brief / "watchlist.json").write_text('{"changed": true}\n', encoding="utf-8")
-        self.assertEqual(self.run_bot("market_edge", "--ticker", "VEEV").returncode, 0)
+    # --- modified, staged, missing or linked code ------------------------------------------
 
-    # --- modified trusted code -------------------------------------------------------------
-
-    def test_modified_tool_is_refused_before_it_runs(self):
-        target = self.tools / "measure_tickers.py"
-        target.write_text(EVIL.format(marker=self.marker), encoding="utf-8")
-        self.assertRefused(self.run_bot("measure_tickers", "--tickers", "VEEV"), "differs from the last commit")
+    def test_modified_or_staged_code_runs_the_committed_version(self):
+        evil = EVIL.format(marker=self.marker)
+        (self.brief / "market_edge.py").write_text(evil, encoding="utf-8")
+        (self.brief / "finviz_classify.py").write_text(evil, encoding="utf-8")
+        self.run_edge()
         git(self.dash, "add", "-A")
-        self.assertRefused(self.run_bot("measure_tickers", "--tickers", "VEEV"), "differs from the last commit")
+        self.run_edge()
 
-    def test_modified_sibling_module_is_refused(self):
-        (self.brief / "finviz_classify.py").write_text(EVIL.format(marker=self.marker), encoding="utf-8")
-        self.assertRefused(self.run_bot("market_edge", "--ticker", "VEEV"), "finviz_classify.py")
+    def test_tool_missing_from_the_last_commit_is_refused(self):
+        git(self.dash, "rm", "-q", "--cached", "packages/bot-box/tools/measure_tickers.py")
+        git(self.dash, "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "drop")
+        self.assertTrue((self.tools / "measure_tickers.py").exists())
+        self.assertRefused(self.run_bot("measure_tickers", "--tickers", "VEEV"), "not in the last commit")
+        done = self.run_bot("--check-all")
+        self.assertEqual(done.returncode, 2)
+        self.assertRegex(done.stdout, r"(?m)^REFUSED +measure_tickers ")
 
-    def test_untracked_tool_is_refused(self):
-        (self.tools / "measure_tickers.py").unlink()
-        commit(self.dash)
-        (self.tools / "measure_tickers.py").write_text(TRUSTED_TOOL, encoding="utf-8")
-        self.assertRefused(self.run_bot("measure_tickers", "--tickers", "VEEV"), "not tracked")
+    def test_link_committed_as_tool_code_is_refused(self):
+        blob = subprocess.run(["git", "hash-object", "-w", "--stdin"], cwd=self.dash, input=str(self.scratch / "json.py"),
+                              check=True, capture_output=True, text=True).stdout.strip()
+        git(self.dash, "update-index", "--add", "--cacheinfo",
+            "120000,{},packages/core-skills/morning-brief/linked.py".format(blob))
+        git(self.dash, "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "link")
+        self.assertRefused(self.run_bot("market_edge", "--ticker", "VEEV"), "link")
 
     @unittest.skipUnless(os.name == "nt", "directory junctions are Windows-only")
-    def test_tool_directory_swapped_for_a_junction_is_refused(self):
+    def test_tool_directory_swapped_for_a_junction_still_runs_committed_code(self):
         copy = self.scratch / "tools"
         shutil.copytree(self.tools, copy)
-        (copy / "measure_tickers.py").write_text(TRUSTED_TOOL, encoding="utf-8")
+        (copy / "measure_tickers.py").write_text(EVIL.format(marker=self.marker), encoding="utf-8")
         shutil.rmtree(self.tools)
         subprocess.run(["cmd", "/c", "mklink", "/J", str(self.tools), str(copy)], check=True, capture_output=True)
-        self.assertRefused(self.run_bot("measure_tickers", "--tickers", "VEEV"), "outside its repository")
+        done = self.run_bot("measure_tickers", "--tickers", "VEEV")
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertCommittedCopy(json.loads(done.stdout), ["measure_tickers.py"])
+        self.assertNotExecuted()
 
     # --- argument validation ---------------------------------------------------------------
 
@@ -220,10 +256,17 @@ class BotRunIsolation(unittest.TestCase):
         self.assertEqual(argv.count("--drop"), 2)
         self.assertEqual(self.run_bot("--check", "breadth_ma", "--universe=sp500", "--min-cap", "2e9").returncode, 0)
 
+    def test_lint_wiki_is_given_the_canonical_wiki_root_by_the_runner(self):
+        done = self.run_bot("lint_wiki")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        argv = json.loads(done.stdout)["argv"]
+        self.assertEqual(argv[0], "--wiki-root")
+        self.assertEqual(Path(argv[1]).resolve(), (self.wiki / "wiki").resolve())
+
     def test_list_names_every_tool(self):
         done = self.run_bot("--list")
         self.assertEqual(done.returncode, 0)
-        for tool in ("measure_tickers", "breadth_ma", "market_edge", "industry_proxies", "lint_wiki", "carry_forward"):
+        for tool in ALL_TOOLS:
             self.assertIn(tool, done.stdout)
 
 
