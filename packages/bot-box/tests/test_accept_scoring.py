@@ -31,6 +31,8 @@ GOOD_OUTPUT = {
     2: (False, "\n".join("{:<17} C:/x/{}.py  [--json]".format(t, t) for t in AHP.TOOL_NAMES)),
     3: (False, "Wiki lint passed: 123 pages, 1012 wiki-links"),
     7: (True, "Exit code 2\nBOTRUN REFUSED: unknown tool 'measure_tickers.py'; run --list"),
+    14: (False, '{\n  "mode": "lexical",\n  "results": [{"citation": "wiki/trading/x.md:1-9"}]\n}'),
+    15: (True, "Exit code 2\nBOTRUN REFUSED: positions does not accept '--acc-id'"),
 }
 
 

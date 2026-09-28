@@ -33,7 +33,7 @@ REPORT = '''import json, os, sys
 here = os.path.dirname(os.path.abspath(__file__))
 payload = {"tool": __file__, "cwd": os.getcwd(), "path0": sys.path[0], "argv": sys.argv[1:],
            "pythonpath": os.environ.get("PYTHONPATH"), "ignore_env": sys.flags.ignore_environment,
-           "pycache_prefix": sys.pycache_prefix, "folder": sorted(os.listdir(here))}
+           "pycache_prefix": sys.pycache_prefix, "folder": sorted(os.listdir(here)), "prefix": sys.prefix}
 '''
 TRUSTED_TOOL = REPORT + "print(json.dumps(payload))\n"
 # Like the real market_edge.py: puts its own folder first on sys.path, then imports a sibling.
@@ -41,7 +41,9 @@ TRUSTED_EDGE = REPORT + ("sys.path.insert(0, here)\nimport finviz_classify\n"
                          "payload['imported'] = finviz_classify.__file__\npayload['mark'] = finviz_classify.MARK\n"
                          "print(json.dumps(payload))\n")
 BRIEF_CODE = ["breadth_ma.py", "finviz_classify.py", "industry_proxies.py", "market_edge.py"]
-ALL_TOOLS = ("measure_tickers", "breadth_ma", "market_edge", "industry_proxies", "lint_wiki", "carry_forward")
+TOOLS_CODE = ["measure_tickers.py", "positions.py"]
+ALL_TOOLS = ("measure_tickers", "breadth_ma", "market_edge", "industry_proxies", "lint_wiki", "carry_forward",
+             "positions", "wiki_search")
 EVIL = "from pathlib import Path\nPath(r'{marker}').write_text('executed')\nprint('EVIL')\n"
 
 
@@ -64,6 +66,7 @@ class BotRunIsolation(unittest.TestCase):
         files = {
             self.dash / "packages/bot-box/lib/botrun.py": RUNNER.read_text(encoding="utf-8"),
             self.dash / "packages/bot-box/tools/measure_tickers.py": TRUSTED_TOOL,
+            self.dash / "packages/bot-box/tools/positions.py": TRUSTED_TOOL,
             self.dash / "packages/core-skills/morning-brief/market_edge.py": TRUSTED_EDGE,
             self.dash / "packages/core-skills/morning-brief/finviz_classify.py": "MARK = 'trusted'\n",
             self.dash / "packages/core-skills/morning-brief/breadth_ma.py": TRUSTED_TOOL,
@@ -71,6 +74,7 @@ class BotRunIsolation(unittest.TestCase):
             self.dash / "packages/core-skills/morning-brief/watchlist.json": "{}\n",
             self.wiki / "scripts/lint_wiki.py": TRUSTED_TOOL,
             self.wiki / "skills/tradingview-daily-screener/scripts/carry_forward.py": TRUSTED_TOOL,
+            self.wiki / "scripts/retrieval/query.py": TRUSTED_TOOL,
             self.wiki / "wiki/verdicts/.keep": "",
             self.wiki / ".gitignore": "outputs/\n",
         }
@@ -80,6 +84,12 @@ class BotRunIsolation(unittest.TestCase):
         for repo in (self.dash, self.wiki):
             git(repo, "init", "-q")
             commit(repo)
+        # Where the runner looks for the wiki retrieval environment. A placeholder is enough
+        # for the preflight; the wiki_search run test builds a real one.
+        self.retrieval_python = self.wiki / "scripts/retrieval/.venv" / (
+            "Scripts/python.exe" if os.name == "nt" else "bin/python")
+        self.retrieval_python.parent.mkdir(parents=True)
+        self.retrieval_python.write_text("placeholder", encoding="utf-8")
         self.runner = self.dash / "packages/bot-box/lib/botrun.py"
         self.tools = self.dash / "packages/bot-box/tools"
         self.brief = self.dash / "packages/core-skills/morning-brief"
@@ -146,7 +156,7 @@ class BotRunIsolation(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stderr)
         report = json.loads(done.stdout)
         self.assertEqual(Path(report["tool"]).name, "measure_tickers.py")
-        self.assertCommittedCopy(report, ["measure_tickers.py"])
+        self.assertCommittedCopy(report, TOOLS_CODE)
         self.assertEqual(report["argv"], ["--tickers", "VEEV,CRM", "--source", "yahoo"])
         self.assertEqual(report["ignore_env"], 1)
         self.assertTrue(report["pycache_prefix"])
@@ -227,7 +237,7 @@ class BotRunIsolation(unittest.TestCase):
         subprocess.run(["cmd", "/c", "mklink", "/J", str(self.tools), str(copy)], check=True, capture_output=True)
         done = self.run_bot("measure_tickers", "--tickers", "VEEV")
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
-        self.assertCommittedCopy(json.loads(done.stdout), ["measure_tickers.py"])
+        self.assertCommittedCopy(json.loads(done.stdout), TOOLS_CODE)
         self.assertNotExecuted()
 
     # --- argument validation ---------------------------------------------------------------
@@ -262,6 +272,53 @@ class BotRunIsolation(unittest.TestCase):
         argv = json.loads(done.stdout)["argv"]
         self.assertEqual(argv[0], "--wiki-root")
         self.assertEqual(Path(argv[1]).resolve(), (self.wiki / "wiki").resolve())
+
+    # --- gate 2 tools ---------------------------------------------------------------------
+
+    def test_positions_takes_no_options(self):
+        done = self.run_bot("positions")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        report = json.loads(done.stdout)
+        self.assertEqual(report["argv"], [])
+        self.assertCommittedCopy(report, TOOLS_CODE)
+        for args in (("--acc-id", "1"), ("--trd-env", "SIMULATE"), ("--host", "10.0.0.1"), ("unlock",)):
+            with self.subTest(args=args):
+                self.assertRefused(self.run_bot("positions", *args))
+
+    def test_wiki_search_runs_keyword_only_in_its_environment_with_the_question_last(self):
+        venv = self.retrieval_python.parents[1]
+        shutil.rmtree(venv)
+        subprocess.run([sys.executable, "-m", "venv", "--without-pip", str(venv)], check=True, capture_output=True)
+        question = "what is my rule -- on stops?"
+        done = self.run_bot("wiki_search", "--question", question, "--limit", "3")
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        report = json.loads(done.stdout)
+        argv = report["argv"]
+        self.assertEqual(argv[:3], ["--limit", "3", "--repo"])
+        self.assertEqual(Path(argv[3]).resolve(), self.wiki.resolve())
+        self.assertEqual(argv[4:], ["--provider", "gemini", "--lexical-only", "--json", "--", question])
+        self.assertEqual(Path(report["prefix"]).resolve(), venv.resolve())
+        self.assertCommittedCopy(report, ["query.py"])
+        self.assertNotExecuted()
+
+    def test_wiki_search_cannot_leave_keyword_mode_or_take_bad_questions(self):
+        cases = [("--question", "x", "--mode", "hybrid"), ("--question", "x", "--index", "C:/x"),
+                 ("--question", "x", "--repo", "C:/"), ("--question", "x", "--no-repair"),
+                 ("--question", "x", "--provider", "openai"), ("--question", "x", "--lexical-only"),
+                 ("--question", "a\nb"), ("--question", "x" * 301), ("--question", "   "),
+                 ("--question", "--mode"), ("--question", "x", "--limit", "21"),
+                 ("--question", "x", "--limit", "0"), ("--limit", "3"), ("--question", "x", "--question", "y")]
+        for args in cases:
+            with self.subTest(args=args):
+                self.assertRefused(self.run_bot("--check", "wiki_search", *args))
+        self.assertEqual(self.run_bot("--check", "wiki_search", "--question", "x" * 300).returncode, 0)
+
+    def test_wiki_search_without_its_environment_is_refused(self):
+        shutil.rmtree(self.retrieval_python.parents[1])
+        self.assertRefused(self.run_bot("wiki_search", "--question", "stops"), "Python environment")
+        done = self.run_bot("--check-all")
+        self.assertEqual(done.returncode, 2)
+        self.assertRegex(done.stdout, r"(?m)^REFUSED +wiki_search ")
 
     def test_list_names_every_tool(self):
         done = self.run_bot("--list")

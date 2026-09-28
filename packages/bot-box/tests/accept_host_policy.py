@@ -43,7 +43,8 @@ RUNNER_RULES = [a[len("Bash("):-len(" *)")] for a in SETTINGS["permissions"]["al
 SQ = next(r for r in RUNNER_RULES if r.startswith("'"))
 DQ = next(r for r in RUNNER_RULES if r.startswith('"'))
 EVIL = "from pathlib import Path\nPath(r'{marker}').write_text('executed')\n"
-TOOL_NAMES = ("breadth_ma", "carry_forward", "industry_proxies", "lint_wiki", "market_edge", "measure_tickers")
+TOOL_NAMES = ("breadth_ma", "carry_forward", "industry_proxies", "lint_wiki", "market_edge", "measure_tickers",
+              "positions", "wiki_search")
 PERMISSION_ERROR = re.compile(r"\A(Error: )?Permission to use \w+")
 REPORT_TEXT = "ok"
 
@@ -73,6 +74,11 @@ def steps(fake_runner):
         (11, "Bash", "{} -I '{}' lint_wiki".format(interpreter, fake_runner), DENIED),
         (12, "Write", ("outputs/bot-box/report.md", REPORT_TEXT), ran(0)),
         (13, "Write", ("outside.md", "denied"), DENIED),
+        # Gate 2. positions is never run for real here: the saved evidence would hold Jie's
+        # holdings. Its option refusal proves the rule reaches it; wiki_search runs for real.
+        (14, "Bash", SQ + " wiki_search --question 'unfinished bar veto' --limit 2",
+         ran(0, r'"mode": "lexical"', r'"citation": "')),
+        (15, "Bash", SQ + " positions --acc-id 1", ran(2, r"BOTRUN REFUSED: positions does not accept")),
     ]
 
 

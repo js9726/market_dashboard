@@ -35,6 +35,9 @@ WRITE_FREE_PROGRAMS = {
     "market_edge": "OpenD/Finviz-cache read, prints",
     "industry_proxies": "OpenD read, prints",
     "measure_tickers": "stdout only, no output option (tests/test_measure_tickers.py)",
+    # Gate 2, 2026-09-28.
+    "positions": "OpenD read-only position query, no options, stdout only (tests/test_positions.py)",
+    "wiki_search": "query.py pinned by the runner to --lexical-only: reads current files, no index/key/network",
 }
 # The launcher turns the prompt's double quotes into single quotes (PowerShell 5.1), so the
 # same absolute paths are allowed in either quote style and in no other form.

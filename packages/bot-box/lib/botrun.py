@@ -22,7 +22,11 @@ packages. The runner - not the command text - then decides what executes:
   from the copy's folder with every PYTHON* variable removed, so the current directory,
   PYTHONPATH/PYTHONSTARTUP and stale bytecode cannot substitute code. User site
   packages stay enabled because the tools' libraries (moomoo, pandas, yfinance) are
-  installed there; the bot cannot write to that directory.
+  installed there; the bot cannot write to that directory. wiki_search runs with the
+  wiki retrieval environment's Python (jie_wiki/scripts/retrieval/.venv, ignored and
+  equally out of the bot's reach) because its tokenizer is installed only there;
+- wiki_search is pinned to keyword-only search (no index, key, network or write) and
+  the bot's question is passed as one argument after "--".
 
     python -I lib/botrun.py --list
     python -I lib/botrun.py --check measure_tickers --tickers VEEV   (verify, do not run)
@@ -97,6 +101,12 @@ def _data_dir(value):
     return str(resolved)
 
 
+def _text(limit):
+    """Free text passed as one argument (never through a shell): 1..limit characters, no
+    control characters, not blank."""
+    return lambda v: v if 0 < len(v) <= limit and v.strip() and not re.search(r"[\x00-\x1f\x7f]", v) else None
+
+
 FLAG = object()  # an option that takes no value
 TICKER_LIST = _match(r"{0}(,{0}){{0,39}}".format(TICKER))
 OPTIONAL_TICKER_LIST = _match(r"(|{0}(,{0}){{0,39}})".format(TICKER))
@@ -120,11 +130,24 @@ TOOLS = {
                        "--lookback": _match(r"[1-9][0-9]?"), "--held": OPTIONAL_TICKER_LIST,
                        "--drop": _match(r"{0}=[^\x00-\x1f]{{1,200}}".format(TICKER)), "--json": FLAG},
                       {"--verdicts-dir", "--asof", "--universe"}),
+    # Read-only moomoo positions; no options, so the bot cannot change what it reads.
+    "positions": (DASH_ROOT, "packages/bot-box/tools/positions.py", {}, set()),
+    # Keyword search of the current wiki files: no index, key, network or write.
+    "wiki_search": (WIKI_ROOT, "scripts/retrieval/query.py",
+                    {"--question": _text(300), "--limit": _match(r"[1-9]|1[0-9]|20")}, {"--question"}),
 }
 REPEATABLE = {("carry_forward", "--drop")}
 # Arguments the runner appends itself: the copy runs outside the repository, so a tool
 # that would locate data from its own path is told the canonical location instead.
-FIXED_ARGS = {"lint_wiki": ["--wiki-root", str(WIKI_ROOT / "wiki")]}
+# wiki_search is pinned to keyword-only mode here, whatever the bot asks.
+FIXED_ARGS = {"lint_wiki": ["--wiki-root", str(WIKI_ROOT / "wiki")],
+              "wiki_search": ["--repo", str(WIKI_ROOT), "--provider", "gemini", "--lexical-only", "--json"]}
+# An option whose value the tool takes as its positional argument, placed last after "--".
+POSITIONAL = {"wiki_search": "--question"}
+# A tool that needs libraries this interpreter lacks runs with its own environment's Python
+# (trusted like user site-packages: an ignored folder the bot cannot write to).
+INTERPRETERS = {"wiki_search": [WIKI_ROOT / "scripts/retrieval/.venv/Scripts/python.exe",
+                                WIKI_ROOT / "scripts/retrieval/.venv/bin/python"]}
 
 
 def validate_args(tool, args):
@@ -224,18 +247,39 @@ def child_environment():
     return {k: v for k, v in os.environ.items() if not k.upper().startswith("PYTHON")}
 
 
+def tool_arguments(tool, args):
+    """The checked bot arguments, then the runner's own, then any positional value."""
+    arguments = validate_args(tool, list(args))
+    positional = []
+    if tool in POSITIONAL:
+        at = arguments.index(POSITIONAL[tool])
+        positional = ["--", arguments[at + 1]]
+        del arguments[at:at + 2]
+    return arguments + FIXED_ARGS.get(tool, []) + positional
+
+
+def interpreter(tool):
+    for candidate in INTERPRETERS.get(tool, []):
+        if candidate.is_file():
+            return str(candidate)
+    if tool in INTERPRETERS:
+        raise Refused("the Python environment for {} is missing".format(tool))
+    return sys.executable
+
+
 def run_tool(tool, args, check_only=False):
     if tool not in TOOLS:
         raise Refused("unknown tool {!r}; run --list".format(tool[:60]))
     repo, relative, _, _ = TOOLS[tool]
-    arguments = validate_args(tool, list(args)) + FIXED_ARGS.get(tool, [])
+    arguments = tool_arguments(tool, args)
+    python = interpreter(tool)
     with tempfile.TemporaryDirectory(prefix="botrun-", ignore_cleanup_errors=True) as temp:
         commit, script, count = snapshot(repo, relative, Path(temp) / "code")
         if check_only:
             print("ok: {} -> {} at {} ({} code files) {}".format(
                 tool, relative, commit[:12], count, " ".join(arguments)).rstrip())
             return 0
-        command = [sys.executable, "-E", "-B", "-X", "pycache_prefix=" + str(Path(temp) / "pycache"),
+        command = [python, "-E", "-B", "-X", "pycache_prefix=" + str(Path(temp) / "pycache"),
                    str(script), *arguments]
         # No tool reads input; an empty stdin means nothing can wait interactively.
         return subprocess.run(command, cwd=script.parent, env=child_environment(),
@@ -248,6 +292,7 @@ def check_all():
     for tool in sorted(TOOLS):
         repo, relative, _, _ = TOOLS[tool]
         try:
+            interpreter(tool)
             with tempfile.TemporaryDirectory(prefix="botrun-", ignore_cleanup_errors=True) as temp:
                 commit, _, count = snapshot(repo, relative, Path(temp) / "code")
             print("ok       {:<17} {} at {} ({} code files)".format(tool, relative, commit[:12], count))
