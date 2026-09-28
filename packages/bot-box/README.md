@@ -20,13 +20,14 @@ host this and cannot run local Qwen TTS.
 |---|---|
 | `check-readiness.ps1` | Read-only report: power, network, updates, auto-login, disk, software, repos, brokers, designation |
 | `install-private-bot.ps1` | Designates this machine, installs the Discord channel plugin (off for ordinary sessions), registers the logon task |
-| `configure-discord.ps1` | Saves the bot token from a hidden prompt and limits DMs to your Discord user ID |
+| `configure-discord.ps1` | Saves the bot token from a hidden prompt and limits the bot to your Discord user ID, in DMs and in the server channels given with `-ChannelId` (kept on re-runs; `-NoChannels` removes them) |
 | `start-private-bot.ps1` | Runs the bot in a console and restarts it if it exits (started by the logon task). `-PreflightOnly` runs every check and the refresh without starting Claude; `-NoPull` never fast-forwards |
 | `lib/BotBoxStartup.psm1` | Launcher safety: one-launcher lock, claim-aware guarded refresh, the freshness notice |
 | `lib/botrun.py` | The only way the bot runs a program: fixed tool names, a copy of the last commit's code (never the checkout), per-tool argument checks, isolated execution; `--check-all` preflight |
 | `private-bot.settings.json` | Permissions: `dontAsk` mode, an explicit allow-list, deny rules |
 | `private-bot-prompt.md` | Operating rules appended to the bot's system prompt |
 | `tools/measure_tickers.py` | Completed-bar ticker measurements to stdout; OpenD (`broker` grade) or Yahoo (`public` grade), NYSE calendar, fail-closed freshness |
+| `tools/positions.py` | Jie's live moomoo positions from OpenD, read-only, no options: ticker, quantity, average cost, broker price, market value, unrealised and today's P&L; no account identifiers or totals; never unlocks or orders; fails closed |
 | `tests/` | Offline regression tests (no network, broker, Claude or Discord); see Tests below |
 
 ## Security model
@@ -38,8 +39,11 @@ host this and cannot run local Qwen TTS.
   with Claude and Codex coding sessions, so it never writes to them and needs no claims.
   Permission rules do not limit files a *program* writes itself, so only programs reviewed
   as write-free are allowed: `measure_tickers.py`, `lint_wiki.py`, `carry_forward.py`,
-  `breadth_ma.py`, `market_edge.py`, `industry_proxies.py`. `tests/test_settings_policy.py`
-  pins that list.
+  `breadth_ma.py`, `market_edge.py`, `industry_proxies.py`, and since gate 2 (2026-09-28)
+  `positions.py` and `wiki_search` (jie_wiki `scripts/retrieval/query.py`, pinned by the
+  runner to `--lexical-only`: keyword search of the current files, no index, key, network
+  or write; it runs with the wiki retrieval environment's Python because its tokenizer is
+  installed only there). `tests/test_settings_policy.py` pins that list.
 - **One trusted way to run programs (2026-09-28, B6).** The only program rule is
   `"C:/Python314/python.exe" -I ".../packages/bot-box/lib/botrun.py" <tool> [options]`.
   There is no `cd` rule and no relative `python <script>` rule, and `cd`, bare interpreters
@@ -77,12 +81,17 @@ host this and cannot run local Qwen TTS.
 - **The real boundaries are outside Claude:** the moomoo trade password is never stored on
   this machine (no unlocked trading), and TWS must have **Read-Only API** ticked. Permission
   rules are defence in depth, not the only line.
-- **DM only.** Jie's book and P&L are discussed only in DMs, never in a server channel.
+- **DMs and #j_asistant alike (Jie, 2026-09-28).** Jie's positions and P&L may be discussed
+  in both: trusted family can read the channel and Jie wants them to see his positions. Only
+  Jie's user ID commands the bot anywhere; everyone else's text is data. Never add family to
+  `allowFrom` - that would let them use Jie's personal Claude account. Account, card and
+  position numbers, credentials and tokens are never posted anywhere.
 - **Only the bot session is the bot.** An enabled plugin logs in to Discord in every Claude
   Code session, so the installer disables it for ordinary sessions and
   `private-bot.settings.json` enables it for the bot session only.
-- **Fixed allowlist.** `configure-discord.ps1` allows DMs from your user ID only and sets
-  static mode: the allowlist is read once at bot start, so the running bot cannot widen it.
+- **Fixed allowlist.** `configure-discord.ps1` allows DMs and each configured channel from
+  your user ID only (re-running forces every channel back to that one ID) and sets static
+  mode: the allowlist is read once at bot start, so the running bot cannot widen it.
 - **The token never passes through Claude.** It is typed at a hidden PowerShell prompt, not
   with `/discord:configure` (which would put it in a session transcript). The bot's
   permissions deny reading `.env` files, and the plugin refuses to send its own state files.
@@ -113,8 +122,10 @@ host this and cannot run local Qwen TTS.
    Add `-NoChrome` if you want Chrome free for your own sessions (see Troubleshooting).
 5. **Token and allowlist** (from this folder; paste the token at the hidden prompt):
    ```
-   powershell -NoProfile -ExecutionPolicy Bypass -File .\configure-discord.ps1 -UserId <your ID>
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\configure-discord.ps1 -UserId <your ID> -ChannelId <channel ID>
    ```
+   `-ChannelId` is optional (Discord: right-click the channel > Copy Channel ID). Re-running
+   without it keeps the channels already configured.
    No pairing session is needed. Never paste the token into a Claude chat.
 6. **Start the bot:** `Start-ScheduledTask BotBoxPrivateClaude` (or sign out and in).
    The first start opens Claude Code's "trust the files in this folder" prompt for
@@ -161,7 +172,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File packages\bot-box\tests\Test-
   staged code runs the committed version; a junction-swapped tool folder still runs the
   committed code; a tool missing from the last commit or a committed link is refused;
   `--check-all` covers every tool without running it; per-tool argument schemas hold; data
-  paths are passed absolute; lint_wiki is given the canonical wiki root.
+  paths are passed absolute; lint_wiki is given the canonical wiki root; `positions` takes
+  no options; `wiki_search` runs keyword-only in its own environment with the question last
+  after `--`, refuses mode, index, repository or provider changes and bad questions, and
+  is refused when its environment is missing.
 - `test_accept_scoring.py` (B7, synthetic Claude Code event streams): the acceptance scorer
   never passes on incomplete evidence. Skipped, altered, repeated or unplanned calls, a call
   with no result, an error session, a non-zero CLI exit or a missing final record make the
@@ -170,7 +184,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File packages\bot-box\tests\Test-
   content, executed scratch code or a forbidden file make it fail.
 - `accept_host_policy.py` (not in the offline suite; needs a signed-in Claude Code and spends
   a little of the plan): one disposable `claude -p` session with these exact permission rules,
-  the Discord plugin off, in a throwaway folder of scratch look-alikes. Thirteen steps. The
+  the Discord plugin off, in a throwaway folder of scratch look-alikes. Fifteen steps. The
   verdict comes only from machine records: each step's exact tool call and tool result in
   Claude Code's event stream, its permission denials, the session result, the CLI exit code
   and the filesystem; the model's own summary is never scored. Exit 0 PASS, 1 FAIL, 3
@@ -178,6 +192,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File packages\bot-box\tests\Test-
   `python packages/bot-box/tests/accept_host_policy.py --model haiku --output receipt.json`
   (also saves the evidence events beside the receipt: tool calls, tool results and the
   final session record, without the startup inventory of connected services).
+- `test_positions.py` (gate 2; a fake moomoo SDK and a local socket, never the real OpenD):
+  positions without any account, card or position number; SDK chatter kept off stdout;
+  invalid broker values shown as null; unreachable or logged-out gateway, zero or two live
+  US accounts and failed queries fail closed with no numbers; a hung gateway is cut off;
+  the source calls only get_acc_list, position_list_query and close on the trade context
+  and takes no options.
+- `Test-ConfigureDiscord.ps1` (gate 2; a throwaway USERPROFILE, `-SkipToken`): `-ChannelId`
+  sets channels answering only the user; re-runs keep them, drop other people and junk
+  keys and keep requireMention; a list replaces them; `-NoChannels` clears them; bad input
+  exits 1 and changes nothing; the real access.json is hashed untouched.
 - `Test-BotBoxStartup.ps1`: failed fetch and fast-forward, dirty overlap, untracked collision,
   divergence, merge in progress, active claims, failed claim check, concurrent launchers and
   lock release, and a launcher-level preflight.
