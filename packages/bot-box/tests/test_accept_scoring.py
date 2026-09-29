@@ -33,6 +33,8 @@ GOOD_OUTPUT = {
     7: (True, "Exit code 2\nBOTRUN REFUSED: unknown tool 'measure_tickers.py'; run --list"),
     14: (False, '{\n  "mode": "lexical",\n  "results": [{"citation": "wiki/trading/x.md:1-9"}]\n}'),
     15: (True, "Exit code 2\nBOTRUN REFUSED: positions does not accept '--acc-id'"),
+    16: (False, '{\n  "status": "OK",\n  "source": "TradingView scanner, live anonymous request (unscored)"\n}'),
+    17: (True, "Exit code 2\nBOTRUN REFUSED: trades option --days has an invalid value"),
 }
 
 

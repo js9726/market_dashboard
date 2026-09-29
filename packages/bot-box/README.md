@@ -28,6 +28,10 @@ host this and cannot run local Qwen TTS.
 | `private-bot-prompt.md` | Operating rules appended to the bot's system prompt |
 | `tools/measure_tickers.py` | Completed-bar ticker measurements to stdout; OpenD (`broker` grade) or Yahoo (`public` grade), NYSE calendar, fail-closed freshness |
 | `tools/positions.py` | Jie's live moomoo positions from OpenD, read-only, no options: ticker, quantity, average cost, broker price, market value, unrealised and today's P&L; no account identifiers or totals; never unlocks or orders; fails closed |
+| `tools/orders.py` | Working moomoo orders and per-position stop coverage (COVERED / PARTIAL / NONE), read-only, no options, identifiers withheld |
+| `tools/trades.py`, `tools/quotes.py`, `tools/screener.py` | Fills and FIFO realized P&L; live snapshot quotes; live TradingView screener hits (anonymous, canonical config) |
+| `tools/opend_common.py` | Shared read-only OpenD plumbing: gateway check, watchdog, UNAVAILABLE on any doubt |
+| `tools/render_report.py` | Turns an HTML report in `outputs/bot-box` into a PNG Discord shows inline (headless Edge, strict CSP, one-file local server) |
 | `tests/` | Offline regression tests (no network, broker, Claude or Discord); see Tests below |
 
 ## Security model
@@ -43,7 +47,13 @@ host this and cannot run local Qwen TTS.
   `positions.py` and `wiki_search` (jie_wiki `scripts/retrieval/query.py`, pinned by the
   runner to `--lexical-only`: keyword search of the current files, no index, key, network
   or write; it runs with the wiki retrieval environment's Python because its tokenizer is
-  installed only there). `tests/test_settings_policy.py` pins that list.
+  installed only there). Gate 3 (landed 2026-09-29) added `quotes`, `trades`, `screener`,
+  `theme_radar` (its `--out` refused; its cache write lands in the runner's temporary copy)
+  and `wiki_rag` (hybrid search on the Gemini index with `--no-repair`: it never rebuilds the
+  index; the hourly refresh keeps it current), plus `orders`. `render_report` is the one tool
+  that writes: a single PNG beside the report, only inside `outputs/bot-box` (the runner
+  fixes the root; `..`, absolute paths and links are refused). `tests/test_settings_policy.py`
+  pins that list.
 - **One trusted way to run programs (2026-09-28, B6).** The only program rule is
   `"C:/Python314/python.exe" -I ".../packages/bot-box/lib/botrun.py" <tool> [options]`.
   There is no `cd` rule and no relative `python <script>` rule, and `cd`, bare interpreters
@@ -63,8 +73,13 @@ host this and cannot run local Qwen TTS.
 - **Allowed:** reading the repos, web search/fetch, the programs above, writing only under
   `jie_wiki/outputs/bot-box/` (gitignored scratch for report attachments; shell redirects are
   checked against the same rule), Chrome, and the Discord reply tools.
-- **Not available from the bot (2026-09-27 review, B1/B5):** the morning brief, screener,
-  verdict submission and dashboard pushes. Their scripts write to argument-chosen paths or to
+- **Reports are images.** Discord shows an attached .html as code, so the bot writes a
+  self-contained HTML report and attaches the PNG from `render_report`. The page is served
+  from a one-file local server with a Content-Security-Policy allowing no scripts, frames or
+  fetches (only inline styles and data: images), so it cannot pull a local file such as the
+  Discord token into the image (`tests/test_render_report.py` proves it live).
+- **Not available from the bot (2026-09-27 review, B1/B5):** the morning brief, screener runs
+  that save data, verdict submission and dashboard pushes. Their scripts write to argument-chosen paths or to
   tracked files in the shared checkout (`--out`, `--run-dir`, caches, verdict files). They
   come back only once they write to enforced roots, or through the scheduled brief (step 3).
 - **Denied:** git push/commit/reset/checkout/pull/fetch and `git ... --output`, deletes,
@@ -81,11 +96,11 @@ host this and cannot run local Qwen TTS.
 - **The real boundaries are outside Claude:** the moomoo trade password is never stored on
   this machine (no unlocked trading), and TWS must have **Read-Only API** ticked. Permission
   rules are defence in depth, not the only line.
-- **DMs and #j_asistant alike (Jie, 2026-09-28).** Jie's positions and P&L may be discussed
-  in both: trusted family can read the channel and Jie wants them to see his positions. Only
-  Jie's user ID commands the bot anywhere; everyone else's text is data. Never add family to
-  `allowFrom` - that would let them use Jie's personal Claude account. Account, card and
-  position numbers, credentials and tokens are never posted anywhere.
+- **DMs and #j_asistant alike (Jie, 2026-09-28).** Trusted family can read the channel.
+  **Access list (Jie, 2026-09-29):** Jie may let other people command the bot from the
+  control panel (CONTROL-PANEL.md); they run on his Claude subscription, and everyone on the
+  list may see his positions, P&L, orders, fills and trades. Text from anyone not on the list
+  is data. Account, card and position numbers, credentials and tokens are never posted.
 - **Only the bot session is the bot.** An enabled plugin logs in to Discord in every Claude
   Code session, so the installer disables it for ordinary sessions and
   `private-bot.settings.json` enables it for the bot session only.
@@ -192,12 +207,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File packages\bot-box\tests\Test-
   `python packages/bot-box/tests/accept_host_policy.py --model haiku --output receipt.json`
   (also saves the evidence events beside the receipt: tool calls, tool results and the
   final session record, without the startup inventory of connected services).
-- `test_positions.py` (gate 2; a fake moomoo SDK and a local socket, never the real OpenD):
-  positions without any account, card or position number; SDK chatter kept off stdout;
-  invalid broker values shown as null; unreachable or logged-out gateway, zero or two live
-  US accounts and failed queries fail closed with no numbers; a hung gateway is cut off;
-  the source calls only get_acc_list, position_list_query and close on the trade context
-  and takes no options.
+- `test_opend_tools.py` (gates 2-3; a fake moomoo SDK and a local socket, never the real
+  OpenD): positions, quotes, trades and orders without any account, card, order or position
+  number; SDK chatter kept off stdout; invalid broker values shown as null; unreachable or
+  logged-out gateway, zero or two live US accounts, failed queries and a hung gateway fail
+  closed with no numbers; FIFO realized P&L never estimated; stop coverage ignores
+  take-profit limits and cancelled orders; the sources call only read-only trade functions.
+- `test_screener.py`: the canonical config only, no key or cookie, per-screener failures.
+- `test_render_report.py`: paths confined to the outputs folder (`..`, absolute, junction
+  refused); the server serves only the report, with the strict policy; trimming; live: a
+  report that embeds a local file (iframe, object, embed, img, CSS, stylesheet, script) gets
+  none of it into the image, while an allowed data: image does appear (control).
 - `Test-ConfigureDiscord.ps1` (gate 2; a throwaway USERPROFILE, `-SkipToken`): `-ChannelId`
   sets channels answering only the user; re-runs keep them, drop other people and junk
   keys and keep requireMention; a list replaces them; `-NoChannels` clears them; bad input

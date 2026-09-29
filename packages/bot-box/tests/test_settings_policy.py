@@ -38,6 +38,16 @@ WRITE_FREE_PROGRAMS = {
     # Gate 2, 2026-09-28.
     "positions": "OpenD read-only position query, no options, stdout only (tests/test_positions.py)",
     "wiki_search": "query.py pinned by the runner to --lexical-only: reads current files, no index/key/network",
+    # Gate 3, 2026-09-29.
+    "wiki_rag": "query.py pinned to --no-repair: reads the index, never rebuilds it; one Gemini query embedding",
+    "quotes": "OpenD market snapshot, quote context only, stdout (tests/test_opend_tools.py)",
+    "trades": "OpenD fill/fee history queries, stdout, no identifiers (tests/test_opend_tools.py)",
+    "screener": "anonymous TradingView scan of the canonical config, stdout, no secret (tests/test_screener.py)",
+    "theme_radar": "OpenD klines + Finviz read; --out refused; its cache write lands in the runner's temp copy",
+    # 2026-09-29.
+    "orders": "OpenD read-only order list and positions, no options, stdout (tests/test_opend_tools.py)",
+    "render_report": "writes one PNG beside the report, only inside outputs/bot-box (root fixed by the runner, "
+                     "links refused; tests/test_render_report.py)",
 }
 # The launcher turns the prompt's double quotes into single quotes (PowerShell 5.1), so the
 # same absolute paths are allowed in either quote style and in no other form.
@@ -47,9 +57,13 @@ RUNNER_RULE = re.compile(
 # Removed because they write where an argument says or into tracked shared-checkout files.
 WRITERS = [
     "session_guard.py", "submit_verdict.py", "fetch_tv_snapshot.py", "build_desk.py", "preflight.py",
-    "holdings_review.py", "compute_index_technicals.py", "fetch_market_internals.py", "theme_radar.py",
-    "finviz_classify.py", "fetch_opend_live.py", "ingest_to_dashboard.py",
+    "holdings_review.py", "compute_index_technicals.py", "fetch_market_internals.py",
+    "finviz_classify.py", "fetch_opend_live.py", "ingest_to_dashboard.py", "tv_screener_fetch.py",
+    "morning_brief.py",
 ]
+# theme_radar.py left WRITERS on 2026-09-29 (gate 3): its --out option is refused by the
+# runner, and the Finviz cache it writes beside itself lands in the runner's temporary copy
+# of committed code, never in the checkout (tests/test_botrun.py proves the second part).
 
 
 class SettingsPolicy(unittest.TestCase):

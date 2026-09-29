@@ -135,19 +135,45 @@ TOOLS = {
     # Keyword search of the current wiki files: no index, key, network or write.
     "wiki_search": (WIKI_ROOT, "scripts/retrieval/query.py",
                     {"--question": _text(300), "--limit": _match(r"[1-9]|1[0-9]|20")}, {"--question"}),
+    # Gate 3 (2026-09-29).
+    # Hybrid wiki RAG on the existing Gemini index, read-only (--no-repair): it refuses when
+    # the index is out of date, and the bot then falls back to wiki_search.
+    "wiki_rag": (WIKI_ROOT, "scripts/retrieval/query.py",
+                 {"--question": _text(300), "--limit": _match(r"[1-9]|1[0-9]|20")}, {"--question"}),
+    "quotes": (DASH_ROOT, "packages/bot-box/tools/quotes.py", {"--tickers": TICKER_LIST}, {"--tickers"}),
+    "trades": (DASH_ROOT, "packages/bot-box/tools/trades.py", {"--days": _match(r"[1-9]|[1-8][0-9]|90")}, set()),
+    "screener": (DASH_ROOT, "packages/bot-box/tools/screener.py",
+                 {"--screener": _match(r"[a-z0-9][a-z0-9-]{0,39}"), "--limit": _match(r"[1-9]|[1-4][0-9]|50")},
+                 set()),
+    "theme_radar": (DASH_ROOT, "packages/core-skills/morning-brief/theme_radar.py",
+                    {"--json": FLAG, "--book": TICKER_LIST}, set()),
+    # 2026-09-29: working orders and stop coverage (read-only OpenD), and HTML report -> PNG.
+    "orders": (DASH_ROOT, "packages/bot-box/tools/orders.py", {}, set()),
+    # Writes one PNG beside the report, inside outputs/bot-box only (the runner fixes --root).
+    "render_report": (DASH_ROOT, "packages/bot-box/tools/render_report.py",
+                      {"--file": _match(r"[A-Za-z0-9][A-Za-z0-9._ -]{0,80}(/[A-Za-z0-9][A-Za-z0-9._ -]{0,80}){0,3}\.html")},
+                      {"--file"}),
 }
 REPEATABLE = {("carry_forward", "--drop")}
 # Arguments the runner appends itself: the copy runs outside the repository, so a tool
 # that would locate data from its own path is told the canonical location instead.
 # wiki_search is pinned to keyword-only mode here, whatever the bot asks.
+_RETRIEVAL_PYTHON = [WIKI_ROOT / "scripts/retrieval/.venv/Scripts/python.exe",
+                     WIKI_ROOT / "scripts/retrieval/.venv/bin/python"]
 FIXED_ARGS = {"lint_wiki": ["--wiki-root", str(WIKI_ROOT / "wiki")],
-              "wiki_search": ["--repo", str(WIKI_ROOT), "--provider", "gemini", "--lexical-only", "--json"]}
+              "wiki_search": ["--repo", str(WIKI_ROOT), "--provider", "gemini", "--lexical-only", "--json"],
+              # The index is named explicitly because the copy runs outside the repository.
+              "wiki_rag": ["--repo", str(WIKI_ROOT), "--provider", "gemini",
+                           "--index", str(WIKI_ROOT / "scripts/retrieval/.index-gemini"), "--no-repair", "--json"],
+              # The canonical screener definitions; the bot cannot choose another file.
+              "screener": ["--config", str(DASH_ROOT / "apps/market_dashboard_backend/scripts/tv-screeners.json")],
+              # The bot's only writable folder; render_report refuses anything outside it.
+              "render_report": ["--root", str(WIKI_ROOT / "outputs/bot-box")]}
 # An option whose value the tool takes as its positional argument, placed last after "--".
-POSITIONAL = {"wiki_search": "--question"}
+POSITIONAL = {"wiki_search": "--question", "wiki_rag": "--question"}
 # A tool that needs libraries this interpreter lacks runs with its own environment's Python
 # (trusted like user site-packages: an ignored folder the bot cannot write to).
-INTERPRETERS = {"wiki_search": [WIKI_ROOT / "scripts/retrieval/.venv/Scripts/python.exe",
-                                WIKI_ROOT / "scripts/retrieval/.venv/bin/python"]}
+INTERPRETERS = {"wiki_search": _RETRIEVAL_PYTHON, "wiki_rag": _RETRIEVAL_PYTHON}
 
 
 def validate_args(tool, args):

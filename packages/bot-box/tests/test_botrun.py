@@ -40,10 +40,12 @@ TRUSTED_TOOL = REPORT + "print(json.dumps(payload))\n"
 TRUSTED_EDGE = REPORT + ("sys.path.insert(0, here)\nimport finviz_classify\n"
                          "payload['imported'] = finviz_classify.__file__\npayload['mark'] = finviz_classify.MARK\n"
                          "print(json.dumps(payload))\n")
-BRIEF_CODE = ["breadth_ma.py", "finviz_classify.py", "industry_proxies.py", "market_edge.py"]
-TOOLS_CODE = ["measure_tickers.py", "positions.py"]
+BRIEF_CODE = ["breadth_ma.py", "finviz_classify.py", "industry_proxies.py", "market_edge.py", "theme_radar.py"]
+TOOLS_CODE = ["measure_tickers.py", "orders.py", "positions.py", "quotes.py", "render_report.py", "screener.py",
+              "trades.py"]
 ALL_TOOLS = ("measure_tickers", "breadth_ma", "market_edge", "industry_proxies", "lint_wiki", "carry_forward",
-             "positions", "wiki_search")
+             "positions", "wiki_search", "wiki_rag", "quotes", "trades", "screener", "theme_radar", "orders",
+             "render_report")
 EVIL = "from pathlib import Path\nPath(r'{marker}').write_text('executed')\nprint('EVIL')\n"
 
 
@@ -67,6 +69,16 @@ class BotRunIsolation(unittest.TestCase):
             self.dash / "packages/bot-box/lib/botrun.py": RUNNER.read_text(encoding="utf-8"),
             self.dash / "packages/bot-box/tools/measure_tickers.py": TRUSTED_TOOL,
             self.dash / "packages/bot-box/tools/positions.py": TRUSTED_TOOL,
+            self.dash / "packages/bot-box/tools/quotes.py": TRUSTED_TOOL,
+            self.dash / "packages/bot-box/tools/trades.py": TRUSTED_TOOL,
+            self.dash / "packages/bot-box/tools/screener.py": TRUSTED_TOOL,
+            self.dash / "packages/bot-box/tools/orders.py": TRUSTED_TOOL,
+            self.dash / "packages/bot-box/tools/render_report.py": TRUSTED_TOOL,
+            # Like the real one: writes its Finviz cache beside itself, which must land in the copy.
+            self.dash / "packages/core-skills/morning-brief/theme_radar.py": REPORT + (
+                "open(os.path.join(here, 'finviz_cache.json'), 'w').write('1')\n"
+                "payload['cache'] = os.path.join(here, 'finviz_cache.json')\n"
+                "print(json.dumps(payload))\n"),
             self.dash / "packages/core-skills/morning-brief/market_edge.py": TRUSTED_EDGE,
             self.dash / "packages/core-skills/morning-brief/finviz_classify.py": "MARK = 'trusted'\n",
             self.dash / "packages/core-skills/morning-brief/breadth_ma.py": TRUSTED_TOOL,
@@ -319,6 +331,83 @@ class BotRunIsolation(unittest.TestCase):
         done = self.run_bot("--check-all")
         self.assertEqual(done.returncode, 2)
         self.assertRegex(done.stdout, r"(?m)^REFUSED +wiki_search ")
+
+    # --- gate 3 tools ---------------------------------------------------------------------
+
+    def test_wiki_rag_is_hybrid_read_only_on_the_named_index_with_the_question_last(self):
+        venv = self.retrieval_python.parents[1]
+        shutil.rmtree(venv)
+        subprocess.run([sys.executable, "-m", "venv", "--without-pip", str(venv)], check=True, capture_output=True)
+        question = "how do I place stops?"
+        done = self.run_bot("wiki_rag", "--question", question, "--limit", "4")
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        report = json.loads(done.stdout)
+        argv = report["argv"]
+        self.assertEqual(argv[:3], ["--limit", "4", "--repo"])
+        self.assertEqual(Path(argv[3]).resolve(), self.wiki.resolve())
+        self.assertEqual(argv[4:6], ["--provider", "gemini"])
+        self.assertEqual(argv[6], "--index")
+        self.assertEqual(Path(argv[7]).resolve(), (self.wiki / "scripts/retrieval/.index-gemini").resolve())
+        self.assertEqual(argv[8:], ["--no-repair", "--json", "--", question])
+        self.assertEqual(Path(report["prefix"]).resolve(), venv.resolve())
+
+    def test_screener_always_reads_the_canonical_config(self):
+        done = self.run_bot("screener", "--screener", "top-gainer", "--limit", "5")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        argv = json.loads(done.stdout)["argv"]
+        self.assertEqual(argv[:4], ["--screener", "top-gainer", "--limit", "5"])
+        self.assertEqual(argv[4], "--config")
+        self.assertEqual(Path(argv[5]).resolve(),
+                         (self.dash / "apps/market_dashboard_backend/scripts/tv-screeners.json").resolve())
+
+    def test_theme_radar_cache_write_lands_in_the_copy_not_the_checkout(self):
+        checkout_cache = self.brief / "finviz_cache.json"
+        self.assertFalse(checkout_cache.exists())
+        done = self.run_bot("theme_radar", "--json", "--book", "NVDA")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        report = json.loads(done.stdout)
+        self.assertCommittedCopy(report, BRIEF_CODE)          # listed before the write
+        self.assertNotIn(self.dash.resolve(), Path(report["cache"]).resolve().parents)
+        self.assertFalse(checkout_cache.exists(), "the cache write reached the checkout")
+
+    def test_gate3_tool_schemas(self):
+        refused = [("quotes",), ("quotes", "--tickers", "nvda;rm"), ("quotes", "--tickers", "NVDA", "--host", "x"),
+                   ("trades", "--days", "0"), ("trades", "--days", "91"), ("trades", "--acc-id", "1"),
+                   ("screener", "--screener", "../x"), ("screener", "--limit", "51"), ("screener", "--config", "x"),
+                   ("theme_radar", "--out", "x.json"), ("theme_radar", "--book", "a;b"),
+                   ("wiki_rag", "--question", "x", "--mode", "dense"), ("wiki_rag", "--question", "x", "--index", "C:/"),
+                   ("wiki_rag", "--question", "x", "--lexical-only"), ("wiki_rag", "--question", "x", "--repo", "C:/")]
+        for args in refused:
+            with self.subTest(args=args):
+                self.assertRefused(self.run_bot("--check", *args))
+        for args in (("quotes", "--tickers", "NVDA,BRK.B"), ("trades",), ("trades", "--days", "90"),
+                     ("screener",), ("screener", "--screener", "vcp-200ma", "--limit", "50"),
+                     ("theme_radar", "--json", "--book", "NVDA,AMD"), ("wiki_rag", "--question", "stops")):
+            with self.subTest(args=args):
+                self.assertEqual(self.run_bot("--check", *args).returncode, 0, args)
+
+    def test_orders_takes_no_options(self):
+        done = self.run_bot("orders")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(json.loads(done.stdout)["argv"], [])
+        for args in (("--acc-id", "1"), ("--trd-env", "SIMULATE"), ("--cancel",), ("unlock",)):
+            with self.subTest(args=args):
+                self.assertRefused(self.run_bot("orders", *args))
+
+    def test_render_report_root_is_fixed_and_file_must_be_an_html_path(self):
+        done = self.run_bot("render_report", "--file", "2026-09-29/SMCI-report.html")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        argv = json.loads(done.stdout)["argv"]
+        self.assertEqual(argv[:2], ["--file", "2026-09-29/SMCI-report.html"])
+        self.assertEqual(argv[2], "--root")
+        self.assertEqual(Path(argv[3]).resolve(), (self.wiki / "outputs/bot-box").resolve())
+        for args in (("render_report",), ("render_report", "--file", "../x.html"),
+                     ("render_report", "--file", "a/../../x.html"), ("render_report", "--file", "C:/x.html"),
+                     ("render_report", "--file", "/etc/x.html"), ("render_report", "--file", "x.png"),
+                     ("render_report", "--file", "x.html", "--root", "C:/"),
+                     ("render_report", "--file", "a/b/c/d/e.html")):
+            with self.subTest(args=args):
+                self.assertRefused(self.run_bot("--check", *args))
 
     def test_list_names_every_tool(self):
         done = self.run_bot("--list")
