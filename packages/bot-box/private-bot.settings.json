@@ -2,6 +2,10 @@
   "enabledPlugins": {
     "discord@claude-plugins-official": true
   },
+  "statusLine": {
+    "type": "command",
+    "command": "\"C:/Python314/python.exe\" -I \"C:/Users/jiesh/AI codes hub/market_dashboard/packages/bot-box/lib/usage-statusline.py\""
+  },
   "permissions": {
     "defaultMode": "dontAsk",
     "allow": [

@@ -22,6 +22,11 @@
   found, logs the reason and starts the bot in STALE mode, where the bot must say its wiki
   and skills may be out of date.
 
+  It also appends who may command the bot (access.json plus the control panel's owner and
+  names, lib\BotBoxPanel.psm1) and records what the session started with in
+  bot-state.json, which the hourly refresher (lib\refresh-repos.ps1) uses to decide
+  whether an idle bot should be restarted.
+
   Log: %USERPROFILE%\.claude\bot-box\logs\private-bot-YYYYMMDD.log
 #>
 [CmdletBinding()]
@@ -44,6 +49,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $settingsFile = Join-Path $here 'private-bot.settings.json'
 $promptFile = Join-Path $here 'private-bot-prompt.md'
 Import-Module (Join-Path $here 'lib\BotBoxStartup.psm1') -Force
+Import-Module (Join-Path $here 'lib\BotBoxPanel.psm1') -Force
 # Bot-box state lives under %USERPROFILE%\.claude, not AppData: a script started from the
 # Claude desktop app (an MSIX package) has its AppData writes silently redirected into the
 # package's LocalCache, where the logon task cannot see them.
@@ -110,15 +116,26 @@ while ($true) {
         Write-BotLog 'WARN starting in STALE mode: the bot is told its wiki and skills may be out of date'
     }
 
+    $paths = Get-BotBoxPaths
+    $access = Get-BotAccess -AccessFile $paths.AccessFile -LabelsFile $paths.LabelsFile
+    $accessNotice = Get-BotAccessNotice -Access $access
+    Write-BotLog ('Access: owner {0}, {1} other user(s)' -f $(if ($access.Owner) { 'set' } else { 'NOT SET' }), @($access.Users | Where-Object { -not $_.IsOwner }).Count)
+
     # PowerShell 5.1 strips embedded double quotes from native-command arguments,
     # so the prompt is passed with single quotes instead.
-    $prompt = ((Get-Content -Raw -Path $promptFile) + $notice) -replace '"', "'"
+    $prompt = ((Get-Content -Raw -Path $promptFile) + $notice + "`n" + $accessNotice) -replace '"', "'"
 
     if ($PreflightOnly) {
         Write-BotLog 'Preflight only: all startup checks passed; Claude was not started'
         Write-Host $notice
+        Write-Host $accessNotice
         exit 0
     }
+
+    Write-BotJson -Path $paths.BotStateFile -Value ([pscustomobject]@{
+        started_at = (Get-Date).ToString('s')
+        repos = @($fresh | ForEach-Object { [pscustomobject]@{ repo = $_.Repo; fresh = $_.Fresh } })
+    })
 
     Set-Location $WikiRoot
     $started = Get-Date
