@@ -82,7 +82,7 @@ try {
     Check 'notice lists the extra user' ($n -match "Also allowed: Mei, Discord user_id $friend")
     Check 'notice shares positions and P&L with everyone listed' ($n -match 'share his positions, P&L, fills and trades with everyone listed' -and $n -notmatch 'owner only')
     Check 'notice still never shares account numbers or credentials' ($n -match 'Account numbers, account totals, credentials and tokens are still' -and $n -match 'never shared')
-    Check 'notice overrides the fixed owner-only rule' ($n -match 'This list replaces')
+    Check 'notice says everyone listed may give requests' ($n -match 'Everyone listed may give you requests')
     $missing = Get-BotAccess -AccessFile (Join-Path $root 'nope.json') -LabelsFile (Join-Path $root 'nope2.json')
     Check 'missing access list answers no one' ((Get-BotAccessNotice -Access $missing) -match 'Answer no one')
 

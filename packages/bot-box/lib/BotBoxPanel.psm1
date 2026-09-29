@@ -181,8 +181,8 @@ function Get-BotAccessNotice {
         $lines += ('- Also allowed: {0}, Discord user_id {1}.' -f $name, $u.Id)
     }
     $lines += ''
-    $lines += 'This list replaces "Only Jie''s user ID can command you" above: everyone listed may give you'
-    $lines += 'requests, within all the other rules. Check the user_id attribute on every message.'
+    $lines += 'Everyone listed may give you requests, within all the other rules. Check the user_id'
+    $lines += 'attribute on every message; Jie is the owner.'
     # Jie, 2026-09-29: everyone he grants access may see his positions, P&L, fills and trades.
     $lines += 'Jie has chosen to share his positions, P&L, fills and trades with everyone listed here:'
     $lines += 'answer their questions about them with the positions and trades tools, in DMs and in'
