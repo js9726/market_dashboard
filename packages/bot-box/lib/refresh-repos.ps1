@@ -16,6 +16,12 @@
   It also restarts a bot whose Discord plugin is not running 3 minutes after it started
   (it can receive nothing, so no conversation is interrupted).
 
+  Then it brings the wiki's Gemini RAG index up to date (store.py refresh --provider gemini),
+  which re-embeds only the sections of files that changed since the last refresh. The bot
+  searches that index with --no-repair and refuses a stale one, so without this every wiki
+  commit would break its RAG search. Each refresh sends the changed files' text to Google's
+  paid embedding API (a fraction of a cent per run). -NoRagRefresh skips it.
+
   The control panel turns the task on and off. Log: %USERPROFILE%\.claude\bot-box\logs\refresh-YYYYMMDD.log
 #>
 [CmdletBinding()]
@@ -23,7 +29,8 @@ param(
     [string]$WikiRoot = (Join-Path $env:USERPROFILE 'AI codes hub\jie_wiki'),
     [string]$DashRoot = (Join-Path $env:USERPROFILE 'AI codes hub\market_dashboard'),
     [int]$IdleMinutes = 10,
-    [switch]$NoRestart
+    [switch]$NoRestart,
+    [switch]$NoRagRefresh
 )
 
 $ErrorActionPreference = 'Continue'
@@ -51,9 +58,32 @@ $results = foreach ($repo in @($WikiRoot, $DashRoot)) {
     $r
 }
 $results = @($results)
+
+$rag = 'skipped (-NoRagRefresh)'
+if (-not $NoRagRefresh) {
+    $py = Join-Path $WikiRoot 'scripts\retrieval\.venv\Scripts\python.exe'
+    $store = Join-Path $WikiRoot 'scripts\retrieval\store.py'
+    $index = Join-Path $WikiRoot 'scripts\retrieval\.index-gemini\index.zip'
+    if (-not ((Test-Path $py) -and (Test-Path $store) -and (Test-Path $index))) {
+        $rag = 'not set up on this PC (needs the retrieval venv and a built Gemini index)'
+    } else {
+        $out = (& $py -B $store refresh --provider gemini 2>&1 | ForEach-Object { "$_" }) -join "`n"
+        if ($LASTEXITCODE -ne 0) {
+            $rag = 'FAILED: ' + (($out -split "`n" | Where-Object { $_ } | Select-Object -Last 1))
+        } elseif ($out -match '"status":\s*"clean"') {
+            $rag = 'current'
+        } elseif ($out -match '"reembedded":\s*(\d+)') {
+            $rag = "updated: $($Matches[1]) section(s) re-embedded"
+        } else {
+            $rag = 'refreshed'
+        }
+    }
+    Write-RefreshLog "wiki RAG index: $rag"
+}
 Write-BotJson -Path $paths.RefreshStatus -Value ([pscustomobject]@{
     at = (Get-Date).ToString('s')
     repos = @($results | ForEach-Object { [pscustomobject]@{ repo = $_.Repo; fresh = $_.Fresh; pulled = $_.Pulled; reason = $_.Reason } })
+    rag = $rag
 })
 
 if ($NoRestart) { exit 0 }

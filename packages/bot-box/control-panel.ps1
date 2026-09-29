@@ -106,7 +106,8 @@ $refreshStatus = New-Label $gRefresh 15 25 570 22
 $refreshLast = New-Object System.Windows.Forms.TextBox
 $refreshLast.Multiline = $true; $refreshLast.ReadOnly = $true; $refreshLast.Font = $font
 $refreshLast.Location = New-Object System.Drawing.Point(15, 50)
-$refreshLast.Size = New-Object System.Drawing.Size(570, 55)
+$refreshLast.Size = New-Object System.Drawing.Size(570, 58)
+$refreshLast.ScrollBars = 'Vertical'
 $gRefresh.Controls.Add($refreshLast)
 $btnToggle = New-Button $gRefresh 'Turn on' 15 112
 $btnRunNow = New-Button $gRefresh 'Run now' 135 112
@@ -173,7 +174,8 @@ function Update-Panel {
         $st = Read-BotJson $paths.RefreshStatus
         $refreshLast.Text = if ($st) {
             ("Last run {0}`r`n" -f ([datetime]$st.at).ToString('ddd HH:mm')) + ((@($st.repos) | ForEach-Object {
-                '{0}: {1} - {2}' -f $_.repo, $(if ($_.pulled) { 'updated' } elseif ($_.fresh) { 'current' } else { 'STALE' }), $_.reason }) -join "`r`n")
+                '{0}: {1} - {2}' -f $_.repo, $(if ($_.pulled) { 'updated' } elseif ($_.fresh) { 'current' } else { 'STALE' }), $_.reason }) -join "`r`n") +
+                $(if ($st.PSObject.Properties['rag']) { "`r`nwiki RAG index: " + $st.rag } else { '' })
         } else { 'No run yet' }
 
         $sel = if ($list.SelectedItems.Count) { $list.SelectedItems[0].SubItems[1].Text } else { $null }

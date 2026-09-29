@@ -47,7 +47,10 @@ while you are signed in it runs `lib/refresh-repos.ps1`, the launcher's guarded 
 clean). If a repository was updated, or one the bot started STALE is current again, it
 restarts the bot once the bot has handled no message for 10 minutes. A repository that has
 diverged from GitHub, or that an agent has an active claim on, stays STALE until that is
-resolved in a coding session; the refresh reports it and never forces it. Log:
+resolved in a coding session; the refresh reports it and never forces it. Each run then
+brings the wiki's Gemini RAG index up to date, re-embedding only the files that changed (the
+bot's `wiki_rag` search refuses a stale index; a fraction of a cent per run, and the changed
+files' text goes to Google). Log:
 `%USERPROFILE%\.claude\bot-box\logs\refresh-YYYYMMDD.log`.
 
 **Access.** Jie chose on 2026-09-29 to let other people command the bot. Adding someone
