@@ -13,6 +13,9 @@
   the next run. The restart ends the bot's Claude session and its Discord plugin; the
   launcher starts a new session after its 15-second backoff.
 
+  It also restarts a bot whose Discord plugin is not running 3 minutes after it started
+  (it can receive nothing, so no conversation is interrupted).
+
   The control panel turns the task on and off. Log: %USERPROFILE%\.claude\bot-box\logs\refresh-YYYYMMDD.log
 #>
 [CmdletBinding()]
@@ -55,6 +58,15 @@ Write-BotJson -Path $paths.RefreshStatus -Value ([pscustomobject]@{
 
 if ($NoRestart) { exit 0 }
 $session = Get-BotSessionInfo
+if (Test-BotPluginRestartNeeded -Running $session.Running -DiscordConnected $session.DiscordConnected -StartedAt $session.StartedAt) {
+    if (@($session.LauncherIds).Count) {
+        $n = Stop-BotSession
+        Write-RefreshLog "Bot running since $($session.StartedAt) but its Discord plugin is not: restarted it (ended $n process(es))"
+    } else {
+        Write-RefreshLog 'WARN bot running without its Discord plugin and without a launcher: press Restart or Start in the control panel'
+    }
+    exit 0
+}
 if (-not $session.Running) {
     if (Test-Path $paths.PendingFile) { Remove-Item $paths.PendingFile -Force }
     exit 0

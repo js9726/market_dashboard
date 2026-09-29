@@ -135,6 +135,22 @@ try {
     $t = @(Get-BotProcessTree -RootId 20 -Processes $procs)
     Check 'process tree covers claude and the Discord plugin' (($t -join ',') -eq '20,30,31')
 
+    # ------------------------------------------------------------------ Discord connected
+    $named = @(
+        [pscustomobject]@{ Name = 'claude.exe'; ProcessId = 20; ParentProcessId = 10 },
+        [pscustomobject]@{ Name = 'cmd.exe'; ProcessId = 30; ParentProcessId = 20 },
+        [pscustomobject]@{ Name = 'bun.exe'; ProcessId = 31; ParentProcessId = 20 },
+        [pscustomobject]@{ Name = 'bun.exe'; ProcessId = 50; ParentProcessId = 1 }
+    )
+    Check 'connected when bun runs under the bot' (Test-BotDiscordPlugin -ClaudeIds @(20) -Processes $named)
+    $noPlugin = @($named | Where-Object { $_.ProcessId -ne 31 })
+    Check 'not connected when its bun is missing, even if another bun runs' (-not (Test-BotDiscordPlugin -ClaudeIds @(20) -Processes $noPlugin))
+    Check 'not connected when no bot' (-not (Test-BotDiscordPlugin -ClaudeIds @() -Processes $named))
+    Check 'plugin missing past 3 minutes: restart' (Test-BotPluginRestartNeeded -Running $true -DiscordConnected $false -StartedAt $now.AddMinutes(-4) -Now $now)
+    Check 'plugin missing within grace: wait' (-not (Test-BotPluginRestartNeeded -Running $true -DiscordConnected $false -StartedAt $now.AddMinutes(-1) -Now $now))
+    Check 'plugin running: no restart' (-not (Test-BotPluginRestartNeeded -Running $true -DiscordConnected $true -StartedAt $now.AddHours(-2) -Now $now))
+    Check 'bot not running: no restart' (-not (Test-BotPluginRestartNeeded -Running $false -DiscordConnected $false -StartedAt $null -Now $now))
+
     # ------------------------------------------------------------------ scheduled task definition (not registered)
     $d = New-BotRefreshTaskDefinition -ScriptPath 'C:\x\refresh-repos.ps1'
     Check 'task repeats hourly' ($d.Trigger.Repetition.Interval -eq 'PT1H')

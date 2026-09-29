@@ -45,6 +45,8 @@ param(
 )
 
 $ErrorActionPreference = 'Continue'
+# The control panel's Show console button finds this window by its title.
+try { $Host.UI.RawUI.WindowTitle = 'BOT BOX - private Discord bot (closing this window stops the bot)' } catch { }
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $settingsFile = Join-Path $here 'private-bot.settings.json'
 $promptFile = Join-Path $here 'private-bot-prompt.md'

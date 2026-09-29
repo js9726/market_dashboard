@@ -89,11 +89,14 @@ $usageNote.ForeColor = [System.Drawing.Color]::DimGray
 
 # ------------------------------------------------------------------ bot
 $gBot = New-Box 'Private bot' 168 95
-$botStatus = New-Label $gBot 15 25 570 22
-$btnStart = New-Button $gBot 'Start' 15 55
-$btnRestart = New-Button $gBot 'Restart' 135 55
-$btnStop = New-Button $gBot 'Stop' 255 55
-$botNote = New-Label $gBot 375 58 215 22
+$botStatus = New-Label $gBot 15 25 290 22
+$discordStatus = New-Label $gBot 310 25 280 22
+$discordStatus.Font = $bold
+$btnStart = New-Button $gBot 'Start' 15 55 85
+$btnRestart = New-Button $gBot 'Restart' 105 55 85
+$btnStop = New-Button $gBot 'Stop' 195 55 85
+$btnConsole = New-Button $gBot 'Show console' 285 55 100
+$botNote = New-Label $gBot 395 58 195 22
 $botNote.ForeColor = [System.Drawing.Color]::DimGray
 $botNote.Text = 'Changes to access apply on Restart'
 
@@ -151,6 +154,14 @@ function Update-Panel {
         $botStatus.Text = if ($s.Running) {
             'Running since {0:ddd HH:mm}{1}' -f $s.StartedAt, $(if (@($s.LauncherIds).Count) { '' } else { ' - WARNING: no launcher, it will not restart itself' })
         } else { 'Not running' }
+        if (-not $s.Running) {
+            $discordStatus.Text = 'Discord: not connected'; $discordStatus.ForeColor = [System.Drawing.Color]::DimGray
+        } elseif ($s.DiscordConnected) {
+            $discordStatus.Text = 'Discord: connected'; $discordStatus.ForeColor = [System.Drawing.Color]::DarkGreen
+        } else {
+            $discordStatus.Text = 'Discord: NOT connected - press Restart'; $discordStatus.ForeColor = [System.Drawing.Color]::DarkRed
+        }
+        $btnConsole.Enabled = (@($s.LauncherIds).Count -gt 0)
         $btnStart.Enabled = -not $s.Running
         $btnRestart.Enabled = $s.Running
         $btnStop.Enabled = $s.Running
@@ -190,6 +201,12 @@ $btnRestart.Add_Click({
     $n = Stop-BotSession
     if ($n -eq 0) { Show-Error 'The bot was not running.' }
     Start-Sleep -Seconds 2; Update-Panel
+})
+$btnConsole.Add_Click({
+    Add-Type -AssemblyName Microsoft.VisualBasic
+    try { [Microsoft.VisualBasic.Interaction]::AppActivate('BOT BOX - private Discord bot') }
+    catch { Show-Error ('The bot console window was not found by its title. Look in the taskbar for a PowerShell ' +
+        'window running start-private-bot.ps1 (a bot started before this update keeps a generic title until its launcher restarts).') }
 })
 $btnStop.Add_Click({
     $r = [System.Windows.Forms.MessageBox]::Show('Stop the bot? It will not answer until you press Start or sign in again.', 'Bot box', 'YesNo', 'Question')
@@ -234,7 +251,7 @@ $timer.Add_Tick({ Update-Panel })
 if ($SmokeTest) {
     Update-Panel
     $out = @('USAGE', $usageRows[0].Text.Text, $usageRows[1].Text.Text, $usageNote.Text,
-        'BOT', $botStatus.Text, ('buttons start={0} restart={1} stop={2}' -f $btnStart.Enabled, $btnRestart.Enabled, $btnStop.Enabled),
+        'BOT', $botStatus.Text, $discordStatus.Text, ('buttons start={0} restart={1} stop={2}' -f $btnStart.Enabled, $btnRestart.Enabled, $btnStop.Enabled),
         'REFRESH', $refreshStatus.Text, $btnToggle.Text, $refreshLast.Text,
         'ACCESS') + @($list.Items | ForEach-Object { '{0} | {1} | {2}' -f $_.Text, ($_.SubItems[1].Text -replace '\d{15,}', '<id>'), $_.SubItems[2].Text })
     $out | ForEach-Object { Write-Host $_ }

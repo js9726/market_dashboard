@@ -256,17 +256,39 @@ function Get-BotProcessTree {
     return $out.ToArray()
 }
 
+function Test-BotDiscordPlugin {
+    # The Discord channel plugin runs as bun.exe (via cmd.exe) under the bot's Claude
+    # process. No bun in that tree means the bot cannot receive or send Discord messages.
+    param([int[]]$ClaudeIds, [Parameter(Mandatory)][object[]]$Processes)
+    foreach ($c in @($ClaudeIds)) {
+        $tree = @(Get-BotProcessTree -RootId $c -Processes $Processes)
+        if (@($Processes | Where-Object { $tree -contains [int]$_.ProcessId -and $_.Name -eq 'bun.exe' }).Count) { return $true }
+    }
+    return $false
+}
+
 function Get-BotSessionInfo {
     $all = @(Get-CimInstance Win32_Process)
     $claude = @($all | Where-Object { $_.Name -eq 'claude.exe' -and $_.CommandLine -match '--channels plugin:discord' })
     $launcher = @($all | Where-Object { $_.Name -match '^(powershell|pwsh)\.exe$' -and $_.CommandLine -match 'start-private-bot\.ps1' })
+    $ids = @($claude | ForEach-Object { [int]$_.ProcessId })
     return [pscustomobject]@{
-        Running     = ($claude.Count -gt 0)
-        ClaudeIds   = @($claude | ForEach-Object { [int]$_.ProcessId })
-        StartedAt   = $(if ($claude.Count) { ($claude | Sort-Object CreationDate | Select-Object -First 1).CreationDate } else { $null })
-        LauncherIds = @($launcher | ForEach-Object { [int]$_.ProcessId })
-        All         = $all
+        Running          = ($claude.Count -gt 0)
+        ClaudeIds        = $ids
+        StartedAt        = $(if ($claude.Count) { ($claude | Sort-Object CreationDate | Select-Object -First 1).CreationDate } else { $null })
+        LauncherIds      = @($launcher | ForEach-Object { [int]$_.ProcessId })
+        DiscordConnected = $(if ($ids.Count) { Test-BotDiscordPlugin -ClaudeIds $ids -Processes $all } else { $false })
+        All              = $all
     }
+}
+
+function Test-BotPluginRestartNeeded {
+    # A bot whose Discord plugin has not started within the grace period answers nobody;
+    # restarting it cannot interrupt a conversation because none can reach it.
+    param([bool]$Running, [bool]$DiscordConnected, [Nullable[datetime]]$StartedAt, [int]$GraceMinutes = 3,
+          [datetime]$Now = (Get-Date))
+    if (-not $Running -or $DiscordConnected -or -not $StartedAt) { return $false }
+    return (($Now - $StartedAt).TotalMinutes -ge $GraceMinutes)
 }
 
 function Stop-BotSession {
@@ -361,6 +383,6 @@ function Disable-BotRefreshTask {
 
 Export-ModuleMember -Function Get-BotBoxPaths, Read-BotJson, Write-BotJson, Test-DiscordId, ConvertTo-SafeLabel,
     Get-BotAccess, Add-BotAccessUser, Remove-BotAccessUser, Set-BotAccessOwner, Get-BotAccessNotice,
-    Get-BotUsage, Format-BotUsageWindow, Get-BotProcessTree, Get-BotSessionInfo, Stop-BotSession,
+    Get-BotUsage, Format-BotUsageWindow, Get-BotProcessTree, Test-BotDiscordPlugin, Get-BotSessionInfo, Test-BotPluginRestartNeeded, Stop-BotSession,
     Get-BotLastActivity, Test-BotIdle, Get-BotRestartReason, New-BotRefreshTaskDefinition,
     Get-BotRefreshTaskState, Enable-BotRefreshTask, Disable-BotRefreshTask
