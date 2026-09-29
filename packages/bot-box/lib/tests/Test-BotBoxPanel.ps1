@@ -69,7 +69,7 @@ try {
     Check 'ambiguous owner is not guessed' ($null -eq $a.Owner)
     Check 'adding is refused until the owner is set' (Throws { Add-BotAccessUser -AccessFile $g.Access -LabelsFile $g.Labels -UserId '444444444444444444' })
     $n = Get-BotAccessNotice -Access $a
-    Check 'no-owner notice shares private data with no one' ($n -match 'NOT SET' -and $n -match 'with no one')
+    Check 'no-owner notice says so' ($n -match 'NOT SET')
     Set-BotAccessOwner -AccessFile $g.Access -LabelsFile $g.Labels -UserId $owner
     Check 'owner can be set' ((Get-BotAccess -AccessFile $g.Access -LabelsFile $g.Labels).Owner -eq $owner)
 
@@ -80,7 +80,8 @@ try {
     Add-BotAccessUser -AccessFile $f.Access -LabelsFile $f.Labels -UserId $friend -Label 'Mei'
     $n = Get-BotAccessNotice -Access (Get-BotAccess -AccessFile $f.Access -LabelsFile $f.Labels)
     Check 'notice lists the extra user' ($n -match "Also allowed: Mei, Discord user_id $friend")
-    Check 'notice keeps positions and P&L owner-only' ($n -match 'positions, P&L, fills, trades' -and $n -match 'owner only')
+    Check 'notice shares positions and P&L with everyone listed' ($n -match 'share his positions, P&L, fills and trades with everyone listed' -and $n -notmatch 'owner only')
+    Check 'notice still never shares account numbers or credentials' ($n -match 'Account numbers, account totals, credentials and tokens are still' -and $n -match 'never shared')
     Check 'notice overrides the fixed owner-only rule' ($n -match 'This list replaces')
     $missing = Get-BotAccess -AccessFile (Join-Path $root 'nope.json') -LabelsFile (Join-Path $root 'nope2.json')
     Check 'missing access list answers no one' ((Get-BotAccessNotice -Access $missing) -match 'Answer no one')

@@ -183,15 +183,11 @@ function Get-BotAccessNotice {
     $lines += ''
     $lines += 'This list replaces "Only Jie''s user ID can command you" above: everyone listed may give you'
     $lines += 'requests, within all the other rules. Check the user_id attribute on every message.'
-    if ($Access.Owner) {
-        $lines += 'Jie''s private trading data - positions, P&L, fills, trades and anything about his'
-        $lines += 'accounts - is for the owner only: use the positions and trades tools, and discuss'
-        $lines += 'their results, only in reply to a message whose user_id is the owner''s. Anyone else'
-        $lines += 'who asks is told that it is private.'
-    } else {
-        $lines += 'Because no owner is set, share Jie''s private trading data (positions, P&L, fills, trades,'
-        $lines += 'accounts) with no one, and say the owner must be set in the control panel.'
-    }
+    # Jie, 2026-09-29: everyone he grants access may see his positions, P&L, fills and trades.
+    $lines += 'Jie has chosen to share his positions, P&L, fills and trades with everyone listed here:'
+    $lines += 'answer their questions about them with the positions and trades tools, in DMs and in'
+    $lines += '#j_asistant alike. Account numbers, account totals, credentials and tokens are still'
+    $lines += 'never shared with anyone.'
     return ($lines -join "`n")
 }
 

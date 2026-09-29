@@ -46,8 +46,9 @@ channel; the name is kept in `access-labels.json`. Changes apply after Restart (
 reads the list only when it starts). The launcher tells the bot who is on the list, and:
 
 - everyone listed may give the bot requests, within all its other rules;
-- Jie's positions, P&L, fills, trades and account details go only to the owner;
-- if no owner is set, nobody gets them.
+- everyone listed may see Jie's positions, P&L, fills and trades (Jie, 2026-09-29), in DMs
+  and in #j_asistant;
+- account numbers, account totals, credentials and tokens are never shared with anyone.
 
 Everyone you add uses **your** Claude subscription, and claude.ai consumer plans are for
 personal use. `configure-discord.ps1` rewrites the list to its `-UserId` only, so re-running it

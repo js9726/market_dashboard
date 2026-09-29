@@ -55,6 +55,7 @@ function New-Box([string]$Title, [int]$Top, [int]$Height) {
 function New-Label($Parent, [int]$X, [int]$Y, [int]$W, [int]$H = 20) {
     $l = New-Object System.Windows.Forms.Label
     $l.Font = $font; $l.AutoSize = $false
+    $l.UseMnemonic = $false  # otherwise '&' in 'P&L' is eaten as a shortcut marker
     $l.Location = New-Object System.Drawing.Point($X, $Y)
     $l.Size = New-Object System.Drawing.Size($W, $H)
     $Parent.Controls.Add($l)
@@ -131,7 +132,7 @@ $btnOwner = New-Button $gAccess 'Make selected owner' 165 150 150
 $warn = New-Label $gAccess 15 185 570 55
 $warn.ForeColor = [System.Drawing.Color]::DarkRed
 $warnText = ('Everyone listed runs on YOUR Claude subscription (consumer plans are for personal use) ' +
-    'and can ask the bot anything except your positions, P&L and trades, which stay owner-only. ' +
+    'and can ask the bot anything, including your positions, P&L and trades. ' +
     'Right-click a person in Discord > Copy User ID (Developer Mode on). Takes effect after Restart.')
 $warn.Text = $warnText
 
@@ -170,12 +171,12 @@ function Update-Panel {
         foreach ($usr in $acc.Users) {
             $item = New-Object System.Windows.Forms.ListViewItem($(if ($usr.Label) { $usr.Label } elseif ($usr.IsOwner) { 'Jie' } else { '(no name)' }))
             [void]$item.SubItems.Add($usr.Id)
-            [void]$item.SubItems.Add($(if ($usr.IsOwner) { 'Owner (sees positions/P&L)' } else { 'User' }))
+            [void]$item.SubItems.Add($(if ($usr.IsOwner) { 'Owner' } else { 'User (sees positions)' }))
             if ($usr.Id -eq $sel) { $item.Selected = $true }
             [void]$list.Items.Add($item)
         }
         $list.EndUpdate()
-        $warn.Text = if (-not $acc.Owner -and $acc.Users.Count -gt 1) { 'Owner NOT SET: select Jie and click "Make selected owner". Until then nobody sees positions/P&L.' } else { $warnText }
+        $warn.Text = if (-not $acc.Owner -and $acc.Users.Count -gt 1) { 'Owner NOT SET: select yourself and click "Make selected owner" before adding anyone else.' } else { $warnText }
     } catch {
         $usageNote.Text = "Refresh failed: $($_.Exception.Message)"
     }
@@ -208,7 +209,7 @@ $btnRunNow.Add_Click({
 $btnAdd.Add_Click({
     $id = $txtId.Text.Trim()
     if (-not (Test-DiscordId $id)) { Show-Error 'A Discord user ID is 17-20 digits. Right-click the person in Discord > Copy User ID.'; return }
-    $r = [System.Windows.Forms.MessageBox]::Show(("Let {0} command the bot on your Claude subscription?`r`nThey will not see your positions, P&L or trades." -f $(if ($txtName.Text) { $txtName.Text } else { $id })), 'Bot box', 'YesNo', 'Warning')
+    $r = [System.Windows.Forms.MessageBox]::Show(("Let {0} command the bot on your Claude subscription?`r`nThey WILL see your positions, P&L and trades." -f $(if ($txtName.Text) { $txtName.Text } else { $id })), 'Bot box', 'YesNo', 'Warning')
     if ($r -ne 'Yes') { return }
     try { Add-BotAccessUser -AccessFile $paths.AccessFile -LabelsFile $paths.LabelsFile -UserId $id -Label $txtName.Text; $txtId.Text = ''; $txtName.Text = '' }
     catch { Show-Error $_.Exception.Message }
