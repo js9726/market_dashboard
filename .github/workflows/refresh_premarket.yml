@@ -19,6 +19,13 @@ name: Refresh Pre-Open Brief (Daily 27min Before Market Open)
 #   7. Commit + push (with -X theirs rebase retry on race)
 #
 # Cron: 13:03 UTC Mon-Fri = 09:03 ET EDT, 27 min before market open.
+# In practice GitHub has started it 4.5-7 hours late (after the open), so the bot PC
+# dispatches this workflow at 09:00 ET (packages/bot-box/brief/dispatch-premarket-brief.ps1).
+# The scheduled run stays as a fallback and is skipped by the `gate` job when this
+# morning's brief already ran (scripts/brief_ran_today.py).
+#
+# The DeepSeek brief is posted to Discord #j_asistant through the DISCORD_BRIEF_WEBHOOK_URL
+# secret (scripts/post_brief_discord.py); a failed or data-less brief posts a notice instead.
 #
 # Concurrency: lock prevents overlap; new run waits + skips if old still
 # finishing (matches the cancel-in-progress=false pattern used by the old split jobs).
@@ -38,7 +45,27 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.ran.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/market_dashboard_backend/scripts/brief_ran_today.py
+            apps/market_dashboard_backend/data/morning_brief_meta.json
+          sparse-checkout-cone-mode: false
+      - name: Skip a late scheduled run if this morning's brief already ran
+        id: ran
+        run: >
+          python3 apps/market_dashboard_backend/scripts/brief_ran_today.py
+          --event "${{ github.event_name }}"
+          --meta apps/market_dashboard_backend/data/morning_brief_meta.json
+
   premarket:
+    needs: gate
+    if: needs.gate.outputs.skip != 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -137,6 +164,16 @@ jobs:
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           VERCEL_INGEST_URL: ${{ secrets.VERCEL_INGEST_URL }}
           BRIEF_INGEST_KEY:  ${{ secrets.BRIEF_INGEST_KEY }}
+
+      # ── Step 4a+: post the DeepSeek brief to Discord #j_asistant ────────
+      # Runs whatever the brief step did: today's brief as an embed, or a short notice
+      # when DeepSeek failed or returned no market data (never an old brief).
+      - name: Post DeepSeek brief to Discord
+        if: success()
+        continue-on-error: true
+        run: python scripts/post_brief_discord.py --data-dir data
+        env:
+          DISCORD_BRIEF_WEBHOOK_URL: ${{ secrets.DISCORD_BRIEF_WEBHOOK_URL }}
 
       # ── Step 4b: Claude SDK runner (Node — Phase 3c MVP) ────────────────
       # Drives the morning-brief SKILL via the Claude Agent SDK under the

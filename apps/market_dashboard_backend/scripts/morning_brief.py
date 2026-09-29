@@ -82,16 +82,36 @@ from deepseek_api import call_deepseek_json  # noqa: E402
 # DeepSeek (official Responses API with server-side web search)
 # ---------------------------------------------------------------------------
 
-def generate_deepseek(prompt: str, out_dir: str) -> bool:
+# prompt.md is written for a model with a WebSearch tool. Without one, DeepSeek announced
+# searches and returned an empty answer (2026-09-29), so the no-web attempts say so plainly.
+DEEPSEEK_NO_WEB = (
+    "You have NO web access in this run and no tools: do not plan, announce or attempt any "
+    "search. Use only the pre-fetched data blocks in the prompt. Every field the data does not "
+    "cover is null (or [] for lists); never invent a number, headline, earnings date or rating. "
+    "Answer with the one JSON object only."
+)
+
+
+def generate_deepseek(prompt: str, out_dir: str, call=None) -> bool:
+    """Write morning_brief_deepseek.json.
+
+    Attempt 1 may web-search, with room for the searches and reasoning (32k output tokens;
+    8,192 ran out, 2026-09-29). If that fails or is not a brief (2026-09-28: a text
+    WebSearch call), attempts 2-3 run without web search on the supplied data block."""
+    call = call or call_deepseek_json
     if not os.environ.get("DEEPSEEK_API_KEY"):
         print("[DeepSeek] DEEPSEEK_API_KEY not set — skipping.")
         return False
     print("[DeepSeek] Calling DeepSeek V4 Flash with web search...")
     for attempt in range(3):
+        web = attempt == 0
         try:
-            body = _strip_fences(call_deepseek_json(prompt, web_search=True, max_output_tokens=8192))
-            if not _validate_json(body, "DeepSeek"):
-                return False
+            body = _strip_fences(call(prompt, web_search=web, max_output_tokens=32000 if web else 8192,
+                                      instructions=None if web else DEEPSEEK_NO_WEB))
+            if not _validate_json(body, "DeepSeek") or not _is_brief(body):
+                if attempt < 2:
+                    print("[DeepSeek] not a brief; retrying without web search on the supplied data")
+                continue
             out_path = os.path.join(out_dir, "morning_brief_deepseek.json")
             with open(out_path, "w", encoding="utf-8") as f:
                 f.write(body)
@@ -239,6 +259,19 @@ def _strip_fences(text: str) -> str:
     return text.strip()
 
 
+def _is_brief(body: str) -> bool:
+    """A StructuredBrief object, not a tool call or a fragment."""
+    try:
+        parsed = json.loads(body)
+    except ValueError:
+        return False
+    ok = isinstance(parsed, dict) and isinstance(parsed.get("mood"), dict) and "indices" in parsed
+    if not ok:
+        print("[DeepSeek] output is not a StructuredBrief (keys: {})".format(
+            sorted(parsed)[:6] if isinstance(parsed, dict) else type(parsed).__name__))
+    return ok
+
+
 def _validate_json(body: str, label: str) -> bool:
     """Verify the model output parses as JSON. Logs a sample on failure."""
     try:
@@ -350,7 +383,12 @@ def main():
 
     enabled = {p.strip().lower() for p in args.providers.split(",")}
     date_str = datetime.date.today().strftime("%A, %B %d, %Y")
-    prompt = build_prompt(date_str)
+    # Hand the models the data this run already fetched (snapshot, technicals, screeners);
+    # without it DeepSeek has nothing to work from. See brief_live_data.py.
+    from brief_live_data import build_live_data_block
+    live_block = build_live_data_block(out_dir)
+    print("[brief] live data block: {} characters".format(len(live_block)))
+    prompt = build_prompt(date_str, live_data_block=live_block)
 
     results = {}
 
