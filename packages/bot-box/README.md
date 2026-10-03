@@ -158,7 +158,7 @@ message.
 1. On the old host: `install-private-bot.ps1 -Uninstall` (removes the task and the designation)
    and `configure-discord.ps1 -Clear` (removes the token).
 2. Brokers move separately and deliberately:
-   `jie_wiki/agent-system/work/new-pc-migration/second-machine-brief.md`, "Failover".
+   `jie_wiki/agent-system/archive/new-pc-migration/second-machine-brief.md`, "Failover".
 3. On the new PC: `bootstrap-new-pc.ps1` from the migration kit, then `check-readiness.ps1`,
    then steps 1-7 above. Push both repositories first: the bootstrap clones from GitHub.
 
