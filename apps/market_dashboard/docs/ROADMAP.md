@@ -1,3 +1,5 @@
+> Historical roadmap: preserve the original plan below. For current implemented/partial status and next acceptance gates, see [maintenance plan](../../../docs/runtime-maintenance.md).
+
 # Market Desk + JS Trade Journal — Roadmap
 
 Living document for features beyond the current production state. Authored

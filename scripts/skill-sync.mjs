@@ -54,8 +54,8 @@ async function readJson(filePath) {
   return JSON.parse(text);
 }
 
-function sha256(text) {
-  return crypto.createHash("sha256").update(text, "utf8").digest("hex");
+export function sha256(text) {
+  return crypto.createHash("sha256").update(text.replace(/\r\n/g, "\n"), "utf8").digest("hex");
 }
 
 function shortHash(hash) {
@@ -76,7 +76,7 @@ function resolvePath(candidate) {
   return path.resolve(REPO_ROOT, candidate);
 }
 
-async function resolveSourceRoot(manifest, rootName) {
+export async function resolveSourceRoot(manifest, rootName) {
   const root = manifest.sourceRoots[rootName];
   if (!root) throw new Error(`Unknown source root "${rootName}" in manifest`);
 
@@ -86,6 +86,9 @@ async function resolveSourceRoot(manifest, rootName) {
 
     const resolved = resolvePath(expanded);
     if (await exists(resolved)) return resolved;
+    if (candidate.match(/^\$\{([A-Z0-9_]+)\}$/i)) {
+      throw new Error(`Explicit ${candidate} source root does not exist: ${resolved}`);
+    }
   }
 
   return null;
@@ -194,7 +197,7 @@ function renderBody(skill, output, resolvedSources) {
   ].join("\n").trimEnd() + "\n";
 }
 
-function renderFile(skill, output, resolvedSources) {
+export function renderFile(skill, output, resolvedSources) {
   const body = renderBody(skill, output, resolvedSources);
   const metadata = {
     manifestVersion: 1,
@@ -218,7 +221,7 @@ function renderFile(skill, output, resolvedSources) {
   };
 }
 
-function classifyStatus(existingContent, rendered, options) {
+export function classifyStatus(existingContent, rendered, options) {
   if (!existingContent) return { status: "missing", fail: true };
 
   const metadata = extractExistingMetadata(existingContent);
@@ -238,6 +241,12 @@ function classifyStatus(existingContent, rendered, options) {
     };
   }
 
+  const normalized = existingContent.replace(/\r\n/g, "\n");
+  const bodyStart = normalized.indexOf(END_MARKER) + END_MARKER.length;
+  const actualBody = normalized.slice(bodyStart).replace(/^\n\n/, "");
+  if (sha256(actualBody) !== rendered.renderHash) {
+    return { status: "modified", fail: true, message: "Generated body differs from its expected content; metadata alone is not proof of integrity." };
+  }
   return { status: "fresh", fail: false };
 }
 
@@ -364,6 +373,10 @@ export async function runSkillSync(rawArgs = process.argv.slice(2)) {
   if (options.list) {
     printList(manifest);
     return 0;
+  }
+
+  for (const rootName of Object.keys(manifest.sourceRoots)) {
+    console.log(`[skill-sync] ${rootName}: ${await resolveSourceRoot(manifest, rootName) || "MISSING (initialize the pinned wiki submodule)"}`);
   }
 
   const results = [];

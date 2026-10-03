@@ -1,0 +1,52 @@
+name: Runtime artifact contracts
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'packages/core-skills/**'
+      - 'apps/market_dashboard/scripts/sync-market-dashboard.mjs'
+      - 'apps/market_dashboard/scripts/test-sync-market-dashboard.mjs'
+      - 'apps/market_dashboard_backend/scripts/check_daily_freshness.py'
+      - 'apps/market_dashboard_backend/scripts/test_daily_freshness.py'
+      - 'apps/market_dashboard_backend/scripts/tv_screener_fetch.py'
+      - 'apps/market_dashboard_backend/scripts/test_screener_fetch_status.py'
+      - '.github/workflows/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  offline-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install PyYAML
+      - run: node --test scripts/test-skill-sync.mjs apps/market_dashboard/scripts/test-sync-market-dashboard.mjs
+      - run: python -m unittest discover -s apps/market_dashboard_backend/scripts -p test_daily_freshness.py
+      - run: python -m unittest discover -s apps/market_dashboard_backend/scripts -p test_screener_fetch_status.py
+      - run: python scripts/test-maintenance-contracts.py
+
+  pinned-knowledge:
+    # Private deploy keys are unavailable to fork PRs; never expose them via pull_request_target.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.WIKI_SSH_KEY }}
+      - run: |
+          git submodule sync -- packages/core-skills/wiki-source
+          git submodule update --init --recursive -- packages/core-skills/wiki-source
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node scripts/check-skill-sync.mjs --strict

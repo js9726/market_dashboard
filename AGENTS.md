@@ -130,11 +130,11 @@ Define success criteria. Loop until verified.
 ### Python data pipeline
 - Output goes to `--out-dir` (default `data/`). Never hardcode paths.
 - Always wrap JSON writes with `sanitize_json()` + `safe_json_dumps()` — bare `NaN` breaks browser `JSON.parse`.
-- `data/` and `apps/market_dashboard/public/market-dashboard/` are gitignored locally; CI force-adds with `git add -f`.
+- Canonical output is `apps/market_dashboard_backend/data/`; CI commits it together with `apps/market_dashboard/public/market-dashboard/`. Root `data/` was archived; always run producers from the backend or pass an explicit output path.
 
 ### Next.js frontend (15.5 — NOT 16)
 - App Router only. Middleware is `src/middleware.ts` (NOT `proxy.ts`).
-- After regenerating Python data, run `npm run sync:market`.
+- After regenerating Python data, run `npm run sync:market`, then `check_daily_freshness.py` with both data/public paths. The copy refuses invalid JSON and older sources.
 - Do not upgrade past 15.x — middleware/auth compatibility breaks.
 
 ### AI agents (`apps/market_dashboard/agents/`)
@@ -146,17 +146,17 @@ Define success criteria. Loop until verified.
 - Each skill = canonical 7-file folder (`SKILL.md`, `prompt.md`, `knowledge.md`, `schema.json`, TS + Python handlers, `tests/golden.json`).
 - Use `/scaffold-skill <name>` to create. Use `/extract-prompt <file> <skill>` to migrate a hardcoded prompt.
 - Knowledge bodies are committed runtime artifacts. Refresh them from the authoring wiki/global skills with `npm run skills:sync`, controlled by `packages/core-skills/skill-sync.manifest.json`.
-- Run `npm run skills:check` before commits that touch `jie_wiki`, global skill references, or `packages/core-skills`.
+- Default knowledge authority is the pinned `wiki-source` submodule; authoring overrides are explicit. Strict checks verify actual bodies with CRLF-normalized hashes. Run `npm run skills:check` before commits that touch `jie_wiki`, global skill references, or `packages/core-skills`.
 - Phase 3 scorer skills are intentionally split by use case: `trader-scorer-market`, `trader-scorer-stock`, and `trader-scorer-trade`.
 
 ### Auth (NextAuth v5)
-- Roles: `owner` (admin), `allowed`, `pending`, `denied`. `OWNER_EMAIL` is auto-promoted on first sign-in.
+- Roles: `owner` (admin), `member`, `pending`, `denied` (`allowed` is a legacy alias). `OWNER_EMAIL` is auto-promoted on first sign-in.
 - Clerk is removed — do not re-add. `DASHBOARD_PASSWORD` / `AUTH_TOKEN` are dead — do not reference.
 - Every `/api/*` route needs an explicit `const session = await auth(); if (!session?.user?.id) return 401` — middleware returns 302 (wrong for AJAX).
 - Middleware exclusions: `/login`, `/api/auth/*`, `/market-dashboard/*` (static).
 
 ### CI / Vercel
-- Workflow `refresh_data.yml`, schedule `00,30 12-18 * * 1-5`, commit message contains `[skip ci]`. Morning brief is `continue-on-error`.
+- Workflows split premarket/intraday/provider/journal tasks; see root `.github/workflows/`. Required market fetches and producer/consumer freshness gates fail closed. Provider failures remain explicit; data commit messages contain `[skip ci]`.
 - Vercel project is configured to build `apps/market_dashboard`; app-level `vercel.json` holds the Next.js build settings. After adding env vars, **manually redeploy** — env vars don't apply to existing deployments.
 
 ---

@@ -5,8 +5,8 @@ name: Refresh Pre-Open Brief (Daily 27min Before Market Open)
 #
 # ONE consolidated cron job that runs 27 min before US market open every
 # trading day (Mon-Fri, US holidays auto-skipped). Replaces the old
-# refresh_data.yml heavy path. TV screeners run on their own cadence; breadth
-# runs post-close from the local dashboard-bridge daemon.
+# refresh_data.yml heavy path. This job refreshes screeners and fast breadth;
+# the local bridge also maintains database breadth independently.
 #
 # Pipeline:
 #   1. Skip if not a US trading day (pandas_market_calendars)
@@ -20,7 +20,7 @@ name: Refresh Pre-Open Brief (Daily 27min Before Market Open)
 #
 # Cron: 13:03 UTC Mon-Fri = 09:03 ET EDT, 27 min before market open.
 # In practice GitHub has started it 4.5-7 hours late (after the open), so the bot PC
-# dispatches this workflow at 09:00 ET (packages/bot-box/brief/dispatch-premarket-brief.ps1).
+# dispatches this workflow at 08:40 ET (packages/bot-box/brief/dispatch-premarket-brief.ps1).
 # The scheduled run stays as a fallback and is skipped by the `gate` job when this
 # morning's brief already ran (scripts/brief_ran_today.py).
 #
@@ -77,7 +77,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # Load the read-only deploy key for the PRIVATE wiki submodule
-      # (trade-analyser_skill). Key is stored as the WIKI_SSH_KEY secret;
+      # (jie_wiki). Key is stored as the WIKI_SSH_KEY secret;
       # public half is a deploy key on the wiki repo. See
       # packages/dashboard-bridge/docs/WIKI_DEPLOY_KEY.md.
       - name: Load wiki deploy key
@@ -85,17 +85,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.WIKI_SSH_KEY }}
 
-      - name: Fetch wiki submodule
-        continue-on-error: true   # still non-fatal: brief ships w/o wiki if clone hiccups
+      - name: Fetch pinned canonical wiki
+        working-directory: .
         run: |
-          # Rewrite submodule URL to SSH so the deploy key applies, then init.
-          git submodule set-url packages/core-skills/wiki-source git@github.com:js9726/trade-analyser_skill.git 2>/dev/null || true
-          if git submodule update --init --recursive; then
-            echo "wiki-source submodule pulled OK (deploy key)"
-          else
-            echo "::warning::wiki submodule clone failed — brief runs without wiki context."
-            mkdir -p packages/core-skills/wiki-source/wiki
-          fi
+          git submodule sync -- packages/core-skills/wiki-source
+          git submodule update --init --recursive -- packages/core-skills/wiki-source
+          test -f packages/core-skills/wiki-source/wiki/trading/traders/trader-styles.md
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -111,6 +106,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Verify pinned runtime knowledge
+        working-directory: .
+        env:
+          JIE_WIKI_ROOT: ${{ github.workspace }}/packages/core-skills/wiki-source
+          JIE_WIKI_SKILLS_ROOT: ${{ github.workspace }}/packages/core-skills/wiki-source/skills
+        run: node scripts/check-skill-sync.mjs --strict
+
 
       - name: Install Claude SDK runner deps
         working-directory: packages/core-skills/morning-brief
@@ -130,11 +133,17 @@ jobs:
       # ── Step 2: TradingView screener hits ────────────────────────────────
       - name: Fetch TV screeners with DeepSeek scoring
         if: success()
-        continue-on-error: true
         run: python scripts/tv_screener_fetch.py --out-dir data --score --score-top 10
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TV_SESSION_ID:    ${{ secrets.TV_SESSION_ID }}
+
+      - name: Refresh breadth
+        run: python scripts/breadth_fast.py --out-dir data
+
+      - name: Validate market inputs before consumers
+        run: python scripts/check_daily_freshness.py --data-dir data --max-age-minutes 180
+
 
       # ── Step 3: pre-compute index technicals ─────────────────────────────
       # Compute ATR/RSI/MACD here so the Claude SDK runner (Step 4b) doesn't
@@ -196,35 +205,13 @@ jobs:
           WIKI_DIR:       ${{ github.workspace }}/packages/core-skills/wiki-source/wiki
 
       # ── Step 5: sync to public folder for Vercel ────────────────────────
-      - name: Sync data into Next.js public folder
-        if: success()
+      - name: Sync validated data into Next.js public folder
         working-directory: apps/market_dashboard
-        run: |
-          mkdir -p public/market-dashboard/charts
-          cp ../market_dashboard_backend/data/snapshot.json          public/market-dashboard/
-          cp ../market_dashboard_backend/data/events.json             public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/meta.json               public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/breadth.json            public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/breadth_history.json    public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/tv_screeners.json       public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/charts/*.png             public/market-dashboard/charts/ 2>/dev/null || true
+        run: node scripts/sync-market-dashboard.mjs
 
-      # ── Step 6: sanitize JSON ────────────────────────────────────────────
-      - name: Sanitize JSON
-        if: success()
-        working-directory: apps/market_dashboard
-        run: |
-          python3 -c "
-          import re, pathlib
-          for p in pathlib.Path('public/market-dashboard').glob('*.json'):
-              raw = p.read_text()
-              fixed = re.sub(r'\bNaN\b|\bInfinity\b|\b-Infinity\b', 'null', raw)
-              if fixed != raw:
-                  p.write_text(fixed)
-                  print(f'Sanitized {p.name}')
-          "
+      - name: Gate producer and consumer freshness before publication
+        run: python scripts/check_daily_freshness.py --data-dir data --public-dir ../market_dashboard/public/market-dashboard --max-age-minutes 180
 
-      # ── Step 7: commit and push ──────────────────────────────────────────
       - name: Commit updated pre-open data
         if: success()
         working-directory: .

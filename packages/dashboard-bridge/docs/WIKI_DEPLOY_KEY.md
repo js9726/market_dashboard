@@ -1,10 +1,10 @@
 # Wiki Submodule Deploy Key Setup
 
-The pre-open and journal-close CI workflows mount your `trade-analyser_skill`
+The pre-open and journal-close CI workflows mount your `jie_wiki`
 wiki repo as a submodule at `packages/core-skills/wiki-source/` so Claude can
 read trader-style / risk-management / entry-method rules at generation time.
 
-`trade-analyser_skill` is a PRIVATE repo, so GH Actions can't clone it with
+`jie_wiki` is a PRIVATE repo, so GH Actions can't clone it with
 the default `GITHUB_TOKEN`. Setup is one-time, ~3 min.
 
 ## Step 1: Generate an SSH keypair
@@ -23,7 +23,7 @@ This creates two files:
 
 ```powershell
 # Open the wiki repo's deploy-keys page
-Start-Process "https://github.com/js9726/trade-analyser_skill/settings/keys/new"
+Start-Process "https://github.com/js9726/jie_wiki/settings/keys/new"
 
 # Print the public key to paste
 Get-Content $env:USERPROFILE\.ssh\wiki_deploy_key.pub
@@ -51,9 +51,9 @@ In the GitHub UI:
 2. Value: paste the private key (the whole `-----BEGIN OPENSSH PRIVATE KEY-----` ... `-----END OPENSSH PRIVATE KEY-----` block)
 3. Click "Add secret"
 
-## Step 4: Update the workflow to use the deploy key
+## Step 4: Verify the committed workflow uses the deploy key
 
-After the secret is set, replace the submodule-fetch step in
+The repository now fails closed on a missing canonical wiki. After configuring the secret, verify the fetch steps in
 `.github/workflows/refresh_premarket.yml` (and `journal_close.yml`) with:
 
 ```yaml
@@ -63,10 +63,13 @@ After the secret is set, replace the submodule-fetch step in
           ssh-private-key: ${{ secrets.WIKI_SSH_KEY }}
 
       - name: Init submodules
-        run: git submodule update --init --recursive
+        working-directory: .
+        run: |
+          git submodule sync -- packages/core-skills/wiki-source
+          git submodule update --init --recursive -- packages/core-skills/wiki-source
 ```
 
-Then remove the non-fatal fallback (the temporary `continue-on-error: true` block).
+Do not restore a non-fatal empty-wiki fallback. Verify strict runtime knowledge before provider execution.
 
 ## Why a deploy key vs PAT / public repo?
 

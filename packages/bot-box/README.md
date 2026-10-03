@@ -1,3 +1,5 @@
+> Current note (4 October 2026): premarket workflow dispatch and Discord brief publishing are implemented. `brief/BriefDispatch.psm1` uses 08:40 ET. Podcast availability and deployment readiness remain unverified. See [maintenance status](../../docs/runtime-maintenance.md).
+
 # Bot box
 
 An always-on machine that runs Jie's Discord bots, the daily brief and the podcast.
@@ -7,7 +9,8 @@ Design agreed 2026-09-26; task record `jie_wiki/agent-system/work/discord-bot-bo
 |---|---|---|
 | **Private bot** - Claude Code in Discord DMs, Jie only | Claude subscription | **Step 1 - this folder** |
 | Friends' bot - DeepSeek flash in the JTPod server | DeepSeek API (~US$2-4/month) | Step 2, not built |
-| 07:30 MYT Mandarin podcast, 20:45 MYT brief, cached deep-dives | Claude subscription | Step 3, not built |
+| Premarket dispatch and Discord brief publishing | Local dispatch + provider workflows | Implemented; dispatch uses 08:40 ET |
+| Mandarin podcast and cached deep-dives | Planned subscription lane | Not established as available |
 
 **Host.** Interim host is `WALPLUS-ASUS` (it already runs the brokers, OpenD and Chrome with
 TradingView, so no broker failover is needed yet). A better PC will replace it later - see

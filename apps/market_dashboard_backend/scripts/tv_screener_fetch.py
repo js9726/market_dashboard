@@ -29,9 +29,8 @@ CI TradingView IP-block workaround:
 Notes:
   - Saved-screener IDs (1R7JpXRD etc.) are NOT directly fetchable by URL.
     The query is approximated in tv-screeners.json — refine whenever needed.
-  - If ALL screeners return zero hits (TradingView blocking CI IPs), the
-    script exits without overwriting the output file so stale-but-valid data
-    is preserved rather than replaced with empty rows.
+  - Any failed screener request raises before output or candidate ingestion.
+    A successful empty scan is explicitly marked status=success.
 """
 from __future__ import print_function
 import argparse
@@ -179,7 +178,7 @@ def fetch_screener(screener_cfg: dict, columns: list) -> list:
     """Returns list of hit dicts: {ticker, columns mapped by name}.
 
     Retries up to _MAX_RETRIES times on transient errors (429, 5xx).
-    Returns [] on permanent rejection (403) or connection error.
+    Raises on failed requests; an empty list means a successful empty scan only.
     """
     body = dict(screener_cfg["query"])
     body["columns"] = columns
@@ -195,6 +194,8 @@ def fetch_screener(screener_cfg: dict, columns: list) -> list:
         try:
             with urllib.request.urlopen(req, timeout=25) as r:
                 data = json.loads(r.read().decode("utf-8"))
+            if not isinstance(data, dict) or not isinstance(data.get("data"), list) or data.get("error"):
+                raise ValueError("Scanner response is missing a successful data array")
             hits = []
             for row in data.get("data", []):
                 symbol = row.get("s", "")  # e.g. "NASDAQ:NVDA"
@@ -216,21 +217,21 @@ def fetch_screener(screener_cfg: dict, columns: list) -> list:
             if code == 403:
                 # Permanent block — don't retry
                 print(f"[tv:{screener_cfg['id']}] 403 Forbidden — TradingView is blocking this IP. "
-                      "Skipping screener.")
-                return []
+                      "Aborting publication.")
+                raise RuntimeError(f"Screener {screener_cfg['id']} failed: HTTP {code}") from e
             if attempt < _MAX_RETRIES and code in (429, 500, 502, 503, 504):
                 wait = _RETRY_DELAY * attempt
                 print(f"[tv:{screener_cfg['id']}] Retrying in {wait}s…")
                 time.sleep(wait)
                 continue
-            return []
+            raise RuntimeError(f"Screener {screener_cfg['id']} failed: HTTP {code}") from e
         except Exception as e:
             print(f"[tv:{screener_cfg['id']}] error on attempt {attempt}: {e}")
             if attempt < _MAX_RETRIES:
                 time.sleep(_RETRY_DELAY)
                 continue
-            return []
-    return []
+            raise RuntimeError(f"Screener {screener_cfg['id']} fetch failed") from e
+    raise RuntimeError(f"Screener {screener_cfg['id']} exhausted retries")
 
 
 def filter_screener_instruments(screener_id: str, hits: list) -> list:
@@ -936,6 +937,7 @@ def main():
 
         screeners_out.append({
             "id": sc["id"],
+            "status": "success",
             "name": sc["name"],
             "tv_url": sc.get("tv_url"),
             "hits": hits,
@@ -944,16 +946,8 @@ def main():
     if args.score:
         deepseek_scored_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
-    # Safety guard: if ALL screeners returned 0 hits, TradingView is almost
-    # certainly blocking this IP. Don't overwrite the output — preserve the
-    # last good data so the dashboard shows something real.
-    if total_hits == 0:
-        print(
-            "[tv] WARNING: ALL screeners returned 0 hits. "
-            "TradingView is likely blocking this IP (common in CI). "
-            "Output file NOT overwritten — stale data preserved."
-        )
-        sys.exit(1)  # non-zero so CI shows a visible failure (continue-on-error still masks it)
+    # Any failed request raises before writing or ingesting a partial result.
+    # Explicitly successful scans may legitimately have zero matching stocks.
 
     out = {
         "fetched_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),

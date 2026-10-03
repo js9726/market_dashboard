@@ -1,55 +1,66 @@
-/**
- * Copies apps/market_dashboard_backend/data (JSON + charts) into public/market-dashboard/
- * so the Next app can load /market-dashboard/*.json (works with static export).
- *
- * Run from apps/market_dashboard: npm run sync:market
- * Or after refreshing data: cd ../market_dashboard_backend && python scripts/build_data.py --out-dir data
- *
- * Also sanitizes JSON files: replaces bare NaN / Infinity tokens (Python artefacts)
- * with null so browsers can parse them correctly.
+/** Copy canonical backend artifacts to the public fallback without time regression.
+ * Invalid JSON fails before any write; strings such as "NaN" are never rewritten.
+ * Generation timestamps are preserved. Run the freshness gate after this copy.
  */
-import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, join, extname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { glob } from "node:fs/promises";
+import { readdir, mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, "..");
-const srcDir = join(root, "..", "market_dashboard_backend", "data");
-const destDir = join(root, "public", "market-dashboard");
-
-async function sanitizeJsonFiles(dir) {
-  let fixed = 0;
-  let total = 0;
-  for await (const entry of glob("**/*.json", { cwd: dir })) {
-    const filePath = join(dir, entry);
-    const raw = await readFile(filePath, "utf8");
-    // Replace bare NaN / Infinity tokens that Python's json module can emit
-    const sanitized = raw
-      .replace(/\bNaN\b/g, "null")
-      .replace(/\bInfinity\b/g, "null")
-      .replace(/\b-Infinity\b/g, "null");
-    if (sanitized !== raw) {
-      await writeFile(filePath, sanitized, "utf8");
-      const count = (raw.match(/\bNaN\b|\bInfinity\b|\b-Infinity\b/g) || []).length;
-      console.log(`  sanitized ${entry} (${count} token(s) replaced)`);
-      fixed++;
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const stampKeys = ["built_at", "fetched_at", "as_of", "generated_at", "generatedAt"];
+function parseArtifact(text) {
+  return JSON.parse(text, (_key, value) => {
+    if (typeof value === "number" && !Number.isFinite(value)) {
+      throw new SyntaxError("Non-finite JSON number");
     }
-    total++;
+    return value;
+  });
+}
+function stamp(data) {
+  for (const key of stampKeys) {
+    if (typeof data?.[key] === "string") {
+      const value = Date.parse(data[key]);
+      if (Number.isFinite(value)) return value;
+    }
   }
-  if (fixed === 0) console.log(`  all ${total} JSON file(s) already clean`);
+  return null;
 }
-
-async function main() {
-  await mkdir(destDir, { recursive: true });
-  await cp(srcDir, destDir, { recursive: true });
-  console.log(`Synced ${srcDir} -> ${destDir}`);
-  console.log("Sanitizing JSON files...");
-  await sanitizeJsonFiles(destDir);
-  console.log("Done.");
+async function files(dir, prefix = "") {
+  const result = [];
+  for (const entry of await readdir(join(dir, prefix), { withFileTypes: true })) {
+    const rel = join(prefix, entry.name);
+    if (entry.isSymbolicLink()) throw new Error(`Refusing symlink artifact: ${rel}`);
+    if (entry.isDirectory()) result.push(...await files(dir, rel));
+    else if (entry.isFile()) result.push(rel);
+  }
+  return result;
 }
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+export async function syncMarket(srcDir, destDir) {
+  const pending = [];
+  for (const rel of await files(srcDir)) {
+    const bytes = await readFile(join(srcDir, rel));
+    if (rel.endsWith(".json")) {
+      const source = parseArtifact(bytes.toString("utf8"));
+      let existing;
+      try { existing = parseArtifact(await readFile(join(destDir, rel), "utf8")); }
+      catch (err) { if (err.code !== "ENOENT") throw err; }
+      const oldStamp = stamp(existing), newStamp = stamp(source);
+      if (oldStamp !== null && (newStamp === null || newStamp < oldStamp)) {
+        throw new Error(`Refusing older/undated source over newer public artifact: ${rel}`);
+      }
+    }
+    pending.push([rel, bytes]);
+  }
+  // Preflight all files before changing any consumer artifact.
+  for (const [rel, bytes] of pending) {
+    const target = join(destDir, rel);
+    await mkdir(dirname(target), { recursive: true });
+    await writeFile(target, bytes);
+  }
+  return pending.length;
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  syncMarket(join(root, "..", "market_dashboard_backend", "data"), join(root, "public", "market-dashboard"))
+    .then(count => console.log(`Synced ${count} validated artifacts; original timestamps retained.`))
+    .catch(err => { console.error(err.message); process.exitCode = 1; });
+}

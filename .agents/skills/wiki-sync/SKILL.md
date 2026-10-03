@@ -42,14 +42,12 @@ npm run skills:sync -- --list
 Wiki sources resolve in this order:
 
 1. `JIE_WIKI_ROOT`
-2. Sibling folder: `../jie_wiki`
+2. Pinned submodule: `packages/core-skills/wiki-source`
 
 Global skill sources resolve in this order:
 
 1. `JIE_WIKI_SKILLS_ROOT`
-2. Sibling folder: `../jie_wiki/skills`
-3. `CLAUDE_SKILLS_ROOT`
-4. `CODEX_SKILLS_ROOT`
+2. Pinned submodule skills: `packages/core-skills/wiki-source/skills`
 
 ## Current Active Runtime Syncs
 
@@ -69,3 +67,5 @@ Global skill sources resolve in this order:
 - Vercel receives only committed files under `packages/core-skills/`.
 - The wiki/global skills are authoring inputs; runtime artifacts are deployable outputs.
 - Keep MooMoo broker logic out of generic trading skills until a tenant-aware broker service exists.
+
+Strict checks validate actual generated bodies, not only stored metadata. CRLF is normalized before hashing. Invalid explicit overrides fail; no implicit sibling fallback. An authoring-override pass is not pinned-source acceptance.

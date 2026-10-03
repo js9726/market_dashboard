@@ -1,10 +1,11 @@
 name: Refresh Market Data (Intraday Light)
 
-# WK-1 split — this file is the INTRADAY LIGHT job. Three ticks per US trading
+# WK-1 split — this file is the INTRADAY LIGHT job. Five ticks per US trading
 # day, runs only the cheap-and-fast pipeline:
 #   - build_data.py        (~30 sec, refreshes per-ticker snapshot + RS chart)
 #   - tv_screener_fetch.py (~10 sec, refreshes TradingView screener hits)
 #
+# Fast breadth is refreshed each run and required by the publication gate.
 # Skipped vs the daily heavy run (intentional):
 #   - breadth_scan.py      ~5 min, daily metric only — full-universe scan
 #   - morning_brief.py     paid API generation, daily-only by design
@@ -16,7 +17,7 @@ name: Refresh Market Data (Intraday Light)
 #   14:03                            33 min after US market open
 #   20:33                            33 min after US market close
 #
-# Total: 3 ticks/day, ~15/week. Each tick commits refreshed snapshot/screener
+# Total: 5 ticks/day, ~25/week. Each tick commits refreshed snapshot/screener
 # data only — no LLM-generated assets touched.
 
 on:
@@ -71,49 +72,38 @@ jobs:
       # but does NOT overwrite the output — last good data is preserved.
       - name: Fetch TV screeners (no scoring)
         if: success()
-        continue-on-error: true
         run: python scripts/tv_screener_fetch.py --out-dir data
         env:
           # TV_SESSION_ID: TradingView sessionid cookie — bypasses CI IP block.
           # See refresh_premarket.yml for instructions on obtaining this value.
           TV_SESSION_ID: ${{ secrets.TV_SESSION_ID }}
 
+      - name: Refresh breadth
+        run: python scripts/breadth_fast.py --out-dir data
+
+      - name: Validate market inputs before consumers
+        run: python scripts/check_daily_freshness.py --data-dir data --max-age-minutes 180
+
+
       # ── Step 3: sync to Next.js public folder ─────────────────────────────
-      - name: Sync data into Next.js public folder
-        if: success()
-        working-directory: apps/market_dashboard
-        run: |
-          mkdir -p public/market-dashboard/charts
-          cp ../market_dashboard_backend/data/snapshot.json     public/market-dashboard/
-          cp ../market_dashboard_backend/data/events.json        public/market-dashboard/
-          cp ../market_dashboard_backend/data/meta.json          public/market-dashboard/
-          cp ../market_dashboard_backend/data/tv_screeners.json  public/market-dashboard/ 2>/dev/null || true
-          cp ../market_dashboard_backend/data/charts/*.png       public/market-dashboard/charts/ 2>/dev/null || true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      # ── Step 4: sanitize JSON (replace NaN/Infinity with null) ────────────
-      - name: Sanitize JSON
-        if: success()
+      - name: Sync validated data into Next.js public folder
         working-directory: apps/market_dashboard
-        run: |
-          python3 -c "
-          import re, pathlib
-          for p in pathlib.Path('public/market-dashboard').glob('*.json'):
-              raw = p.read_text()
-              fixed = re.sub(r'\bNaN\b|\bInfinity\b|\b-Infinity\b', 'null', raw)
-              if fixed != raw:
-                  p.write_text(fixed)
-                  print(f'Sanitized {p.name}')
-          print('JSON sanitization complete')
-          "
+        run: node scripts/sync-market-dashboard.mjs
 
-      # ── Step 5: commit and push ───────────────────────────────────────────
+      - name: Gate producer and consumer freshness before publication
+        run: python scripts/check_daily_freshness.py --data-dir data --public-dir ../market_dashboard/public/market-dashboard --max-age-minutes 180
+
       - name: Commit updated data
         if: success()
         working-directory: .
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f apps/market_dashboard/public/market-dashboard
+          git add -f apps/market_dashboard_backend/data apps/market_dashboard/public/market-dashboard
           echo "=== Staged changes ==="
           git diff --cached --name-status || true
           if git diff --cached --quiet; then

@@ -5,8 +5,8 @@
   "target": "trader-scorer-stock/knowledge.md",
   "kind": "knowledge",
   "strategy": "concat-markdown",
-  "generatedAt": "2026-09-23T16:10:46.133Z",
-  "renderHash": "cb4b96a0572d7e0c39c599fc08531d0907f3b0b495b5cf7a707f58d8cc4a9bd6",
+  "generatedAt": "2026-10-03T17:02:33.299Z",
+  "renderHash": "04801c4937c689134e7ec5b32c3210c5d9e64ba4a610959b25d8cb939d6c6905",
   "sources": [
     {
       "root": "wiki",
@@ -71,7 +71,7 @@
     {
       "root": "wiki",
       "path": "wiki/trading/concepts/duan-scoring-model.md",
-      "sha256": "cde803f78c20b91a70c23e46210e0cf8f9a0611b49fef841cc45fd0a7df3e7e6"
+      "sha256": "ec66a6901ef3ba53e2e3d4cc4f4d12c96599ccb83b3d25832467ea49b25dff14"
     }
   ]
 }
@@ -95,7 +95,7 @@ Edit the upstream wiki/global skill sources, then run `npm run skills:sync` from
 - wiki:wiki/trading/traders/lengyan-cold-eye.md sha256:2796af9cbbbc
 - wiki:wiki/trading/traders/lengyan-stock-analyses.md sha256:e8cd93d2f551
 - wiki:wiki/trading/traders/duan-yongping.md sha256:548ef58df592
-- wiki:wiki/trading/concepts/duan-scoring-model.md sha256:cde803f78c20
+- wiki:wiki/trading/concepts/duan-scoring-model.md sha256:ec66a6901ef3
 
 ## Application Notes
 - Use this artifact for ticker-level analysis where fundamentals, catalysts, and relative strength matter.

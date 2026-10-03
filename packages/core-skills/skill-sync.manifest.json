@@ -8,16 +8,14 @@
       "description": "Authoring source for trading knowledge.",
       "candidates": [
         "${JIE_WIKI_ROOT}",
-        "../jie_wiki"
+        "packages/core-skills/wiki-source"
       ]
     },
     "globalSkills": {
       "description": "Operator skills that stay global/local, used only as upstream references.",
       "candidates": [
         "${JIE_WIKI_SKILLS_ROOT}",
-        "../jie_wiki/skills",
-        "${CLAUDE_SKILLS_ROOT}",
-        "${CODEX_SKILLS_ROOT}"
+        "packages/core-skills/wiki-source/skills"
       ]
     }
   },

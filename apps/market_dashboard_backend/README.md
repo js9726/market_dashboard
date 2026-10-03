@@ -1,3 +1,11 @@
+# Current backend responsibilities
+
+Python batch producers generate the canonical `data/` tree. Snapshot, TradingView
+screeners and fast breadth must pass `scripts/check_daily_freshness.py` before AI
+consumers, then pass again against the copied public tree before publication.
+Use explicit `--out-dir data` from this folder. Root repository data was archived.
+See [current maintenance guide](../../docs/runtime-maintenance.md).
+
 # Market Dashboard Backend Scripts
 
 This folder is the operator-facing script area: things you can double-click or
@@ -39,7 +47,7 @@ packages\dashboard-bridge\.venv\Scripts\python.exe ibkr_bridge.py --run
 It syncs IBKR positions, fills, and account equity while IB Gateway or TWS is
 logged in and API access is enabled.
 
-## Legacy Scripts
+## Market producers
 
 The Python scripts in `scripts/` are still useful for market data builds,
 screeners, breadth, and morning brief generation.

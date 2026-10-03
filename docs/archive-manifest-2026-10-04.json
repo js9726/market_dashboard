@@ -1,0 +1,2348 @@
+{
+  "date": "2026-10-04",
+  "visibility": "Local recovery ZIPs are Git-ignored; do not publish private contents.",
+  "restore": "Extract selected archive members to their original repository-relative paths after checking for newer files. Verify SHA256 against this manifest.",
+  "groups": [
+    {
+      "archive": "archive/2026-10-04/historical-scripts.zip",
+      "archive_sha256": "7377aa149c4eb173684256d8051dd516f020d4847879440cbfffcafd24918ae6",
+      "files": [
+        {
+          "path": "packages/core-skills/morning-brief/_update_brief_2026-06-14.py",
+          "bytes": 4981,
+          "sha256": "c127cd57337ac44b03c7e86ccfc1bac851c65f2b3f79a858ef7d24717d80d2b5"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/_update_brief_v3_2026-06-14.py",
+          "bytes": 5899,
+          "sha256": "bd3983c0ca42a7635c8edde9eee0322845e1c09cb171a3a68c4f6b9380908d0e"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/_update_brief_v4_2026-06-15.py",
+          "bytes": 2341,
+          "sha256": "a2cb5b5a3247da902253ed0008fd6e9288f24ff2d6ca98bf3ca0c967f37df954"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/_update_brief_v5_2026-06-15.py",
+          "bytes": 6499,
+          "sha256": "77fc6f80eaf81093fd5377baf6589fcf5cdedacb41a0f4f9d366e098908758a8"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/_account_check_2026-06-22.py",
+          "bytes": 2497,
+          "sha256": "dc50170f643bd9ad58cf2335837e3af48bb5d1fd31bea13ca3931882e383868a"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/_journal_qcom_2026-06-22.py",
+          "bytes": 4042,
+          "sha256": "fe5a8ad74fd2be5163d95e9c45bfbd0a7be59a311fd89dd25a3dc8e1a04b363e"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/analyse_batch_2026-06-22.py",
+          "bytes": 3581,
+          "sha256": "18e850816457b57d5d17b56d0c61e930b23d11cab2103417868b21f3a4898153"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/extract_levels_2026-06-14.py",
+          "bytes": 3481,
+          "sha256": "057af0689c40032595ccb0aef0e400f2a175a1e29ed6810634b527e95a8e97da"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/swing_metrics_2026-06-14.py",
+          "bytes": 4380,
+          "sha256": "4c1e617cc234f6441b4e55c012851520ee65fae9674e85e2a6760c747f719de7"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/aaon_analyse.py",
+          "bytes": 4040,
+          "sha256": "199fbe4b08dde3d33ef3e8e2a1a01ea8037b91d5f8ed494ee1045cf4289577a5"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/nok_levels.py",
+          "bytes": 2236,
+          "sha256": "b1591e10ac3bf4f9fef663a52d80fa46f274ca006d5b67366efafbc3a74d1a70"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/watch_triggers.py",
+          "bytes": 4601,
+          "sha256": "7f828fe132976ad575254a159f6f0eaf7a3919037db18dabf15a09f8e3e0dd13"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/watch_triggers_v2.py",
+          "bytes": 3933,
+          "sha256": "1d594c2b6b10a3bff6c98e4bb991095d6e274a3c404639666efe9fd9c2afdb78"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/screener_go_watch.py",
+          "bytes": 3556,
+          "sha256": "963dba8efa1125c604a60e88ee3b7db2096a90e1f40aab51b78e6ec573be5e4a"
+        },
+        {
+          "path": "packages/core-skills/morning-brief/write_brief.py",
+          "bytes": 18259,
+          "sha256": "ec2b8665031d69fe131bdea9e49dbf36f3412e8b07ac275af3792c48b77d5487"
+        }
+      ],
+      "roundtrip_verified": true
+    },
+    {
+      "archive": "archive/2026-10-04/legacy-root-data.zip",
+      "archive_sha256": "7bac914cf49324e5108a125cbd5174907764527766a633c9757b3280c5f9a016",
+      "files": [
+        {
+          "path": "data/_universe_us.json",
+          "bytes": 53497,
+          "sha256": "e8a010744c36a21fb2ddf29f4cabb6baec8df48ad7c995c89a717b407bceba81"
+        },
+        {
+          "path": "data/charts/ACWI.png",
+          "bytes": 5323,
+          "sha256": "dbb18867a2245a7110a758e0538d0420fe3680b10d63a160977a508110c22974"
+        },
+        {
+          "path": "data/charts/AIQ.png",
+          "bytes": 5319,
+          "sha256": "277c8c5517397642cfda411b48decb397685973775290d27634cf5d641b69750"
+        },
+        {
+          "path": "data/charts/ARGT.png",
+          "bytes": 5526,
+          "sha256": "41b0bf3551e5236bb9c6c13171c562e4891e019c3b167b129fb823909100169d"
+        },
+        {
+          "path": "data/charts/ARKF.png",
+          "bytes": 4800,
+          "sha256": "cbae13eee17bda80c37302b745693c3b7fff311e04b7419dea9b9a7728113000"
+        },
+        {
+          "path": "data/charts/ARKG.png",
+          "bytes": 5402,
+          "sha256": "3fd0767d0322492e142e8784c59037c03e1e0fd52b44b41a39d5dd8088bb4bb8"
+        },
+        {
+          "path": "data/charts/ARKK.png",
+          "bytes": 5009,
+          "sha256": "833fff2013940238df3f783860267ae87e1a7bc826a64666a768f5e71f2a8a00"
+        },
+        {
+          "path": "data/charts/ASHR.png",
+          "bytes": 6006,
+          "sha256": "753e8b3d13049d025f6ea406dd931da344c44add4061b71a7d678fb0f6f74e5d"
+        },
+        {
+          "path": "data/charts/BLOK.png",
+          "bytes": 4947,
+          "sha256": "fafd13b052b99159a26b25b3fe83f923d308652ec4f29e299454af86365810c2"
+        },
+        {
+          "path": "data/charts/BOAT.png",
+          "bytes": 3611,
+          "sha256": "92371acd3d36f5f122360d1d555a49c3a9bf8adca38bdef1807700c6086f77d5"
+        },
+        {
+          "path": "data/charts/CIBR.png",
+          "bytes": 5796,
+          "sha256": "b7c2307ca92c362df856b0e91ba01dc1638abc7c871f34ded81cb12a6b861b73"
+        },
+        {
+          "path": "data/charts/CPER.png",
+          "bytes": 5958,
+          "sha256": "32a6ff49f7860f231d432cc4841ad6bedf71ebca22a2f942b706226548d97816"
+        },
+        {
+          "path": "data/charts/DBA.png",
+          "bytes": 4503,
+          "sha256": "d7ed5da5e87f0e352f7e544d3d4cc6a26c0786d239fb86973e5dab7c542c1e48"
+        },
+        {
+          "path": "data/charts/DBC.png",
+          "bytes": 4405,
+          "sha256": "5e86412759f7be32a935f77b565df980c25dc9780a77a8282eff30816616f298"
+        },
+        {
+          "path": "data/charts/DIA.png",
+          "bytes": 4880,
+          "sha256": "07b76b5f730552fe98e89adbe63dd3e833922f037950fbf7ef89f73234e044cb"
+        },
+        {
+          "path": "data/charts/DRIV.png",
+          "bytes": 5296,
+          "sha256": "7aa8f97cd3d710c96290315e010f43facb830d99ce378cb2c1ac6f3cbd5c7f7d"
+        },
+        {
+          "path": "data/charts/EATZ.png",
+          "bytes": 5716,
+          "sha256": "5a3e7f193ccf8091ebf128c20a66f2176feb66945b6315472828a2fc3f16621b"
+        },
+        {
+          "path": "data/charts/ECH.png",
+          "bytes": 5857,
+          "sha256": "d31b46bf1dd57004d1af279f0ace09a96d1dec4eae6e7ceef76553c0f68a8587"
+        },
+        {
+          "path": "data/charts/EEM.png",
+          "bytes": 4593,
+          "sha256": "592ab5d105da35d88260869e065821eba73881e9057315ac250fed5b8f88474a"
+        },
+        {
+          "path": "data/charts/EFA.png",
+          "bytes": 5046,
+          "sha256": "46cba7a505ed22a92df083fcf9e160039427b07ad5b2e18418d5dfc2f12c929b"
+        },
+        {
+          "path": "data/charts/EIDO.png",
+          "bytes": 4871,
+          "sha256": "267b9851cf257ab00bd83898127119b96981465aeac84691f842ac4f8088d4d3"
+        },
+        {
+          "path": "data/charts/ETHA.png",
+          "bytes": 4953,
+          "sha256": "3f89b3856a179e13cfe50bf7e2a88a8bb6bcd583c1b0b241361efd492fed2707"
+        },
+        {
+          "path": "data/charts/EUFN.png",
+          "bytes": 4800,
+          "sha256": "813d2f4ddcc70ceaaa13aa5b6f80e9c9dc323734c0bdcf90eec239aa1a3b40a5"
+        },
+        {
+          "path": "data/charts/EWA.png",
+          "bytes": 3862,
+          "sha256": "49b715d9bb496910852f71c24e1d3e40e4e4a56f566fce0b07dbafd64be7c49e"
+        },
+        {
+          "path": "data/charts/EWC.png",
+          "bytes": 3751,
+          "sha256": "b0920806931baa3c915dd5a7523b7df279b498b08b265ab4892cf9d5e14c5432"
+        },
+        {
+          "path": "data/charts/EWD.png",
+          "bytes": 5454,
+          "sha256": "54f4da7a94bb397dfa1bb1d38d876ba8129312cb9e913d6809df4447c9b6d590"
+        },
+        {
+          "path": "data/charts/EWG.png",
+          "bytes": 6378,
+          "sha256": "4352868791bab51eb4bd4e281691c7a99f2ab340956a2ab94aa31f734aebc013"
+        },
+        {
+          "path": "data/charts/EWH.png",
+          "bytes": 4710,
+          "sha256": "7c915fac2cee205a1e7f414e3606219df7402b62dca51013af01a0454e36756b"
+        },
+        {
+          "path": "data/charts/EWI.png",
+          "bytes": 5046,
+          "sha256": "5c5c48617c004efcc581e9233bac4aa7f866afe8c0c58bdb98b57675a0ff56c1"
+        },
+        {
+          "path": "data/charts/EWJ.png",
+          "bytes": 4479,
+          "sha256": "4f0cd75a028aa215e86c326815b55d391286a66041025ac046d2052fe169139a"
+        },
+        {
+          "path": "data/charts/EWL.png",
+          "bytes": 5275,
+          "sha256": "da1b66d6a3a9c8b91775efe441fb316596a7ef05a7c188755af2b6e60819cbbf"
+        },
+        {
+          "path": "data/charts/EWP.png",
+          "bytes": 4519,
+          "sha256": "40607cfebb32c57fd480def26300d148fa2658d8a6d4969d373da66f8d8ff2dd"
+        },
+        {
+          "path": "data/charts/EWQ.png",
+          "bytes": 6487,
+          "sha256": "e601a9f4d5ee6b9b86251eb5176b76091e73652dd0301ba017a459f49ee6cab0"
+        },
+        {
+          "path": "data/charts/EWS.png",
+          "bytes": 4834,
+          "sha256": "f2a9fd1690beb0d56d8f0e6bf2431fb1cf65e5dcac882c58716fb74598fbb987"
+        },
+        {
+          "path": "data/charts/EWT.png",
+          "bytes": 4639,
+          "sha256": "5da1ef539e80623bdd4f1697c47c1e696323382a1594ac06bd9623d7ccee67c4"
+        },
+        {
+          "path": "data/charts/EWW.png",
+          "bytes": 3716,
+          "sha256": "61bea4d5df819fa7e4f28e9a0274275bc3c7c1e1c0fa01278a351bad812e309e"
+        },
+        {
+          "path": "data/charts/EWY.png",
+          "bytes": 4302,
+          "sha256": "291064b608bc08b419c92e689a9beff75a63af490477ac3216ab3efcb512a7c2"
+        },
+        {
+          "path": "data/charts/EWZ.png",
+          "bytes": 4330,
+          "sha256": "837f272931341eab45c164939ecaf55851223b3df91bc8366a3cb4a755ef12d3"
+        },
+        {
+          "path": "data/charts/EZA.png",
+          "bytes": 5250,
+          "sha256": "f81214187c8b694dce76bafabdab030cb907a2890b215e9ace89a42883d7a0cf"
+        },
+        {
+          "path": "data/charts/FCG.png",
+          "bytes": 4336,
+          "sha256": "82005d3a4d324915388a8382da5c04af05f3862d1d191e40f1b600e7f83b6183"
+        },
+        {
+          "path": "data/charts/FDN.png",
+          "bytes": 5625,
+          "sha256": "0696c0829ed821f838b15ce65c9ef77e0fbb1ef583959b712aefa6bed84612df"
+        },
+        {
+          "path": "data/charts/FNGS.png",
+          "bytes": 5170,
+          "sha256": "63d3f32ce277ee6b8f297138afce0f604011c0a9f3d0d3f628e043ad0e0db89e"
+        },
+        {
+          "path": "data/charts/FXI.png",
+          "bytes": 5510,
+          "sha256": "7409a5723bbb7f5513b4a98430396ac7757c3767decbc9d41356e9af61ae3194"
+        },
+        {
+          "path": "data/charts/GDX.png",
+          "bytes": 5655,
+          "sha256": "54dad443a47376a91c6abb871fc2108669f98bb337106735ce234a0bfa95885a"
+        },
+        {
+          "path": "data/charts/GLD.png",
+          "bytes": 4858,
+          "sha256": "7818fb326484731f3a54923894f63b621f2c7a8fb501cb0ea5ecf35bf37b9a4c"
+        },
+        {
+          "path": "data/charts/GREK.png",
+          "bytes": 5263,
+          "sha256": "844a4be0e9a223cc3b255e8ad5d457c8b274018d91bb54fbb06090647ecabf43"
+        },
+        {
+          "path": "data/charts/GXC.png",
+          "bytes": 6583,
+          "sha256": "f0159b00217eb5af0a471d5ae05bbd5ec8100cede0f08e8dbb99ec1db6a68a2e"
+        },
+        {
+          "path": "data/charts/IBB.png",
+          "bytes": 4523,
+          "sha256": "b2e59181cdd55ea0e2dd36388242384e3e7a492276073a377c02e2654a1a9fa1"
+        },
+        {
+          "path": "data/charts/IBIT.png",
+          "bytes": 5206,
+          "sha256": "a29e51ec866ffcbe31b0cba3e74a00d696be1c369d441cf28a8c48b5072050b5"
+        },
+        {
+          "path": "data/charts/IBUY.png",
+          "bytes": 3556,
+          "sha256": "f455588ce7fefcef6cb33a37031951e298413a413dd74dc9e6a91cd700aff673"
+        },
+        {
+          "path": "data/charts/ICLN.png",
+          "bytes": 4454,
+          "sha256": "110a32cc001633bc7d716ad9a36a4822d67dab597e7b5fabcff3fce67cf34cef"
+        },
+        {
+          "path": "data/charts/IEUR.png",
+          "bytes": 5329,
+          "sha256": "157e310a74b00a310db35d63b421f7c5178b6dbf3854865b4f7a5c71a08c6f71"
+        },
+        {
+          "path": "data/charts/IEV.png",
+          "bytes": 5154,
+          "sha256": "17529ca20169b7f7b1087e3cb04d368cccbfb7661eecf51c4dfb51aa1f507b99"
+        },
+        {
+          "path": "data/charts/IGV.png",
+          "bytes": 4555,
+          "sha256": "f28ab0edb3c743dc8c4d00d528920b0386d2e717531c312e5a27acff553c7b70"
+        },
+        {
+          "path": "data/charts/IHI.png",
+          "bytes": 3474,
+          "sha256": "a608564a5e5fc793496495db0c21ea93113a72e096ba372aeb9da6298fa99c96"
+        },
+        {
+          "path": "data/charts/IJH.png",
+          "bytes": 4151,
+          "sha256": "f5cdaa56e7de7a4c488a07397f6aadedc57af74d1de6c2c563a29e909e9b3d71"
+        },
+        {
+          "path": "data/charts/IJJ.png",
+          "bytes": 3875,
+          "sha256": "ddef9fb0743f5b7413c9e6297e004fa56556ae4e005d997503f5e04bf305acfe"
+        },
+        {
+          "path": "data/charts/IJK.png",
+          "bytes": 3974,
+          "sha256": "f99c3cc28de75de9bfa94aff5e950068cc9588682eb282dc2fc2c0f46eba1c5f"
+        },
+        {
+          "path": "data/charts/IJR.png",
+          "bytes": 3716,
+          "sha256": "f19a5f8e2c7947c356016ec16833dd79388c59d17200a42c32cd664a79ff479e"
+        },
+        {
+          "path": "data/charts/IJS.png",
+          "bytes": 3908,
+          "sha256": "3c23c8f07e3d02a6ffdaf712ce1acd51af594de0f577621f9d37fa13f353dea9"
+        },
+        {
+          "path": "data/charts/IJT.png",
+          "bytes": 4136,
+          "sha256": "5b33c081d44b305b775e7c683ea365f77f5f90e18fe5b330a3f933a67dae9016"
+        },
+        {
+          "path": "data/charts/INDA.png",
+          "bytes": 4969,
+          "sha256": "d8d806bf140eb776ba626002b5730dea93ec108f4d70d59b9154ac9b2f1d5f2e"
+        },
+        {
+          "path": "data/charts/IPAY.png",
+          "bytes": 4919,
+          "sha256": "5552ecde8ab9140e7710a0ee887dd7f74e7d2dd4aa5f4aed31b75848fa78fdc8"
+        },
+        {
+          "path": "data/charts/ITA.png",
+          "bytes": 5600,
+          "sha256": "1fc8272889e03f0f7639fb8b510e0bd8325ed9ce5dbebf04ad7d295c3f9905f3"
+        },
+        {
+          "path": "data/charts/IVE.png",
+          "bytes": 4531,
+          "sha256": "b97310fa22951137299133f9a7b4aecba3f53ecb98e7ba0aad5efdaf9da70030"
+        },
+        {
+          "path": "data/charts/IVV.png",
+          "bytes": 4495,
+          "sha256": "c83f972910c6e525699b60260d3a37ac273b86ea9f7cfd040bc42bb640d807c5"
+        },
+        {
+          "path": "data/charts/IVW.png",
+          "bytes": 5163,
+          "sha256": "851dc6a57bf9179e32c44cbdf4e07545198056f2f4fa8458fa290da52c967171"
+        },
+        {
+          "path": "data/charts/IWM.png",
+          "bytes": 5086,
+          "sha256": "fbaaf31167cb9e22dfd99da1a2481b02fd0b6b1ed313ec780a759b5a2fb38615"
+        },
+        {
+          "path": "data/charts/IYZ.png",
+          "bytes": 4087,
+          "sha256": "15631ed4344bf9b4e9dabf1c79ed66e4225ddaa1b74d5d001f2cfdf7c06160c6"
+        },
+        {
+          "path": "data/charts/JETS.png",
+          "bytes": 4977,
+          "sha256": "15f6ce6e314c09599f08c2e8e65bc9ba52ae5b362004c920c3f593755d585f61"
+        },
+        {
+          "path": "data/charts/KBE.png",
+          "bytes": 5444,
+          "sha256": "bbe1aa95d285f230795238db42b45e6ad8ddfe53ec7854d3e3368fc010d309e9"
+        },
+        {
+          "path": "data/charts/KCE.png",
+          "bytes": 4877,
+          "sha256": "c74e25c44a0e61425b6bb745f58bb5cb0839ccf3e4140555aedcf1ed853a75d4"
+        },
+        {
+          "path": "data/charts/KIE.png",
+          "bytes": 5639,
+          "sha256": "5eaa0abbd4ffa73603ce9de7df831797689c2695cab01fdabaff1026aa6c1c96"
+        },
+        {
+          "path": "data/charts/KRE.png",
+          "bytes": 5429,
+          "sha256": "3a5a4ab5ca539b3513f365ae8d3c0e149d26ebe0369e44cf51908941b216cc07"
+        },
+        {
+          "path": "data/charts/KSA.png",
+          "bytes": 5401,
+          "sha256": "e7414a4960920d45e091de07b17b37557573a9916c6fb1247e401961c1b9f959"
+        },
+        {
+          "path": "data/charts/KWEB.png",
+          "bytes": 5974,
+          "sha256": "f9d7b177efba94f846363f4a81607685fe4424a8e3e84c7fed65ab4755157217"
+        },
+        {
+          "path": "data/charts/LIT.png",
+          "bytes": 4391,
+          "sha256": "01cd2fdf4e1ebde9d40907d23aa235f7e049be2ab51781e8c1342f5a22acc500"
+        },
+        {
+          "path": "data/charts/MCHI.png",
+          "bytes": 6648,
+          "sha256": "9288ea90c46dae28dca525735286c798c2e7f1aea80463e158647773941bcb71"
+        },
+        {
+          "path": "data/charts/MDY.png",
+          "bytes": 4137,
+          "sha256": "9318461f2469bd7299ab11b9cca9eca182032fe98e38e9928f853937f0cf182c"
+        },
+        {
+          "path": "data/charts/MGK.png",
+          "bytes": 5049,
+          "sha256": "73973bbb3c3ef98c0cd7554b66fc74b1e196f54cbdd674ccd9ad7807aed5290b"
+        },
+        {
+          "path": "data/charts/MSOS.png",
+          "bytes": 5568,
+          "sha256": "349d510faf5a9a6e3b4e3b8767250bf106f39fca4f4b52f79c10b1ee31ece911"
+        },
+        {
+          "path": "data/charts/OIH.png",
+          "bytes": 4022,
+          "sha256": "93b59a5cc218b8563e98d33f0bbedd135d508de767420796cea2b5760c84c3b8"
+        },
+        {
+          "path": "data/charts/PAVE.png",
+          "bytes": 4542,
+          "sha256": "6839be2a631f607a4143f2e0ef3a3fef2da29443e0b81be0e796b750a9ae848d"
+        },
+        {
+          "path": "data/charts/PBJ.png",
+          "bytes": 3764,
+          "sha256": "6bde51f0c9c84dcc59f87534bd888f3b7d13deb564138d49bfcad20aa6bccade"
+        },
+        {
+          "path": "data/charts/PEJ.png",
+          "bytes": 5578,
+          "sha256": "b4289baebc3268ec13e6ddf9ac4f213c2003b32b41d2bc03c02425ddd59e13ac"
+        },
+        {
+          "path": "data/charts/PPH.png",
+          "bytes": 4764,
+          "sha256": "5c7c3959d981503f2a3be58f79a8447edc28d731ad87fcb41d44a973359e3282"
+        },
+        {
+          "path": "data/charts/QQQ.png",
+          "bytes": 5505,
+          "sha256": "3f4828cecde888633f4c942ab46ab881daff1faa5d92a374bfb950357e1c6e8a"
+        },
+        {
+          "path": "data/charts/QQQE.png",
+          "bytes": 5352,
+          "sha256": "f3906a08a0efd276fd052c17fc626f8a0890e11e2c67e12386da3bfbb0d2533b"
+        },
+        {
+          "path": "data/charts/REMX.png",
+          "bytes": 5332,
+          "sha256": "35cefd2dc80d27b2160f60a10cd3bc078c0b7ef45fe418351fedb78b9d797096"
+        },
+        {
+          "path": "data/charts/REZ.png",
+          "bytes": 3497,
+          "sha256": "f6c33019102848b62df407d2198dbcac39969811139361105c444e180492dae1"
+        },
+        {
+          "path": "data/charts/ROBO.png",
+          "bytes": 5673,
+          "sha256": "54d761ddb98d734b23e98f7c7ddc4598c3ce47b7f3899a8656026ac2b083bf24"
+        },
+        {
+          "path": "data/charts/RSP.png",
+          "bytes": 4619,
+          "sha256": "ba3ca9106f067c29eabfc1805ee4499ccd42eb45fd1bdcf235a37e0cef159dfd"
+        },
+        {
+          "path": "data/charts/RSPC.png",
+          "bytes": 5207,
+          "sha256": "47f2a0368aa22e5c0cddf7212c49880745164f813be3d58a380d4550380c38c8"
+        },
+        {
+          "path": "data/charts/RSPD.png",
+          "bytes": 5743,
+          "sha256": "279a145bea2cf4c972e525c57a1788e6e05288b376533f693723336b66b437b8"
+        },
+        {
+          "path": "data/charts/RSPF.png",
+          "bytes": 4867,
+          "sha256": "9eaf63c5d3661f60150c46b800470363a24c53ddfe94b6b9db9e3995571d3149"
+        },
+        {
+          "path": "data/charts/RSPG.png",
+          "bytes": 4109,
+          "sha256": "d8695683428646e60e13c3817ef415be3a3cbecc72a4c4f7431e9a0c861c1a7b"
+        },
+        {
+          "path": "data/charts/RSPH.png",
+          "bytes": 6511,
+          "sha256": "cdb05a024f4b7eb78ab174641ffbb923894bd4fea1a2ec8829e8b3b7b2825522"
+        },
+        {
+          "path": "data/charts/RSPM.png",
+          "bytes": 4517,
+          "sha256": "8a2736a35c0beab1bd254f3d3a920e7fbc380b8dc347e312bb8e532b88ecee66"
+        },
+        {
+          "path": "data/charts/RSPN.png",
+          "bytes": 5414,
+          "sha256": "b2ceb40f48095ce582d998577e5cb05628cb11cf22ddc9c126d929680f5d38a2"
+        },
+        {
+          "path": "data/charts/RSPR.png",
+          "bytes": 4662,
+          "sha256": "f738fc54e84e90209f9c35e4618426b7323383fa5d0b7034eaf3a1dedfc845f9"
+        },
+        {
+          "path": "data/charts/RSPS.png",
+          "bytes": 4718,
+          "sha256": "7a40b55eba9629ac178577f02c22bb9055aa3438a9bdb33296d9160197c4abab"
+        },
+        {
+          "path": "data/charts/RSPT.png",
+          "bytes": 5384,
+          "sha256": "f94ea84c9226ab20cda812c7400b28055e657872f3942ce986e19a35facb497e"
+        },
+        {
+          "path": "data/charts/RSPU.png",
+          "bytes": 4449,
+          "sha256": "9ce101fcb7adb5f00441045ffc1bacad35a2cc129b824d16b5834e9403ce3cbb"
+        },
+        {
+          "path": "data/charts/SCHH.png",
+          "bytes": 3494,
+          "sha256": "deae8c632eafe79859e8174277c9346c7b2f69c28e441dffe77f12220cde9fb3"
+        },
+        {
+          "path": "data/charts/SILJ.png",
+          "bytes": 5550,
+          "sha256": "f2f51f25e9a35b5ee631af4c5a41e67e9566e620ec792f6885c3c3ec5103b3d4"
+        },
+        {
+          "path": "data/charts/SLV.png",
+          "bytes": 5194,
+          "sha256": "db822aed480d6adf58300eae2ce4868a1187f2f72f5ff13920c219b920004e34"
+        },
+        {
+          "path": "data/charts/SLX.png",
+          "bytes": 5019,
+          "sha256": "ab55c8466bd2991828d7e7256be09aca736305f56e8d80e266ad778384dbd37d"
+        },
+        {
+          "path": "data/charts/SMH.png",
+          "bytes": 4693,
+          "sha256": "1e516a16b286fb38ae318c80e751059891442c531d5421ab2de44c110d6fd815"
+        },
+        {
+          "path": "data/charts/SOCL.png",
+          "bytes": 6188,
+          "sha256": "b5eef7bc8b7c4b9b3817d104e84e1f7ff8e107ab4245f7c62bc2f7bd722e3b67"
+        },
+        {
+          "path": "data/charts/SPY.png",
+          "bytes": 4259,
+          "sha256": "8ea7b848cd430b03aa5ddcd45c6dae6d191f0ddc2cdb0ebb136912405fffca00"
+        },
+        {
+          "path": "data/charts/TAN.png",
+          "bytes": 4802,
+          "sha256": "7adcd471f5f06d0187ac33c812494303a03d8b6debacb64355324fc93aed5d89"
+        },
+        {
+          "path": "data/charts/THD.png",
+          "bytes": 3374,
+          "sha256": "c0c9dcc0d3b1e280dec8ef06e96aa70b351225c59ba83f3ee745b24690302fe1"
+        },
+        {
+          "path": "data/charts/TLT.png",
+          "bytes": 4537,
+          "sha256": "1f271b68ecab6c5298f5f6c23fbafbe7b9d7eb0fd074dc3a4d6dbe4eedf185bb"
+        },
+        {
+          "path": "data/charts/TUR.png",
+          "bytes": 5628,
+          "sha256": "264578e4a27954b9687aa9f4105220537d4b17d3a6273b5e1df81c7f9dd1300c"
+        },
+        {
+          "path": "data/charts/UNG.png",
+          "bytes": 4806,
+          "sha256": "43721af6f3f50dcb517dc654581a7a2d4a3696ef0f6bf8944f163b5d9ca9a6c9"
+        },
+        {
+          "path": "data/charts/URA.png",
+          "bytes": 5478,
+          "sha256": "8206a02e1f3c0930e790fd6076daabf21ec838b17fba52a555ab209dd824bd62"
+        },
+        {
+          "path": "data/charts/USO.png",
+          "bytes": 5100,
+          "sha256": "640bc95872f1d39bd3336f5a4ca62336e8654f51af4fe72358b0dca4c3af8ece"
+        },
+        {
+          "path": "data/charts/UTES.png",
+          "bytes": 4894,
+          "sha256": "41dbec5001931e6b96ba5aaaa04baf6257507590995bd968c044f7759c2af695"
+        },
+        {
+          "path": "data/charts/VNQ.png",
+          "bytes": 3793,
+          "sha256": "86b85da71afe528727f6d422335f2211e4b635ebba618b81f20eccba239d8002"
+        },
+        {
+          "path": "data/charts/WCLD.png",
+          "bytes": 5599,
+          "sha256": "ea9797bbb6377469d91cdd045cb7f4ddd90a2a9d4002a35aa0da5a959c26bbe0"
+        },
+        {
+          "path": "data/charts/WGMI.png",
+          "bytes": 4690,
+          "sha256": "04d738fa1b1581ca81159718dd8d1f54222e60b87697a63c28e57d3d5c93ffe5"
+        },
+        {
+          "path": "data/charts/XBI.png",
+          "bytes": 4396,
+          "sha256": "b26c2cdce4e09582a69f82797a8d4e6027c57d86b6ca55e7484d1fbc46487e98"
+        },
+        {
+          "path": "data/charts/XES.png",
+          "bytes": 3946,
+          "sha256": "f913514c24a2cec76e738a6bdd4557f0aff4314625b65b98c6c7a7dbb2ce7c5d"
+        },
+        {
+          "path": "data/charts/XHB.png",
+          "bytes": 5256,
+          "sha256": "5bfb20846807c4b49d97e747ce291e7ef8b600d9047dae43852a991c552b3297"
+        },
+        {
+          "path": "data/charts/XHE.png",
+          "bytes": 4198,
+          "sha256": "743aa8b635f00061f37384f667d165c8e6ebc6b64404a42b5077071d94a24b59"
+        },
+        {
+          "path": "data/charts/XLB.png",
+          "bytes": 4481,
+          "sha256": "690d040c4b569d5bc118cefbdcefcd4f5cd3e765dc50b553c46fdc2d7cfbf04f"
+        },
+        {
+          "path": "data/charts/XLC.png",
+          "bytes": 4912,
+          "sha256": "e299c6c240c5a6c468690177ad13b878869422b3c00bfd3ee4b877c220147d47"
+        },
+        {
+          "path": "data/charts/XLE.png",
+          "bytes": 3965,
+          "sha256": "ca2983e0dd877964056c4a84466aeb9ee72c01e52c86e6f82486e4f3fab3aa4c"
+        },
+        {
+          "path": "data/charts/XLF.png",
+          "bytes": 5045,
+          "sha256": "7b4255e1246e2ffe17567882ffb44db12dc013ce2690accfd7ef1a3cf26e3035"
+        },
+        {
+          "path": "data/charts/XLI.png",
+          "bytes": 4301,
+          "sha256": "4991573d759ff0026ca918022dae8f0faec242ca8b064e08a4442dbd95a27b8d"
+        },
+        {
+          "path": "data/charts/XLK.png",
+          "bytes": 5675,
+          "sha256": "8896a00056ffecf9cc83c4aa8b9dd1a703cd3f78f0ef2463a707d487e952e26d"
+        },
+        {
+          "path": "data/charts/XLP.png",
+          "bytes": 4550,
+          "sha256": "8711241f31a3623ef4d79f8d1938ced250d9db0f7c7d0e20dc9110a0f94fa1cb"
+        },
+        {
+          "path": "data/charts/XLRE.png",
+          "bytes": 3738,
+          "sha256": "82154f0358f51a11edfb1c7caa233eaae66ca6357e3538a8130b0b83e1847890"
+        },
+        {
+          "path": "data/charts/XLU.png",
+          "bytes": 4954,
+          "sha256": "525c2e2d66f7875a90fd01ed2ba861840e2dbbe9cef3d5580f46550607e52342"
+        },
+        {
+          "path": "data/charts/XLV.png",
+          "bytes": 5892,
+          "sha256": "1de701b4507866ab5381b2d5c7ca9f7d5f3bda27033fff502b8f1f87b8422a9a"
+        },
+        {
+          "path": "data/charts/XLY.png",
+          "bytes": 5028,
+          "sha256": "9ec1006bfabfa3b93cbb86c0ee1b46d6126f97964d609ef08f2c6b7e3c1a3b38"
+        },
+        {
+          "path": "data/charts/XME.png",
+          "bytes": 5714,
+          "sha256": "8da4f7dc3fc633ed625805fd93ebf6976b490810258a8782f5807ac345f9f30f"
+        },
+        {
+          "path": "data/charts/XOP.png",
+          "bytes": 4435,
+          "sha256": "4dee1d302907447e52c9a1489de32f4cd9ebcdde1b6bd85847fba4b37f4c6700"
+        },
+        {
+          "path": "data/charts/XRT.png",
+          "bytes": 4468,
+          "sha256": "cd279d3da2e1d0008d420c7ec2c0d7b9352962842afad6e0f90d44381da3ab87"
+        },
+        {
+          "path": "data/charts/XTN.png",
+          "bytes": 4032,
+          "sha256": "ad21eef4c6b9e84b67d024b0aa8b3f3d9b7544630971910c131823011a7d2319"
+        },
+        {
+          "path": "data/events.json",
+          "bytes": 2,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        {
+          "path": "data/meta.json",
+          "bytes": 4397,
+          "sha256": "19ccddd9f355955acc43e5e10445b1c458a24072dc6a49223a093832dc4176c0"
+        },
+        {
+          "path": "data/snapshot.json",
+          "bytes": 50928,
+          "sha256": "a620dca9a53ac51b9eb385c8b880a89ed96f3ca926de5be1e29055af9ab0fe80"
+        }
+      ],
+      "roundtrip_verified": true
+    },
+    {
+      "archive": "archive/2026-10-04/before-data-reconciliation.zip",
+      "archive_sha256": "584c23e81aa43d8675d0c58f7da0d8315e0ae914f6255bcce95d09dc9359d06f",
+      "files": [
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/_curated_universe.json",
+          "bytes": 1753,
+          "sha256": "d6580ccefcb08fd1d128e9dd4d837968ed08a9a2dd286f372cd15f3c6c629954"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/_premarket_routine.log",
+          "bytes": 28305,
+          "sha256": "1de129c2737bbe4adecd4af4d14f8d86621b21d9bccbe3aaf6b21431b3ab85b0"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/_universe_us.json",
+          "bytes": 53960,
+          "sha256": "c3a2936dab643a309129bfb096bcca26bf995593d3db911f406caacc62ce4c80"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/breadth.json",
+          "bytes": 11419,
+          "sha256": "a12a5ae41dbced32f8774086c988c62ac573c18bab184ddbe462ba4ec2590818"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/breadth_history.json",
+          "bytes": 70237,
+          "sha256": "3979541a451970fe10dd53bde877b161bc9d015f8583334dd5dcaae6b5015505"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ACWI.png",
+          "bytes": 5129,
+          "sha256": "2df19bfae7143338d17652bbc2656b27f283e05cc2afc818144e8bb550273138"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/AIQ.png",
+          "bytes": 5557,
+          "sha256": "8d0b5f3878ce94db8114ffc97bb4e61f8dddb85a3a95fc3b06bfbe72de560784"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ARGT.png",
+          "bytes": 5129,
+          "sha256": "19b88379bb75ec1b014b42a2022769a7f5917e187995a402e9eb3df955019812"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ARKF.png",
+          "bytes": 4999,
+          "sha256": "e3feacfe5f6f892b55bb6a5a7fc30a284e211dde648436b71098230df21f1d30"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ARKG.png",
+          "bytes": 4562,
+          "sha256": "69f8c85f67fe15cade04d713ab9aa81787a36226d78820c3a86c87fdcd8ae7c0"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ARKK.png",
+          "bytes": 5723,
+          "sha256": "6c12cb01d7b7c9fea7758630d4b2a293b687b54399635ef622c4803e46f5837a"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ASHR.png",
+          "bytes": 4629,
+          "sha256": "6ca5b4e046b351d97e4d7c3582adba0aa924182fe2bb98357af4dcef9e681018"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/BLOK.png",
+          "bytes": 5684,
+          "sha256": "e62a8335b5026e539550d093e28b12189310e9fb8a3dacc28c583be64b27b4bf"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/BOAT.png",
+          "bytes": 4696,
+          "sha256": "1b9920825889a43ef6e44b3693cd66d1f4b55cdd4c1fc0fbc44f108473b3df64"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/CIBR.png",
+          "bytes": 5189,
+          "sha256": "cd1621986d845ca5e78bad27691646f7c55bd7b2c352aa26af98a71c0c89cc35"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/CPER.png",
+          "bytes": 5679,
+          "sha256": "2332e0c9990956d9e404f5d7e85b7aac51cd3473332338840ddc90b7b19c66cd"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/DBA.png",
+          "bytes": 5372,
+          "sha256": "26a79808bbdb38bcdaadc018992b5099a220fa2e83165711e95e242dcd6016d9"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/DBC.png",
+          "bytes": 5746,
+          "sha256": "bd6ce34bc2567ebb91850966e75adc8a366210b3423b68faa171c118e2022eab"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/DIA.png",
+          "bytes": 7553,
+          "sha256": "0ac033c71db41c150c5c0ca0066c2e43fa3a2ba72a2d0b12dbef85143227d5d7"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/DRIV.png",
+          "bytes": 4323,
+          "sha256": "8a68ed3c1451659045814f713524cbcc4e8b961b841c0926a225379196e93e51"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EATZ.png",
+          "bytes": 4630,
+          "sha256": "62b12a335a3519207015ca0471327967abb3af2b5bb385352f2bc362a1b529e0"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ECH.png",
+          "bytes": 5553,
+          "sha256": "5b67a060481241254f92f740197a224b982e38c843a9e2013eff59b85f31fb01"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EEM.png",
+          "bytes": 5620,
+          "sha256": "9d78d16e943677f5849bf98eb69652c509b43039f6d3f11adba57e40ba3b8cc3"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EFA.png",
+          "bytes": 5980,
+          "sha256": "65b26bb9db16dcf62499ce8c7cd220914885b6a7d054cc0b78f29ebfafa23e82"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EIDO.png",
+          "bytes": 4829,
+          "sha256": "15725620c49f39ae444733a17f26bcb7d3e757e8ca01d3b4b3e524292b7592b2"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ETHA.png",
+          "bytes": 5348,
+          "sha256": "e3a875f4c6227809f8075256ecfc490064b01c278cf93a53092e361ccd3bdddf"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EUFN.png",
+          "bytes": 5442,
+          "sha256": "1f4136d0302778d5ebe0d15369abbcf7615117b06e5d8ea098ab34312ec4bc0e"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWA.png",
+          "bytes": 5766,
+          "sha256": "7554d1b8c4563456816847fa19e11ce4dd846c265f48b650f4f0e7a1de28567e"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWC.png",
+          "bytes": 5297,
+          "sha256": "6db511819dcbe1324ba5265d62ab8c505c9cba86a1cabc8e9ae20ff5286f2e54"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWD.png",
+          "bytes": 5805,
+          "sha256": "308a1035fdf9e2d8b24395500be2bc7692d13eac443322a4e62ec20032c3c903"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWG.png",
+          "bytes": 5954,
+          "sha256": "e3e734ea6ec6b802ee45307f2f3d088b46c84180cc240ce137cfa1516a911b80"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWH.png",
+          "bytes": 5069,
+          "sha256": "b0c898d25886e85203fb8adb081a39eeeda2356b187def936d6f71cba5fad615"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWI.png",
+          "bytes": 6325,
+          "sha256": "1eb8e08330fed6f5ac79d94310b50076fe66534296ff828d5c3d5adc78d68e3e"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWJ.png",
+          "bytes": 5524,
+          "sha256": "b33ce069e2d1ab441b98c13cb1052a77302d185530eb5caeaeb2c1305e99f307"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWL.png",
+          "bytes": 7816,
+          "sha256": "fd431d0ba4cbc4e16b884a95fee9f2d7fba85812732a466ca69e7226133a0496"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWP.png",
+          "bytes": 5334,
+          "sha256": "211b0ed1a34dd99c584c46215633e3f1b8d0cc3dd33acf4376f81cb8fc2001c0"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWQ.png",
+          "bytes": 7010,
+          "sha256": "1f2461eec84e84d2d2a7c979bca125a548525480e8540d5c81b5674fc06f4d13"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWS.png",
+          "bytes": 5957,
+          "sha256": "f0e20b6f8ed54c73ac3de5523ee90e9c552b4ec1197d6ccde2422f9868d50dd7"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWT.png",
+          "bytes": 5550,
+          "sha256": "58329ada922d71cf51224e1dc321dce20e309662320cc9309a9f011c53ae822c"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWW.png",
+          "bytes": 5477,
+          "sha256": "75247fca7a0ddafa1c58db2713a64e4824ea1bd021e59f26cf6969523286ff20"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWY.png",
+          "bytes": 5578,
+          "sha256": "b1404e93084e13e5eb965602a899dde66a400bbd396cf1a45bc809616a0ebd41"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EWZ.png",
+          "bytes": 5667,
+          "sha256": "1336398dbe178f6dd55da1f68db71c06a3dacdff9445de601e78176478759ac8"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/EZA.png",
+          "bytes": 5279,
+          "sha256": "fb27e094dcce138660e318290ae5d84f1972dc2014132659716d62de7c94606b"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/FCG.png",
+          "bytes": 5017,
+          "sha256": "89ba8b30686edbccb003e36f821f708f81e8b8666fc09900e603c966901fa80a"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/FDN.png",
+          "bytes": 5778,
+          "sha256": "3310392ee340207ff725a713816652fe6873b8e5bf7c450dccd7be39f99d75b6"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/FNGS.png",
+          "bytes": 5452,
+          "sha256": "91696d4a575c462e4bdadfa0e41a5cc00ec9e59055668b8179fc63524a5afd0b"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/FXI.png",
+          "bytes": 5011,
+          "sha256": "47988adff664b65ba4ba1cea3f9f86f3e51e0c8966ddb6447239ef7099bff1da"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/GDX.png",
+          "bytes": 5344,
+          "sha256": "5704740576d16b35168c64bfe7896c16f1c628ef02aa2d67edaea9adaa862505"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/GLD.png",
+          "bytes": 5441,
+          "sha256": "d3ab16e75d472cbffca2c5562a18e12e7b3638ec6fc996848709d322446149ff"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/GREK.png",
+          "bytes": 4092,
+          "sha256": "0bfc8bd9138705ef2749080b7b7d12ca047e4628420171432e116b0a534f37cb"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/GXC.png",
+          "bytes": 5316,
+          "sha256": "c367ee135723140d33141054385939c9b3601b4ae609bfdf23ee13962b627c06"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IBB.png",
+          "bytes": 5609,
+          "sha256": "381a23dc1c74919895c0169e4719c2c93febb394653a48dfaab63897e520e795"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IBIT.png",
+          "bytes": 5700,
+          "sha256": "20571a2aa2232e461c538537a62bea46494a6593d9b789ec5f1a6c4ce64ae310"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IBUY.png",
+          "bytes": 7469,
+          "sha256": "71bf7349f82aa8fbaa73ffc7845648f998fe80e700af993753a4f364892c4334"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ICLN.png",
+          "bytes": 4657,
+          "sha256": "c773ac4d3d71223ca4272b2db493aad00e2f0caa3e8214930df1d807a8bcf153"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IEUR.png",
+          "bytes": 6322,
+          "sha256": "ad7fcddef18ad89413e71a6c8706670cbc081de266f7bd2c5cd31c78ef6e73dc"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IEV.png",
+          "bytes": 6393,
+          "sha256": "e17fbaf85eea18e2c8c6cbe4a08d55ef66404474d3499412e92e8bead0741e77"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IGV.png",
+          "bytes": 4890,
+          "sha256": "5f6c320d3d52ca111531eba4b04816136476ef4a239ba34627e15408e1c5f584"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IHI.png",
+          "bytes": 6394,
+          "sha256": "90f45f517c38dc1dc32c09c3ea565726de456106193822ebd2bc1e8b99427182"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IJH.png",
+          "bytes": 4278,
+          "sha256": "5c7c6792414edaec8cca24c1fc604bda7bcf6a480a46c049620f350c9d33bd8a"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IJJ.png",
+          "bytes": 4388,
+          "sha256": "745b8f022aebe26d430c12e5e4753419f3b21074c14b97e6d5f2b6f5b8942345"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IJK.png",
+          "bytes": 3945,
+          "sha256": "09c75242b69632dab4ea6fc5241ad9a11c286df8879d25eff191f74fcabf4e59"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IJR.png",
+          "bytes": 3704,
+          "sha256": "3f60a87c90be3c05d68a7f3c291ce0f34578883a7de8cbc054df4cdd21bc532c"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IJS.png",
+          "bytes": 3901,
+          "sha256": "91c8fb94c5f87b2e7ef3923a1fdf2ddec7016fa9c4ca8f4319ac4e21f881bdaa"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IJT.png",
+          "bytes": 3757,
+          "sha256": "d001f7cf272652d84982b657f4b41e7286030d961331811bf80325b59b263038"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/INDA.png",
+          "bytes": 7664,
+          "sha256": "b1be75943b94e9d24af32e7cf3d6bfd5eae1812491740c28df49ece6d94dfd65"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IPAY.png",
+          "bytes": 6646,
+          "sha256": "d852a748aafb7c401dfb5f63c5213855cbf87718876ecf0483a12fcf91398a98"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ITA.png",
+          "bytes": 6910,
+          "sha256": "ae9d0c8da951d4d780e202098dd1d0d5292577bad836100fd2743dce64c22d81"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IVE.png",
+          "bytes": 4708,
+          "sha256": "9f73740d2cca8cc080780b453344268753d6672fc6485bc71a11296f2cc08463"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IVV.png",
+          "bytes": 5179,
+          "sha256": "9f605514111fe13c2cceb8ae45b0bb23d5dafb93835f8f259fccc15b86423d93"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IVW.png",
+          "bytes": 5783,
+          "sha256": "444279126af7e02ca68e8c2e2b47ce7ee5a29833fd58ca0b09ed1fa79d35f52a"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IWM.png",
+          "bytes": 6788,
+          "sha256": "cdda61900c8fa877f79007917f4b4f5e4019e54a84839866c735147b493dd67d"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/IYZ.png",
+          "bytes": 4572,
+          "sha256": "2a1445110f97ca44fef62c26505dfa471110ceae813710a28955511da74e00fb"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/JETS.png",
+          "bytes": 6292,
+          "sha256": "08274266498558cac608c97530652bfc1f3a13e851d6ebd8272cdb2061b7655c"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/KBE.png",
+          "bytes": 7060,
+          "sha256": "d5e96c01aebffc21c7a7cbe13ffbbb6e0cf201cb1bf49ff8acac75a06fdd743c"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/KCE.png",
+          "bytes": 5938,
+          "sha256": "728c715dc2fc05b7b9620e77fe6abaa0bc7a7dc69087f410e6a3471f9f3e1750"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/KIE.png",
+          "bytes": 6589,
+          "sha256": "0d669b7c4e4a13b2103c8107273b91324e83e6471c7323e1b499819718f76f38"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/KRE.png",
+          "bytes": 7323,
+          "sha256": "6eded5bd10d17bc8f5020cd23a9017eb518cc897da0cddd2b0dabea802cc8f7e"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/KSA.png",
+          "bytes": 5731,
+          "sha256": "64e4abf453e517285b4f77638f9a4bfc1882c981b20596b25613105aeaeb3529"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/KWEB.png",
+          "bytes": 5652,
+          "sha256": "e6bd875c7339c0b9d1e3bf974d703ab0966e4df8a1935a12be62332c8d53c178"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/LIT.png",
+          "bytes": 3633,
+          "sha256": "3dead378637a3286cb27b61b8a3abf49b128e9fba71932a0aa2bd663602dfbe7"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/MCHI.png",
+          "bytes": 5674,
+          "sha256": "f06f1eb704d88b340832953b89f9dfc9cff4319d1e0a6246d700b744b7868c18"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/MDY.png",
+          "bytes": 6986,
+          "sha256": "836e93e841861d8f443c482f8cbad31cc231130c7e5846a76808075f9e065e0d"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/MGK.png",
+          "bytes": 5587,
+          "sha256": "d8081f0bfa5a3cc189fbffd2367c1afc1f2f6f8afbaa73a6c905a44a022cb926"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/MSOS.png",
+          "bytes": 6008,
+          "sha256": "36e22a2ac86a42c0e7e5210405a9baa2eab4128f44b49d45fef4f2cc058d4dad"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/OIH.png",
+          "bytes": 5212,
+          "sha256": "7725763297e8451389728a9b25c1bc03ff156f0c90b847a354044b6d8bd5b22c"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/PAVE.png",
+          "bytes": 6008,
+          "sha256": "a24c6d6f6be3d147cf3016acee5f4dd8d1ac0cd37584b95ff05bc6e839044d45"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/PBJ.png",
+          "bytes": 7189,
+          "sha256": "8795dd074461886c1c0b2fa8e71c699c733402ab5336bd5ed72a0a78ed50016c"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/PEJ.png",
+          "bytes": 8176,
+          "sha256": "396732632783766da3fe4eac6fff292ed4b63a6edb83e6d8432f9a61264473a0"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/PPH.png",
+          "bytes": 5454,
+          "sha256": "839909a45138b43eef1d1d99a5a2b45d059b3820cef29be66bb4f73129f76387"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/QQQ.png",
+          "bytes": 5058,
+          "sha256": "618c194ca1d61a66a99b0027ad3e167ca4efa8a57bd59569dcefcf58ec0f8a2d"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/QQQE.png",
+          "bytes": 6701,
+          "sha256": "4565ab83463c75bd409d8fc7105e0beec0894412132796a4263ac6dd54d20a39"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/REMX.png",
+          "bytes": 3307,
+          "sha256": "7b8dcdecd307d8615a02c8473ff0721d0296a472765eea17b7dd5c9d303dc199"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/REZ.png",
+          "bytes": 6999,
+          "sha256": "3cd3e39479b373169704f5707f6911f1533a658a0d8612b03e455751c7a9c0b1"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/ROBO.png",
+          "bytes": 4542,
+          "sha256": "341afc2b3c1d779124732ce1a86cd4066c8c7f03d3088698e76b8b8a87dc1bbc"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSP.png",
+          "bytes": 6524,
+          "sha256": "af3fefa74b28964000e0b79c4ad377a3e54ea623a38e3d4447455b20482d0405"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPC.png",
+          "bytes": 4931,
+          "sha256": "b614069db95dd01ff8e4d805dfbad33e0521f5fb9d3beed23a771a9b7a389454"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPD.png",
+          "bytes": 5866,
+          "sha256": "c20eecc2e9e69fb0990ff4a71902e706e3939f8d171338f270981b8182400d67"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPF.png",
+          "bytes": 5058,
+          "sha256": "9295bc4aea981fc4c8e23657ed81b9564c8e7d359d5aa8a5592ee23ad7fb2b30"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPG.png",
+          "bytes": 4272,
+          "sha256": "349ef6239f34a5ab15bebea5fb5c95e6d937f97715a1d5e3fd2b87925bcc7e38"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPH.png",
+          "bytes": 6297,
+          "sha256": "10c7a437be20d3de23e0c2b60af2f50ee2cdc91b8598a979fc4e23bf0205fcb0"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPM.png",
+          "bytes": 4855,
+          "sha256": "a3d98d12f7ecd3489b17ec0e2b8aa7d319d6dd247fc67665ad7a5a0dccab03b7"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPN.png",
+          "bytes": 4676,
+          "sha256": "a3e30c68816eb6abc7ab61e068844e671c09abcf5dfbfcc2a3b0ca88f396abb9"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPR.png",
+          "bytes": 4604,
+          "sha256": "4d1ece15bc2a89ccef415eeddbe60a12241e2e4ac2a3c1a7ff4c117f42ea2266"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPS.png",
+          "bytes": 4588,
+          "sha256": "57c36dbbc0866c28756c7436b77d57500f3fa2e26618dde848342745779fb9a8"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPT.png",
+          "bytes": 4844,
+          "sha256": "ee0d25a9f17ccdc14e101276a3505dd1ca6b0acc50e219dc5a18e727e920ca35"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/RSPU.png",
+          "bytes": 4224,
+          "sha256": "9568945bab697772fb033b1a95bd68bc9079de32664b089bd245f36bfbf72a6f"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/SCHH.png",
+          "bytes": 5644,
+          "sha256": "88a2db6522cd4cccbcfc3cb7d287fab95b1cb4cc6356b45d1a16e8c8b486b242"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/SILJ.png",
+          "bytes": 5142,
+          "sha256": "f0346f67c06c79359c96df7fbf083a755acdb05b22947404fb9c407418332c55"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/SLV.png",
+          "bytes": 6001,
+          "sha256": "3393ac0fb859d0a7f9067cbdae7740550245c507abc805280b02a5a6c4b6731f"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/SLX.png",
+          "bytes": 5192,
+          "sha256": "d0e1f5ab9aaea156af9bf58d7d7e1ae0d37bc57cbcdf1dc74f08ef432495021d"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/SMH.png",
+          "bytes": 4884,
+          "sha256": "2dc3f2a0a881473c6a3b1d2c28ae894c446c1c96e87e9814c057dc59feda0aac"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/SOCL.png",
+          "bytes": 5577,
+          "sha256": "e15a451ba29cbdcffd65392031afb8a0424f9fa8c56251d91aa091c3e6cdb094"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/SPY.png",
+          "bytes": 5583,
+          "sha256": "010274c277d2c70d342407757f7e63f68a5482863b053f59a584b68445dd373e"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/TAN.png",
+          "bytes": 3988,
+          "sha256": "aeb62897850374079b4d14444bf8d0d68a84b3da1168ba125f7c735e89c40567"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/THD.png",
+          "bytes": 5074,
+          "sha256": "81958807e94f7bc8efe1302c7fb93fd80823241dc0f93828283a375ec0c349bb"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/TLT.png",
+          "bytes": 3839,
+          "sha256": "efe515da3b5beb6c8175bb9e309f2d264825ecd64c20227b1a04425112a4265c"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/TUR.png",
+          "bytes": 5364,
+          "sha256": "353f4fe6688d59c5265ec0b462df73a0be45e6d592436a74ef8c6bf409b1f752"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/UNG.png",
+          "bytes": 4943,
+          "sha256": "4072fbe7e3c35ef9ea63d6f6e9a23c39f42e38ca4582ad5d141ffb85b5380def"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/URA.png",
+          "bytes": 4978,
+          "sha256": "ee31ffbacc55fc200431fee8898b8c7dbc20e162af0373b613b43be1cd8abc33"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/USO.png",
+          "bytes": 5743,
+          "sha256": "60c9ddd916381d00ac0ac8df83ab287312c261e933740e2bb683528074e39810"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/UTES.png",
+          "bytes": 5389,
+          "sha256": "e298325bd1be3027971d8f8131226ab3ce91264d3341b46c12ee5d40d9b99556"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/VNQ.png",
+          "bytes": 5815,
+          "sha256": "abaee74e9beca34276719b4dba12f99d18059218962afd5e887715f36370159b"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/WCLD.png",
+          "bytes": 5305,
+          "sha256": "9f4ca841de8f5072c111acb7d4a07470c565d806329c67fbfec9c4f957f0f6c8"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/WGMI.png",
+          "bytes": 4406,
+          "sha256": "8d8be1382c666b621ecca074abdec8dc185370326b0d5493e8fe884e2426d60d"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XBI.png",
+          "bytes": 6607,
+          "sha256": "3d1d54e5eb815136cbeb57435619d4f012e335f695c3c5e1c88780ed40d525eb"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XES.png",
+          "bytes": 5095,
+          "sha256": "59628a1631ca56f2cb153ff6dd5d6d287c196992f2c543e5a319c980e3d155cf"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XHB.png",
+          "bytes": 6363,
+          "sha256": "47942f96599455a95f6278ec19d429125da386309bd227d8d1d955c741ba35df"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XHE.png",
+          "bytes": 5633,
+          "sha256": "9fad8cb822573a5211f4f0ce0f6ec2cd80733aae4f64a5701d8ad20ef2465631"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLB.png",
+          "bytes": 6315,
+          "sha256": "b7ff9ba857ad64bf73452051bf504e1ab6fa56b3a83f9b8155d71f961cb68167"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLC.png",
+          "bytes": 5737,
+          "sha256": "c5cf852f03c4b175a413658e8e1f2ec9024048c65d179cceed9925eb3450b187"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLE.png",
+          "bytes": 5313,
+          "sha256": "f5a064acc32ac5f8c39a10dc33bb224d2963a6c4b573d64cbb55ccb26ac8c5e4"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLF.png",
+          "bytes": 6232,
+          "sha256": "4b52dfad8e9531d9713545137d318b299aa96fcc59685f25bdaabf3f2e8d86ab"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLI.png",
+          "bytes": 6760,
+          "sha256": "f84a314495dbe8588371535fdcf0cfa701f23b9762ca49cee020cdfd9499bb35"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLK.png",
+          "bytes": 5337,
+          "sha256": "5ea125e65aed8fc95f18428bb1ffb57ec7f10b582f79116a73b39dbbe7829017"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLP.png",
+          "bytes": 6192,
+          "sha256": "55ef39834767649181aef2849ea4d0a440fbccc1f4a8076ea7edd152dbba37f1"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLRE.png",
+          "bytes": 5460,
+          "sha256": "8ac04417d6a168489b19afc59c01784bd548352c01223e0e2e47c9fd32cb4b7b"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLU.png",
+          "bytes": 5783,
+          "sha256": "ca84683977adf5e7c28c643e997507e6db2a878407cbf5a32cf93ca06ade9331"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLV.png",
+          "bytes": 5842,
+          "sha256": "902276c3dc659a007c85d61fa55290a6831d20721959df2bf3ec97d6c918e89c"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XLY.png",
+          "bytes": 6362,
+          "sha256": "5ebbe1273f7055fd898574b8150111b7eefe63a41607f117091810c60f03dbdc"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XME.png",
+          "bytes": 4897,
+          "sha256": "ccd3f294399d2a00256eaf9291cfa2e4d3d8e84236a4ca528dd24e055c575d31"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XOP.png",
+          "bytes": 5352,
+          "sha256": "a8308500b9e89d3bdbd8c0fb944c1f14ad561f4a0734d01ad4dfff163abde06d"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XRT.png",
+          "bytes": 6219,
+          "sha256": "dda12e87ee027636e1696079824fe4b010586ed99d1f7e4f051e07852608fe03"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/charts/XTN.png",
+          "bytes": 6255,
+          "sha256": "1a0fdee7c1818263145776514a6bfa932650cfb6cbf7f40968e1cd673ef79035"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/events.json",
+          "bytes": 2,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/index_technicals.json",
+          "bytes": 2,
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/meta.json",
+          "bytes": 4397,
+          "sha256": "19ccddd9f355955acc43e5e10445b1c458a24072dc6a49223a093832dc4176c0"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/morning_brief.md",
+          "bytes": 522,
+          "sha256": "087fc2aef50f9a8dc6da6fa08baf136bb2bd5ccbf4f7a84bb1d92aecd80642b5"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/morning_brief_gemini.html",
+          "bytes": 14693,
+          "sha256": "31ac549a2d1209dccd0339a69815452e0405795f1fab1a91c22773493daf23ad"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/morning_brief_gemini.json",
+          "bytes": 14073,
+          "sha256": "f65d5ed5b90c8f2dd24d48d320a418b98c736593acfebbb90c9e68a0b588ac50"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/morning_brief_meta.json",
+          "bytes": 412,
+          "sha256": "4a5807e883a095dfec019871795e0340a4008cb228a4e3ba4c85598641a90154"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/snapshot.json",
+          "bytes": 50897,
+          "sha256": "0e95c985632fc23c7ed48c9d20a2d899b8317a66f4b29bac591323d7c43ad044"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/trader_verdict.json",
+          "bytes": 1602,
+          "sha256": "5adeb2b74efeecc064f0e35446e548b1950025a5e03283200c3fb20aca41159b"
+        },
+        {
+          "path": "apps/market_dashboard/public/market-dashboard/tv_screeners.json",
+          "bytes": 275529,
+          "sha256": "8d6fa0fe959c56dc270c96127369da3453b89e823378d248e12c33317537e3f0"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/_curated_universe.json",
+          "bytes": 1753,
+          "sha256": "d6580ccefcb08fd1d128e9dd4d837968ed08a9a2dd286f372cd15f3c6c629954"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/_universe_us.json",
+          "bytes": 53498,
+          "sha256": "1ce7784c245e6040436e9b76ec1b38541c7b7a2362f1e42968823da3184fbf03"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/breadth.json",
+          "bytes": 11419,
+          "sha256": "a12a5ae41dbced32f8774086c988c62ac573c18bab184ddbe462ba4ec2590818"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/breadth_history.json",
+          "bytes": 70237,
+          "sha256": "3979541a451970fe10dd53bde877b161bc9d015f8583334dd5dcaae6b5015505"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ACWI.png",
+          "bytes": 5019,
+          "sha256": "93444269f2ba8ed63246cf29f1b7447fd6f5d000a011d9bd4d8f6078ca860ae9"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/AIQ.png",
+          "bytes": 5572,
+          "sha256": "2fdc0aafcd5439619e7e7578009f548c3b8e2f0154bf4f6824370d6346f3ecf4"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ARGT.png",
+          "bytes": 5133,
+          "sha256": "842894366711b06cdded0cfff225fc720304922db9a7db43efd1d9ba68feb8d0"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ARKF.png",
+          "bytes": 5010,
+          "sha256": "a322c64cb27c5d009eaa3fe0f2b5294c8236092d118f777ffbbac6bdc705b6b1"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ARKG.png",
+          "bytes": 4579,
+          "sha256": "2657d96ad06a88e59f52b321f7f075631ccbe5124452f64c72e36153d4c19de5"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ARKK.png",
+          "bytes": 5717,
+          "sha256": "c34d72b45b8141491056c48c5b17c8a1f62f85a45682f0de8a2a30eb22b76d92"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ASHR.png",
+          "bytes": 4657,
+          "sha256": "fdfc3f093f2a733da8f74343dd9369c3b9defaa18381dcead3fef77722c2d6b5"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/BLOK.png",
+          "bytes": 5702,
+          "sha256": "e906e3bfa8d415e8441c2d99483852c86446b1e2ca61b9650c53f9b1df38aca3"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/BOAT.png",
+          "bytes": 4701,
+          "sha256": "b0390f3d9b409db1f227268789586bfa8ec8b62aa4d37b66c69274aa54a99ad0"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/CIBR.png",
+          "bytes": 5226,
+          "sha256": "dea7d73e65efdebc0572735d00268d71f40dd45dd436e380f311d0db4571ba45"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/CPER.png",
+          "bytes": 5646,
+          "sha256": "b40d4907363e708d5e1236737df527d0ae6961573cc905bc8184ca724001885d"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/DBA.png",
+          "bytes": 5333,
+          "sha256": "83f694671586edeccc81f465a151257087c1ec1ab056bf0d1ffed7759435a39d"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/DBC.png",
+          "bytes": 5720,
+          "sha256": "40e20196070e47dd735adc34a1a8d48fa345e81ed09085d9a4cb7a7de9ff4d99"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/DIA.png",
+          "bytes": 7489,
+          "sha256": "45b344d043d4e51cc7a59a6140a18b783335ee48b1ed5f910519b65153520ca9"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/DRIV.png",
+          "bytes": 4331,
+          "sha256": "c7efc2ead8f751126c9a5ed01765f11d1dbabdebf5f69f1b53373baea764ddd2"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EATZ.png",
+          "bytes": 4630,
+          "sha256": "62b12a335a3519207015ca0471327967abb3af2b5bb385352f2bc362a1b529e0"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ECH.png",
+          "bytes": 5463,
+          "sha256": "e1b8b7a9b86dbb633b32999c44bd42dfdc220a775659a98c5d72406d17e138a5"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EEM.png",
+          "bytes": 5584,
+          "sha256": "b25642bfe3cbb361812b15a5455a95a7a11aa142e12d14d4743e32dd86b709f2"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EFA.png",
+          "bytes": 5986,
+          "sha256": "af4e948582d959b2cbac9e273baea92de36f78f5f375a09a6b7be72d667fcdf3"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EIDO.png",
+          "bytes": 4855,
+          "sha256": "9ee1701b947cc4d454d4219b6ecc6046378ca8bcaf2cc874b71a0652de52e128"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ETHA.png",
+          "bytes": 5346,
+          "sha256": "cfca43f58642cbb76bef244bc25a1062a6bc8b13e40e6bd7769b86b7f7fed3af"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EUFN.png",
+          "bytes": 5558,
+          "sha256": "46d41d6d2d1339e660cd46d36bfe1aa5818b5be29e697eb52df77d13d2c3071d"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWA.png",
+          "bytes": 5747,
+          "sha256": "f0b0d7d3114a8337b84e38802261198487998f83858630a8bf2336b9c0d6ef64"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWC.png",
+          "bytes": 5461,
+          "sha256": "32a28da1b430330c2802903a8e20fc0be00c8a78050349b50084a7110c107f42"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWD.png",
+          "bytes": 5680,
+          "sha256": "35d797d773869104ca545156d19b94cbcd66df78bb5e834811fa78f7b5589dff"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWG.png",
+          "bytes": 5962,
+          "sha256": "093e8ad7efead215b6fa71507e33f201ec68aeeb560a6b79bd594c01e2e4e75c"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWH.png",
+          "bytes": 5059,
+          "sha256": "0c035a974fc875bfade2abe97e011023b5e824f51b0b36b75b26fd42f3b7908e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWI.png",
+          "bytes": 6336,
+          "sha256": "b42361e5bad139d8fc33e6be6ce497a0f4014819f3eecd3aa3237b1fd6c86fab"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWJ.png",
+          "bytes": 5498,
+          "sha256": "c92bc879733f5d066b085fc7a8a8084d2ff52a5ef5595b2aca44b98b164a6963"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWL.png",
+          "bytes": 7857,
+          "sha256": "aeb5da77e92004c9d64c14e3e09c767cc102b348c223caf8ef8e1e6c463edc7d"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWP.png",
+          "bytes": 5378,
+          "sha256": "2828c97c0dbd87d6cdf20d2efd3913d633eadac7b95bf08fa772b04a7444f6ea"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWQ.png",
+          "bytes": 7012,
+          "sha256": "14340c95b2bb9839a791956480ed8221e83388335d5e64d91956724c23c84e0e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWS.png",
+          "bytes": 5881,
+          "sha256": "94f8a3196190f6cce4b1e93e4890db06f6e9430b609b235f83b2c7c33509af0d"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWT.png",
+          "bytes": 5554,
+          "sha256": "a2cf3c0824dba6a53edf7afb67022d722b0143e9f0251e9485afaa38dcaaf757"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWW.png",
+          "bytes": 5451,
+          "sha256": "16eca4fa82b809522741a420937174f181839d56a68a3e871c454249e87726f9"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWY.png",
+          "bytes": 5596,
+          "sha256": "c10f9e013a3802adefa4e8989a794b7500cbedb2ea13517bb07f2df44da268a8"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EWZ.png",
+          "bytes": 5605,
+          "sha256": "1ca8c0d2d610922124028180709aed0b31ae402df509af7d713b2cb519543971"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/EZA.png",
+          "bytes": 5279,
+          "sha256": "2218b90d166a9f02196510b13835511e0037d713f15e65a10255d30990525645"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/FCG.png",
+          "bytes": 4917,
+          "sha256": "5e1b4f95c1fdb2d9970cf6931e44be92b228938d345c8fb3ea4d59950a2bd0f1"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/FDN.png",
+          "bytes": 5780,
+          "sha256": "2d91cf307098f9c3278582178bbb74f2ae441bb83845728c538b4dd5be0d6c1d"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/FNGS.png",
+          "bytes": 5508,
+          "sha256": "3f1ffa492ad84135019a2c74fffefafd6211b1f7f1e97cbbc144f0a61ed10b5d"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/FXI.png",
+          "bytes": 5001,
+          "sha256": "ca487c2f1b58be36f0a66c842fea0c8549d52144d7b4516645153a2dc18022d1"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/GDX.png",
+          "bytes": 5360,
+          "sha256": "4def122cb88b890964ae90c312509fdaa89f52c057a44f20587e4942b2b17dc1"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/GLD.png",
+          "bytes": 5576,
+          "sha256": "3b357d03833f1844bb82aa14baeb86938888b48a64e79a676d398f14aa19fcbf"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/GREK.png",
+          "bytes": 4163,
+          "sha256": "9d88b516118e0e8a56efe5ae7de37bb634bc4f1c187bbae04448104cd405112f"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/GXC.png",
+          "bytes": 5241,
+          "sha256": "c48a91831abfadd5d0050c1cc3968f422089f5d30307c5d5265ee4e677b286e9"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IBB.png",
+          "bytes": 6403,
+          "sha256": "fb0313092e12a2354073ce2450c8ba998cea60697507c25ac15e1af53fbfe7ce"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IBIT.png",
+          "bytes": 5724,
+          "sha256": "b0dbc7bdeb904d59eecb02f4eae4c6c0f0c1c6d3f1edf853552380167d9ca7f0"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IBUY.png",
+          "bytes": 7430,
+          "sha256": "fa5101a47118ba5dd6a9b5edd7ab489d8879450b8e59d3debd4ad3bad0285456"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ICLN.png",
+          "bytes": 4653,
+          "sha256": "63c27d6ad83e0bc27818d4031fdd4d165570b2a28954b3c77f9fd87428b7aeee"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IEUR.png",
+          "bytes": 6323,
+          "sha256": "a14519c87ce83bcb0ef73550c7ccce635e7247180fea86c674bfd236534249f8"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IEV.png",
+          "bytes": 6389,
+          "sha256": "da97d791ca1cd6bf04a16470c66a21228f2566bd21a76a4973f53a4911af83e2"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IGV.png",
+          "bytes": 4867,
+          "sha256": "20d70d039b09a9a8916fe233b3ca193eaabe36c25bec9073d393a5ca293b663b"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IHI.png",
+          "bytes": 6472,
+          "sha256": "9ca121aa9973e61d82aa3dfd48aae1b338e93b00d0cabc8b3710b7b0cdd8af7d"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IJH.png",
+          "bytes": 4278,
+          "sha256": "5c7c6792414edaec8cca24c1fc604bda7bcf6a480a46c049620f350c9d33bd8a"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IJJ.png",
+          "bytes": 4388,
+          "sha256": "745b8f022aebe26d430c12e5e4753419f3b21074c14b97e6d5f2b6f5b8942345"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IJK.png",
+          "bytes": 3945,
+          "sha256": "09c75242b69632dab4ea6fc5241ad9a11c286df8879d25eff191f74fcabf4e59"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IJR.png",
+          "bytes": 3704,
+          "sha256": "3f60a87c90be3c05d68a7f3c291ce0f34578883a7de8cbc054df4cdd21bc532c"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IJS.png",
+          "bytes": 3901,
+          "sha256": "91c8fb94c5f87b2e7ef3923a1fdf2ddec7016fa9c4ca8f4319ac4e21f881bdaa"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IJT.png",
+          "bytes": 3757,
+          "sha256": "d001f7cf272652d84982b657f4b41e7286030d961331811bf80325b59b263038"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/INDA.png",
+          "bytes": 7649,
+          "sha256": "502b0705a9b72c83e2a4cf7803ddd44fa60294017e3dcb26442bc5fc8d969ec8"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IPAY.png",
+          "bytes": 6662,
+          "sha256": "73a23728d2f284afc4a2fcc498964954b39d589d4313579a8793aa7c1eb61ac3"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ITA.png",
+          "bytes": 6951,
+          "sha256": "20289547f5c2d303af3b462769ccdb1bc6b26dfefd0a0f777ae0a7e6db28ca9c"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IVE.png",
+          "bytes": 4708,
+          "sha256": "9f73740d2cca8cc080780b453344268753d6672fc6485bc71a11296f2cc08463"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IVV.png",
+          "bytes": 5179,
+          "sha256": "9f605514111fe13c2cceb8ae45b0bb23d5dafb93835f8f259fccc15b86423d93"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IVW.png",
+          "bytes": 5783,
+          "sha256": "444279126af7e02ca68e8c2e2b47ce7ee5a29833fd58ca0b09ed1fa79d35f52a"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IWM.png",
+          "bytes": 6764,
+          "sha256": "8b8d19f63362ae7d14e13dd2a7686b08c61b52402664c56043a212a83170d906"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/IYZ.png",
+          "bytes": 4595,
+          "sha256": "8361509acfe5dadb789c144c6c35851368c011b25e33303c576d4d4c10015132"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/JETS.png",
+          "bytes": 6273,
+          "sha256": "b1a7fdaa7e36f504d37425c0c51dc8ed1845a02cf2888a158310e715886000e6"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/KBE.png",
+          "bytes": 7068,
+          "sha256": "56fc5e8978e93a3949a1fef63649508756895e1d004b53dcfb3f1cc0332ae6af"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/KCE.png",
+          "bytes": 6063,
+          "sha256": "9135a708a51c2842ab89d969b59a7fd268205fe49f578868a46fcb96f80407e3"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/KIE.png",
+          "bytes": 6691,
+          "sha256": "0931c4e47429bb4face37cdd3b8aab719f55dc27ff65b35cf65cd8c9c0765c92"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/KRE.png",
+          "bytes": 7333,
+          "sha256": "8f868d2dd5554ee9362965e4f73ff6c6b813d12228d3beb1417e5b47ad5cf2fe"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/KSA.png",
+          "bytes": 5658,
+          "sha256": "5ea49f482e12995b857a44a6b71e3872955f6538519d052816d9b27588908a50"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/KWEB.png",
+          "bytes": 5637,
+          "sha256": "7956f4756337ee6c124b346e7d6a3f48bf2185d924a6258b23643364747368e2"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/LIT.png",
+          "bytes": 3604,
+          "sha256": "babf3bc19c4adce8c75a7ff6211e76c4b008044a25695fee8798d8deb28eaed8"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/MCHI.png",
+          "bytes": 5645,
+          "sha256": "720436ec5eb90b8b192390088cd10967e28808fed712a57d5858f3779c1ca093"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/MDY.png",
+          "bytes": 7025,
+          "sha256": "941dc0adae6733421a577a869c31f1108edc78b3c8360edd6a071db31275c9ca"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/MGK.png",
+          "bytes": 5591,
+          "sha256": "52b3f41d7abdec30fe6fbea952e39b8fd38261e8e2e7f571d9b8caa59934c64e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/MSOS.png",
+          "bytes": 6011,
+          "sha256": "08b4d44b03c0465575c96b76c4b0c548c5b315ad83667fd468f719b24d4385c1"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/OIH.png",
+          "bytes": 5301,
+          "sha256": "351e0e171c1b7a36bc0b77fd9ca45e8a9698450bb27b8127f7a59f734ccbb63e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/PAVE.png",
+          "bytes": 6018,
+          "sha256": "57199d8d5f5820d7f390ed790b6e5585dedde82a83e3f2425afbbcdb6c4678da"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/PBJ.png",
+          "bytes": 7175,
+          "sha256": "b1a36fdca3f9ecdffebcf1970f7164e4e02668ae7db980175243576e3979752f"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/PEJ.png",
+          "bytes": 8183,
+          "sha256": "73195d8ef0ec7fb456be2e4e62eda9ba7aab49faf0e1b2e68efaca735065fcbb"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/PPH.png",
+          "bytes": 5450,
+          "sha256": "504dd94904b056911f1d2b3d6c23c853fcff3ece2cfacee9248941ad8aff14b8"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/QQQ.png",
+          "bytes": 5067,
+          "sha256": "3505cf8d0fc6b5dd5024b4a6aa678fc493901e5cc4c2a62e65fa53ebf5f116db"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/QQQE.png",
+          "bytes": 6669,
+          "sha256": "ad1630296853c2bc23524f0e518fab2dfbd03d5878e445db9bc25bd29607c2b4"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/REMX.png",
+          "bytes": 3338,
+          "sha256": "ca4a4750641e8b8f945141fd126f5701b0b6fa5ee2a92fca5a8b944a0a157512"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/REZ.png",
+          "bytes": 7047,
+          "sha256": "964ee46c49ba7bcf753661eacd8660d40f38ec5b76afbc5dcbd7c64aa1d85713"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/ROBO.png",
+          "bytes": 4592,
+          "sha256": "c68aa39c019cc4a79031c08468c24572581ecb54c0095f07f995226f8af4b220"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSP.png",
+          "bytes": 6777,
+          "sha256": "e2e609891bb9dee8eed6b681629a3a96bd35c0c6900d2d913fd2c2de3ddf0603"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPC.png",
+          "bytes": 4931,
+          "sha256": "b614069db95dd01ff8e4d805dfbad33e0521f5fb9d3beed23a771a9b7a389454"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPD.png",
+          "bytes": 5866,
+          "sha256": "c20eecc2e9e69fb0990ff4a71902e706e3939f8d171338f270981b8182400d67"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPF.png",
+          "bytes": 5058,
+          "sha256": "9295bc4aea981fc4c8e23657ed81b9564c8e7d359d5aa8a5592ee23ad7fb2b30"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPG.png",
+          "bytes": 4272,
+          "sha256": "349ef6239f34a5ab15bebea5fb5c95e6d937f97715a1d5e3fd2b87925bcc7e38"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPH.png",
+          "bytes": 6297,
+          "sha256": "10c7a437be20d3de23e0c2b60af2f50ee2cdc91b8598a979fc4e23bf0205fcb0"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPM.png",
+          "bytes": 4855,
+          "sha256": "a3d98d12f7ecd3489b17ec0e2b8aa7d319d6dd247fc67665ad7a5a0dccab03b7"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPN.png",
+          "bytes": 4676,
+          "sha256": "a3e30c68816eb6abc7ab61e068844e671c09abcf5dfbfcc2a3b0ca88f396abb9"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPR.png",
+          "bytes": 4604,
+          "sha256": "4d1ece15bc2a89ccef415eeddbe60a12241e2e4ac2a3c1a7ff4c117f42ea2266"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPS.png",
+          "bytes": 4588,
+          "sha256": "57c36dbbc0866c28756c7436b77d57500f3fa2e26618dde848342745779fb9a8"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPT.png",
+          "bytes": 4844,
+          "sha256": "ee0d25a9f17ccdc14e101276a3505dd1ca6b0acc50e219dc5a18e727e920ca35"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/RSPU.png",
+          "bytes": 4224,
+          "sha256": "9568945bab697772fb033b1a95bd68bc9079de32664b089bd245f36bfbf72a6f"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/SCHH.png",
+          "bytes": 5621,
+          "sha256": "5b4333479dfa06d38ee0cf40fa106ac8f09770db129f0a62768bd65fccb2aeff"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/SILJ.png",
+          "bytes": 5172,
+          "sha256": "9cc831c6a31bd3f23cffc8c68f619d1f126b3a2d9fe2dabb9932af1d7d127c1e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/SLV.png",
+          "bytes": 5968,
+          "sha256": "4839929c1bba695301d6eb64e28a475665f46964e2d3ad8ef8381f8abc03bea2"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/SLX.png",
+          "bytes": 5188,
+          "sha256": "57637a9ab3d2b85a248b0de8a087f1eee6ce4a2163d889c76409fb7aa4239df6"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/SMH.png",
+          "bytes": 4825,
+          "sha256": "0bdc84cd451d10ff9278babb5e0296c57c0ea0ed75ae48cf5318b437f68630b5"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/SOCL.png",
+          "bytes": 5558,
+          "sha256": "f52ff4aa8ed85d1fdc36e9be7a49f07395dbf128ec89d4834ed8a9c2a621631f"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/SPY.png",
+          "bytes": 5583,
+          "sha256": "010274c277d2c70d342407757f7e63f68a5482863b053f59a584b68445dd373e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/TAN.png",
+          "bytes": 4001,
+          "sha256": "6518cad3f61fa80b617956ae2b887a16464d928cc5fd54c3e2279ec7410c9369"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/THD.png",
+          "bytes": 5072,
+          "sha256": "02ff395760450b3c6585ae701013801cab380c4529f92191af20e29cc04c8ba3"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/TLT.png",
+          "bytes": 3828,
+          "sha256": "5936a942c1f8d9c9ef091582a9e346c28f8904ea51932c8370f0f097e0e5a9b5"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/TUR.png",
+          "bytes": 5342,
+          "sha256": "1e6175a9679420e8fd2f180a7978fd2a30cf81cf360f16035ca19e17ee736af6"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/UNG.png",
+          "bytes": 4930,
+          "sha256": "b3b59dfa71cce98f3c8c47f369b0014baa2e6232f0798886f6a3213c35181c74"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/URA.png",
+          "bytes": 4957,
+          "sha256": "c704e00460e64647fc03b15b4e46e9edbc31a9f2fbbfdf123ca2083d8b49ddf9"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/USO.png",
+          "bytes": 5750,
+          "sha256": "c50b081271aa648b0e040c0070fe98f033de6db911ac64d6bd85d4c45fcc6249"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/UTES.png",
+          "bytes": 5429,
+          "sha256": "8d884cf844a36aeeda64fe4cbb573a050b2dfbe760d5bba482e70b589b61c792"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/VNQ.png",
+          "bytes": 5739,
+          "sha256": "3dceaf4d64a56d75e63f18410a002351c51ccc7c0e7b5afd4911374f632a863e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/WCLD.png",
+          "bytes": 5320,
+          "sha256": "f37d89d5cc7ebc9cc5f5d1e0f63e574781b803af63601cba6d30419929847627"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/WGMI.png",
+          "bytes": 4424,
+          "sha256": "4021b8370154276cb37cdb38315e100e0309744357509cd69926e61ccff57c5c"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XBI.png",
+          "bytes": 6515,
+          "sha256": "aa4576fe918d6d2917a05374fc5fc71aaed4cb926e8827fb344c1f4e173aabcb"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XES.png",
+          "bytes": 5043,
+          "sha256": "14f9f03201ac0c6f0e0dec6f37189b24199503b95c8f7d64eaae39c1c8bfa2d6"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XHB.png",
+          "bytes": 6368,
+          "sha256": "3fda0633046a531a42a6eca319f81c98ac6303640535754d6ce16e90dd0d09aa"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XHE.png",
+          "bytes": 5726,
+          "sha256": "1fcc1874a7a2bcbf030b11bc06eff4486d7522728ccb18a61fff3b905d6b367f"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLB.png",
+          "bytes": 6430,
+          "sha256": "9fe51aca158e1f20a955eb4e207b8e01ab8f2c1337e4d5276799a18f350d5881"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLC.png",
+          "bytes": 5702,
+          "sha256": "39382f3f571bfb607c6c45c7785191a122cf9bfb143667d0d63f247a4e81bcf0"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLE.png",
+          "bytes": 5275,
+          "sha256": "5ad77b1781f612bef49f2e4633ecd44716efed838b6cfe2b63ad4a7de492209b"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLF.png",
+          "bytes": 6293,
+          "sha256": "b185eb5633b19afe002d6a584c71de4ca75036f5a4b905d69fa66538f4389368"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLI.png",
+          "bytes": 6932,
+          "sha256": "ef93a38a6649e4e4e038c2d28dd4ea10f4747980b5f272dd76329c0225b6a02a"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLK.png",
+          "bytes": 5353,
+          "sha256": "b9e046b44de77b5ea74fabfc02d64969917b7386f508fbc8fa718e89de094654"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLP.png",
+          "bytes": 5983,
+          "sha256": "2d4948ea0ef357e5c6520bf8a00c62b2f8e0d148df9e42cd962b8fc11c4433d5"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLRE.png",
+          "bytes": 5453,
+          "sha256": "fd25cc02780d8c823fdb7bf0aa45bb39c35d48beac24089241c8ba55c67e321e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLU.png",
+          "bytes": 5741,
+          "sha256": "92682a4d0cf2781f7e7fc3ba65d4d2128fd1a786488d7f714701ef2bea3ebd3f"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLV.png",
+          "bytes": 5917,
+          "sha256": "bd6e83e2c174419a2eea287a945c36ba628a602650ef37faf93ac677769e8b32"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XLY.png",
+          "bytes": 6362,
+          "sha256": "07e4a7c71f76a394c54cd5743ca248998a4cfda07e548d66833b2563a74c9181"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XME.png",
+          "bytes": 4895,
+          "sha256": "3aa4ddbfa6bc397dbf0ada3aba3e17af1e76a7c41f0eb2b78b2d2697e1075db6"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XOP.png",
+          "bytes": 5408,
+          "sha256": "66c2e2130280f077aec1dfc9d95d22af6b8e8c7367748ac5b99e8291fd8926ea"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XRT.png",
+          "bytes": 6223,
+          "sha256": "f137d35026d730c4f42786d1f496a6fbe99dd7f3043c5da660257dbda4a6eeb3"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/charts/XTN.png",
+          "bytes": 6265,
+          "sha256": "3034f76d871ed18cb845def298ea93f13cc0808b6317b7f2689ee99606b2eb2a"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/events.json",
+          "bytes": 2,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/index_technicals.json",
+          "bytes": 2,
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/meta.json",
+          "bytes": 4397,
+          "sha256": "19ccddd9f355955acc43e5e10445b1c458a24072dc6a49223a093832dc4176c0"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/morning_brief_deepseek.json",
+          "bytes": 18155,
+          "sha256": "d2377480022d642b2cc65e6af958cef1608028c7e4eb8da8e458776a013088ff"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/morning_brief_gemini.html",
+          "bytes": 14693,
+          "sha256": "31ac549a2d1209dccd0339a69815452e0405795f1fab1a91c22773493daf23ad"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/morning_brief_gemini.json",
+          "bytes": 12807,
+          "sha256": "986950ffbc73bd2af54c459b3e32b3429ee81aa9ced09b629ccfa6e9487fbe92"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/morning_brief_meta.json",
+          "bytes": 407,
+          "sha256": "83dd7fbd748a9b69edad0f53d900b8f827728edbe1dc56996b444767e48ba83e"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/snapshot.json",
+          "bytes": 50914,
+          "sha256": "fc31bc271d490a7b303e21d2848ccbfb0aa41157d15403488eeecfecfef34229"
+        },
+        {
+          "path": "apps/market_dashboard_backend/data/tv_screeners.json",
+          "bytes": 242832,
+          "sha256": "f06a1f09d0a5fb95fc86bde8c8807e7699ac52dbcee811c2acb32d964af31456"
+        }
+      ],
+      "roundtrip_verified": true
+    }
+  ]
+}

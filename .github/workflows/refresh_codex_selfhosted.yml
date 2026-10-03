@@ -34,17 +34,27 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Load wiki deploy key
-        continue-on-error: true
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.WIKI_SSH_KEY }}
 
-      - name: Fetch wiki submodule
-        continue-on-error: true
+      - name: Fetch pinned canonical wiki
         working-directory: .
         run: |
-          git submodule set-url packages/core-skills/wiki-source git@github.com:js9726/trade-analyser_skill.git 2>/dev/null || true
-          git submodule update --init --recursive || { echo "::warning::wiki submodule clone failed"; mkdir -p packages/core-skills/wiki-source/wiki; }
+          git submodule sync -- packages/core-skills/wiki-source
+          git submodule update --init --recursive -- packages/core-skills/wiki-source
+          test -f packages/core-skills/wiki-source/wiki/trading/traders/trader-styles.md
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify pinned runtime knowledge
+        working-directory: .
+        env:
+          JIE_WIKI_ROOT: ${{ github.workspace }}/packages/core-skills/wiki-source
+          JIE_WIKI_SKILLS_ROOT: ${{ github.workspace }}/packages/core-skills/wiki-source/skills
+        run: node scripts/check-skill-sync.mjs --strict
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
@@ -54,11 +64,17 @@ jobs:
         run: python scripts/build_data.py --out-dir data
 
       - name: Fetch TV screeners
-        continue-on-error: true
         run: python scripts/tv_screener_fetch.py --out-dir data --score --score-top 10
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TV_SESSION_ID:    ${{ secrets.TV_SESSION_ID }}
+
+      - name: Refresh breadth
+        run: python scripts/breadth_fast.py --out-dir data
+
+      - name: Validate market inputs before consumers
+        run: python scripts/check_daily_freshness.py --data-dir data --max-age-minutes 180
+
 
       - name: Pre-compute index technicals
         continue-on-error: true
