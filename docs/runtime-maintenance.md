@@ -1,6 +1,6 @@
 # Dashboard maintenance and next steps
 
-Status: local implementation, 4 October 2026 (MYT). No push, deployment, broker
+Status: local implementation f159b9949 independently reviewed and passed, 4 October 2026 (MYT). No push, deployment, broker
 restart, market refresh, paid analysis or external message was performed.
 
 ## Changes completed locally
@@ -101,8 +101,8 @@ Existing producer-owned REC ingestion and provider validators remain separate co
 
 ## Plan for items 8 and 9
 
-1. **Close reliability first.** Independently review this local patch, then approve
-   push/deployment separately. Verify the deployed SHA and public timestamps after a
+1. **Close reliability first.** Independent review passed this local patch. Approve
+   push/deployment separately when ready. Verify the deployed SHA and public timestamps after a
    real producer run; require fresh static breadth and database cache read-backs. Add a
    metadata-only health view with per-source age, session, coverage, errors and last
    successful delivery. A single aggregate timestamp is insufficient.
