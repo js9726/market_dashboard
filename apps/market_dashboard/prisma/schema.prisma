@@ -84,6 +84,8 @@ model User {
   // become a hot path.
 
   accounts            Account[]
+  researchThreads     ResearchThread[]
+  researchJobs        ResearchJob[]
   sessions            Session[]
   connection          SpreadsheetConnection?
   tradeRecords        TradeRecord[]
@@ -464,6 +466,59 @@ model WikiAudit {
   @@id([operatorLabel, period])
   @@index([period(sort: Desc)])
   @@index([updatedAt(sort: Desc)])
+}
+
+/// Owner-only portable research memory; provider transcripts stay on the worker.
+model ResearchThread {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticker           String
+  horizon          String
+  summary          String   @default("") @db.Text
+  previousResultId String?
+  sessionId        String?
+  sessionProvider  String?
+  promptVersion    String
+  version          Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  jobs             ResearchJob[]
+  @@index([userId, updatedAt])
+}
+
+/// Migration must be applied separately before enabling the outbound worker.
+model ResearchJob {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  threadId       String
+  thread         ResearchThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  requestKey     String
+  inputHash      String
+  ticker         String
+  provider       String
+  horizon        String
+  question       String   @db.Text
+  operatorLabel  String
+  asOf           DateTime
+  promptVersion  String
+  schemaVersion  String
+  status         String   @default("queued")
+  attempt        Int      @default(0)
+  leaseToken     String?
+  leaseExpiresAt DateTime?
+  heartbeatAt    DateTime?
+  deadlineAt     DateTime
+  contextJson    Json?
+  resultJson     Json?
+  verdictId      String?
+  errorCode      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@unique([userId, requestKey])
+  @@index([userId, createdAt])
+  @@index([status, leaseExpiresAt, createdAt])
 }
 
 model WikiTradeVerdict {

@@ -1,8 +1,37 @@
 # Stateful research: dashboard, Claude and DeepSeek
 
-Status: 4 October 2026. Report-correctness repairs are implemented locally. The
-shared worker, durable queue and complete research schema below are proposed.
-No deployment, bot restart, paid analysis, embedding refresh or message was performed.
+Status: 5 October 2026. Report-correctness repairs and the first local stateful research
+implementation are present. The design below now has schema/context, durable owner-only
+jobs, Claude/DeepSeek adapters, optional collectors and a saved-report dashboard view.
+Everything is disabled by default. No database migration was applied, no deployment,
+bot restart, paid analysis, embedding refresh or message was performed.
+
+## Implementation update
+
+See [worker setup and limits](../packages/research-worker/README.md). Report validation
+lives in `apps/market_dashboard/src/lib/research/schema.ts`; jobs and transactional
+analysis ingestion in `src/server/research-jobs.ts`; authenticated routes under
+`/api/research`; local context/providers/collectors in `packages/research-worker`.
+The SQL migration is authored, not applied. The old analysis UI remains the default;
+the new UI is behind NEXT_PUBLIC_FEATURE_RESEARCH_WORKER and RESEARCH_ENABLED.
+
+The worker implements outbound claim/heartbeat/checkpoint/complete/receipt, bounded
+crash recovery, cancellation and exact thread-bound Claude resume. Seven full mandatory
+wiki documents and pre-ranking trading filters prevent unrelated wiki material entering
+the prompt. Lexical retrieval is explicitly labelled; hybrid never repairs the index.
+Optional Yahoo evidence and Gemini search-supported news preserve gaps on failure.
+
+Independent review found missing source-type/ticker/age and risk-level checks; these
+were repaired with regressions. GO/PROBE remain rejected because a model boolean cannot
+replace the complete deterministic structural-veto evaluator. Unsupported scores,
+financial grades and price plans cannot masquerade as complete research.
+
+Still outstanding: real PostgreSQL concurrency/rollback validation in staging, approved
+live-provider/ingest verification, full structural action gates, automated authenticated
+chart capture, and bot submission/PNG integration. These are not reported as implemented
+or live. The remaining design describes their intended behavior. Validation: 413 app tests across
+52 files, 26 offline Python tests, TypeScript and skill-sync freshness pass. Independent
+review of the final local implementation passed on 5 October; live readiness is separate.
 
 ## The report Jie already specified
 
@@ -44,9 +73,9 @@ visible as unavailable. No GO without required usable daily and weekly chart evi
 - start-private-bot.ps1:146 has no resume/continue option. A recorded session ID supports
   operational/idle information; no inspected custom restart-to-conversation mapping
   restores research threads. Wiki document retrieval is not conversation memory.
-- /api/analysis/multi-agent is synchronous and returns unpersisted JSON. News, chart
+- The legacy /api/analysis/multi-agent is synchronous and returns unpersisted JSON. News, chart
   and history are stubs; fundamental/technical are older implementations; the moderator
-  is arithmetic. No general-purpose durable ticker-research queue was found.
+  is arithmetic. The new feature-gated /api/research path now supplies durable jobs.
 - WikiTradeVerdict(intent="analysis") already stores ad-hoc research. The stock-analysis
   route demonstrates user binding and journal-collision protection. Existing subscription
   brief dispatch can start a runner, but HTTP 204 proves dispatch only.
@@ -70,7 +99,7 @@ Risk requires actual snapshot price and ATR; the invented $100 entry is removed.
 Default $10,000 sizing is labelled illustrative, not broker equity. A new request clears
 the previous result, so a failed ticker cannot retain the prior ticker's report.
 
-This is a truthful interim display, not the completed report worker. Historical/weekend
+The legacy path is a truthful interim display. The new worker remains research-only. Historical/weekend
 review needs a separate explicit as-of mode, not a relaxed current-run gate. Partial
 legacy reports are not automatically ingested as final research.
 
@@ -98,7 +127,7 @@ Use outbound HTTPS polling from the PC, not an inbound shell port. Dashboard ret
 jobId/queued promptly; the worker loads its local wiki index and tools. Vercel need not
 access Windows paths or the index ZIP. PC commands and UI requests enter one workflow.
 
-Proposed job fields: id, ownerId, threadId, ticker, horizon, requestedAsOf, provider,
+Implemented job fields follow this design: id, userId, threadId, ticker, horizon, asOf, provider,
 schemaVersion, promptVersion, state, attempt, leaseOwner/expiry, heartbeatAt, inputHash,
 resultId, errorCode and timestamps. States: queued/running/succeeded/partial/failed/
 expired/cancelled. A model reply is not success until validation and ingest read-back.
@@ -111,7 +140,9 @@ An offline PC leaves queued/expired status, never a successful-looking substitut
 Keep job/state separate from WikiTradeVerdict. Model final ingest on /api/analysis/stock
 with its user binding and journal-intent safeguards. Do not blindly use wiki-audit
 upserts that can change intent. Review versioned report persistence (JSON extension
-versus a new report table) before any schema migration. No migration is included here.
+versus a new report table) before applying any schema migration. The authored migration
+adds ResearchJob and ResearchThread; each job stores its immutable report JSON, while
+WikiTradeVerdict stores the latest analysis for the mapped operator/date/ticker.
 
 ## How embeddings enrich the prompt
 

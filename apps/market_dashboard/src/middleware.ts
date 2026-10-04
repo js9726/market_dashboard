@@ -18,6 +18,11 @@ export default auth((req) => {
   if (
     pathname.startsWith("/login") ||
     pathname.startsWith("/api/auth") ||
+    // Research routes enforce session/owner or dedicated worker-token auth themselves;
+    // let unauthenticated clients receive JSON 401 rather than a login redirect.
+    pathname === "/api/research/worker" ||
+    pathname === "/api/research/jobs" ||
+    pathname.startsWith("/api/research/jobs/") ||
     pathname.startsWith("/api/cron") ||
     pathname.startsWith("/api/morning-verdict/ingest") ||
     pathname.startsWith("/api/daily-screener/ingest") ||
