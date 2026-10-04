@@ -85,7 +85,7 @@
   → _update_brief_v3_2026-06-14.py    → v3: NOK + Conviction scoring
   → _update_brief_v4_2026-06-15.py    → v4: TWLO interpretation correction
   → _update_brief_v5_2026-06-15.py    → v5: fixed June 15 premarket data</pre>
-<p>They do not fetch fresh prices/news. The version number belongs to one historical brief revision. <strong>They are unnecessary for the current normal brief pipeline and are good archival candidates</strong>, but “no repository caller found” does not prove that no external scheduled/manual workflow uses them.</p>
+<p>These helpers do not fetch fresh prices/news; their version numbers belong to historical brief revisions. <strong>All four have been archived with 11 other historical helpers.</strong> Repository references, scheduled tasks and relevant wrappers were inspected. No direct production caller was found. Recovery ZIPs preserve the originals for any unrecorded manual use.</p>
 <div class="tablewrap"><table><thead><tr><th>File/family</th><th>Meaning</th><th>Current disposition</th></tr></thead><tbody>
 <tr><td>_account_check_2026-06-22.py</td><td>OpenD diagnostic reading positions, orders and funds; no order placement</td><td>Archived; maintained holdings_review.py remains.</td></tr>
 <tr><td>_journal_qcom_2026-06-22.py</td><td>Hardcoded June QCOM journal POST</td><td>Archived; execution would submit dated data.</td></tr>
