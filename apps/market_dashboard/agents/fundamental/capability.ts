@@ -9,6 +9,8 @@ interface SignalReasoning {
 }
 
 interface FundamentalAnalysis {
+  analysisAvailable: boolean;
+  analysisReason: string;
   signal: string;
   confidence: number;
   metrics: any;
@@ -18,6 +20,11 @@ interface FundamentalAnalysis {
     financial_health_signal: SignalReasoning;
     price_ratios_signal: SignalReasoning;
   };
+}
+
+function formatMetric(value: unknown, scale = 1): string {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? (value * scale).toFixed(2) : 'Unavailable';
 }
 
 const progress = {
@@ -66,25 +73,27 @@ export async function fundamentalsAgent(state: AgentState) {
       progress.updateStatus("fundamentals_agent", ticker, "Financial metrics fetched successfully");
 
       fundamentalAnalysis[ticker] = {
-        signal: "neutral",
-        confidence: 50,
+        analysisAvailable: false,
+        analysisReason: "Financial metrics only; AI analysis unavailable.",
+        signal: "unknown",
+        confidence: 0,
         metrics: metrics,
         reasoning: {
           profitability_signal: {
             signal: "neutral",
-            details: `ROE: ${((metrics.returnOnEquity ?? 0) * 100).toFixed(2)}%, Net Margin: ${((metrics.profitMargins ?? 0) * 100).toFixed(2)}%`
+            details: `ROE: ${formatMetric(metrics.returnOnEquity, 100)}%, Net Margin: ${formatMetric(metrics.profitMargins, 100)}%`
           },
           growth_signal: {
             signal: "neutral",
-            details: `Revenue Growth: ${((metrics.revenueGrowth ?? 0) * 100).toFixed(2)}%, Total Revenue: $${((metrics.totalRevenue ?? 0) / 1000000).toFixed(2)}M`
+            details: `Revenue Growth: ${formatMetric(metrics.revenueGrowth, 100)}%, Total Revenue: $${formatMetric(metrics.totalRevenue, 0.000001)}M`
           },
           financial_health_signal: {
             signal: "neutral",
-            details: `Current Ratio: ${(metrics.currentRatio ?? 0).toFixed(2)}, Debt to Equity: ${(metrics.debtToEquity ?? 0).toFixed(2)}`
+            details: `Current Ratio: ${formatMetric(metrics.currentRatio)}, Debt to Equity: ${formatMetric(metrics.debtToEquity)}`
           },
           price_ratios_signal: {
             signal: "neutral",
-            details: `Forward P/E: ${(metrics.forwardPE ?? 0).toFixed(2)}, P/S: ${(metrics.priceToSalesTrailing12Months ?? 0).toFixed(2)}`
+            details: `Forward P/E: ${formatMetric(metrics.forwardPE)}, P/S: ${formatMetric(metrics.priceToSalesTrailing12Months)}`
           }
         }
       };
@@ -96,22 +105,22 @@ export async function fundamentalsAgent(state: AgentState) {
           Analyze the following financial metrics for ${ticker}:
 
           Profitability Metrics:
-          - Return on Equity: ${((metrics.returnOnEquity ?? 0) * 100).toFixed(2)}%
-          - Net Margin: ${((metrics.profitMargins ?? 0) * 100).toFixed(2)}%
-          - Operating Margin: ${((metrics.operatingMargins ?? 0) * 100).toFixed(2)}%
+          - Return on Equity: ${formatMetric(metrics.returnOnEquity, 100)}%
+          - Net Margin: ${formatMetric(metrics.profitMargins, 100)}%
+          - Operating Margin: ${formatMetric(metrics.operatingMargins, 100)}%
 
           Growth Metrics:
-          - Revenue Growth: ${((metrics.revenueGrowth ?? 0) * 100).toFixed(2)}%
+          - Revenue Growth: ${formatMetric(metrics.revenueGrowth, 100)}%
 
           Financial Health:
-          - Current Ratio: ${metrics.currentRatio ?? "N/A"}
-          - Debt to Equity: ${metrics.debtToEquity ?? "N/A"}
-          - Free Cash Flow: ${metrics.freeCashflow ?? "N/A"}
+          - Current Ratio: ${formatMetric(metrics.currentRatio)}
+          - Debt to Equity: ${formatMetric(metrics.debtToEquity)}
+          - Free Cash Flow: ${formatMetric(metrics.freeCashflow)}
 
           Price Ratios:
-          - Forward P/E: ${metrics.forwardPE ?? "N/A"}
-          - P/B Ratio: ${metrics.priceToBook ?? "N/A"}
-          - P/S Ratio: ${metrics.priceToSalesTrailing12Months ?? "N/A"}
+          - Forward P/E: ${formatMetric(metrics.forwardPE)}
+          - P/B Ratio: ${formatMetric(metrics.priceToBook)}
+          - P/S Ratio: ${formatMetric(metrics.priceToSalesTrailing12Months)}
 
           Please provide a detailed analysis with signals (bullish/bearish/neutral) and confidence levels for each aspect.`;
 
@@ -121,7 +130,14 @@ export async function fundamentalsAgent(state: AgentState) {
           progress.updateStatus("fundamentals_agent", ticker, "Processing AI response");
           const analysis = JSON.parse(raw || '{}');
 
+          if (!['bullish', 'bearish', 'neutral'].includes(analysis.overall_signal)
+            || !Number.isFinite(analysis.confidence) || analysis.confidence < 0 || analysis.confidence > 100
+            || !['profitability', 'growth', 'financial_health', 'price_ratios'].every(
+              key => typeof analysis[key]?.details === 'string' && analysis[key].details.trim()
+            )) throw new Error('Incomplete fundamental analysis response');
           fundamentalAnalysis[ticker] = {
+            analysisAvailable: true,
+            analysisReason: "Legacy fundamental analysis; full research contract is separate.",
             signal: analysis.overall_signal,
             confidence: analysis.confidence,
             metrics: metrics,
@@ -133,7 +149,7 @@ export async function fundamentalsAgent(state: AgentState) {
             }
           };
         } catch (error) {
-          console.log("DeepSeek analysis unavailable, using deterministic analysis");
+          console.log("DeepSeek analysis unavailable; retaining financial metrics only");
         }
       }
 
@@ -143,8 +159,10 @@ export async function fundamentalsAgent(state: AgentState) {
       progress.updateStatus("fundamentals_agent", ticker, "Analysis failed");
       
       fundamentalAnalysis[ticker] = {
-        signal: "neutral",
-        confidence: 50,
+        analysisAvailable: false,
+        analysisReason: "Financial metrics only; AI analysis unavailable.",
+        signal: "unknown",
+        confidence: 0,
         metrics: {},
         reasoning: {
           profitability_signal: { signal: "neutral", details: "Analysis unavailable" },

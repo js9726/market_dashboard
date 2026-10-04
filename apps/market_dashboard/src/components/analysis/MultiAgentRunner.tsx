@@ -14,8 +14,9 @@ const PIPELINE_ORDER: MultiAgentResult["reports"][number]["agent"][] = [
   "risk",
 ];
 
-function verdictTone(verdict: "BUY" | "HOLD" | "PASS"): { bg: string; fg: string } {
+function verdictTone(verdict: MultiAgentResult["moderator"]["verdict"]): { bg: string; fg: string } {
   switch (verdict) {
+    case "UNAVAILABLE": return { bg: "var(--bg-raised)", fg: "var(--fg-2)" };
     case "BUY":  return { bg: "var(--gain-bg)", fg: "var(--gain-fg)" };
     case "PASS": return { bg: "var(--loss-bg)", fg: "var(--loss-fg)" };
     default:     return { bg: "var(--accent-soft-bg)", fg: "var(--accent)" };
@@ -36,6 +37,7 @@ export default function MultiAgentRunner() {
     }
     setLoading(true);
     setError(null);
+    setResult(null);
     try {
       const r = await fetch("/api/analysis/multi-agent", {
         method: "POST",
@@ -62,8 +64,8 @@ export default function MultiAgentRunner() {
         <div>
           <p className="t-overline">Multi-Agent Analysis</p>
           <p className="t-caption">
-            7 specialised agents inspect the ticker from different angles. The Moderator
-            synthesises a final BUY / HOLD / PASS verdict with confidence.
+            Preliminary research across available sources. A final verdict requires verified
+            market data, fundamentals, technicals, news, charts and risk evidence.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -94,7 +96,7 @@ export default function MultiAgentRunner() {
       <div className="mb-4 flex flex-wrap items-center gap-2 rounded-md bg-[var(--bg-raised)] p-3">
         {PIPELINE_ORDER.map((agent, i) => {
           const r = reportsByAgent.get(agent);
-          const active = !!r;
+          const active = r?.status === "ok";
           const stub = r?.status === "stub";
           return (
             <div key={agent} className="flex items-center gap-2">
@@ -137,10 +139,10 @@ export default function MultiAgentRunner() {
               className="font-mono text-3xl font-bold"
               style={{ color: tone?.fg }}
             >
-              {result.moderator.verdict}
+              {result.moderator.verdict === "UNAVAILABLE" ? "Research incomplete" : result.moderator.verdict}
             </p>
             <p className="font-mono text-[13px]" style={{ color: tone?.fg }}>
-              confidence {result.moderator.confidence} / 100
+              {result.moderator.verdict === "UNAVAILABLE" ? "Incomplete evidence" : `confidence ${result.moderator.confidence} / 100`}
             </p>
           </div>
           <p className="mt-2 text-[13px] leading-relaxed text-[var(--fg-1)]">
@@ -156,7 +158,7 @@ export default function MultiAgentRunner() {
         ))}
         {!result && !loading ? (
           <p className="t-body-small text-[var(--fg-3)]">
-            Enter a ticker and click <strong>Run analysis</strong> to see the full 7-agent breakdown.
+            Enter a ticker and click <strong>Run analysis</strong> to inspect available findings and missing evidence.
           </p>
         ) : null}
       </div>

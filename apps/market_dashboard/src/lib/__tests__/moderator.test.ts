@@ -39,6 +39,7 @@ describe("AGENT_WEIGHTS", () => {
 describe("runModerator", () => {
   it("BUY when bullish weight clearly dominates", () => {
     const out = runModerator([
+      report("news", "neutral"), report("chart", "neutral"),
       report("data", "bullish", 80),
       report("fundamental", "bullish", 80),
       report("technical", "bullish", 70),
@@ -50,6 +51,7 @@ describe("runModerator", () => {
 
   it("PASS when bearish weight clearly dominates", () => {
     const out = runModerator([
+      report("news", "neutral"), report("chart", "neutral"),
       report("data", "bearish", 90),
       report("fundamental", "bearish", 90),
       report("technical", "bearish", 90),
@@ -60,6 +62,7 @@ describe("runModerator", () => {
 
   it("HOLD when signals are mixed", () => {
     const out = runModerator([
+      report("news", "neutral"), report("chart", "neutral"), report("fundamental", "neutral"),
       report("data", "bullish", 70),
       report("technical", "bearish", 70),
       report("risk", "neutral", 60),
@@ -67,12 +70,12 @@ describe("runModerator", () => {
     expect(out.verdict).toBe("HOLD");
   });
 
-  it("HOLD with 0 confidence when no agent produces a signal", () => {
+  it("UNAVAILABLE when no agent produces a signal", () => {
     const out = runModerator([
       report("data", "unknown", 0),
       report("news", "unknown", 0),
     ]);
-    expect(out.verdict).toBe("HOLD");
+    expect(out.verdict).toBe("UNAVAILABLE");
     expect(out.confidence).toBe(0);
   });
 
@@ -84,8 +87,8 @@ describe("runModerator", () => {
       report("risk", "neutral", 30),
     ];
     const out = runModerator(reports);
-    // All bullish votes from stubs should be ignored — risk neutral keeps it HOLD.
-    expect(out.verdict).toBe("HOLD");
+    // Missing required evidence blocks a verdict; votes from stub roles have zero weight — risk alone is insufficient.
+    expect(out.verdict).toBe("UNAVAILABLE");
   });
 });
 

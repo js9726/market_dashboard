@@ -10,6 +10,8 @@ interface TraderSignal {
 }
 
 interface TechnicalAnalysis {
+  analysisAvailable: boolean;
+  analysisReason: string;
   signal: string;
   confidence: number;
   metrics: {
@@ -177,8 +179,15 @@ Derived:
 
       progress.updateStatus("technical_agent", ticker, "Processing AI response");
       const analysis = JSON.parse(raw || '{}');
+      if (!['bullish', 'bearish', 'neutral'].includes(analysis.overall_signal)
+        || !Number.isFinite(analysis.overall_confidence) || analysis.overall_confidence < 0 || analysis.overall_confidence > 100
+        || !['markminervini', 'clement_ang', 'jfsrev', 'ted_zhang', 'srx_trades', 'prime_trading'].every(
+          key => typeof analysis[key]?.details === 'string' && analysis[key].details.trim()
+        )) throw new Error('Incomplete technical analysis response');
 
       technicalAnalysis[ticker] = {
+        analysisAvailable: true,
+        analysisReason: "Legacy six-persona analysis uses indicator proxies; not the canonical seven-trader report.",
         signal: analysis.overall_signal ?? "neutral",
         confidence: analysis.overall_confidence ?? 50,
         metrics,
@@ -197,8 +206,10 @@ Derived:
       console.error(`Error analyzing ${ticker}:`, error);
       progress.updateStatus("technical_agent", ticker, "Analysis failed");
       technicalAnalysis[ticker] = {
-        signal: "neutral",
-        confidence: 50,
+        analysisAvailable: false,
+        analysisReason: "Technical data or analysis request failed.",
+        signal: "unknown",
+        confidence: 0,
         metrics: {
           price: 0, volume: 0,
           moving_averages: { sma_20: 0, sma_50: 0, sma_200: 0 },

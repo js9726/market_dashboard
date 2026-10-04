@@ -42,14 +42,15 @@ function verdictTone(verdict: AgentReport["verdict"]): { bg: string; fg: string;
 function statusTone(status: AgentReport["status"]): { bg: string; fg: string; label: string } {
   switch (status) {
     case "ok":      return { bg: "var(--gain-bg)", fg: "var(--gain-fg)", label: "REPORT COMPLETED" };
-    case "stub":    return { bg: "var(--bg-raised)", fg: "var(--fg-3)",  label: "COMING SOON" };
+    case "partial": return { bg: "var(--bg-raised)", fg: "var(--fg-2)", label: "PARTIAL RESEARCH" };
+    case "stub":    return { bg: "var(--bg-raised)", fg: "var(--fg-3)",  label: "UNAVAILABLE" };
     case "skipped": return { bg: "var(--bg-raised)", fg: "var(--fg-3)",  label: "SKIPPED" };
     case "error":   return { bg: "var(--loss-bg)", fg: "var(--loss-fg)", label: "ERROR" };
   }
 }
 
 export default function MultiAgentAnalysisCard({ report, defaultOpen }: Props) {
-  const [open, setOpen] = useState(defaultOpen ?? report.status === "ok");
+  const [open, setOpen] = useState(defaultOpen ?? (report.status === "ok" || report.status === "partial"));
   const verdict = verdictTone(report.verdict);
   const status = statusTone(report.status);
 
@@ -77,7 +78,7 @@ export default function MultiAgentAnalysisCard({ report, defaultOpen }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {report.status === "ok" || report.status === "error" ? (
+          {report.status === "ok" && report.verdict !== "unknown" ? (
             <span
               className="rounded px-2 py-1 font-mono text-[11px] font-bold"
               style={{ background: verdict.bg, color: verdict.fg }}

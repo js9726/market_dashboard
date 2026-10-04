@@ -30,7 +30,7 @@ export type AgentVerdict = "bullish" | "neutral" | "bearish" | "unknown";
 
 export interface AgentReport {
   agent: AgentRole;
-  status: "ok" | "stub" | "skipped" | "error";
+  status: "ok" | "partial" | "stub" | "skipped" | "error";
   verdict: AgentVerdict;
   confidence: number;      // 0-100
   headline: string;        // one-sentence summary
@@ -40,7 +40,7 @@ export interface AgentReport {
 }
 
 export interface ModeratorOutput {
-  verdict: "BUY" | "HOLD" | "PASS";
+  verdict: "BUY" | "HOLD" | "PASS" | "UNAVAILABLE";
   confidence: number;       // 0-100, confidence in the verdict itself
   rationale: string;        // one-sentence explanation
   votes: Record<AgentVerdict, number>;
@@ -86,17 +86,21 @@ export function runDataAgent(
       status: "skipped",
       verdict: "unknown",
       confidence: 0,
-      headline: `${ticker} not present in today's snapshot.`,
+      headline: `${ticker}: no usable row in the local market snapshot.`,
       details: [
         "The Data Agent reads from snapshot.json. Outside-universe tickers fall through.",
-        "Consider adding the ticker to STOCK_GROUPS in build_data.py.",
+        "A current ticker-specific fetch is required; the snapshot may be missing, stale or outside this ticker's universe.",
       ],
     };
   }
 
-  const daily = row.daily ?? 0;
-  const distAtr = row.dist_sma50_atr ?? 0;
-  const rs = row.rs ?? 50;
+  const daily = row.daily;
+  const distAtr = row.dist_sma50_atr;
+  const rs = row.rs;
+  if (daily == null || distAtr == null || rs == null || ![daily, distAtr, rs].every(Number.isFinite)) {
+    return { agent: "data", status: "skipped", verdict: "unknown", confidence: 0,
+      headline: `${ticker}: required snapshot measurements are missing.`, details: [] };
+  }
 
   let verdict: AgentVerdict = "neutral";
   if (daily >= 1.5 && distAtr > 0.5 && rs >= 60) verdict = "bullish";
@@ -154,7 +158,8 @@ export interface RiskInput {
 }
 
 export function runRiskAgent(ticker: string, input: RiskInput | null): AgentReport {
-  if (!input || input.price <= 0 || input.atrPct <= 0) {
+  if (!input || ![input.price, input.atrPct, input.accountSize ?? 10000, input.riskPct ?? 1, input.rMultiple ?? 2]
+    .every(v => Number.isFinite(v) && v > 0) || input.atrPct >= 50 || (input.riskPct ?? 1) > 100) {
     return {
       agent: "risk",
       status: "skipped",
@@ -194,6 +199,7 @@ export function runRiskAgent(ticker: string, input: RiskInput | null): AgentRepo
     confidence,
     headline: `2-ATR stop at $${stop.toFixed(2)}; ${rMult}R target $${target.toFixed(2)}; size ${shares} sh ($${positionValue.toFixed(0)}).`,
     details: [
+      input.accountSize == null ? "Illustrative sizing assumes a $10,000 account; this is not your broker equity." : "Sizing uses the supplied account value.",
       `Entry $${input.price.toFixed(2)}, ATR ${input.atrPct.toFixed(1)}% ($${atrAbsolute.toFixed(2)}).`,
       `Stop ${input.price > 0 ? ((stop / input.price - 1) * 100).toFixed(1) : "-"}% below entry → $${stop.toFixed(2)}.`,
       `Target ${rMult}R above entry → $${target.toFixed(2)}.`,
@@ -275,17 +281,22 @@ export function runModerator(reports: AgentReport[]): ModeratorOutput {
   const components: ModeratorOutput["components"] = [];
 
   for (const r of reports) {
+    if (r.status !== "ok" || r.verdict === "unknown" || !Number.isFinite(r.confidence)
+      || r.confidence <= 0 || r.confidence > 100) continue;
     const weight = AGENT_WEIGHTS[r.agent] * (r.confidence / 100);
     votes[r.verdict] += weight;
     components.push({ agent: r.agent, verdict: r.verdict, weight });
   }
 
   const total = votes.bullish + votes.bearish + votes.neutral;
-  if (total === 0) {
+  const required: AgentRole[] = ["data", "fundamental", "technical", "news", "chart", "risk"];
+  const missing = required.filter(agent => !reports.some(r => r.agent === agent && r.status === "ok"
+    && r.verdict !== "unknown" && Number.isFinite(r.confidence) && r.confidence > 0 && r.confidence <= 100));
+  if (total === 0 || missing.length) {
     return {
-      verdict: "HOLD",
+      verdict: "UNAVAILABLE",
       confidence: 0,
-      rationale: "No agent produced a usable signal. Default to HOLD.",
+      rationale: `Research incomplete. No final trade verdict. Missing verified sections: ${missing.join(", ") || "usable analysis"}.`,
       votes,
       components,
     };
