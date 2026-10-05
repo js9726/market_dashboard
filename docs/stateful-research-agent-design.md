@@ -3,8 +3,9 @@
 Status: 5 October 2026. Report-correctness repairs and the first local stateful research
 implementation are present. The design below now has schema/context, durable owner-only
 jobs, Claude/DeepSeek adapters, optional collectors and a saved-report dashboard view.
-Everything is disabled by default. No database migration was applied, no deployment,
-bot restart, paid analysis, embedding refresh or message was performed.
+Production remains disabled. The research migration and two Claude subscription turns
+passed against isolated local PostgreSQL on 5 October; no production migration,
+deployment, bot restart, paid API analysis, embedding refresh or message was performed.
 
 ## Implementation update
 
@@ -12,7 +13,7 @@ See [worker setup and limits](../packages/research-worker/README.md). Report val
 lives in `apps/market_dashboard/src/lib/research/schema.ts`; jobs and transactional
 analysis ingestion in `src/server/research-jobs.ts`; authenticated routes under
 `/api/research`; local context/providers/collectors in `packages/research-worker`.
-The SQL migration is authored, not applied. The old analysis UI remains the default;
+The SQL migration passed locally; it has not been applied to production. The old analysis UI remains the default;
 the new UI is behind NEXT_PUBLIC_FEATURE_RESEARCH_WORKER and RESEARCH_ENABLED.
 
 The worker implements outbound claim/heartbeat/checkpoint/complete/receipt, bounded
@@ -26,12 +27,17 @@ were repaired with regressions. GO/PROBE remain rejected because a model boolean
 replace the complete deterministic structural-veto evaluator. Unsupported scores,
 financial grades and price plans cannot masquerade as complete research.
 
-Still outstanding: real PostgreSQL concurrency/rollback validation in staging, approved
-live-provider/ingest verification, full structural action gates, automated authenticated
-chart capture, and bot submission/PNG integration. These are not reported as implemented
-or live. The remaining design describes their intended behavior. Validation: 413 app tests across
-52 files, 26 offline Python tests, TypeScript and skill-sync freshness pass. Independent
-review of the final local implementation passed on 5 October; live readiness is separate.
+The [5 October smoke validation](research-worker-smoke-2026-10-05.md) closes the local
+PostgreSQL concurrency/rollback and subscription transport/session/ingest checks. Two
+Claude turns persisted partial reports and reused the exact saved session. A temporary
+completion-conflict recovery bug was repaired with bounded same-report retries.
+Validation: 427 app tests across 53 files, one separately passed two-turn Claude test,
+29 Python tests, TypeScript and strict skill-sync freshness pass.
+
+Still outstanding: staging/production activation, authenticated browser acceptance, a
+fresh live-evidence report, full structural action gates, automated authenticated chart
+capture and bot submission/PNG integration. Local smoke success does not enable the
+24/7 service. The remaining design describes those unfinished behaviors.
 
 ## The report Jie already specified
 

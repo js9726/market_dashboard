@@ -19,6 +19,10 @@ from collectors import collect_market, collect_news
 class WorkerError(RuntimeError):
     pass
 
+class ConcurrentUpdate(WorkerError):
+    """The server rolled back a conflicting database transaction; safe to resubmit."""
+    pass
+
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         # Never forward the dedicated worker token to another origin/login route.
@@ -43,6 +47,13 @@ class Client:
             with self.opener.open(request, timeout=30) as response:
                 return json.loads(response.read(2_000_001))
         except urllib.error.HTTPError as error:
+            if error.code == 409:
+                try:
+                    payload = json.loads(error.read(4096))
+                    if isinstance(payload, dict) and payload.get("error") == "CONCURRENT_UPDATE_RETRY":
+                        raise ConcurrentUpdate("CONCURRENT_UPDATE_RETRY") from None
+                except (ValueError, OSError):
+                    pass
             raise WorkerError(f"WORKER_HTTP_{error.code}") from None
         except (OSError, ValueError) as error:
             raise WorkerError("WORKER_CONNECTION_FAILED") from error
@@ -112,13 +123,22 @@ def process_job(client, job, wiki_root, mode="lexical", evidence_dir=None, gener
         fields = {**identity, "report": report}
         if session_id:
             fields["sessionId"] = session_id
-        try:
-            client.post("complete", **fields)
-        except WorkerError:
-            # Response may have been lost AFTER commit. Read the receipt before retrying.
-            receipt = client.post("receipt", **identity)
-            if not receipt.get("persisted"):
-                raise
+        for attempt in range(3):
+            try:
+                client.post("complete", **fields)
+                break
+            except WorkerError as error:
+                # A lost response may follow a successful commit. Check before resubmitting.
+                try:
+                    receipt = client.post("receipt", **identity)
+                except WorkerError:
+                    receipt = {}
+                if receipt.get("persisted"):
+                    break
+                if not isinstance(error, ConcurrentUpdate) or attempt == 2:
+                    raise error
+                if cancelled.wait(.25 * (attempt + 1)):
+                    raise WorkerError("LEASE_LOST")
         receipt = client.post("receipt", **identity)
         if receipt.get("id") != job["id"] or not receipt.get("persisted") or not receipt.get("verdictId") or receipt.get("status") not in {"partial", "succeeded"}:
             raise WorkerError("INGEST_READBACK_FAILED")

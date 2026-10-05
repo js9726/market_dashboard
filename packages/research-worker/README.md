@@ -26,9 +26,11 @@ charts and incomplete news coverage remain visible. No trade or publication is i
 
 ## Configuration for a separately authorized rollout
 
-First apply the reviewed migration `20261004000000_research_jobs` to an isolated staging
-database and test concurrent claims/transaction rollback there. This task generated SQL
-and Prisma types offline; it did not apply the migration or verify a live database.
+The migration `20261004000000_research_jobs` and concurrent claims/transaction rollback
+passed against an isolated local PostgreSQL 16.4 database on 5 October 2026. Two actual
+Claude subscription turns persisted reports and resumed the same session. See the
+[smoke report](../../docs/research-worker-smoke-2026-10-05.md) for evidence and limits.
+Production/staging migration and environment configuration remain separate rollout work.
 The repository's `npm run build` wrapper applies migrations, so do not use it as a
 harmless type check. Direct TypeScript validation and mocked DB tests are separate.
 
@@ -82,6 +84,9 @@ permits a query embedding call, not an index refresh. A stale index fails explic
 choose lexical explicitly for a new run if that is the intended evidence mode.
 Switching providers is explicit. Failed provider runs do not reroute or auto-retry;
 crashed workers can reclaim an expired lease within the deadline/retry limit.
+Completion checks for a saved receipt after an error. An explicit database transaction
+conflict retries the same generated report up to three attempts, without another model
+call. Lease loss, validation errors and other conflicts are not automatically retried.
 
 ## Evidence and report contract
 
@@ -113,8 +118,10 @@ Private thread state is never embedded into the shared wiki index.
 
 Offline tests cover context scope/freshness, evidence/report gates, route auth, job
 lease predicates, provider credential isolation, explicit execution, cancellation and
-ingest read-back. Database tests mock Prisma: they do not establish real Postgres
-concurrency/rollback, deployment readiness or provider model availability.
+ingest read-back. The opt-in `postgres-smoke.test.ts` also uses real PostgreSQL and the
+actual worker HTTP handler; only the Prisma client injection is replaced. It refuses
+non-loopback URLs and database names outside `research_smoke*`, and cleans its own rows.
+The provider test requires a separate explicit opt-in. Production remains disabled.
 
 ```powershell
 # From dashboard app
@@ -124,9 +131,15 @@ node node_modules/typescript/bin/tsc --noEmit --incremental false
 python -m unittest discover -s packages/research-worker/tests
 ```
 
+To repeat the isolated database suite, provision a disposable database with the current
+schema and set `RESEARCH_SMOKE_DATABASE_URL` to its loopback URL. Run the test file above;
+add `RESEARCH_SMOKE_CLAUDE=1` only to authorize two subscription calls. The Python helper
+uses the sibling wiki retrieval virtual environment by default; override with
+`RESEARCH_SMOKE_PYTHON` / `RESEARCH_SMOKE_WIKI_ROOT` where needed. Tests do not migrate.
+
 Still separate: complete structural action-gate integration, authenticated chart
-capture automation, bot job submission and PNG rendering/delivery, staging migration
-and concurrent DB tests, approved live report/receipt verification, then scheduling.
+capture automation, bot job submission and PNG rendering/delivery, staging/production
+migration and configuration, live-evidence report verification, then scheduling.
 Current bot tools and restrictions are unchanged. The shared report can be read by the
 authenticated owner route; this does not grant a bot publication or ingest authority.
 

@@ -1,4 +1,5 @@
 import hashlib
+import io
 import json
 from pathlib import Path
 import sys
@@ -6,6 +7,7 @@ import tempfile
 import threading
 import time
 import unittest
+import urllib.error
 from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -42,6 +44,15 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual([c.args[0] for c in client.post.call_args_list], ["checkpoint", "checkpoint", "complete", "receipt"])
         self.assertEqual(generate.call_args.kwargs["session_id"], "exact-session")
 
+    def test_http_conflict_classification_is_allowlisted(self):
+        for body, expected in [(b'{"error":"CONCURRENT_UPDATE_RETRY"}', worker.ConcurrentUpdate), (b'{"error":"LEASE_LOST"}', worker.WorkerError), (b'invalid', worker.WorkerError)]:
+            client = worker.Client("http://127.0.0.1:3000", "x" * 32)
+            client.opener = Mock()
+            client.opener.open.side_effect = urllib.error.HTTPError(client.url, 409, "conflict", {}, io.BytesIO(body))
+            with self.assertRaises(expected) as error:
+                client.post("complete")
+            self.assertIs(type(error.exception), expected)
+
     def test_lost_completion_response_recovers_by_receipt_without_regeneration(self):
         client = self.client()
         def post(operation, **_):
@@ -58,6 +69,37 @@ class WorkerTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             worker.process_job(client, self.job(), Path("wiki"), generator=Mock(side_effect=RuntimeError("failed")), builder=Mock(return_value={}))
         self.assertEqual([c.args[0] for c in client.post.call_args_list], ["checkpoint", "fail"])
+
+    def test_completion_conflict_retries_same_report_without_regeneration(self):
+        client = self.client()
+        attempts = []
+        def post(operation, **fields):
+            if operation == "complete":
+                attempts.append(fields)
+                if len(attempts) == 1:
+                    raise worker.ConcurrentUpdate("CONCURRENT_UPDATE_RETRY")
+            if operation == "receipt":
+                if len(attempts) < 2:
+                    raise worker.WorkerError("WORKER_HTTP_409")
+                return {"id": "job", "verdictId": "saved", "persisted": True, "status": "partial"}
+            return {}
+        client.post.side_effect = post
+        generate = Mock(return_value=({"report": "same"}, None))
+        self.assertTrue(worker.process_job(client, self.job(), Path("wiki"), generator=generate, builder=Mock(return_value={}))["persisted"])
+        self.assertEqual(attempts[0], attempts[1])
+        generate.assert_called_once()
+
+    def test_only_explicit_transaction_conflicts_are_retried_and_retry_is_bounded(self):
+        for error, count in [(worker.ConcurrentUpdate("CONCURRENT_UPDATE_RETRY"), 3), (worker.WorkerError("WORKER_HTTP_409"), 1)]:
+            client = self.client()
+            def post(operation, **fields):
+                if operation in {"complete", "receipt"}:
+                    raise error
+                return {}
+            client.post.side_effect = post
+            with self.assertRaises(worker.WorkerError):
+                worker.process_job(client, self.job(), Path("wiki"), generator=Mock(return_value=({}, None)), builder=Mock(return_value={}))
+            self.assertEqual([c.args[0] for c in client.post.call_args_list].count("complete"), count)
 
     def test_lease_loss_prevents_completion(self):
         client = self.client()
