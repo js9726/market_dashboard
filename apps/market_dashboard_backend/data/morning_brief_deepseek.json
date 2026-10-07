@@ -1,1 +1,405 @@
-{"mood":{"label":"CAUTIOUSLY-RISK-ON","posture":"RAISE-THE-BAR","summary":"Large-cap tech is carrying the tape (QQQ +0.61% / RS 95, XLK +0.75% / RS 90) while small- and mid-caps lag hard (IWM -0.71%, RSP and MDY both negative on 20d) and only 49.4% of the sample sits above the 200SMA. With Fear & Greed pinned at 48 (Neutral) and per-index technicals unavailable this run, the single most important variable is leadership narrowness — pay up only for A-grade setups."},"breadth":{"up":null,"down":null},"fearGreed":{"score":48,"label":"Neutral"},"indices":[{"symbol":"SPY","name":"S&P 500","level":null,"changePct":0.67,"note":"last completed US session (2026-10-06); RS 80, grade A — level not supplied in snapshot, no pre-market futures feed this run","citation":"Source: snapshot.json built 2026-10-06T18:50:27Z"},{"symbol":"QQQ","name":"Nasdaq 100","level":null,"changePct":0.61,"note":"RS 95, grade A; 20d +6.02% — the leadership engine of the tape","citation":"Source: snapshot.json built 2026-10-06T18:50:27Z"},{"symbol":"DIA","name":"Dow Jones Industrial Average","level":null,"changePct":0.52,"note":"RS 0, grade C; 20d -2.29% — index of laggards, bounce not trend","citation":"Source: snapshot.json built 2026-10-06T18:50:27Z"},{"symbol":"IWM","name":"Russell 2000 (Small Caps)","level":null,"changePct":-0.71,"note":"Only major index red on the day; 20d -4.27%, RS 0, grade C — risk appetite is NOT broad","citation":"Source: snapshot.json built 2026-10-06T18:50:27Z"},{"symbol":"TLT","name":"20Y+ Treasury Bond","level":null,"changePct":0.38,"note":"RS 0, grade C; 20d -5.45% — bonds still in a downtrend despite the bounce","citation":"Source: snapshot.json built 2026-10-06T18:50:27Z"},{"symbol":"^VIX","name":"CBOE Volatility Index","level":null,"changePct":null,"note":"no live volatility feed supplied in the pre-fetched block and web search unavailable this run","citation":"Source: data unavailable at generation time"},{"symbol":"^TNX","name":"US 10Y Treasury Yield","level":null,"changePct":null,"note":"no live rates feed supplied; web search unavailable this run — read TLT (20d -5.45%) as proxy for a still-hostile rate tape","citation":"Source: data unavailable at generation time"},{"symbol":"CL=F","name":"WTI Crude Oil","level":null,"changePct":null,"note":"no live commodity feed supplied; web search unavailable this run — XLE +0.77% / 5d +3.90% / grade A is the only read on energy","citation":"Source: data unavailable at generation time"}],"indicesNarrative":"Mega-cap growth led again (MGK +0.69%, QQQ +0.61%, XLK +0.75%) while the equal-weight and small-cap complex lagged (RSP +0.50% but 20d -1.74%, IWM -0.71% and 20d -4.27%) — a narrow, cap-weighted tape. Only 49.4% of the 79-name sample is above its 200SMA, so this is index strength without broad participation. The rotation tell is defensive/power (XLU +2.30%, UTES +4.91%, URA +4.65%) catching a bid alongside tech, which usually flags hedging rather than full risk-on.","technicals":{"SPY":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":null,"curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"QQQ":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":null,"curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"DIA":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":null,"curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"},"IWM":{"close":null,"atr14":null,"atr_pct":null,"ema21":null,"ema50":null,"ma200":null,"dist_21_atr":null,"dist_50_atr":null,"dist_200_atr":null,"rsi14":null,"macd":null,"macd_signal":null,"macd_hist":null,"macd_dir":null,"curving_down":null,"bear_cross_imminent":null,"overbought":null,"oversold":null,"entry_risk":"UNKNOWN"}},"technicalsNarrative":"The INDEX TECHNICALS block was not populated in this run, so every ATR/RSI/MACD field above is null and the entry-risk badge renders UNKNOWN for SPY, QQQ, DIA and IWM. Do not infer 'FAIR' or 'AT-MA' entries — refresh per-index technicals before sizing anything off the index cards. What the price data does say: QQQ is the strongest structure (RS 95, 20d +6.02%) and most likely the most extended, while IWM is the weakest (RS 0, 20d -4.27%) and structurally broken — neither is a free-looking index entry without the ATR/extension data.","sectorsThemes":[{"symbol":"XLK","name":"Technology","changePct":0.75,"rs":90,"note":"Grade A, 20d +7.88% — the only sector with both leader-level RS and a positive monthly trend"},{"symbol":"XLU","name":"Utilities","changePct":2.30,"rs":10,"note":"Biggest sector gain of the day (+2.30%) but RS still 10 and 20d -5.20% — defensive bid, not a leadership trend"},{"symbol":"XLE","name":"Energy","changePct":0.77,"rs":10,"note":"Grade A, 5d +3.90% — quietly improving even though 20d is still -0.69%"},{"symbol":"XLY","name":"Consumer Discretionary","changePct":0.90,"rs":20,"note":"+0.90% but 20d -2.04%; rebound inside a downtrend unless 20d turns"},{"symbol":"XLRE","name":"Real Estate","changePct":0.91,"rs":5,"note":"Rate-sensitive bounce; 20d -5.73% says yields still the problem"},{"symbol":"XLI","name":"Industrials","changePct":0.84,"rs":0,"note":"RS 0 / grade C; 20d -1.39% — cyclical participation still missing"},{"symbol":"XLB","name":"Materials","changePct":0.69,"rs":0,"note":"Participation without leadership; 20d -3.60%"},{"symbol":"XLP","name":"Consumer Staples","changePct":0.83,"rs":0,"note":"+0.83% with 5d -0.17% — staples bid alongside utilities is a defensive tell"},{"symbol":"XLF","name":"Financials","changePct":0.18,"rs":0,"note":"Weakest daily gain of the cyclical group; 20d -5.47% is the worst sector trend here"},{"symbol":"XLC","name":"Communication Services","changePct":-0.09,"rs":0,"note":"Only sector red on the day, but 20d +0.33% / grade B — the lone non-tech sector holding its monthly line"},{"symbol":"XLV","name":"Health Care","changePct":-0.05,"rs":0,"note":"Flat price but 5d -2.01%; the biotech complex underneath is bleeding"},{"symbol":"IBB","name":"Biotechnology","changePct":-2.04,"rs":0,"note":"Grade B on 20d -1.74% but today -2.04% — health-care is the funding short"}],"sectorsNarrative":"This is a one-engine tape: Technology (XLK, RS 90, grade A) plus Energy (XLE, grade A) on the growth side, with a simultaneous defensive bid in Utilities/Staples/Real Estate and a clear funding-out of Health Care. Financials (XLF 20d -5.47%) and small caps are the tell that this rally is not broadening — rotation is happening inside defensive/quality, not down the market-cap curve.","industryNarrative":"Below the sector layer the cleanest bid is power generation and fuel-for-power — UTES +4.91% (5d +6.36%) and URA +4.65% — with telecom infrastructure (IYZ +2.28%, 5d +6.63%, RS 75) the best-quality second group. The weakest groups are genomics and biotech (ARKG -7.79%, XBI -3.07%, IBB -2.04%), which is a same-day unwind rather than a slow drift.","industryMovers":[{"industry":"Alternative Power Generation / Independent Power","sector":"Utilities","changePct":4.91,"perf1W":6.36,"perf1M":-1.58,"breadthPct":null,"deltaWow":null,"leaders":[{"ticker":"CEG","changePct":11.59,"rvol":3.49,"source":"TradingView Best Winner (Small Cap ~ Big Cap) + VCP USA"},{"ticker":"TLN","changePct":10.97,"rvol":2.01,"source":"TradingView Best Winners"}],"note":"UTES +4.91% (proxy for the group): utilities/power is the day's strongest industry bid with real volume behind CEG (+11.59%, RVOL 3.49) and TLN — but 20d is still -1.58%, so treat it as a reclaim, not a new trend."},{"industry":"Uranium / Nuclear Fuel","sector":"Energy","changePct":4.65,"perf1W":5.04,"perf1M":-11.45,"breadthPct":null,"deltaWow":null,"leaders":[{"ticker":"CEG","changePct":11.59,"rvol":3.49,"source":"TradingView VCP USA"}],"note":"URA +4.65% on the day but 20d -11.45% — a violent counter-trend bounce in a still-damaged group; RS 10 means no institutional trend yet."},{"industry":"Electric Utilities","sector":"Utilities","changePct":2.33,"perf1W":3.00,"perf1M":-5.18,"breadthPct":null,"deltaWow":null,"leaders":[{"ticker":"CEG","changePct":11.59,"rvol":3.49,"source":"TradingView Best Winner (Small Cap ~ Big Cap)"},{"ticker":"TLN","changePct":10.97,"rvol":2.01,"source":"TradingView Best Winners"}],"note":"XLU +2.30%/+2.33% is defensive rotation with a power-demand story stapled on — the same money bidding staples (XLP +0.83%) is bidding utilities."},{"industry":"Telecommunications / Integrated Telecom","sector":"Communication Services","changePct":2.28,"perf1W":6.63,"perf1M":2.14,"breadthPct":null,"deltaWow":null,"leaders":[{"ticker":"CIEN","changePct":11.24,"rvol":1.84,"source":"TradingView Best Winners"}],"note":"IYZ +2.28%, 5d +6.63%, 20d +2.14%, RS 75 / grade B — the rare industry with a positive monthly trend outside tech; CIEN +11.24% on 1.84x RVOL confirms equipment demand beneath it."},{"industry":"Genomics / Biotechnology","sector":"Health Care","changePct":-7.79,"perf1W":-2.97,"perf1M":11.73,"breadthPct":null,"deltaWow":null,"leaders":[{"ticker":"ANRO","changePct":-0.58,"rvol":0.46,"source":"TradingView Premarket Movers"},{"ticker":"PRME","changePct":9.97,"rvol":2.60,"source":"TradingView Premarket Movers"}],"note":"ARKG -7.79% is the single worst industry print in the block while XBI -3.07% / IBB -2.04% confirm it is sector-wide, not one name — do NOT bottom-fish clinical-stage biotech into this."}],"movers":[{"ticker":"OPCH","side":"LONG","changePct":32.80,"why":"Catalyst not source-verified in this run (web search unavailable); move is extreme and RVOL 27.4x — clearly a news/re-rating event, not a technical breakout","traderLens":"Qullamaggie would treat this as an episodic pivot only if the catalyst is defined and volume holds through the ORH; with an unverified catalyst and a 32% gap this is un-tradeable for Minervini/SRxTrades — no chase"},{"ticker":"FCEL","side":"LONG","changePct":16.13,"why":"Catalyst not source-verified; +16.13% on RVOL 1.91 in Electronic Equipment, sitting inside the power/fuel-cell bid that UTES +4.91% is showing","traderLens":"Qullamaggie-style momentum long if it holds VWAP/ORH with expanding volume; Ted Zhang would want the peer group (UTES/URA) to stay green for a second day before trusting it"},{"ticker":"HTZ","side":"LONG","changePct":15.92,"why":"Catalyst not source-verified; +15.92% on RVOL 2.43 in Finance/Rental/Leasing — low-priced name, high volatility","traderLens":"Clement Ang would skip this: sub-$3 stock, no confirmed theme, poor institutional sponsorship — a bystander"},{"ticker":"APOG","side":"LONG","changePct":14.79,"why":"Catalyst not source-verified; +14.79% on RVOL 4.57 in Building Products, the only housing/building name in the premarket and best-winner lists","traderLens":"SRxTrades wants volume confirmation on a clean pivot — 4.57x RVOL is the right raw material; wait for the first tight range after the gap before considering entry"},{"ticker":"EROC","side":"LONG","changePct":13.40,"why":"Catalyst not source-verified; +13.40% on RVOL 1.64 in Electrical Products — second electrical/power-infrastructure name gapping with the utilities complex","traderLens":"Ted Zhang rotation lens: power infrastructure is where the fresh institutional flow is; if CEG/UTES hold, EROC is the small-cap expression"},{"ticker":"CEG","side":"LONG","changePct":11.59,"why":"Catalyst not source-verified; +11.59% on RVOL 3.49 with the VCP-screener flag and clear peer confirmation from UTES +4.91% / URA +4.65% / XLU +2.30%","traderLens":"Minervini-grade candidate — largest, highest-quality name in the strongest industry of the day, on above-average volume; needs a defined pivot before entry, not a market chase"},{"ticker":"CIEN","side":"LONG","changePct":11.24,"why":"Catalyst not source-verified; +11.24% on RVOL 1.84 in Telecommunications Equipment, confirming the IYZ +2.28% / 5d +6.63% telecom trend","traderLens":"Qullamaggie-style breakout with a positive 20d sector tailwind behind it (IYZ 20d +2.14%) — the best 'trend + catalyst-day' combination in the gainer list"},{"ticker":"TRMD","side":"SHORT","changePct":-4.48,"why":"Catalyst not source-verified; -4.48% on RVOL 2.90 in Marine Shipping, the only notable large-move decliner in the set","traderLens":"Jeff lens: if shorting, mechanical stop above the prior day's high, no averaging; tanker names are headline-driven and gap-prone"},{"ticker":"ANRO","side":"SHORT","changePct":-0.58,"why":"Only marginally red (-0.58%) on light RVOL 0.46 in Biotechnology, which is the weakest industry group today (ARKG -7.79%, XBI -3.07%)","traderLens":"Weak price action plus a broken group is the correct short-side context, but 0.46x RVOL is no volume — SRxTrades would wait for distribution volume before touching it"}],"watchlist":[{"ticker":"NVDA","level":240.17,"changePct":0.53,"abc":null,"note":"Leader Pullback (reclaim day) hit; +0.53% on light RVOL 0.63 — reclaim of the 21EMA without volume is a watch-not-marry level; ATR/MA data unavailable this run"},{"ticker":"TSLA","level":null,"changePct":null,"abc":null,"note":"No price feed supplied in this run; TSLA did not appear in any screener list — no setup read available"},{"ticker":"AAPL","level":333.48,"changePct":0.18,"abc":null,"note":"Reclaim-day hit but +0.18% on RVOL 0.42 — dead-cat volume, no institutional footprint; wait for a volume-confirmed pivot"},{"ticker":"MSFT","level":530.59,"changePct":1.03,"abc":null,"note":"Reclaim-day hit, +1.03% on RVOL 0.54 — the best relative performer of the mega-cap pullback group, tracking the QQQ/XLK leadership"},{"ticker":"AMZN","level":null,"changePct":null,"abc":null,"note":"No price feed supplied and no screener appearance — no setup read available"},{"ticker":"META","level":742.76,"changePct":0.12,"abc":null,"note":"Reclaim-day hit, score 67, +0.12% on RVOL 0.30 — sitting still while XLC was the only red sector; needs a volume day to matter"},{"ticker":"GOOGL","level":null,"changePct":null,"abc":null,"note":"No price feed supplied and no screener appearance — no setup read available"},{"ticker":"AMD","level":654.23,"changePct":3.56,"abc":null,"note":"Strongest mega-cap on the list: +3.56% with score 74, leading the semiconductor reclaim alongside MRVL +5.62% (score 87, RVOL 2.79)"},{"ticker":"SMCI","level":null,"changePct":null,"abc":null,"note":"No price feed supplied and no screener appearance — no setup read available"},{"ticker":"PLTR","level":null,"changePct":null,"abc":null,"note":"No price feed supplied and no screener appearance — no setup read available"},{"ticker":"CRWD","level":null,"changePct":null,"abc":null,"note":"No price feed supplied and no screener appearance — no setup read available"},{"ticker":"MSTR","level":null,"changePct":null,"abc":null,"note":"No price feed supplied; proxy IBIT was -0.30% on the day (20d +9.07%) — crypto-adjacent beta was not leading the tape"}],"traderLens":[{"name":"Minervini","view":"Not a Stage-2 market for new money. Breadth is 49.4% above the 200SMA, IWM is on its back (20d -4.27%) and the RS leaders are the same mega-caps that have been extended for weeks. Only CEG-type setups — largest name in the strongest industry, on 3.49x volume — deserve a look; everything else is chasing."},{"name":"Ted Zhang","view":"The rotation is into power and electrification (UTES +4.91%, URA +4.65%, XLU +2.30%) with telecom infrastructure (IYZ +2.28%, 5d +6.63%, RS 75) as the only other group with a positive monthly trend. Health care is the funding source (ARKG -7.79%, XBI -3.07%). Follow the flow, don't fight it."},{"name":"Clement Ang","view":"Market context first: cap-weighted indices are up but the average stock is not — 49.4% above 200SMA and Fear & Greed at a neutral 48 is a 'selective, A-grade only' tape. Per-index technicals are unavailable this run, so no index-level entries until that refreshes. Watch OPCH/HTZ-type parabolic names from the sideline."},{"name":"SRxTrades","view":"Volume is the filter today. The valid ones have it: OPCH 27.4x, APOG 4.57x, CEG 3.49x, MRVL 2.79x. The invalid ones don't: NVDA 0.63x, AAPL 0.42x, META 0.30x, WBD 5.35x on a +0.03% move. No volume, no entry — and never chase a 15–32% gap."},{"name":"Jeff","view":"Hard stops on everything, no averaging down. With the technical/ATR block missing this run you cannot size a stop correctly off the index cards — so either derive stops from the individual chart or stand aside. The un-verified-catalyst gappers (OPCH, HTZ, APOG) are exactly where undisciplined size gets punished."},{"name":"Qullamaggie","view":"Best raw momentum material is CIEN (+11.24%, 1.84x RVOL) because it has a positive 20d sector tailwind (IYZ +2.14%), and CEG (+11.59%, 3.49x) for the same reason. Take ORH triggers with LOD stops, half size if the catalyst is unconfirmed, and let the leaders run — do not touch clinical-stage biotech (ANRO, PRME) into an ARKG -7.79% day."},{"name":"Composite","view":"RAISE-THE-BAR, not GO. Run a small watch-and-trigger list — CEG, CIEN, MRVL, AMD on the long side with ORH triggers and hard LOD stops — and take nothing else. Leader-pullback reclaims in NVDA/AAPL/META are sub-1x volume and are watch levels, not entries. Avoid adding small-cap, biotech and unverified-gap exposure. Re-arm fully only when per-index technicals and breadth improve."}],"standout":{"ticker":"CEG","side":"LONG","score":81,"sector":"Power / Utilities (UTES, URA, XLU)","rs":90,"grade":"A","thesis":"Largest, highest-quality name inside the strongest industry of the day — Electric Utilities/Alternative Power (UTES +4.91%, URA +4.65%, XLU +2.30%) — up 11.59% on 3.49x relative volume with VCP-screener confirmation. Peer-group confirmation is present across three separate industry ETFs, which is the rarest thing on today's tape.","entry":null,"stop":null,"target":null,"rrr":null,"tags":["#momentum","#sector-leadership","#volume-confirmation","#power-theme"]},"earnings":{"bmo":null,"amc":null,"yesterdayReactions":[]},"calendar":null,"ratings":{"upgrades":[],"downgrades":[]},"alert":"RAISE-THE-BAR: narrow large-cap tech leadership only — IWM -0.71%, breadth 49.4% above 200SMA, Fear & Greed 48 (Neutral). Per-index technicals unavailable this run (entry-risk UNKNOWN); do not chase the OPCH/HTZ/APOG gap cluster without a verified catalyst.","news":[],"screenerScores":{},"citations":["Pre-fetched snapshot.json built 2026-10-06T18:50:27.854682Z — index, sector-ETF and industry-ETF levels, daily/5d/20d %, RS and grades (authoritative)","Pre-fetched TV screener run 2026-10-06T19:01:43.317490Z — Top Gainer / Best Winners / Small-Cap-Big-Cap / Premarket / VCP USA / Leader Pullback hits with prices, %chg, RVOL and pipeline scores (authoritative)","Fear & Greed Index: 48/100 Neutral as of 2026-10-06T18:41:33Z (pre-fetched; copied verbatim)","Breadth: pre-fetched block supplied only '49.4% above 200SMA, 35.4% near 52w high' out of a 79-name sample — no advance/decline counts were supplied, so breadth.up/breadth.down are null rather than derived","INDEX TECHNICALS block was not populated in this run — technicals.* numeric fields (close, ATR, EMA, MA200, RSI, MACD) set to null with entry_risk UNKNOWN; no values fabricated","Live web search unavailable at generation time — VIX level, 10Y yield (^TNX), WTI crude (CL=F), overnight futures, Asia/Europe recap, pre-market movers, earnings BMO/AMC, analyst upgrades/downgrades, macro calendar and high-impact news could not be sourced; those fields are null/[] rather than invented","No broker-protection feed in this run — no statement is made about whether any holding is protected; this is not a signal"]}
+{
+  "mood": {
+    "label": "CHOPPY",
+    "posture": "RAISE-THE-BAR",
+    "summary": "Leadership is narrow — megacap tech (XLK/QQQ/MGK all RS 100) is carrying the tape while small caps, equal-weight, industrials and materials get sold (IWM -4.1% / MDY -2.0% over 20d). Breadth is mediocre at 45.6% above the 200SMA and F&G is a neutral 45, so treat this as a two-sided, leader-only tape: only A-grade setups off clean pivots, and don't chase extended names.",
+    "postureNote": null
+  },
+  "breadth": {
+    "up": null,
+    "down": null
+  },
+  "fearGreed": {
+    "score": 45,
+    "label": "Neutral"
+  },
+  "indices": [
+    {
+      "symbol": "SPY",
+      "name": "S&P 500",
+      "level": null,
+      "changePct": -0.23,
+      "note": "Prior session close; 5d +1.93%, 20d +2.21%, RS 65, grade A. Live futures/pre-market not available in this run.",
+      "citation": "Source: snapshot.json built 2026-10-07T19:15:07Z"
+    },
+    {
+      "symbol": "QQQ",
+      "name": "Nasdaq 100",
+      "level": null,
+      "changePct": -0.36,
+      "note": "Prior session close; 5d +2.31%, 20d +5.78%, RS 100, grade A — the market's leadership index.",
+      "citation": "Source: snapshot.json built 2026-10-07T19:15:07Z"
+    },
+    {
+      "symbol": "DIA",
+      "name": "Dow Jones Industrial Average",
+      "level": null,
+      "changePct": -0.64,
+      "note": "Prior session close; 5d +0.53%, 20d -2.22%, RS 0, grade C.",
+      "citation": "Source: snapshot.json built 2026-10-07T19:15:07Z"
+    },
+    {
+      "symbol": "IWM",
+      "name": "Russell 2000",
+      "level": null,
+      "changePct": -1.20,
+      "note": "Prior session close; 5d +0.02%, 20d -4.12%, RS 0, grade C — small caps are the weak leg.",
+      "citation": "Source: snapshot.json built 2026-10-07T19:15:07Z"
+    },
+    {
+      "symbol": "RSP",
+      "name": "S&P 500 Equal Weight",
+      "level": null,
+      "changePct": -0.60,
+      "note": "Prior session close; 20d -1.30%, RS 0, grade C — confirms narrow (cap-weighted) leadership.",
+      "citation": "Source: snapshot.json built 2026-10-07T19:15:07Z"
+    },
+    {
+      "symbol": "TLT",
+      "name": "20+ Year Treasury Bond",
+      "level": null,
+      "changePct": -0.15,
+      "note": "Prior session close; 20d -5.21%, RS 0 — long-duration bonds still a downtrend.",
+      "citation": "Source: snapshot.json built 2026-10-07T19:15:07Z"
+    },
+    {
+      "symbol": "^VIX",
+      "name": "CBOE Volatility Index",
+      "level": null,
+      "changePct": null,
+      "note": "Live VIX level not available in this run (no web feed supplied).",
+      "citation": "data unavailable at generation time"
+    },
+    {
+      "symbol": "^TNX",
+      "name": "US 10Y Treasury Yield",
+      "level": null,
+      "changePct": null,
+      "note": "Live 10Y yield not available in this run (no web feed supplied). TLT 20d -5.21% implies yields have been backing up.",
+      "citation": "data unavailable at generation time"
+    },
+    {
+      "symbol": "CL=F",
+      "name": "WTI Crude Oil",
+      "level": null,
+      "changePct": null,
+      "note": "Live oil price not available in this run. Energy (XLE) 5d +3.27% / grade A is the only cyclical with a firm short-term trend.",
+      "citation": "data unavailable at generation time"
+    }
+  ],
+  "indicesNarrative": "Every index in the snapshot finished the last session red, but the damage was concentrated below megacap tech: QQQ -0.36% vs IWM -1.20%, MDY -1.57% and XLI -2.04%. The 20-day picture says the same thing — QQQ +5.78% and MGK +5.91% versus IWM -4.12%, RSP -1.30% and DIA -2.22% — i.e. a cap-weighted tech tape propped up by a handful of leaders while the broad market stalls. With breadth at only 45.6% above the 200SMA and neutral F&G, this is a leader-selection market, not an index-beta market.",
+  "technicals": {
+    "SPY": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": "FLAT",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "UNKNOWN"
+    },
+    "QQQ": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": "FLAT",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "UNKNOWN"
+    },
+    "DIA": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": "FLAT",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "UNKNOWN"
+    },
+    "IWM": {
+      "close": null,
+      "atr14": null,
+      "atr_pct": null,
+      "ema21": null,
+      "ema50": null,
+      "ma200": null,
+      "dist_21_atr": null,
+      "dist_50_atr": null,
+      "dist_200_atr": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "macd_hist": null,
+      "macd_dir": "FLAT",
+      "curving_down": false,
+      "bear_cross_imminent": false,
+      "overbought": false,
+      "oversold": false,
+      "entry_risk": "UNKNOWN"
+    }
+  },
+  "technicalsNarrative": "The index_technicals.json feed was not supplied in this run, so no ATR/RSI/MACD/entry-risk badge could be computed — every index is marked UNKNOWN rather than guessed. What we can infer from the 20-day performance block: QQQ (+5.78%) and MGK (+5.91%) have run the hardest and are the most likely to be extended, while DIA (-2.22%), IWM (-4.12%) and RSP (-1.30%) sit below their intermediate trends. With entry-risk unverified on all four majors, posture is RAISE-THE-BAR: size down, demand a tight pivot rather than a mid-range entry, and do not chase QQQ/megacap tech until the technicals feed confirms FAIR or AT-MA.",
+  "sectorsThemes": [
+    { "symbol": "XLK", "name": "Technology", "changePct": -0.42, "rs": 100, "note": "Only sector with RS 100 — 20d +7.20%, the market's engine." },
+    { "symbol": "XLC", "name": "Communication Services", "changePct": -0.21, "rs": 0, "note": "Held up best on a red day; RS reading still lags." },
+    { "symbol": "XLY", "name": "Consumer Discretionary", "changePct": -0.26, "rs": 15, "note": "5d +2.38% but no sustained RS edge." },
+    { "symbol": "XLV", "name": "Health Care", "changePct": 1.23, "rs": 0, "note": "Best sector on the day — defensive/megacap pharma bid (LLY +3.0%)." },
+    { "symbol": "XLF", "name": "Financials", "changePct": -0.50, "rs": 0, "note": "20d -5.49% — weakest of the big cyclicals." },
+    { "symbol": "XLI", "name": "Industrials", "changePct": -2.04, "rs": 0, "note": "Worst sector of the session; cyclical risk-off signal." },
+    { "symbol": "XLE", "name": "Energy", "changePct": -0.38, "rs": 15, "note": "5d +3.27%, grade A — only cyclical with a firm short-term trend." },
+    { "symbol": "XLP", "name": "Consumer Staples", "changePct": 0.26, "rs": 0, "note": "Green on a red day — defensive rotation, not leadership." },
+    { "symbol": "XLU", "name": "Utilities", "changePct": 0.15, "rs": 35, "note": "Best 5-day of the defensives (+4.51%); rate-sensitive but bid." },
+    { "symbol": "XLB", "name": "Materials", "changePct": -1.29, "rs": 0, "note": "20d -4.04%; commodity complex broadly broken." },
+    { "symbol": "XLRE", "name": "Real Estate", "changePct": -0.82, "rs": 0, "note": "20d -5.30% with TLT soft — the rate trade is against it." }
+  ],
+  "sectorsNarrative": "The rotation story is defensive-plus-megacap-tech: XLK (RS 100) and XLV (+1.23%) led while XLI (-2.04%), XLB (-1.29%) and XLRE (-0.82%) bled, and XLU/XLP were quietly green. That is a barbell of growth leadership and defensive ballast with the middle (industrials, materials, financials, small caps) getting liquidated — historically a narrow, fragile tape rather than a broad risk-on thrust.",
+  "industryNarrative": "Below the sector layer it is a straight commodity-and-crypto unwind: uranium (URA -4.65%), bitcoin miners (WGMI -4.51%), junior silver (SILJ -3.99%), rare/strategic metals (REMX -3.45%), gold miners (GDX -3.08%), silver (SLV -2.74%) and metals & mining (XME -3.02%) were all hit hard, with bitcoin proxy IBIT -2.75% and 5d -0.39%. The offsetting strength is semis and chip-adjacent names (MU +3.78%, PENG +13.69%, SNDK +3.50%), which is the only industry group showing real upside momentum right now.",
+  "industryMovers": [
+    {
+      "industry": "Semiconductors",
+      "sector": "Technology",
+      "changePct": null,
+      "perf1W": null,
+      "perf1M": null,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [
+        { "ticker": "PENG", "changePct": 13.69, "rvol": 5.91, "source": "TradingView Best Winners screener" },
+        { "ticker": "MU", "changePct": 3.78, "rvol": 0.98, "source": "TradingView Top Gainer screener" },
+        { "ticker": "SNDK", "changePct": 3.50, "rvol": 1.00, "source": "TradingView Top Gainer screener" }
+      ],
+      "note": "The only group with real upside momentum — PENG's 5.9x RVOL breakout plus MU/SNDK strength keeps the memory/AI-hardware bid alive while everything commodity-adjacent is sold."
+    },
+    {
+      "industry": "Uranium",
+      "sector": "Energy",
+      "changePct": -4.65,
+      "perf1W": 0.01,
+      "perf1M": -14.95,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [],
+      "note": "Worst industry print of the day (URA -4.65%, RS 10, grade C) and -14.95% over 20d — momentum is broken, stand aside."
+    },
+    {
+      "industry": "Bitcoin Miners / Crypto",
+      "sector": "Technology",
+      "changePct": -4.51,
+      "perf1W": -4.60,
+      "perf1M": -10.38,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [],
+      "note": "WGMI -4.51% with no 5d bounce (-4.60%) — crypto-beta is in a downtrend leg; IBIT -2.75% and ETHA -4.92% corroborate."
+    },
+    {
+      "industry": "Gold Miners",
+      "sector": "Materials",
+      "changePct": -3.08,
+      "perf1W": -2.61,
+      "perf1M": -14.04,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [],
+      "note": "GDX -3.08%, RS 5, grade C; 20d -14.04% — precious-metals complex is being de-risked hard along with silver (SLV -2.74%, SILJ -3.99%)."
+    },
+    {
+      "industry": "Rare Earth / Strategic Metals",
+      "sector": "Materials",
+      "changePct": -3.45,
+      "perf1W": -4.15,
+      "perf1M": -19.32,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [],
+      "note": "REMX -19.32% over 20d, RS 5 — the worst 20-day trend in the whole industry block; a value trap for anyone bottom-fishing."
+    },
+    {
+      "industry": "Metals & Mining",
+      "sector": "Materials",
+      "changePct": -3.02,
+      "perf1W": 1.36,
+      "perf1M": -11.87,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [],
+      "note": "XME -3.02% despite a mildly positive 5d (+1.36%) — the group has given back its bounce, RS 0."
+    },
+    {
+      "industry": "Silver",
+      "sector": "Materials",
+      "changePct": -2.74,
+      "perf1W": -1.06,
+      "perf1M": -11.18,
+      "breadthPct": null,
+      "deltaWow": null,
+      "leaders": [],
+      "note": "SLV -2.74% / SILJ -3.99%; RS 5 across the silver complex — no bid anywhere in the precious-metals chain."
+    }
+  ],
+  "movers": [
+    {
+      "ticker": "XRPN",
+      "side": "LONG",
+      "changePct": 43.39,
+      "why": "Catalyst not verified in this run (no live news source supplied). Screener flags it as a Financial Conglomerates micro-cap, RVOL only 1.20 and screener score 17 — a low-quality, low-turnover spike.",
+      "traderLens": "PASS for every style here — no Minervini base, no Qullamaggie volume signature, and Clement Ang's rule is to sit out unverified micro-cap spikes."
+    },
+    {
+      "ticker": "CD",
+      "side": "LONG",
+      "changePct": 21.88,
+      "why": "Catalyst not verified in this run. Information Technology Services name with RVOL 0.96 — the move happened on below-average volume, which is a red flag rather than confirmation.",
+      "traderLens": "SRxTrades would reject outright: a >20% move without volume expansion is not a tradeable pivot. Watch, don't chase."
+    },
+    {
+      "ticker": "PENG",
+      "side": "LONG",
+      "changePct": 13.69,
+      "why": "Catalyst not verified in this run, but the tape signature is clean: RVOL 5.91 (best in the entire screener run) in Semiconductors, screener score 79, appearing on both the Best Winners and Small-Cap-to-Big-Cap lists.",
+      "traderLens": "Qullamaggie episodic-pivot profile — huge relative volume, semis tailwind, closes strong. Manage as an EP/ORH entry with the low-of-day as the fail level, not as a swing base buy."
+    },
+    {
+      "ticker": "BRZE",
+      "side": "LONG",
+      "changePct": 9.04,
+      "why": "Catalyst not verified in this run. Internet Software/Services, RVOL 0.94 — up 9% on slightly below-average volume.",
+      "traderLens": "SRxTrades/Minervini want volume confirmation; without it this is a WAIT — score 55 suggests the base quality is only average."
+    },
+    {
+      "ticker": "PGNY",
+      "side": "LONG",
+      "changePct": 8.72,
+      "why": "Catalyst not verified in this run. Miscellaneous Commercial Services, RVOL 1.10 (mild expansion), screener score 60.",
+      "traderLens": "Borderline momentum-continuation setup; Clem Ang would want an A-grade base and a market tailwind, neither of which is confirmed today → WAIT."
+    },
+    {
+      "ticker": "MU",
+      "side": "LONG",
+      "changePct": 3.78,
+      "why": "Catalyst not verified in this run. Semiconductors/memory, RVOL 0.98, screener score 74, also on the Leader Pullback (reclaim day) list — consistent with a leader reclaiming a moving average.",
+      "traderLens": "Minervini/Ted Zhang profile: leader in the leading sector (XLK RS 100) reclaiming a key MA on a reclaim day. Best risk-defined leader setup in the list."
+    },
+    {
+      "ticker": "ETRA",
+      "side": "SHORT",
+      "changePct": -7.08,
+      "why": "Catalyst not verified in this run. Pharmaceuticals: Major, RVOL 0.38 — a -7% drop on very thin volume, screener score 30.",
+      "traderLens": "Low-RVOL breakdowns are unreliable shorts (gap risk in both directions); PASS for mechanical styles."
+    },
+    {
+      "ticker": "NEOG",
+      "side": "SHORT",
+      "changePct": -2.72,
+      "why": "Catalyst not verified in this run. Medical Specialties, RVOL 1.54 — the only downside mover in the block with volume expansion, screener score 47.",
+      "traderLens": "Weakest-RS medical name with real volume; only tradable as a short against a defined pivot. Medical names need the binary-risk check first — WAIT."
+    },
+    {
+      "ticker": "GDX",
+      "side": "SHORT",
+      "changePct": -3.08,
+      "why": "Gold miners broke down with the whole precious-metals complex (SLV -2.74%, SILJ -3.99%, REMX -3.45%); 20d -14.04%, RS 5.",
+      "traderLens": "Group-short/avoid, not a single-name short — Ted Zhang's rotation read is 'stay out of the broken commodity complex', and Jeff's rule is don't bottom-fish a -14% 20d trend."
+    }
+  ],
+  "watchlist": [
+    { "ticker": "NVDA", "level": null, "changePct": null, "abc": null, "note": "No live watchlist price feed supplied this run. Semis are the leading group (MU +3.78%, PENG +13.69%) — NVDA is the theme anchor; wait for a live level before planning a pivot." },
+    { "ticker": "TSLA", "level": null, "changePct": null, "abc": null, "note": "No live price in this run. XLY -0.26% / RS 15 and 20d -0.69% — auto/discretionary backdrop is neutral-to-soft; needs its own volume confirmation." },
+    { "ticker": "AAPL", "level": 336.91, "changePct": 0.98, "abc": "B", "note": "On the Leader Pullback (reclaim day) screener list but RVOL only 0.60 — a reclaim without volume. Needs volume expansion to upgrade to A." },
+    { "ticker": "MSFT", "level": 530.81, "changePct": 0.29, "abc": "B", "note": "Reclaim day too, but RVOL 0.42 — the least-confirmed of the megacap leaders. Packaged Software, screener score 41." },
+    { "ticker": "AMZN", "level": null, "changePct": null, "abc": null, "note": "No live price in this run; XLY leadership is absent (RS 15), so treat as a megacap-tech holding rather than a fresh setup." },
+    { "ticker": "META", "level": null, "changePct": null, "abc": null, "note": "No live price in this run. XLC was the second-best sector (-0.21%) — relatively firm, but no verifiable level to plan from." },
+    { "ticker": "GOOGL", "level": null, "changePct": null, "abc": null, "note": "No live price in this run. Same XLC support as META; needs a live pivot before any entry." },
+    { "ticker": "AMD", "level": null, "changePct": null, "abc": null, "note": "No live price in this run. Semis are the strongest sub-group (XLK RS 100) — AMD is a candidate only if it shows sector-leading RVOL." },
+    { "ticker": "SMCI", "level": null, "changePct": null, "abc": null, "note": "No live price in this run. High-beta AI-hardware name — only tradable if the semis bid broadens beyond MU/PENG." },
+    { "ticker": "PLTR", "level": null, "changePct": null, "abc": null, "note": "No live price in this run. IGV/software is not in the supplied sector block; no evidence of a group tailwind either way — WAIT." },
+    { "ticker": "CRWD", "level": null, "changePct": null, "abc": null, "note": "No live price in this run. Security software sits in the XLK leadership bucket, but BRZE (+9.04%) moved on RVOL 0.94 — software volume is not confirming." },
+    { "ticker": "MSTR", "level": null, "changePct": null, "abc": null, "note": "No live price in this run, but the crypto complex is broken: IBIT -2.75% (5d -0.39%), WGMI -4.51%, ETHA -4.92%. Do not add crypto-beta risk today." }
+  ],
+  "traderLens": [
+    { "name": "Minervini", "view": "Stage 2 leadership is confined to megacap tech and semis (XLK RS 100, QQQ 20d +5.78%); everything else — IWM -4.12%, RSP -1.30%, XME -11.87% — is not Stage 2. In a tape this narrow I want VCPs near highs in XLK/semis only, and I will not buy mid-range or chase. MU reclaiming a moving average inside the leading group is the closest thing to a proper Minervini entry today." },
+    { "name": "Ted Zhang", "view": "Institutional flow is rotating INTO semis/AI hardware and defensive health care (XLV +1.23%), and OUT of commodities and crypto-beta: URA -4.65%, WGMI -4.51%, SILJ -3.99%, REMX -3.45%, GDX -3.08%. Energy (XLE 5d +3.27%, grade A) is the one cyclical worth tracking for a rotation turn. Everything material-related is a funding source, not a destination." },
+    { "name": "Clement Ang", "view": "Market context first: breadth 45.6% above the 200SMA, F&G 45 neutral, index technicals UNKNOWN, and a down session across all majors — this is not a confirmed uptrend environment. That means A-grade setups only, half size, and no new risk into unverified micro-cap spikes (XRPN +43%, CD +22% on sub-1.0 RVOL are exactly the setups I sit out)." },
+    { "name": "SRxTrades", "view": "Volume is the tell and it is mostly missing: AAPL +0.98% on RVOL 0.60, MSFT +0.29% on 0.42, BRZE +9.04% on 0.94, MU +3.78% on 0.98. Only PENG (RVOL 5.91) and NEOG (1.54) show real expansion. No chasing — I want price clearing a clean pivot with volume, otherwise I wait." },
+    { "name": "Jeff", "view": "Mechanical discipline: hard stops on every position, no averaging down, and no new risk while the entry-risk feed is UNKNOWN. Some of the biggest movers in this run (XRPN +43% on RVOL 1.20, CD +22% on RVOL 0.96) are exactly the names that produce -30% round trips; if you cannot define the stop, you do not take the trade." },
+    { "name": "Qullamaggie", "view": "The one clean momentum signature on the board is PENG: +13.69% on RVOL 5.91 in Semiconductors, the leading group, printing a high-volume range expansion. That is an EP/ORH entry with the low-of-day as the stop. MU -+3.78% on a reclaim day is the secondary continuation candidate. Nothing in the commodity/crypto complex qualifies — those are broken and short-only at best." },
+    { "name": "Composite", "view": "DO LESS, BUT BETTER. Posture is RAISE-THE-BAR, not GO: all four major index entry-risk badges are UNKNOWN because the technicals feed was not supplied, breadth is 45.6% above the 200SMA, F&G is a neutral 45, and the last session was red across SPY/QQQ/DIA/IWM. Trade only XLK/semis leaders (MU reclaim, PENG EP — both half size with hard stops), take no new crypto or commodity-metals risk, and keep the watchlist megacaps (AAPL/MSFT) on the bench until they reclaim on RVOL > 1.5." }
+  ],
+  "standout": {
+    "ticker": "PENG",
+    "side": "LONG",
+    "score": 79,
+    "sector": "Semiconductors",
+    "rs": null,
+    "grade": null,
+    "thesis": "High-volume range expansion in the market's leading industry group: PENG +13.69% on RVOL 5.91 (the largest relative-volume reading in the entire screener run), score 79, and it appears on both the Best Winners and Small-Cap-to-Big-Cap lists. Momentum/EP profile — but it is already extended intraday, so it is a managed momentum trade, not a base buy.",
+    "entry": null,
+    "stop": null,
+    "target": null,
+    "rrr": null,
+    "tags": ["#episodic-pivot", "#momentum", "#rvol-breakout", "#semis"]
+  },
+  "earnings": {
+    "bmo": [],
+    "amc": [],
+    "yesterdayReactions": []
+  },
+  "calendar": [],
+  "ratings": {
+    "upgrades": [],
+    "downgrades": []
+  },
+  "alert": "Index technicals feed not supplied — entry-risk badges UNKNOWN on SPY/QQQ/DIA/IWM. Posture RAISE-THE-BAR: half size, A-grade pivots only, no new crypto/commodity-metals risk. No live broker protection data in this run.",
+  "news": [],
+  "screenerScores": {},
+  "citations": [
+    "snapshot.json built 2026-10-07T19:15:07.748Z — authoritative index, sector ETF and industry ETF levels/changes (pre-fetched block)",
+    "Fear & Greed feed 2026-10-07T19:10:08Z — 45/100 neutral (pre-fetched block)",
+    "TradingView screener run fetched 2026-10-07T19:25:26Z (market_open=True) — Top Gainer / Best Winners / Small-Cap-to-Big-Cap / Premarket / VCP USA / Leader Pullback hits, prices, RVOL and screener scores (pre-fetched block)",
+    "Breadth snapshot sample of 79 names — 45.6% above 200SMA, 31.6% near 52w high (pre-fetched block)",
+    "index_technicals.json was not supplied in this run — technicals.* set to null and entry_risk=UNKNOWN rather than fabricated",
+    "Watchlist live prices block was not supplied in this run — watchlist levels from TradingView screener hits only (AAPL 336.91, MSFT 530.81)",
+    "web search for overnight Asia/Europe recap, VIX, 10Y yield, WTI, pre-market catalysts, earnings BMO/AMC, macro calendar and analyst ratings was unavailable at generation time — those fields returned null/empty rather than fabricated",
+    "data unavailable at generation time — ^VIX level, ^TNX 10Y yield, CL=F WTI price",
+    "data unavailable at generation time — earnings calendar (bmo/amc/yesterdayReactions)",
+    "data unavailable at generation time — economic calendar events",
+    "data unavailable at generation time — analyst upgrades/downgrades",
+    "data unavailable at generation time — high-impact news headlines (no verifiable live source links available, so news omitted rather than fabricated)"
+  ]
+}
