@@ -14,6 +14,8 @@ import type { ComposedSnapshot } from "@/lib/brief/snapshot";
 import { structuredBriefSchema } from "@/lib/brief/structured-schema";
 import { buildTraderLensBlock } from "@/lib/brief/trader-profiles";
 import { salvageJsonObject } from "@/lib/brief/salvage";
+import { reconcileSnapshotBrief } from "@/lib/brief/source-evidence";
+import type { StructuredBrief } from "@/types/structured-brief";
 
 export interface ProviderResult {
   htmlBody: string;
@@ -49,6 +51,7 @@ function buildSystemPrompt(): string {
     "industry movers, trader lens, standout, watchlist, movers, calendar, and sources.",
     "Return concise field values — NOT HTML, markdown, or a long article.",
     "This is a snapshot-fed refresh with no live web access; reason only from the snapshot and breadth data provided.",
+    "News, earnings, ratings, calendar, catalysts, trade sides, standout and trade plans are unavailable in this path: return null. Never infer them from price movement.",
     "Use null (not empty string) when a field cannot be inferred from the snapshot.",
     "",
     "ANTI-HALLUCINATION RULES",
@@ -151,6 +154,7 @@ export async function runProvider(
     usage = err.usage;
   }
 
+  object = reconcileSnapshotBrief(object as StructuredBrief, snapshot);
   return {
     htmlBody: "",
     verdictJson: object,

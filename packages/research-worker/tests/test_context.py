@@ -122,6 +122,75 @@ class ContextTests(unittest.TestCase):
             with self.assertRaisesRegex(context.ContextError, "changed"):
                 self.build()
 
+    def test_pg_vectors_are_filtered_before_ranking_and_freshness_checked_twice(self):
+        store, query, providers = self.modules
+        rows = store.build_chunks(store.read_corpus(self.root))
+        vectors = store.np.arange(len(rows) * 2).reshape(len(rows), 2)
+        provider = providers.named("gemini")
+        meta = dict(source="worktree", embedding=provider.as_meta(), model=provider.model,
+                    dimensions=2, chunker=store.CHUNKER, built_at="2026-10-04T10:00:00Z")
+        selected = [i for i, row in enumerate(rows) if context.allowed_path(row["path"])]
+        def rank(question, ranked_rows, ranked_vectors, *args):
+            self.assertEqual(ranked_rows, [rows[i] for i in selected])
+            self.assertTrue(store.np.array_equal(ranked_vectors, vectors[selected]))
+            return []
+        with patch.object(context, "_pg_generation", return_value=(rows, vectors, meta, 7)), \
+                patch.object(store, "prepare_index") as local, \
+                patch.object(store, "assert_fresh") as fresh, \
+                patch.object(query, "search_detailed", side_effect=rank):
+            result = self.build(mode="hybrid", store_type="pg")
+            self.assertEqual(result["retrieval"]["index"]["generationId"], 7)
+            self.assertEqual(fresh.call_count, 2)
+            local.assert_not_called()
+
+    def test_pg_failure_never_falls_back_or_embeds_a_query(self):
+        store, query, _ = self.modules
+        with patch.object(context, "_pg_generation", side_effect=ValueError("offline")), \
+                patch.object(store, "prepare_index") as local, \
+                patch.object(query, "search_detailed") as rank:
+            with self.assertRaises(context.ContextError):
+                self.build(mode="hybrid", store_type="pg")
+            local.assert_not_called()
+            rank.assert_not_called()
+        with self.assertRaises(context.ContextError):
+            self.build(store_type="pg")
+
+    def test_pg_real_freshness_gate_checks_entire_corpus_before_ranking(self):
+        store, query, providers = self.modules
+        provider = providers.named("gemini")
+        documents = store.read_corpus(self.root)
+        rows = store.build_chunks(documents, provider.chunker)
+        meta = store._meta(documents, rows, "worktree", provider)
+        vectors = store.np.zeros((len(rows), provider.dimensions))
+        # Even an out-of-scope change invalidates the mirror's complete generation.
+        self.write("wiki/operations/secret.md", "Changed after mirror activation\n")
+        with patch.object(context, "_pg_generation", return_value=(rows, vectors, meta, 7)), \
+                patch.object(store, "prepare_index") as local, \
+                patch.object(query, "search_detailed") as rank:
+            with self.assertRaises(context.ContextError) as error:
+                self.build(mode="hybrid", store_type="pg")
+            self.assertEqual(type(error.exception.__cause__).__name__, "StaleIndexError")
+            rank.assert_not_called()
+            local.assert_not_called()
+
+    def test_pg_real_freshness_gate_rechecks_after_ranking(self):
+        store, query, providers = self.modules
+        provider = providers.named("gemini")
+        documents = store.read_corpus(self.root)
+        rows = store.build_chunks(documents, provider.chunker)
+        meta = store._meta(documents, rows, "worktree", provider)
+        vectors = store.np.zeros((len(rows), provider.dimensions))
+
+        def rank(*args):
+            self.write(context.MANDATORY_PATHS[0], self.text + "Changed during query\n")
+            return []
+
+        with patch.object(context, "_pg_generation", return_value=(rows, vectors, meta, 7)), \
+                patch.object(query, "search_detailed", side_effect=rank):
+            with self.assertRaises(context.ContextError) as error:
+                self.build(mode="hybrid", store_type="pg")
+            self.assertEqual(type(error.exception.__cause__).__name__, "StaleIndexError")
+
     def test_missing_mandatory_and_untracked_replacement_fail(self):
         path = context.MANDATORY_PATHS[0]
         self.git("rm", "--cached", path)

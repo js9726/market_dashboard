@@ -5,12 +5,18 @@ changed. The existing analysis panel remains the default until the UI flag is en
 
 ## What is implemented
 
+- LangGraph executes evidence collection, wiki context, checkpoints, one selected
+  synthesis provider, completion and receipt read-back. PostgreSQL jobs/threads remain
+  the durable authority; there is no second graph checkpointer or provider auto-retry.
+  External LangSmith tracing is explicitly disabled.
 - Owner-only authenticated job submission, history, polling and cancellation.
 - Postgres job/thread persistence, request idempotency, atomic compare-and-swap leases,
   30-minute job deadlines, 120-second leases and at most three crash-recovery claims.
 - Current, tracked, mandatory wiki doctrine plus six trading-only supplemental passages.
   Scope filtering happens before keyword/vector ranking. Lexical is the default;
   hybrid explicitly uses Gemini query embeddings and never repairs the index.
+  `--wiki-store pg --retrieval hybrid` reads the canonical Neon mirror with full-corpus
+  freshness checks; local retrieval remains the default. No backend fallback occurs.
 - Portable thread summaries and previous-result IDs; Claude exact-session resume is
   bound to that thread/provider/prompt version. DeepSeek receives the saved context.
 - Selected Claude subscription or DeepSeek API; no cross-provider fallback.
@@ -60,7 +66,13 @@ Worker environment (loaded by the operator, never written by this implementation
 | `CLAUDE_CODE_OAUTH_TOKEN` or existing Claude login | Subscription authentication; Anthropic API credentials ignored |
 | `GEMINI_API_KEY`, `RESEARCH_NEWS_MODEL` | Only for explicit `--grounded-news`; model must support Google Search |
 
-Use Python with the canonical wiki's `scripts/retrieval/requirements-lock.txt` dependencies.
+Use the worker's isolated Python environment and pinned dependencies:
+
+```powershell
+python -m venv packages/research-worker/.venv
+packages/research-worker/.venv/Scripts/python.exe -m pip install -r packages/research-worker/requirements.txt
+```
+
 `--live-market` additionally uses the dashboard backend's existing yfinance dependency.
 Claude must support the installed CLI's `--safe-mode`, `--tools`, `--strict-mcp-config`
 and `--resume` flags. It receives no tools or unrestricted shell permissions. Do not use
@@ -70,13 +82,13 @@ Provider model names are explicit configuration, avoiding an automatic model mig
 Safe command (no calls, claims or generation):
 
 ```powershell
-python packages/research-worker/worker.py --provider claude
+packages/research-worker/.venv/Scripts/python.exe packages/research-worker/worker.py --provider claude
 ```
 
 After separate live-run approval and configuration, a single job can be processed with:
 
 ```powershell
-python packages/research-worker/worker.py --provider claude --execute --once --live-market --grounded-news
+packages/research-worker/.venv/Scripts/python.exe packages/research-worker/worker.py --provider claude --execute --once --live-market --grounded-news
 ```
 
 Omit `--once` for polling; no service is installed automatically. `--retrieval hybrid`
@@ -116,6 +128,13 @@ Private thread state is never embedded into the shared wiki index.
 
 ## Validation and remaining integration
 
+October 8 local validation: 44 Python tests execute real LangGraph; 426 app tests pass
+with 15 database/provider integration tests skipped; TypeScript and strict skill-sync
+checks pass. This does not replace the October 5 PostgreSQL/Claude smoke with a new
+live LangGraph end-to-end test. Current Neon research tables are absent and the vector
+mirror fails freshness on two changed wiki files. See the
+[current architecture and database access guide](../../docs/research-orchestration-and-data-access.md).
+
 Offline tests cover context scope/freshness, evidence/report gates, route auth, job
 lease predicates, provider credential isolation, explicit execution, cancellation and
 ingest read-back. The opt-in `postgres-smoke.test.ts` also uses real PostgreSQL and the
@@ -127,15 +146,17 @@ The provider test requires a separate explicit opt-in. Production remains disabl
 # From dashboard app
 node node_modules/vitest/vitest.mjs run src/lib/research/__tests__
 node node_modules/typescript/bin/tsc --noEmit --incremental false
-# From repo, using Python with the wiki retrieval dependencies
-python -m unittest discover -s packages/research-worker/tests
+# From repo, using the worker environment
+packages/research-worker/.venv/Scripts/python.exe -m unittest discover -s packages/research-worker/tests
 ```
 
 To repeat the isolated database suite, provision a disposable database with the current
 schema and set `RESEARCH_SMOKE_DATABASE_URL` to its loopback URL. Run the test file above;
 add `RESEARCH_SMOKE_CLAUDE=1` only to authorize two subscription calls. The Python helper
-uses the sibling wiki retrieval virtual environment by default; override with
-`RESEARCH_SMOKE_PYTHON` / `RESEARCH_SMOKE_WIKI_ROOT` where needed. Tests do not migrate.
+uses the sibling wiki retrieval virtual environment by default. Set
+`RESEARCH_SMOKE_PYTHON` to the absolute worker `.venv/Scripts/python.exe` path for
+LangGraph dependencies; `RESEARCH_SMOKE_WIKI_ROOT` can select the canonical wiki.
+Tests do not migrate.
 
 Still separate: complete structural action-gate integration, authenticated chart
 capture automation, bot job submission and PNG rendering/delivery, staging/production

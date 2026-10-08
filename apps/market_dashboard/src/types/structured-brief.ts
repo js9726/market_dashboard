@@ -64,6 +64,25 @@ export interface BriefMover {
   changePct: number | null;
   why: string | null;
   traderLens: string | null;
+  observedAt?: string;
+  source?: string;
+  rvol?: number | null;
+}
+
+/** Set by the server from accepted inputs, never by a provider or ingest caller. */
+export interface BriefSymbolEvidence {
+  observedAt: string;
+  source: string;
+  kind: "quote" | "screener";
+  changePct: number | null;
+  price: number | null;
+  rvol: number | null;
+}
+
+export interface BriefMarketEvidence {
+  version: 1;
+  status: "verified" | "unverified";
+  symbols: Record<string, BriefSymbolEvidence>;
 }
 
 export interface BriefWatchlistRow {
@@ -125,6 +144,7 @@ export interface BriefNewsItem {
 }
 
 export interface StructuredBrief {
+  marketEvidence?: BriefMarketEvidence;
   mood: BriefMood | null;
   breadth: BriefBreadth | null;
   fearGreed: BriefFearGreed | null;

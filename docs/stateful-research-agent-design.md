@@ -1,6 +1,6 @@
 # Stateful research: dashboard, Claude and DeepSeek
 
-Status: 5 October 2026. Report-correctness repairs and the first local stateful research
+Status: 8 October 2026. Report-correctness repairs and the first local stateful research
 implementation are present. The design below now has schema/context, durable owner-only
 jobs, Claude/DeepSeek adapters, optional collectors and a saved-report dashboard view.
 Production remains disabled. The research migration and two Claude subscription turns
@@ -8,6 +8,14 @@ passed against isolated local PostgreSQL on 5 October; no production migration,
 deployment, bot restart, paid API analysis, embedding refresh or message was performed.
 
 ## Implementation update
+
+The worker now uses real LangGraph nodes while retaining the existing PostgreSQL
+job/thread state, leases and receipt checks. Gemini hybrid retrieval can explicitly
+use the Neon `wiki_rag` mirror; it fails on stale corpus hashes with no backend fallback.
+The October 8 read-back found 850 vector chunks, but two changed wiki files invalidate
+that generation. Production still lacks `ResearchJob` and `ResearchThread` tables.
+The October 5 live smoke below predates LangGraph; it is not a live graph acceptance test.
+See [current architecture, database viewer and activation boundaries](research-orchestration-and-data-access.md).
 
 See [worker setup and limits](../packages/research-worker/README.md). Report validation
 lives in `apps/market_dashboard/src/lib/research/schema.ts`; jobs and transactional
@@ -70,7 +78,7 @@ visible as unavailable. No GO without required usable daily and weekly chart evi
   implemented paths, not proof of current host uptime.
 - The retrieval README's older claim that no automatic integration exists is superseded
   for this bot by those call sites. The dashboard multi-agent route still lacks RAG.
-- Local index metadata: 268 documents, 835 sections, 768 dimensions,
+- Historical October 4 local index metadata: 268 documents, 835 sections, 768 dimensions,
   gemini-embedding-001, built/refreshed 2026-10-03T17:57:50Z. Status verifies stored
   identity/integrity, not current-corpus freshness or retrieval quality. This review
   used keyword-only searches; no embedding API requests were made.

@@ -1,0 +1,8 @@
+# Isolated worker runtime; no LangGraph server or second checkpoint database.
+langgraph==1.2.13
+langsmith==0.14.4
+numpy==2.4.3
+google-genai==2.25.0
+tiktoken==0.14.0
+openai==2.31.0
+psycopg[binary]==3.2.13

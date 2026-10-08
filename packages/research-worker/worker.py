@@ -1,7 +1,6 @@
 """Outbound research worker. Nothing runs without --execute; no service installation."""
 from __future__ import annotations
 import argparse
-from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -16,12 +15,7 @@ from context import build_context
 from provider_adapter import generate
 from collectors import collect_market, collect_news
 
-class WorkerError(RuntimeError):
-    pass
-
-class ConcurrentUpdate(WorkerError):
-    """The server rolled back a conflicting database transaction; safe to resubmit."""
-    pass
+from workflow import ConcurrentUpdate, WorkerError, run_workflow
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -83,7 +77,7 @@ def evidence_for(ticker, directory):
     except (KeyError, TypeError, ValueError) as error:
         raise WorkerError("INVALID_COLLECTOR_EVIDENCE") from error
 
-def process_job(client, job, wiki_root, mode="lexical", evidence_dir=None, generator=generate, builder=build_context, heartbeat_seconds=30, live_market=False, grounded_news=False):
+def process_job(client, job, wiki_root, mode="lexical", evidence_dir=None, generator=generate, builder=build_context, heartbeat_seconds=30, live_market=False, grounded_news=False, wiki_store="local"):
     identity = {"id": job["id"], "leaseToken": job["leaseToken"]}
     stop, cancelled = threading.Event(), threading.Event()
     def heartbeat():
@@ -96,53 +90,12 @@ def process_job(client, job, wiki_root, mode="lexical", evidence_dir=None, gener
     thread = threading.Thread(target=heartbeat, daemon=True)
     thread.start()
     try:
-        evidence, evidence_status = evidence_for(job["ticker"], evidence_dir)
-        collector_gaps = []
-        for enabled, collector in [(live_market, collect_market), (grounded_news, collect_news)]:
-            if enabled and not cancelled.is_set():
-                collected, gaps = collector(job["ticker"])
-                collected_ids = {s["id"] for s in collected}
-                evidence = [s for s in evidence if s.get("id") not in collected_ids] + collected
-                collector_gaps.extend(gaps)
-        if len(evidence) > 100:
-            priority = {"chart_daily": 0, "chart_weekly": 0, "quote": 1, "fundamental": 2, "search_grounded": 3}
-            evidence = sorted(evidence, key=lambda s: priority.get(s.get("kind"), 4))[:100]
-            collector_gaps.append("Evidence truncated to 100 sources; charts and market evidence retained first")
-        context = builder(wiki_root, job, job["thread"], evidence, mode=mode)
-        context["evidenceStatus"] = evidence_status
-        context["collectorGaps"] = collector_gaps
-        if cancelled.is_set():
-            raise WorkerError("LEASE_LOST")
-        client.post("checkpoint", **identity, context=context)
-        report, session_id = generator(job["provider"], context, job["template"], cancelled,
-                                       session_id=job["thread"].get("sessionId"), cwd=str(Path(__file__).resolve().parent))
-        if cancelled.is_set():
-            raise WorkerError("LEASE_LOST")
-        # Persist the observed model/usage alongside the same source-hashed context.
-        client.post("checkpoint", **identity, context=context)
-        fields = {**identity, "report": report}
-        if session_id:
-            fields["sessionId"] = session_id
-        for attempt in range(3):
-            try:
-                client.post("complete", **fields)
-                break
-            except WorkerError as error:
-                # A lost response may follow a successful commit. Check before resubmitting.
-                try:
-                    receipt = client.post("receipt", **identity)
-                except WorkerError:
-                    receipt = {}
-                if receipt.get("persisted"):
-                    break
-                if not isinstance(error, ConcurrentUpdate) or attempt == 2:
-                    raise error
-                if cancelled.wait(.25 * (attempt + 1)):
-                    raise WorkerError("LEASE_LOST")
-        receipt = client.post("receipt", **identity)
-        if receipt.get("id") != job["id"] or not receipt.get("persisted") or not receipt.get("verdictId") or receipt.get("status") not in {"partial", "succeeded"}:
-            raise WorkerError("INGEST_READBACK_FAILED")
-        return receipt
+        return run_workflow(client=client, job=job, wiki_root=wiki_root, mode=mode,
+                            evidence_dir=evidence_dir, generator=generator, builder=builder,
+                            evidence_loader=evidence_for, market_collector=collect_market,
+                            news_collector=collect_news, cancelled=cancelled,
+                            live_market=live_market, grounded_news=grounded_news,
+                            wiki_store=wiki_store)
     except Exception:
         if not cancelled.is_set():
             try:
@@ -158,12 +111,15 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--provider", choices=["claude", "deepseek"], required=True)
     parser.add_argument("--retrieval", choices=["lexical", "hybrid"], default="lexical")
+    parser.add_argument("--wiki-store", choices=["local", "pg"], default="local", help="Hybrid index backend; pg requires --retrieval hybrid")
     parser.add_argument("--execute", action="store_true", help="Explicitly allow claiming jobs and selected provider calls")
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--live-market", action="store_true", help="Fetch read-only Yahoo market/fundamental evidence")
     parser.add_argument("--grounded-news", action="store_true", help="Explicitly enable Gemini search-grounded news collection (metered)")
     parser.add_argument("--poll-seconds", type=int, default=15)
     args = parser.parse_args(argv)
+    if args.wiki_store == "pg" and args.retrieval != "hybrid":
+        parser.error("--wiki-store pg requires --retrieval hybrid")
     if not args.execute:
         print("Not started. Add --execute only after configuration, migration and live-run approval.")
         return 0
@@ -177,7 +133,7 @@ def main(argv=None):
         try:
             job = client.post("claim", provider=args.provider).get("job")
             if job:
-                receipt = process_job(client, job, wiki_root, args.retrieval, os.environ.get("RESEARCH_EVIDENCE_DIR"), live_market=args.live_market, grounded_news=args.grounded_news)
+                receipt = process_job(client, job, wiki_root, args.retrieval, os.environ.get("RESEARCH_EVIDENCE_DIR"), live_market=args.live_market, grounded_news=args.grounded_news, wiki_store=args.wiki_store)
                 print(json.dumps({"id": receipt["id"], "status": receipt["status"], "persisted": True}))
         except Exception:
             # Deliberately exclude exception payloads (provider/HTTP messages may contain secrets).

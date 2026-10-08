@@ -46,10 +46,9 @@ export default function SpotlightAndIdeas() {
   const verdict = useMorningVerdict();
   const [filter, setFilter] = useState<FilterKey>("All");
 
-  // Live Ideas needs a brief that actually HAS movers/standout — not just the
-  // freshest one (a fresh Gemini run with movers:[] would blank the panel).
+  // Source observations, not the cache write time, determine eligibility.
   const entry = verdict.data ? selectFreshestBriefWithContent(verdict.data.providers)?.entry ?? null : null;
-  const brief = asStructuredBrief(entry?.structured ?? entry?.verdict);
+  const brief = asStructuredBrief(entry?.liveIdeas);
   const standout = brief?.standout ?? null;
   const movers: BriefMover[] = useMemo(() => brief?.movers ?? [], [brief?.movers]);
   const traderViews: BriefTraderView[] = brief?.traderLens ?? [];
@@ -59,12 +58,12 @@ export default function SpotlightAndIdeas() {
   );
 
   const ticker = standout?.ticker ?? "-";
-  const side = (standout?.side ?? "LONG").toUpperCase();
+  const side = (standout?.side ?? "—").toUpperCase();
   const score = standout?.score ?? null;
   const isLong = side === "LONG";
   const sideStyle = {
-    background: isLong ? "var(--gain-bg)" : "var(--loss-bg)",
-    color: isLong ? "var(--gain-fg)" : "var(--loss-fg)",
+    background: side === "—" ? "var(--bg-raised)" : isLong ? "var(--gain-bg)" : "var(--loss-bg)",
+    color: side === "—" ? "var(--fg-3)" : isLong ? "var(--gain-fg)" : "var(--loss-fg)",
   };
 
   return (
@@ -73,7 +72,7 @@ export default function SpotlightAndIdeas() {
         <div className="market-section-head">
           <div className="flex items-center gap-3">
             <p className="t-overline">Live Ideas</p>
-            <FreshnessBadge timestamp={entry?.generatedAt} thresholds={BRIEF_THRESHOLDS} />
+            <FreshnessBadge timestamp={entry?.liveIdeasAsOf} thresholds={BRIEF_THRESHOLDS} />
           </div>
           <p className="t-caption">
             {movers.length} idea{movers.length !== 1 ? "s" : ""}
@@ -104,7 +103,7 @@ export default function SpotlightAndIdeas() {
         {filteredMovers.length === 0 ? (
           <p className="t-caption text-[var(--fg-3)]">
             {movers.length === 0
-              ? "Awaiting structured movers..."
+              ? "Live ideas unavailable: awaiting current, verified symbol observations."
               : `No movers match "${filter}".`}
           </p>
         ) : (
@@ -181,11 +180,11 @@ export default function SpotlightAndIdeas() {
 }
 
 function IdeaRow({ mover, isStandout }: { mover: BriefMover; isStandout: boolean }) {
-  const side = (mover.side ?? "LONG").toUpperCase();
+  const side = (mover.side ?? "—").toUpperCase();
   const isLong = side === "LONG";
   const sideStyle = {
-    background: isLong ? "var(--gain-bg)" : "var(--loss-bg)",
-    color: isLong ? "var(--gain-fg)" : "var(--loss-fg)",
+    background: side === "—" ? "var(--bg-raised)" : isLong ? "var(--gain-bg)" : "var(--loss-bg)",
+    color: side === "—" ? "var(--fg-3)" : isLong ? "var(--gain-fg)" : "var(--loss-fg)",
   };
   const changeClass =
     mover.changePct == null ? "text-[var(--fg-3)]" :
@@ -211,6 +210,12 @@ function IdeaRow({ mover, isStandout }: { mover: BriefMover; isStandout: boolean
             </span>
           ) : null}
         </div>
+        {mover.observedAt ? (
+          <p className="t-caption mt-1 text-[var(--fg-3)]">
+            {mover.source} · observed {new Date(mover.observedAt).toLocaleString()}
+            {mover.rvol != null ? ` · RVOL ${mover.rvol.toFixed(1)}x` : ""}
+          </p>
+        ) : null}
         {asText(mover.why) ? <p className="t-body-small mt-1">{asText(mover.why)}</p> : null}
         {asText(mover.traderLens) ? (
           <p className="t-caption mt-1 text-[var(--fg-3)]">

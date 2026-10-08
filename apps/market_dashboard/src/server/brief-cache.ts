@@ -24,6 +24,7 @@ import {
 import { composeSnapshot, hashSnapshot } from "@/lib/brief/snapshot";
 import { LIVE_QUOTE_DEFAULT_WATCHLIST } from "@/lib/live-quote-universe";
 import { runProvider } from "./brief-providers";
+import { markIngestUnverified } from "@/lib/brief/source-evidence";
 
 /** Fallback used only when the DB watchlist is empty and no OWNER_EMAIL is set. */
 export const DEFAULT_WATCHLIST = [...LIVE_QUOTE_DEFAULT_WATCHLIST];
@@ -191,14 +192,16 @@ export async function ingestRow(opts: {
   tokensOut?: number | null;
   costUsd?: number | null;
 }) {
+  const structuredJson = markIngestUnverified(opts.structuredJson);
+  const verdictJson = markIngestUnverified(opts.verdictJson);
   return prisma.morningBriefCache.upsert({
     where: { bucketAt_provider: { bucketAt: opts.bucket, provider: opts.provider } },
     create: {
       bucketAt: opts.bucket,
       provider: opts.provider,
       htmlBody: opts.htmlBody,
-      verdictJson: (opts.verdictJson ?? null) as never,
-      structuredJson: (opts.structuredJson ?? null) as never,
+      verdictJson: (verdictJson ?? null) as never,
+      structuredJson: (structuredJson ?? null) as never,
       generatedBy: opts.generatedBy,
       inputHash: opts.inputHash,
       tokensIn: opts.tokensIn ?? null,
@@ -207,8 +210,8 @@ export async function ingestRow(opts: {
     },
     update: {
       htmlBody: opts.htmlBody,
-      verdictJson: (opts.verdictJson ?? null) as never,
-      structuredJson: (opts.structuredJson ?? null) as never,
+      verdictJson: (verdictJson ?? null) as never,
+      structuredJson: (structuredJson ?? null) as never,
       generatedAt: new Date(),
       generatedBy: opts.generatedBy,
       inputHash: opts.inputHash,

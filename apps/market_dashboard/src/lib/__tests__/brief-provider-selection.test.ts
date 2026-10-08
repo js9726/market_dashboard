@@ -85,7 +85,7 @@ describe("brief provider selection", () => {
     expect(normalizeBriefProvider("unknown")).toBeNull();
   });
 
-  it("keeps Live Ideas on the current bucket before stale fallback ideas", () => {
+  it("does not promote legacy ideas or a fresh cache write without symbol evidence", () => {
     const providers: BriefProviderMap = {
       deepseek: entry("2026-05-20T13:00:00.000Z", { stale: true, ideas: true }),
       gemini: entry("2026-05-20T14:00:00.000Z"),
@@ -94,7 +94,6 @@ describe("brief provider selection", () => {
     };
 
     const selected = selectFreshestBriefWithContent(providers);
-    expect(selected?.provider).toBe("gemini");
-    expect(selected?.entry.stale).not.toBe(true);
+    expect(selected).toBeNull();
   });
 });

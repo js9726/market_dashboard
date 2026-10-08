@@ -25,12 +25,15 @@ import {
 } from "@/lib/live-quote-universe";
 import type { BreadthSnapshot, MarketBreadth } from "@/types/breadth";
 import type { TvScreenerHit, TvScreenersFile } from "@/types/tv-screener";
+import type { BriefSymbolEvidence } from "@/types/structured-brief";
+import { isBriefInputFresh, isSymbolEvidenceFresh } from "./source-evidence";
 
 export interface SnapshotIndustryLeader {
   ticker: string;
   changePct: number | null;
   rvol: number | null;
   source: string | null;
+  observedAt?: string;
 }
 
 export interface SnapshotIndustryMover {
@@ -56,6 +59,7 @@ export interface ComposedSnapshot {
   breadth: MarketBreadth | null;
   marketDirection: string | null;
   baseline: unknown; // raw snapshot.json content for the LLM
+  symbolEvidence?: Record<string, BriefSymbolEvidence>;
 }
 
 const PUBLIC_MARKET_DATA_DIR = path.join(process.cwd(), "public", "market-dashboard");
@@ -116,9 +120,8 @@ function addLeader(
     return;
   }
 
-  const existingMove = Math.abs(scoreNumber(existing.changePct));
-  const candidateMove = Math.abs(scoreNumber(candidate.changePct));
-  if (candidateMove > existingMove) leaders.set(ticker, candidate);
+  // Prefer recency, never the largest (potentially old) move.
+  if (Date.parse(candidate.observedAt ?? "") > Date.parse(existing.observedAt ?? "")) leaders.set(ticker, candidate);
 }
 
 function topSector(votes: Map<string, number>): string | null {
@@ -170,7 +173,7 @@ function getAggregate(map: Map<string, IndustryAggregate>, industry: string): In
   return created;
 }
 
-function addHit(aggregate: IndustryAggregate, hit: TvScreenerHit, source: string) {
+function addHit(aggregate: IndustryAggregate, hit: TvScreenerHit, source: string, observedAt: string) {
   if (hit.sector) {
     aggregate.sectorVotes.set(hit.sector, (aggregate.sectorVotes.get(hit.sector) ?? 0) + 1);
   }
@@ -192,9 +195,10 @@ function addHit(aggregate: IndustryAggregate, hit: TvScreenerHit, source: string
   if (!ticker) return;
   addLeader(aggregate.leaders, ticker, {
     ticker,
-    changePct: changePct ?? premarketChange,
+    changePct,
     rvol,
     source,
+    observedAt,
   });
 }
 
@@ -239,19 +243,24 @@ export function buildIndustryMovers(opts: {
   tvScreeners: TvScreenersFile | null;
   breadth: BreadthSnapshot | null;
   limit?: number;
+  now?: Date;
 }): SnapshotIndustryMover[] {
   const aggregates = new Map<string, IndustryAggregate>();
+  const now = opts.now ?? new Date();
+  const tvScreeners = isBriefInputFresh(opts.tvScreeners?.fetched_at, now) ? opts.tvScreeners : null;
+  const baseline = isBriefInputFresh(asObject(opts.baseline)?.built_at, now) ? opts.baseline : null;
+  const breadth = isBriefInputFresh(opts.breadth?.as_of ?? opts.breadth?.built_at, now) ? opts.breadth : null;
 
-  for (const screener of opts.tvScreeners?.screeners ?? []) {
+  for (const screener of tvScreeners?.screeners ?? []) {
     const source = screener.name || screener.id;
     for (const hit of screener.hits ?? []) {
       if (!hit.industry) continue;
-      addHit(getAggregate(aggregates, hit.industry), hit, source);
+      addHit(getAggregate(aggregates, hit.industry), hit, source, tvScreeners!.fetched_at);
     }
   }
 
-  addIndustryPerformanceRows(aggregates, opts.baseline);
-  addBreadthRows(aggregates, opts.breadth);
+  addIndustryPerformanceRows(aggregates, baseline);
+  addBreadthRows(aggregates, breadth);
 
   const rows = Array.from(aggregates.values()).map((aggregate) => {
     const changePct = average(aggregate.changes);
@@ -308,17 +317,23 @@ export function buildIndustryMovers(opts: {
 }
 
 export async function composeSnapshot(watchlist: string[]): Promise<ComposedSnapshot> {
-  const [baseline, tvScreeners, breadth] = await Promise.all([
+  const now = new Date();
+  const [rawBaseline, rawTvScreeners, rawBreadth] = await Promise.all([
     readJsonFile<unknown>(PUBLIC_SNAPSHOT_PATH),
     readJsonFile<TvScreenersFile>(PUBLIC_TV_SCREENERS_PATH),
     readJsonFile<BreadthSnapshot>(PUBLIC_BREADTH_PATH),
   ]);
+  const baseline = isBriefInputFresh(asObject(rawBaseline)?.built_at, now) ? rawBaseline : null;
+  const tvScreeners = isBriefInputFresh(rawTvScreeners?.fetched_at, now) ? rawTvScreeners : null;
+  const breadth = isBriefInputFresh(rawBreadth?.as_of ?? rawBreadth?.built_at, now) ? rawBreadth : null;
   const baselineBuiltAt =
     (baseline && typeof baseline === "object" && "built_at" in baseline
       ? String((baseline as { built_at: unknown }).built_at)
       : null) ?? null;
 
-  const allSymbols = requiredLiveQuoteSymbols(watchlist);
+  const screenerTickers = (tvScreeners?.screeners ?? []).flatMap((s) => s.hits.map((hit) => hit.ticker));
+  const allSymbols = requiredLiveQuoteSymbols(Array.from(new Set([...watchlist, ...screenerTickers]
+    .map((symbol) => symbol.trim().toUpperCase()).filter(Boolean))));
   const liveRows = await prisma.liveQuote.findMany({
     where: { symbol: { in: allSymbols } },
   });
@@ -327,12 +342,32 @@ export async function composeSnapshot(watchlist: string[]): Promise<ComposedSnap
     ...liveRows,
     ...liveIndexRows.filter((row) => row.symbol === "VIX"),
   ];
-  const { bySymbol: liveBySymbol, latestObservedAt: liveAsOf } = selectFreshLiveQuotes(candidates);
+  const { bySymbol: liveBySymbol } = selectFreshLiveQuotes(candidates.filter((row) =>
+    isBriefInputFresh(row.observedAt.toISOString(), now)), now);
+  const symbolEvidence: Record<string, BriefSymbolEvidence> = {};
+  for (const screener of tvScreeners?.screeners ?? []) {
+    for (const hit of screener.hits) {
+      symbolEvidence[hit.ticker.trim().toUpperCase()] = {
+        observedAt: tvScreeners!.fetched_at, source: `TradingView: ${screener.name || screener.id}`,
+        kind: "screener", price: asNumber(hit.close), changePct: asNumber(hit.change),
+        rvol: asNumber(hit.relative_volume_10d_calc),
+      };
+    }
+  }
+  for (const [symbol, row] of Array.from(liveBySymbol)) {
+    const evidence: BriefSymbolEvidence = { observedAt: row.observedAt.toISOString(), source: row.source,
+      kind: "quote", price: asNumber(row.price), changePct: asNumber(row.changePct), rvol: null };
+    if (evidence.price != null && isSymbolEvidenceFresh(evidence, now)
+      && (!symbolEvidence[symbol] || Date.parse(evidence.observedAt) >= Date.parse(symbolEvidence[symbol].observedAt))) {
+      symbolEvidence[symbol] = evidence;
+    }
+  }
+  const liveAsOf = Array.from(liveBySymbol.values()).map((row) => row.observedAt.toISOString()).sort().at(-1);
 
   const pickGroup = (symbols: readonly string[]) =>
     Object.fromEntries(
       symbols
-        .map((s): [string, { price: number; changePct: number | null; source: string }] | null => {
+        .map((s): [string, { price: number; changePct: number | null; source: string; observedAt: string }] | null => {
           const row = liveBySymbol.get(s);
           if (!row) return null;
           return [
@@ -341,22 +376,32 @@ export async function composeSnapshot(watchlist: string[]): Promise<ComposedSnap
               price: Number(row.price),
               changePct: row.changePct == null ? null : Number(row.changePct),
               source: row.source,
+              observedAt: row.observedAt.toISOString(),
             },
           ];
         })
-        .filter((x): x is [string, { price: number; changePct: number | null; source: string }] => x !== null),
+        .filter((x): x is [string, { price: number; changePct: number | null; source: string; observedAt: string }] => x !== null),
     );
 
   const indices = pickGroup(LIVE_QUOTE_INDEX_SYMBOLS);
 
   return {
-    builtAt: new Date().toISOString(),
+    builtAt: now.toISOString(),
     baselineBuiltAt,
-    liveAsOf: liveAsOf ? liveAsOf.toISOString() : null,
+    liveAsOf: liveAsOf ?? null,
+    symbolEvidence,
     indices,
     sectors: pickGroup(SECTOR_SYMBOLS),
     watchlist: pickGroup(watchlist),
-    industryMovers: buildIndustryMovers({ baseline, tvScreeners, breadth }),
+    industryMovers: buildIndustryMovers({ baseline, tvScreeners, breadth, now }).map((industry) => ({
+      ...industry,
+      leaders: industry.leaders?.map((leader) => {
+        const row = symbolEvidence[leader.ticker];
+        return row ? { ticker: leader.ticker, changePct: row.changePct, rvol: row.rvol,
+          source: row.source, observedAt: row.observedAt } : leader;
+      }) ?? null,
+      note: null,
+    })),
     breadth: breadth?.market ?? null,
     marketDirection: buildMarketDirection(indices),
     baseline,
@@ -404,6 +449,7 @@ function buildMarketDirection(
  * unchanged from the previous bucket can short-circuit the regen.
  */
 export function hashSnapshot(s: ComposedSnapshot): string {
-  const subset = { indices: s.indices, sectors: s.sectors, watchlist: s.watchlist, industryMovers: s.industryMovers };
+  const subset = { indices: s.indices, sectors: s.sectors, watchlist: s.watchlist, industryMovers: s.industryMovers,
+    symbolEvidence: s.symbolEvidence, breadth: s.breadth, baseline: s.baseline };
   return crypto.createHash("sha256").update(JSON.stringify(subset)).digest("hex");
 }

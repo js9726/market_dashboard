@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BriefProviderName } from "@/lib/brief/provider-selection";
+import type { StructuredBrief } from "@/types/structured-brief";
 
 export type { BriefProviderName };
 
 export interface ProviderEntry {
+  liveIdeas?: StructuredBrief | null;
+  liveIdeasAsOf?: string | null;
   html: string;
   structured: unknown;     // StructuredBrief shape — primary
   verdict: unknown;        // legacy mirror of structured
@@ -44,6 +47,8 @@ export function useMorningVerdict(intervalMs = 60_000) {
       setError(null);
       setLoading(false);
     } catch (e) {
+      // A failed poll must also trigger a render so symbol evidence expires.
+      setData((previous) => previous ? { ...previous } : previous);
       setError((e as Error).message);
       setLoading(false);
     }

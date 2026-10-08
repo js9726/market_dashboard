@@ -26,6 +26,7 @@ import { auth } from "@/auth";
 import { ALL_PROVIDERS, isIntradayWindow, type BriefProvider } from "@/lib/brief/bucket";
 import { readCurrentBucketWithLazyRegen, readLatestRow } from "@/server/brief-cache";
 import { fetchFearGreed, overlayFearGreed } from "@/lib/fear-greed";
+import { ideasObservedAt, liveIdeasFromBrief } from "@/lib/brief/source-evidence";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +48,10 @@ export async function GET() {
   for (const p of ALL_PROVIDERS) {
     const row = byProvider.get(p);
     if (row) {
+      const liveIdeas = row.errorMsg ? null : liveIdeasFromBrief(row.structuredJson);
       providers[p] = {
+        liveIdeas,
+        liveIdeasAsOf: ideasObservedAt(liveIdeas),
         html: row.htmlBody,
         structured: overlayFearGreed(row.structuredJson, fearGreed),
         verdict: overlayFearGreed(row.verdictJson, fearGreed),
@@ -62,8 +66,11 @@ export async function GET() {
       // Cache miss for this bucket — fall back to the most recent row for this
       // provider so the UI can still render *something*. Mark stale=true.
       const latest = await readLatestRow(p);
+      const liveIdeas = latest?.errorMsg ? null : liveIdeasFromBrief(latest?.structuredJson);
       providers[p] = latest
         ? {
+            liveIdeas,
+            liveIdeasAsOf: ideasObservedAt(liveIdeas),
             html: latest.htmlBody,
             structured: overlayFearGreed(latest.structuredJson, fearGreed),
             verdict: overlayFearGreed(latest.verdictJson, fearGreed),

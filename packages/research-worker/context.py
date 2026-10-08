@@ -65,6 +65,24 @@ def _hashes(documents):
     return {path: doc["sha256"] for path, doc in documents.items()}
 
 
+def _pg_generation(root, provider):
+    """Read and verify the canonical mirror without changing or repairing it."""
+    directory = root / "scripts" / "retrieval"
+    module_path = directory / "pg_store.py"
+    loaded = sys.modules.get("pg_store")
+    if not module_path.is_file() or (loaded is not None and
+            Path(getattr(loaded, "__file__", "")).resolve() != module_path.resolve()):
+        raise ContextError("Canonical Postgres retrieval module required")
+    sys.path.insert(0, str(directory))
+    try:
+        pg = importlib.import_module("pg_store")
+    finally:
+        sys.path.remove(str(directory))
+    with pg.connect() as connection:
+        connection.execute("SET default_transaction_read_only = on")
+        return pg.load_active(connection, provider, with_vectors=True)
+
+
 def _scoped_documents(store, root):
     return {path: doc for path, doc in store.read_corpus(root).items() if allowed_path(path)}
 
@@ -108,7 +126,7 @@ def _validate_request(job, state, evidence, mode):
         raise ContextError("Evidence must be finite JSON") from error
 
 
-def build_context(wiki_root, job, thread_state, evidence, mode="lexical"):
+def build_context(wiki_root, job, thread_state, evidence, mode="lexical", store_type="local"):
     """Return a fresh context packet or raise ContextError; never repair an index.
 
     thread_state must explicitly carry userId and threadId even on a first run.
@@ -116,6 +134,8 @@ def build_context(wiki_root, job, thread_state, evidence, mode="lexical"):
     rows (and corresponding vectors), with at most six distinct source documents.
     """
     _validate_request(job, thread_state, evidence, mode)
+    if store_type not in {"local", "pg"} or (store_type == "pg" and mode != "hybrid"):
+        raise ContextError("Postgres retrieval requires explicit hybrid mode; store must be local or pg")
     root = Path(wiki_root).resolve()
     try:
         store, query, providers = _retrieval_modules(root)
@@ -133,8 +153,14 @@ def build_context(wiki_root, job, thread_state, evidence, mode="lexical"):
         else:
             provider = providers.named("gemini")
             index = root / "scripts" / "retrieval" / provider.default_index
-            all_rows, all_vectors, meta, state = store.prepare_index(
-                root, index, allow_embed=False, expected=provider)
+            generation_id = None
+            if store_type == "pg":
+                all_rows, all_vectors, meta, generation_id = _pg_generation(root, provider)
+                store.assert_fresh(root, all_rows, meta)
+                state = {"status": "clean"}
+            else:
+                all_rows, all_vectors, meta, state = store.prepare_index(
+                    root, index, allow_embed=False, expected=provider)
             if meta["source"] != "worktree":
                 raise ContextError("Current research requires a current-worktree index")
             indices = [i for i, row in enumerate(all_rows) if allowed_path(row["path"])]
@@ -143,7 +169,8 @@ def build_context(wiki_root, job, thread_state, evidence, mode="lexical"):
             index_metadata = {key: deepcopy(meta[key]) for key in (
                 "embedding", "model", "dimensions", "chunker", "source", "built_at")}
             index_metadata.update({"refreshedAt": meta.get("refreshed_at"),
-                                   "status": state["status"], "scopedChunks": len(rows)})
+                                   "status": state["status"], "scopedChunks": len(rows),
+                                   "store": store_type, "generationId": generation_id})
         hits = query.search_detailed(query_text, rows, vectors, meta or {}, mode, 6)
         if meta is not None:
             store.assert_fresh(root, all_rows, meta)
@@ -167,7 +194,7 @@ def build_context(wiki_root, job, thread_state, evidence, mode="lexical"):
                 "jobId": job["id"], **{key: job[key] for key in (
                     "userId", "threadId", "ticker", "provider", "asOf", "question", "horizon")},
                 "mandatory": mandatory, "supplemental": supplemental,
-                "retrieval": {"mode": mode, "status": "current", "index": index_metadata,
+                "retrieval": {"mode": mode, "store": store_type, "status": "current", "index": index_metadata,
                               "sourceRevision": revision, "checkedAt": retrieved_at,
                               "scope": list(ALLOWED_PREFIXES)},
                 "state": {"summary": thread_state.get("summary", ""),
