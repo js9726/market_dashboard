@@ -66,6 +66,8 @@ MIN_BARS = 60          # EMA50, 50-day U/D and 20-day windows
 HIGH_52W_BARS = 252    # sessions in a 52-week lookback
 ALIGN_SESSIONS = 60    # trailing exchange sessions every series must match exactly
 FINALIZE_MINUTES = 20  # a daily bar is final this long after the session close
+OPEND_READS = 4               # get_cur_kline reads per subscribed code before accepting what arrived
+OPEND_SETTLE_SECONDS = 0.5    # wait before re-reading a short or failed read, times the read number
 REGULAR_CLOSE = dt.time(16, 0)
 EARLY_CLOSE = dt.time(13, 0)
 CALENDAR_FIRST_YEAR = 2000
@@ -178,8 +180,40 @@ def recent_sessions(last: dt.date, n: int) -> list[dt.date]:
 
 
 # ---------------------------------------------------------------- data sources
-def fetch_opend(tickers: list[str], count: int = 300) -> dict[str, list[dict]]:
+def _futu():
     from futu import AuType, KLType, OpenQuoteContext, SubType  # type: ignore
+
+    return AuType, KLType, OpenQuoteContext, SubType
+
+
+def settled_kline(ctx, code: str, count: int, ktype, autype, sleep: Callable[[float], None] = time.sleep):
+    """Daily bars for a subscribed code, re-read until the subscription has loaded its history.
+
+    Straight after subscribe(), OpenD answers get_cur_kline from its first push: 60 bars whatever
+    `count` asks for, then the full history about half a second later (measured 2026-10-19 on KO
+    and PEP). Taken at face value that short read failed a whole run: SPY had 59 completed bars
+    against MIN_BARS. A read is accepted when it returns `count` bars, or when a later read returns
+    the same shorter length, which is a genuinely short history such as a recent listing. If the
+    length is still changing after every read, the last read is returned and the gates judge it.
+    None when every read failed.
+    """
+    previous = None
+    for attempt in range(OPEND_READS):
+        try:
+            ret, data = ctx.get_cur_kline(code, count, ktype, autype)
+        except Exception:  # noqa: BLE001
+            ret, data = -1, None
+        if ret == 0:
+            if len(data) >= count or (previous is not None and len(data) == len(previous)):
+                return data
+            previous = data
+        if attempt < OPEND_READS - 1:
+            sleep(OPEND_SETTLE_SECONDS * (attempt + 1))
+    return previous
+
+
+def fetch_opend(tickers: list[str], count: int = 300, sleep: Callable[[float], None] = time.sleep) -> dict[str, list[dict]]:
+    AuType, KLType, OpenQuoteContext, SubType = _futu()
 
     out: dict[str, list[dict]] = {}
     ctx = OpenQuoteContext(host="127.0.0.1", port=11111)
@@ -189,17 +223,16 @@ def fetch_opend(tickers: list[str], count: int = 300) -> dict[str, list[dict]]:
             for attempt in range(3):
                 try:
                     ctx.subscribe([code], [SubType.K_DAY])
-                    r = ctx.get_cur_kline(code, count, KLType.K_DAY, AuType.QFQ)
-                except Exception as e:  # noqa: BLE001
-                    r = (-1, str(e))
-                if r[0] == 0:
-                    df = r[1]
+                    df = settled_kline(ctx, code, count, KLType.K_DAY, AuType.QFQ, sleep)
+                except Exception:  # noqa: BLE001
+                    df = None
+                if df is not None:
                     out[t] = [{"d": str(x[0])[:10], "o": float(x[1]), "h": float(x[2]), "l": float(x[3]),
                                "c": float(x[4]), "v": float(x[5])}
                               for x in df[["time_key", "open", "high", "low", "close", "volume"]].values.tolist()]
                     break
-                time.sleep(2.0 * (attempt + 1))
-            time.sleep(0.6)  # OpenD rate limit
+                sleep(2.0 * (attempt + 1))
+            sleep(0.6)  # OpenD rate limit
     finally:
         ctx.close()
     return out

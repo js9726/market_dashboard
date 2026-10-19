@@ -337,5 +337,108 @@ class Unknowns(unittest.TestCase):
         walk(doc)
 
 
+class FakeQuoteContext:
+    """Scripted OpenD quote context: each get_cur_kline call pops the next response for its code.
+
+    A response is a bar count (served as that many rows) or an Exception (raised).
+    """
+
+    def __init__(self, script: dict[str, list], end: dt.date = SESSION):
+        self.script = {code: list(steps) for code, steps in script.items()}
+        self.end = end
+        self.reads: dict[str, int] = {}
+        self.subscribed: list[str] = []
+        self.closed = False
+
+    def subscribe(self, codes, _subtypes):
+        self.subscribed += codes
+        return 0, ""
+
+    def get_cur_kline(self, code, count, _ktype, _autype):
+        self.reads[code] = self.reads.get(code, 0) + 1
+        step = self.script[code].pop(0)
+        if isinstance(step, Exception):
+            raise step
+        return 0, frame(min(step, count), self.end)
+
+    def close(self):
+        self.closed = True
+
+
+def frame(n: int, end: dt.date = SESSION):
+    """n daily bars ending at `end`, in get_cur_kline's DataFrame layout."""
+    import pandas as pd
+
+    bars = series(end, n) if n else []
+    return pd.DataFrame({"time_key": [f"{b['d']} 00:00:00" for b in bars], "open": [b["o"] for b in bars],
+                         "high": [b["h"] for b in bars], "low": [b["l"] for b in bars],
+                         "close": [b["c"] for b in bars], "volume": [b["v"] for b in bars]})
+
+
+def settle(script: list):
+    ctx, waits = FakeQuoteContext({"US.AAA": script}), []
+    data = m.settled_kline(ctx, "US.AAA", 300, None, None, sleep=waits.append)
+    return data, ctx.reads["US.AAA"], waits
+
+
+class OpendColdSubscription(unittest.TestCase):
+    """A fresh K_DAY subscription first answers with 60 bars, then the full history.
+
+    2026-10-19: taking that first read at face value left SPY with 59 completed bars and the
+    whole run exited 3 (BENCHMARK_INSUFFICIENT_HISTORY); a re-run seconds later measured fine.
+    """
+
+    def test_short_first_read_is_reread_until_full(self):
+        data, reads, waits = settle([60, 300])
+        self.assertEqual((len(data), reads), (300, 2))
+        self.assertEqual(waits, [m.OPEND_SETTLE_SECONDS])
+
+    def test_full_first_read_is_not_reread(self):
+        data, reads, waits = settle([300])
+        self.assertEqual((len(data), reads, waits), (300, 1, []))
+
+    def test_repeated_short_length_is_a_real_short_history(self):
+        data, reads, _ = settle([45, 45])
+        self.assertEqual((len(data), reads), (45, 2))
+
+    def test_still_growing_after_every_read_returns_the_last_read(self):
+        data, reads, waits = settle([60, 120, 180, 240])
+        self.assertEqual((len(data), reads), (240, m.OPEND_READS))
+        self.assertEqual(len(waits), m.OPEND_READS - 1)
+
+    def test_failed_read_is_retried(self):
+        data, reads, _ = settle([RuntimeError("timeout"), 300])
+        self.assertEqual((len(data), reads), (300, 2))
+
+    def test_every_read_failing_returns_none(self):
+        data, reads, _ = settle([RuntimeError("down")] * m.OPEND_READS)
+        self.assertIsNone(data)
+        self.assertEqual(reads, m.OPEND_READS)
+
+    def test_fetch_opend_returns_the_full_series_after_a_cold_read(self):
+        ctx = FakeQuoteContext({"US.SPY": [60, 300], "US.AAA": [300]})
+        futu = (mock.Mock(), mock.Mock(), lambda **_: ctx, mock.Mock())
+        with mock.patch.object(m, "_futu", return_value=futu):
+            bars = m.fetch_opend(["SPY", "AAA"], sleep=lambda _s: None)
+        self.assertEqual({t: len(b) for t, b in bars.items()}, {"SPY": 300, "AAA": 300})
+        self.assertEqual(bars["SPY"][-1]["d"], SESSION.isoformat())
+        self.assertEqual(ctx.subscribed, ["US.SPY", "US.AAA"])
+        self.assertTrue(ctx.closed)
+
+    def test_cold_read_mid_session_no_longer_fails_the_benchmark(self):
+        # The 2026-10-19 shape: mid-session, so the 60-bar first push includes today's live bar
+        # and leaves 59 completed bars, one short of MIN_BARS.
+        live_day = dt.date(2026, 9, 29)  # Tuesday, the session after SESSION
+        ctx = FakeQuoteContext({"US.SPY": [60, 300], "US.AAA": [300]}, end=live_day)
+        futu = (mock.Mock(), mock.Mock(), lambda **_: ctx, mock.Mock())
+        fetch = lambda wanted: m.fetch_opend(wanted, sleep=lambda _s: None)  # noqa: E731
+        mid_session = dt.datetime.combine(live_day, dt.time(10, 30), tzinfo=ET)
+        with mock.patch.object(m, "_futu", return_value=futu):
+            code, doc = m.run(["--tickers", "AAA", "--source", "opend"], now=lambda: mid_session,
+                              fetchers={"opend": fetch, "yahoo": fetch}, reachable=lambda: True)
+        self.assertEqual((code, doc["status"], row(doc)["status"]), (0, "OK", "OK"))
+        self.assertEqual(doc["spy_last_bar"], SESSION.isoformat())
+
+
 if __name__ == "__main__":
     unittest.main()
