@@ -23,6 +23,12 @@ Two layers, deliberately:
 Layer 1 guarantees nothing is ever dropped. Layer 2 only ever ADDS resolution.
 
 Cache: classifications are stable, so they persist to finviz_cache.json (default 30d).
+Only successful lookups are cached. A failed lookup falls back to the last good record.
+
+Failure is never silent. Every Finviz miss raises FinvizUnavailable, whose `kind` says
+why: bot_check, http, network, markup or dependency. Since 2026-09-30 finviz.com has
+answered python-requests with Cloudflare's "Just a moment..." challenge (HTTP 403,
+cf-mitigated: challenge) on every URL. That is a bot-check, not a markup change.
 
 Usage
 -----
@@ -49,6 +55,46 @@ except ImportError:
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 CACHE = Path(__file__).with_name("finviz_cache.json")
 CACHE_DAYS = 30
+GROUPS_URL = "https://finviz.com/groups.ashx?g=industry&v=210&o=name&st=d1"
+GROUP_ROW = re.compile(
+    r'\{"ticker":"(?P<slug>[^"]+)","label":"(?P<label>[^"]+)"'
+    r'.*?"perfT":(?P<d>-?[\d.]+),"perfW":(?P<w>-?[\d.]+),"perfM":(?P<m>-?[\d.]+)'
+    r',"perfQ":(?P<q>-?[\d.]+)'
+)
+
+
+class FinvizUnavailable(RuntimeError):
+    """Finviz served no usable data. `kind` is bot_check, http, network, markup or
+    dependency; the message names the URL and what to do next."""
+
+    def __init__(self, kind: str, detail: str):
+        super().__init__(detail)
+        self.kind = kind
+
+
+def _is_bot_check(html: str) -> bool:
+    """Cloudflare's managed-challenge interstitial, served instead of the page."""
+    return "<title>Just a moment...</title>" in html or "/cdn-cgi/challenge-platform/" in html
+
+
+def _fetch(url: str, timeout: int = 20) -> str:
+    """GET a Finviz page, or raise FinvizUnavailable naming the exact failure."""
+    if not _OK:
+        raise FinvizUnavailable("dependency", "requests/beautifulsoup4 not installed")
+    try:
+        r = requests.get(url, headers=UA, timeout=timeout)
+    except requests.RequestException as e:
+        raise FinvizUnavailable("network", f"network error fetching {url}: {e}") from e
+    if r.headers.get("cf-mitigated") == "challenge" or _is_bot_check(r.text):
+        raise FinvizUnavailable(
+            "bot_check",
+            f"Cloudflare bot-check on {url} (HTTP {r.status_code}, "
+            f"cf-mitigated={r.headers.get('cf-mitigated')}): Finviz served the "
+            "'Just a moment...' challenge instead of data. Not a markup or URL change; "
+            "scripts cannot pass it. Read the table via Chrome MCP.")
+    if r.status_code != 200:
+        raise FinvizUnavailable("http", f"HTTP {r.status_code} from {url}")
+    return r.text
 
 
 def _load_cache() -> dict:
@@ -67,45 +113,68 @@ def _save_cache(c: dict) -> None:
         pass
 
 
-def classify(tickers: list[str], throttle: float = 0.4) -> dict[str, dict]:
-    """ticker -> {sector, industry, country}. Cached; misses return None fields."""
-    if not _OK:
-        print("requests/beautifulsoup4 missing — cannot classify.", file=sys.stderr)
-        return {t: {"sector": None, "industry": None, "country": None} for t in tickers}
+_EMPTY = {"sector": None, "industry": None, "country": None}
 
+
+def _parse_quote(html: str, ticker: str) -> dict:
+    """{sector, industry, country} from a quote page's header category links."""
+    rec = dict(_EMPTY)
+    vals = []
+    for a in BeautifulSoup(html, "html.parser").select("a.quote-header_category"):
+        href = a.get("href", "")
+        txt = a.get("title") or a.get_text(strip=True)
+        if "f=sec_" in href:
+            rec["sector"] = txt
+        elif "f=ind_" in href:
+            rec["industry"] = txt
+        elif "f=geo_" in href:
+            rec["country"] = txt
+        vals.append(txt)
+    if not rec["sector"] and len(vals) >= 2:
+        rec["sector"], rec["industry"] = vals[0], vals[1]
+    if not rec["industry"]:
+        raise FinvizUnavailable(
+            "markup", f"quote page for {ticker} has no sector/industry links "
+                      "(unlisted ticker or markup change)")
+    return rec
+
+
+def classify(tickers: list[str], throttle: float = 0.4) -> dict[str, dict]:
+    """ticker -> {sector, industry, country}. Cached for CACHE_DAYS.
+
+    A failed lookup never touches the cache. It returns the last good record (or None
+    fields) plus "error" naming the failure. On 2026-10-20 a blocked run cached nulls
+    with a fresh timestamp over good records, which would have served them for 30 days.
+    After a bot-check the remaining lookups are skipped: every Finviz URL is challenged.
+    """
     cache = _load_cache()
     fresh_after = (datetime.now() - timedelta(days=CACHE_DAYS)).isoformat()
     out: dict[str, dict] = {}
     dirty = False
+    blocked: FinvizUnavailable | None = None
 
     for t in tickers:
         t = t.upper().strip()
-        hit = cache.get(t)
-        if hit and hit.get("fetched_at", "") > fresh_after:
-            out[t] = {k: hit.get(k) for k in ("sector", "industry", "country")}
+        hit = cache.get(t) or {}
+        # null records left by the 2026-10-20 bot-check are misses, never answers
+        last_good = ({k: hit.get(k) for k in ("sector", "industry", "country")}
+                     if hit.get("industry") else None)
+        if last_good and hit.get("fetched_at", "") > fresh_after:
+            out[t] = last_good
             continue
-        rec = {"sector": None, "industry": None, "country": None}
+        if blocked:
+            out[t] = {**(last_good or _EMPTY), "error": f"skipped after {blocked}"}
+            continue
         try:
-            r = requests.get(f"https://finviz.com/quote.ashx?t={t}", headers=UA, timeout=15)
-            if r.status_code == 200:
-                soup = BeautifulSoup(r.text, "html.parser")
-                cats = soup.select("a.quote-header_category")
-                vals = []
-                for a in cats:
-                    href = a.get("href", "")
-                    txt = a.get("title") or a.get_text(strip=True)
-                    if "f=sec_" in href:
-                        rec["sector"] = txt
-                    elif "f=ind_" in href:
-                        rec["industry"] = txt
-                    elif "f=geo_" in href:
-                        rec["country"] = txt
-                    vals.append(txt)
-                if not rec["sector"] and len(vals) >= 2:
-                    rec["sector"], rec["industry"] = vals[0], vals[1]
+            html = _fetch(f"https://finviz.com/quote.ashx?t={t}", timeout=15)
             time.sleep(throttle)
-        except Exception as e:
-            print(f"  finviz classify {t}: {e}", file=sys.stderr)
+            rec = _parse_quote(html, t)
+        except FinvizUnavailable as e:
+            if e.kind in ("bot_check", "dependency"):
+                blocked = e
+            print(f"  finviz classify {t} [{e.kind}]: {e}", file=sys.stderr)
+            out[t] = {**(last_good or _EMPTY), "error": str(e)}
+            continue
         cache[t] = {**rec, "fetched_at": datetime.now().isoformat()}
         dirty = True
         out[t] = rec
@@ -115,32 +184,21 @@ def classify(tickers: list[str], throttle: float = 0.4) -> dict[str, dict]:
     return out
 
 
-def industry_performance() -> list[dict]:
-    """All Finviz industries ranked by 1-month performance (desc).
+def parse_industry_performance(html: str) -> list[dict]:
+    """Industries from a groups page, ranked by 1-month performance (desc).
 
-    Finviz moved the groups table to a client-rendered JSON blob embedded in the page;
-    the legacy `tr.table-light-row-cp` selectors now match ZERO rows. (This is the same
-    breakage still present in `apps/market_dashboard_backend/scripts/build_data.py`
-    `fetch_finviz_industry_performance()`, which fails silently to an empty dict.)
-    Parse the embedded JSON instead.
+    Finviz renders the groups table client-side from JSON embedded in the page
+    (`FinvizInitGroupsPerformance([...])`); the legacy `tr.table-light-row-cp` rows no
+    longer exist. Raises FinvizUnavailable instead of returning an empty list, so a
+    blocked or changed page can never read as a flat market.
     """
-    if not _OK:
-        return []
-    url = "https://finviz.com/groups.ashx?g=industry&v=210&o=name&st=d1"
-    try:
-        html = requests.get(url, headers=UA, timeout=20).text
-    except Exception as e:
-        print(f"finviz industry perf error: {e}", file=sys.stderr)
-        return []
-
+    if _is_bot_check(html):
+        raise FinvizUnavailable(
+            "bot_check", "page is Cloudflare's 'Just a moment...' challenge, not the "
+                         "groups table. Read the table via Chrome MCP.")
     rows: list[dict] = []
     seen: set[str] = set()
-    for m in re.finditer(
-        r'\{"ticker":"(?P<slug>[^"]+)","label":"(?P<label>[^"]+)"'
-        r'.*?"perfT":(?P<d>-?[\d.]+),"perfW":(?P<w>-?[\d.]+),"perfM":(?P<m>-?[\d.]+)'
-        r',"perfQ":(?P<q>-?[\d.]+)',
-        html,
-    ):
+    for m in GROUP_ROW.finditer(html):
         label = m.group("label").encode().decode("unicode_escape")
         if label in seen:
             continue
@@ -154,10 +212,22 @@ def industry_performance() -> list[dict]:
             "perf_3m": float(m.group("q")),
         })
     if not rows:
-        print("finviz: parsed 0 industries — markup changed again, FAIL CLOSED",
-              file=sys.stderr)
+        title = re.search(r"<title>(.*?)</title>", html, re.S)
+        raise FinvizUnavailable(
+            "markup", f"groups page ({len(html)} bytes, title "
+                      f"{title.group(1).strip()[:60] if title else None!r}) has no "
+                      "FinvizInitGroupsPerformance JSON rows. Markup changed; fix the "
+                      "parser or read the table via Chrome MCP.")
     rows.sort(key=lambda x: -x["perf_1m"])
     return rows
+
+
+def industry_performance() -> list[dict]:
+    """All Finviz industries ranked by 1-month performance (desc), live.
+
+    Raises FinvizUnavailable with the specific reason. Never returns an empty list.
+    """
+    return parse_industry_performance(_fetch(GROUPS_URL))
 
 
 def universe(screeners_json: str | None = None, extra: list[str] | None = None) -> list[str]:
@@ -254,7 +324,14 @@ def main() -> int:
                     help="classify the FULL universe: holdings + screener hits")
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args()
+    try:
+        return _run(ap, a)
+    except FinvizUnavailable as e:
+        print(f"finviz unavailable [{e.kind}]: {e}", file=sys.stderr)
+        return 2
 
+
+def _run(ap: argparse.ArgumentParser, a: argparse.Namespace) -> int:
     if a.industries:
         rows = industry_performance()
         if a.json:

@@ -22,7 +22,8 @@ Checks
                     PRELIMINARY FOCUS and must reach the brief. Writes watchlist.json.
   2. watchlist    — exists and is <= 3 days old.
   3. themes       — Finviz industry ranking returns > 100 industries. Zero or a tiny
-                    number means the scraper broke, NOT a flat market.
+                    number means the scraper broke, NOT a flat market. The receipt's
+                    `reason` names why (bot_check, http, network, markup, dependency).
   4. universe     — the classified universe actually contains the operator's holdings
                     and focus names. A theme read over a universe that cannot contain
                     his theme is worthless (2026-08-05: 47 tickers, zero cyber leaders).
@@ -139,7 +140,11 @@ def check_themes() -> dict:
         from finviz_classify import industry_performance
         rows = industry_performance()
     except Exception as e:
-        return {"ok": False, "hard": True, "detail": f"theme source raised: {e}"}
+        # FinvizUnavailable.kind: bot_check / http / network / markup / dependency
+        kind = getattr(e, "kind", "error")
+        return {"ok": False, "hard": True, "count": 0, "reason": kind,
+                "detail": f"Finviz themes unavailable [{kind}]: {e} "
+                          f"This is NOT a flat market."}
     n = len(rows)
     if n < MIN_INDUSTRIES:
         return {"ok": False, "hard": True, "count": n,
@@ -161,6 +166,10 @@ def check_universe(focus: dict) -> dict:
         cls = classify(uni) if uni else {}
         unclassified = sorted(t for t, v in cls.items()
                               if not v.get("industry") and t.isalpha() and len(t) <= 4)
+        # classify() names every failed lookup; a refresh failure may still be served
+        # from the last good cache record
+        errors = sorted({v["error"] for v in cls.values() if v.get("error")})
+        stale = sorted(t for t, v in cls.items() if v.get("error") and v.get("industry"))
     except Exception as e:
         return {"ok": False, "hard": True, "detail": f"universe build raised: {e}"}
     ok = not missing
@@ -170,10 +179,16 @@ def check_universe(focus: dict) -> dict:
         "size": len(uni),
         "missing_focus": missing,
         "unclassified": unclassified[:10],
+        "stale_classified": len(stale),
+        "lookup_errors": errors[:3],
         "detail": (f"universe {len(uni)} tickers"
                    + (f"; MISSING focus names {missing} — they cannot reach the brief" if missing else "")
-                   + (f"; {len(unclassified)} unclassified (scraper suspect): {', '.join(unclassified[:6])}"
-                      if unclassified else "")),
+                   + (f"; {len(unclassified)} unclassified: {', '.join(unclassified[:6])}"
+                      if unclassified else "")
+                   + (f"; {len(stale)} served from last-good cache" if stale else "")
+                   + (f"; Finviz lookup failed: {errors[0]}"
+                      + (f" (+{len(errors) - 1} other reasons)" if len(errors) > 1 else "")
+                      if errors else "")),
     }
 
 

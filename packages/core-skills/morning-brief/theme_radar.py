@@ -267,10 +267,16 @@ def main() -> int:
         try:
             from finviz_classify import classify, industry_performance
             cls = classify(held)
-            perf = {r["industry"]: r for r in industry_performance()}
         except Exception as e:
             print(f"finviz classify unavailable: {e}", file=sys.stderr)
-            cls, perf = {}, {}
+            cls = {}
+        # industry_performance raises its reason; a blocked ranking must not discard
+        # the (cached) classifications above
+        try:
+            perf = {r["industry"]: r for r in industry_performance()}
+        except Exception as e:
+            print(f"finviz industry ranking unavailable: {e}", file=sys.stderr)
+            perf = {}
         by_ind: dict[str, list[str]] = {}
         for t in held:
             ind = (cls.get(t) or {}).get("industry") or "UNCLASSIFIED"
