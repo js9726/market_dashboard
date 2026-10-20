@@ -97,6 +97,9 @@ def _position_rows(df) -> list[dict]:
         code = str(raw.get("code", ""))
         rows.append({
             "ticker": code.replace("US.", "").upper(),
+            # Broker market prefix (US, MY, HK...). Read from the code, never from a dot in the
+            # ticker: US symbols such as BRK.B contain dots too.
+            "market": code.split(".", 1)[0].upper() if "." in code else "",
             "qty": qty,
             # average_cost = original un-diluted entry (use for R). cost_price/
             # diluted_cost are netted by realized P&L and would inflate R wildly.
@@ -235,11 +238,13 @@ def reconcile_protection(position: dict, orders: list[dict] | None) -> dict:
     """Pure reconciliation of one live long position against active protective sells."""
     ticker = str(position.get("ticker", "")).upper()
     live_qty = max(_number(position.get("qty")), 0.0)
-    if ticker in HOLD_EXEMPT:
+    exempt_reason = hold_exempt_reason(position)
+    if exempt_reason:
         return {
             "protection_state": "HOLD-EXEMPT", "order_feed_verified": orders is not None,
             "working_qty": 0.0, "queued_qty": 0.0, "protected_qty": 0.0,
             "unprotected_qty": 0.0, "protective_orders": [], "new_risk_block": False,
+            "exempt_reason": exempt_reason,
         }
     if orders is None:
         return {
@@ -321,13 +326,28 @@ HOLD_EXEMPT = {
 }
 
 
+def hold_exempt_reason(position: dict) -> str | None:
+    """Why a holding is outside the US swing book's protection gate, or None.
+
+    Permanent holds (HOLD_EXEMPT, currently MTLS) and every non-US holding (e.g. Bursa
+    MY.5306) are reported but never block new US risk or the brief: Jie, 2026-10-20.
+    """
+    if str(position.get("ticker", "")).upper() in HOLD_EXEMPT:
+        return "permanent hold (operator rule) - excluded from risk budget"
+    market = str(position.get("market", "")).upper()
+    if market and market != "US":
+        return f"non-US holding ({market}) - outside the US swing book; reported, never blocks new risk"
+    return None
+
+
 def classify(h: dict) -> dict:
     """Attach broker-protection and separate planned-stop diagnostics."""
-    if h.get("ticker", "").upper() in HOLD_EXEMPT:
+    exempt_reason = hold_exempt_reason(h)
+    if exempt_reason:
         h["protection_state"], h["stop_status"], h["urgency"] = "HOLD-EXEMPT", "HOLD-EXEMPT", "OK"
         h["new_risk_block"] = False
         h["planned_stop_status"] = "NOT-REQUIRED"
-        h["notes"] = ["permanent hold (operator rule) - excluded from risk budget"]
+        h["notes"] = [exempt_reason]
         return h
 
     last = h.get("last")

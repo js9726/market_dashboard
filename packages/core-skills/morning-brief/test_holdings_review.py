@@ -225,5 +225,46 @@ class BrokerSnapshotTests(unittest.TestCase):
         self.assertIsNone(snapshot["orders"])
 
 
+class NonUsExemptionTests(unittest.TestCase):
+    """Jie, 2026-10-20: non-US holdings and permanent holds never block new US risk."""
+
+    def test_position_rows_record_market_from_the_code_not_the_ticker(self):
+        rows = hr._position_rows(FakeFrame([{"code": "MY.5306", "qty": 1000}, {"code": "US.BRK.B", "qty": 1}]))
+        self.assertEqual([(r["ticker"], r["market"]) for r in rows], [("MY.5306", "MY"), ("BRK.B", "US")])
+
+    def test_unprotected_non_us_holding_is_exempt(self):
+        result = hr.reconcile_protection({"ticker": "MY.5306", "market": "MY", "qty": 1000}, [])
+        self.assertEqual(result["protection_state"], "HOLD-EXEMPT")
+        self.assertFalse(result["new_risk_block"])
+        self.assertIn("non-US", result["exempt_reason"])
+
+    def test_dotted_us_ticker_still_needs_protection(self):
+        result = hr.reconcile_protection({"ticker": "BRK.B", "market": "US", "qty": 1}, [])
+        self.assertEqual(result["protection_state"], "UNPROTECTED")
+        self.assertTrue(result["new_risk_block"])
+
+    def test_classify_reports_non_us_holding_without_blocking(self):
+        row = hr.classify({"ticker": "MY.1155", "market": "MY", "qty": 200, "avg_cost": 10.16,
+                           **hr.reconcile_protection({"ticker": "MY.1155", "market": "MY", "qty": 200}, [])})
+        self.assertEqual((row["protection_state"], row["urgency"], row["new_risk_block"]), ("HOLD-EXEMPT", "OK", False))
+        self.assertIn("non-US", row["notes"][0])
+
+    def test_permanent_hold_keeps_its_own_reason(self):
+        result = hr.reconcile_protection({"ticker": "MTLS", "market": "US", "qty": 600}, [])
+        self.assertEqual(result["protection_state"], "HOLD-EXEMPT")
+        self.assertIn("permanent hold", result["exempt_reason"])
+
+    def test_preflight_is_not_blocked_by_a_non_us_holding(self):
+        import preflight
+        snapshot = {"positions": [{"ticker": "MY.5306", "market": "MY", "qty": 1000},
+                                  {"ticker": "NET", "market": "US", "qty": 2}],
+                    "orders": [order()], "error": None}
+        with mock.patch.object(hr, "fetch_broker_snapshot", return_value=snapshot):
+            result = preflight.check_broker_protection("local")
+        self.assertFalse(result["new_risk_block"])
+        self.assertEqual(result["unprotected_tickers"], [])
+        self.assertEqual(result["counts"]["HOLD-EXEMPT"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

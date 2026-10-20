@@ -88,7 +88,7 @@ It enforces, in code:
 | `themes` | yes | Finviz returns >100 industries. Fewer = **scraper broken, not a flat market** |
 | `universe` | yes | Every focus ticker actually reached the classified universe, and flags `UNCLASSIFIED` liquid names |
 | `empty_go` | warn | Counts consecutive empty GO lists. **3+ forces the brief to say it may be a broken gate**, name the leading theme, and list green-zone names |
-| `broker_protection` | yes if local feed unavailable; warn if verified unprotected | Uses one read-only OpenD trade context for positions + active orders. A failed order query blocks local publication. `UNPROTECTED`/`PARTIALLY-PROTECTED` blocks new risk, not the warning brief. |
+| `broker_protection` | yes if local feed unavailable; warn if verified unprotected | Uses one read-only OpenD trade context for positions + active orders. A failed order query blocks local publication. `UNPROTECTED`/`PARTIALLY-PROTECTED` blocks new risk, not the warning brief. Non-US holdings (e.g. Bursa `MY.*`) and permanent holds are `HOLD-EXEMPT`: reported, never a block (Jie, 2026-10-20). |
 
 Quote the receipt hash in the brief. A brief without one is unverified by definition.
 
@@ -717,8 +717,11 @@ NOT cancel the owner's GO.
 
 **Broker protection.** Any live position without full remaining active protective-order
 quantity is `UNPROTECTED` or `PARTIALLY-PROTECTED` and blocks new live risk — except
-`HOLD-EXEMPT` holdings (currently MTLS; see
-`jie_wiki/wiki/trading/companies/materialise.md`). A queued full-quantity stop is
+`HOLD-EXEMPT` holdings, which are reported but never fail anything closed: permanent holds
+(currently MTLS; see `jie_wiki/wiki/trading/companies/materialise.md`) and every non-US
+holding, identified by the broker code's market prefix (e.g. `MY.5306`), never by a dot in
+the ticker, since US symbols such as `BRK.B` contain dots too. Jie decided this on
+2026-10-20: the Malaysian holdings sit outside the US swing book. A queued full-quantity stop is
 `PROTECTED-QUEUED`, never mislabeled broker-working. A journal/planned stop cannot change
 any of these states. An unavailable local order feed blocks publication; CI/SaaS renders
 `ORDER-FEED-UNVERIFIED` and never makes a protected claim. The OpenD check covers the
