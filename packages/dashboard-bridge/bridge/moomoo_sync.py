@@ -10,6 +10,7 @@ from __future__ import annotations
 import datetime
 import logging
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from moomoo import (
     Currency,
@@ -106,6 +107,11 @@ class MoomooSync:
             side = "BUY" if "BUY" in side_raw else ("SELL" if "SELL" in side_raw else None)
             if side is None:
                 continue
+            try:
+                executed_at = deal_time_utc(row.get("create_time"), str(row["code"]))
+            except ValueError as e:
+                log.error("skipping deal %s: %s", row.get("deal_id"), e)
+                continue
             qty = float(row.get("qty", 0))
             oid = str(row.get("order_id", ""))
             order_qty[oid] = order_qty.get(oid, 0.0) + qty
@@ -116,7 +122,7 @@ class MoomooSync:
                 "side": side,
                 "qty": qty,
                 "price": float(row.get("price", 0)),
-                "executedAt": _iso(row.get("create_time")),
+                "executedAt": executed_at,
                 "fees": None,
                 "currency": currency,
             })
@@ -252,16 +258,38 @@ class MoomooSync:
         }
 
 
-def _iso(v: Any) -> str:
-    """Coerce whatever moomoo returns into ISO 8601 UTC."""
-    if v is None:
-        return datetime.datetime.now(datetime.timezone.utc).isoformat()
-    if isinstance(v, datetime.datetime):
-        if v.tzinfo is None:
-            v = v.replace(tzinfo=datetime.timezone.utc)
-        return v.isoformat()
-    # moomoo often returns string "2026-05-21 10:21:15.560"
-    s = str(v).replace(" ", "T")
-    if "+" not in s and "Z" not in s:
-        s += "Z"
-    return s
+# OpenD reports a deal's create_time as naive wall-clock time in the security's
+# own market, keyed here by the code prefix (US.SMCI, HK.00700, MY.5347).
+MARKET_TZ = {
+    "US": "America/New_York",
+    "HK": "Asia/Hong_Kong",
+    "MY": "Asia/Kuala_Lumpur",
+    "SG": "Asia/Singapore",
+    "SH": "Asia/Shanghai",
+    "SZ": "Asia/Shanghai",
+    "JP": "Asia/Tokyo",
+}
+
+
+def deal_time_utc(create_time: Any, code: str) -> str:
+    """Convert an OpenD deal create_time into an ISO 8601 UTC instant.
+
+    "2026-10-12 11:07:49.621" for US.SMCI is 11:07 New York time, so this returns
+    "2026-10-12T15:07:49.621Z". Before 2026-10-21 the bridge appended "Z" to the raw
+    digits and stored New York wall-clock as if it were UTC.
+
+    Raises ValueError for an unknown market or an unparseable time, so a deal is
+    never stored at a guessed instant.
+    """
+    prefix = str(code).split(".", 1)[0].upper()
+    zone = MARKET_TZ.get(prefix)
+    if zone is None:
+        raise ValueError(f"no market time zone for deal code {code!r}")
+    if isinstance(create_time, datetime.datetime):
+        local = create_time
+    else:
+        local = datetime.datetime.fromisoformat(str(create_time).strip())
+    if local.tzinfo is None:
+        local = local.replace(tzinfo=ZoneInfo(zone))
+    utc = local.astimezone(datetime.timezone.utc)
+    return utc.isoformat(timespec="milliseconds").replace("+00:00", "Z")

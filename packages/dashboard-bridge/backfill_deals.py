@@ -20,8 +20,14 @@ import argparse
 import datetime
 import json
 import sys
+import time
 
 from moomoo import OpenSecTradeContext, TrdEnv, TrdMarket, SecurityFirm, RET_OK
+
+from bridge.moomoo_sync import deal_time_utc
+
+# OpenD allows 10 history-deal queries per 30 seconds.
+HISTORY_QUERY_GAP_SEC = 3.1
 
 
 def fetch(host: str, port: int, market: str, firm: str, acc_id: int, months: int) -> list[dict]:
@@ -46,6 +52,8 @@ def fetch(host: str, port: int, market: str, firm: str, acc_id: int, months: int
         end = datetime.date.today()
         chunks = max(1, round(months * 30 / 90) + 1)
         for i in range(chunks):
+            if i:
+                time.sleep(HISTORY_QUERY_GAP_SEC)
             w_end = end - datetime.timedelta(days=90 * i)
             w_start = w_end - datetime.timedelta(days=92)
             ret, data = ctx.history_deal_list_query(
@@ -61,6 +69,11 @@ def fetch(host: str, port: int, market: str, firm: str, acc_id: int, months: int
                 side = "BUY" if "BUY" in side_raw else ("SELL" if "SELL" in side_raw else None)
                 if not did or did in deals or side is None:
                     continue
+                try:
+                    executed_at = deal_time_utc(r.get("create_time"), str(r.get("code")))
+                except ValueError as e:
+                    print(f"[backfill] skipping deal {did}: {e}", file=sys.stderr)
+                    continue
                 deals[did] = {
                     "brokerFillId": did,
                     "orderId": str(r.get("order_id", "")),
@@ -68,7 +81,7 @@ def fetch(host: str, port: int, market: str, firm: str, acc_id: int, months: int
                     "side": side,
                     "qty": float(r.get("qty", 0)),
                     "price": float(r.get("price", 0)),
-                    "executedAt": str(r.get("create_time", "")),
+                    "executedAt": executed_at,
                     "currency": "USD" if market.upper() == "US" else "HKD",
                 }
 
