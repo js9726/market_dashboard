@@ -44,6 +44,10 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 const TIMESTAMP_TOLERANCE_SEC = 300;  // ±5 minutes
+// Stop starting new reconcile tickers this long after the request began. The
+// rest of the 30 s (also the bridge's read timeout) covers the ticker already
+// in progress, the health check and the heartbeat.
+const RECONCILE_DEADLINE_MS = 20_000;
 
 type IncomingFill = {
   brokerFillId: string;
@@ -115,6 +119,7 @@ function liveQuoteSymbol(ticker: string): string {
 }
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
   // ── Auth: bearer token + timestamp ──────────────────────────────────────
   const authHeader = req.headers.get("authorization") ?? "";
   const tsHeader = req.headers.get("x-timestamp") ?? "";
@@ -166,24 +171,39 @@ export async function POST(req: Request) {
   const accountCurrency = account.displayCurrency ?? account.preset.currency;
 
   // ── Insert new fills (dedup on brokerFillId) ────────────────────────────
+  // The bridge re-sends a wide window after an outage, so most of a catch-up
+  // batch already exists. Look the whole batch up in one query and insert the
+  // new rows in one more: each round trip from the function (iad1) to Neon
+  // (Singapore) costs ~0.3 s, and a query per fill blew the 30 s budget.
   let fillsInserted = 0;
   let fillsSkipped = 0;
   let fillsFeeUpdated = 0;
+  const insertedTickers = new Set<string>();
 
+  const incoming = new Map<string, IncomingFill>();
   for (const f of body.fills) {
+    if (
+      typeof f.brokerFillId !== "string" || !f.brokerFillId || !f.ticker || !f.side ||
+      f.qty == null || f.price == null || incoming.has(f.brokerFillId)
+    ) {
+      fillsSkipped++;
+      continue;
+    }
+    incoming.set(f.brokerFillId, f);
+  }
+
+  const existingFills = incoming.size > 0
+    ? await prisma.tradeFill.findMany({
+        where: { brokerAccountId: account.id, brokerFillId: { in: Array.from(incoming.keys()) } },
+        select: { id: true, brokerFillId: true, fees: true },
+      })
+    : [];
+  const existingByFillId = new Map(existingFills.map((row) => [row.brokerFillId, row]));
+
+  const newFills: Prisma.TradeFillCreateManyInput[] = [];
+  for (const f of Array.from(incoming.values())) {
     try {
-      if (!f.brokerFillId || !f.ticker || !f.side || f.qty == null || f.price == null) {
-        fillsSkipped++;
-        continue;
-      }
-      const existing = await prisma.tradeFill.findUnique({
-        where: {
-          brokerAccount_brokerFillId: {
-            brokerAccountId: account.id,
-            brokerFillId: f.brokerFillId,
-          },
-        },
-      });
+      const existing = existingByFillId.get(f.brokerFillId);
       if (existing) {
         // Backfill a late-arriving fee onto an already-stored fill (a deal can
         // sync before its order fee is finalized by the broker).
@@ -197,24 +217,44 @@ export async function POST(req: Request) {
         fillsSkipped++;
         continue;
       }
-      await prisma.tradeFill.create({
-        data: {
-          brokerAccountId: account.id,
-          brokerFillId: f.brokerFillId,
-          ticker: f.ticker.toUpperCase(),
-          side: f.side.toUpperCase(),
-          qty: new Prisma.Decimal(Math.abs(f.qty)),
-          price: new Prisma.Decimal(f.price),
-          executedAt: new Date(f.executedAt),
-          fees: f.fees != null ? new Prisma.Decimal(f.fees) : null,
-          currency: f.currency ?? accountCurrency,
-          source: "BRIDGE",
-        },
+      newFills.push({
+        brokerAccountId: account.id,
+        brokerFillId: f.brokerFillId,
+        ticker: f.ticker.toUpperCase(),
+        side: f.side.toUpperCase(),
+        qty: new Prisma.Decimal(Math.abs(f.qty)),
+        price: new Prisma.Decimal(f.price),
+        executedAt: new Date(f.executedAt),
+        fees: f.fees != null ? new Prisma.Decimal(f.fees) : null,
+        currency: f.currency ?? accountCurrency,
+        source: "BRIDGE",
       });
-      fillsInserted++;
     } catch (e) {
       console.error("[bridge/sync] fill insert failed:", e);
       fillsSkipped++;
+    }
+  }
+
+  if (newFills.length > 0) {
+    try {
+      // skipDuplicates absorbs a concurrent sync that inserted the same deal.
+      const { count } = await prisma.tradeFill.createMany({ data: newFills, skipDuplicates: true });
+      fillsInserted += count;
+      fillsSkipped += newFills.length - count;
+      if (count > 0) for (const row of newFills) insertedTickers.add(row.ticker);
+    } catch (e) {
+      // One bad row fails the whole batch; retry row by row so the rest land.
+      console.error("[bridge/sync] batch fill insert failed, retrying per fill:", e);
+      for (const row of newFills) {
+        try {
+          await prisma.tradeFill.create({ data: row });
+          fillsInserted++;
+          insertedTickers.add(row.ticker);
+        } catch (rowError) {
+          console.error("[bridge/sync] fill insert failed:", rowError);
+          fillsSkipped++;
+        }
+      }
     }
   }
 
@@ -292,13 +332,22 @@ export async function POST(req: Request) {
     }
   }
 
-  // Delete positions for this account that the broker no longer reports
-  const removed = await prisma.position.deleteMany({
-    where: {
-      brokerAccountId: account.id,
-      ticker: { notIn: Array.from(incomingTickers) },
-    },
-  });
+  // Delete positions for this account that the broker no longer reports.
+  // Read them first: the reconcile below needs to know which tickers went flat.
+  const removedTickers = (
+    await prisma.position.findMany({
+      where: {
+        brokerAccountId: account.id,
+        ticker: { notIn: Array.from(incomingTickers) },
+      },
+      select: { ticker: true },
+    })
+  ).map((p) => p.ticker);
+  const removed = removedTickers.length > 0
+    ? await prisma.position.deleteMany({
+        where: { brokerAccountId: account.id, ticker: { in: removedTickers } },
+      })
+    : { count: 0 };
 
   // ── Phase 4: equity snapshot (optional, best-effort) ────────────────────
   // Upserts on (userId, brokerAccountId, snapshotDate). Latest capture per
@@ -351,15 +400,25 @@ export async function POST(req: Request) {
   }
 
   // ── Reconcile fills → journal rows (close exited positions) ─────────────
-  // Run stopgap cleanup on every snapshot, but only scan full fill history
-  // when a fill arrived or a position disappeared. The minute bridge has a
-  // 30-second timeout, so unchanged snapshots must stay lightweight.
+  // Run stopgap cleanup on every snapshot, but only walk episodes for the
+  // tickers that just got a fill or went flat: the full history costs one
+  // query per ticker ever traded (108 for moomoo on 2026-10-21), which alone
+  // overran the 30-second budget. Tickers left when the deadline passes wait
+  // for /api/cron/reconcile-trades, which still scans everything.
   let reconciled: { recordsClosed: number; duplicatesDeleted: number } | null = null;
   try {
     const report = await reconcileBrokerTrades({
       brokerAccountId: account.id,
       stopgapsOnly: fillsInserted === 0 && removed.count === 0,
+      tickers: [...Array.from(insertedTickers), ...removedTickers],
+      deadline: startedAt + RECONCILE_DEADLINE_MS,
     });
+    if (report.deferredTickers.length > 0) {
+      console.warn(
+        `[bridge/sync] reconcile deferred to cron for ${report.deferredTickers.length} ticker(s): ` +
+          report.deferredTickers.join(", "),
+      );
+    }
     reconciled = {
       recordsClosed: report.recordsClosed,
       duplicatesDeleted: report.duplicatesDeleted,

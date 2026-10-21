@@ -17,8 +17,9 @@
  *      that duplicate the canonical row — re-pointing verdict history and the
  *      per-trade JournalEntry before deleting.
  *
- * Invoked from /api/bridge/sync after each fill batch and from
- * /api/cron/reconcile-trades (repair + nightly backstop, supports dry-run).
+ * Invoked from /api/bridge/sync after each fill batch (scoped to the tickers
+ * that changed, under a deadline) and from /api/cron/reconcile-trades (full
+ * scan: repair + nightly backstop, supports dry-run).
  * Pure episode/matching math lives in lib/trade-episodes.ts.
  */
 import { Prisma } from "@prisma/client";
@@ -48,6 +49,8 @@ export interface ReconcileReport {
   conflicts: string[];
   actions: string[];
   staleOpenAfter: string[];
+  /** Tickers skipped because `deadline` passed; the nightly cron picks them up. */
+  deferredTickers: string[];
 }
 
 export async function reconcileBrokerTrades(opts: {
@@ -55,6 +58,10 @@ export async function reconcileBrokerTrades(opts: {
   brokerAccountId?: string;
   dryRun?: boolean;
   stopgapsOnly?: boolean;
+  /** Walk episodes only for these tickers (plain or prefixed). Omit to scan all. */
+  tickers?: Iterable<string>;
+  /** Epoch ms. Tickers not yet started by then are skipped and reported. */
+  deadline?: number;
 }): Promise<ReconcileReport> {
   const dryRun = opts.dryRun ?? false;
   const report: ReconcileReport = {
@@ -69,7 +76,9 @@ export async function reconcileBrokerTrades(opts: {
     conflicts: [],
     actions: [],
     staleOpenAfter: [],
+    deferredTickers: [],
   };
+  const onlyTickers = opts.tickers ? new Set(Array.from(opts.tickers, plainTicker)) : null;
 
   const accounts = await prisma.userBrokerAccount.findMany({
     where: {
@@ -227,6 +236,11 @@ export async function reconcileBrokerTrades(opts: {
     const usedRecordIds = new Set<string>();
 
     for (const [ticker, fills] of Array.from(byTicker.entries())) {
+      if (onlyTickers && !onlyTickers.has(ticker)) continue;
+      if (opts.deadline != null && Date.now() >= opts.deadline) {
+        report.deferredTickers.push(ticker);
+        continue;
+      }
       const episodes = buildEpisodes(fills).filter((e) => e.closedAt != null);
       const rawCandidates = await prisma.tradeRecord.findMany({
         where: { userId: account.userId, ticker },
