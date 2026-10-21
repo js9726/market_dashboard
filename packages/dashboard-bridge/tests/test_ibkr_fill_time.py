@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import datetime
 import unittest
+import xml.etree.ElementTree as ET
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
-from ib_async import CommissionReport, Contract, Execution, Fill
+from ib_async import CommissionReport, Contract, Execution, Fill, FlexReport
 
+import ibkr_bridge
 from bridge.ibkr_adapter import IBKRSync, execution_time_utc
 
 UTC = datetime.timezone.utc
@@ -76,6 +78,52 @@ class IbkrFillTimeTests(unittest.TestCase):
                 self.assertIsNone(execution_time_utc(time))
                 with self.assertLogs("bridge.ibkr_adapter", level="ERROR"):
                     self.assertEqual(sync_fills(ibkr_fill(time)), [])
+
+
+def flex_trades(*attrs: str) -> list:
+    """Trade records as _flex_backfill reads them: FlexReport.extract(parseNumbers=True)."""
+    report = FlexReport()
+    report.root = ET.fromstring(
+        "<FlexQueryResponse><FlexStatements><FlexStatement>"
+        + "".join(f"<Trade {a} />" for a in attrs)
+        + "</FlexStatement></FlexStatements></FlexQueryResponse>"
+    )
+    return report.extract("Trade", parseNumbers=True)
+
+
+class FlexTimeTests(unittest.TestCase):
+    def test_flex_pltr_buy_is_read_as_new_york_time(self) -> None:
+        # Flex reported this PLTR BUY as "20261020;125357"; reqExecutions has 16:53:57Z.
+        # Read as UTC, as before 2026-10-22, it landed four hours early.
+        (trade,) = flex_trades(
+            'symbol="PLTR" buySell="BUY" quantity="6" tradePrice="194.16" ibCommission="-1" '
+            'ibExecID="0001390d.6ad7ae14.01.01" dateTime="20261020;125357" currency="USD"'
+        )
+        fill = ibkr_bridge._flex_trade_to_fill(trade)
+
+        self.assertEqual(fill["executedAt"], "2026-10-20T16:53:57+00:00")
+        self.assertEqual(fill["brokerFillId"], "0001390d.6ad7ae14.01.01")
+        self.assertEqual((fill["ticker"], fill["side"], fill["qty"], fill["fees"]), ("PLTR", "BUY", 6.0, 1.0))
+
+    def test_flex_winter_time_uses_eastern_standard_time(self) -> None:
+        self.assertEqual(
+            ibkr_bridge._flex_datetime(SimpleNamespace(dateTime="20260115;100000")),
+            "2026-01-15T15:00:00+00:00",
+        )
+
+    def test_separate_trade_date_and_time_survive_parse_numbers(self) -> None:
+        # parseNumbers turns tradeTime "093523" into 93523; the leading zero must come back.
+        (trade,) = flex_trades('tradeDate="20261016" tradeTime="093523"')
+        self.assertEqual(ibkr_bridge._flex_datetime(trade), "2026-10-16T13:35:23+00:00")
+
+    def test_flex_trade_without_a_time_is_skipped_instead_of_stamped_now(self) -> None:
+        (trade,) = flex_trades(
+            'symbol="PLTR" buySell="BUY" quantity="6" tradePrice="194.16" '
+            'ibExecID="0001390d.6ad7ae14.01.01" tradeDate="20261020"'
+        )
+        self.assertIsNone(ibkr_bridge._flex_datetime(trade))
+        with self.assertLogs("ibkr_bridge", level="ERROR"):
+            self.assertIsNone(ibkr_bridge._flex_trade_to_fill(trade))
 
 
 if __name__ == "__main__":

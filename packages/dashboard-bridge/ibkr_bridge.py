@@ -33,6 +33,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 LOG_PATH = Path.home() / ".ibkr-bridge.log"
 
@@ -383,25 +384,38 @@ def _fetch_backfill_fills(ib, months: int) -> list[dict[str, Any]]:
 
 # ── Flex Query backfill (full trade history) ─────────────────────────────────
 
-def _flex_datetime(t) -> str:
-    """Best-effort ISO-8601 (UTC) timestamp from a Flex <Trade>'s date/time fields."""
+# Flex reports trade times as New York wall-clock with no zone in the string.
+# Checked 2026-10-22: Flex "20261020;125357" is the PLTR execution that
+# reqExecutions reports at 16:53:57Z, and RBRK and CLOU line up the same way.
+FLEX_TZ = ZoneInfo("America/New_York")
+
+
+def _flex_datetime(t) -> str | None:
+    """ISO-8601 UTC timestamp from a Flex <Trade>'s date/time fields, or None.
+
+    Reading Flex times as UTC put fills 4-5 h early. A record with no time of
+    day returns None rather than a guessed time: the server never rewrites a
+    stored fill, so a wrong time would stick.
+    """
     raw = getattr(t, "dateTime", None) or getattr(t, "tradeDateTime", None)
     date = getattr(t, "tradeDate", None) or getattr(t, "reportDate", None)
     tm = getattr(t, "tradeTime", None)
     s = None
     if raw:
         s = str(raw).replace(";", " ").replace("T", " ")
-    elif date:
-        s = str(date) + ((" " + str(tm)) if tm else "")
+    elif date and tm is not None:
+        # FlexReport.extract(parseNumbers=True) turns "093523" into 93523.
+        tm = str(tm)
+        s = f"{date} {tm.zfill(6) if tm.isdigit() else tm}"
     if s:
-        for fmt in ("%Y%m%d %H%M%S", "%Y%m%d %H:%M:%S", "%Y%m%d",
-                    "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H%M%S", "%Y-%m-%d"):
+        for fmt in ("%Y%m%d %H%M%S", "%Y%m%d %H:%M:%S",
+                    "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H%M%S"):
             try:
                 d = datetime.datetime.strptime(s.strip(), fmt)
-                return d.replace(tzinfo=datetime.timezone.utc).isoformat()
             except ValueError:
                 continue
-    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+            return d.replace(tzinfo=FLEX_TZ).astimezone(datetime.timezone.utc).isoformat()
+    return None
 
 
 def _flex_trade_to_fill(t):
@@ -431,13 +445,17 @@ def _flex_trade_to_fill(t):
     except (TypeError, ValueError):
         fees = None
     fill_id = g("ibExecID", "tradeID", "transactionID", "ibOrderID")
+    executed_at = _flex_datetime(t)
+    if executed_at is None:
+        log.error("[flex] no usable trade time for %s %s (execId %s) — skipping", symbol, side, fill_id)
+        return None
     return {
         "brokerFillId": str(fill_id) if fill_id else None,
         "ticker": str(symbol).upper(),
         "side": side,
         "qty": qty,
         "price": price,
-        "executedAt": _flex_datetime(t),
+        "executedAt": executed_at,
         "fees": fees,
         "currency": str(g("currency") or "USD"),
     }
