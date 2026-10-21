@@ -151,7 +151,7 @@ async function runCron() {
   return response.json() as Promise<Record<string, unknown>>;
 }
 
-function installStatefulCandidateUpdates(rows: Array<Record<string, any>>) {
+function installStatefulCandidateUpdates(rows: Array<Record<string, unknown>>) {
   db.aListCandidate.update.mockImplementation(async ({ where, data }) => {
     const row = rows.find((item) => item.id === where.id);
     if (row) Object.assign(row, data);
