@@ -312,7 +312,7 @@ def _fetch_backfill_fills(ib, months: int) -> list[dict[str, Any]]:
         from ib_async import ExecutionFilter
     except ImportError:
         from ib_insync import ExecutionFilter
-    from bridge.ibkr_adapter import _normalize_ticker, _parse_ibkr_time
+    from bridge.ibkr_adapter import _normalize_ticker, execution_time_utc
 
     seen: dict[str, dict[str, Any]] = {}
     end = datetime.datetime.now(datetime.timezone.utc)
@@ -341,9 +341,10 @@ def _fetch_backfill_fills(ib, months: int) -> list[dict[str, Any]]:
             if exec_id in seen:
                 continue
 
-            executed_at = _parse_ibkr_time(ex.time)
+            executed_at = execution_time_utc(ex.time)
             if executed_at is None:
-                executed_at = chunk_end
+                log.error("[backfill] unusable fill time %r for execId %s — skipping", ex.time, exec_id)
+                continue
 
             side_raw = str(ex.side).upper()
             if side_raw in ("BOT", "BUY"):

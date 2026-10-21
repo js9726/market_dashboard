@@ -177,27 +177,32 @@ class IBKRSync:
     def _fills(self, ib) -> list[dict[str, Any]]:
         """
         ib.fills() returns Fill namedtuples with (contract, execution, commissionReport, time).
-        We filter to the last N days (fill_lookback_days) and map to the bridge shape.
+        We map every fill to the bridge shape.
 
         brokerFillId = execution.execId  — globally unique per IBKR execution.
+        executedAt   = execution.time    — the IBKR execution instant, sent as UTC.
         fees         = commissionReport.commission (USD, may be UNSET=1.7976931348623157e+308).
-        """
-        lookback = datetime.timedelta(days=self.cfg.ibkr.fill_lookback_days)  # type: ignore[attr-defined]
-        cutoff = datetime.datetime.now(datetime.timezone.utc) - lookback
 
+        There is no fill_lookback_days cutoff here. TWS already bounds ib.fills()
+        to its trade-log window and the server dedups on execId. Until 2026-10-21
+        every fill was stamped with the sync time, so the cutoff never dropped one.
+        With true execution times it would silently drop a fill that TWS first
+        reports more than a day late, for example after the bridge was down.
+        """
         rows: list[dict[str, Any]] = []
         for fill in ib.fills():
             ex = fill.execution
             cr = fill.commissionReport
             contract = fill.contract
 
-            # Parse execution time — IBKR format: "20260531  15:30:00 US/Eastern"
-            executed_at = _parse_ibkr_time(ex.time)
+            # A fill without a trustworthy execution time is skipped, never
+            # stamped with the sync time: the server never rewrites a stored
+            # fill, so a wrong time would stick. The next sync retries it.
+            executed_at = execution_time_utc(ex.time)
             if executed_at is None:
-                log.warning("Could not parse fill time '%s' — using now", ex.time)
-                executed_at = datetime.datetime.now(datetime.timezone.utc)
-
-            if executed_at < cutoff:
+                log.error(
+                    "Unusable fill time %r for execId %s — skipping fill", ex.time, ex.execId,
+                )
                 continue
 
             side_raw = str(ex.side).upper()
@@ -235,7 +240,7 @@ class IBKRSync:
                 "currency": currency,
             })
 
-        log.debug("IBKR fills (last %d days): %d rows", self.cfg.ibkr.fill_lookback_days, len(rows))  # type: ignore[attr-defined]
+        log.debug("IBKR fills: %d rows", len(rows))
         return rows
 
     # ── Equity snapshot ───────────────────────────────────────────────────────
@@ -317,6 +322,27 @@ class IBKRSync:
 
 # ── Time parsing ──────────────────────────────────────────────────────────────
 
+def execution_time_utc(raw: Any) -> datetime.datetime | None:
+    """
+    Return an IBKR execution time as an aware UTC datetime, or None if unknown.
+
+    ib_async and ib_insync parse the API's time string themselves and set
+    Execution.time to an aware datetime (UTC by default). The old code passed
+    that datetime to the string parser below, which could not read
+    "2026-10-20 16:53:57+00:00" and fell back to now(). A raw IBKR string is
+    still accepted. A naive datetime has no zone to trust, and an unset time
+    is the library's 1970 epoch default; both return None.
+    """
+    if isinstance(raw, datetime.datetime):
+        if raw.tzinfo is None or raw.utcoffset() is None:
+            return None
+        utc = raw.astimezone(datetime.timezone.utc)
+        return utc if utc.timestamp() > 0 else None
+    if isinstance(raw, str):
+        return _parse_ibkr_time(raw)
+    return None
+
+
 def _parse_ibkr_time(raw: str | None) -> datetime.datetime | None:
     """
     Parse the IBKR execution time string.
@@ -362,8 +388,9 @@ def _parse_ibkr_time(raw: str | None) -> datetime.datetime | None:
             return None
 
     # Determine US/Eastern UTC offset via DST rules (second Sunday March → first Sunday Nov).
+    # ET is UTC-4/-5, so UTC = ET + offset (12:53 EDT -> 16:53 UTC).
     et_offset = _et_utc_offset(naive)
-    return (naive - datetime.timedelta(hours=et_offset)).replace(tzinfo=datetime.timezone.utc)
+    return (naive + datetime.timedelta(hours=et_offset)).replace(tzinfo=datetime.timezone.utc)
 
 
 def _et_utc_offset(dt: datetime.datetime) -> int:
