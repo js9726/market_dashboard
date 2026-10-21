@@ -22,6 +22,7 @@ from moomoo import (
 )
 
 from .config import Config
+from .fill_window import deal_query_window, query_deals
 
 log = logging.getLogger(__name__)
 
@@ -40,8 +41,13 @@ class MoomooSync:
     def __init__(self, cfg: Config):
         self.cfg = cfg
 
-    def fetch(self) -> dict[str, Any]:
-        """Return {positions, fills} for the configured account."""
+    def fetch(self, fills_since: datetime.date | None = None) -> dict[str, Any]:
+        """Return {positions, fills, fillsOk, equity} for the configured account.
+
+        fills_since reaches the deal query back to that host-local date. fillsOk is
+        False when the deal query failed, so an OpenD outage is never mistaken for
+        a day without fills.
+        """
         firm = _firm(self.cfg.opend.security_firm)
         market = _market(self.cfg.opend.market)
 
@@ -53,9 +59,14 @@ class MoomooSync:
         )
         try:
             positions = self._positions(ctx)
-            fills = self._fills(ctx)
+            fills = self._fills(ctx, since=fills_since)
             equity = self._equity(ctx)
-            return {"positions": positions, "fills": fills, "equity": equity}
+            return {
+                "positions": positions,
+                "fills": fills or [],
+                "fillsOk": fills is not None,
+                "equity": equity,
+            }
         finally:
             ctx.close()
 
@@ -84,20 +95,22 @@ class MoomooSync:
             })
         return rows
 
-    # ── Fills (last N days) ──────────────────────────────────────────────
+    # ── Fills (since the last synced day, at least N days) ───────────────
 
-    def _fills(self, ctx: OpenSecTradeContext) -> list[dict[str, Any]]:
-        end = datetime.datetime.now(datetime.timezone.utc)
-        start = end - datetime.timedelta(days=self.cfg.sync.fill_lookback_days)
-        ret, data = ctx.history_deal_list_query(
-            start=start.strftime("%Y-%m-%d"),
-            end=end.strftime("%Y-%m-%d"),
-            trd_env=TrdEnv.REAL,
-            acc_id=self.cfg.opend.acc_id,
+    def _fills(
+        self,
+        ctx: OpenSecTradeContext,
+        since: datetime.date | None = None,
+        today: datetime.date | None = None,
+    ) -> list[dict[str, Any]] | None:
+        """Deals in fill_window.deal_query_window, or None when OpenD could not
+        be queried. Dates are host-local because that is how OpenD reads them."""
+        start, end = deal_query_window(
+            today or datetime.date.today(), self.cfg.sync.fill_lookback_days, since,
         )
-        if ret != RET_OK:
-            log.error("history_deal_list_query failed: %s", data)
-            return []
+        data = query_deals(ctx, start, end, self.cfg.opend.acc_id)
+        if data is None:
+            return None
 
         currency = "USD" if self.cfg.opend.market.upper() == "US" else "HKD"
         rows: list[dict[str, Any]] = []

@@ -1,6 +1,6 @@
 """
-backfill_deals.py — one-time / refreshable backfill of MooMoo deal history + fees
-into TradeFill, so the dashboard can compute broker-true NET realized P&L (USD).
+backfill_deals.py — read-only export of MooMoo deal history + fees to JSON, e.g.
+for apps/market_dashboard/scripts/fix-moomoo-fill-timezones.mjs.
 
 The regular bridge sync only pulls a recent fill window; this tool walks the full
 deal history in 90-day chunks (MooMoo caps a single query at ~90 days) and pulls
@@ -8,11 +8,11 @@ per-order fees via order_fee_query (which the deal API does NOT return). Each
 deal's fee is the order fee split across the order's deals by quantity.
 
 Usage (OpenD running on this PC):
-    python backfill_deals.py                 # write deals_backfill.json (dry)
+    python backfill_deals.py                 # write deals_backfill.json
     python backfill_deals.py --months 36     # go back 36 months
-    python backfill_deals.py --post          # POST to the dashboard /api/bridge/sync
 
-Output JSON rows match the bridge fills shape (+ fee), ready to ingest.
+Output JSON rows match the bridge fills shape (+ fee). To put missing deals on
+the dashboard, run `python -m bridge once --since YYYY-MM-DD` instead.
 """
 from __future__ import annotations
 
@@ -28,6 +28,14 @@ from bridge.moomoo_sync import deal_time_utc
 
 # OpenD allows 10 history-deal queries per 30 seconds.
 HISTORY_QUERY_GAP_SEC = 3.1
+
+# --post sent positions=[], and /api/bridge/sync deletes every Position missing
+# from the payload (re-created on the next poll with openedAt reset).
+POST_DISABLED = (
+    "--post is disabled: it would empty the dashboard's positions. "
+    "Catch up fills with `python -m bridge once --since YYYY-MM-DD`, "
+    "which posts live positions with them."
+)
 
 
 def fetch(host: str, port: int, market: str, firm: str, acc_id: int, months: int) -> list[dict]:
@@ -128,8 +136,10 @@ def main() -> None:
     ap.add_argument("--acc-id", type=int, default=0, help="0 = auto-detect REAL account")
     ap.add_argument("--months", type=int, default=30)
     ap.add_argument("--out", default="deals_backfill.json")
-    ap.add_argument("--post", action="store_true", help="POST fills to /api/bridge/sync via bridge config")
+    ap.add_argument("--post", action="store_true", help="disabled; use `python -m bridge once --since`")
     args = ap.parse_args()
+    if args.post:
+        sys.exit(POST_DISABLED)
 
     rows = fetch(args.host, args.port, args.market, args.firm, args.acc_id, args.months)
     buys = sum(1 for r in rows if r["side"] == "BUY")
@@ -138,17 +148,9 @@ def main() -> None:
           f"fee coverage {sum(1 for r in rows if r.get('fees') is not None)}/{len(rows)} | total fee ${fees:.2f}",
           file=sys.stderr)
 
-    if args.post:
-        from bridge.config import load_config
-        from bridge.client import DashboardClient
-        cfg = load_config()
-        client = DashboardClient(cfg.dashboard.url, cfg.dashboard.token)
-        client.sync(positions=[], fills=rows)
-        print(f"[backfill] POSTed {len(rows)} fills to {cfg.dashboard.url}", file=sys.stderr)
-    else:
-        with open(args.out, "w", encoding="utf-8") as f:
-            json.dump(rows, f)
-        print(f"[backfill] wrote {len(rows)} rows -> {args.out} (use --post to ingest)", file=sys.stderr)
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(rows, f)
+    print(f"[backfill] wrote {len(rows)} rows -> {args.out}", file=sys.stderr)
 
 
 if __name__ == "__main__":

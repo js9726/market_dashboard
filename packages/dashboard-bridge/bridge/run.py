@@ -4,10 +4,13 @@ Bridge main loop.
   python -m bridge run           — start the polling loop
   python -m bridge once          — one-shot sync (useful for cron / scheduled task)
   python -m bridge dry-run       — fetch from moomoo but don't POST to the dashboard
+  python -m bridge once --since 2026-07-30
+                                 — catch up fills from that host-local date (≤ ~88 days)
 """
 from __future__ import annotations
 
 import argparse
+import datetime
 import logging
 import logging.handlers
 import signal
@@ -17,6 +20,7 @@ from pathlib import Path
 
 from .client import DashboardClient
 from .config import load_config
+from .fill_window import FillSyncState
 from .moomoo_sync import MoomooSync
 
 LOG_PATH = Path.home() / ".dashboard-bridge.log"
@@ -42,12 +46,24 @@ def setup_logging() -> None:
 log = logging.getLogger("bridge")
 
 
-def _sync_once(dry: bool = False) -> bool:
-    """Perform one sync. Returns True on success."""
+def _sync_once(dry: bool = False, since: datetime.date | None = None) -> bool:
+    """Perform one sync. Returns True on success.
+
+    Fills are fetched from the last day whose fills were fetched and posted (or
+    `since`, if earlier), so a sleeping PC or an OpenD outage cannot outlast the
+    lookback window and silently drop a deal.
+    """
     cfg = load_config()
     sync = MoomooSync(cfg)
+    state = FillSyncState()
+    account = cfg.broker.account_alias
+    last = state.last_synced(account)
+    if last is not None:
+        synced_day = last.astimezone().date()
+        since = min(since, synced_day) if since else synced_day
+    started = datetime.datetime.now(datetime.timezone.utc)
     try:
-        snapshot = sync.fetch()
+        snapshot = sync.fetch(fills_since=since)
     except Exception as e:  # broad — log and report
         log.exception("moomoo fetch failed: %s", e)
         if not dry:
@@ -73,6 +89,8 @@ def _sync_once(dry: bool = False) -> bool:
     client = DashboardClient(cfg)
     result = client.sync(positions, fills, equity=equity)
     log.info("Sync result: %s", result)
+    if result.get("ok") and snapshot["fillsOk"]:
+        state.mark_synced(account, started)
 
     # Live quotes push: local bridge is now the primary live-price path.
     # Non-fatal: failure here does NOT block positions/fills/equity sync above.
@@ -149,18 +167,23 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="bridge")
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("run", help="Run the polling loop indefinitely")
-    sub.add_parser("once", help="Perform one sync and exit")
-    sub.add_parser("dry-run", help="Fetch from moomoo but skip the HTTP POST")
+    once = sub.add_parser("once", help="Perform one sync and exit")
+    dry_run = sub.add_parser("dry-run", help="Fetch from moomoo but skip the HTTP POST")
+    for p in (once, dry_run):
+        p.add_argument(
+            "--since", type=datetime.date.fromisoformat, default=None,
+            help="also fetch fills from this host-local date (YYYY-MM-DD) to catch up a gap",
+        )
     sub.add_parser("breadth", help="Force one market-breadth refresh and exit")
     args = parser.parse_args()
 
     if args.cmd == "run":
         _loop()
     elif args.cmd == "once":
-        ok = _sync_once()
+        ok = _sync_once(since=args.since)
         sys.exit(0 if ok else 1)
     elif args.cmd == "dry-run":
-        ok = _sync_once(dry=True)
+        ok = _sync_once(dry=True, since=args.since)
         sys.exit(0 if ok else 1)
     elif args.cmd == "breadth":
         from .breadth import maybe_refresh_breadth

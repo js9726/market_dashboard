@@ -19,7 +19,8 @@ Vercel dashboard APIs
 
 Every 60 seconds (default), the bridge:
 1. Pulls your current positions from moomoo OpenD
-2. Pulls trade fills since last sync
+2. Pulls trade fills since the last day whose fills it fetched and posted
+   (kept in `~/.dashboard-bridge-state.json`, so a sleeping PC catches up)
 3. Posts both to your dashboard via authenticated HTTPS
 4. Pushes live quotes for held tickers + configured watch tickers when `live_quote_key` is set
 5. Nudges the dashboard portfolio quote refresh endpoint every five minutes when `live_quote_key` is set
@@ -96,7 +97,8 @@ market = "US"
 [sync]
 # Polling interval in seconds
 interval_sec = 60
-# Fetch fills since N days ago on each sync (broker dedup will skip duplicates)
+# Minimum fill lookback in days; after an outage the bridge reaches back to its
+# last successful fill sync instead (dashboard dedup skips duplicates)
 fill_lookback_days = 1
 live_quote_extras = "SPY,QQQ,IWM,DIA,VIX,SMH,XLK,NVDA,CRDO,ARM,MRVL"
 breadth_post_close = true
@@ -134,3 +136,14 @@ The `account_alias` in your TOML must match an existing alias in the dashboard. 
 
 **`Timestamp drift Ns exceeds tolerance`**:
 Your system clock is off. Sync via `w32tm /resync` (Windows) or NTP.
+
+**A fill is missing from the dashboard**:
+Each poll fetches deals from the day before the last successful fill sync, so
+outages catch up on their own. A gap from before that record existed needs a
+one-off catch-up from a host-local date (one OpenD query, up to ~88 days back).
+It posts live positions with the fills, so it never empties the position table:
+
+```powershell
+.\.venv\Scripts\python.exe -m bridge dry-run --since 2026-07-30
+.\.venv\Scripts\python.exe -m bridge once --since 2026-07-30
+```

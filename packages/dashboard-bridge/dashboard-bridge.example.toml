@@ -38,8 +38,10 @@ market = "US"
 [sync]
 # Poll every N seconds. 60 is reasonable for a swing trader.
 interval_sec = 60
-# Fetch the last N days of fills on each poll. The dashboard dedups by
-# brokerFillId so re-pulling is cheap; this just bounds the request size.
+# Fetch at least the last N days of fills on each poll. After an outage the
+# bridge reaches back to its last successful fill sync instead (recorded in
+# ~/.dashboard-bridge-state.json). The dashboard dedups by brokerFillId, so
+# re-pulling is cheap.
 fill_lookback_days = 1
 # Extra tickers to push live quotes for (in addition to held positions).
 # Defaults to the major US index ETFs so the dashboard's market tape always
