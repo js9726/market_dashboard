@@ -1,0 +1,20 @@
+{
+  "built_at": "2026-10-21T18:05:12.303795+00:00",
+  "providers": {
+    "deepseek": {
+      "available": true,
+      "generated": true,
+      "label": "DeepSeek V4 Flash"
+    },
+    "gemini": {
+      "available": true,
+      "generated": false,
+      "label": "Gemini 3.7 Flash"
+    },
+    "openai": {
+      "available": false,
+      "generated": false,
+      "label": "Codex"
+    }
+  }
+}
