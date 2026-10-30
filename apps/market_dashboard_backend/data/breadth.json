@@ -1,130 +1,130 @@
 {
-  "built_at": "2026-10-30T12:44:48.518954+00:00",
-  "as_of": "2026-10-30T12:44:48.518954+00:00",
+  "built_at": "2026-10-30T18:29:46.334506+00:00",
+  "as_of": "2026-10-30T18:29:46.334506+00:00",
   "generated_by": "breadth_fast_tv_scanner",
   "mcap_floor": 100000000,
-  "universe_size": 6423,
+  "universe_size": 6427,
   "market": {
-    "new_highs": 148,
-    "new_lows": 168,
-    "advance": 3710,
-    "decline": 2462,
+    "new_highs": 158,
+    "new_lows": 200,
+    "advance": 2087,
+    "decline": 4111,
     "stage_counts": {
-      "1": 1201,
-      "2": 1669,
-      "3": 896,
-      "4": 1907
+      "1": 1338,
+      "2": 1525,
+      "3": 823,
+      "4": 1982
     },
-    "universe_size": 6423
+    "universe_size": 6427
   },
   "momentum": {
-    "up_from_open": 2947,
-    "down_from_open": 2110,
-    "up_on_volume": 1425,
-    "down_on_volume": 839,
-    "up_4pct": 748,
-    "down_4pct": 606
+    "up_from_open": 1427,
+    "down_from_open": 3620,
+    "up_on_volume": 350,
+    "down_on_volume": 609,
+    "up_4pct": 418,
+    "down_4pct": 1543
   },
   "sectors": [
     {
       "sector": "Utilities",
-      "n": 158,
-      "pct_above_50sma": 62.7
+      "n": 159,
+      "pct_above_50sma": 63.5
+    },
+    {
+      "sector": "Consumer Non-Durables",
+      "n": 198,
+      "pct_above_50sma": 62.1
+    },
+    {
+      "sector": "Energy Minerals",
+      "n": 200,
+      "pct_above_50sma": 62.0
     },
     {
       "sector": "Retail Trade",
       "n": 179,
-      "pct_above_50sma": 62.0
+      "pct_above_50sma": 61.5
     },
     {
       "sector": "Health Services",
-      "n": 81,
-      "pct_above_50sma": 61.7
-    },
-    {
-      "sector": "Energy Minerals",
-      "n": 199,
-      "pct_above_50sma": 59.8
-    },
-    {
-      "sector": "Consumer Non-Durables",
-      "n": 200,
-      "pct_above_50sma": 59.0
-    },
-    {
-      "sector": "Technology Services",
-      "n": 496,
-      "pct_above_50sma": 54.2
+      "n": 79,
+      "pct_above_50sma": 51.9
     },
     {
       "sector": "Commercial Services",
-      "n": 187,
-      "pct_above_50sma": 53.5
+      "n": 185,
+      "pct_above_50sma": 49.7
     },
     {
       "sector": "Industrial Services",
-      "n": 182,
-      "pct_above_50sma": 51.1
-    },
-    {
-      "sector": "Distribution Services",
-      "n": 109,
-      "pct_above_50sma": 49.5
+      "n": 184,
+      "pct_above_50sma": 48.9
     },
     {
       "sector": "Consumer Services",
-      "n": 212,
-      "pct_above_50sma": 47.6
+      "n": 213,
+      "pct_above_50sma": 47.4
+    },
+    {
+      "sector": "Technology Services",
+      "n": 493,
+      "pct_above_50sma": 47.1
+    },
+    {
+      "sector": "Distribution Services",
+      "n": 108,
+      "pct_above_50sma": 45.4
     },
     {
       "sector": "Transportation",
       "n": 174,
-      "pct_above_50sma": 46.0
+      "pct_above_50sma": 43.1
     },
     {
       "sector": "Finance",
-      "n": 1853,
-      "pct_above_50sma": 45.9
-    },
-    {
-      "sector": "Process Industries",
-      "n": 204,
-      "pct_above_50sma": 43.6
-    },
-    {
-      "sector": "Health Technology",
-      "n": 635,
-      "pct_above_50sma": 42.7
+      "n": 1863,
+      "pct_above_50sma": 42.5
     },
     {
       "sector": "Consumer Durables",
-      "n": 178,
-      "pct_above_50sma": 41.0
+      "n": 179,
+      "pct_above_50sma": 41.9
     },
     {
-      "sector": "Producer Manufacturing",
-      "n": 365,
-      "pct_above_50sma": 33.7
+      "sector": "Process Industries",
+      "n": 205,
+      "pct_above_50sma": 39.0
     },
     {
-      "sector": "Miscellaneous",
-      "n": 58,
-      "pct_above_50sma": 31.0
-    },
-    {
-      "sector": "Electronic Technology",
-      "n": 377,
-      "pct_above_50sma": 30.5
+      "sector": "Health Technology",
+      "n": 627,
+      "pct_above_50sma": 36.0
     },
     {
       "sector": "Communications",
-      "n": 74,
-      "pct_above_50sma": 29.7
+      "n": 73,
+      "pct_above_50sma": 30.1
+    },
+    {
+      "sector": "Producer Manufacturing",
+      "n": 367,
+      "pct_above_50sma": 29.2
+    },
+    {
+      "sector": "Miscellaneous",
+      "n": 56,
+      "pct_above_50sma": 25.0
+    },
+    {
+      "sector": "Electronic Technology",
+      "n": 380,
+      "pct_above_50sma": 23.4
     },
     {
       "sector": "Non-Energy Minerals",
-      "n": 500,
-      "pct_above_50sma": 13.4
+      "n": 503,
+      "pct_above_50sma": 11.5
     }
   ],
   "industries": []
