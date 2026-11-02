@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-11-02T22:28:32.384318Z",
+  "built_at": "2026-11-02T22:43:05.510494Z",
   "groups": {
     "Indices": [
       {
@@ -975,7 +975,7 @@
       {
         "ticker": "SLX",
         "daily": 1.16,
-        "intra": 0.41,
+        "intra": 0.99,
         "5d": 1.03,
         "20d": -4.36,
         "atr_pct": 1.7,
@@ -1231,7 +1231,7 @@
         "5d": -2.9,
         "20d": -5.83,
         "atr_pct": 0.9,
-        "dist_sma50_atr": -6.03,
+        "dist_sma50_atr": -6.05,
         "rs": 15.0,
         "rs_chart": "data/charts/DBA.png",
         "long": [],
@@ -1307,7 +1307,7 @@
       {
         "ticker": "SLV",
         "daily": 2.17,
-        "intra": -0.68,
+        "intra": 1.29,
         "5d": -6.35,
         "20d": -17.34,
         "atr_pct": 3.5,
@@ -1653,7 +1653,7 @@
         "5d": -4.89,
         "20d": -4.59,
         "atr_pct": 1.1,
-        "dist_sma50_atr": -5.02,
+        "dist_sma50_atr": -5.01,
         "rs": 0.0,
         "rs_chart": "data/charts/THD.png",
         "long": [],
@@ -2220,6 +2220,6 @@
     "label": "extreme fear",
     "status": "ok",
     "source": "cnn",
-    "as_of": "2026-11-02T22:08:19+00:00"
+    "as_of": "2026-11-02T22:23:17+00:00"
   }
 }
