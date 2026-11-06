@@ -1,105 +1,105 @@
 {
-  "built_at": "2026-11-06T01:07:48.713269+00:00",
-  "as_of": "2026-11-06T01:07:48.713269+00:00",
+  "built_at": "2026-11-06T13:49:42.496268+00:00",
+  "as_of": "2026-11-06T13:49:42.496268+00:00",
   "generated_by": "breadth_fast_tv_scanner",
   "mcap_floor": 100000000,
-  "universe_size": 6505,
+  "universe_size": 6400,
   "market": {
-    "new_highs": 169,
-    "new_lows": 214,
-    "advance": 1520,
-    "decline": 4786,
+    "new_highs": 156,
+    "new_lows": 204,
+    "advance": 1473,
+    "decline": 4743,
     "stage_counts": {
-      "1": 1371,
-      "2": 1416,
-      "3": 977,
-      "4": 1933
+      "1": 1362,
+      "2": 1389,
+      "3": 967,
+      "4": 1915
     },
-    "universe_size": 6505
+    "universe_size": 6400
   },
   "momentum": {
-    "up_from_open": 805,
-    "down_from_open": 4441,
-    "up_on_volume": 725,
-    "down_on_volume": 2899,
-    "up_4pct": 554,
-    "down_4pct": 2198
+    "up_from_open": 796,
+    "down_from_open": 4404,
+    "up_on_volume": 716,
+    "down_on_volume": 2877,
+    "up_4pct": 515,
+    "down_4pct": 2162
   },
   "sectors": [
     {
       "sector": "Consumer Non-Durables",
-      "n": 197,
-      "pct_above_50sma": 69.5
+      "n": 189,
+      "pct_above_50sma": 72.0
     },
     {
       "sector": "Retail Trade",
-      "n": 186,
-      "pct_above_50sma": 68.8
+      "n": 180,
+      "pct_above_50sma": 68.3
     },
     {
       "sector": "Utilities",
-      "n": 155,
-      "pct_above_50sma": 64.5
+      "n": 152,
+      "pct_above_50sma": 63.8
     },
     {
       "sector": "Commercial Services",
-      "n": 182,
-      "pct_above_50sma": 59.3
+      "n": 179,
+      "pct_above_50sma": 59.8
     },
     {
       "sector": "Health Services",
-      "n": 83,
-      "pct_above_50sma": 59.0
+      "n": 82,
+      "pct_above_50sma": 58.5
     },
     {
       "sector": "Consumer Services",
-      "n": 214,
-      "pct_above_50sma": 54.2
-    },
-    {
-      "sector": "Consumer Durables",
-      "n": 177,
-      "pct_above_50sma": 48.0
+      "n": 206,
+      "pct_above_50sma": 55.3
     },
     {
       "sector": "Finance",
-      "n": 1881,
-      "pct_above_50sma": 47.5
+      "n": 1858,
+      "pct_above_50sma": 47.4
+    },
+    {
+      "sector": "Consumer Durables",
+      "n": 178,
+      "pct_above_50sma": 47.2
     },
     {
       "sector": "Technology Services",
-      "n": 489,
-      "pct_above_50sma": 45.2
+      "n": 484,
+      "pct_above_50sma": 45.0
     },
     {
       "sector": "Transportation",
-      "n": 186,
-      "pct_above_50sma": 40.9
+      "n": 184,
+      "pct_above_50sma": 39.7
     },
     {
       "sector": "Process Industries",
-      "n": 210,
-      "pct_above_50sma": 39.5
-    },
-    {
-      "sector": "Communications",
-      "n": 75,
-      "pct_above_50sma": 38.7
+      "n": 205,
+      "pct_above_50sma": 39.0
     },
     {
       "sector": "Distribution Services",
-      "n": 112,
-      "pct_above_50sma": 38.4
+      "n": 109,
+      "pct_above_50sma": 38.5
+    },
+    {
+      "sector": "Communications",
+      "n": 72,
+      "pct_above_50sma": 37.5
     },
     {
       "sector": "Health Technology",
-      "n": 631,
+      "n": 623,
       "pct_above_50sma": 36.9
     },
     {
       "sector": "Producer Manufacturing",
-      "n": 386,
-      "pct_above_50sma": 29.8
+      "n": 379,
+      "pct_above_50sma": 30.1
     },
     {
       "sector": "Miscellaneous",
@@ -108,23 +108,23 @@
     },
     {
       "sector": "Industrial Services",
-      "n": 189,
-      "pct_above_50sma": 26.5
+      "n": 186,
+      "pct_above_50sma": 26.3
     },
     {
       "sector": "Electronic Technology",
-      "n": 379,
-      "pct_above_50sma": 17.7
+      "n": 377,
+      "pct_above_50sma": 17.8
     },
     {
       "sector": "Energy Minerals",
-      "n": 204,
-      "pct_above_50sma": 16.7
+      "n": 197,
+      "pct_above_50sma": 16.2
     },
     {
       "sector": "Non-Energy Minerals",
-      "n": 508,
-      "pct_above_50sma": 15.2
+      "n": 498,
+      "pct_above_50sma": 15.1
     }
   ],
   "industries": []
