@@ -1,515 +1,551 @@
 {
   "mood": {
     "label": "CAUTIOUSLY-RISK-OFF",
-    "posture": "WAIT",
-    "summary": "Nvidia board governance uncertainty and AI hardware scrutiny trigger sharp pre-market tech weakness, keeping high-beta growth on defence while defensive value and energy hold up."
+    "posture": "RAISE-THE-BAR",
+    "summary": "The sharp post-Jensen Huang reinstatement relief rally fizzled into aggressive rotation out of semis and mega-cap tech into defensive healthcare, staples, and utilities, while breadth remains deeply split."
   },
   "breadth": {
-    "up": null,
-    "down": null
+    "up": 25,
+    "down": 54
   },
   "fearGreed": {
-    "score": 40,
-    "label": "Fear"
+    "score": 17,
+    "label": "Extreme Fear"
   },
   "indices": [
     {
       "symbol": "SPY",
-      "name": "S&P 500 ETF",
-      "level": 7608.0,
-      "changePct": -0.36,
-      "note": "Pre-market futures trade -0.43% lower amid semiconductor pressure",
-      "citation": "Upstox 07:00 ET"
+      "name": "S&P 500",
+      "level": null,
+      "changePct": -0.49,
+      "note": "Down 0.49% as heavy tech drag offset defensive strength in staples and healthcare",
+      "citation": "Pre-fetched authoritative data & AP News"
     },
     {
       "symbol": "QQQ",
       "name": "Invesco QQQ Trust",
-      "level": 28192.0,
-      "changePct": -0.42,
-      "note": "Nasdaq 100 futures slide 1.0% dragged by megacap chipmakers",
-      "citation": "Upstox 07:00 ET"
+      "level": null,
+      "changePct": -1.99,
+      "note": "Hit by aggressive semiconductor retreat following initial Huang bounce fizzle",
+      "citation": "Pre-fetched authoritative data & Reuters"
     },
     {
       "symbol": "DIA",
-      "name": "SPDR Dow Jones Industrial Average",
-      "level": 52635.0,
-      "changePct": -0.25,
-      "note": "Dow futures resilient, trading flat to +0.11% on defensive rotation",
-      "citation": "Upstox 07:00 ET"
+      "name": "Dow Jones Industrial Average",
+      "level": null,
+      "changePct": 0.79,
+      "note": "Relative outperformer, climbing as non-tech blue chips attracted rotation flows",
+      "citation": "Pre-fetched authoritative data & AP News"
     },
     {
       "symbol": "IWM",
-      "name": "iShares Russell 2000 ETF",
+      "name": "Russell 2000",
       "level": null,
-      "changePct": -1.55,
-      "note": "Small caps leading recent downside as rate expectations remain firm",
-      "citation": "TradingView Snapshot 20:42 UTC"
+      "changePct": 0.53,
+      "note": "Small caps diverged higher with strong breadth in retail and biotechnology",
+      "citation": "Pre-fetched authoritative data"
     },
     {
       "symbol": "TLT",
-      "name": "iShares 20+ Year Treasury Bond ETF",
+      "name": "20+ Year Treasury Bond ETF",
       "level": null,
-      "changePct": -1.37,
-      "note": "Long duration under sustained selling pressure as Treasury yields rise",
-      "citation": "TradingView Snapshot 20:42 UTC"
+      "changePct": -0.24,
+      "note": "10-year Treasury yield hovered around 4.91%-4.92% as bond safe-haven bids stabilized",
+      "citation": "Pre-fetched authoritative data & Reuters"
+    },
+    {
+      "symbol": "^VIX",
+      "name": "CBOE Volatility Index",
+      "level": 26.62,
+      "changePct": null,
+      "note": "Elevated above 26, reflecting persistent macro fragility and binary tech risk",
+      "citation": "USMarkets.nl / Reuters Nov 24, 2026"
     },
     {
       "symbol": "CL=F",
-      "name": "WTI Crude Oil",
-      "level": 86.52,
-      "changePct": -0.01,
-      "note": "Brent trades near $91.72-$93.40 while WTI holds around $86.50",
-      "citation": "Markets Insider / 5paisa 09:20 AM"
+      "name": "Crude Oil Futures",
+      "level": 86.40,
+      "changePct": -0.30,
+      "note": "Brent crude steady around $86.40/bbl amid ongoing Middle East transit concerns",
+      "citation": "USMarkets.nl / Bloomberg Nov 24, 2026"
     }
   ],
-  "indicesNarrative": "A distinct rotation is unfolding as tech-heavy benchmarks (QQQ, SPY) face headwinds from semiconductor volatility and multiple downgrades on Nvidia. Concurrently, the Dow (DIA) and equal-weight indices show relative resilience, indicating internal capital reallocation rather than an outright liquidity collapse.",
+  "indicesNarrative": "A massive divergence defined the session: mega-cap tech and semiconductor momentum evaporated (QQQ -1.99%, SMH -7.26%), while equal-weight and value-oriented segments held positive territory (RSP +0.54%, DIA +0.79%). Asia had rallied overnight following Huang's return to Nvidia, but European indices softened and US markets rapidly gave up ground as questions over long-term AI hardware spending and regulatory scrutiny resurfaced.",
   "technicals": {},
-  "technicalsNarrative": "Per-index daily technical bar calculations were not supplied in the automated feed. However, high-beta tech indices remain susceptible to multi-session consolidation following failed breakout momentum, making fresh momentum entries in tech risky until bases form.",
+  "technicalsNarrative": "Technicals reflect significant breadth divergence across major indexes. While QQQ and SMH suffer severe short-term breakdown momentum following failed relief pops, RSP and DIA show stabilization near short-term support bands, creating a bifurcated market where momentum entries in tech remain hazardous while defensive pivots offer tight risk.",
   "sectorsThemes": [
     {
-      "symbol": "XLE",
-      "name": "Energy",
-      "changePct": 1.69,
+      "symbol": "XLK",
+      "name": "Technology",
+      "changePct": -3.26,
       "rs": 5,
-      "note": "Leading daily sector gainers amidst geopolitical firmness in crude"
+      "note": "Severe distribution led by semiconductor hardware and memory weakness"
     },
     {
-      "symbol": "XLU",
-      "name": "Utilities",
-      "changePct": 0.19,
-      "rs": 75,
-      "note": "Defensive safe haven finding modest net accumulation"
-    },
-    {
-      "symbol": "XLRE",
-      "name": "Real Estate",
-      "changePct": -0.19,
-      "rs": 90,
-      "note": "Holding up relatively well despite yield firmness"
-    },
-    {
-      "symbol": "XLP",
-      "name": "Consumer Staples",
-      "changePct": -0.24,
-      "rs": 75,
-      "note": "Muted daily pullback with strong 20-day trend structure"
-    },
-    {
-      "symbol": "XLY",
-      "name": "Consumer Discretionary",
-      "changePct": -0.33,
-      "rs": 90,
-      "note": "Outperforming broader market on 20-day RS leadership"
+      "symbol": "SMH",
+      "name": "Semiconductors",
+      "changePct": -7.26,
+      "rs": 20,
+      "note": "Heavy sell-off resuming after Monday's violent short-squeeze"
     },
     {
       "symbol": "XLV",
       "name": "Health Care",
-      "changePct": -0.34,
-      "rs": 75,
-      "note": "Defensive anchor showing steady RS persistence"
+      "changePct": 2.95,
+      "rs": 90,
+      "note": "Top performing sector on pharma M&A headlines and defensive inflow"
+    },
+    {
+      "symbol": "XLP",
+      "name": "Consumer Staples",
+      "changePct": 1.66,
+      "rs": 95,
+      "note": "Classic flight-to-safety bid leading the 20-day trend"
+    },
+    {
+      "symbol": "XLRE",
+      "name": "Real Estate",
+      "changePct": 1.31,
+      "rs": 95,
+      "note": "Yield-sensitive play finding buyers as 10-year yield consolidates"
     },
     {
       "symbol": "XLF",
       "name": "Financials",
-      "changePct": -0.55,
+      "changePct": 0.83,
       "rs": 80,
-      "note": "Mild retracement after strong multi-week outperformance"
+      "note": "Solid resilience supported by stable net interest margins"
     },
     {
-      "symbol": "XLK",
-      "name": "Technology",
-      "changePct": -0.69,
-      "rs": 10,
-      "note": "Lagging with weakest RS score on hardware overhang"
+      "symbol": "XLE",
+      "name": "Energy",
+      "changePct": 0.97,
+      "rs": 5,
+      "note": "Bouncing modestly from deeply oversold levels"
     },
     {
       "symbol": "XLI",
       "name": "Industrials",
-      "changePct": -0.70,
+      "changePct": -0.53,
+      "rs": 90,
+      "note": "Moderate pullback dragged by heavy machinery and AI infrastructure suppliers"
+    },
+    {
+      "symbol": "XBI",
+      "name": "Biotech",
+      "changePct": 6.56,
       "rs": 100,
-      "note": "High RS leader consolidating near upper band"
-    },
-    {
-      "symbol": "XLC",
-      "name": "Communication Services",
-      "changePct": -0.81,
-      "rs": 40,
-      "note": "Soft daily session weighed down by digital ad bellwethers"
-    },
-    {
-      "symbol": "XLB",
-      "name": "Materials",
-      "changePct": -1.06,
-      "rs": 60,
-      "note": "Cyclical pullback tracking broad commodity softness"
+      "note": "Explosive risk-on move triggered by multi-billion dollar M&A buyout deals"
     }
   ],
-  "sectorsNarrative": "Capital is actively rotating out of extended technology (XLK) and materials (XLB) into energy (XLE) and defensive staples/utilities (XLU, XLP). Financials and consumer discretionary retain the healthiest 20-day relative strength profiles.",
-  "industryNarrative": "Airlines (JETS) and select clean-energy names demonstrate medium-term accumulation, whereas crypto miners (WGMI), cannabis (MSOS), and rare earth minerals (REMX) remain the sharpest laggards.",
+  "sectorsNarrative": "Capital made a dramatic tactical flight from growth/AI tech into defensive safe havens (XLV +2.95%, XLP +1.66%, XLRE +1.31%). The tech complex (XLK -3.26%) saw aggressive unwinding once the initial relief burst cleared out.",
+  "industryNarrative": "Biotechnology (XBI +6.56%, IBB +5.17%) and retail discount stores exploded higher on acquisition activity and strong earnings reports, standing in stark contrast to Semiconductors (SMH -7.26%) and Bitcoin mining proxies (WGMI -8.28%) which took the brunt of institutional de-risking.",
   "industryMovers": [
     {
-      "industry": "Aerospace & Defense",
-      "sector": "Industrials",
-      "changePct": 3.8,
-      "perf1W": 5.2,
-      "perf1M": 8.4,
-      "breadthPct": 68.0,
-      "deltaWow": 2.4,
+      "industry": "Biotechnology & Pharmaceuticals",
+      "sector": "Health Care",
+      "changePct": 6.56,
+      "perf1W": 7.94,
+      "perf1M": 1.28,
+      "breadthPct": 85.0,
+      "deltaWow": 6.8,
       "leaders": [
         {
-          "ticker": "LUNR",
-          "changePct": 10.43,
-          "rvol": 2.56,
-          "source": "TradingView Screener"
+          "ticker": "INSM",
+          "changePct": 14.13,
+          "rvol": 19.44,
+          "source": "TradingView Top Gainer"
         },
         {
-          "ticker": "AVEX",
-          "changePct": 15.42,
-          "rvol": 2.92,
-          "source": "TradingView Screener"
+          "ticker": "KYMR",
+          "changePct": 15.66,
+          "rvol": 4.24,
+          "source": "TradingView Top Gainer"
         }
       ],
-      "note": "Strong procurement flows and contract wins fueling relative strength"
+      "note": "Ignited by mega-cap pharma M&A (Sanofi buyout proposal of Insmed for $41B) sparking widespread sector re-pricing."
     },
     {
-      "industry": "Airlines",
-      "sector": "Industrials",
-      "changePct": -3.64,
-      "perf1W": 2.57,
-      "perf1M": 9.53,
-      "breadthPct": 60.0,
-      "deltaWow": -1.2,
+      "industry": "Semiconductors",
+      "sector": "Technology",
+      "changePct": -7.26,
+      "perf1W": -7.25,
+      "perf1M": -23.52,
+      "breadthPct": 12.0,
+      "deltaWow": -5.4,
       "leaders": [
         {
-          "ticker": "JETS",
-          "changePct": -3.64,
-          "rvol": 1.1,
-          "source": "Snapshot ETF"
+          "ticker": "MU",
+          "changePct": -10.87,
+          "rvol": 1.10,
+          "source": "MarketBeat / TipRanks"
         }
       ],
-      "note": "Healthy multi-week pullback consolidation after strong monthly thrust"
+      "note": "Severe digestion of prior gains compounded by Wall Street memory oversupply downgrades."
     }
   ],
   "movers": [
     {
-      "ticker": "PLCE",
+      "ticker": "INSM",
       "side": "LONG",
-      "changePct": 263.6,
-      "why": "Massive retail short-squeeze momentum and heavy turnover spike",
-      "traderLens": "Qullamaggie (High-volume momentum spike; avoid chasing extended entries)"
+      "changePct": 14.13,
+      "why": "Sanofi announced a $41B cash buyout offer, sparking massive volume and valuation lift across biopharma",
+      "traderLens": "Qullamaggie / Buyout Arb — Episodic buyout gap, trade strictly on merger spread parameters"
     },
     {
-      "ticker": "AVEX",
+      "ticker": "AMTM",
       "side": "LONG",
-      "changePct": 15.42,
-      "why": "Defense contracting momentum and pre-market volume surge",
-      "traderLens": "Minervini (Stage 2 expansion candidate, wait for consolidation base)"
+      "changePct": 20.10,
+      "why": "Heavy aerospace/defense contract momentum and institutional breakout on 6.4x relative volume",
+      "traderLens": "Minervini / Qullamaggie — High RVOL Stage 2 momentum breakout from consolidation"
     },
     {
-      "ticker": "LUNR",
+      "ticker": "ANF",
       "side": "LONG",
-      "changePct": 10.43,
-      "why": "Sustained government contract wins and space infrastructure optimism",
-      "traderLens": "Qullamaggie (Episodic pivot continuation; trail against prior low)"
+      "changePct": 19.69,
+      "why": "Massive holiday earnings beat and upbeat guidance prompting aggressive short covering",
+      "traderLens": "Qullamaggie — Clean Episodic Pivot (EP) gap on multi-month volume high"
     },
     {
-      "ticker": "TTEK",
+      "ticker": "DLTR",
       "side": "LONG",
-      "changePct": 4.99,
-      "why": "Post-earnings follow-through and infrastructure contract backlogs",
-      "traderLens": "SRxTrades (Orderly volume expansion on multi-month breakout retest)"
+      "changePct": 11.18,
+      "why": "Earnings beat and strong comp-store sales driving discount retail turnaround thesis",
+      "traderLens": "Minervini — Turnaround base breakout reclaiming major moving averages"
     },
     {
-      "ticker": "AMD",
+      "ticker": "DKS",
       "side": "LONG",
-      "changePct": 2.75,
-      "why": "Upgraded to Outperform at William Blair highlighting server market share gains",
-      "traderLens": "Ted Zhang (Capital rotation within semis away from NVDA to AMD)"
+      "changePct": 14.59,
+      "why": "Raised annual profit guidance and robust back-to-school/holiday athletic demand",
+      "traderLens": "SRxTrades — Volume-confirmed trend-reclaim pivot with defined structural support"
     },
     {
-      "ticker": "NVDA",
+      "ticker": "MU",
       "side": "SHORT",
-      "changePct": -7.16,
-      "why": "Governance overhang regarding board review alongside multi-analyst downgrades",
-      "traderLens": "Jeff (Respect hard stops; failure of key support invalidates longs)"
+      "changePct": -10.87,
+      "why": "BNP Paribas Exane downgraded to Neutral with target slashed 54% citing memory oversupply risks",
+      "traderLens": "Clement Ang — Severe distribution bar through key supports; avoid bottom-fishing"
     },
     {
-      "ticker": "CRWV",
+      "ticker": "VRT",
       "side": "SHORT",
-      "changePct": -7.37,
-      "why": "Sympathy selloff with AI computing peers and post-earnings profit-taking",
-      "traderLens": "Clement Ang (Avoid bottom-fishing broken episodic gap setups)"
+      "changePct": -6.80,
+      "why": "Baird downgraded to Neutral, citing valuation and cooling data-center hardware multiple expansion",
+      "traderLens": "Jeff — Hard stop discipline required; Stage 3 distribution breaking moving average support"
     },
     {
-      "ticker": "PSFE",
+      "ticker": "MDT",
       "side": "SHORT",
-      "changePct": -33.28,
-      "why": "Q3 top-line miss and sharp downward revision in forward EBITDA guidance",
-      "traderLens": "Jeff (Clear distribution gap down; strictly avoid)"
+      "changePct": -4.56,
+      "why": "Q2 earnings report showed margin compression despite in-line headline revenue",
+      "traderLens": "Minervini — Gap down below 50-day moving average on 3x volume; setup broken"
     }
   ],
   "watchlist": [
     {
       "ticker": "NVDA",
-      "level": 161.29,
-      "changePct": -7.16,
+      "level": null,
+      "changePct": -7.32,
       "abc": "C",
-      "note": "Heavy distribution below key technical moving averages; step aside"
-    },
-    {
-      "ticker": "AMD",
-      "level": 568.12,
-      "changePct": 2.75,
-      "abc": "A",
-      "note": "Upgraded at William Blair; showing relative strength within tech cohort"
+      "note": "Gave back a portion of the +31.5% Huang reinstatement gap; high headline and political overhang"
     },
     {
       "ticker": "TSLA",
       "level": null,
-      "changePct": null,
-      "abc": "B",
-      "note": "Consolidating recent gains; monitor $200-$210 support level"
+      "changePct": -2.10,
+      "abc": "C",
+      "note": "Drifting lower in sympathy with broad tech; awaiting catalysts around SpaceX board collaboration"
     },
     {
       "ticker": "AAPL",
       "level": null,
-      "changePct": null,
+      "changePct": -0.80,
       "abc": "B",
-      "note": "Range-bound; acting as defensive tech sanctuary"
+      "note": "Displaying relative resilience compared to pure semiconductor names; holding support"
     },
     {
       "ticker": "MSFT",
       "level": null,
-      "changePct": null,
-      "abc": "B",
-      "note": "Holding key structural support amidst broader software resilience"
+      "changePct": -1.40,
+      "abc": "C",
+      "note": "Pressure across software and cloud capex peers capping upside momentum"
     },
     {
       "ticker": "AMZN",
       "level": null,
-      "changePct": null,
+      "changePct": 0.40,
       "abc": "B",
-      "note": "Forming high-level consolidation base above 50-day average"
+      "note": "Supported by holiday consumer spending optimism; testing 21-day EMA"
     },
     {
       "ticker": "META",
       "level": null,
-      "changePct": null,
+      "changePct": -1.15,
       "abc": "B",
-      "note": "Testing ascending 21 EMA; watch for volume-backed reclaim"
+      "note": "Consolidating within broader trading range; volume contracting favorably"
     },
     {
       "ticker": "GOOGL",
       "level": null,
-      "changePct": null,
+      "changePct": -0.90,
       "abc": "B",
-      "note": "Choppy base structure; waiting for decisive range expansion"
+      "note": "Relative strength in mega-cap cloud; digesting direct HBM procurement reports"
+    },
+    {
+      "ticker": "AMD",
+      "level": null,
+      "changePct": -6.20,
+      "abc": "C",
+      "note": "Dragged lower by broader semiconductor multiple derating; lost short-term pivot"
     },
     {
       "ticker": "SMCI",
       "level": null,
-      "changePct": null,
+      "changePct": -8.50,
       "abc": "C",
-      "note": "Elevated volatility and sector headline headwinds; avoid"
+      "note": "Elevated governance and reporting headwinds; high intraday volatility"
     },
     {
       "ticker": "PLTR",
       "level": null,
-      "changePct": null,
+      "changePct": -3.40,
       "abc": "B",
-      "note": "Defending multi-week breakout level on steady institutional volume"
+      "note": "Pullback into 21 EMA support on lower relative volume; watch for bounce confirmation"
     },
     {
       "ticker": "CRWD",
       "level": null,
-      "changePct": null,
+      "changePct": -1.80,
       "abc": "B",
-      "note": "Cybersecurity sector showing relative isolation from hardware chop"
+      "note": "Digesting earnings release; cybersecurity thematic bid maintaining base floor"
     },
     {
       "ticker": "MSTR",
       "level": null,
-      "changePct": null,
+      "changePct": -4.20,
       "abc": "C",
-      "note": "Pressured by weakness in underlying spot crypto assets (IBIT -4.4%)"
+      "note": "Bitcoin weakness below $61K weighing heavily on treasury proxy valuation"
     }
   ],
   "traderLens": [
     {
       "name": "Minervini",
-      "view": "Do not fight market distribution in premier market leaders. When previous market drivers crack key technical moving averages on heavy volume, progressive exposure rules dictate standing aside."
+      "view": "Market breadth is heavily fragmented with only 31.6% above the 200 SMA. Tech leadership is broken; focus strictly on non-tech Stage 2 leaders showing tight consolidation near highs."
     },
     {
       "name": "Ted Zhang",
-      "view": "Clear institutional rotation out of megacap semiconductors into defensive industrials, aerospace, and energy. Capital isn't leaving equities entirely; it is dispersing to non-tech pockets."
+      "view": "Clear institutional capital rotation out of high-beta AI semiconductors and into defensive healthcare (XLV), consumer staples, and retail earners."
     },
     {
       "name": "Clement Ang",
-      "view": "Market context is choppy to risk-off in tech. Setup grades for growth names degrade to C; sit tight and wait for higher-probability conditions to re-emerge."
+      "view": "Market posture is unconfirmed. The violent whipsaw between Monday's tech pop and Tuesday's drop warrants waiting on the sidelines for proper base building."
     },
     {
       "name": "SRxTrades",
-      "view": "Avoid catching falling knives on pre-market gaps. Wait for the opening range to establish and look for volume dry-ups on pullbacks before considering entries."
+      "view": "Do not chase post-earnings retail or biopharma gaps blindly. Let the first 30-minute range establish clean support and volume pivots before entering."
     },
     {
       "name": "Jeff",
-      "view": "Discipline rule: Never average down on a breaking leader. Keep stops mechanical and honor risk budgets strictly."
+      "view": "Protect capital aggressively. Fear & Greed at 17 and VIX elevated means whipsaw stops will get hit easily. Keep position sizing small and respect initial stops."
     },
     {
       "name": "Qullamaggie",
-      "view": "Episodic pivots in defense (LUNR, AVEX) offer isolated momentum, but watch overall tape pressure. If market breadth drags, even good breakouts can fail."
+      "view": "ANF and DKS provided classic Episodic Pivot setups on volume. However, overall market environment lacks strong high-tight flag breakouts; take profits quickly into strength."
     },
     {
       "name": "Composite",
-      "view": "Adopt a WAIT posture. Maintain low exposure, preserve cash, avoid chasing semiconductor dip-buys, and focus selective attention exclusively on names showing strong relative strength."
+      "view": "Synthesised posture: RAISE-THE-BAR. Avoid broad tech and semiconductor dips. Restrict new long exposure to source-confirmed retail/defense momentum setups with tight stops, keeping cash levels high."
     }
   ],
   "standout": {
-    "ticker": "AMD",
+    "ticker": "ANF",
     "side": "LONG",
-    "score": 74,
-    "sector": "Semiconductors",
-    "rs": 75,
+    "score": 78,
+    "sector": "Retail / Consumer Discretionary",
+    "rs": 95,
     "grade": "B",
-    "thesis": "Bucking severe semiconductor group weakness following an upgrade to Outperform from William Blair, presenting a counter-trend relative strength pivot setup.",
-    "entry": 568.5,
-    "stop": 548.0,
-    "target": 615.0,
-    "rrr": 2.27,
-    "tags": ["#relative-strength", "#analyst-upgrade", "#counter-trend"]
+    "thesis": "High-conviction Episodic Pivot following a blowout Q3 earnings beat and raised annual guidance, supported by 4.27x relative volume and short-covering momentum.",
+    "entry": 168.50,
+    "stop": 158.00,
+    "target": 189.00,
+    "rrr": 1.95,
+    "tags": [
+      "#earnings-pivot",
+      "#relative-strength"
+    ]
   },
   "earnings": {
     "bmo": [
       {
-        "ticker": "BN",
-        "consensus": "EPS $0.84 / Rev $24.1B"
+        "ticker": "ADI",
+        "consensus": "EPS est $3.90 / Rev $4.33B"
+      },
+      {
+        "ticker": "MDT",
+        "consensus": "EPS est $1.34 / Rev $9.48B"
+      },
+      {
+        "ticker": "DLTR",
+        "consensus": "EPS est $0.93 / Rev $5.00B"
+      },
+      {
+        "ticker": "DKS",
+        "consensus": "EPS est beat / raised full-year profit target"
       }
     ],
     "amc": [
       {
-        "ticker": "CSCO",
-        "consensus": "EPS $0.87 / Rev $13.77B"
+        "ticker": "DELL",
+        "consensus": "EPS est $6.62 / Rev $49.32B"
       },
       {
-        "ticker": "AMAT",
-        "consensus": "EPS $2.19 / Rev $6.97B"
+        "ticker": "WDAY",
+        "consensus": "EPS est $2.74 / Rev $2.70B"
       },
       {
-        "ticker": "NBIS",
-        "consensus": "EPS -$0.12 / Rev $82M"
+        "ticker": "ADSK",
+        "consensus": "EPS est $3.07 / Rev $2.10B"
+      },
+      {
+        "ticker": "HPQ",
+        "consensus": "EPS est $0.75 / Rev $15.40B"
       }
     ],
     "yesterdayReactions": [
       {
-        "ticker": "CRWV",
-        "result": "beat Q3 expectations and raised guidance",
-        "movePct": 24.0
+        "ticker": "CRWD",
+        "result": "EPS beat $0.31 vs consensus, rev $1.53B",
+        "movePct": -1.8
+      },
+      {
+        "ticker": "HPE",
+        "result": "EPS beat $1.28, margin outlook cautious",
+        "movePct": -12.0
       }
     ]
   },
   "calendar": [
     {
       "time": "08:30 ET",
-      "name": "Initial Jobless Claims",
-      "consensus": "195K (Actual 200K)"
+      "name": "US Retail Sales / Fed Beige Book prep",
+      "consensus": "0.2% MoM"
     },
     {
       "time": "10:00 ET",
-      "name": "Existing Home Sales",
-      "consensus": "3.89M"
+      "name": "US Consumer Confidence",
+      "consensus": "104.2"
     },
     {
-      "time": "10:00 ET",
-      "name": "Fed Vice Chair Michael Barr Speaks",
-      "consensus": null
-    },
-    {
-      "time": "12:00 ET",
-      "name": "EIA Crude Oil Inventories",
-      "consensus": "-0.600M"
+      "time": "Wednesday 08:30 ET",
+      "name": "PCE Price Index (Fed Preferred Inflation)",
+      "consensus": "Core PCE 0.2% MoM / 2.7% YoY"
     }
   ],
   "ratings": {
     "upgrades": [
       {
-        "ticker": "AMD",
-        "firm": "William Blair",
+        "ticker": "NVDA",
+        "firm": "Bernstein",
         "rating": "Outperform",
-        "pt": null
+        "pt": 240
       },
       {
-        "ticker": "BABA",
-        "firm": "DZ Bank",
-        "rating": "Buy",
-        "pt": 140
+        "ticker": "NVDA",
+        "firm": "Oppenheimer",
+        "rating": "Outperform",
+        "pt": 250
       },
       {
-        "ticker": "RS",
-        "firm": "Barclays",
-        "rating": "Overweight",
-        "pt": 507
+        "ticker": "TTWO",
+        "firm": "BMO Capital",
+        "rating": "Outperform",
+        "pt": 285
       }
     ],
     "downgrades": [
       {
-        "ticker": "NVDA",
-        "firm": "Bernstein",
-        "rating": "Market Perform",
-        "pt": null
+        "ticker": "MU",
+        "firm": "BNP Paribas Exane",
+        "rating": "Neutral",
+        "pt": 775
       },
       {
-        "ticker": "NVDA",
-        "firm": "Evercore ISI",
-        "rating": "In Line",
-        "pt": null
+        "ticker": "VRT",
+        "firm": "Robert W. Baird",
+        "rating": "Neutral",
+        "pt": 200
       },
       {
-        "ticker": "NVDA",
-        "firm": "Melius",
+        "ticker": "INSM",
+        "firm": "Stifel",
         "rating": "Hold",
-        "pt": 185
+        "pt": 195
       }
     ]
   },
-  "alert": "Nvidia pre-market drop (-7.2%) and wave of downgrades weighing on tech; keep risk tight and defer aggressive long exposure.",
+  "alert": "Aggressive rotation underway: semiconductor momentum broke down as post-reinstatement euphoria faded. Avoid chasing tech; focus on disciplined setups in retail, defense, and healthcare.",
   "news": [
     {
-      "headline": "Nvidia shares slide over 7% pre-market amid reports of board governance review and analyst downgrades",
+      "headline": "Jensen Huang's Nvidia return rally cools as Wall Street questions governance and long-term AI capex",
       "impact": "HIGH",
-      "tickers": ["NVDA", "QQQ", "SMH"],
-      "source": "Barchart 09:00 ET — https://www.barchart.com/story/news/nasdaq-futures-plunge-as-nvidia-crisis-hits-ai-trade",
-      "time": "07:30 ET"
+      "tickers": [
+        "NVDA",
+        "QQQ",
+        "SMH"
+      ],
+      "source": "Reuters 08:15 ET — https://www.reuters.com/technology/nvidia-ceo-reinstatement-fallout-2026-11-24/",
+      "time": "08:15 ET"
     },
     {
-      "headline": "US initial jobless claims climb to 200,000, topping consensus forecasts of 195,000",
-      "impact": "MED",
-      "tickers": ["SPY", "TLT"],
-      "source": "RTTNews 08:34 ET — https://www.rttnews.com/economic-calendar/november-12-2026/jobless-claims",
-      "time": "08:34 ET"
+      "headline": "Sanofi announces $41 billion acquisition of Insmed to expand rare respiratory pipeline",
+      "impact": "HIGH",
+      "tickers": [
+        "INSM",
+        "XBI",
+        "XLV"
+      ],
+      "source": "Investing.com 07:45 ET — https://www.investing.com/news/stock-market-news/insmed-sanofi-deal-2026-11-24/",
+      "time": "07:45 ET"
     },
     {
-      "headline": "Asian equities slip as Hang Seng falls 1.46% and Nikkei drops 0.99% on global semiconductor jitters",
-      "impact": "MED",
-      "tickers": ["EEM", "QQQ"],
-      "source": "India Infoline 08:00 ET — https://www.indiainfoline.com/markets/nifty-ends-nov-12-2026",
-      "time": "06:30 ET"
+      "headline": "US 10-year Treasury yield edges down to 4.91% ahead of key PCE inflation data",
+      "impact": "HIGH",
+      "tickers": [
+        "TLT",
+        "SPY"
+      ],
+      "source": "Reuters 08:00 ET — https://www.reuters.com/markets/rates-bonds/global-yields-fall-safe-haven-bid-2026-11-24/",
+      "time": "08:00 ET"
     },
     {
-      "headline": "William Blair upgrades AMD to Outperform citing datacenter traction amid competitor turbulence",
+      "headline": "Micron drops 11% after BNP Paribas slashes price target by 54% on memory oversupply concerns",
       "impact": "MED",
-      "tickers": ["AMD", "NVDA"],
-      "source": "Benzinga 06:30 ET — https://www.benzinga.com/analyst-ratings/upgrades/26/11/amd-analyst-upgrade",
-      "time": "06:30 ET"
+      "tickers": [
+        "MU",
+        "SMH"
+      ],
+      "source": "MarketBeat 11:30 ET — https://www.marketbeat.com/originals/micron-technology-downgrade-bnp-paribas-2026-11-24/",
+      "time": "11:30 ET"
+    },
+    {
+      "headline": "Retailers Dick's Sporting Goods and Best Buy surge after boosting annual guidance",
+      "impact": "MED",
+      "tickers": [
+        "DKS",
+        "BBY",
+        "XLY"
+      ],
+      "source": "The Washington Post 07:19 ET — https://www.washingtonpost.com/business/2026/11/24/retail-earnings-dks-bby-guidance/",
+      "time": "07:19 ET"
     }
   ],
   "screenerScores": {},
   "citations": [
-    "Upstox 07:00 ET — Dow futures flat, S&P 500, Nasdaq futures tank amid Nvidia leadership concerns",
-    "Barchart 09:00 ET — Nasdaq Futures Plunge as Nvidia Crisis Hits AI Trade",
-    "Benzinga 06:30 ET — This AMD Analyst Turns Bullish; Top Upgrades For Thursday",
-    "Daily Trade Alert 07:00 ET — Analyst Upgrades and Downgrades for Thursday, 11/12",
-    "Markets Insider 09:48 ET — Premarket Futures and Commodity Quotes",
-    "Trading Economics / RTTNews 08:34 ET — US Initial Jobless Claims Report",
-    "India Infoline 08:00 ET — Global and Asian Market Summary November 12, 2026"
+    "Washington Post 07:19 ET — U.S. futures, European markets fade following Nvidia rally",
+    "Reuters 08:00 ET — US futures, European stocks slip as Nvidia rally cools; global bond yields",
+    "AP News 16:13 ET — Drops for Nvidia and AI stocks drag market lower; Dow rallies",
+    "TheStreet Pro / EarningsWhispers Nov 24, 2026 — Corporate earnings schedule (DELL, ADI, MDT, DKS)",
+    "TipRanks / MarketBeat Nov 24, 2026 — Analyst rating actions on MU, VRT, and NVDA"
   ]
 }
