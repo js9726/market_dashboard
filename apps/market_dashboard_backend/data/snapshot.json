@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-11-24T01:10:57.521235Z",
+  "built_at": "2026-11-24T01:37:33.626130Z",
   "groups": {
     "Indices": [
       {
@@ -440,19 +440,19 @@
       },
       {
         "ticker": "KCE",
-        "daily": 3.59,
-        "intra": 0.4,
-        "5d": -4.43,
-        "20d": -2.19,
-        "atr_pct": 2.3,
-        "dist_sma50_atr": -1.49,
+        "daily": -3.09,
+        "intra": -2.59,
+        "5d": -9.31,
+        "20d": null,
+        "atr_pct": 2.2,
+        "dist_sma50_atr": -3.1,
         "rs": 100.0,
         "rs_chart": "data/charts/KCE.png",
         "long": [],
         "short": [],
         "abc": "C",
-        "rvol": 2.48,
-        "off_52w_high_pct": -12.46
+        "rvol": 2.0,
+        "off_52w_high_pct": -15.49
       },
       {
         "ticker": "IBUY",
@@ -2170,7 +2170,7 @@
     "Industries": {
       "daily": [
         -14.35,
-        3.59
+        2.92
       ],
       "intra": [
         -11.47,
@@ -2181,8 +2181,8 @@
         4.04
       ],
       "20d": [
-        -2.19,
-        -2.19
+        -30,
+        30
       ]
     },
     "Countries": {
